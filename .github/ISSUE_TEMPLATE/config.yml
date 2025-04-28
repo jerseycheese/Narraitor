@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: NarrAItor Documentation
+    url: https://github.com/jerseycheese/narraitor/tree/main/docs
+    about: Check the documentation for information about NarrAItor.
