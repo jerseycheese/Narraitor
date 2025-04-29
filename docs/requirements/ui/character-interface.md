@@ -1,0 +1,95 @@
+---
+title: Character Interface Requirements
+aliases: [Character UI Requirements]
+tags: [narraitor, requirements, ui, character-interface]
+created: 2025-04-29
+updated: 2025-04-29
+---
+
+# Character Interface Requirements
+
+## Overview
+The Character Interface provides the user-facing components for creating, viewing, and managing player characters in NarrAItor. It includes interfaces for character creation, attribute and skill assignment, character description, and character selection.
+
+## Core Functionality
+- **Character Creation Wizard**: Step-by-step interface for creating new characters
+- **Character Listing**: View and select from available characters
+- **Character Sheet**: View detailed character information
+- **Attribute Assignment**: Interface for allocating attribute points
+- **Skill Assignment**: Interface for selecting and rating skills
+- **Character Description**: Input fields for appearance and personality
+- **Character Selection**: Choose a character for play
+
+## UI Components
+
+### Core Components
+- **CharacterList**: Displays available characters with basic information
+- **CharacterCreationWizard**: Multi-step wizard for character creation
+- **CharacterSheet**: Comprehensive view of character details
+- **AttributeAssignment**: Component for allocating attribute points
+- **SkillAssignment**: Component for selecting and rating skills
+- **CharacterDescription**: Text input fields for descriptive content
+- **CharacterPortrait**: Optional placeholder for character image
+- **DeleteCharacterDialog**: Confirmation dialog for character deletion
+
+## User Interactions
+- Users navigate a multi-step wizard to create new characters
+- Users allocate attribute points within the constraints of the world
+- Users select and rate skills based on world definitions
+- Users input descriptive text for character appearance and personality
+- Users view a list of existing characters with basic information
+- Users select characters for play sessions
+- Users view detailed character information on the character sheet
+- Users delete unwanted characters with confirmation
+
+## Integration Points
+- **Character System**: Connects UI to character data and operations
+- **World System**: Uses world configuration for attributes and skills
+- **State Management**: Persists UI state during wizard steps
+- **Narrative Engine**: Provides character context for narrative generation
+
+## MVP Scope Boundaries
+
+### Included
+- Basic character creation wizard with essential steps
+- Simple list view of available characters
+- Comprehensive character sheet display
+- Attribute point allocation interface
+- Skill selection and rating interface
+- Text fields for character description
+- Basic character selection functionality
+
+### Excluded
+- AI-generated character portraits
+- Character advancement interface
+- Equipment management interface
+- Character relationship visualization
+- Character history tracking
+- Advanced character searching and filtering
+- Drag-and-drop skill organization
+- Rich text formatting for descriptions
+
+## Acceptance Criteria
+1. Users can complete the character creation process without confusion
+2. Character creation enforces the rules of the selected world
+3. Character sheet displays all relevant character information
+4. Attribute allocation respects minimum and maximum values
+5. Skill selection and rating interface is intuitive
+6. Character listing shows essential information for selection
+7. The interface adapts responsively to different screen sizes
+
+## GitHub Issues
+- [Create CharacterList component] - Link to GitHub issue
+- [Implement CharacterCreationWizard component] - Link to GitHub issue
+- [Build CharacterSheet component] - Link to GitHub issue
+- [Develop AttributeAssignment component] - Link to GitHub issue
+- [Create SkillAssignment component] - Link to GitHub issue
+- [Implement CharacterDescription component] - Link to GitHub issue
+- [Build DeleteCharacterDialog component] - Link to GitHub issue
+
+## Status
+- [x] Requirements defined
+- [ ] GitHub issues created
+- [ ] Implementation started
+- [ ] Implementation completed
+- [ ] Acceptance criteria met

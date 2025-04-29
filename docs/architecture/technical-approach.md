@@ -3,7 +3,7 @@ title: Technical Approach
 aliases: [Tech Stack, Technical Strategy]
 tags: [narraitor, documentation, architecture, technology]
 created: 2025-04-28
-updated: 2025-04-28
+updated: 2025-04-29
 ---
 
 # Technical Approach
@@ -96,6 +96,8 @@ Implementation follows a strict TDD approach:
 2. Implement minimal code to pass tests
 3. Refactor for clarity and maintainability
 4. Repeat for each feature
+5. Create flow diagrams before implementation
+6. Maintain high test coverage for critical paths
 
 ### KISS (Keep It Simple, Stupid)
 
@@ -105,6 +107,8 @@ The codebase follows KISS principles:
 3. Maintain readability over cleverness
 4. Break complex problems into simple parts
 5. Use standard patterns where possible
+6. Focus on core functionality first
+7. Implement only what's necessary for the current iteration
 
 ### Component-First Development
 
@@ -132,6 +136,34 @@ Code quality is maintained through:
 4. Clear separation of concerns
 5. Consistent formatting with Prettier
 6. Linting with ESLint
+
+## Code Organization and Structure
+
+### File Size Limits
+- **Component files**: Maximum 300 lines
+- **Utility files**: Maximum 200 lines
+- **Hook files**: Maximum 150 lines
+- **Type definition files**: Maximum 200 lines
+
+### Domain-Based Organization
+- Group related files by business domain rather than technical type
+- Keep related functionality together (types, components, hooks, utilities)
+- Use clear, descriptive naming conventions
+- Use domain-driven design principles consistently
+
+### Separation of Concerns
+- Each file should have a single, clear responsibility
+- Split complex components into smaller, focused ones
+- Extract reusable logic into custom hooks
+- Move utility functions to dedicated files
+- Maintain clear boundaries between domains
+
+### Module Dependencies
+- Strive for unidirectional dependencies between modules
+- Avoid circular dependencies
+- Use dependency injection where appropriate
+- Create clear abstractions for external services
+- Document integration points between systems
 
 ## Folder Structure Rationale
 
@@ -162,13 +194,36 @@ This structure provides:
 
 ## Performance Considerations
 
-The application prioritizes performance through:
-1. Server components for static content
-2. Client components only where interactivity is needed
-3. Memoization for expensive calculations
-4. Efficient state updates with immutable patterns
-5. Throttled persistence to prevent UI blocking
-6. Image and asset optimization
+### State Management Optimization
+- Use memoization (useMemo, useCallback) for expensive calculations
+- Implement proper dependency arrays in useEffect and memo hooks
+- Split global state into domain-specific contexts to minimize re-renders
+- Leverage React.memo for pure components that render often
+- Consider state compression for efficient storage
+- Implement batch processing for journal entries
+
+### UI Performance
+- Implement virtualization for large lists (react-window)
+- Optimize image loading and display
+- Use CSS transitions instead of JavaScript animations when possible
+- Defer non-critical rendering with suspense and lazy loading
+- Apply memoization for complex UI elements
+- Use virtualized components for large data sets
+- Implement lazy loading for historical content
+
+### Data Handling
+- Batch updates to minimize render cycles
+- Use efficient data structures for lookups (Maps, Sets)
+- Implement pagination for large datasets
+- Cache results of expensive operations
+- Optimize IndexedDB operations for local persistence
+- Implement efficient context window management for AI prompts
+
+### Application Responsiveness
+- Keep main thread clear with web workers for intensive operations
+- Break up long-running tasks into smaller chunks
+- Set up request priorities for network operations
+- Implement loading indicators and optimistic UI updates
 
 ## Security Considerations
 
