@@ -13,28 +13,59 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 <!-- Select the domain this user story belongs to -->
 - [ ] World Configuration
 - [ ] Character System
-- [ ] Decision Tracking System
-- [ ] Decision Relevance System
 - [ ] Narrative Engine
 - [ ] Journal System
 - [ ] State Management
+- [ ] AI Service Integration
+- [ ] Game Session UI
+- [ ] Utilities and Helpers
 - [ ] Other: _________
+
+## Acceptance Criteria
+<!-- List the specific, measurable conditions that must be met for this story to be considered complete -->
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
+
+## Technical Requirements
+<!-- List technical implementation details, constraints, or dependencies -->
+- 
+- 
+- 
+
+## Implementation Notes
+<!-- Add guidance on implementation approach, architecture considerations, etc. -->
+- 
+- 
+- 
+
+## Related Documentation
+<!-- Link to requirements documents and other references -->
+- 
+
+## Definition of Done
+- [ ] Code implemented following TDD approach
+- [ ] Unit tests cover all logic paths
+- [ ] Component has Storybook stories (if UI component)
+- [ ] Documentation updated
+- [ ] Passes accessibility standards (if applicable)
+- [ ] Responsive on all target devices (if UI component)
+- [ ] Code reviewed
+- [ ] Acceptance criteria verified
 
 ## Priority
 <!-- Select the priority level for this user story -->
 - [ ] High (MVP)
-- [ ] Medium
-- [ ] Low
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
 - [ ] Post-MVP
 
-## Acceptance Criteria
-<!-- List the conditions that must be met for this story to be considered complete -->
-1. 
-2. 
-3. 
-
-## Additional Context
-<!-- Add any other details about the user story here -->
+## Estimated Complexity
+<!-- Select the estimated complexity level -->
+- [ ] Small (1-2 days)
+- [ ] Medium (3-5 days)
+- [ ] Large (1+ week)
 
 ## Related Issues/Stories
 <!-- Link to any related issues or stories -->

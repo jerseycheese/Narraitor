@@ -19,19 +19,34 @@ The Narrative Engine is the core storytelling system in NarrAItor, responsible f
 - **Decision Impact**: Track the impact of player decisions on the narrative
 - **Scene Management**: Create and transition between narrative scenes
 - **Prompt Construction**: Build effective prompts for the AI service
+- **Context Optimization**: Optimize context to maintain token efficiency
+- **Error Handling**: Gracefully handle AI service failures
+- **NPC Interaction**: Enable dialogue with non-player characters
+- **Narrative Formatting**: Apply appropriate formatting to narrative text
+- **Fallback Content**: Provide pre-written content when AI fails
 
 ## Data Model
 
 ```typescript
 interface NarrativeState {
+  id: string;
+  worldId: string;
+  characterId: string;
   currentStoryPoint: StoryPoint | null;
   visitedPoints: string[];
   availableChoices: NarrativeChoice[];
-  narrativeHistory: string[];
+  narrativeHistory: NarrativeHistoryEntry[];
   narrativeContext: NarrativeContext;
   selectedChoice?: string;
   currentDecision?: PlayerDecision;
   error?: NarrativeErrorInfo | null;
+  activeNPCs?: NPC[];
+  currentLocation?: Location;
+  narrativeMode?: 'normal' | 'dialogue' | 'combat' | 'exploration';
+  lastRequestTimestamp?: number;
+  failedAttempts?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface StoryPoint {
@@ -40,6 +55,10 @@ interface StoryPoint {
   type: 'scene' | 'encounter' | 'dialogue';
   significance: 'major' | 'minor';
   timestamp: number;
+  formattedContent?: string;
+  location?: string;
+  involvedNPCs?: string[];
+  tags?: string[];
 }
 
 interface NarrativeChoice {
@@ -47,6 +66,12 @@ interface NarrativeChoice {
   text: string;
   impact?: string;
   tags: string[];
+  relatedAttributes?: string[];
+  relatedSkills?: string[];
+  difficulty?: number;
+  destination?: string;
+  visibility?: 'always' | 'conditional';
+  condition?: string;
 }
 
 interface PlayerDecision {
@@ -58,7 +83,19 @@ interface PlayerDecision {
     impact?: string;
     tags: string[];
   }[];
+  selectedOptionId?: string;
   timestamp: number;
+  location?: string;
+}
+
+interface NarrativeHistoryEntry {
+  id: string;
+  content: string;
+  type: 'narrative' | 'decision' | 'outcome' | 'system';
+  timestamp: number;
+  formattedContent?: string;
+  location?: string;
+  importance?: 'high' | 'medium' | 'low';
 }
 
 interface NarrativeContext {
@@ -68,6 +105,45 @@ interface NarrativeContext {
   recentEvents: string[];
   importantDecisions: PlayerDecision[];
   toneSettings: any; // From World Configuration
+  activeNPCs?: NPC[];
+  thematicElements?: string[];
+  narrativeGoals?: string[];
+  contextSize?: number;
+}
+
+interface NPC {
+  id: string;
+  name: string;
+  description: string;
+  role: string;
+  disposition: 'friendly' | 'neutral' | 'hostile';
+  traits: string[];
+  dialogue?: NPCDialogue[];
+}
+
+interface NPCDialogue {
+  id: string;
+  trigger: string;
+  content: string;
+  options?: NarrativeChoice[];
+}
+
+interface Location {
+  id: string;
+  name: string;
+  description: string;
+  connections: string[];
+  npcs?: string[];
+  initialPrompt?: string;
+}
+
+interface NarrativeErrorInfo {
+  code: string;
+  message: string;
+  recoverable: boolean;
+  timestamp: number;
+  attemptCount: number;
+  lastSuccessfulResponse?: string;
 }
 ```
 
@@ -78,6 +154,8 @@ interface NarrativeContext {
 - Users can review narrative history
 - Users engage in dialogue with non-player characters
 - Users navigate between different locations or scenes
+- Users receive feedback when choices align with character attributes/skills
+- Users view properly formatted narrative text with paragraphs and dialogue
 
 ## Integration Points
 - **World System**: Uses world configuration to inform narrative style and content
@@ -86,18 +164,50 @@ interface NarrativeContext {
 - **State Management**: Persists narrative state between sessions
 - **AI Service**: Generates narrative content through API integration
 - **Decision Tracking**: Records and references player choices
+- **Inventory System**: References character possessions in narrative (post-MVP)
+- **Location Service**: Manages narrative locations and transitions
 
 ## MVP Scope Boundaries
 
 ### Included
-- Basic narrative generation using AI service
-- Simple player choice presentation (3-5 options)
-- Essential context management for coherent storytelling
-- Basic history tracking of narrative content
-- Scene transitions based on player choices
-- World-appropriate tone and content
+- Narrative generation using Google Gemini API with the following capabilities:
+  - Generation of world and character-appropriate content
+  - Respect for tone settings (narrative style, content rating)
+  - Scene-based storytelling with clear transitions
+  - Basic recognition of player character attributes and skills
+- Player choice system with:
+  - 3-4 distinct choices per decision point
+  - Clear presentation of options
+  - Basic impact tracking of decisions
+  - Appropriate continuation based on selection
+- Context management with:
+  - Last 5-10 narrative segments retained
+  - Important character information
+  - Recent decisions and outcomes
+  - Current location/setting
+- History tracking that records:
+  - All narrative segments
+  - Player decisions and selections
+  - Major outcome changes
+- Scene transitions that:
+  - Clearly indicate location/setting changes
+  - Maintain narrative coherence
+  - Allow for logical story progression
+- Basic error recovery with:
+  - Retry capability for failed AI calls
+  - Fallback content for unrecoverable errors
+  - User-friendly error messages
+- Prompt construction system that:
+  - Creates effective prompts for the AI service
+  - Includes relevant context from world and character
+  - Maintains consistent tone and style
+  - Optimizes token usage for efficiency
+- Basic formatting for narrative text:
+  - Paragraph breaks
+  - Dialogue formatting
+  - Emphasis for important elements
 
-### Excluded
+### Excluded from MVP
 - Complex branching narrative structures
 - Advanced character relationship tracking
 - Long-term narrative planning
@@ -105,14 +215,61 @@ interface NarrativeContext {
 - Procedural quest generation
 - Advanced dialogue system with NPC memory
 - Narrative visualization (images, maps, etc.)
+- Voice narration or audio effects
+- Advanced emotion or sentiment analysis
+- Multi-thread storytelling
+- Direct modification of generated content
+- Custom story templates
+- Complex NPC interaction systems
+- Dynamic difficulty adjustment
+- Narrative-based puzzles or challenges
+- Environmental interactions beyond basic choices
+
+## User Stories
+
+1. **Narrative Generation**
+   - As a user, I want to read engaging narrative content that matches my selected world so I can immerse myself in the story
+   - As a user, I want the narrative to acknowledge my character's attributes and skills so the story feels personalized
+   - As a user, I want content that respects my chosen tone settings so the narrative style meets my expectations
+   - As a user, I want properly formatted text with paragraphs and dialogue so it's easy to read
+
+2. **Player Choices**
+   - As a user, I want to make meaningful decisions that affect the narrative so I feel agency in the story
+   - As a user, I want clear choices that represent different approaches so I can express my character's personality
+   - As a user, I want to see the consequences of my decisions reflected in the narrative so my choices matter
+   - As a user, I want visual indication when choices align with my character's strengths so I can leverage my attributes
+
+3. **Narrative Flow**
+   - As a user, I want smooth transitions between scenes so the story maintains coherence
+   - As a user, I want the narrative to remember important decisions I've made so the story remains consistent
+   - As a user, I want to be able to navigate to different locations through my choices so I can explore the world
+   - As a user, I want to interact with NPCs through dialogue so I can engage with the world's inhabitants
+
+4. **Narrative History**
+   - As a user, I want to review previous narrative segments so I can recall what happened
+   - As a user, I want to see a record of important decisions I've made so I can track my story path
+   - As a user, I want to reference past events in the narrative so I can maintain story continuity
+
+5. **Error Handling**
+   - As a user, I want graceful error handling when AI requests fail so my experience isn't disrupted
+   - As a user, I want fallback content when the AI service is unavailable so I can continue playing
+   - As a user, I want clear error messages that don't break immersion so my narrative experience is preserved
 
 ## Acceptance Criteria
 1. The system generates coherent narrative content appropriate to the selected world
-2. Player choices influence subsequent narrative development
-3. The narrative respects world tone settings (family-friendly vs mature, etc.)
-4. The system maintains sufficient context to create a cohesive story
-5. Narrative history is recorded and accessible to the player
-6. The system recovers gracefully from AI service failures
+2. Narrative content respects the character attributes and skills
+3. Player choices influence subsequent narrative development in meaningful ways
+4. The narrative respects world tone settings (family-friendly vs mature, etc.)
+5. The system maintains sufficient context to create a cohesive story
+6. Narrative history is recorded and accessible to the player
+7. The system recovers gracefully from AI service failures
+8. Scene transitions maintain narrative continuity
+9. The system optimizes prompts to stay within token limits
+10. Generated content is free from inappropriate material based on content rating
+11. Narrative text is properly formatted with paragraphs and dialogue formatting
+12. Choice options reflect the current narrative context appropriately
+13. Users receive feedback when choices align with character strengths
+14. The system provides fallback content when AI generation fails
 
 ## GitHub Issues
 - [Implement narrative state management] - Link to GitHub issue
@@ -120,7 +277,23 @@ interface NarrativeContext {
 - [Build player choice interface] - Link to GitHub issue
 - [Develop narrative history tracking] - Link to GitHub issue
 - [Implement context management system] - Link to GitHub issue
-- [Create basic scene transition logic] - Link to GitHub issue
+- [Create scene transition logic] - Link to GitHub issue
+- [Build narrative text display component] - Link to GitHub issue
+- [Implement error handling and recovery] - Link to GitHub issue
+- [Create token optimization system] - Link to GitHub issue
+- [Build narrative history viewer] - Link to GitHub issue
+- [Implement text formatting for narrative content] - Link to GitHub issue
+- [Create fallback content system] - Link to GitHub issue
+
+## BootHillGM Reference Code
+- The narrative context implementation in `/app/context/NarrativeContext.tsx` and related hooks provide a proven structure for narrative state management
+- The optimization in `/app/components/GamePromptWithOptimizedContext.tsx` demonstrates effective token usage management
+- The AI service in `/app/services/ai/aiService.ts` shows patterns for reliable AI integration with fallbacks
+- The response parsing in `/app/services/ai/responseParser.ts` offers techniques for handling AI outputs
+- The prompt construction in `/app/services/ai/promptBuilder.ts` provides templates for effective AI prompting
+- The narrative formatting in `/app/components/NarrativeDisplay.tsx` shows how to properly display formatted text
+- The error handling in `/app/components/GameSessionContent.tsx` demonstrates recovery from AI service failures
+- The fallback generation in `/app/services/ai/fallback/fallbackDecisionGenerator.ts` provides patterns for creating backup content
 
 ## Status
 - [x] Requirements defined
