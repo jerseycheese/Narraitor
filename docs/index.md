@@ -3,7 +3,7 @@ title: NarrAItor Documentation
 aliases: [Documentation Home, Docs Home]
 tags: [narraitor, documentation, index]
 created: 2025-04-28
-updated: 2025-04-28
+updated: 2025-04-30
 ---
 
 # NarrAItor Documentation
@@ -17,6 +17,11 @@ Welcome to the documentation for NarrAItor, a world-agnostic narrative-driven RP
 - [[development-roadmap|Development Roadmap]]
 - [[mvp-implementation-plan|MVP Implementation Plan]]
 - [[user-stories|User Stories]]
+
+### Requirements
+- [[requirements/index|Requirements Documentation]]
+- [[summaries/refined-requirements-summary|Refined Requirements Summary]]
+- [[workflows/requirements-to-github|Requirements to GitHub Workflow]]
 
 ### Architecture
 - [[architecture/repository-structure|Repository Structure]]
@@ -45,7 +50,7 @@ Welcome to the documentation for NarrAItor, a world-agnostic narrative-driven RP
 ### Template Worlds
 - [[universes/western|Western World Template]]
 - [[universes/sitcom|Sitcom World Template]]
-- [[universes/adventure|Adventure World Template]]
+- [[universes/fantasy|Fantasy World Template]]
 
 ## Key Project Goals
 
@@ -53,12 +58,12 @@ Welcome to the documentation for NarrAItor, a world-agnostic narrative-driven RP
 2. Implement world-agnostic systems for characters and storytelling
 3. Develop a clean, modular codebase with strict quality standards
 4. Follow Test-Driven Development practices
-5. Integrate visual elements for better engagement
-6. Create reusable components with Storybook
+5. Create a responsive and accessible UI with world-appropriate styling
+6. Build robust error handling and recovery mechanisms
 
 ## Development Status
 
-The project is currently in the initial setup and planning phase. The GitHub repository has been established, and core documentation has been created. Implementation of the MVP features will begin soon according to the development roadmap.
+The project is currently in the planning phase. Requirements have been refined and detailed, and the next steps include converting these requirements into GitHub issues and beginning the implementation of the core state management system and world configuration functionality.
 
 ## Contributing
 

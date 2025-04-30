@@ -3,7 +3,7 @@ title: NarrAItor Development Roadmap
 aliases: [Roadmap, Implementation Plan]
 tags: [narraitor, documentation, planning, roadmap]
 created: 2025-04-27
-updated: 2025-04-28
+updated: 2025-04-30
 ---
 
 # NarrAItor Development Roadmap
@@ -11,7 +11,7 @@ updated: 2025-04-28
 ## Overview
 This roadmap outlines the development phases for the NarrAItor project, focusing on an MVP approach with clear milestones and deliverables.
 
-## Phase 1: Core Framework (MVP) (3-4 weeks)
+## Phase 1: Core Framework (MVP)
 
 ### 1.1 Environment Setup
 - [ ] Initialize Next.js 14 project with TypeScript
@@ -36,33 +36,40 @@ This roadmap outlines the development phases for the NarrAItor project, focusing
 
 ### 1.4 World Configuration System
 - [ ] Implement world configuration reducer
-- [ ] Create minimal world editor UI components
-- [ ] Develop basic world template system
-- [ ] Add import/export functionality
-- [ ] Create test worlds:
+- [ ] Create minimal world creation UI components
+- [ ] Build freeform world description analyzer using AI
+- [ ] Implement attribute and skill suggestion system
+- [ ] Create user interface for reviewing and editing AI suggestions
+- [ ] Develop basic world template system as fallback option
+- [ ] Add basic validation for world configurations
+- [ ] Create test worlds for development:
   - [ ] Western
   - [ ] Sitcom
-  - [ ] Adventure
+  - [ ] Fantasy
 
 ### 1.5 Character System
 - [ ] Implement character state reducer
-- [ ] Create minimal character creation workflow
+- [ ] Create 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
 - [ ] Develop basic character sheet component
-- [ ] Add essential attribute and skill management
+- [ ] Add point-buy attribute allocation with world-defined constraints
+- [ ] Implement skill selection (max 8 skills per character)
 - [ ] Create test characters for each world
 
 ### 1.6 Narrative Engine
-- [ ] Set up basic AI integration
-- [ ] Create simple prompt template system
-- [ ] Implement minimal context management
-- [ ] Develop narrative display components
-- [ ] Create world-appropriate narrative styles
+- [ ] Set up Google Gemini AI integration
+- [ ] Create prompt template system
+- [ ] Implement context management (preserving 5-10 narrative segments)
+- [ ] Develop player choice system with 3-4 options per decision point
+- [ ] Add scene transition handling
+- [ ] Create error recovery mechanisms with retries and fallback content
 
 ### 1.7 Journal System
 - [ ] Implement basic journal state reducer
 - [ ] Create automatic entry generation
 - [ ] Develop simple journal viewer component
-- [ ] Add basic filtering functionality
+- [ ] Add entry categorization (4 primary types, major/minor significance)
+- [ ] Implement new/unread entry indicators and session date grouping
+- [ ] Add filtering by entry type and significance
 
 ### 1.8 Basic UI Components
 - [ ] Create navigation structure
@@ -71,7 +78,7 @@ This roadmap outlines the development phases for the NarrAItor project, focusing
 - [ ] Add essential form components
 - [ ] Create themed container components
 
-## Phase 2: Enhanced Narrative (2-3 weeks)
+## Phase 2: Enhanced Narrative
 
 ### 2.1 Improved AI Integration
 - [ ] Enhance prompt engineering
@@ -101,7 +108,7 @@ This roadmap outlines the development phases for the NarrAItor project, focusing
 - [ ] Implement dark mode support
 - [ ] Create world-specific UI themes
 
-## Phase 3: Extended Systems (3-4 weeks)
+## Phase 3: Extended Systems
 
 ### 3.1 Character Advancement
 - [ ] Implement experience tracking
@@ -131,7 +138,7 @@ This roadmap outlines the development phases for the NarrAItor project, focusing
 - [ ] Develop location imagery
 - [ ] Add thematic UI elements
 
-## Phase 4: Polish and Integration (2 weeks)
+## Phase 4: Polish and Integration
 
 ### 4.1 System Integration
 - [ ] Connect all core systems
@@ -165,7 +172,7 @@ This roadmap outlines the development phases for the NarrAItor project, focusing
 
 The MVP will be considered complete when:
 
-1. Users can create and configure basic world settings
+1. Users can create worlds by providing freeform descriptions that are processed by AI to suggest attributes and skills
 2. Character creation works with a minimal attribute/skill system
 3. The narrative engine generates appropriate content for different worlds
 4. The journal system records game events
@@ -179,7 +186,8 @@ The MVP will be considered complete when:
 ### Content and Features
 - Enhanced AI capabilities with memory and personality
 - More sophisticated character development
-- Advanced combat systems for different genres
+- Advanced world customization options including tone settings
+- Combat systems for different genres
 - Expanded inventory and equipment systems
 - Complex relationship tracking between characters
 - Quest and objective management

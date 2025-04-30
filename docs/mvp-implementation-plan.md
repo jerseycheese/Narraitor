@@ -3,7 +3,7 @@ title: MVP Implementation Plan
 aliases: [Implementation Strategy, MVP Strategy]
 tags: [narraitor, implementation, planning]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-04-30
 ---
 
 # NarrAItor MVP Implementation Plan
@@ -13,28 +13,33 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 
 ## MVP Goals
 
-1. Create a working narrative RPG framework that supports different fictional worlds
-2. Implement essential systems for character creation and management
-3. Provide a basic AI-driven narrative experience with Google Gemini integration
-4. Include a journal system for tracking game history and player decisions
-5. Ensure robust state persistence between sessions using IndexedDB
-6. Deliver a clean, maintainable codebase following best practices and TDD principles
-7. Incorporate error recovery and graceful failure handling
+1. Create a working narrative RPG framework that supports user-defined fictional worlds
+2. Implement AI-assisted world creation from freeform descriptions
+3. Develop essential systems for character creation and management
+4. Provide a basic AI-driven narrative experience with Google Gemini integration
+5. Include a journal system for tracking game history and player decisions
+6. Ensure robust state persistence between sessions using IndexedDB
+7. Deliver a clean, maintainable codebase following best practices and TDD principles
+8. Incorporate error recovery and graceful failure handling
 
 ## Core Systems Scope
 
 ### World Configuration System (MVP)
-- World creation wizard with basic information (name, description, genre)
+- AI-assisted world creation from freeform descriptions:
+  - User provides a description of their fictional world
+  - AI analyzes description and suggests attributes and skills
+  - User reviews and modifies suggestions
+  - System finalizes world configuration
 - Attribute system with up to 6 attributes per world (range 1-10)
 - Skill system with up to 12 skills linked to attributes (range 1-5)
-- Tone settings (narrative style, pace, content rating, language style)
-- Three template worlds (Fantasy Adventure, Sci-Fi Exploration, Mystery Investigation)
-- World import/export functionality using JSON format
+- Template worlds as fallback options (Western, Sitcom, Fantasy)
+- World selection interface showing available worlds
+- Basic world editing functionality
 - Five pre-defined theme options affecting UI appearance
 - Basic error handling and validation for world configurations
 
 ### Character System (MVP)
-- 4-step character creation wizard (basic info, attributes, skills, background)
+- 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
 - Point-buy attribute allocation respecting world-defined limits
 - Skill selection and rating (up to 8 skills per character)
 - Text-based character description and background
@@ -66,7 +71,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Session date grouping
 - Mobile and desktop responsive design
 - Integration with game session UI
-- Entry importance levels (high, medium, low)
+- Entry importance levels (major/minor)
 - Proper formatting for journal entries
 
 ### State Management (MVP)
@@ -98,6 +103,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 
 ### AI Service Integration (MVP)
 - Google Gemini integration as primary AI provider
+- Dual-purpose AI usage:
+  - World creation assistance (analyzing descriptions, suggesting attributes/skills)
+  - Narrative generation (creating story content, player choices)
 - Prompt template system for different use cases
 - Error handling with automatic retries
 - Context optimization for token efficiency
@@ -111,7 +119,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 
 ## Implementation Phases
 
-### Phase 1: Project Setup and Infrastructure (1 week)
+### Phase 1: Project Setup and Infrastructure
 - Initialize Next.js 14 project with TypeScript
 - Configure ESLint, Prettier, and EditorConfig
 - Set up Jest and React Testing Library
@@ -123,18 +131,19 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Build error boundary system
 - Set up development diagnostics
 
-### Phase 2: World Configuration System (1 week)
+### Phase 2: World Configuration System
 - Implement world configuration reducer and types
-- Create world creation wizard components
-- Develop attribute and skill management interfaces
-- Implement tone settings configuration
-- Create three template worlds
-- Add world import/export functionality
-- Develop world theme system with 5 presets
+- Create world creation form for freeform descriptions
+- Build world description analyzer using Google Gemini
+- Implement attribute and skill suggestion system
+- Create user interface for reviewing and editing AI suggestions
+- Develop template world system as fallback option
+- Build world selection interface
+- Implement world editor interface
+- Create world theme system with 5 presets
 - Build validation and error handling
-- Implement form state preservation
 
-### Phase 3: Character System (1 week)
+### Phase 3: Character System
 - Implement character state reducer and types
 - Create 4-step character creation wizard
 - Develop attribute allocation interface with validation
@@ -145,7 +154,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Build character creation progress recovery
 - Create validation and error handling
 
-### Phase 4: AI Service Integration (1 week)
+### Phase 4: AI Service Integration
 - Implement Google Gemini API client
 - Create prompt template system for different use cases
 - Develop response parsing and normalization
@@ -157,7 +166,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Add basic performance monitoring
 - Create response formatting system
 
-### Phase 5: Narrative Engine (2 weeks)
+### Phase 5: Narrative Engine
 - Implement narrative state reducer and types
 - Create narrative context management system
 - Develop player choice interface components
@@ -170,7 +179,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Build text formatting system
 - Create retry mechanism for failed generation
 
-### Phase 6: Journal System (1 week)
+### Phase 6: Journal System
 - Implement journal entry data model and reducer
 - Create automatic entry creation system
 - Build journal list view component
@@ -182,7 +191,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Implement entry importance levels
 - Create journal entry formatting
 
-### Phase 7: Game Session Integration (1 week)
+### Phase 7: Game Session Integration
 - Create game session container component
 - Integrate narrative display with AI service
 - Connect player choices to narrative progression
@@ -195,11 +204,10 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Implement choice strength indicators
 - Add save indicators and confirmation
 
-### Phase 8: Testing and Refinement (1 week)
+### Phase 8: Testing and Refinement
 - Complete unit test coverage for all components
 - Add integration tests for system interactions
 - Implement end-to-end tests for critical flows
-- Conduct usability testing with sample players
 - Address performance bottlenecks
 - Improve error handling and recovery
 - Enhance accessibility features
@@ -237,14 +245,27 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 6. Build custom hooks for component access
 7. Add state validation and integrity checks
 
-### Error Handling Strategy
-1. Implement component-level error boundaries
-2. Create user-friendly error messages
-3. Add recovery paths for common failures
-4. Implement retry logic for transient issues
-5. Provide fallback content for service unavailability
-6. Build session recovery system
-7. Create emergency state export for critical failures
+### AI Integration
+1. Create modular AI service with specialized generators
+2. Implement structured prompt templates for world creation and narrative
+3. Build robust response parsers with validation
+4. Develop fallback systems for service unavailability
+5. Create error handling with appropriate retry logic
+6. Implement context optimization for token efficiency
+
+## AI-Assisted World Creation Flow
+
+```mermaid
+flowchart TD
+    A[User enters freeform world description] --> B[System sends description to AI]
+    B --> C[AI analyzes and generates suggestions]
+    C --> D[System presents suggested attributes and skills]
+    D --> E[User reviews and modifies suggestions]
+    E --> F[System validates configuration]
+    F -->|Valid| G[System saves world configuration]
+    F -->|Invalid| E
+    H[Alternative: User selects template] --> G
+```
 
 ## Key Technical Decisions
 
@@ -278,7 +299,7 @@ These components should be examined closely during implementation to leverage pr
 ## MVP Deliverables
 
 1. **Working Application**
-   - Complete world configuration system with templates
+   - AI-assisted world creation system
    - Character creation and management system
    - AI-driven narrative engine with player choices
    - Journal system for game history tracking
@@ -306,30 +327,19 @@ These components should be examined closely during implementation to leverage pr
 
 The MVP will be considered successful when:
 
-1. Users can create and configure worlds with attributes, skills, and tone settings
-2. Users can create characters with attributes and skills defined by the world
-3. The narrative engine generates coherent, world-appropriate content
-4. Player choices meaningfully influence subsequent narrative
-5. The journal system records and categorizes game events
-6. The state management system reliably persists game state
-7. The UI is responsive across desktop and mobile devices
-8. The system recovers gracefully from errors and crashes
-9. All core user journeys pass end-to-end tests
-10. The codebase follows established best practices and standards
-11. The application performs well with acceptable loading times
-12. Users can recover from interrupted sessions without significant data loss
-
-## Implementation Timeline
-
-- **Project Setup & Infrastructure**: Week 1
-- **World Configuration System**: Week 2
-- **Character System**: Week 3
-- **AI Service Integration**: Week 4
-- **Narrative Engine**: Weeks 5-6
-- **Journal System**: Week 7
-- **Game Session Integration**: Week 8
-- **Testing and Refinement**: Week 9
-- **MVP Release**: Week 10
+1. Users can create worlds by providing freeform descriptions that are analyzed by AI
+2. Users can review and customize AI-suggested attributes and skills
+3. Users can create characters with attributes and skills defined by the world
+4. The narrative engine generates coherent, world-appropriate content
+5. Player choices meaningfully influence subsequent narrative
+6. The journal system records and categorizes game events
+7. The state management system reliably persists game state
+8. The UI is responsive across desktop and mobile devices
+9. The system recovers gracefully from errors and crashes
+10. All core user journeys pass end-to-end tests
+11. The codebase follows established best practices and standards
+12. The application performs well with acceptable loading times
+13. Users can recover from interrupted sessions without significant data loss
 
 ## Risk Management
 
@@ -377,14 +387,14 @@ The MVP will be considered successful when:
    - **Mitigation**: Focused implementation plan, regular progress tracking, clear documentation
    - **Contingency**: Identify features that could be simplified if timeline is threatened
 
-4. **User Experience Gaps**
-   - **Risk**: Usability issues due to UI/UX limitations
-   - **Mitigation**: Early usability testing with sample users, focus on core journeys
-   - **Contingency**: Prioritize UX improvements for critical flows only
+4. **AI Prompt Engineering Challenges**
+   - **Risk**: Difficulty creating effective prompts for world creation and narrative
+   - **Mitigation**: Iterative prompt development, extensive testing with varied inputs
+   - **Contingency**: Develop simplified prompt templates with more structure
 
 ## Post-MVP Priorities
 
-### Near-Term Enhancements (Next Phase)
+### Near-Term Enhancements
 
 1. **UI/UX Refinements**
    - Enhanced visual theme system
@@ -396,7 +406,7 @@ The MVP will be considered successful when:
    - Additional world templates
    - More sophisticated prompt engineering
    - Character portrait generation
-   - Enhanced tone and style controls
+   - Tone settings for narrative style customization
 
 3. **Functional Improvements**
    - Advanced character advancement
@@ -444,52 +454,6 @@ The MVP will be considered successful when:
    - Community features
    - Rating and feedback system
 
-## Development Resources
-
-### Key Libraries
-
-1. **State Management**: React Context + useReducer pattern
-2. **Storage**: idb (IndexedDB wrapper)
-3. **UI Components**: Headless UI + Tailwind CSS
-4. **Forms**: React Hook Form + Zod validation
-5. **Testing**: Jest + React Testing Library + Playwright
-6. **Documentation**: Storybook + Markdown
-7. **AI Integration**: Google AI SDK for JavaScript
-
-### Development Tools
-
-1. **IDE Setup**: VSCode with recommended extensions
-2. **Linting**: ESLint with TypeScript integration
-3. **Formatting**: Prettier with consistent configuration
-4. **Git Workflow**: Feature branches with PR reviews
-5. **CI/CD**: Basic GitHub Actions setup
-6. **Monitoring**: Simple error tracking
-7. **Performance**: React DevTools + Lighthouse
-
-## Implementation Strategy
-
-### Incremental Development
-
-The implementation will follow an incremental approach:
-
-1. **Foundation First**: Establish core infrastructure and state management
-2. **Vertical Slices**: Implement complete features across all layers
-3. **Continuous Integration**: Maintain a working application throughout development
-4. **Regular Testing**: Test features as they're implemented
-5. **Incremental Refinement**: Improve features based on testing feedback
-6. **Documentation Driven**: Update docs alongside code
-
-### Leveraging BootHillGM
-
-The existing BootHillGM codebase will be used as reference rather than directly ported:
-
-1. **Study Patterns**: Understand implementation patterns from BootHillGM
-2. **Adapt Architecture**: Modify architecture for world-agnostic approach
-3. **Enhance Error Handling**: Incorporate robust recovery mechanisms
-4. **Improve Modularity**: Create more modular component structure
-5. **Optimize Performance**: Address known performance issues
-6. **Enhance Testing**: Improve test coverage and strategies
-
 ## Getting Started
 
 To begin MVP implementation:
@@ -501,10 +465,10 @@ To begin MVP implementation:
 5. Implement core state management architecture
 6. Configure Storybook for component development
 7. Create GitHub issues from refined requirements
-8. Begin implementing World Configuration System as the foundation
+8. Begin implementing World Configuration System with AI assistance
 
 ## Conclusion
 
-This MVP implementation plan provides a comprehensive roadmap for developing the NarrAItor application. By leveraging lessons learned from BootHillGM while embracing a more flexible architecture, the project aims to deliver a compelling narrative RPG framework that can support multiple fictional worlds.
+This MVP implementation plan provides a comprehensive roadmap for developing the NarrAItor application. By focusing on AI-assisted world creation from freeform descriptions, the project aims to deliver a flexible narrative RPG framework that can truly adapt to any fictional world the user wishes to explore.
 
-The plan maintains a balanced approach between feature scope and quality, with special attention to error handling, recovery mechanisms, and user experience. Through disciplined development practices and incremental delivery, the MVP will establish a solid foundation for future enhancements while providing a fully functional application within the 10-week timeline.
+The plan maintains a balanced approach between feature scope and quality, with special attention to error handling, recovery mechanisms, and user experience. Through disciplined development practices and incremental delivery, the MVP will establish a solid foundation for future enhancements while providing a fully functional application.
