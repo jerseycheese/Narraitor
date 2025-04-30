@@ -1,0 +1,9 @@
+import { Header } from '../../../src/stories/Header';
+
+export function HeaderHarness() {
+  // Stage 1: Isolation – …
+  // Stage 2: Test Harness – …
+  // Stage 3: Integration – …
+
+  return <Header />;
+}

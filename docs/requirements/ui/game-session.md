@@ -22,7 +22,7 @@ The Game Session Interface is the primary user-facing component for playing Narr
 - **Session Controls**: Save, load, and exit game sessions
 - **Game Recovery**: Recover from unexpected errors or crashes
 - **Session Information**: Display current location, progress, and state
-- **Context Awareness**: Show relevant information based on context
+- **Context Awareness**: Show relevant information based on context (post-MVP)
 - **Theming**: Apply world-appropriate visual styling
 - **Accessibility**: Ensure the interface is usable by all players
 - **Responsive Design**: Adapt to different screen sizes and devices
@@ -77,25 +77,22 @@ The Game Session Interface is the primary user-facing component for playing Narr
 
 ### Included
 - Responsive narrative display with:
-  - Markdown formatting support for text
   - Auto-scrolling to new content
   - Clear differentiation between narrative and dialogue
   - Mobile and desktop optimized layouts
   - Paragraph spacing and text formatting
 - Choice presentation with:
   - 3-4 distinct choices displayed as cards or buttons
+  - Text field input for custom narrative/choice response
   - Hover/focus states for better UX
   - Disabled state during AI processing
   - Support for choice descriptions when needed
-  - Visual indication of choices aligned with character strengths
 - Character summary panel showing:
   - Character name and brief description
-  - 3-5 most relevant attributes for current context
-  - 3-5 most relevant skills for current context
   - Collapsible on mobile devices
   - Basic character status information
 - Essential UI elements:
-  - Persistent journal access button with unread count
+  - Persistent journal access button
   - Clear loading indicator during AI generation
   - Auto-saving with last save time display
   - Manual save button with confirmation
@@ -108,7 +105,7 @@ The Game Session Interface is the primary user-facing component for playing Narr
   - Error details toggle for debugging
   - Recovery options for session crashes
   - Fallback content when AI fails
-- World-appropriate basic styling:
+- World-appropriate AI-determined basic styling:
   - Font choices matching world theme
   - Color scheme based on world settings
   - Simple themed decorative elements
@@ -126,6 +123,10 @@ The Game Session Interface is the primary user-facing component for playing Narr
   - Diagnostic information (dev mode only)
 
 ### Excluded from MVP
+- Markdown formatting support for text
+- Visual indication of choices aligned with character strengths
+- Character summary panel showing contextual attributes/skills
+- Journal access button with unread count
 - Voice narration of text
 - Character portrait animations
 - Environmental sound effects
@@ -160,14 +161,14 @@ The Game Session Interface is the primary user-facing component for playing Narr
    - As a player, I want to see clearly presented choices so I can make informed decisions
    - As a player, I want visual feedback when selecting a choice so I know my selection was registered
    - As a player, I want choices to be disabled while the AI generates content so I don't make inadvertent selections
-   - As a player, I want to see which choices align with my character's strengths so I can make strategic decisions
+   - As a player, I want to see which choices align with my character's strengths so I can make strategic decisions (post-MVP)
    - As a player, I want choice cards that visually reflect their nature or impact so I can understand potential outcomes
 
 3. **Character Reference**
-   - As a player, I want to see my character's relevant attributes and skills during gameplay so I can make appropriate choices
+   - As a player, I want to see my character's basic information during gameplay so I can remember who I'm playing
    - As a player, I want to collapse or expand the character panel so I can focus on the narrative when desired
-   - As a player, I want character information that adapts to show contextually relevant details so I have useful information
-   - As a player, I want to quickly see my character's status at a glance so I know their current state
+   - As a player, I want to see my character's name and brief description during play
+   - As a player, I want character information that adapts to show contextually relevant details so I have useful information (post-MVP)
 
 4. **Session Management**
    - As a player, I want to know when my game is being saved so I don't lose progress
@@ -192,8 +193,8 @@ The Game Session Interface is the primary user-facing component for playing Narr
 ## Acceptance Criteria
 1. Narrative text is clearly displayed with appropriate formatting (paragraphs, emphasis, etc.)
 2. Player choices are presented in an intuitive and attractive manner
-3. Character information relevant to the current context is visible and accessible
-4. Journal is easily accessible during gameplay with unread count indicator
+3. Basic character information is visible and accessible
+4. Journal is easily accessible during gameplay
 5. Loading indicators clearly show when AI is processing
 6. Error messages are user-friendly and offer appropriate actions
 7. Session controls allow proper saving and exiting
@@ -206,10 +207,70 @@ The Game Session Interface is the primary user-facing component for playing Narr
 14. Manual saving is confirmed with visual feedback
 15. The system recovers from crashes with minimal loss of progress
 16. Recovery options are presented when errors occur
-17. Choices aligned with character strengths are visually indicated
-18. Current location information is clearly displayed
-19. The system maintains performance across different devices
-20. Screen readers can access all interface elements
+17. Current location information is clearly displayed
+18. The system maintains performance across different devices
+19. Screen readers can access all interface elements
+
+## Technical Implementation Details
+
+### Component Structure
+```
+GameSession/
+├── NarrativeDisplay/
+│   ├── NarrativeContent.tsx
+│   ├── DialogueFormatter.tsx
+│   └── AutoScroller.tsx
+├── ChoiceSelector/
+│   ├── ChoiceList.tsx
+│   ├── ChoiceCard.tsx
+│   └── CustomInputField.tsx
+├── CharacterSummary/
+│   ├── CharacterHeader.tsx
+│   ├── CharacterPreview.tsx
+│   └── CollapsiblePanel.tsx
+├── SessionControls/
+│   ├── SaveButton.tsx
+│   ├── ExitButton.tsx
+│   └── SaveIndicator.tsx
+├── UIElements/
+│   ├── GameHeader.tsx
+│   ├── GameFooter.tsx
+│   ├── LoadingIndicator.tsx
+│   ├── JournalButton.tsx
+│   └── LocationIndicator.tsx
+├── ErrorHandling/
+│   ├── ErrorDisplay.tsx
+│   ├── RecoveryOptions.tsx
+│   └── FallbackContent.tsx
+├── Theming/
+│   ├── ThemeProvider.tsx
+│   └── WorldTheme.ts
+└── GameSession.tsx
+```
+
+### State Management
+The game session will use a combination of React Context and Redux for state management:
+- Context: For UI-specific state like panel visibility, loading indicators
+- Redux: For game state persistence, narrative history, and session management
+
+### Responsiveness Strategy
+- Mobile-first design approach
+- CSS Grid layout for main components
+- Flexbox for internal component layouts
+- Media queries for breakpoints at 640px, 768px, 1024px, and 1280px
+- Collapsible panels on mobile devices
+- Touch-friendly button sizes (minimum 44x44px)
+- Simplified layout on smaller screens
+
+### Accessibility Implementation
+- ARIA landmarks for main regions
+- Focus trapping during modal dialogs
+- Skip links for keyboard navigation
+- Semantic HTML structure
+- Proper heading hierarchy
+- Color contrast testing with WCAG AA standards
+- Keyboard event handlers for all interactive elements
+- Screen reader testing during development
 
 ## GitHub Issues
 - [Create NarrativeDisplay component] - Link to GitHub issue

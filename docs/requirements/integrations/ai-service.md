@@ -20,11 +20,11 @@ The AI Service Integration system provides a unified interface for interacting w
 - **Service Configuration**: Allow configuration of AI service parameters
 - **Fallback Systems**: Provide alternatives when AI service is unavailable
 - **Content Safety**: Filter inappropriate content from responses
-- **Response Caching**: Cache identical requests to reduce API usage
-- **Request Logging**: Log API requests and responses for debugging
-- **Performance Monitoring**: Track response times and success rates
-- **Token Usage Tracking**: Monitor and manage API token consumption
-- **Service Health Checks**: Verify API availability before making requests
+- **Response Caching**: Cache identical requests to reduce API usage (post-MVP)
+- **Request Logging**: Log API requests and responses for debugging (post-MVP)
+- **Performance Monitoring**: Track response times and success rates (post-MVP)
+- **Token Usage Tracking**: Monitor and manage API token consumption (post-MVP)
+- **Service Health Checks**: Verify API availability before making requests (post-MVP)
 
 ## Data Model
 
@@ -56,8 +56,8 @@ interface AIServiceConfig {
     blockUnsafeContent: boolean;
     contentFilters: string[];
   };
-  cachingEnabled: boolean;
-  cacheTTL: number;
+  cachingEnabled?: boolean; // Post-MVP
+  cacheTTL?: number; // Post-MVP
   debug: boolean;
 }
 
@@ -69,8 +69,8 @@ interface AIRequest {
   maxTokens?: number;
   requestType: 'narrative' | 'decision' | 'summary' | 'character' | 'dialogue' | 'description';
   timestamp: number;
-  priority?: 'high' | 'normal' | 'low';
-  cacheKey?: string;
+  priority?: 'high' | 'normal' | 'low'; // Post-MVP
+  cacheKey?: string; // Post-MVP
   worldId?: string;
   characterId?: string;
   safetyLevel?: string;
@@ -91,7 +91,7 @@ interface AIResponse {
     retryable: boolean;
     details?: string;
   };
-  responseTime?: number;
+  responseTime?: number; // Post-MVP
   source: 'api' | 'cache' | 'fallback';
   timestamp: number;
   safetyFilterApplied?: boolean;
@@ -111,7 +111,7 @@ interface PromptTemplate {
   tokensEstimate?: number;
 }
 
-interface ServiceStatistics {
+interface ServiceStatistics { // Post-MVP
   requestsTotal: number;
   requestsSucceeded: number;
   requestsFailed: number;
@@ -130,10 +130,10 @@ interface ServiceStatistics {
 - Users interact indirectly via narrative and character features
 - Users see loading indicators during API requests
 - Users receive error messages for non-recoverable failures
-- Users can configure basic AI service settings via settings page
+- Users can restart a generation if they're unsatisfied with results
+- Users can configure basic AI service settings via settings page (post-MVP)
 - Users can view token usage statistics (post-MVP)
 - Users can provide feedback on AI-generated content (post-MVP)
-- Users can restart a generation if they're unsatisfied with results
 
 ## Integration Points
 - **Narrative Engine**: Provides narrative generation capabilities
@@ -142,7 +142,7 @@ interface ServiceStatistics {
 - **World System**: Uses world configuration to influence prompts
 - **State Management**: Persists configuration between sessions
 - **Game Session UI**: Shows loading states and error messages
-- **Debug Tools**: Provides monitoring and diagnostics
+- **Debug Tools**: Provides monitoring and diagnostics (post-MVP)
 
 ## MVP Scope Boundaries
 
@@ -176,17 +176,17 @@ interface ServiceStatistics {
   - Context truncation when needed
   - Prioritization of recent/important content
   - Prompt compression techniques
+
+### Excluded from MVP
 - Configuration interface for:
   - API key management
   - Temperature settings adjustment
   - Max token limits configuration
   - Safety filter toggling
-- Basic performance monitoring with:
+- Performance monitoring with:
   - Response time tracking
   - Success/failure rates
-  - Simple token usage statistics
-
-### Excluded from MVP
+  - Token usage statistics
 - Multi-provider support (OpenAI, Anthropic, etc.)
 - Advanced prompt engineering interface
 - Streaming responses
@@ -204,14 +204,19 @@ interface ServiceStatistics {
 - Advanced caching strategies
 - Distributed request handling
 - Custom safety filters beyond provider defaults
+- Response caching and cache invalidation
+- Proxy server integration
+- Service level agreement monitoring
+- Multi-region service deployment
+- Automated content quality assessment
 
 ## User Stories
 
 1. **AI Service Configuration**
    - As an administrator, I want to configure the Google Gemini API connection so the system can generate narrative content
-   - As an administrator, I want to adjust temperature settings for different use cases so I can control creativity vs. consistency
-   - As an administrator, I want to set token limits for different request types to manage API usage
-   - As an administrator, I want to configure safety settings to ensure appropriate content
+   - As an administrator, I want to adjust temperature settings for different use cases so I can control creativity vs. consistency (post-MVP)
+   - As an administrator, I want to set token limits for different request types to manage API usage (post-MVP)
+   - As an administrator, I want to configure safety settings to ensure appropriate content (post-MVP)
 
 2. **Prompt Management**
    - As a developer, I want to define effective prompt templates for different use cases so the AI generates appropriate content
@@ -231,7 +236,7 @@ interface ServiceStatistics {
    - As a user, I want the AI to provide character development assistance so I can create rich characters
    - As a user, I want AI responses to be appropriately formatted for display so they're easy to read
 
-5. **Performance Monitoring**
+5. **Performance Monitoring** (post-MVP)
    - As an administrator, I want to track API response times so I can monitor service performance
    - As an administrator, I want to monitor token usage so I can manage API costs
    - As an administrator, I want to see success and failure rates so I can identify system issues
@@ -243,15 +248,12 @@ interface ServiceStatistics {
 4. Fallback content is provided when AI service is unavailable
 5. Response content is properly parsed and normalized
 6. Token usage is optimized to stay within limits
-7. Configuration settings persist between sessions
-8. Prompt templates effectively guide AI responses for different use cases
-9. Error messages are user-friendly and informative
-10. The system respects rate limits and prevents excessive API usage
-11. Content safety filters block inappropriate material
-12. Performance statistics are collected and available for review
-13. Context optimization effectively reduces token usage without sacrificing quality
-14. Different prompt types have appropriate temperature and token settings
-15. Error recovery allows continued gameplay even when API service fails
+7. Prompt templates effectively guide AI responses for different use cases
+8. Error messages are user-friendly and informative
+9. The system respects rate limits and prevents excessive API usage
+10. Content safety filters block inappropriate material
+11. Context optimization effectively reduces token usage without sacrificing quality
+12. Different prompt types are formatted appropriately for their specific use cases
 
 ## GitHub Issues
 - [Implement Google Gemini API client] - Link to GitHub issue
@@ -260,23 +262,28 @@ interface ServiceStatistics {
 - [Develop response parser] - Link to GitHub issue
 - [Implement context optimization] - Link to GitHub issue
 - [Create fallback content system] - Link to GitHub issue
-- [Build configuration interface] - Link to GitHub issue
 - [Implement token estimation] - Link to GitHub issue
-- [Create API key management] - Link to GitHub issue
 - [Develop prompt variable substitution] - Link to GitHub issue
 - [Implement content safety filters] - Link to GitHub issue
-- [Create basic performance monitoring] - Link to GitHub issue
 - [Build response formatting system] - Link to GitHub issue
-- [Implement request caching] - Link to GitHub issue
 
 ## BootHillGM Reference Code
-- The AI service implementation in `/app/services/ai/aiService.ts` provides a proven architecture for reliable AI integration
-- The prompt builder in `/app/services/ai/promptBuilder.ts` demonstrates effective prompt construction patterns
-- The fallback generator in `/app/services/ai/fallback/fallbackDecisionGenerator.ts` offers a model for creating backup content
-- The response parser in `/app/services/ai/responseParser.ts` shows how to handle and normalize AI responses
-- The error handling patterns in BootHillGM provide robust recovery from API failures
-- The context optimization in `/app/components/GamePromptWithOptimizedContext.tsx` shows token efficiency techniques
-- The diagnostic logging in BootHillGM provides patterns for effective monitoring
+- The AIService class in `app/services/ai/aiService.ts` provides a proven architecture for reliable AI integration with function-specific generators
+- The prompt builder in `app/services/ai/promptBuilder.ts` demonstrates effective prompt construction patterns with theme analysis and inventory formatting
+- The fallback service in `app/services/ai/fallback/fallbackService.ts` offers a comprehensive model for creating context-specific backup content
+- The narrative generator in `app/services/ai/fallback/narrativeGenerator.ts` shows how to create varied fallback responses based on context type
+- The error handling patterns in BootHillGM provide robust recovery from API failures with standardized error objects
+- The context optimization techniques demonstrate token efficiency approaches
+
+## Implementation Approach
+1. Create a centralized AIService class with specialized generator sub-components
+2. Implement a robust fallback system with context-specific narratives
+3. Use a template-based approach for different prompt types
+4. Prioritize error recovery with standardized error objects and retry logic
+5. Implement context optimization with a focus on token efficiency
+6. Create a flexible prompt builder with variable substitution
+7. Use request tracking to monitor in-progress API calls
+8. Implement a safety layer for content filtering
 
 ## Status
 - [x] Requirements defined

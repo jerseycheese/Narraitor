@@ -3,7 +3,7 @@ title: Claude App Workflow Handoffs
 aliases: [Chat Transition Templates, Handoff Templates]
 tags: [development, workflow, claude, process, transitions, handoffs]
 created: 2025-04-28
-updated: 2025-03-21
+updated: 2025-04-29
 ---
 
 # Claude App Workflow Handoffs
@@ -46,9 +46,11 @@ What is NOT included:
 - [Out of scope functionality 1]
 - [Out of scope functionality 2]
 
-Technical constraints:
-- Must use [specific approach]
-- Must not introduce [specific pattern/library]
+## KISS Principles Applied
+- Components limited to max 300 lines
+- Single responsibility per function/component
+- Simple props and state management
+- Follows established patterns
 
 ## Technical Specification
 Key Components:
@@ -59,10 +61,14 @@ Files to Modify:
 - [Path 1]: [Changes needed]
 - [Path 2]: [Changes needed]
 
+Utilities/Helpers to Leverage:
+- [Path to utility]: [Purpose and usage]
+
 Implementation Steps:
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
+1. Define tests (TDD approach)
+2. Create Storybook stories (for UI components)
+3. Implement minimum code to pass tests
+4. [Additional steps]
 
 Data Flow:
 [Brief description of data flow]
@@ -78,9 +84,14 @@ I'm continuing work on a Narraitor task from a previous chat. Here's the technic
 
 [Paste the summary artifact]
 
-Let's proceed with implementation, focusing ONLY on what's defined within the scope boundaries. Please help me write the code for this feature, starting with [specific component or step].
+Let's proceed with implementation, following our TDD and KISS principles:
+1. Write tests first
+2. Create Storybook stories for UI components
+3. Implement the minimum code needed to pass tests
+4. Keep components under 300 lines
+5. Use existing utilities/helpers from `/users/jackhaas/projects/narraitor/src/lib` where appropriate
 
-Important: Do NOT add features, optimizations, or enhancements outside the defined scope.
+Important: Focus ONLY on what's defined within the scope boundaries. Do NOT add features, optimizations, or enhancements outside the defined scope.
 ```
 
 ## 2. Implementation to Test Fixes Handoff
@@ -119,6 +130,10 @@ Failing Tests:
 - [Test 3]: [Issue description]
 - [Test 4]: [Issue description]
 
+## Storybook Status (for UI components)
+- [Story 1]: [Status - Complete/Needs updates]
+- [Story 2]: [Status - Complete/Needs updates]
+
 ## Next Steps
 1. Fix test [Test 3] by addressing [specific issue]
 2. Complete implementation of [remaining component]
@@ -135,7 +150,7 @@ I'm continuing work on test fixes for a Narraitor feature from a previous chat. 
 
 [Paste the summary artifact]
 
-Let's focus on fixing the failing tests, starting with [specific test].
+Let's focus on fixing the failing tests, starting with [specific test]. Remember to maintain our KISS principles and ensure we've got appropriate Storybook stories for UI components.
 
 Important: Fix only the specified issues without adding functionality beyond the defined scope boundaries.
 ```
@@ -183,6 +198,11 @@ Error 2:
 Location: [File path]
 Probable cause: [Brief analysis]
 
+## Component Status
+- Component size: [Line count, under/over 300]
+- Storybook status: [Complete/Incomplete]
+- KISS adherence: [Notes on simplicity]
+
 ## Next Steps
 1. Address build error in [specific file]
 2. Fix remaining test issue with [specific test]
@@ -195,7 +215,7 @@ I'm continuing work on build issues for a Narraitor feature from a previous chat
 
 [Paste the summary artifact]
 
-Let's focus on resolving these build errors, starting with the issue in [specific file].
+Let's focus on resolving these build errors, starting with the issue in [specific file]. Remember to maintain KISS principles (files under 300 lines, single responsibility) and ensure our test coverage remains intact.
 
 Important: Fix only the specified build errors without modifying functionality or adding features beyond the defined scope.
 ```
@@ -229,6 +249,12 @@ What is NOT included:
 
 ## Technical Approach
 [Brief description of implementation approach]
+
+## KISS & TDD Adherence
+- Component sizes: [All under 300 lines?]
+- Test-driven: [Were tests written first?]
+- Storybook stories: [Created for UI components?]
+- Utilities used: [List of utilities leveraged]
 
 ## Cleanup Needed
 - Remove console.logs in [specific files]
@@ -293,6 +319,12 @@ What is NOT included:
 1. [Next step 1]
 2. [Next step 2]
 
+## TDD & KISS Status
+- Tests written first: [Yes/No/Partial]
+- Component size compliance: [Under 300 lines?]
+- Storybook stories status: [Complete/Incomplete]
+- Utilities leveraged: [List utilities used]
+
 ## Technical Context
 - [Important technical detail 1]
 - [Important technical detail 2]
@@ -308,7 +340,7 @@ I'm continuing work on a Narraitor task from a previous chat. Here's our current
 
 [Paste the summary artifact]
 
-Let's continue with [specific next step].
+Let's continue with [specific next step], following our TDD and KISS principles (tests first, keep it simple, components under 300 lines, use existing utilities).
 
 Important: Focus only on the functionality defined in the scope boundaries. Do not add features or enhancements beyond what's specified.
 ```
@@ -324,6 +356,7 @@ Important: Focus only on the functionality defined in the scope boundaries. Do n
 7. **Include Critical Context**: Technical decisions, approaches, and constraints
 8. **Save Artifacts**: Copy summary artifacts to a local file for safekeeping
 9. **Reference Related Files**: Include specific file paths in summaries
+10. **Reinforce KISS & TDD Principles**: Always mention these in handoffs
 
 ## Responding to Scope Creep in New Chats
 

@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Lore Management System Requirements
 
 ## Overview
-The Lore Management System tracks, organizes, and applies world facts and knowledge throughout the narrative experience. By systematically managing lore, the system enhances narrative coherence, prevents contradictions, and maintains consistent world details across long play sessions.
+The Lore Management System tracks, organizes, and applies world facts and knowledge throughout the narrative experience. By systematically managing lore, the system enhances narrative coherence, prevents contradictions, and maintains consistent world details across play sessions.
 
 ## Core Functionality
 - **Lore Tracking**: Record and store world facts and details
@@ -17,9 +17,6 @@ The Lore Management System tracks, organizes, and applies world facts and knowle
 - **Fact Extraction**: Identify new facts from narrative content
 - **Lore Storage**: Maintain a central repository of world knowledge
 - **Context Building**: Include relevant lore in AI prompts
-- **Lore Validation**: Track and verify the reliability of facts
-- **Contradiction Detection**: Identify potentially conflicting information
-- **Importance Scoring**: Assign priority levels to different facts
 
 ## Data Model
 
@@ -31,12 +28,6 @@ interface LoreFact {
   createdAt: number;                // Timestamp of creation
   updatedAt: number;                // Timestamp of last update
   sourceId?: string;                // Original source reference
-  confidence: number;               // Confidence score (1-10)
-  importance: number;               // Importance score (1-10)
-  version: number;                  // Version number
-  isValid: boolean;                 // Validation status
-  relatedFactIds: string[];         // Related facts by ID
-  tags: string[];                   // Searchable tags
 }
 
 type LoreCategory = 
@@ -49,8 +40,6 @@ type LoreCategory =
 interface LoreStore {
   facts: Record<string, LoreFact>;              // All facts by ID
   categorizedFacts: Record<LoreCategory, string[]>; // Fact IDs by category
-  factsByTag: Record<string, string[]>;         // Fact IDs by tag
-  factVersions: Record<string, LoreFact[]>;     // Version history by fact ID
   latestUpdate: number;                         // Timestamp of last update
 }
 ```
@@ -59,7 +48,6 @@ interface LoreStore {
 - Users don't directly interact with this system in MVP
 - Users experience consistent world details in narrative
 - Users benefit from AI referencing established lore
-- Users notice fewer contradictions in long play sessions
 
 ## Integration Points
 - **Narrative Engine**: Provides source content for lore extraction
@@ -71,41 +59,77 @@ interface LoreStore {
 ## MVP Scope Boundaries
 
 ### Included
-- Basic lore fact storage and categorization
-- Simple lore extraction from narrative content
-- Essential lore categories (character, location, history, item, concept)
-- Basic confidence and importance scoring
-- Fact versioning and validation status
-- Simple contradiction detection
-- Lore context inclusion in AI prompts
+- Basic lore fact storage and retrieval
+- Simple fact categorization with five primary categories:
+  - Character (information about NPCs and PCs)
+  - Location (places, landmarks, regions)
+  - History (past events of significance)
+  - Item (notable objects and artifacts)
+  - Concept (abstract ideas, rules, customs)
+- Manual fact extraction from narrative content
+- Storage of fact source references
+- Persistence via IndexedDB
+- Basic context inclusion in AI prompts
+- Simple timestamp tracking for facts
+- DevTools integration to expose helpful info/debug tools
 
-### Excluded
-- Advanced natural language processing for extraction
-- Player-facing lore codex UI
-- Complex semantic analysis for contradictions
-- Automatic tagging based on content analysis
-- Visual lore relationship mapping
+### Excluded from MVP
+- Confidence scoring and importance ranking
+- Contradiction detection and resolution
+- User-facing lore codex or interface
+- Advanced fact extraction using NLP
+- Fact versioning and history tracking
+- Fact validation and verification status
+- Related facts identification
+- Tagging system
+- Advanced context building with prioritization
+- Complex semantic analysis
+- Visual relationship mapping
 - External knowledge base integration
-- Advanced contradiction resolution
 - Lore suggestion system
+- Auto-generation of facts from world configuration
+- Automatic contradiction resolution
+- Fact search or filtering functionality
+- Semantic similarity detection
+- Advanced relationship mapping between facts
+- Fact editing interface
+- Custom categorization beyond the five primary types
+- Importance or relevance scoring
+- Analytics or fact usage statistics
+
+## User Stories
+
+1. **Lore Tracking**
+   - As a developer, I want the system to store world facts so they can be referenced consistently
+   - As a developer, I want facts categorized to better organize world knowledge
+   - As a player, I want the AI to remember established world details for a coherent experience
+
+2. **Lore Integration**
+   - As a developer, I want relevant lore included in AI prompts for consistent storytelling
+   - As a player, I want the narrative to maintain consistent details about the world
+   - As a developer, I want to trace facts back to their original sources for verification
+
+3. **Development Support**
+   - As a developer, I want access to debug tools to inspect the lore database during development
+   - As a developer, I want to see how lore is being used in AI contexts to improve the system
 
 ## Acceptance Criteria
 1. The system correctly stores and categorizes lore facts
-2. Lore extraction identifies new facts from narrative content
-3. Lore context is appropriately included in AI prompts
-4. Fact versioning maintains history of changes
-5. Basic contradiction detection identifies obvious conflicts
-6. Importance and confidence scoring prioritizes facts appropriately
-7. The system maintains a consistent world state across play sessions
+2. Facts are properly associated with their sources
+3. Basic fact extraction from narrative content works correctly
+4. Lore context is included in AI prompts when relevant
+5. Facts persist between game sessions
+6. The system maintains a consistent world state across gameplay
+7. DevTools provide visibility into the lore database for debugging
 
 ## GitHub Issues
 - [Implement lore data model and store] - Link to GitHub issue
-- [Create basic lore extraction functionality] - Link to GitHub issue
-- [Build lore categorization system] - Link to GitHub issue
-- [Develop fact versioning and validation] - Link to GitHub issue
-- [Implement lore context builder for AI prompts] - Link to GitHub issue
-- [Create simple contradiction detection] - Link to GitHub issue
-- [Develop importance and confidence scoring] - Link to GitHub issue
+- [Create basic fact categorization system] - Link to GitHub issue
+- [Build fact source reference tracking] - Link to GitHub issue
+- [Implement basic lore context for AI prompts] - Link to GitHub issue
+- [Develop persistence layer for lore data] - Link to GitHub issue
+- [Create manual fact extraction functionality] - Link to GitHub issue
+- [Implement DevTools integration for lore system] - Link to GitHub issue
 
 ## Status
 - [x] Requirements defined

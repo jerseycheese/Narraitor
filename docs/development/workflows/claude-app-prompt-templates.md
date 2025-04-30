@@ -3,7 +3,7 @@ title: Claude App Prompt Templates (Updated)
 aliases: [App Prompts, Claude Prompt Library, Updated Prompt Templates]
 tags: [development, workflow, claude, prompt, templates]
 created: 2025-04-28
-updated: 2025-04-28
+updated: 2025-04-29
 ---
 
 # Claude App Prompt Templates (Updated)
@@ -24,6 +24,7 @@ updated: 2025-04-28
 - [Bug Fix Request](#bug-fix-request)
 - [Feature-Specific Implementation](#feature-specific-implementation)
 - [IDE-Based Build & Test Request](#ide-based-build--test-request-clineroo)
+- [Storybook Integration](#storybook-integration)
 - [GitHub Issue Management](#github-issue-management)
 - [Related Documents](#related-documents)
 
@@ -43,7 +44,7 @@ Each template is contained in a single code block that you can copy with a singl
 I'm working on the NarrAItor project, a Next.js/React application for a narrative-driven RPG framework using AI.
 
 ## Request
-Help me select and analyze the next task to implement.
+Help me select and analyze the next task to implement, following KISS principles.
 
 ## Information Access
 Please use MCP tools to:
@@ -51,12 +52,14 @@ Please use MCP tools to:
 2. Review the roadmap at `/Users/jackhaas/Projects/narraitor/docs/development-roadmap.md`
 3. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
 4. Check project structure at `/Users/jackhaas/Projects/narraitor/src`
+5. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
 
 ## Scope Constraints
 - Focus only on the current issue without adding enhancements
 - Do not propose architectural changes unless explicitly requested
 - Maintain existing patterns and approaches
 - Don't suggest additional libraries or dependencies
+- Follow KISS principles (max 300 lines per file, single responsibility, etc.)
 
 ## Analysis Goals
 Based on this information, please:
@@ -65,7 +68,8 @@ Based on this information, please:
 3. Evaluate value to effort ratios
 4. Check alignment with roadmap goals
 5. Create a technical specification for implementation
-6. Provide a clear, step-by-step plan
+6. Provide a clear, step-by-step plan following TDD principles
+7. Identify existing utilities/helpers that can be leveraged
 
 ## Output Format
 Please present your analysis as a markdown artifact with this structure:
@@ -95,8 +99,13 @@ INTERFACES
 [Interface definitions]
 
 IMPLEMENTATION STEPS
-1. [ ] [First step]
-2. [ ] [Second step]
+1. [ ] Define test cases (TDD approach)
+2. [ ] Create Storybook stories (for UI components)
+3. [ ] Implement minimum code to pass tests
+4. [ ] [Additional steps]
+
+Existing Utilities to Leverage:
+- [utility/helper path]: [purpose and usage]
 
 Files to Modify:
 - [path]: [changes]
@@ -108,6 +117,8 @@ TEST PLAN
    - [test scenario]
 2. Integration Tests:
    - [test scenario]
+3. Storybook Stories (for UI components):
+   - [story variants]
 
 SUCCESS CRITERIA
 - [ ] [criterion]
@@ -137,19 +148,21 @@ I'm implementing this technical spec:
 [PASTE SPEC ARTIFACT HERE]
 
 ## Request
-Help me define the tests for this feature before implementation.
+Help me define the tests for this feature before implementation, following strict TDD principles.
 
 ## Information Access
 Please use MCP tools to:
 1. Review existing test patterns at `/Users/jackhaas/Projects/narraitor/tests`
 2. Check component test examples at `/Users/jackhaas/Projects/narraitor/docs/technical-guides/component-testing.md`
+3. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib` and test utilities
 
 ## Test Requirements
 1. Write tests before implementation (TDD approach)
 2. Only test what's in scope (as defined in the spec)
 3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
 4. Use data-testid attributes for element selection
-5. Keep tests focused and minimal
+5. Keep tests focused and minimal (KISS approach)
+6. For UI components, include Storybook story definitions alongside tests
 
 ## Output Format
 Please provide:
@@ -157,6 +170,7 @@ Please provide:
    - Test file structure
    - Test cases covering functionality
    - Clear data-testid names following our convention
+   - Storybook story definitions for UI components
 2. An explanation of your testing approach
 3. A verification list of what is covered and what is not
 
@@ -178,13 +192,14 @@ And I've defined these tests:
 [PASTE TEST ARTIFACT HERE]
 
 ## Request
-Help me implement this specification to make the tests pass.
+Help me implement this specification to make the tests pass, following KISS principles and leveraging existing utilities.
 
 ## Information Access
 Please use MCP tools to:
 1. Review related files at [specific paths]
 2. Check our existing patterns for similar components
 3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+4. Review and leverage existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib` 
 
 ## Scope Constraints
 - Implement ONLY what's specified in the technical spec
@@ -192,6 +207,8 @@ Please use MCP tools to:
 - Follow existing patterns exactly, even if you see potential improvements
 - Use only the libraries and dependencies already in use
 - Do not introduce additional state management approaches
+- Keep files under 300 lines (KISS principle)
+- Use single responsibility for functions and components
 
 ## Implementation Approach
 1. Test-driven development (make the defined tests pass)
@@ -199,7 +216,9 @@ Please use MCP tools to:
 3. Clean code principles
 4. Error handling for specified cases only
 5. Stay within the defined scope boundaries
-6. Use existing utils and helpers in `/Users/jackhaas/Projects/narraitor/tests` or `/Users/jackhaas/Projects/narraitor/src/utils`
+6. For UI components, implement alongside Storybook stories
+7. Leverage existing utilities rather than creating new ones
+8. Maintain simple, readable code over clever optimizations
 
 ## Output Format
 Please provide implementation in this format:
@@ -212,9 +231,18 @@ CURRENT IMPLEMENTATION
 File: [current file]
 Status: [In Progress/Complete]
 
+Used Utilities/Helpers:
+- [path to utility/helper]: [how it was used]
+
 CODE CHANGES
 ```[language]
 [Actual code changes]
+```
+
+STORYBOOK STORIES (for UI components)
+```[language]
+[Storybook story code]
+```
 ```
 
 ## Build Phase
@@ -589,6 +617,62 @@ Please start with:
 2. A plan to address build issues first
 3. Specific changes to fix each issue
 4. A clear indication when we're transitioning to test fixes
+```
+
+## Storybook Integration
+
+```
+# Storybook Integration Request
+
+## Context
+I've implemented this UI component:
+
+[PASTE COMPONENT CODE]
+
+## Request
+Help me create comprehensive Storybook stories for this component following our component-driven development approach.
+
+## Information Access
+Please use MCP tools to:
+1. Review existing Storybook stories at `/Users/jackhaas/Projects/narraitor/src/stories`
+2. Check our Storybook workflow documentation at `/Users/jackhaas/Projects/narraitor/docs/development/workflows/storybook-workflow.md`
+3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+
+## Storybook Requirements
+1. Create stories for all component variants and states
+2. Include documentation on component props
+3. Demonstrate all interactive behaviors
+4. Show loading, error, and empty states
+5. Follow KISS principles in story implementation
+6. Use ArgTypes for interactive controls
+7. Organize within the correct category
+
+## Output Format
+Please provide:
+
+STORYBOOK STORIES
+File: [component].stories.tsx
+Category: [UI/Character/World/etc.]
+
+```tsx
+[Complete Storybook stories code]
+```
+
+DOCUMENTATION
+```tsx
+[JSDoc or prop table code]
+```
+
+COMPONENT VARIANTS COVERED
+- [ ] Default state
+- [ ] Loading state
+- [ ] Error state
+- [ ] Empty state
+- [ ] Interactive states
+- [ ] Additional variants: [list]
+
+TESTING INTEGRATION NOTES
+[Notes on how these stories relate to component tests]
 ```
 
 ## GitHub Issue Management

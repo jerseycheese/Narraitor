@@ -29,7 +29,7 @@ The Character Interface provides the user-facing components for creating, viewin
 - **AttributeAssignment**: Component for allocating attribute points
 - **SkillAssignment**: Component for selecting and rating skills
 - **CharacterDescription**: Text input fields for descriptive content
-- **CharacterPortrait**: Optional placeholder for character image
+- **CharacterPortrait**: Placeholder for character image (post-MVP)
 - **DeleteCharacterDialog**: Confirmation dialog for character deletion
 
 ## User Interactions
@@ -77,6 +77,35 @@ The Character Interface provides the user-facing components for creating, viewin
 5. Skill selection and rating interface is intuitive
 6. Character listing shows essential information for selection
 7. The interface adapts responsively to different screen sizes
+
+## UI Design Guidelines
+
+### Character Creation Wizard
+- Use a step-by-step approach with clear navigation between steps
+- Provide contextual help and tooltips for each input field
+- Show progress indicator to indicate completion status
+- Use consistent layout and styling across all wizard steps
+- Implement form validation with clear error messages
+- Allow users to navigate back to previous steps
+- Ensure all inputs are accessible with keyboard navigation
+
+### Character Sheet
+- Organize information into logical sections (basic info, attributes, skills)
+- Use visual hierarchy to emphasize important character details
+- Provide clean, readable typography for character information
+- Use consistent spacing and alignment for related information
+- Ensure the layout is responsive and adapts to different screen sizes
+- Use appropriate contrast for text readability
+- Include edit functionality for character details where applicable
+
+### Character List
+- Display characters in a grid or list format based on screen size
+- Show essential information (name, world, creation date)
+- Use consistent card or list item design for each character
+- Provide clear visual indication of selected character
+- Include obvious controls for character deletion
+- Implement confirmation for destructive actions
+- Use subtle animations for selection and deletion
 
 ## GitHub Issues
 - [Create CharacterList component] - Link to GitHub issue

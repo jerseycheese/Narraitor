@@ -15,10 +15,10 @@ The World Configuration System allows users to define and customize fictional wo
 - **World Creation**: Create new world configurations with name, description, and genre
 - **Attribute Management**: Define custom attributes with ranges and default values
 - **Skill Management**: Define skills linked to attributes
-- **Tone Configuration**: Set narrative tone and style preferences
-- **Template System**: Select from pre-defined world templates
-- **World Export/Import**: Export and import world configurations as JSON
-- **Location Management**: Define and manage locations within the world
+- **Tone Configuration**: Set narrative tone and style preferences (post-MVP)
+- **Template System**: Select from pre-defined world templates (post-MVP)
+- **World Export/Import**: Export and import world configurations as JSON (post-MVP)
+- **Location Management**: Define and manage locations within the world (post-MVP)
 - **Error Handling**: Graceful error handling and validation for world configurations
 
 ## Data Model
@@ -32,9 +32,9 @@ interface World {
   theme: WorldTheme;
   attributes: AttributeDefinition[];
   skills: SkillDefinition[];
-  toneSettings: ToneSettings;
-  locations?: LocationDefinition[];
-  ruleMechanics?: RuleMechanic[];
+  toneSettings?: ToneSettings; // Post-MVP
+  locations?: LocationDefinition[]; // Post-MVP
+  ruleMechanics?: RuleMechanic[]; // Post-MVP
   createdAt: string;
   updatedAt: string;
 }
@@ -46,7 +46,7 @@ interface AttributeDefinition {
   minValue: number;
   maxValue: number;
   defaultValue: number;
-  category?: string;
+  category?: string; // Post-MVP
 }
 
 interface SkillDefinition {
@@ -57,10 +57,10 @@ interface SkillDefinition {
   minValue: number;
   maxValue: number;
   defaultValue: number;
-  category?: string;
+  category?: string; // Post-MVP
 }
 
-interface ToneSettings {
+interface ToneSettings { // Post-MVP
   narrativeStyle: 'descriptive' | 'concise' | 'dramatic' | 'humorous';
   pacePreference: 'slow' | 'moderate' | 'fast';
   contentRating: 'family' | 'teen' | 'mature';
@@ -77,10 +77,10 @@ interface WorldTheme {
   accentColor: string;
   fontFamily: string;
   backgroundStyle: string;
-  customCSS?: string;
+  customCSS?: string; // Post-MVP
 }
 
-interface LocationDefinition {
+interface LocationDefinition { // Post-MVP
   id: string;
   name: string;
   description: string;
@@ -90,7 +90,7 @@ interface LocationDefinition {
   initialNarrativePrompt?: string;
 }
 
-interface RuleMechanic {
+interface RuleMechanic { // Post-MVP
   id: string;
   name: string;
   description: string;
@@ -103,20 +103,21 @@ interface RuleMechanic {
 
 ## User Interactions
 - Users create worlds through a step-by-step wizard interface
-- Users select from templates to speed up creation
 - Users edit existing worlds through a dedicated interface
 - Users view a list of available worlds and select one for play
-- Users export worlds to share or backup configurations
-- Users import worlds created by themselves or others
-- Users manage locations within a world with connections between them
-- Users define world-specific rule mechanics (optional)
+- Users select from templates to speed up creation (post-MVP)
+- Users export worlds to share or backup configurations (post-MVP)
+- Users import worlds created by themselves or others (post-MVP)
+- Users manage locations within a world with connections between them (post-MVP)
+- Users define world-specific rule mechanics (post-MVP)
 
 ## Integration Points
 - **Character System**: Provides attribute and skill definitions for character creation
-- **Narrative Engine**: Provides tone settings to guide AI narrative generation
+- **Narrative Engine**: Provides world context for narrative generation
 - **Journal System**: Provides world context for journal entries
 - **State Management**: Persists world configurations between sessions
-- **Location Service**: Manages locations for scene transitions in narrative
+- **Location Service**: Manages locations for scene transitions in narrative (post-MVP)
+- **Tone Configuration**: Guides AI narrative generation style (post-MVP)
 - **Recovery System**: Handles error recovery for world configuration issues
 
 ## MVP Scope Boundaries
@@ -131,6 +132,12 @@ interface RuleMechanic {
   - Up to 12 skills per world
   - Numeric range of 1-5 for all skills
   - Each skill linked to 1-2 attributes
+- World selection screen showing name, description, and genre
+- Basic editor interface for updating world settings after creation
+- Five AI-generated theme option values that affect UI appearance
+- Basic error handling and validation for world configurations
+
+### Excluded from MVP
 - Basic tone settings:
   - Four narrative style options (descriptive, concise, dramatic, humorous)
   - Three pacing options (slow, moderate, fast)
@@ -142,12 +149,6 @@ interface RuleMechanic {
   - Sci-Fi Exploration (attributes: Physique, Reflexes, Intelligence, Perception, Social, Technical)
   - Mystery Investigation (attributes: Physical, Mental, Social, Observation, Knowledge, Intuition)
 - Simple import/export functionality using JSON file format
-- World selection screen showing name, description, and genre
-- Basic editor interface for updating world settings after creation
-- Five pre-defined theme options that affect UI appearance
-- Basic error handling and validation for world configurations
-
-### Excluded from MVP
 - Custom narrative prompt templates
 - Location management within worlds
 - Faction and organization definitions
@@ -164,7 +165,7 @@ interface RuleMechanic {
 
 1. **World Creation**
    - As a user, I want to create a new world with basic information so I can start building my narrative setting
-   - As a user, I want to select a pre-defined template to quickly set up a world in a particular genre
+   - As a user, I want to select a pre-defined template to quickly set up a world in a particular genre (post-MVP)
 
 2. **Attribute Management**
    - As a user, I want to define custom attributes for my world so characters can have appropriate traits
@@ -176,16 +177,16 @@ interface RuleMechanic {
    - As a user, I want to organize skills by related attributes for logical character development
    - As a user, I want to categorize skills by type or domain (post-MVP)
 
-4. **Tone Configuration**
+4. **Tone Configuration** (post-MVP)
    - As a user, I want to set narrative style preferences so the generated content matches my desired tone
    - As a user, I want to specify content rating to ensure appropriate material for my intended audience
-   - As a user, I want to define custom narrative prompt templates for specific situations (post-MVP)
+   - As a user, I want to define custom narrative prompt templates for specific situations
 
 5. **World Selection and Management**
    - As a user, I want to view all my created worlds so I can select one for play
    - As a user, I want to edit existing worlds to refine my settings
-   - As a user, I want to export my world configuration so I can backup or share it
-   - As a user, I want to import a world configuration so I can use settings created by myself or others
+   - As a user, I want to export my world configuration so I can backup or share it (post-MVP)
+   - As a user, I want to import a world configuration so I can use settings created by myself or others (post-MVP)
 
 6. **Location Management** (post-MVP)
    - As a user, I want to define locations within my world so characters can have places to visit
@@ -200,22 +201,17 @@ interface RuleMechanic {
 ## Acceptance Criteria
 1. Users can successfully create, edit, and delete worlds
 2. Users can define custom attributes and skills for each world with proper validation
-3. Users can configure tone settings that influence narrative generation
-4. Template worlds demonstrate different genres with appropriate attributes and skills
-5. Worlds can be exported to JSON and imported from JSON files
-6. World settings correctly influence character creation and narrative generation
-7. UI adapts to the selected world's theme
-8. Form validation prevents invalid configurations (e.g., duplicate attribute names)
-9. World list shows all created worlds with sorting by date created
-10. Deleted worlds are confirmed before removal and completely purged from storage
-11. The system handles errors gracefully during world creation and editing
-12. The system allows recovery of unsaved world configuration progress
+3. World settings correctly influence character creation
+4. UI adapts to the selected world's theme
+5. Form validation prevents invalid configurations (e.g., duplicate attribute names)
+6. World list shows all created worlds with sorting by date created
+7. Deleted worlds are confirmed before removal and completely purged from storage
+8. The system handles errors gracefully during world creation and editing
+9. The system allows recovery of unsaved world configuration progress
 
 ## GitHub Issues
 - [Create World Creation Wizard component] - Link to GitHub issue
 - [Implement world data model and state management] - Link to GitHub issue
-- [Develop world template system with three templates] - Link to GitHub issue
-- [Create world export/import functionality] - Link to GitHub issue
 - [Build world selection interface] - Link to GitHub issue
 - [Implement world editor interface] - Link to GitHub issue
 - [Create world theme system with 5 preset themes] - Link to GitHub issue

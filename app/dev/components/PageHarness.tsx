@@ -1,0 +1,9 @@
+import { Page } from '../../../src/stories/Page';
+
+export function PageHarness() {
+  // Stage 1: Isolation – …
+  // Stage 2: Test Harness – …
+  // Stage 3: Integration – …
+
+  return <Page />;
+}

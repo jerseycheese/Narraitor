@@ -77,6 +77,7 @@ interface NarrativeContext {
 - Basic impact assessment for narrative consequences
 - Essential configuration parameters
 - Token-efficient context formatting
+- DevTools integration to expose helpful info/debug tools
 
 ### Excluded
 - Advanced semantic analysis of decision content
@@ -106,6 +107,10 @@ interface NarrativeContext {
 - [Implement context selection logic] - Link to GitHub issue
 - [Create configuration interface] - Link to GitHub issue
 - [Develop token-efficient context formatting] - Link to GitHub issue
+- [Implement DevTools integration for Decision Relevance] - Link to GitHub issue
+
+## BootHillGM Reference Code
+- The BootHillGM project doesn't have a dedicated Decision Relevance System, as its narrative is more linear. However, the context management approach in `/app/components/GamePromptWithOptimizedContext.tsx` and the decision tracking in `/app/reducers/gameReducer.ts` could provide some conceptual reference for managing relevant information for the AI.
 
 ## Status
 - [x] Requirements defined
