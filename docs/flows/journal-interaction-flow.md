@@ -9,10 +9,10 @@ updated: 2025-04-29
 # Journal Interaction User Flow
 
 ## Overview
-This user flow documents the process of accessing, reviewing, and interacting with the journal system in NarrAItor. It covers both in-game journal access and standalone journal review outside of active gameplay.
+This user flow documents the process of accessing, reviewing, and interacting with the journal system in Narraitor. It covers both in-game journal access and standalone journal review outside of active gameplay.
 
 ## Prerequisites
-- User has logged in to NarrAItor
+- User has logged in to Narraitor
 - At least one campaign with journal entries exists
 
 ## User Flow Diagram

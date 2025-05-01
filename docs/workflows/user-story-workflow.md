@@ -1,35 +1,22 @@
 ---
-title: NarrAItor User Story Workflow
+title: Narraitor User Story Workflow
 aliases: [User Story Workflow, Issue Management Workflow]
 tags: [narraitor, documentation, workflow, agile]
 created: 2025-04-28
 updated: 2025-04-28
 ---
 
-# NarrAItor User Story Workflow
+# Narraitor User Story Workflow
 
-This document outlines the workflow for creating, tracking, and completing user stories in the NarrAItor project using GitHub Issues.
+This document outlines the workflow for creating, tracking, and completing user stories in the Narraitor project using GitHub Issues.
 
 ## Issue Templates
 
-NarrAItor uses several issue templates to standardize how we track work:
+Narraitor uses several issue templates to standardize how we track work:
 
 ### User Story Template
 
-Use this template for describing features from a user's perspective. The template follows the standard format:
-
-```
-As a [type of user], I want [goal/need] so that [benefit/value].
-```
-
-When creating a user story:
-1. Clearly identify the type of user (e.g., player, game master, system designer)
-2. Specify what they want to achieve
-3. Explain the benefit or value they'll receive
-4. Assign the relevant domain label
-5. Set the appropriate priority level
-6. Define clear acceptance criteria
-
+The official user story GitHub issue template is located at `.github/ISSUE_TEMPLATE/user-story.md`. Use that file as the single source of truth for creating user story issues.
 ### Bug Report Template
 
 Use this template when reporting bugs or issues in the system. When creating a bug report:
@@ -82,7 +69,7 @@ User stories are prioritized into four levels:
 
 ## GitHub Project Board
 
-The NarrAItor project uses GitHub Projects to visualize and manage the workflow. The board consists of the following columns:
+The Narraitor project uses GitHub Projects to visualize and manage the workflow. The board consists of the following columns:
 
 1. **Backlog**: User stories that have been created but not yet planned for implementation
 2. **Ready**: User stories that are planned for the current or upcoming development cycle
@@ -94,7 +81,7 @@ The NarrAItor project uses GitHub Projects to visualize and manage the workflow.
 
 ### Creating User Stories
 
-1. Go to the [Issues tab](https://github.com/jerseycheese/narraitor/issues) of the NarrAItor repository
+1. Go to the [Issues tab](https://github.com/jerseycheese/narraitor/issues) of the Narraitor repository
 2. Click "New Issue"
 3. Select the appropriate template
 4. Fill in the required information

@@ -3,13 +3,13 @@ title: Utilities and Helpers Requirements
 aliases: [Core Utilities Requirements]
 tags: [narraitor, requirements, utilities, helpers]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-04-30
 ---
 
 # Utilities and Helpers Requirements
 
 ## Overview
-The Utilities and Helpers module provides a collection of reusable functions, tools, and utilities that support various core systems across NarrAItor. These utilities handle common operations, provide type safety, manage errors, and support development workflows.
+The Utilities and Helpers module provides a collection of reusable functions, tools, and utilities that support various core systems across Narraitor. These utilities handle common operations, provide type safety, manage errors, and support development workflows.
 
 ## Core Functionality
 - **Error Handling**: Create standardized error objects with consistent structure
@@ -113,6 +113,38 @@ For a comprehensive development environment, these utilities work in conjunction
 - Complex object diffing and patching
 - Resource caching strategies
 - Background processing utilities
+
+## User Stories
+
+1. **Error Handling**
+- As a developer, I want to create standardized error objects with consistent structure so that errors can be processed uniformly across the application (Complexity: Small, Priority: High)
+- As a developer, I want to categorize errors by type so that appropriate recovery strategies can be applied (Complexity: Small, Priority: Medium)
+- As a developer, I want simple retry determination for service errors so that transient failures can be handled automatically (Complexity: Small, Priority: Medium)
+
+2. **Storage**
+- As a developer, I want a type-safe IndexedDB wrapper so that data persistence operations are reliable and well-typed (Complexity: Medium, Priority: High)
+- As a developer, I want robust error handling for storage operations so that data integrity is maintained (Complexity: Medium, Priority: High)
+- As a developer, I want helpers for safely accessing nested properties so that code is more robust against undefined values (Complexity: Small, Priority: Medium)
+
+3. **Text Processing**
+- As a developer, I want utilities to clean metadata from AI-generated content so that users see properly formatted text (Complexity: Small, Priority: High)
+- As a developer, I want tools to normalize text formats so that content appears consistent throughout the application (Complexity: Small, Priority: Medium)
+- As a developer, I want helpers to extract relevant information from responses so that AI outputs can be processed efficiently (Complexity: Medium, Priority: Medium)
+
+4. **Debugging**
+- As a developer, I want console logging with severity levels so that I can filter log output appropriately (Complexity: Small, Priority: Medium)
+- As a developer, I want performance measurement utilities so that I can identify optimization opportunities (Complexity: Medium, Priority: Medium)
+- As a developer, I want access to state inspection utilities so that I can debug application state issues (Complexity: Medium, Priority: Medium)
+
+5. **AI Service Support**
+- As a developer, I want retry logic with backoff strategy so that AI service calls are resilient to temporary failures (Complexity: Medium, Priority: High)
+- As a developer, I want context optimization utilities so that token usage remains within limits (Complexity: Medium, Priority: High)
+- As a developer, I want response validation tools so that invalid AI responses can be detected and handled (Complexity: Medium, Priority: Medium)
+
+6. **General Utilities**
+- As a developer, I want UUID generation with browser compatibility so that entities have reliable unique identifiers (Complexity: Small, Priority: High)
+- As a developer, I want type guards for core domain objects so that runtime type checking is reliable (Complexity: Small, Priority: High)
+- As a developer, I want basic string and date formatting helpers so that presentation is consistent (Complexity: Small, Priority: Medium)
 
 ## Acceptance Criteria
 1. Error handling utilities create consistent error objects with appropriate metadata

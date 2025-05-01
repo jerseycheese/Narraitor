@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Game Session Interface Requirements
 
 ## Overview
-The Game Session Interface is the primary user-facing component for playing NarrAItor. It displays the narrative content, presents choices to the player, shows relevant character information, and provides access to the journal. This interface is the core gameplay experience and must be intuitive, responsive, and immersive.
+The Game Session Interface is the primary user-facing component for playing Narraitor. It displays the narrative content, presents choices to the player, shows relevant character information, and provides access to the journal. This interface is the core gameplay experience and must be intuitive, responsive, and immersive.
 
 ## Core Functionality
 - **Narrative Display**: Show AI-generated narrative content

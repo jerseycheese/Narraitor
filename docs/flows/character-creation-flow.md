@@ -9,10 +9,10 @@ updated: 2025-04-29
 # Character Creation User Flow
 
 ## Overview
-This user flow documents the process of creating a new character within a selected world in NarrAItor. It covers the complete workflow from initiating character creation to having a fully defined character ready for narrative play.
+This user flow documents the process of creating a new character within a selected world in Narraitor. It covers the complete workflow from initiating character creation to having a fully defined character ready for narrative play.
 
 ## Prerequisites
-- User has logged in to NarrAItor
+- User has logged in to Narraitor
 - At least one world has been created
 - No active game session is in progress
 

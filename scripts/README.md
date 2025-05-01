@@ -1,82 +1,85 @@
-# NarrAItor GitHub Setup Scripts
+# Narraitor Scripts
 
-This directory contains scripts to help set up and manage the GitHub project for NarrAItor.
+This directory contains utility scripts for managing and automating tasks in the Narraitor project.
 
-## Available Scripts
+## User Story Update Script
 
-1. **github-label-creator.js** - Creates and updates GitHub issue labels
-2. **migrate-user-stories.js** - Migrates user stories from docs/user-stories.md to GitHub Issues
+The `update-user-stories.js` script is used to update GitHub issues with user stories, ensuring they have:
 
-## Prerequisites
+- Correct documentation links
+- Implementation notes
+- Consistent complexity and priority values (from mapping)
+- Appropriate labels
 
-- Node.js installed on your system
-- GitHub Personal Access Token with repo scope permissions
-- Owner/Repo information updated in the scripts (if different from default)
+### Recent Changes
 
-## Setup Instructions
+The script has been refactored to:
 
-Before running these scripts, make sure to:
+1. **Always use mapping values**: Complexity and priority values now always come from `getStoryComplexityAndPriority()` in the story-complexity-mapping.js file, overriding any values in issue bodies or labels.
 
-1. Install Node.js if you don't already have it
-2. Generate a GitHub Personal Access Token:
-   - Go to GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
-   - Generate a new token with "repo" scope permissions
-   - Copy the token for use with the scripts
+2. **Improved label handling**: Now cleans up existing complexity and priority labels (case-insensitive) before adding new ones.
 
-## Running the Scripts
+3. **Modular structure**: The code has been split into multiple files to maintain better organization and keep components under 300 lines:
+   - `update-user-stories.js` - Main script and entry point
+   - `story-validation-utils.js` - Utility functions for validating and extracting information
+   - `github-issue-utils.js` - GitHub API utilities
+   - `process-issues.js` - Core issue processing logic
 
-### 1. First, create the GitHub labels:
+4. **New validation mode**: Added a `--validate` flag to check for inconsistencies between GitHub issues and requirement docs without modifying any issues.
 
-```bash
-# Set your GitHub token as an environment variable
-export GITHUB_TOKEN=your_github_token_here
+5. **Standalone validator**: New `validate-user-stories.js` script that can be run separately to identify inconsistencies.
 
-# Run the label creator script
-node github-label-creator.js
-```
-
-The script will:
-- Read labels defined in `/.github/labels.md`
-- Create and update labels in your GitHub repository
-- Display a summary of changes made
-
-### 2. Then, migrate user stories to GitHub Issues (optional):
+### Usage
 
 ```bash
-# Make sure your GitHub token is still set
-export GITHUB_TOKEN=your_github_token_here
+# Update all issues (interactive)
+node scripts/update-user-stories.js
 
-# Run the user story migration script
-node migrate-user-stories.js
+# Validate all issues without making changes
+node scripts/update-user-stories.js --validate
+
+# Dry run - show what would be updated without making changes
+node scripts/update-user-stories.js --dry-run
+
+# Process a specific issue
+node scripts/update-user-stories.js --issue 123
+
+# Limit the number of issues to process
+node scripts/update-user-stories.js --limit 10
+
+# Bypass label verification
+node scripts/update-user-stories.js --force
 ```
 
-The script will:
-- Parse user stories from `/docs/user-stories.md`
-- Show a preview of the first story
-- Ask for confirmation before proceeding
-- Create GitHub issues for each user story with appropriate labels
-- Display a summary of the migration
+### Standalone Validation
 
-## Troubleshooting
+```bash
+# Validate all issues
+node scripts/validate-user-stories.js
 
-Common issues:
+# Validate a specific issue
+node scripts/validate-user-stories.js --issue 123
+```
 
-1. **Authentication Error**: Make sure your GitHub token is valid and has the necessary permissions
-2. **File Not Found**: Ensure the paths to labels.md and user-stories.md are correct
-3. **Rate Limiting**: GitHub API has rate limits - the scripts add delays, but you might hit limits if creating many issues
+### Testing
 
-## Notes
+A test script is provided to verify the functionality:
 
-- The labels script will only update labels that have changed, so it's safe to run multiple times
-- The migration script will create new issues for all user stories in the markdown file, potentially creating duplicates if run multiple times
-- You can modify the scripts to change the repository owner/name or to customize the issue format
+```bash
+# Make the script executable first
+chmod +x scripts/test-update-stories.sh
 
-## GitHub Project Board
+# Run the tests
+./scripts/test-update-stories.sh
+```
 
-After running these scripts, you'll need to manually create a GitHub Project Board:
+## Requirements Annotation Script
 
-1. Go to the repository → Projects tab → New project
-2. Select "Classic project board" and use the "Kanban" template
-3. Name it "NarrAItor Development"
-4. Configure columns: Backlog, Ready, In Progress, In Review, Done
-5. Set up automation rules for the columns
+The `annotate-requirements-docs.js` script annotates user stories in core requirement documents with their complexity and priority based on the mapping defined in the story-complexity-mapping.js file.
+
+### Usage
+
+```bash
+# Annotate all requirement documents
+node scripts/annotate-requirements-docs.js
+```

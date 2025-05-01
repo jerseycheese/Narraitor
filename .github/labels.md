@@ -1,6 +1,6 @@
 # GitHub Issue Labels
 
-This file documents the labels used in the NarrAItor repository. You can use a tool like [github-label-sync](https://github.com/Financial-Times/github-label-sync) to set up these labels in your repository.
+This file documents the labels used in the Narraitor repository. You can use a tool like [github-label-sync](https://github.com/Financial-Times/github-label-sync) to set up these labels in your repository.
 
 ## Type Labels
 
@@ -9,9 +9,6 @@ This file documents the labels used in the NarrAItor repository. You can use a t
 - `user-story` - New feature described from a user's perspective
 - `epic` - Large feature that contains multiple user stories
 - `documentation` - Improvements or additions to documentation
-- `question` - Further information is requested
-- `help-wanted` - Extra attention is needed
-- `good-first-issue` - Good for newcomers
 
 ## Domain Labels
 
@@ -30,6 +27,12 @@ This file documents the labels used in the NarrAItor repository. You can use a t
 - `priority:medium` - Medium priority items
 - `priority:low` - Low priority items
 - `priority:post-mvp` - Items intentionally planned for after MVP
+
+## Complexity Labels
+
+- `complexity:small` - Small complexity (1-2 days of effort)
+- `complexity:medium` - Medium complexity (3-5 days of effort)
+- `complexity:large` - Large complexity (1+ week of effort)
 
 ## Status Labels
 
@@ -50,4 +53,5 @@ For consistent visual styling, use these hex colors for labels:
 - Documentation: `#0075ca` (blue)
 - Domain labels: `#5319e7` (purple)
 - Priority labels: `#f9d0c4` (salmon)
+- Complexity labels: `#bfd4f2` (light blue)
 - Status labels: `#c2e0c6` (light green)

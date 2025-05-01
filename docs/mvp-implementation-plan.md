@@ -6,10 +6,10 @@ created: 2025-04-29
 updated: 2025-04-30
 ---
 
-# NarrAItor MVP Implementation Plan
+# Narraitor MVP Implementation Plan
 
 ## Overview
-This document outlines the implementation strategy for the Minimum Viable Product (MVP) of the NarrAItor project. It focuses on delivering essential functionality with a phased approach, ensuring a working product that can be iteratively enhanced while maintaining a lean scope.
+This document outlines the implementation strategy for the Minimum Viable Product (MVP) of the Narraitor project. It focuses on delivering essential functionality with a phased approach, ensuring a working product that can be iteratively enhanced while maintaining a lean scope.
 
 ## MVP Goals
 
@@ -469,6 +469,6 @@ To begin MVP implementation:
 
 ## Conclusion
 
-This MVP implementation plan provides a comprehensive roadmap for developing the NarrAItor application. By focusing on AI-assisted world creation from freeform descriptions, the project aims to deliver a flexible narrative RPG framework that can truly adapt to any fictional world the user wishes to explore.
+This MVP implementation plan provides a comprehensive roadmap for developing the Narraitor application. By focusing on AI-assisted world creation from freeform descriptions, the project aims to deliver a flexible narrative RPG framework that can truly adapt to any fictional world the user wishes to explore.
 
 The plan maintains a balanced approach between feature scope and quality, with special attention to error handling, recovery mechanisms, and user experience. Through disciplined development practices and incremental delivery, the MVP will establish a solid foundation for future enhancements while providing a fully functional application.

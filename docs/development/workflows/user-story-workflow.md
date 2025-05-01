@@ -9,7 +9,7 @@ updated: 2025-04-28
 # User Story Workflow
 
 > [!info]
-> Process for managing user stories using GitHub Issues in the NarrAItor project.
+> Process for managing user stories using GitHub Issues in the Narraitor project.
 
 ## Process
 
@@ -28,9 +28,9 @@ graph TD
 
 ## Issue Templates
 
-NarrAItor uses four templates to standardize tracking:
+Narraitor uses four templates to standardize tracking:
 
-1. **User Story**: Features from a user's perspective
+1. **User Story**: Use the official template at `.github/ISSUE_TEMPLATE/user-story.md` to describe features from a user's perspective
 2. **Bug Report**: Issues in the existing system
 3. **Enhancement**: Improvements to features
 4. **Epic**: Larger features composed of multiple stories
@@ -94,7 +94,7 @@ Columns:
 
 ## MCP Integration
 
-NarrAItor supports GitHub Issues MCP integration:
+Narraitor supports GitHub Issues MCP integration:
 - Create stories via Claude
 - Query issue status
 - Update issue details

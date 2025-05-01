@@ -133,23 +133,23 @@ interface JournalSession {
 ## User Stories
 
 1. **Journal Recording**
-   - As a player, I want the system to automatically record important narrative events so I can review them later
-   - As a player, I want my decisions and their outcomes recorded so I can remember the choices I've made
-   - As a player, I want to see when I discovered important information so I can track my progress
-   - As a player, I want system events recorded so I have a complete history of my game session
+- As a player, I want the system to automatically record important narrative events so I can review them later (Complexity: Small, Priority: Medium)
+- As a player, I want my decisions and their outcomes recorded so I can remember the choices I've made (Complexity: Small, Priority: Medium)
+- As a player, I want to see when I discovered important information so I can track my progress (Complexity: Small, Priority: Medium)
+- As a player, I want system events recorded so I have a complete history of my game session (Complexity: Small, Priority: Medium)
 
 2. **Journal Navigation**
-   - As a player, I want to browse journal entries chronologically so I can follow the story progression
+- As a player, I want to browse journal entries chronologically so I can follow the story progression (Complexity: Small, Priority: Medium)
 
 3. **Journal Interaction**
-   - As a player, I want to access the journal during gameplay so I can remind myself of previous events
-   - As a player, I want to read entries with proper formatting so they're easy to read
+- As a player, I want to access the journal during gameplay so I can remind myself of previous events (Complexity: Small, Priority: Medium)
+- As a player, I want to read entries with proper formatting so they're easy to read (Complexity: Small, Priority: Medium)
 
 4. **Journal Persistence**
-   - As a player, I want my journal to persist between sessions so my story history is preserved
+- As a player, I want my journal to persist between sessions so my story history is preserved (Complexity: Small, Priority: Medium)
 
 5. **Journal Summaries**
-   - As a player, I want to see summaries of longer entries so I can quickly understand their content
+- As a player, I want to see summaries of longer entries so I can quickly understand their content (Complexity: Small, Priority: Medium)
 
 ## Acceptance Criteria
 1. The system automatically creates journal entries for narrative events, decisions, discoveries, and character encounters

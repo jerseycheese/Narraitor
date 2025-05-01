@@ -93,22 +93,22 @@ interface PlayerChoice {
 ## User Stories
 
 1. **Decision Presentation**
-   - As a player, I want to be presented with clear decision points in the narrative so I can make meaningful choices
-   - As a player, I want multiple options for each decision so I can express my character's personality
-   - As a player, I want a clean, readable interface for decisions so I can easily understand my options
+- As a player, I want to be presented with clear decision points in the narrative so I can make meaningful choices (Complexity: Medium, Priority: Medium)
+- As a player, I want multiple options for each decision so I can express my character's personality (Complexity: Medium, Priority: Medium)
+- As a player, I want a clean, readable interface for decisions so I can easily understand my options (Complexity: Medium, Priority: Medium)
 
 2. **Decision Recording**
-   - As a player, I want my choices to be recorded so they can influence the narrative going forward
-   - As a player, I want to see my major decisions in my journal so I can remember what choices I've made
-   - As a player, I want basic context recorded with my decisions so I understand when and where they were made
+- As a player, I want my choices to be recorded so they can influence the narrative going forward (Complexity: Medium, Priority: Medium)
+- As a player, I want to see my major decisions in my journal so I can remember what choices I've made (Complexity: Medium, Priority: Medium)
+- As a player, I want basic context recorded with my decisions so I understand when and where they were made (Complexity: Medium, Priority: Medium)
 
 3. **Decision Impact**
-   - As a player, I want my decisions to have consequences in the narrative so my choices feel meaningful
-   - As a player, I want the story to acknowledge my past choices so the narrative feels personalized
+- As a player, I want my decisions to have consequences in the narrative so my choices feel meaningful (Complexity: Medium, Priority: Medium)
+- As a player, I want the story to acknowledge my past choices so the narrative feels personalized (Complexity: Medium, Priority: Medium)
 
 4. **Development Support**
-   - As a developer, I want to see decision data during development to debug decision tracking
-   - As a developer, I want to understand how decisions are being presented and recorded in the system
+- As a developer, I want to see decision data during development to debug decision tracking (Complexity: Medium, Priority: Medium)
+- As a developer, I want to understand how decisions are being presented and recorded in the system (Complexity: Medium, Priority: Medium)
 
 ## Acceptance Criteria
 1. Players are presented with clear, contextual decision points in the narrative

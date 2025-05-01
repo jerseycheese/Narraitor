@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Data Migration Strategy
 
 ## Overview
-This document outlines the approach for handling schema evolution, data migrations, and backward compatibility in NarrAItor. It describes how the application manages changes to data structures over time while maintaining data integrity and user experience.
+This document outlines the approach for handling schema evolution, data migrations, and backward compatibility in Narraitor. It describes how the application manages changes to data structures over time while maintaining data integrity and user experience.
 
 ## Data Versioning Approach
 

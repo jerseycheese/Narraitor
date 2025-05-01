@@ -9,10 +9,10 @@ updated: 2025-04-29
 # World Creation User Flow
 
 ## Overview
-This user flow documents the process of creating and configuring a new fictional world in NarrAItor. It covers the complete workflow from initiating world creation to having a fully configured world ready for character creation and narrative generation.
+This user flow documents the process of creating and configuring a new fictional world in Narraitor. It covers the complete workflow from initiating world creation to having a fully configured world ready for character creation and narrative generation.
 
 ## Prerequisites
-- User has logged in to NarrAItor
+- User has logged in to Narraitor
 - No active game session is in progress
 
 ## User Flow Diagram

@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Domain Integration Protocols
 
 ## Overview
-This document defines how the different domains within NarrAItor communicate and interact with each other, establishing clear interfaces, data flow patterns, and error handling protocols at domain boundaries.
+This document defines how the different domains within Narraitor communicate and interact with each other, establishing clear interfaces, data flow patterns, and error handling protocols at domain boundaries.
 
 ## Domain Communication Principles
 1. **Loose Coupling**: Domains should interact through well-defined interfaces only

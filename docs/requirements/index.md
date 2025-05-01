@@ -6,10 +6,10 @@ created: 2025-04-29
 updated: 2025-04-29
 ---
 
-# NarrAItor Requirements Documentation
+# Narraitor Requirements Documentation
 
 ## Purpose
-This directory contains lean requirements documentation for NarrAItor systems, focused on providing clear guidance for development while avoiding overengineering. These documents are designed specifically for a solo developer working towards an MVP.
+This directory contains lean requirements documentation for Narraitor systems, focused on providing clear guidance for development while avoiding overengineering. These documents are designed specifically for a solo developer working towards an MVP.
 
 ## Usage
 1. These documents define what needs to be built (not how)

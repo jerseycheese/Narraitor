@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Refined Requirements Summary
 
 ## Overview
-This document summarizes the refined requirements for the NarrAItor MVP. The requirements have been updated to provide clearer scope boundaries, more specific implementation details, and well-defined user stories that can be directly converted to GitHub issues.
+This document summarizes the refined requirements for the Narraitor MVP. The requirements have been updated to provide clearer scope boundaries, more specific implementation details, and well-defined user stories that can be directly converted to GitHub issues.
 
 ## Key Refinements Made
 
@@ -141,4 +141,4 @@ Key risks to monitor:
 
 ## Conclusion
 
-The refined requirements provide a clear, focused scope for the NarrAItor MVP. By strictly adhering to these boundaries while implementing the key features of each core system, we can deliver a functional narrative RPG framework within the 10-week timeline. The next step is to convert these requirements into specific GitHub issues to begin implementation.
+The refined requirements provide a clear, focused scope for the Narraitor MVP. By strictly adhering to these boundaries while implementing the key features of each core system, we can deliver a functional narrative RPG framework within the 10-week timeline. The next step is to convert these requirements into specific GitHub issues to begin implementation.

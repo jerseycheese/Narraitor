@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * GitHub Label Management Script for NarrAItor
+ * GitHub Label Management Script for Narraitor
  * 
  * This script creates and updates GitHub labels based on the defined structure
- * in the NarrAItor project. It reads from the .github/labels.md file to determine
+ * in the Narraitor project. It reads from the .github/labels.md file to determine
  * which labels to create.
  * 
  * Usage:
@@ -14,9 +14,7 @@
  *   node setup-github-labels.js ghp_xxxxxxxxxxxx jerseycheese narraitor
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import https from 'https';
 
 // Get command line arguments
 const [,, token, owner, repo] = process.argv;
@@ -76,7 +74,7 @@ function makeRequest(method, path, data = null) {
       path,
       method,
       headers: {
-        'User-Agent': 'NarrAItor-Label-Setup',
+        'User-Agent': 'Narraitor-Label-Setup',
         'Authorization': `token ${token}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
@@ -93,7 +91,7 @@ function makeRequest(method, path, data = null) {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try {
             resolve(responseData ? JSON.parse(responseData) : {});
-          } catch (e) {
+          } catch {
             resolve(responseData);
           }
         } else {

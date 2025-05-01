@@ -10,7 +10,7 @@ updated: 2025-04-29
 
 ## Overview
 
-This document outlines the technical approach and technology stack for the NarrAItor project. It focuses on modern best practices, maintainable code, and a tech stack that supports the project's unique requirements.
+This document outlines the technical approach and technology stack for the Narraitor project. It focuses on modern best practices, maintainable code, and a tech stack that supports the project's unique requirements.
 
 ## Core Technologies
 

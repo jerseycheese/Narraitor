@@ -100,18 +100,18 @@ interface LoreStore {
 ## User Stories
 
 1. **Lore Tracking**
-   - As a developer, I want the system to store world facts so they can be referenced consistently
-   - As a developer, I want facts categorized to better organize world knowledge
-   - As a player, I want the AI to remember established world details for a coherent experience
+- As a developer, I want the system to store world facts so they can be referenced consistently (Complexity: Small, Priority: Medium)
+- As a developer, I want facts categorized to better organize world knowledge (Complexity: Small, Priority: Medium)
+- As a player, I want the AI to remember established world details for a coherent experience (Complexity: Small, Priority: Medium)
 
 2. **Lore Integration**
-   - As a developer, I want relevant lore included in AI prompts for consistent storytelling
-   - As a player, I want the narrative to maintain consistent details about the world
-   - As a developer, I want to trace facts back to their original sources for verification
+- As a developer, I want relevant lore included in AI prompts for consistent storytelling (Complexity: Small, Priority: Medium)
+- As a player, I want the narrative to maintain consistent details about the world (Complexity: Small, Priority: Medium)
+- As a developer, I want to trace facts back to their original sources for verification (Complexity: Small, Priority: Medium)
 
 3. **Development Support**
-   - As a developer, I want access to debug tools to inspect the lore database during development
-   - As a developer, I want to see how lore is being used in AI contexts to improve the system
+- As a developer, I want access to debug tools to inspect the lore database during development (Complexity: Small, Priority: Medium)
+- As a developer, I want to see how lore is being used in AI contexts to improve the system (Complexity: Small, Priority: Medium)
 
 ## Acceptance Criteria
 1. The system correctly stores and categorizes lore facts

@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in NarrAItor
+about: Report a bug in Narraitor
 title: '[BUG] '
 labels: bug
 ---

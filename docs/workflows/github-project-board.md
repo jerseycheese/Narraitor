@@ -1,18 +1,18 @@
 ---
-title: NarrAItor GitHub Project Board
+title: Narraitor GitHub Project Board
 aliases: [GitHub Project Board, Project Board]
 tags: [narraitor, documentation, workflow, github, project-management]
 created: 2025-04-29
 updated: 2025-04-29
 ---
 
-# NarrAItor GitHub Project Board
+# Narraitor GitHub Project Board
 
-This document describes the GitHub Project Board setup for NarrAItor and how to effectively use it for tracking user stories and development progress.
+This document describes the GitHub Project Board setup for Narraitor and how to effectively use it for tracking user stories and development progress.
 
 ## Project Board Overview
 
-The NarrAItor development team uses a GitHub Project Board to visualize and manage the workflow of user stories, bugs, and other development tasks. The project board is accessible at [https://github.com/jerseycheese/narraitor/projects](https://github.com/jerseycheese/narraitor/projects).
+The Narraitor development team uses a GitHub Project Board to visualize and manage the workflow of user stories, bugs, and other development tasks. The project board is accessible at [https://github.com/jerseycheese/narraitor/projects](https://github.com/jerseycheese/narraitor/projects).
 
 ## Board Columns
 
@@ -57,7 +57,7 @@ All new issues created in the repository are automatically added to the Backlog 
 
 1. Go to the issue in GitHub
 2. On the right sidebar, click on "Projects"
-3. Select the NarrAItor Development project
+3. Select the Narraitor Development project
 4. The issue will be added to the Backlog column
 
 ### Moving Issues Between Columns

@@ -9,7 +9,7 @@ updated: 2025-04-28
 # Development Workflows
 
 > [!note]
-> Start here to understand development processes for NarrAItor.
+> Start here to understand development processes for Narraitor.
 
 ## Core Workflows
 - 🧪 [[testing-workflow|Testing]]

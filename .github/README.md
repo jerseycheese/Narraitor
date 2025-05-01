@@ -1,6 +1,6 @@
-# NarrAItor GitHub Configuration
+# Narraitor GitHub Configuration
 
-This directory contains configuration files for GitHub features used in the NarrAItor project.
+This directory contains configuration files for GitHub features used in the Narraitor project.
 
 ## Issue Templates
 
@@ -42,7 +42,7 @@ The following labels are used to categorize issues:
 
 ## GitHub Project
 
-NarrAItor uses GitHub Projects to visualize and manage the workflow. The project board consists of the following columns:
+Narraitor uses GitHub Projects to visualize and manage the workflow. The project board consists of the following columns:
 
 1. **Backlog**: Issues that have been created but not yet planned for implementation
 2. **Ready**: Issues that are planned for the current or upcoming development cycle

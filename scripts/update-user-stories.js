@@ -1,0 +1,417 @@
+// User Story Update Script (Enhanced Version)
+// This script updates existing user story issues with correct documentation links,
+// implementation notes, and complexity/priority estimates.
+// All complexity and priority values are sourced from getStoryComplexityAndPriority() mapping.
+
+import https from 'https';
+import { 
+  validateIssuesAgainstDocs
+} from './story-validation-utils.js';
+import { 
+  processIssues 
+} from './process-issues.js';
+
+const OWNER = 'jerseycheese';
+const REPO = 'narraitor';
+const TOKEN = process.env.GITHUB_TOKEN;
+
+// Debug flag - set to true to enable extra logging
+const DEBUG = true;
+
+// Generate implementation notes based on user story content and technical requirements
+export function generateImplementationNotes(story) {
+  const content = story.body || '';
+  
+  // Extract category if available
+  let category = '';
+  const categoryMatch = content.match(/domain:([a-z-]+)/i);
+  if (categoryMatch) {
+    category = categoryMatch[1].replace(/-/g, ' ');
+  }
+  
+  // Extract user story text
+  const storyTextMatch = content.match(/## User Story\n([\s\S]*?)(?=\n##)/);
+  const storyText = storyTextMatch ? storyTextMatch[1].trim() : '';
+  
+  // Extract technical requirements
+  const techReqMatch = content.match(/## Technical Requirements\n([\s\S]*?)(?=\n##)/);
+  const techReq = techReqMatch ? techReqMatch[1].trim() : '';
+  
+  const lowerStory = storyText.toLowerCase();
+  
+  let notes = [];
+  
+  // First note based on story pattern and category
+  const actionWords = ['create', 'implement', 'develop', 'build', 'integrate', 'manage', 'track', 'handle'];
+  const actionMatch = actionWords.find(word => lowerStory.includes(word));
+  
+  if (category && actionMatch) {
+    notes.push(`Follow the ${category} module pattern for the ${actionMatch} functionality`);
+  } else {
+    notes.push(`Use standard implementation approach for this feature`);
+  }
+  
+  // Second note based on technical requirements
+  if (techReq && techReq.length > 0) {
+    const lowerReq = techReq.toLowerCase();
+    if (lowerReq.includes('api') || lowerReq.includes('service')) {
+      notes.push(`Implement with service interface design patterns`);
+    } else if (lowerReq.includes('storage') || lowerReq.includes('data')) {
+      notes.push(`Consider data persistence and state management requirements`);
+    } else {
+      notes.push(`Ensure compatibility with existing system architecture`);
+    }
+  }
+  
+  // Third note - always include testing recommendation
+  notes.push(`Write tests first following TDD approach`);
+  
+  return notes;
+}
+
+// Fix documentation links in issue body
+export function fixDocumentationLinks(body) {
+  // This regex finds the documentation link and captures the domain name (supports relative and absolute URLs)
+  const linkRegex = /- \[([^.]+)\.md\]\(\s*(?:https:\/\/github\.com\/[\w-]+\/[\w-]+\/blob\/(?:main|develop)\/)?docs\/requirements\/core\/([^)]+)\.md\s*\) - Source requirements document/;
+  const linkMatch = body.match(linkRegex);
+  
+  if (linkMatch) {
+    const domain = linkMatch[2];
+    const oldLink = linkMatch[0];
+    const newLink = `- [${domain}.md](https://github.com/${OWNER}/${REPO}/blob/develop/docs/requirements/core/${domain}.md) - Source requirements document`;
+    
+    return body.replace(oldLink, newLink);
+  }
+  
+  // Handle HTML anchor tags for documentation links
+  const htmlLinkRegex = /<a\s+href="(?:https:\/\/github\.com\/[\w-]+\/[\w-]+\/blob\/(?:main|develop)\/)?(?:\/|\.\.\/)?docs\/requirements\/core\/([^"]+)\.md">([^<]+)<\/a>/g;
+  body = body.replace(htmlLinkRegex, `<a href="https://github.com/${OWNER}/${REPO}/blob/develop/docs/requirements/core/$1.md">$2</a>`);
+  return body;
+}
+
+// Add implementation notes to issue body
+export function addImplementationNotes(body, notes) {
+  const implNotesRegex = /## Implementation Notes\n<!-- Add guidance on implementation approach, architecture considerations, etc. -->\n([^#]*)/;
+  const implNotesMatch = body.match(implNotesRegex);
+  
+  if (implNotesMatch) {
+    const oldNotes = implNotesMatch[0];
+    const notesText = notes.map(note => `- ${note}`).join('\n');
+    const newNotes = `## Implementation Notes\n<!-- Add guidance on implementation approach, architecture considerations, etc. -->\n${notesText}\n`;
+    
+    return body.replace(oldNotes, newNotes);
+  }
+  
+  return body;
+}
+
+// Update estimated complexity in issue body
+export function updateComplexity(body, complexity) {
+  const compRegex = /## Estimated Complexity[\s\S]*?(?=\n##|$)/;
+  const match = body.match(compRegex);
+  if (match) {
+    const newSection = [
+      '## Estimated Complexity',
+      '<!-- Select the estimated complexity level -->',
+      `- [${complexity === 'Small' ? 'x' : ' '}] Small (1-2 days)`,
+      `- [${complexity === 'Medium' ? 'x' : ' '}] Medium (3-5 days)`,
+      `- [${complexity === 'Large' ? 'x' : ' '}] Large (1+ week)`
+    ].join('\n');
+    return body.replace(compRegex, newSection);
+  }
+  return body;
+}
+
+// Update priority in issue body
+export function updatePriority(body, priority) {
+  const priRegex = /## Priority[\s\S]*?(?=\n##|$)/;
+  const match = body.match(priRegex);
+  if (match) {
+    const newSection = [
+      '## Priority',
+      '<!-- Select the priority level -->',
+      `- [${priority === 'High' ? 'x' : ' '}] High (MVP)`,
+      `- [${priority === 'Medium' ? 'x' : ' '}] Medium (MVP Enhancement)`,
+      `- [${priority === 'Low' ? 'x' : ' '}] Low (Nice to Have)`,
+      `- [${priority === 'Post-MVP' ? 'x' : ' '}] Post-MVP`
+    ].join('\n');
+    return body.replace(priRegex, newSection);
+  }
+  return body;
+}
+
+// Verify labels in repository - Enhanced version with case-insensitive comparison
+async function verifyLabels() {
+  try {
+    // Check for complexity and priority labels
+    console.log('Checking for required labels...');
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${OWNER}/${REPO}/labels?per_page=100`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'User-Story-Update-Script',
+        'Authorization': `token ${TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    };
+    
+    const labels = await new Promise((resolve, reject) => {
+      const req = https.request(options, res => {
+        let responseData = '';
+        res.on('data', chunk => (responseData += chunk));
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            try {
+              const parsedLabels = JSON.parse(responseData);
+              if (DEBUG) {
+                console.log(`Received ${parsedLabels.length} labels from GitHub`);
+                console.log(`Labels: ${parsedLabels.map(l => l.name).join(', ')}`);
+              }
+              resolve(parsedLabels);
+            } catch (err) {
+              reject(new Error(`Failed to parse response: ${err.message}`));
+            }
+          } else {
+            reject(new Error(`Failed to get labels: ${responseData}`));
+          }
+        });
+      });
+      req.on('error', reject);
+      req.end();
+    });
+    
+    // Normalize label names for more reliable comparison (lowercase, trim)
+    const normalizedLabels = labels.map(l => ({ ...l, name: l.name.toLowerCase().trim() }));
+    
+    // Define required labels (all lowercase)
+    const requiredLabels = [
+      'complexity:small', 'complexity:medium', 'complexity:large',
+      'priority:high', 'priority:medium', 'priority:low', 'priority:post-mvp'
+    ];
+    
+    // Find missing labels with case-insensitive comparison
+    const missingLabels = requiredLabels.filter(
+      requiredLabel => !normalizedLabels.some(l => l.name === requiredLabel)
+    );
+    
+    if (missingLabels.length > 0) {
+      console.warn(`Warning: Missing required labels: ${missingLabels.join(', ')}`);
+      console.warn('Run "node scripts/github-label-creator.js" to create all required labels before proceeding.');
+      
+      // Debug output of all actual labels for diagnosis
+      if (DEBUG) {
+        console.log('Existing labels:', normalizedLabels.map(l => l.name).join(', '));
+      }
+      
+      return false;
+    }
+    
+    console.log('All required labels exist.');
+    return true;
+  } catch (err) {
+    console.warn(`Warning: Could not verify labels: ${err.message}`);
+    console.warn('Run "node scripts/github-label-creator.js" to ensure all required labels exist.');
+    return false;
+  }
+}
+
+// Fetch issues from GitHub
+export async function fetchIssues(labels = ['user-story']) {
+  return new Promise((resolve, reject) => {
+    const labelsParam = `labels=${labels.map(encodeURIComponent).join(',')}`;
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${OWNER}/${REPO}/issues?${labelsParam}&state=open&per_page=100`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'User-Story-Update-Script',
+        'Authorization': `token ${TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    };
+    
+    const req = https.request(options, res => {
+      let responseData = '';
+      res.on('data', chunk => (responseData += chunk));
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(responseData));
+          } catch (err) {
+            reject(new Error(`Failed to parse response: ${err.message}`));
+          }
+        } else {
+          reject(new Error(`Failed to fetch issues: ${responseData}`));
+        }
+      });
+    });
+    
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+// Fetch a single issue by number
+export async function fetchIssueByNumber(issueNumber) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.github.com',
+      path: `/repos/${OWNER}/${REPO}/issues/${issueNumber}`,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'User-Story-Update-Script',
+        'Authorization': `token ${TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    };
+
+    const req = https.request(options, res => {
+      let responseData = '';
+      res.on('data', chunk => (responseData += chunk));
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(responseData));
+          } catch (err) {
+            reject(new Error(`Failed to parse issue data: ${err.message}`));
+          }
+        } else {
+          reject(new Error(`Failed to fetch issue: ${responseData}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+// Main function
+async function main() {
+  // Check for GitHub token
+  if (!TOKEN) {
+    console.error('GitHub token not found. Set GITHUB_TOKEN environment variable.');
+    process.exit(1);
+  }
+  
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const dryRun = args.includes('--dry-run');
+  const limitIndex = args.indexOf('--limit');
+  const limit = limitIndex !== -1 && args[limitIndex + 1] ? parseInt(args[limitIndex + 1], 10) : null;
+  const force = args.includes('--force'); // Flag to bypass label verification
+  const validate = args.includes('--validate'); // New flag to run validation mode
+  
+  // Issue number to process
+  const issueNumIndex = args.indexOf('--issue');
+  const specificIssueNum = issueNumIndex !== -1 && args[issueNumIndex + 1] ? parseInt(args[issueNumIndex + 1], 10) : null;
+  
+  console.log(`User Story Update Script (Enhanced Version)`);
+  console.log(`-------------------------------------`);
+  console.log(`Repository: ${OWNER}/${REPO}`);
+  if (dryRun) console.log(`Mode: Dry Run`);
+  if (validate) console.log(`Mode: Validation`);
+  if (limit) console.log(`Limit: ${limit} issues`);
+  if (force) console.log(`Force mode: Bypassing label verification`);
+  
+  try {
+    // Only verify labels if not in force mode
+    let labelsExist = true;
+    if (!force) {
+      // Verify labels first
+      labelsExist = await verifyLabels();
+      if (!labelsExist && !dryRun) {
+        console.error('Required labels are missing. Run "node scripts/github-label-creator.js" first or use --force to bypass verification.');
+        process.exit(1);
+      }
+    }
+    
+    // Process specific issue if requested
+    if (specificIssueNum) {
+      console.log(`\nFetching specific issue #${specificIssueNum}...`);
+      const issue = await fetchIssueByNumber(specificIssueNum);
+      console.log(`Processing single issue #${issue.number}`);
+      
+      if (validate) {
+        await validateIssuesAgainstDocs([issue], dryRun);
+      } else {
+        await processIssues([issue], dryRun);
+      }
+      
+      console.log(`\nCompleted processing issue #${specificIssueNum}`);
+      process.exit(0);
+    }
+    
+    // Fetch user story issues
+    console.log(`\nFetching user story issues...`);
+    let issues = await fetchIssues(['user-story']);
+    
+    // Apply limit if specified
+    if (limit && limit < issues.length) {
+      console.log(`Limiting to first ${limit} issues.`);
+      issues = issues.slice(0, limit);
+    }
+    
+    // Run validation mode if requested
+    if (validate) {
+      const inconsistencies = await validateIssuesAgainstDocs(issues, dryRun);
+      
+      if (inconsistencies.length > 0) {
+        console.log(`\nInconsistencies Found (${inconsistencies.length}):`);
+        inconsistencies.forEach(issue => {
+          console.log(`- Issue #${issue.issue}: ${issue.title}`);
+          console.log(`  Domain: ${issue.domain}`);
+          console.log(`  Story: ${issue.storyText}`);
+          
+          if (issue.currentComplexity !== issue.expectedComplexity) {
+            console.log(`  Complexity: ${issue.currentComplexity} (expected: ${issue.expectedComplexity})`);
+          }
+          
+          if (issue.currentPriority !== issue.expectedPriority) {
+            console.log(`  Priority: ${issue.currentPriority} (expected: ${issue.expectedPriority})`);
+          }
+          
+          console.log('');
+        });
+        
+        console.log('Run without --validate to fix these inconsistencies.');
+      } else {
+        console.log('\nAll issues are consistent with requirement docs!');
+      }
+      
+      process.exit(0);
+    }
+    
+    // Confirm before proceeding
+    if (!dryRun) {
+      console.log(`\nReady to update ${issues.length} issues. Continue? (y/n)`);
+      const proceed = await new Promise(resolve =>
+        process.stdin.once('data', data => resolve(data.toString().trim().toLowerCase() === 'y'))
+      );
+      
+      if (!proceed) {
+        console.log('Operation cancelled');
+        process.exit(0);
+      }
+    }
+    
+    // Process issues
+    const result = await processIssues(issues, dryRun);
+    
+    // Show summary
+    console.log(`\nSummary:`);
+    console.log(`- Updated: ${result.updated}`);
+    console.log(`- Skipped (no changes needed): ${result.skipped}`);
+    console.log(`- Errors: ${result.errors}`);
+    console.log(`- Total processed: ${result.total}`);
+    console.log(`- Priority labels updated: ${result.priorityUpdated || 0}`);
+    console.log(`- Complexity labels updated: ${result.complexityUpdated || 0}`);
+    
+  } catch (err) {
+    console.error('Error:', err.message);
+    process.exit(1);
+  }
+}
+
+// Start execution
+main();

@@ -41,7 +41,7 @@ Each template is contained in a single code block that you can copy with a singl
 # Project Analysis Request
 
 ## Context
-I'm working on the NarrAItor project, a Next.js/React application for a narrative-driven RPG framework using AI.
+I'm working on the Narraitor project, a Next.js/React application for a narrative-driven RPG framework using AI.
 
 ## Request
 Help me select and analyze the next task to implement, following KISS principles.

@@ -1,14 +1,14 @@
 # GitHub Project Board Setup Guide
 
-This guide provides step-by-step instructions for setting up the NarrAItor Development project board.
+This guide provides step-by-step instructions for setting up the Narraitor Development project board.
 
 ## Step 1: Create the Project Board
 
-1. Go to the NarrAItor repository on GitHub
+1. Go to the Narraitor repository on GitHub
 2. Click on the "Projects" tab
 3. Click "New project"
 4. Select "Classic project board"
-5. Enter "NarrAItor Development" as the project name
+5. Enter "Narraitor Development" as the project name
 6. Select "Kanban" as the template
 7. Click "Create project"
 
@@ -52,7 +52,7 @@ No automation needed - issues will be manually moved here when they're ready for
 
 1. Go to the "Issues" tab of your repository
 2. Click on each issue you want to add to the project board
-3. In the right sidebar, click "Projects" and select "NarrAItor Development"
+3. In the right sidebar, click "Projects" and select "Narraitor Development"
 4. Alternatively, use the migration script to automatically create issues from user-stories.md
 
 ## Step 5: Configure Project Settings

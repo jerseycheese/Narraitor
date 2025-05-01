@@ -9,10 +9,10 @@ updated: 2025-04-29
 # Game Session User Flow
 
 ## Overview
-This user flow documents the process of starting and playing through a narrative game session in NarrAItor. It covers the sequence from session initiation through narrative progression, player choices, and journal interaction.
+This user flow documents the process of starting and playing through a narrative game session in Narraitor. It covers the sequence from session initiation through narrative progression, player choices, and journal interaction.
 
 ## Prerequisites
-- User has logged in to NarrAItor
+- User has logged in to Narraitor
 - At least one world has been created
 - At least one character has been created
 - No other active game session is in progress

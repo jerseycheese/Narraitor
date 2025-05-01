@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Character Interface Requirements
 
 ## Overview
-The Character Interface provides the user-facing components for creating, viewing, and managing player characters in NarrAItor. It includes interfaces for character creation, attribute and skill assignment, character description, and character selection.
+The Character Interface provides the user-facing components for creating, viewing, and managing player characters in Narraitor. It includes interfaces for character creation, attribute and skill assignment, character description, and character selection.
 
 ## Core Functionality
 - **Character Creation Wizard**: Step-by-step interface for creating new characters

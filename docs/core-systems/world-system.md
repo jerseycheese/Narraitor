@@ -10,7 +10,7 @@ updated: 2025-04-28
 
 ## Overview
 
-The World Configuration System is the foundation of NarrAItor, allowing users to define the parameters, tone, and mechanics of different fictional worlds. This system is designed to be flexible enough to support a wide range of genres while maintaining a consistent structure.
+The World Configuration System is the foundation of Narraitor, allowing users to define the parameters, tone, and mechanics of different fictional worlds. This system is designed to be flexible enough to support a wide range of genres while maintaining a consistent structure.
 
 ## Core Concepts
 

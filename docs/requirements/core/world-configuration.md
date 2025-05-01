@@ -9,7 +9,7 @@ updated: 2025-04-30
 # World Configuration System Requirements
 
 ## Overview
-The World Configuration System allows users to define and customize fictional worlds with their own attributes, skills, and narrative tone settings. It forms the foundation of NarrAItor by establishing the parameters that influence character creation, narrative style, and gameplay mechanics. The system uses AI to assist in transforming a user's freeform world description into a structured game world with appropriate attributes and skills.
+The World Configuration System allows users to define and customize fictional worlds with their own attributes, skills, and narrative tone settings. It forms the foundation of Narraitor by establishing the parameters that influence character creation, narrative style, and gameplay mechanics. The system uses AI to assist in transforming a user's freeform world description into a structured game world with appropriate attributes and skills.
 
 ## Core Functionality
 - **World Creation**: Create new world configurations from freeform descriptions using AI assistance
@@ -155,23 +155,23 @@ interface WorldTheme {
 ## User Stories
 
 1. **World Creation**
-   - As a user, I want to create a new world by describing it in my own words so I can quickly set up a custom narrative setting
-   - As a user, I want AI to suggest appropriate attributes and skills based on my world description so I don't have to design everything from scratch
-   - As a user, I want to select a pre-defined template to quickly set up a world if I don't want to create my own
+- As a user, I want to create a new world by describing it in my own words so I can quickly set up a custom narrative setting (Complexity: Medium, Priority: High)
+- As a user, I want AI to suggest appropriate attributes and skills based on my world description so I don't have to design everything from scratch (Complexity: Medium, Priority: High)
+- As a user, I want to select a pre-defined template to quickly set up a world if I don't want to create my own (Complexity: Small, Priority: Medium)
 
 2. **Attribute Management**
-   - As a user, I want to review and modify AI-suggested attributes for my world so I can customize them to my preferences
-   - As a user, I want to define custom attributes for my world so characters can have appropriate traits
-   - As a user, I want to set ranges and default values for attributes to establish world norms
+- As a user, I want to review and modify AI-suggested attributes for my world so I can customize them to my preferences (Complexity: Medium, Priority: High)
+- As a user, I want to define custom attributes for my world so characters can have appropriate traits (Complexity: Medium, Priority: High)
+- As a user, I want to set ranges and default values for attributes to establish world norms (Complexity: Medium, Priority: High)
 
 3. **Skill Management**
-   - As a user, I want to review and modify AI-suggested skills for my world so I can customize them to my preferences
-   - As a user, I want to create skills linked to attributes so characters can have specialized abilities
-   - As a user, I want to organize skills by related attributes for logical character development
+- As a user, I want to review and modify AI-suggested skills for my world so I can customize them to my preferences (Complexity: Medium, Priority: High)
+- As a user, I want to create skills linked to attributes so characters can have specialized abilities (Complexity: Medium, Priority: High)
+- As a user, I want to organize skills by related attributes for logical character development (Complexity: Medium, Priority: Medium)
 
 4. **World Selection and Management**
-   - As a user, I want to view all my created worlds so I can select one for play
-   - As a user, I want to edit existing worlds to refine my settings
+- As a user, I want to view all my created worlds so I can select one for play (Complexity: Small, Priority: High)
+- As a user, I want to edit existing worlds to refine my settings (Complexity: Medium, Priority: Medium)
 
 ## Acceptance Criteria
 1. Users can successfully create worlds by providing freeform descriptions

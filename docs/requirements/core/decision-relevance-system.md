@@ -3,7 +3,7 @@ title: Decision Relevance System Requirements
 aliases: [Relevance Scoring Requirements]
 tags: [narraitor, requirements, decision-relevance]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-04-30
 ---
 
 # Decision Relevance System Requirements
@@ -88,6 +88,33 @@ interface NarrativeContext {
 - Dynamic adjustment of algorithm weights
 - Granular dimension-specific relevance scoring
 - Multi-dimensional context mapping
+
+## User Stories
+
+1. **Relevance Scoring**
+- As a developer, I want to calculate multi-factor relevance scores for past decisions so that the most applicable ones are prioritized for AI context (Complexity: Medium, Priority: Medium)
+- As a developer, I want to weight recent decisions more heavily so that the narrative maintains recency bias for coherence (Complexity: Medium, Priority: Medium)
+- As a developer, I want to configure relevance algorithm parameters so that the system can be tuned for optimal performance (Complexity: Medium, Priority: Medium)
+
+2. **Context Matching**
+- As a developer, I want to implement tag matching between decisions and current context so that thematically relevant decisions are prioritized (Complexity: Medium, Priority: Medium)
+- As a developer, I want to assess the importance of decisions based on their classification so that significant decisions have appropriate influence (Complexity: Medium, Priority: Medium)
+- As a developer, I want to evaluate decision consequences to include decisions with major narrative impacts (Complexity: Medium, Priority: Medium)
+
+3. **Context Optimization**
+- As a developer, I want to select the most relevant decisions for AI context so that token usage is optimized (Complexity: Medium, Priority: Medium)
+- As a developer, I want to format decisions efficiently for the AI context so that token limits are respected (Complexity: Medium, Priority: Medium)
+- As a developer, I want to set a minimum relevance threshold so that only meaningfully relevant decisions are included (Complexity: Medium, Priority: Medium)
+
+4. **System Integration**
+- As a developer, I want the relevance system to integrate with the player decision system so that decision history is accessible (Complexity: Medium, Priority: Medium)
+- As a developer, I want the relevance system to provide optimized context to the narrative engine so that AI generation has appropriate history (Complexity: Medium, Priority: Medium)
+- As a developer, I want to expose debugging tools for the relevance system so that the scoring can be monitored and adjusted (Complexity: Medium, Priority: Medium)
+
+5. **User Experience**
+- As a user, I want the narrative to appropriately reference my past important decisions so that the story feels responsive to my choices (Complexity: Medium, Priority: Medium)
+- As a user, I want continuity in how the narrative responds to my previous actions so that the story feels coherent (Complexity: Medium, Priority: Medium)
+- As a user, I want the story to prioritize my recent decisions appropriately so that the narrative flow feels natural (Complexity: Medium, Priority: Medium)
 
 ## Acceptance Criteria
 1. The system correctly identifies decisions that are relevant to the current context

@@ -1,15 +1,15 @@
 ---
-title: NarrAItor Project Overview
+title: Narraitor Project Overview
 aliases: [Project Overview, Overview]
 tags: [narraitor, documentation, overview]
 created: 2025-04-27
 updated: 2025-04-30
 ---
 
-# NarrAItor Project Overview
+# Narraitor Project Overview
 
 ## 1. Project Description
-NarrAItor is a Next.js-based web application providing an AI-driven narrative experience for tabletop RPGs across any fictional world. The application uses Google Gemini AI to deliver dynamic storytelling while adapting to the specific themes, tone, and mechanics of user-defined worlds. Built with modern web technologies, it offers an accessible and responsive single-player experience.
+Narraitor is a Next.js-based web application providing an AI-driven narrative experience for tabletop RPGs across any fictional world. The application uses Google Gemini AI to deliver dynamic storytelling while adapting to the specific themes, tone, and mechanics of user-defined worlds. Built with modern web technologies, it offers an accessible and responsive single-player experience.
 
 ## 2. Current Development Status
 

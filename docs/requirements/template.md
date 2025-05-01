@@ -9,7 +9,7 @@ updated: YYYY-MM-DD
 # [System Name] Requirements
 
 ## Overview
-Brief description of the system and its purpose within NarrAItor.
+Brief description of the system and its purpose within Narraitor.
 
 ## Core Functionality
 - **[Function 1]**: Brief description

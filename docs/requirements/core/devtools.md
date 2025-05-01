@@ -3,13 +3,13 @@ title: DevTools Requirements
 aliases: [Developer Tools Requirements]
 tags: [narraitor, requirements, devtools, debugging]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-04-30
 ---
 
 # DevTools Requirements
 
 ## Overview
-The DevTools system provides a comprehensive set of development and debugging tools for NarrAItor. It offers both UI-based tools and programmatic access via the browser console, enabling developers to test, monitor, and troubleshoot the application during development.
+The DevTools system provides a comprehensive set of development and debugging tools for Narraitor. It offers both UI-based tools and programmatic access via the browser console, enabling developers to test, monitor, and troubleshoot the application during development.
 
 ## Core Functionality
 - **DevTools UI Panel**: Interactive interface for testing and debugging
@@ -174,6 +174,38 @@ const analysis = window.narraiDevTools.analyzeContent();
 - User permission system for DevTools
 - Performance optimization suggestions
 - Localized DevTools interface
+
+## User Stories
+
+1. **DevTools UI**
+- As a developer, I want to toggle the DevTools panel with a keyboard shortcut so that I can quickly access debugging tools (Complexity: Small, Priority: High)
+- As a developer, I want to collapse and expand sections in the DevTools panel so that I can focus on relevant information (Complexity: Small, Priority: Medium)
+- As a developer, I want debug-only components with visibility toggles so that I can control which debugging tools are displayed (Complexity: Medium, Priority: Medium)
+
+2. **State Inspection**
+- As a developer, I want to view the complete application state so that I can understand the current system status (Complexity: Medium, Priority: High)
+- As a developer, I want basic state modification capabilities so that I can test different state scenarios (Complexity: Medium, Priority: Medium)
+- As a developer, I want to visually explore the state tree so that I can understand state relationships (Complexity: Medium, Priority: Medium)
+
+3. **Narrative and Decision Testing**
+- As a developer, I want to test narrative generation with custom inputs so that I can verify it produces expected content (Complexity: Medium, Priority: High)
+- As a developer, I want to trigger test decisions so that I can verify decision handling (Complexity: Medium, Priority: Medium)
+- As a developer, I want to analyze narrative content patterns so that I can ensure content quality (Complexity: Medium, Priority: Low)
+
+4. **AI Service Debugging**
+- As a developer, I want to monitor AI service requests and responses so that I can debug integration issues (Complexity: Medium, Priority: High)
+- As a developer, I want to view errors from AI service calls so that I can identify failure points (Complexity: Medium, Priority: High)
+- As a developer, I want to mock AI responses so that I can test edge cases without making real API calls (Complexity: Medium, Priority: Medium)
+
+5. **Performance and Error Monitoring**
+- As a developer, I want to view basic performance metrics so that I can identify bottlenecks (Complexity: Medium, Priority: Medium)
+- As a developer, I want comprehensive error reporting so that I can diagnose and fix issues (Complexity: Medium, Priority: High)
+- As a developer, I want to capture and display runtime errors so that I can trace their origin (Complexity: Medium, Priority: High)
+
+6. **Browser Console API**
+- As a developer, I want programmatic access to debugging functions via the console so that I can automate debugging tasks (Complexity: Medium, Priority: High)
+- As a developer, I want to access state inspection methods via the console so that I can quickly check state values (Complexity: Small, Priority: Medium)
+- As a developer, I want to trigger game operations via the console so that I can test functionality programmatically (Complexity: Medium, Priority: Medium)
 
 ## Implementation Approach
 1. Create a central DevTools context provider

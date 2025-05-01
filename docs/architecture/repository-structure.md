@@ -6,11 +6,11 @@ created: 2025-04-28
 updated: 2025-04-28
 ---
 
-# NarrAItor Repository Structure
+# Narraitor Repository Structure
 
 ## Overview
 
-This document outlines the recommended file and directory structure for the NarrAItor GitHub repository. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
+This document outlines the recommended file and directory structure for the Narraitor GitHub repository. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
 
 ## Structure
 
@@ -142,7 +142,7 @@ Implement each domain incrementally, starting with World domain:
 
 ### Why Domain-Driven Organization?
 
-This approach is chosen specifically for NarrAItor because:
+This approach is chosen specifically for Narraitor because:
 
 1. The application has clearly defined domain boundaries (world, character, narrative, journal)
 2. Each domain has its own state, actions, and UI concerns
@@ -151,7 +151,7 @@ This approach is chosen specifically for NarrAItor because:
 
 ### Why App Router vs. Pages Router?
 
-App Router provides several benefits for NarrAItor:
+App Router provides several benefits for Narraitor:
 
 1. Better support for nested layouts (important for the game interface)
 2. Improved data loading and state management

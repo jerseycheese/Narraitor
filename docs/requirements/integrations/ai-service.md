@@ -9,7 +9,7 @@ updated: 2025-04-29
 # AI Service Integration Requirements
 
 ## Overview
-The AI Service Integration system provides a unified interface for interacting with AI models that power NarrAItor's narrative generation, character assistance, and decision management. It handles API communication, prompt construction, response processing, and error management for all AI-dependent features.
+The AI Service Integration system provides a unified interface for interacting with AI models that power Narraitor's narrative generation, character assistance, and decision management. It handles API communication, prompt construction, response processing, and error management for all AI-dependent features.
 
 ## Core Functionality
 - **API Communication**: Interface with Google Gemini or alternative AI models

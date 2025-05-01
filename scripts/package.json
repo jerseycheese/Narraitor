@@ -1,7 +1,8 @@
 {
   "name": "scripts",
+  "type": "module",
   "version": "1.0.0",
-  "description": "This directory contains scripts to help set up and manage the GitHub project for NarrAItor.",
+  "description": "This directory contains scripts to help set up and manage the GitHub project for Narraitor.",
   "main": "github-label-creator.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

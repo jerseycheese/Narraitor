@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature for NarrAItor
+about: Suggest a new feature for Narraitor
 title: '[FEATURE] '
 labels: enhancement
 ---

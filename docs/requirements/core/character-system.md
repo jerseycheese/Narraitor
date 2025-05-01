@@ -168,29 +168,29 @@ interface DerivedStatistic {
 ## User Stories
 
 1. **Character Creation**
-   - As a user, I want to create a new character for my selected world so I can have a persona in the narrative
-   - As a user, I want to allocate attribute points to customize my character's strengths and weaknesses
-   - As a user, I want to select and rate skills that define my character's abilities
-   - As a user, I want to write a description and background for my character to establish their identity
-   - As a user, I want to resume character creation if I accidentally navigate away or close the browser
+- As a user, I want to create a new character for my selected world so I can have a persona in the narrative (Complexity: Medium, Priority: High)
+- As a user, I want to allocate attribute points to customize my character's strengths and weaknesses (Complexity: Medium, Priority: High)
+- As a user, I want to select and rate skills that define my character's abilities (Complexity: Medium, Priority: High)
+- As a user, I want to write a description and background for my character to establish their identity (Complexity: Small, Priority: High)
+- As a user, I want to resume character creation if I accidentally navigate away or close the browser (Complexity: Medium, Priority: Medium)
 
 2. **Character Management**
-   - As a user, I want to view all my created characters so I can select one for play
-   - As a user, I want to edit my existing characters to refine their attributes, skills, or descriptions
-   - As a user, I want to delete characters I no longer want to use
+- As a user, I want to view all my created characters so I can select one for play (Complexity: Small, Priority: High)
+- As a user, I want to edit my existing characters to refine their attributes, skills, or descriptions (Complexity: Medium, Priority: High)
+- As a user, I want to delete characters I no longer want to use (Complexity: Small, Priority: Medium)
 
 3. **Character Selection**
-   - As a user, I want to select a character to use in my narrative session
-   - As a user, I want to see a summary of my character during gameplay for reference, including key derived stats.
+- As a user, I want to select a character to use in my narrative session (Complexity: Small, Priority: High)
+- As a user, I want to see a summary of my character during gameplay for reference, including key derived stats. (Complexity: Small, Priority: High)
 
 4. **Inventory Management**
-   - As a user, I want to view a list of items my character possesses so I know what they are carrying
-   - As a user, I want to add items to my character's inventory
-   - As a user, I want to remove items from my character's inventory
+- As a user, I want to view a list of items my character possesses so I know what they are carrying (Complexity: Small, Priority: Medium)
+- As a user, I want to add items to my character's inventory (Complexity: Small, Priority: Medium)
+- As a user, I want to remove items from my character's inventory (Complexity: Small, Priority: Medium)
 
 5. **Derived Statistics**
-   - As a user, I want to see key derived statistics for my character so I understand their overall capabilities.
-   - As a developer, I want the system to calculate derived stats based on character attributes so the AI can use this information for narrative determinations.
+- As a user, I want to see key derived statistics for my character so I understand their overall capabilities. (Complexity: Medium, Priority: Medium)
+- As a developer, I want the system to calculate derived stats based on character attributes so the AI can use this information for narrative determinations. (Complexity: Medium, Priority: Medium)
 
 ## Acceptance Criteria
 1. Users can successfully create characters with all required information

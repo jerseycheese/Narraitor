@@ -9,7 +9,7 @@ updated: 2025-04-29
 # Narrative Engine Requirements
 
 ## Overview
-The Narrative Engine is the core storytelling system in NarrAItor, responsible for generating contextually appropriate narrative content, presenting choices to the player, and evolving the story based on player decisions. It integrates with AI services to create dynamic, responsive narratives that adapt to the world configuration and player character.
+The Narrative Engine is the core storytelling system in Narraitor, responsible for generating contextually appropriate narrative content, presenting choices to the player, and evolving the story based on player decisions. It integrates with AI services to create dynamic, responsive narratives that adapt to the world configuration and player character.
 
 ## Core Functionality
 - **Narrative Generation**: Create world-appropriate narrative content using AI
@@ -188,28 +188,28 @@ interface NarrativeErrorInfo {
 ## User Stories
 
 1. **Narrative Generation**
-   - As a user, I want to read engaging narrative content that matches my selected world so I can immerse myself in the story
-   - As a user, I want the narrative to acknowledge my character's attributes and skills so the story feels personalized
-   - As a user, I want content that respects my chosen tone settings so the narrative style meets my expectations
-   - As a user, I want properly formatted text with paragraphs and dialogue so it's easy to read
+- As a user, I want to read engaging narrative content that matches my selected world so I can immerse myself in the story (Complexity: Large, Priority: High)
+- As a user, I want the narrative to acknowledge my character's attributes and skills so the story feels personalized (Complexity: Large, Priority: High)
+- As a user, I want content that respects my chosen tone settings so the narrative style meets my expectations (Complexity: Medium, Priority: High)
+- As a user, I want properly formatted text with paragraphs and dialogue so it's easy to read (Complexity: Medium, Priority: High)
 
 2. **Player Choices**
-   - As a user, I want to make meaningful decisions that affect the narrative so I feel agency in the story
-   - As a user, I want clear choices that represent different approaches so I can express my character's personality
-   - As a user, I want to see the consequences of my decisions reflected in the narrative so my choices matter
+- As a user, I want to make meaningful decisions that affect the narrative so I feel agency in the story (Complexity: Large, Priority: High)
+- As a user, I want clear choices that represent different approaches so I can express my character's personality (Complexity: Medium, Priority: High)
+- As a user, I want to see the consequences of my decisions reflected in the narrative so my choices matter (Complexity: Large, Priority: High)
 
 3. **Narrative Flow**
-   - As a user, I want smooth transitions between scenes so the story maintains coherence
-   - As a user, I want the narrative to remember important decisions I've made so the story remains consistent
+- As a user, I want smooth transitions between scenes so the story maintains coherence (Complexity: Medium, Priority: Medium)
+- As a user, I want the narrative to remember important decisions I've made so the story remains consistent (Complexity: Large, Priority: High)
 
 4. **Error Handling**
-   - As a user, I want graceful error handling when AI requests fail so my experience isn't disrupted
-   - As a user, I want fallback content when the AI service is unavailable so I can continue playing
-   - As a user, I want clear error messages that don't break immersion so my narrative experience is preserved
+- As a user, I want graceful error handling when AI requests fail so my experience isn't disrupted (Complexity: Medium, Priority: High)
+- As a user, I want fallback content when the AI service is unavailable so I can continue playing (Complexity: Medium, Priority: Medium)
+- As a user, I want clear error messages that don't break immersion so my narrative experience is preserved (Complexity: Small, Priority: Medium)
 
 5. **Development Support**
-   - As a developer, I want to debug and inspect narrative state during development
-   - As a developer, I want to see how prompts are constructed and optimized
+- As a developer, I want to debug and inspect narrative state during development (Complexity: Large, Priority: Medium)
+- As a developer, I want to see how prompts are constructed and optimized (Complexity: Large, Priority: Medium)
 
 ## Acceptance Criteria
 1. The system generates coherent narrative content appropriate to the selected world

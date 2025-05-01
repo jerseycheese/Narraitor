@@ -9,7 +9,7 @@ updated: 2025-04-29
 # [Flow Name] User Flow
 
 ## Overview
-Brief description of this user flow's purpose and context within NarrAItor.
+Brief description of this user flow's purpose and context within Narraitor.
 
 ## Prerequisites
 - [Prerequisite 1]

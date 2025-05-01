@@ -1,14 +1,14 @@
 ---
-title: NarrAItor Documentation
+title: Narraitor Documentation
 aliases: [Documentation Home, Docs Home]
 tags: [narraitor, documentation, index]
 created: 2025-04-28
 updated: 2025-04-30
 ---
 
-# NarrAItor Documentation
+# Narraitor Documentation
 
-Welcome to the documentation for NarrAItor, a world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any fictional world.
+Welcome to the documentation for Narraitor, a world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any fictional world.
 
 ## Documentation Sections
 

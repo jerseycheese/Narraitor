@@ -8,7 +8,7 @@ updated: 2025-04-28
 
 # Architecture Decisions
 
-This document records the key architectural decisions made for the NarrAItor project.
+This document records the key architectural decisions made for the Narraitor project.
 
 ## 1. Next.js App Router
 

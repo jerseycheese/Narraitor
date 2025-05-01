@@ -43,7 +43,7 @@ graph TD
 
 ## Component-First Development Approach
 
-The NarrAItor project follows a strict component-first development approach where:
+The Narraitor project follows a strict component-first development approach where:
 
 1. Components are developed in complete isolation first
 2. Testing happens in stages from isolation to integration

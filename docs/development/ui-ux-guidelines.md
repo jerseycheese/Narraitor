@@ -10,7 +10,7 @@ updated: 2025-04-29
 
 ## Overview
 
-This document outlines the user interface and experience guidelines for NarrAItor. These guidelines ensure a consistent, accessible, and responsive design that adapts to the selected world theme while providing an intuitive user experience.
+This document outlines the user interface and experience guidelines for Narraitor. These guidelines ensure a consistent, accessible, and responsive design that adapts to the selected world theme while providing an intuitive user experience.
 
 ## Core Principles
 

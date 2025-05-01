@@ -1,8 +1,12 @@
 // GitHub Label Creator Script
 // This script reads the labels defined in .github/labels.md and creates/updates them in the repository
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // GitHub repository information - update these values
 const OWNER = 'jerseycheese';
@@ -18,6 +22,7 @@ const defaultColors = {
   documentation: '0075ca',
   domain: '5319e7',
   priority: 'f9d0c4',
+  complexity: 'bfd4f2',
   status: 'c2e0c6',
   question: 'd876e3',
   'help-wanted': '008672',
@@ -74,7 +79,7 @@ function parseLabelsFromMarkdown(filePath) {
           continue;
         }
         
-        // Handle domain, priority, and status labels without backticks
+        // Handle domain, priority, complexity, and status labels without backticks
         const nameMatch = line.match(/^- ([^:]+):/);
         if (nameMatch && currentSection.includes('domain')) {
           labelName = `domain:${nameMatch[1].toLowerCase().replace(/\s+/g, '-')}`;
@@ -82,6 +87,9 @@ function parseLabelsFromMarkdown(filePath) {
         } else if (nameMatch && currentSection.includes('priority')) {
           labelName = `priority:${nameMatch[1].toLowerCase()}`;
           description = `${nameMatch[1]} priority item`;
+        } else if (nameMatch && currentSection.includes('complexity')) {
+          labelName = `complexity:${nameMatch[1].toLowerCase()}`;
+          description = `${nameMatch[1]} complexity item`;
         } else if (nameMatch && currentSection.includes('status')) {
           labelName = `status:${nameMatch[1].toLowerCase().replace(/\s+/g, '-')}`;
           description = `Item is in ${nameMatch[1]} status`;
@@ -95,6 +103,8 @@ function parseLabelsFromMarkdown(filePath) {
             color = defaultColors.domain;
           } else if (labelName.startsWith('priority:')) {
             color = defaultColors.priority;
+          } else if (labelName.startsWith('complexity:')) {
+            color = defaultColors.complexity;
           } else if (labelName.startsWith('status:')) {
             color = defaultColors.status;
           } else if (labelName === 'bug') {
@@ -182,6 +192,19 @@ function parseLabelsFromMarkdown(filePath) {
         name: labelName,
         color: defaultColors.priority,
         description: `${priority.charAt(0).toUpperCase() + priority.slice(1)} priority item`
+      });
+    }
+  });
+  
+  // Ensure we have complexity labels
+  const complexities = ['small', 'medium', 'large'];
+  complexities.forEach(complexity => {
+    const labelName = `complexity:${complexity}`;
+    if (!labelNames.includes(labelName)) {
+      labels.push({
+        name: labelName,
+        color: defaultColors.complexity,
+        description: `${complexity.charAt(0).toUpperCase() + complexity.slice(1)} complexity item`
       });
     }
   });
@@ -276,6 +299,9 @@ function createLabel(label) {
       
       res.on('end', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve();
+        } else if (res.statusCode === 422 && responseData.includes('already_exists')) {
+          // This is not an error, the label already exists
           resolve();
         } else {
           reject(new Error(`Failed to create label "${label.name}": ${responseData}`));
@@ -377,8 +403,14 @@ async function createOrUpdateLabels(labels) {
           created++;
         }
       } catch (error) {
-        console.error(`Error processing label "${label.name}":`, error.message);
-        errors++;
+        // Check if error is because label already exists
+        if (error.message.includes('already_exists')) {
+          console.log(`Label already exists (caught in error handler): ${label.name}`);
+          unchanged++;
+        } else {
+          console.error(`Error processing label "${label.name}":`, error.message);
+          errors++;
+        }
       }
     }
     

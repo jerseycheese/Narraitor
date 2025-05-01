@@ -59,7 +59,7 @@ Converting detailed requirements to focused GitHub issues helps us to:
 6. Link related issues to indicate dependencies
 
 ### Step 6: Organize in Project Board
-1. Add all created issues to the NarrAItor project board
+1. Add all created issues to the Narraitor project board
 2. Organize by priority and implementation phase
 3. Group related issues together
 4. Identify critical path issues

@@ -6,10 +6,10 @@ created: 2025-04-29
 updated: 2025-04-29
 ---
 
-# NarrAItor Testing Strategy
+# Narraitor Testing Strategy
 
 ## Overview
-This document outlines the comprehensive testing approach for NarrAItor, covering unit testing, integration testing, component testing, and end-to-end testing. It defines testing boundaries, responsibilities, and patterns for each domain.
+This document outlines the comprehensive testing approach for Narraitor, covering unit testing, integration testing, component testing, and end-to-end testing. It defines testing boundaries, responsibilities, and patterns for each domain.
 
 ## Core Testing Principles
 

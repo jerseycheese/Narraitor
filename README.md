@@ -1,10 +1,10 @@
-# NarrAItor
+# Narraitor
 
 A world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any fictional world.
 
 ## Project Overview
 
-NarrAItor is a Next.js-based web application providing an AI-driven narrative experience for tabletop RPGs across any fictional world. The application uses modern AI models to deliver dynamic storytelling while adapting to the specific themes, tone, and mechanics of the selected world.
+Narraitor is a Next.js-based web application providing an AI-driven narrative experience for tabletop RPGs across any fictional world. The application uses modern AI models to deliver dynamic storytelling while adapting to the specific themes, tone, and mechanics of the selected world.
 
 ## Features
 
@@ -51,7 +51,7 @@ npm run test
 
 ## Architecture
 
-NarrAItor follows a domain-driven design approach with clear separation of concerns:
+Narraitor follows a domain-driven design approach with clear separation of concerns:
 
 - **World Configuration**: Define settings, rules, and parameters
 - **Character System**: Create and manage characters

@@ -10,7 +10,7 @@ updated: 2025-04-28
 
 ## Overview
 
-This document outlines the state management approach for the NarrAItor application. The architecture follows a domain-driven design with separate state management for each core domain, combined with a persistence layer using IndexedDB.
+This document outlines the state management approach for the Narraitor application. The architecture follows a domain-driven design with separate state management for each core domain, combined with a persistence layer using IndexedDB.
 
 ## State Management Principles
 

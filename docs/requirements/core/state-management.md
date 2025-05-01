@@ -9,7 +9,7 @@ updated: 2025-04-29
 # State Management Requirements
 
 ## Overview
-The State Management system handles the persistence, retrieval, and organization of game state data across all NarrAItor systems. It provides a unified approach to state manipulation with domain-specific reducers, type-safe operations, and reliable storage using IndexedDB.
+The State Management system handles the persistence, retrieval, and organization of game state data across all Narraitor systems. It provides a unified approach to state manipulation with domain-specific reducers, type-safe operations, and reliable storage using IndexedDB.
 
 ## Core Functionality
 - **State Storage**: Persist application state between sessions
@@ -216,24 +216,24 @@ type Action<T extends string, P = void> = P extends void
 ## User Stories
 
 1. **Campaign Management**
-   - As a player, I want to create a new campaign with a selected world and character so I can start a new story
-   - As a player, I want to continue an existing campaign so I can resume my story where I left off
-   - As a player, I want to delete campaigns I'm no longer interested in so I can keep my campaign list organized
+- As a player, I want to create a new campaign with a selected world and character so I can start a new story (Complexity: Medium, Priority: High)
+- As a player, I want to continue an existing campaign so I can resume my story where I left off (Complexity: Medium, Priority: High)
+- As a player, I want to delete campaigns I'm no longer interested in so I can keep my campaign list organized (Complexity: Small, Priority: Medium)
 
 2. **State Persistence**
-   - As a player, I want my game state to automatically save during play so I don't lose progress if my browser crashes
-   - As a player, I want to be notified when my game is saved so I know my progress is secure
-   - As a player, I want to safely resume interrupted sessions so no progress is lost
+- As a player, I want my game state to automatically save during play so I don't lose progress if my browser crashes (Complexity: Large, Priority: High)
+- As a player, I want to be notified when my game is saved so I know my progress is secure (Complexity: Small, Priority: Medium)
+- As a player, I want to safely resume interrupted sessions so no progress is lost (Complexity: Medium, Priority: High)
 
 3. **Error Recovery**
-   - As a player, I want the system to handle storage failures gracefully so my experience isn't disrupted
-   - As a player, I want to recover from browser crashes without losing significant progress
-   - As a player, I want clear error messages that help me understand and resolve issues
+- As a player, I want the system to handle storage failures gracefully so my experience isn't disrupted (Complexity: Medium, Priority: High)
+- As a player, I want to recover from browser crashes without losing significant progress (Complexity: Medium, Priority: High)
+- As a player, I want clear error messages that help me understand and resolve issues (Complexity: Small, Priority: Medium)
 
 4. **Development Support**
-   - As a developer, I want to debug and inspect application state during development
-   - As a developer, I want to track state changes to understand the effects of actions
-   - As a developer, I want type-safe state operations to prevent data integrity issues
+- As a developer, I want to debug and inspect application state during development (Complexity: Medium, Priority: Medium)
+- As a developer, I want to track state changes to understand the effects of actions (Complexity: Medium, Priority: Medium)
+- As a developer, I want type-safe state operations to prevent data integrity issues (Complexity: Medium, Priority: High)
 
 ## Acceptance Criteria
 1. Game state persists correctly between browser sessions with all relevant data intact

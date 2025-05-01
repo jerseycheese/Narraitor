@@ -1,15 +1,15 @@
 ---
-title: NarrAItor Development Roadmap
+title: Narraitor Development Roadmap
 aliases: [Roadmap, Implementation Plan]
 tags: [narraitor, documentation, planning, roadmap]
 created: 2025-04-27
 updated: 2025-04-30
 ---
 
-# NarrAItor Development Roadmap
+# Narraitor Development Roadmap
 
 ## Overview
-This roadmap outlines the development phases for the NarrAItor project, focusing on an MVP approach with clear milestones and deliverables.
+This roadmap outlines the development phases for the Narraitor project, focusing on an MVP approach with clear milestones and deliverables.
 
 ## Phase 1: Core Framework (MVP)
 

@@ -9,7 +9,7 @@ updated: 2025-04-29
 # World Interface Requirements
 
 ## Overview
-The World Interface provides the user-facing components for creating, editing, and managing fictional worlds in NarrAItor. It offers intuitive interfaces for world configuration, attribute and skill management, template selection, and world listing.
+The World Interface provides the user-facing components for creating, editing, and managing fictional worlds in Narraitor. It offers intuitive interfaces for world configuration, attribute and skill management, template selection, and world listing.
 
 ## Core Functionality
 - **World Creation Wizard**: Step-by-step interface for creating new worlds
