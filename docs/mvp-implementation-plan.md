@@ -45,7 +45,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Text-based character description and background
 - Character listing with filtering by world
 - Basic character editing functionality
-- Support for multiple characters per world
+- Character deletion with confirmation
+- Basic inventory management
+- Basic derived statistics
 - Character creation progress recovery
 - Character validation and error handling
 
@@ -66,12 +68,8 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Automatic entry creation for narrative events, decisions, discoveries, and character encounters
 - Entry categorization by four primary types
 - Chronological journal view with entry detail display
-- Basic filtering by entry type and significance
-- New/unread entry indicators
-- Session date grouping
 - Mobile and desktop responsive design
 - Integration with game session UI
-- Entry importance levels (major/minor)
 - Proper formatting for journal entries
 
 ### State Management (MVP)
@@ -79,13 +77,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - TypeScript-based type safety throughout
 - IndexedDB persistence with auto-save (every 5 minutes and after major events)
 - Campaign management (create, list, load, delete)
-- Export/import functionality for campaign data and world configurations
 - Error handling with storage failure detection and recovery
 - Component hooks for clean state access
 - Safe resume functionality for interrupted sessions
-- State validation middleware
-- Database versioning system
-- Basic progress tracking per campaign
 
 ### Game Session UI (MVP)
 - Responsive narrative display with markdown formatting
@@ -99,7 +93,6 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Session recovery options
 - Error recovery interface
 - Save indicators and confirmation
-- Character strength indicators for choices
 
 ### AI Service Integration (MVP)
 - Google Gemini integration as primary AI provider
@@ -112,9 +105,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Fallback content when service unavailable
 - Response parsing and normalization
 - Content safety filters
-- Basic performance monitoring
 - Response formatting for display
-- Token usage tracking
 - User-friendly error messages
 
 ## Implementation Phases
@@ -151,6 +142,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Create character listing with filtering and sorting
 - Implement character detail view
 - Add basic character editing functionality
+- Implement character deletion with confirmation
+- Develop basic inventory management
+- Create basic derived statistics calculation
 - Build character creation progress recovery
 - Create validation and error handling
 
@@ -163,7 +157,6 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Create fallback systems for service failures
 - Build configuration interface for API settings
 - Implement content safety filters
-- Add basic performance monitoring
 - Create response formatting system
 
 ### Phase 5: Narrative Engine
@@ -184,11 +177,8 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Create automatic entry creation system
 - Build journal list view component
 - Develop journal entry detail component
-- Implement entry filtering and categorization
-- Add new/unread entry tracking
-- Create journal session grouping
+- Implement entry categorization
 - Build mobile-responsive journal interface
-- Implement entry importance levels
 - Create journal entry formatting
 
 ### Phase 7: Game Session Integration
@@ -201,7 +191,6 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Develop session controls (save, exit)
 - Add world theme integration for UI components
 - Build session recovery interface
-- Implement choice strength indicators
 - Add save indicators and confirmation
 
 ### Phase 8: Testing and Refinement

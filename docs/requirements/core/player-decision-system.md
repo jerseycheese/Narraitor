@@ -93,32 +93,177 @@ interface PlayerChoice {
 ## User Stories
 
 1. **Decision Presentation**
-- As a player, I want to be presented with clear decision points in the narrative so I can make meaningful choices (Complexity: Medium, Priority: Medium)
-- As a player, I want multiple options for each decision so I can express my character's personality (Complexity: Medium, Priority: Medium)
-- As a player, I want a clean, readable interface for decisions so I can easily understand my options (Complexity: Medium, Priority: Medium)
+- As a player, I want to be presented with clear decision points in the narrative so I can make meaningful choices
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The Narrative Engine generates decision points with 3-4 distinct options relevant to the current narrative context.
+
+- As a player, I want multiple options for each decision so I can express my character's personality
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Each decision provides at least 3 distinct options representing different approaches or attitudes.
+  2. Options reflect different character traits or motivations when appropriate.
+
+- As a player, I want a clean, readable interface for decisions so I can easily understand my options
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Each decision option is presented clearly in the UI (e.g., as a button or list item).
+  2. The UI is responsive and displays choices clearly on different screen sizes.
 
 2. **Decision Recording**
-- As a player, I want my choices to be recorded so they can influence the narrative going forward (Complexity: Medium, Priority: Medium)
-- As a player, I want to see my major decisions in my journal so I can remember what choices I've made (Complexity: Medium, Priority: Medium)
-- As a player, I want basic context recorded with my decisions so I understand when and where they were made (Complexity: Medium, Priority: Medium)
+- As a player, I want my choices to be recorded so they can influence the narrative going forward
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. When a player selects an option, a `PlayerChoice` record is created containing the `decisionId`, `optionId`, and `timestamp`.
+  2. The `PlayerChoice` record is stored persistently (e.g., via State Management).
+
+- As a player, I want to see my major decisions in my journal so I can remember what choices I've made
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Major decisions (identified by specific tags or context) are recorded as entries in the Journal System.
+  2. Journal entries reference decision points and the player's chosen option.
+
+- As a player, I want basic context recorded with my decisions so I understand when and where they were made
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [x] Small
+  - [ ] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Basic context (e.g., location tag from `PlayerDecision`) is stored with the choice.
+  2. Timestamp information is maintained to show when each decision was made.
 
 3. **Decision Impact**
-- As a player, I want my decisions to have consequences in the narrative so my choices feel meaningful (Complexity: Medium, Priority: Medium)
-- As a player, I want the story to acknowledge my past choices so the narrative feels personalized (Complexity: Medium, Priority: Medium)
+- As a player, I want my decisions to have consequences in the narrative so my choices feel meaningful
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The Narrative Engine receives the player's latest `PlayerChoice`.
+  2. Subsequent narrative generation reflects the immediate outcome or consequence of the chosen option.
+
+- As a player, I want the story to acknowledge my past choices so the narrative feels personalized
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The Decision Relevance System uses recorded choices to inform future context provided to the Narrative Engine.
+  2. The narrative references past decisions when contextually appropriate.
 
 4. **Development Support**
-- As a developer, I want to see decision data during development to debug decision tracking (Complexity: Medium, Priority: Medium)
-- As a developer, I want to understand how decisions are being presented and recorded in the system (Complexity: Medium, Priority: Medium)
+- As a developer, I want to see decision data during development to debug decision tracking
 
-## Acceptance Criteria
-1. Players are presented with clear, contextual decision points in the narrative
-2. Each decision offers 3-4 meaningful options
-3. Player choices are recorded with timestamp and location metadata
-4. Decision history is maintained between game sessions
-5. Past decisions influence subsequent narrative content
-6. Major decisions are viewable in the journal system
-7. Decision presentation UI is clean and responsive
-8. DevTools expose decision data for debugging purposes
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. DevTools allow inspection of the current `PlayerDecision` object presented to the user.
+  2. DevTools allow viewing the history of `PlayerChoice` records for the current session.
+
+- As a developer, I want to understand how decisions are being presented and recorded in the system
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. DevTools show the tags associated with decisions and options.
+  2. DevTools provide visualization of the decision flow and recording process.
 
 ## GitHub Issues
 - [Implement decision data model and storage] - Link to GitHub issue

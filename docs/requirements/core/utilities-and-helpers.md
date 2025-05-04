@@ -117,46 +117,280 @@ For a comprehensive development environment, these utilities work in conjunction
 ## User Stories
 
 1. **Error Handling**
-- As a developer, I want to create standardized error objects with consistent structure so that errors can be processed uniformly across the application (Complexity: Small, Priority: High)
-- As a developer, I want to categorize errors by type so that appropriate recovery strategies can be applied (Complexity: Small, Priority: Medium)
-- As a developer, I want simple retry determination for service errors so that transient failures can be handled automatically (Complexity: Small, Priority: Medium)
+- As a developer, I want to create standardized error objects with consistent structure so that errors can be processed uniformly across the application
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want to categorize errors by type so that appropriate recovery strategies can be applied
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want simple retry determination for service errors so that transient failures can be handled automatically
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Error objects follow a consistent structure with `code`, `message`, and `retryable` properties.
+  2. Error objects are categorized by type (e.g., network, service, validation) in their metadata.
+  3. Error types determine appropriate recovery strategies (retry for network issues, fallback for service errors).
+  4. Retryable errors have a flag that automated systems can use to determine retry behavior.
 
 2. **Storage**
-- As a developer, I want a type-safe IndexedDB wrapper so that data persistence operations are reliable and well-typed (Complexity: Medium, Priority: High)
-- As a developer, I want robust error handling for storage operations so that data integrity is maintained (Complexity: Medium, Priority: High)
-- As a developer, I want helpers for safely accessing nested properties so that code is more robust against undefined values (Complexity: Small, Priority: Medium)
+- As a developer, I want a type-safe IndexedDB wrapper so that data persistence operations are reliable and well-typed
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want robust error handling for storage operations so that data integrity is maintained
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want helpers for safely accessing nested properties so that code is more robust against undefined values
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The IndexedDB wrapper provides type-safe get/set operations that enforce schema types.
+  2. Storage operations have proper error handling with clear error messages.
+  3. Helper functions safely access nested properties without throwing errors if intermediate properties are undefined.
+  4. The IndexedDB wrapper handles connection failures and retries as appropriate.
 
 3. **Text Processing**
-- As a developer, I want utilities to clean metadata from AI-generated content so that users see properly formatted text (Complexity: Small, Priority: High)
-- As a developer, I want tools to normalize text formats so that content appears consistent throughout the application (Complexity: Small, Priority: Medium)
-- As a developer, I want helpers to extract relevant information from responses so that AI outputs can be processed efficiently (Complexity: Medium, Priority: Medium)
+- As a developer, I want utilities to clean metadata from AI-generated content so that users see properly formatted text
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want tools to normalize text formats so that content appears consistent throughout the application
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want helpers to extract relevant information from responses so that AI outputs can be processed efficiently
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Text cleaning utilities remove unwanted metadata and formatting markers from AI responses.
+  2. Content normalizing functions convert text to consistent paragraph breaks and punctuation.
+  3. Information extraction helpers can identify and extract structured data from text responses.
+  4. Text normalization produces consistent output regardless of the input format variations.
 
 4. **Debugging**
-- As a developer, I want console logging with severity levels so that I can filter log output appropriately (Complexity: Small, Priority: Medium)
-- As a developer, I want performance measurement utilities so that I can identify optimization opportunities (Complexity: Medium, Priority: Medium)
-- As a developer, I want access to state inspection utilities so that I can debug application state issues (Complexity: Medium, Priority: Medium)
+- As a developer, I want console logging with severity levels so that I can filter log output appropriately
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want performance measurement utilities so that I can identify optimization opportunities
+
+   ## Priority
+   - [ ] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [x] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want access to state inspection utilities so that I can debug application state issues
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Debug logging functions accept a severity level parameter (e.g., info, warn, error).
+  2. Logging is only active in development mode and can be toggled on/off.
+  3. Performance utilities can measure and report execution time of specified operations.
+  4. State inspection utilities provide a readable view of complex state objects during development.
 
 5. **AI Service Support**
-- As a developer, I want retry logic with backoff strategy so that AI service calls are resilient to temporary failures (Complexity: Medium, Priority: High)
-- As a developer, I want context optimization utilities so that token usage remains within limits (Complexity: Medium, Priority: High)
-- As a developer, I want response validation tools so that invalid AI responses can be detected and handled (Complexity: Medium, Priority: Medium)
+- As a developer, I want retry logic with backoff strategy so that AI service calls are resilient to temporary failures
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want context optimization utilities so that token usage remains within limits
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want response validation tools so that invalid AI responses can be detected and handled
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Retry logic implements exponential backoff for failed API calls.
+  2. The system caps maximum retry attempts to prevent infinite retry loops.
+  3. Context optimization functions maintain token counts under specified limits.
+  4. Response validation checks for common failure patterns in AI responses before passing to application logic.
 
 6. **General Utilities**
-- As a developer, I want UUID generation with browser compatibility so that entities have reliable unique identifiers (Complexity: Small, Priority: High)
-- As a developer, I want type guards for core domain objects so that runtime type checking is reliable (Complexity: Small, Priority: High)
-- As a developer, I want basic string and date formatting helpers so that presentation is consistent (Complexity: Small, Priority: Medium)
+- As a developer, I want UUID generation with browser compatibility so that entities have reliable unique identifiers
 
-## Acceptance Criteria
-1. Error handling utilities create consistent error objects with appropriate metadata
-2. Storage utilities successfully persist and retrieve data from IndexedDB
-3. Type guards correctly narrow and validate core domain types
-4. UUID generation creates reliable unique identifiers across sessions
-5. Text processing properly cleans and normalizes AI-generated content
-6. Debug utilities provide meaningful logging in development mode
-7. Retry logic correctly handles transient failures from AI services
-8. Context optimization effectively manages token limits for AI prompts
-9. Debug console functions are accessible via the window object in development mode
-10. State inspection utilities provide readable representation of complex state objects
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want type guards for core domain objects so that runtime type checking is reliable
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a developer, I want basic string and date formatting helpers so that presentation is consistent
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. UUID generation works consistently across browsers and creates reliably unique identifiers.
+  2. Type guards correctly identify and narrow core domain object types at runtime.
+  3. String formatting helpers standardize display of common data types.
+  4. Date formatting utilities provide consistent date/time representation across the application.
 
 ## GitHub Issues
 - [Implement core error handling utilities] - Link to GitHub issue

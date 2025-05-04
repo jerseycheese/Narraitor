@@ -216,37 +216,189 @@ type Action<T extends string, P = void> = P extends void
 ## User Stories
 
 1. **Campaign Management**
-- As a player, I want to create a new campaign with a selected world and character so I can start a new story (Complexity: Medium, Priority: High)
-- As a player, I want to continue an existing campaign so I can resume my story where I left off (Complexity: Medium, Priority: High)
-- As a player, I want to delete campaigns I'm no longer interested in so I can keep my campaign list organized (Complexity: Small, Priority: Medium)
+- As a player, I want to create a new campaign with a selected world and character so I can start a new story
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a player, I want to continue an existing campaign so I can resume my story where I left off
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a player, I want to delete campaigns I'm no longer interested in so I can keep my campaign list organized
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Users can initiate the creation of a new campaign, linking a selected world and character.
+  2. Existing campaigns are listed, showing basic metadata (name, world, character, last played).
+  3. Users can select an existing campaign to load its state and resume play.
+  4. Users can delete a campaign after confirming the action in a dialog.
 
 2. **State Persistence**
-- As a player, I want my game state to automatically save during play so I don't lose progress if my browser crashes (Complexity: Large, Priority: High)
-- As a player, I want to be notified when my game is saved so I know my progress is secure (Complexity: Small, Priority: Medium)
-- As a player, I want to safely resume interrupted sessions so no progress is lost (Complexity: Medium, Priority: High)
+- As a player, I want my game state to automatically save during play so I don't lose progress if my browser crashes
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a player, I want to be notified when my game is saved so I know my progress is secure
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+- As a player, I want to safely resume interrupted sessions so no progress is lost
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The application state (including world, character, narrative, journal, etc.) is automatically saved to IndexedDB every 5 minutes during active gameplay.
+  2. State is automatically saved after significant events like player decisions or scene changes.
+  3. A visual indicator confirms successful save operations.
+  4. Upon reloading the application after a crash or closure, the most recent saved state for the active campaign is automatically loaded.
 
 3. **Error Recovery**
-- As a player, I want the system to handle storage failures gracefully so my experience isn't disrupted (Complexity: Medium, Priority: High)
-- As a player, I want to recover from browser crashes without losing significant progress (Complexity: Medium, Priority: High)
-- As a player, I want clear error messages that help me understand and resolve issues (Complexity: Small, Priority: Medium)
+- As a player, I want the system to handle storage failures gracefully so my experience isn't disrupted
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a player, I want to recover from browser crashes without losing significant progress
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [ ] Medium
+   - [x] Large
+
+- As a player, I want clear error messages that help me understand and resolve issues
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The system detects failures during IndexedDB read/write operations.
+  2. If storage fails, the system attempts retries before notifying the user.
+  3. User-friendly error messages are displayed, explaining the issue without technical jargon.
+  4. When applicable, error messages include suggested actions for resolution.
 
 4. **Development Support**
-- As a developer, I want to debug and inspect application state during development (Complexity: Medium, Priority: Medium)
-- As a developer, I want to track state changes to understand the effects of actions (Complexity: Medium, Priority: Medium)
-- As a developer, I want type-safe state operations to prevent data integrity issues (Complexity: Medium, Priority: High)
+- As a developer, I want to debug and inspect application state during development
 
-## Acceptance Criteria
-1. Game state persists correctly between browser sessions with all relevant data intact
-2. Players can create, load, and delete campaigns with appropriate confirmations
-3. Automatic saving occurs at 5-minute intervals and after significant events
-4. The system handles storage failures with appropriate error messages and fallback options
-5. State operations maintain type safety and data integrity
-6. Loading saved campaigns restores the exact state of narrative, character, and journal
-7. The system prevents data corruption through proper error handling
-8. Component hooks provide clean, simple access to appropriate state slices
-9. The system recovers gracefully from interrupted save operations
-10. Save operations provide visual feedback to the user
-11. DevTools provide visibility into state for debugging purposes
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want to track state changes to understand the effects of actions
+
+   ## Priority
+   - [ ] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [x] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+- As a developer, I want type-safe state operations to prevent data integrity issues
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+  **Acceptance Criteria**:
+  1. DevTools expose the current application state via a UI panel in development mode.
+  2. The state tree can be inspected to view nested objects and arrays.
+  3. State changes are tracked and displayed via the DevTools (if included in MVP).
+  4. Domain reducers are fully typed with TypeScript, enforcing type safety for all state operations.
+  5. Custom hooks (`useWorld()`, `useCharacter()`, etc.) provide typed access to specific state slices.
 
 ## GitHub Issues
 - [Implement domain-specific reducers for all systems] - Link to GitHub issue

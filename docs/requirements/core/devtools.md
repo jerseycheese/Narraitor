@@ -178,34 +178,274 @@ const analysis = window.narraiDevTools.analyzeContent();
 ## User Stories
 
 1. **DevTools UI**
-- As a developer, I want to toggle the DevTools panel with a keyboard shortcut so that I can quickly access debugging tools (Complexity: Small, Priority: High)
-- As a developer, I want to collapse and expand sections in the DevTools panel so that I can focus on relevant information (Complexity: Small, Priority: Medium)
-- As a developer, I want debug-only components with visibility toggles so that I can control which debugging tools are displayed (Complexity: Medium, Priority: Medium)
+- As a developer, I want to toggle the DevTools panel with a keyboard shortcut so that I can quickly access debugging tools
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [x] Small
+  - [ ] Medium
+  - [ ] Large
+
+- As a developer, I want to collapse and expand sections in the DevTools panel so that I can focus on relevant information
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [x] Small
+  - [ ] Medium
+  - [ ] Large
+
+- As a developer, I want debug-only components with visibility toggles so that I can control which debugging tools are displayed
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The main `DevToolsPanel` can be toggled visible/hidden using the Ctrl+Shift+D keyboard shortcut in development environments.
+  2. Individual sections within the panel (e.g., State Inspector, AI Debugger) can be collapsed and expanded.
+  3. DevTools components are only rendered and included in the build when the application is run in a development environment (`NODE_ENV === 'development'`).
 
 2. **State Inspection**
-- As a developer, I want to view the complete application state so that I can understand the current system status (Complexity: Medium, Priority: High)
-- As a developer, I want basic state modification capabilities so that I can test different state scenarios (Complexity: Medium, Priority: Medium)
-- As a developer, I want to visually explore the state tree so that I can understand state relationships (Complexity: Medium, Priority: Medium)
+- As a developer, I want to view the complete application state so that I can understand the current system status
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want basic state modification capabilities so that I can test different state scenarios
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to visually explore the state tree so that I can understand state relationships
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `StateInspector` section displays the current application state (e.g., from Redux or Context).
+  2. The state is displayed in a readable format (e.g., using a `JsonViewer`).
+  3. Basic state values (strings, numbers, booleans) can be modified directly through the DevTools UI (MVP scope might limit this to viewing only, confirm if editing is MVP).
 
 3. **Narrative and Decision Testing**
-- As a developer, I want to test narrative generation with custom inputs so that I can verify it produces expected content (Complexity: Medium, Priority: High)
-- As a developer, I want to trigger test decisions so that I can verify decision handling (Complexity: Medium, Priority: Medium)
-- As a developer, I want to analyze narrative content patterns so that I can ensure content quality (Complexity: Medium, Priority: Low)
+- As a developer, I want to test narrative generation with custom inputs so that I can verify it produces expected content
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to trigger test decisions so that I can verify decision handling
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to analyze narrative content patterns so that I can ensure content quality
+
+  ## Priority
+  - [ ] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [x] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `NarrativeDebugger` section allows triggering narrative generation with test prompts or contexts.
+  2. The `NarrativeDebugger` section allows triggering test decisions.
+  3. Basic content analysis (e.g., word count, sentence count) is available (if included in MVP).
 
 4. **AI Service Debugging**
-- As a developer, I want to monitor AI service requests and responses so that I can debug integration issues (Complexity: Medium, Priority: High)
-- As a developer, I want to view errors from AI service calls so that I can identify failure points (Complexity: Medium, Priority: High)
-- As a developer, I want to mock AI responses so that I can test edge cases without making real API calls (Complexity: Medium, Priority: Medium)
+- As a developer, I want to monitor AI service requests and responses so that I can debug integration issues
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to view errors from AI service calls so that I can identify failure points
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to mock AI responses so that I can test edge cases without making real API calls
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `AIServiceDebugger` section displays a log of recent AI requests and their corresponding responses (or errors).
+  2. Request/response details (prompt, content, status) are viewable.
+  3. Functionality exists to mock AI responses for testing purposes (if included in MVP).
 
 5. **Performance and Error Monitoring**
-- As a developer, I want to view basic performance metrics so that I can identify bottlenecks (Complexity: Medium, Priority: Medium)
-- As a developer, I want comprehensive error reporting so that I can diagnose and fix issues (Complexity: Medium, Priority: High)
-- As a developer, I want to capture and display runtime errors so that I can trace their origin (Complexity: Medium, Priority: High)
+- As a developer, I want to view basic performance metrics so that I can identify bottlenecks
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want comprehensive error reporting so that I can diagnose and fix issues
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to capture and display runtime errors so that I can trace their origin
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `PerformanceMonitor` section displays basic metrics (e.g., last render time, time since last AI response).
+  2. The `ErrorDisplay` component within DevTools shows runtime errors captured by the application's error boundaries.
+  3. Error messages and basic stack trace information are displayed.
 
 6. **Browser Console API**
-- As a developer, I want programmatic access to debugging functions via the console so that I can automate debugging tasks (Complexity: Medium, Priority: High)
-- As a developer, I want to access state inspection methods via the console so that I can quickly check state values (Complexity: Small, Priority: Medium)
-- As a developer, I want to trigger game operations via the console so that I can test functionality programmatically (Complexity: Medium, Priority: Medium)
+- As a developer, I want programmatic access to debugging functions via the console so that I can automate debugging tasks
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+- As a developer, I want to access state inspection methods via the console so that I can quickly check state values
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [x] Small
+  - [ ] Medium
+  - [ ] Large
+
+- As a developer, I want to trigger game operations via the console so that I can test functionality programmatically
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `window.narraiDevTools` object is available in the browser console in development environments.
+  2. Console API functions like `getState()`, `generateNarrative()`, `triggerDecision()` are callable and perform their intended actions.
+  3. Console API functions return expected values or promises.
 
 ## Implementation Approach
 1. Create a central DevTools context provider
@@ -215,18 +455,6 @@ const analysis = window.narraiDevTools.analyzeContent();
 5. Implement state inspection with JSON viewer
 6. Integrate with existing system interfaces
 7. Add conditional rendering based on environment
-
-## Acceptance Criteria
-1. DevTools are only visible in development environments
-2. All DevTools components are properly typed with TypeScript
-3. The browser console API provides access to critical operations
-4. The UI panel can be toggled with a keyboard shortcut
-5. State inspection shows the complete application state
-6. Performance metrics don't impact application performance
-7. Error reporting captures and displays runtime errors
-8. The panel can be collapsed and expanded as needed
-9. Changes made via DevTools are reflected in the application
-10. All DevTools functionality has appropriate error handling
 
 ## GitHub Issues
 - [Create DevTools context provider] - Link to GitHub issue

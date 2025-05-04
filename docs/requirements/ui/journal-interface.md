@@ -76,35 +76,139 @@ The Journal Interface provides a way for players to review their game history, i
 
 1. **Journal Access and Navigation**
    - As a player, I want to access my journal during gameplay so I can refresh my memory about past events
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. The journal interface can be opened from the main game session UI (e.g., via a `JournalButton`).
+   2. Opening the journal preserves the current game session state.
+
    - As a player, I want to navigate back to the game without losing my game state so I can seamlessly continue playing
-   - As a player, I want intuitive navigation between the entry list and detailed views so I can easily explore my journal
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. A 'Back' or 'Close' button within the journal interface returns the user to the game session UI at the point they left off.
 
 2. **Entry Browsing and Viewing**
    - As a player, I want to see journal entries in chronological order so I can follow the story progression
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. The `EntryList` component displays journal entries sorted chronologically by timestamp (newest first).
+   2. Each entry in the list (`EntryCard`) shows a title or summary.
+
    - As a player, I want to select entries to view their complete content so I can read the full details
-   - As a player, I want entry summaries in the list view so I can quickly identify entries of interest
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. Selecting an entry from the list displays its full `content` in the `EntryDetail` view.
+   2. An empty state message is shown if no journal entries exist for the current campaign.
+
    - As a player, I want proper formatting in entries so they're easy to read and understand
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [x] Small
+   - [ ] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. The `EntryDetail` view renders entry content with basic formatting (e.g., paragraph breaks).
 
 3. **Journal Styling and Responsiveness**
    - As a player, I want journal styling that matches my world theme so it feels integrated with the game
+
+   ## Priority
+   - [ ] High (MVP)
+   - [x] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. The journal interface uses colors and fonts consistent with the active world's theme.
+
    - As a player, I want the journal interface to work well on different devices so I can play anywhere
-   - As a player, I want legible text with appropriate spacing so I can comfortably read entries
+
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. The layout adapts for mobile, tablet, and desktop screens (e.g., list-only vs. list/detail view).
 
 4. **Journal Persistence**
    - As a player, I want my journal to persist between game sessions so I don't lose my story history
-   - As a player, I want to continue from where I left off so I don't have to re-read previous entries
 
-## Acceptance Criteria
-1. Journal entries are displayed in chronological order (newest to oldest)
-2. Entry detail view shows complete entry content with appropriate formatting
-3. Journal can be accessed during gameplay without losing game state
-4. Navigation between list and detail views is intuitive
-5. Journal styling respects the selected world's theme
-6. The interface adapts responsively to different screen sizes
-7. Entries persist between game sessions
-8. Empty state is displayed when no entries exist
-9. Back button returns user to the game session
-10. Entry cards provide enough summary information to identify content
+   ## Priority
+   - [x] High (MVP)
+   - [ ] Medium (MVP Enhancement)
+   - [ ] Low (Nice to Have)
+   - [ ] Post-MVP
+
+   ## Estimated Complexity
+   - [ ] Small
+   - [x] Medium
+   - [ ] Large
+
+   **Acceptance Criteria**:
+   1. Journal entries stored via the State Management system are correctly loaded and displayed when the journal is opened.
+   2. Entries created during the current session are visible immediately in the journal.
 
 ## Technical Implementation Details
 

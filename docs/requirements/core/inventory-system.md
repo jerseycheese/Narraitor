@@ -3,7 +3,7 @@ title: Inventory System Requirements
 aliases: [Item Management Requirements]
 tags: [narraitor, requirements, inventory-system]
 created: 2025-04-29
-updated: 2025-05-01
+updated: 2025-05-03
 ---
 
 # Inventory System Requirements
@@ -103,46 +103,259 @@ interface InventoryCategory {
 - Complex AI analysis for categorization beyond basic text matching.
 - Any features listed under "Post-MVP Exclusions (Future Phases)" in the original document.
 
-## User Stories
+## User Stories and Acceptance Criteria
 
-1. **Item Management**
-- As a player, I want to view a list of items my character possesses so I know what they are carrying (Complexity: Small, Priority: Medium)
-- As a player, I want to add items to my character's inventory so they can use or equip them later (Complexity: Small, Priority: Medium)
-- As a player, I want to remove items from my character's inventory when they're no longer needed (Complexity: Small, Priority: Medium)
+### 1. View Inventory
+**User Story**: As a player, I want to view a list of items my character possesses so I know what they are carrying.
 
-2. **Item Usage**
-- As a player, I want to use items from my inventory so they can affect the narrative (Complexity: Small, Priority: Medium)
-- As a player, I want used consumable items to be automatically removed from my inventory when depleted (Complexity: Small, Priority: Medium)
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
 
-3. **Equipment Management**
-- As a player, I want to equip items from my inventory so my character can use them (Complexity: Medium, Priority: Medium)
-- As a player, I want to unequip items when they're no longer needed (Complexity: Small, Priority: Medium)
-- As a player, I want to see which items are currently equipped at a glance (Complexity: Small, Priority: Medium)
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
 
-4. **Item Categorization**
-- As a player, I want items to be automatically categorized upon acquisition so they're easier to find (Complexity: Small, Priority: Medium)
-- As a player, I want to see item categories in the inventory view for better organization (Complexity: Small, Priority: Medium)
+**Acceptance Criteria**:
+1. The inventory UI displays a complete list of items associated with the character
+2. Each item shows its name, quantity, and optional description
+3. The inventory list is organized or grouped by categories
+4. The inventory UI is responsive and works on different screen sizes
+5. The inventory list refreshes automatically when items are added or removed
 
-5. **Narrative Integration**
-- As a player, I want the narrative to acknowledge the items my character has so the story feels personalized (Complexity: Small, Priority: Medium)
-- As a player, I want my equipped items to be reflected in the narrative so my choices matter (Complexity: Small, Priority: Medium)
+### 2. Add Items
+**User Story**: As a player, I want to add items to my character's inventory so they can use or equip them later.
 
-## Acceptance Criteria
-1. The system can track a list of items associated with a character.
-2. Items can be added to and removed from a character's inventory programmatically.
-3. Items can be used via the Inventory UI.
-4. Using an item reduces its quantity, removing the item if quantity reaches zero.
-5. Players can equip and unequip items through the Inventory UI.
-6. The Inventory UI clearly indicates which items are currently equipped.
-7. Inventory state persists correctly between sessions.
-8. A basic list of items is displayed in the Inventory UI, showing category information.
-9. Inventory data is accessible by the Narrative Engine.
-10. Item acquisition events can be recorded in the Journal, including the assigned category.
-11. Item usage can trigger narrative effects via the Narrative Engine.
-12. The Inventory UI is responsive on desktop and mobile.
-13. When items are acquired via narrative events, the AI automatically assigns a category.
-14. Items are stored with their assigned category ID.
-15. Equipped items retain their equipped status between sessions.
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Items can be added to the character's inventory programmatically
+2. When a new item is added, the inventory UI updates immediately
+3. If an existing item is added, its quantity increases appropriately
+4. The system tracks when and how items are acquired
+5. New items are automatically categorized by the AI upon acquisition
+
+### 3. Remove Items
+**User Story**: As a player, I want to remove items from my character's inventory when they're no longer needed.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Items can be removed from the character's inventory via the UI
+2. When an item is removed, the inventory UI updates immediately
+3. If a quantity is specified, only that amount is removed
+4. When an item's quantity reaches zero, it is removed entirely from the inventory
+5. The system provides confirmation for item removal to prevent accidents
+
+### 4. Use Items
+**User Story**: As a player, I want to use items from my inventory so they can affect the narrative.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Players can select and use items from the inventory UI
+2. Using an item triggers appropriate narrative effects via the Narrative Engine
+3. The system provides feedback when an item is used
+4. Used items that are consumable have their quantity reduced
+5. Used items are reflected in the journal system if narratively significant
+
+### 5. Consumable Items
+**User Story**: As a player, I want used consumable items to be automatically removed from my inventory when depleted.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. The system identifies items that are consumable
+2. Using a consumable item reduces its quantity by one
+3. When a consumable item's quantity reaches zero, it is automatically removed from inventory
+4. The inventory UI updates immediately when items are depleted
+5. The system provides feedback when an item is depleted
+
+### 6. Equip Items
+**User Story**: As a player, I want to equip items from my inventory so my character can use them.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Players can equip items from the inventory UI
+2. Equipped items are marked with a clear visual indicator
+3. Equipped status persists between game sessions
+4. The system prevents equipping incompatible or unusable items
+5. Equipping an item is reflected in the narrative context
+
+### 7. Unequip Items
+**User Story**: As a player, I want to unequip items when they're no longer needed.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Players can unequip items from the inventory UI
+2. Unequipped items remain in the inventory but lose equipped status
+3. Unequipped status persists between game sessions
+4. The system provides feedback when an item is unequipped
+5. Unequipping an item is reflected in the narrative context
+
+### 8. Equipped Items Indicator
+**User Story**: As a player, I want to see which items are currently equipped at a glance.
+
+## Priority
+- [x] High (MVP)
+- [ ] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. Equipped items have a clear, distinctive visual indicator in the inventory UI
+2. The equipped status is immediately visible without additional interaction
+3. The equipped indicator is consistent across all inventory views
+4. The equipped indicator is accessible and visible across device sizes
+5. Equipped status is updated immediately when changed
+
+### 9. Item Categorization
+**User Story**: As a player, I want items to be automatically categorized upon acquisition so they're easier to find.
+
+## Priority
+- [ ] High (MVP)
+- [x] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. New items are automatically analyzed and categorized by the AI service
+2. Items are assigned to predefined categories based on their description and properties
+3. The categorization system handles a variety of item types effectively
+4. Category assignments are stored with the item data
+5. The system handles edge cases gracefully when categorization is unclear
+
+### 10. Category Display
+**User Story**: As a player, I want to see item categories in the inventory view for better organization.
+
+## Priority
+- [ ] High (MVP)
+- [x] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [x] Small
+- [ ] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. The inventory UI displays items grouped by their categories
+2. Category names are clearly visible as headers or labels
+3. The category organization improves inventory navigation
+4. Categories are consistently applied across the inventory UI
+5. The category display adapts to different screen sizes
+
+### 11. Narrative Item Acknowledgement
+**User Story**: As a player, I want the narrative to acknowledge the items my character has so the story feels personalized.
+
+## Priority
+- [ ] High (MVP)
+- [x] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. The Narrative Engine has access to the character's inventory data
+2. Narrative text references relevant items when appropriate
+3. The system prioritizes narratively significant items for mentions
+4. Item acknowledgment feels natural and integrated into the story
+5. Item acknowledgment varies to avoid repetition
+
+### 12. Equipped Items in Narrative
+**User Story**: As a player, I want my equipped items to be reflected in the narrative so my choices matter.
+
+## Priority
+- [ ] High (MVP)
+- [x] Medium (MVP Enhancement)
+- [ ] Low (Nice to Have)
+- [ ] Post-MVP
+
+## Estimated Complexity
+- [ ] Small
+- [x] Medium
+- [ ] Large
+
+**Acceptance Criteria**:
+1. The Narrative Engine distinguishes between equipped and unequipped items
+2. Equipped items receive special consideration in narrative generation
+3. Narrative text references equipped items when relevant to the story
+4. Equipped items can influence possible narrative choices or outcomes
+5. Changes to equipped items are reflected in subsequent narrative content
 
 ## GitHub Issues
 - [Implement basic inventory data model and state management] - Link to GitHub issue

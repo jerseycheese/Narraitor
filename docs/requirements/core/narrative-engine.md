@@ -188,44 +188,246 @@ interface NarrativeErrorInfo {
 ## User Stories
 
 1. **Narrative Generation**
-- As a user, I want to read engaging narrative content that matches my selected world so I can immerse myself in the story (Complexity: Large, Priority: High)
-- As a user, I want the narrative to acknowledge my character's attributes and skills so the story feels personalized (Complexity: Large, Priority: High)
-- As a user, I want content that respects my chosen tone settings so the narrative style meets my expectations (Complexity: Medium, Priority: High)
-- As a user, I want properly formatted text with paragraphs and dialogue so it's easy to read (Complexity: Medium, Priority: High)
+- As a user, I want to read engaging narrative content that matches my selected world so I can immerse myself in the story
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [ ] Medium
+  - [x] Large
+
+  **Acceptance Criteria**:
+  1. The AI Service generates narrative text that aligns with the selected world's genre, description, and basic tone (as inferred from world description).
+  2. The system handles basic scene transitions smoothly, maintaining narrative context.
+
+- As a user, I want the narrative to acknowledge my character's attributes and skills so the story feels personalized
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [ ] Medium
+  - [x] Large
+
+  **Acceptance Criteria**:
+  1. Generated narrative incorporates the active character's name, basic attributes, and selected skills when relevant to the scene.
+
+- As a user, I want content that respects my chosen tone settings so the narrative style meets my expectations
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The AI Service respects tone settings such as narrative style and content rating specified in the world configuration.
+  2. Generated content maintains a consistent tone throughout the narrative session.
+
+- As a user, I want properly formatted text with paragraphs and dialogue so it's easy to read
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Narrative text is formatted with standard paragraph breaks.
+  2. Dialogue is clearly distinguishable (e.g., using quotation marks).
 
 2. **Player Choices**
-- As a user, I want to make meaningful decisions that affect the narrative so I feel agency in the story (Complexity: Large, Priority: High)
-- As a user, I want clear choices that represent different approaches so I can express my character's personality (Complexity: Medium, Priority: High)
-- As a user, I want to see the consequences of my decisions reflected in the narrative so my choices matter (Complexity: Large, Priority: High)
+- As a user, I want to make meaningful decisions that affect the narrative so I feel agency in the story
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [ ] Medium
+  - [x] Large
+
+  **Acceptance Criteria**:
+  1. The system presents 3-4 distinct, contextually relevant choices to the player at appropriate narrative junctures.
+  2. Player selections are recorded by the Player Decision System.
+
+- As a user, I want clear choices that represent different approaches so I can express my character's personality
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Choice options are presented clearly (e.g., as buttons or list items).
+  2. Choices reflect different approaches or strategies appropriate to the narrative context.
+
+- As a user, I want to see the consequences of my decisions reflected in the narrative so my choices matter
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [ ] Medium
+  - [x] Large
+
+  **Acceptance Criteria**:
+  1. Subsequent narrative generation takes the player's most recent choice into account, reflecting its immediate consequence.
+  2. Major decisions have visible impact on the progression of the story.
 
 3. **Narrative Flow**
-- As a user, I want smooth transitions between scenes so the story maintains coherence (Complexity: Medium, Priority: Medium)
-- As a user, I want the narrative to remember important decisions I've made so the story remains consistent (Complexity: Large, Priority: High)
+- As a user, I want smooth transitions between scenes so the story maintains coherence
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Scene transitions (such as location changes) maintain narrative continuity by referring to the previous scene or reason for moving.
+  2. The narrative context correctly tracks the current location/setting and uses it to inform scene descriptions.
+
+- As a user, I want the narrative to remember important decisions I've made so the story remains consistent
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [ ] Medium
+  - [x] Large
+
+  **Acceptance Criteria**:
+  1. The narrative context maintains a record of at least 3 important player decisions from previous interactions.
+  2. These important decisions are referenced in subsequent narrative generation when contextually appropriate.
 
 4. **Error Handling**
-- As a user, I want graceful error handling when AI requests fail so my experience isn't disrupted (Complexity: Medium, Priority: High)
-- As a user, I want fallback content when the AI service is unavailable so I can continue playing (Complexity: Medium, Priority: Medium)
-- As a user, I want clear error messages that don't break immersion so my narrative experience is preserved (Complexity: Small, Priority: Medium)
+- As a user, I want graceful error handling when AI requests fail so my experience isn't disrupted
+
+  ## Priority
+  - [x] High (MVP)
+  - [ ] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. If the AI Service fails to generate content after retries, a user-friendly error message is displayed within the narrative flow.
+  2. Errors are logged internally for debugging but do not expose technical details to the user unless in debug mode.
+
+- As a user, I want fallback content when the AI service is unavailable so I can continue playing
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. A generic fallback narrative snippet or choice prompt is presented to allow the user to continue or retry.
+  2. The system can operate with limited functionality when the AI service is unavailable.
+
+- As a user, I want clear error messages that don't break immersion so my narrative experience is preserved
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [x] Small
+  - [ ] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. Error messages are phrased in a way that fits the narrative context when possible.
+  2. Technical details are abstracted into user-friendly language appropriate to the game world.
 
 5. **Development Support**
-- As a developer, I want to debug and inspect narrative state during development (Complexity: Large, Priority: Medium)
-- As a developer, I want to see how prompts are constructed and optimized (Complexity: Large, Priority: Medium)
+- As a developer, I want to debug and inspect narrative state during development
 
-## Acceptance Criteria
-1. The system generates coherent narrative content appropriate to the selected world
-2. Narrative content respects the character attributes and skills
-3. Player choices influence subsequent narrative development in meaningful ways
-4. The narrative respects world tone settings (family-friendly vs mature, etc.)
-5. The system maintains sufficient context to create a cohesive story
-6. Narrative history is recorded and accessible through the journal system
-7. The system recovers gracefully from AI service failures
-8. Scene transitions maintain narrative continuity
-9. The system optimizes prompts to stay within token limits
-10. Generated content is free from inappropriate material based on content rating
-11. Narrative text is properly formatted with paragraphs and dialogue formatting
-12. Choice options reflect the current narrative context appropriately
-13. The system provides fallback content when AI generation fails
-14. DevTools provide visibility into narrative state and AI interactions
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. DevTools allow inspection of the current narrative state (e.g., recent history, current context).
+  2. The system provides debug information about the narrative flow and decision tracking.
+
+- As a developer, I want to see how prompts are constructed and optimized
+
+  ## Priority
+  - [ ] High (MVP)
+  - [x] Medium (MVP Enhancement)
+  - [ ] Low (Nice to Have)
+  - [ ] Post-MVP
+
+  ## Estimated Complexity
+  - [ ] Small
+  - [x] Medium
+  - [ ] Large
+
+  **Acceptance Criteria**:
+  1. DevTools display the prompt sent to the AI Service and the raw response received for the last narrative turn.
+  2. The system provides information about token usage and context optimization strategies.
 
 ## GitHub Issues
 - [Implement narrative state management] - Link to GitHub issue

@@ -69,14 +69,157 @@ The Character Interface provides the user-facing components for creating, viewin
 - Drag-and-drop skill organization
 - Rich text formatting for descriptions
 
-## Acceptance Criteria
-1. Users can complete the character creation process without confusion
-2. Character creation enforces the rules of the selected world
-3. Character sheet displays all relevant character information
-4. Attribute allocation respects minimum and maximum values
-5. Skill selection and rating interface is intuitive
-6. Character listing shows essential information for selection
-7. The interface adapts responsively to different screen sizes
+## User Stories
+
+1. **Character Creation Components**
+   - As a user, I want to use a character creation wizard to build my character step by step
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [ ] Small
+     - [x] Medium
+     - [ ] Large
+
+   - As a user, I want to assign attribute points to customize my character's abilities
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+   - As a user, I want to select and rate skills to define my character's capabilities
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+   - As a user, I want to enter descriptions for my character's appearance and personality
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+   - As a user, I want validation to ensure my character meets world requirements
+
+     ## Priority
+     - [ ] High (MVP)
+     - [x] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `CharacterCreationWizard` component guides the user through distinct steps (e.g., Basic Info, Attributes, Skills, Description).
+  2. The `AttributeAssignment` component allows users to allocate points within the min/max values defined by the world.
+  3. The `SkillAssignment` component allows users to select skills defined by the world and assign ratings within allowed ranges.
+  4. The `CharacterDescription` component provides text input fields for appearance, personality, and background.
+  5. Basic validation prevents proceeding if required fields (e.g., name) are empty or if attribute/skill rules are violated.
+
+2. **Character Management Components**
+   - As a user, I want to view a list of my created characters with basic information
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+   - As a user, I want to edit my existing characters to update their details
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [ ] Small
+     - [x] Medium
+     - [ ] Large
+
+   - As a user, I want to delete characters I no longer need with proper confirmation
+
+     ## Priority
+     - [ ] High (MVP)
+     - [x] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [x] Small
+     - [ ] Medium
+     - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `CharacterList` component displays a list of created characters, showing at least their name and world.
+  2. An editing interface (potentially reusing wizard steps or a dedicated form) allows modification of existing character fields.
+  3. The `DeleteCharacterDialog` component prompts the user for confirmation before deleting a character.
+  4. The character list updates immediately after deletion.
+
+3. **Character Display Components**
+   - As a user, I want to view a detailed character sheet that shows all my character's information
+
+     ## Priority
+     - [x] High (MVP)
+     - [ ] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [ ] Small
+     - [x] Medium
+     - [ ] Large
+
+   - As a user, I want all character interfaces to work well on different screen sizes
+
+     ## Priority
+     - [ ] High (MVP)
+     - [x] Medium (MVP Enhancement)
+     - [ ] Low (Nice to Have)
+     - [ ] Post-MVP
+
+     ## Estimated Complexity
+     - [ ] Small
+     - [x] Medium
+     - [ ] Large
+
+  **Acceptance Criteria**:
+  1. The `CharacterSheet` component displays all core character information (name, description, attributes, skills, background).
+  2. All character interface components (Wizard, List, Sheet) are responsive and usable on mobile, tablet, and desktop screen sizes.
 
 ## UI Design Guidelines
 
