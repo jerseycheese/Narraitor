@@ -15,11 +15,21 @@ This file documents the labels used in the Narraitor repository. You can use a t
 - `domain:world-configuration` - Related to the World Configuration system
 - `domain:character-system` - Related to the Character System
 - `domain:decision-tracking` - Related to the Decision Tracking System
-- `domain:decision-relevance` - Related to the Decision Relevance System
+- `domain:decision-relevance` - Related to the Decision Relevance System 
 - `domain:narrative-engine` - Related to the Narrative Engine
 - `domain:journal-system` - Related to the Journal System
 - `domain:state-management` - Related to the State Management system
 - `domain:infrastructure` - Related to project infrastructure, build, or deployment
+- `domain:utilities-and-helpers` - Related to utility functions and helper modules
+- `domain:inventory-system` - Related to the Inventory System
+- `domain:lore-management-system` - Related to the Lore Management System
+- `domain:player-decision-system` - Related to the Player Decision System
+- `domain:devtools` - Related to developer tools and debugging
+- `domain:ai-service` - Related to AI service integration
+- `domain:character-interface` - Related to character UI/UX
+- `domain:game-session` - Related to game session UI/UX
+- `domain:journal-interface` - Related to journal UI/UX
+- `domain:world-interface` - Related to world configuration UI/UX
 
 ## Priority Labels
 
