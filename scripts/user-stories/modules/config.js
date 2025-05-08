@@ -12,6 +12,9 @@ export const OWNER = 'jerseycheese';
 export const REPO = 'narraitor';
 export const TOKEN = process.env.GITHUB_TOKEN;
 
+// GitHub Project Board URL (for user stories)
+export const PROJECT_BOARD_URL = 'https://github.com/users/jerseycheese/projects/3';
+
 // Base paths
 export const BASE_DIR = path.join(__dirname, '..', '..', '..');
 export const DOCS_DIR = path.join(BASE_DIR, 'docs');

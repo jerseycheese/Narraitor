@@ -1,58 +1,135 @@
 // Parsers for user story files (CSV and Markdown)
 import fs from 'fs';
 import path from 'path';
-import { getStoryComplexityAndPriority } from '../story-complexity-mapping.js';
+import { parse } from 'csv-parse/sync'; // Add csv-parse import
+// Removed import of getStoryComplexityAndPriority as it's no longer needed here
 import { buildRelatedDocumentationLink } from './fs-utils.js';
 import { ISSUE_BODY_TEMPLATE } from './config.js';
 
-// Parse CSV file if it exists
-export function parseUserStoriesFromCSV(csvFile, domain) {
-  if (!csvFile) {
+/**
+ * Parses a CSV file and returns an array of row objects using csv-parse.
+ * It maps specific columns from the CSV to a standardized object structure.
+ * Handles new columns like Technical Requirements, Implementation Considerations,
+ * Related Issues/Stories, and Related Documentation. Priority and Complexity
+ * are sourced directly from the CSV.
+ *
+ * @param {string} csvPath - The path to the CSV file.
+ * @returns {Array<Object>} An array of objects, where each object represents a row
+ *   from the CSV with mapped keys. Returns an empty array if the file is not found
+ *   or parsing fails.
+ * @returns {string} returns[].titleSummary - The user story title summary.
+ * @returns {string} returns[].userStory - The main user story content.
+ * @returns {string} returns[].priority - The priority from the CSV.
+ * @returns {string} returns[].complexity - The estimated complexity from the CSV.
+ * @returns {string} returns[].acceptanceCriteriaRaw - The raw acceptance criteria string from the CSV.
+ * @returns {string} returns[].gitHubIssueLink - The GitHub issue link from the CSV.
+ * @returns {string} returns[].relatedIssues - The related issues/stories from the CSV.
+ * @returns {string} returns[].technicalRequirements - The technical requirements from the CSV.
+ * @returns {string} returns[].implementationConsiderations - The implementation considerations from the CSV.
+ * @returns {string} returns[].relatedDocumentation - The related documentation paths from the CSV.
+ */
+export function parseCsvRows(csvPath) {
+  try {
+    console.log(`Reading CSV file: ${csvPath}`);
+    if (!fs.existsSync(csvPath)) {
+      console.warn(`CSV file not found: ${csvPath}`);
+      return [];
+    }
+    const content = fs.readFileSync(csvPath, 'utf8');
+
+    // Use csv-parse/sync for robust parsing
+    const records = parse(content, {
+      columns: true,          // Treat the first line as column headers
+      skip_empty_lines: true, // Skip lines that are empty
+      trim: true,             // Trim whitespace from values
+      relax_column_count: true // Allow varying numbers of columns per row
+    });
+
+    // Basic validation/mapping to expected keys for consistency downstream
+    return records.map(row => ({
+      titleSummary: row['User Story Title Summary'] || '',
+      userStory: row['User Story'] || '',
+      priority: row['Priority'] || '',
+      complexity: row['Estimated Complexity'] || '',
+      acceptanceCriteriaRaw: row['Acceptance Criteria'] || '', // Keep raw AC string
+      gitHubIssueLink: row['GitHub Issue Link'] || '',
+      relatedIssues: row['Related Issues/Stories'] || '', // Add Related Issues/Stories
+      technicalRequirements: row['Technical Requirements'] || '', // Add Technical Requirements
+      implementationConsiderations: row['Implementation Considerations'] || '', // Add Implementation Considerations
+      // Add other columns if needed later
+      relatedDocumentation: row['Related Documentation'] || '', // Add Related Documentation
+    }));
+
+  } catch (error) {
+    console.error(`Error parsing CSV file ${csvPath}: ${error.message}`);
     return [];
   }
-  
-  console.log(`Reading CSV file: ${csvFile.path}`);
-  const content = fs.readFileSync(csvFile.path, 'utf8');
-  const lines = content.split('\n');
-  
-  // Skip header line
-  const userStories = [];
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    
-    // Parse CSV line
-    const columns = line.split(',');
-    if (columns.length < 5) continue;
-    
-    // Extract data
-    const titleSummary = columns[0].trim().replace(/"/g, '');
-    const userStory = columns[1].trim().replace(/"/g, '');
-    const priority = columns[2].trim().replace(/"/g, '');
-    const complexity = columns[3].trim().replace(/"/g, '');
-    const acceptanceCriteria = columns[4].trim().replace(/"/g, '').split('\\n');
-    
-    userStories.push({
-      domain,
-      priority,
-      complexity,
-      content: userStory,
-      title: `[USER STORY] ${userStory}`,
-      acceptanceCriteria,
-      technicalRequirements: [],
-      relatedDocumentation: buildRelatedDocumentationLink(domain, csvFile.type),
-      implementationNotes: [
-        'Use standard implementation approach for this feature',
-        'Implement with service interface design patterns',
-        'Write tests first following TDD approach'
-      ]
-    });
-  }
-  
-  return convertUserStoriesToGithubIssues(userStories);
 }
 
-// Extract acceptance criteria from the markdown content
+
+// --- Functions below are mostly for Markdown parsing or GitHub Issue conversion ---
+// --- They might need review/adjustment if migrate-user-stories.js is used ---
+
+
+// Parse CSV file if it exists (Original function - kept for reference/potential use by migrate-user-stories?)
+// NOTE: This uses the old mapping file logic via getStoryComplexityAndPriority
+export function parseUserStoriesFromCSV_Legacy(csvFile, domain) {
+  // ... (Original implementation using getStoryComplexityAndPriority) ...
+  // This function likely needs refactoring if migrate-user-stories.js
+  // should also use the CSV directly for complexity/priority.
+  // For now, we focus on the update script.
+  console.warn("parseUserStoriesFromCSV_Legacy is being called - review if complexity/priority should come from CSV directly here too.");
+   if (!csvFile) {
+     return [];
+   }
+   
+   console.log(`Reading CSV file: ${csvFile.path}`);
+   const content = fs.readFileSync(csvFile.path, 'utf8');
+   const lines = content.split('\n');
+   
+   // Skip header line
+   const userStories = [];
+   for (let i = 1; i < lines.length; i++) {
+     const line = lines[i].trim();
+     if (!line) continue;
+     
+     // Parse CSV line (Fragile)
+     const columns = line.split(',');
+     if (columns.length < 5) continue;
+     
+     // Extract data
+     const titleSummary = columns[0].trim().replace(/"/g, '');
+     const userStory = columns[1].trim().replace(/"/g, '');
+     // Priority & Complexity from CSV are ignored here in legacy version!
+     // const priority = columns[2].trim().replace(/"/g, '');
+     // const complexity = columns[3].trim().replace(/"/g, '');
+     const acceptanceCriteria = columns[4].trim().replace(/"/g, '').split('\\n');
+     
+     // Get complexity/priority from mapping file (Legacy behavior)
+     const { complexity, priority } = getStoryComplexityAndPriority(userStory, domain);
+
+     userStories.push({
+       domain,
+       priority, // Uses mapped priority
+       complexity, // Uses mapped complexity
+       content: userStory,
+       title: titleSummary, // Uses title summary from CSV
+       acceptanceCriteria,
+       technicalRequirements: [],
+       relatedDocumentation: buildRelatedDocumentationLink(domain, csvFile.type),
+       implementationNotes: [
+         'Use standard implementation approach for this feature',
+         'Implement with service interface design patterns',
+         'Write tests first following TDD approach'
+       ]
+     });
+   }
+   
+   return convertUserStoriesToGithubIssues(userStories);
+}
+
+
+// Extract acceptance criteria from the markdown content (Used by parseUserStoriesFromMarkdown)
 function extractAcceptanceCriteria(content, userStory) {
   // Extract the "Acceptance Criteria" section
   const acMatch = content.match(/## Acceptance Criteria\n([\s\S]*?)(?=\n##|$)/);
@@ -264,26 +341,49 @@ export function parseUserStoriesFromMarkdown(filePath, domainType) {
     // Add implementation notes
     story.implementationNotes = generateImplementationNotes(story, story.technicalRequirements);
     
-    // Add complexity and priority using our mapping
-    const { complexity, priority } = getStoryComplexityAndPriority(story.content, domainName);
-    story.complexity = complexity;
+    // Add complexity and priority using our mapping (Legacy behavior for Markdown parsing)
+    // TODO: Consider if Markdown parsing should also read from CSVs if a link exists?
+    const { complexity: mappedComplexity, priority: mappedPriority } = getStoryComplexityAndPriority(story.content, domainName);
+    story.complexity = mappedComplexity;
     
     // Only override the story priority if it doesn't already have one or if it's empty
     if (!story.priority || story.priority.trim() === '') {
-      story.priority = priority;
+      story.priority = mappedPriority;
     }
     
-    console.log(`Story complexity: ${story.complexity}, priority: ${story.priority}`);
+    console.log(`Story complexity (from mapping): ${story.complexity}, priority (from mapping/markdown): ${story.priority}`);
   });
   
   return convertUserStoriesToGithubIssues(userStories);
 }
 
-// Convert user stories to GitHub issues format
+/**
+ * Converts an array of user story objects into an array of GitHub issue objects,
+ * formatting the content according to a predefined template.
+ * Handles formatting of list-based fields like Acceptance Criteria, Technical Requirements,
+ * Related Documentation, and Implementation Notes into Markdown lists.
+ *
+ * @param {Array<Object>} userStories - An array of user story objects, typically parsed from CSV or Markdown.
+ * @param {string} userStories[].title - The title summary for the user story (from CSV).
+ * @param {string} userStories[].content - The main content of the user story.
+ * @param {string} userStories[].domain - The domain the user story belongs to.
+ * @param {string} userStories[].priority - The priority level of the user story (e.g., 'High', 'Medium', 'Low', 'Post-MVP').
+ * @param {string} userStories[].complexity - The estimated complexity of the user story (e.g., 'Small', 'Medium', 'Large').
+ * @param {Array<string>} userStories[].acceptanceCriteria - An array of acceptance criteria strings.
+ * @param {Array<string>} userStories[].technicalRequirements - An array of technical requirements strings.
+ * @param {string} userStories[].relatedDocumentation - A formatted string or path for related documentation.
+ * @param {Array<string>} userStories[].implementationNotes - An array of implementation notes strings.
+ * @param {string} userStories[].relatedIssues - A string containing related issues/stories, potentially comma-separated.
+ * @param {string} userStories[].implementationConsiderations - A string containing implementation considerations, potentially multi-line.
+ * @returns {Array<Object>} An array of objects formatted for GitHub issue creation.
+ * @returns {string} returns[].title - The title of the GitHub issue.
+ * @returns {string} returns[].body - The body content of the GitHub issue in Markdown format.
+ * @returns {Array<string>} returns[].labels - An array of labels for the GitHub issue.
+ */
 export function convertUserStoriesToGithubIssues(userStories) {
   return userStories.map(story => {
-    const lines = story.content ? story.content.split('\n') : ['No content'];
-    const title = lines[0];
+    // Use the title from the story object, which is now the title summary from CSVs
+    const issueTitle = story.title;
     let priorityLevel = story.priority || 'Medium';
     
     // Format domain label correctly
@@ -299,7 +399,6 @@ export function convertUserStoriesToGithubIssues(userStories) {
     const priorityLabelValue = `priority:${priorityLevel.toLowerCase().replace(/\s+|\(|\)/g, '-')}`;
     
     // Populate the issue body template
-    const issueTitle = `[USER STORY] ${title}`;
     
     // Start with the original template
     let body = ISSUE_BODY_TEMPLATE;
@@ -337,7 +436,7 @@ export function convertUserStoriesToGithubIssues(userStories) {
     // Populate implementation notes
     const implNotes = story.implementationNotes || [];
     const implNotesText = implNotes.map(note => `- ${note}`).join('\n');
-    body = body.replace(/<!-- Add guidance[\s\S]*?- [\s\S]*?- [\s\S]*?- /, 
+    body = body.replace(/<!-- Add guidance[\s\S]*?- [\s\S]*?- [\s\S]*?- /,
                       `<!-- Add guidance on implementation approach, architecture considerations, etc. -->\n${implNotesText}\n`);
     
     // Check the correct priority checkbox

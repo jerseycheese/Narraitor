@@ -57,3 +57,6 @@ storybook-static
 
 # Obsidian
 docs/.obsidian
+
+# Roo
+.roo/mcp.json

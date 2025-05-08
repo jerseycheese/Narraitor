@@ -18,7 +18,7 @@ The synchronization process ensures consistency between these two sources, parti
 
 ## Prerequisites
 
-1. Ensure you have the necessary environment variables set:
+1. Ensure you have the necessary environment variables set and check [`scripts/user-stories/modules/config.js`](scripts/user-stories/modules/config.js) for other configuration variables like `PROJECT_BOARD_URL`:
    ```
    export GITHUB_TOKEN=your_github_token
    ```
@@ -39,14 +39,22 @@ When creating or modifying requirements:
 1. Follow the format specified in the requirements CSV files:
    - User Story Title Summary
    - User Story
-   - Priority (High/Medium/Low/Post-MVP)
-   - Estimated Complexity (Small/Medium/Large)
-   - Acceptance Criteria (separated by \n for new lines)
+   - Priority (High/Medium/Low/Post-MVP) - **Sourced directly from this column.**
+   - Estimated Complexity (Small/Medium/Large) - **Sourced directly from this column.**
+   - Acceptance Criteria (separated by `\n` or `\\n` for new lines)
+   - Technical Requirements (separated by `\n` or `\\n` for new lines)
+   - Implementation Considerations (separated by `\n` or `\\n` for new lines)
+   - Related Issues/Stories (separated by `\n` or `\\n` for new lines)
+   - Related Documentation (comma-separated paths, generates absolute links to `develop` branch)
    - GitHub Issue Link
 
-2. Format acceptance criteria as separate items with newline separators in CSV:
+2. Format multi-line list fields (Acceptance Criteria, Technical Requirements, Implementation Considerations, Related Issues/Stories) as separate items using newline separators (`\n` or `\\n`) in CSV:
    ```
-   Criterion 1\nCriterion 2\nCriterion 3
+   Item 1\nItem 2\nItem 3
+   ```
+   For "Related Documentation", use comma-separated paths:
+   ```
+   path/to/doc1.md,path/to/doc2.md
    ```
 
 ### 2. Standardize Requirements Format
@@ -72,7 +80,7 @@ node scripts/testing/test-update-stories.sh
 
 Review the output for:
 - Parsing errors in requirements documents
-- Mismatches between document complexity/priority and the mapping file
+- Mismatches between document complexity/priority and the corresponding CSV row
 - Format inconsistencies
 
 ### 4. Validate GitHub Issues
@@ -121,9 +129,10 @@ node scripts/user-stories/update-user-stories.js
 This script will:
 - Update issue bodies with correct user story text
 - Update acceptance criteria formatting
-- Update complexity and priority settings
+- Update complexity and priority settings based *directly* on the values in the user story CSV files (the `story-complexity-mapping.js` file is no longer used)
 - Update GitHub labels to match complexity, priority, and domain
-- Fix documentation links
+- Automatically assign issues (except those with `priority:post-mvp`) to the configured project board. **GitHub Project assignment functionality is now active.**
+- Fix documentation links (now using absolute URLs to the `develop` branch for "Related Documentation")
 - Add implementation notes
 
 For a specific issue:
@@ -157,7 +166,7 @@ Confirm that all inconsistencies have been resolved.
 2. Run `node scripts/user-stories/annotate-requirements-docs.js` to validate format
 3. Either:
    - Create GitHub issues manually following the template, or
-   - Use `node scripts/user-stories/migrate-user-stories.js` to automatically create issues from CSV
+   - Use `node scripts/user-stories/migrate-user-stories.js` to automatically create issues from CSV. Issues created this way (except those with `priority:post-mvp`) will be automatically assigned to the configured project board.
 
 To see available options for the migration script:
 
@@ -201,16 +210,21 @@ node scripts/user-stories/migrate-user-stories.js --domain=character-system --dr
 ### CSV Format
 
 The CSV files use the following columns:
-- `User Story Title Summary`: Brief title for the user story
-- `User Story`: Complete user story in "As a [role], I want [goal] so that [benefit]" format
-- `Priority`: High (MVP), Medium (MVP Enhancement), Low (Nice to Have), or Post-MVP
-- `Estimated Complexity`: Small (1-2 days), Medium (3-5 days), or Large (1+ week)
-- `Acceptance Criteria`: Newline-separated list of criteria
+- `User Story Title Summary`: Brief title for the user story. This is used directly as the GitHub issue title.
+- `User Story`: Complete user story in "As a [role], I want [goal] so that [benefit)" format
+- `Priority`: High (MVP), Medium (MVP Enhancement), Low (Nice to Have), or Post-MVP. **This is sourced directly from this column.**
+- `Estimated Complexity`: Small (1-2 days), Medium (3-5 days), or Large (1+ week). **This is sourced directly from this column.**
+- `Acceptance Criteria`: Newline-separated list of criteria (`\n` or `\\n`)
+- `Technical Requirements`: Newline-separated list of technical requirements (`\n` or `\\n`)
+- `Implementation Considerations`: Newline-separated list of implementation considerations (`\n` or `\\n`)
+- `Related Issues/Stories`: Newline-separated list of related issue or story numbers (`\n` or `\\n`)
+- `Related Documentation`: Comma-separated list of paths to related documentation files. These generate absolute links to the `develop` branch.
 - `GitHub Issue Link`: URL to the corresponding GitHub issue
 
 ### GitHub Issue Template
 
 GitHub issues follow a structured template that includes:
+- Title: Uses the "User Story Title Summary" from the CSV. The `[USER STORY]` prefix is no longer used.
 - User Story: The full user story text
 - Acceptance Criteria: List of criteria for completion
 - Technical Requirements: Implementation details
@@ -226,9 +240,8 @@ GitHub issues follow a structured template that includes:
 ### Common Issues
 
 1. **Complexity/Priority Mismatch**:
-   - Check the `scripts/user-stories/story-complexity-mapping.js` file for the standard mappings
-   - Update requirements to match the standard options
-   - Run validation scripts to identify discrepancies
+   - Ensure the Priority and Estimated Complexity values in the CSV files match the standard options (High/Medium/Low/Post-MVP and Small/Medium/Large).
+   - Run validation scripts to identify discrepancies between the CSV values and the GitHub issue labels.
 
 2. **Unmatched Requirements/Issues**:
    - Verify the GitHub issue links in the CSV files
@@ -263,7 +276,6 @@ The user story scripts are organized into a modular structure:
     annotate-requirements-docs.js
     migrate-user-stories.js
     process-issues.js
-    story-complexity-mapping.js
     story-validation-utils.js
     update-user-stories.js
     validate-user-stories.js
@@ -305,4 +317,3 @@ This script uses the `github-label-creator.js` utility to create a consistent se
 - [User Story Template](/docs/workflows/user-story-template.md)
 - [GitHub Issue Templates](/.github/ISSUE_TEMPLATE/)
 - [Requirements CSV Files](/docs/requirements/)
-- [Story Complexity Mapping](/scripts/user-stories/story-complexity-mapping.js)

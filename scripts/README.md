@@ -24,9 +24,8 @@ The scripts have been organized into the following directories:
 - **user-stories/annotate-requirements-docs.js** - Update requirements documents with standard annotations
 - **user-stories/migrate-user-stories.js** - Migrate user stories from CSV to GitHub issues
 - **user-stories/process-issues.js** - Process GitHub issues to update formatting
-- **user-stories/story-complexity-mapping.js** - Mapping of story text to complexity and priority
 - **user-stories/story-validation-utils.js** - Utilities for validating story format
-- **user-stories/update-user-stories.js** - Update GitHub issues based on requirements
+- **user-stories/update-user-stories.js** - Update GitHub issues based on requirements and sources "Priority" and "Estimated Complexity" directly from the user story CSV files.
 - **user-stories/validate-user-stories.js** - Validate consistency between requirements and issues
 
 ### Testing

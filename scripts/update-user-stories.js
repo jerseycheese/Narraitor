@@ -4,19 +4,22 @@
 // All complexity and priority values are sourced from getStoryComplexityAndPriority() mapping.
 
 import https from 'https';
-import { 
+import fs from 'fs'; // Added
+import path from 'path'; // Added
+import {
   validateIssuesAgainstDocs
 } from './story-validation-utils.js';
-import { 
-  processIssues 
+import {
+  processIssues
 } from './process-issues.js';
+import { parseCsvRows } from './user-stories/modules/parsers.js'; // Added
 
 const OWNER = 'jerseycheese';
 const REPO = 'narraitor';
 const TOKEN = process.env.GITHUB_TOKEN;
 
 // Debug flag - set to true to enable extra logging
-const DEBUG = true;
+const DEBUG = false;
 
 // Generate implementation notes based on user story content and technical requirements
 export function generateImplementationNotes(story) {
@@ -286,6 +289,37 @@ export async function fetchIssueByNumber(issueNumber) {
   });
 }
 
+// Helper function to recursively find CSV files
+function findAllCsvFiles(startPath, filter = /.+-user-stories\.csv$/) {
+  let results = [];
+  try {
+    const files = fs.readdirSync(startPath);
+    files.forEach(file => {
+      const filename = path.join(startPath, file);
+      const stat = fs.lstatSync(filename);
+      if (stat.isDirectory()) {
+        results = results.concat(findAllCsvFiles(filename, filter));
+      } else if (filter.test(filename)) {
+        results.push(filename);
+      }
+    });
+  } catch (error) {
+     console.error(`Error reading directory ${startPath}: ${error.message}`);
+  }
+  return results;
+}
+
+// Helper function to normalize priority strings
+function normalizePriority(priorityStr) {
+  const lowerPriority = priorityStr.toLowerCase();
+  if (lowerPriority.includes('high')) return 'High';
+  if (lowerPriority.includes('medium')) return 'Medium';
+  if (lowerPriority.includes('low')) return 'Low';
+  if (lowerPriority.includes('post-mvp')) return 'Post-MVP';
+  return 'Medium'; // Default if unknown format
+}
+
+
 // Main function
 async function main() {
   // Check for GitHub token
@@ -303,8 +337,24 @@ async function main() {
   const validate = args.includes('--validate'); // New flag to run validation mode
   
   // Issue number to process
-  const issueNumIndex = args.indexOf('--issue');
-  const specificIssueNum = issueNumIndex !== -1 && args[issueNumIndex + 1] ? parseInt(args[issueNumIndex + 1], 10) : null;
+  let specificIssueNum = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--issue') {
+      if (i + 1 < args.length && !isNaN(parseInt(args[i + 1], 10))) {
+        specificIssueNum = parseInt(args[i + 1], 10);
+        // To prevent '--issue' from being processed again if it's also part of another arg like --issue-related
+        // we can consume the next argument if it was used as a value.
+        // However, for this specific script, simply breaking is likely sufficient.
+        break;
+      }
+    } else if (args[i].startsWith('--issue=')) {
+      const valuePart = args[i].substring('--issue='.length);
+      if (!isNaN(parseInt(valuePart, 10))) {
+        specificIssueNum = parseInt(valuePart, 10);
+        break;
+      }
+    }
+  }
   
   console.log(`User Story Update Script (Enhanced Version)`);
   console.log(`-------------------------------------`);
@@ -325,6 +375,50 @@ async function main() {
         process.exit(1);
       }
     }
+
+    // --- Read Issue Template ---
+    console.log('\nReading GitHub Issue Template...');
+    const issueTemplatePath = path.resolve(process.cwd(), '.github/ISSUE_TEMPLATE/user-story.md');
+    let issueTemplateContent = '';
+    try {
+      issueTemplateContent = fs.readFileSync(issueTemplatePath, 'utf8');
+      console.log('Successfully read issue template.');
+    } catch (error) {
+      console.error(`Error reading issue template file ${issueTemplatePath}: ${error.message}`);
+      console.log('Cannot proceed without the issue template.');
+      process.exit(1); // Exit if template is not found
+    }
+    // --- End Read Issue Template ---
+
+    // --- Load CSV Data ---
+    console.log('\nLoading User Story data from CSV files...');
+    const csvFiles = findAllCsvFiles(path.resolve(process.cwd(), 'docs/requirements'));
+    const loadedCsvData = new Map();
+    let totalCsvRows = 0;
+
+    for (const csvPath of csvFiles) {
+      const rows = parseCsvRows(csvPath);
+      totalCsvRows += rows.length;
+      for (const row of rows) {
+        if (row.gitHubIssueLink && row.gitHubIssueLink.startsWith('https://github.com/')) {
+           // Normalize URL slightly in case of trailing slashes etc.
+           const normalizedUrl = row.gitHubIssueLink.trim().replace(/\/$/, '');
+           // Add complexity/priority directly to the row object for easy access
+           row.priority = normalizePriority(row.priority); // Normalize priority
+           row.complexity = row.complexity || 'Medium'; // Default complexity if empty
+           loadedCsvData.set(normalizedUrl, row);
+        } else {
+           // Optionally log rows without valid links if needed for debugging
+           // console.warn(`Skipping row without valid GitHub link in ${csvPath}: ${row.titleSummary}`);
+        }
+      }
+    }
+    console.log(`Loaded data for ${loadedCsvData.size} issues from ${csvFiles.length} CSV files (total rows scanned: ${totalCsvRows}).`);
+    if (loadedCsvData.size === 0) {
+        console.error("Error: No valid user story data with GitHub links found in CSV files. Exiting.");
+        process.exit(1);
+    }
+    // --- End Load CSV Data ---
     
     // Process specific issue if requested
     if (specificIssueNum) {
@@ -335,7 +429,8 @@ async function main() {
       if (validate) {
         await validateIssuesAgainstDocs([issue], dryRun);
       } else {
-        await processIssues([issue], dryRun);
+        // Pass loadedCsvData to processIssues
+        await processIssues([issue], loadedCsvData, issueTemplateContent, dryRun);
       }
       
       console.log(`\nCompleted processing issue #${specificIssueNum}`);
@@ -396,7 +491,8 @@ async function main() {
     }
     
     // Process issues
-    const result = await processIssues(issues, dryRun);
+    // Pass loadedCsvData to processIssues
+    const result = await processIssues(issues, loadedCsvData, issueTemplateContent, dryRun);
     
     // Show summary
     console.log(`\nSummary:`);

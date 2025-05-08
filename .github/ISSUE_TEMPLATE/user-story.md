@@ -10,27 +10,18 @@ assignees: ''
 As a [type of user], I want [goal/need] so that [benefit/value].
 
 ## Acceptance Criteria
-- [ ] [Criterion 1]
-- [ ] [Criterion 2]
-- [ ] [Criterion 3]
-- [ ] [Criterion 4]
-- [ ] [Criterion 5]
+{{ACCEPTANCE_CRITERIA_LIST}}
 
 ## Technical Requirements
 <!-- List specific technical implementation details -->
-- [Requirement 1]
-- [Requirement 2]
-- [Requirement 3]
+{{TECHNICAL_REQUIREMENTS_LIST}}
 
-## Implementation Notes
-<!-- Add guidance on implementation approach, architecture considerations, etc. -->
-- Use standard implementation approach for this feature
-- Implement with service interface design patterns
-- Write tests first following TDD approach
-
+## Implementation Considerations
+<!-- Describe potential challenges, dependencies, or alternative approaches -->
+{{IMPLEMENTATION_CONSIDERATIONS}}
 ## Related Documentation
 <!-- Link to requirements documents and other references -->
-- [Related document link]
+{{RELATED_DOCUMENTATION_LIST}}
 
 ## Estimated Complexity
 <!-- Select the estimated complexity level -->
@@ -72,3 +63,4 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 
 ## Related Issues/Stories
 <!-- Link to any related issues or stories -->
+{{RELATED_ISSUES_LIST}}
