@@ -54,3 +54,6 @@ storybook-static
 # Temp files
 .temp
 .tmp
+
+# Obsidian
+docs/.obsidian

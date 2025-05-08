@@ -1,85 +1,73 @@
 # Narraitor Scripts
 
-This directory contains utility scripts for managing and automating tasks in the Narraitor project.
+This directory contains various scripts for maintaining and managing the Narraitor project.
 
-## User Story Update Script
+## Directory Structure
 
-The `update-user-stories.js` script is used to update GitHub issues with user stories, ensuring they have:
+The scripts have been organized into the following directories:
 
-- Correct documentation links
-- Implementation notes
-- Consistent complexity and priority values (from mapping)
-- Appropriate labels
+- **github/** - Scripts for managing GitHub repositories, issues, and labels
+- **user-stories/** - Scripts for managing user stories and requirements
+  - **modules/** - Modular components used by the user story scripts
+- **testing/** - Scripts for testing and validating other scripts
 
-### Recent Changes
+## Available Scripts
 
-The script has been refactored to:
+### GitHub Management
 
-1. **Always use mapping values**: Complexity and priority values now always come from `getStoryComplexityAndPriority()` in the story-complexity-mapping.js file, overriding any values in issue bodies or labels.
+- **github/github-issue-utils.js** - Utility functions for working with GitHub issues
+- **github/github-label-creator.js** - Create and manage GitHub labels
+- **github/setup-github-labels.js** - Set up standard labels for the repository
 
-2. **Improved label handling**: Now cleans up existing complexity and priority labels (case-insensitive) before adding new ones.
+### User Story Management
 
-3. **Modular structure**: The code has been split into multiple files to maintain better organization and keep components under 300 lines:
-   - `update-user-stories.js` - Main script and entry point
-   - `story-validation-utils.js` - Utility functions for validating and extracting information
-   - `github-issue-utils.js` - GitHub API utilities
-   - `process-issues.js` - Core issue processing logic
-
-4. **New validation mode**: Added a `--validate` flag to check for inconsistencies between GitHub issues and requirement docs without modifying any issues.
-
-5. **Standalone validator**: New `validate-user-stories.js` script that can be run separately to identify inconsistencies.
-
-### Usage
-
-```bash
-# Update all issues (interactive)
-node scripts/update-user-stories.js
-
-# Validate all issues without making changes
-node scripts/update-user-stories.js --validate
-
-# Dry run - show what would be updated without making changes
-node scripts/update-user-stories.js --dry-run
-
-# Process a specific issue
-node scripts/update-user-stories.js --issue 123
-
-# Limit the number of issues to process
-node scripts/update-user-stories.js --limit 10
-
-# Bypass label verification
-node scripts/update-user-stories.js --force
-```
-
-### Standalone Validation
-
-```bash
-# Validate all issues
-node scripts/validate-user-stories.js
-
-# Validate a specific issue
-node scripts/validate-user-stories.js --issue 123
-```
+- **user-stories/annotate-requirements-docs.js** - Update requirements documents with standard annotations
+- **user-stories/migrate-user-stories.js** - Migrate user stories from CSV to GitHub issues
+- **user-stories/process-issues.js** - Process GitHub issues to update formatting
+- **user-stories/story-complexity-mapping.js** - Mapping of story text to complexity and priority
+- **user-stories/story-validation-utils.js** - Utilities for validating story format
+- **user-stories/update-user-stories.js** - Update GitHub issues based on requirements
+- **user-stories/validate-user-stories.js** - Validate consistency between requirements and issues
 
 ### Testing
 
-A test script is provided to verify the functionality:
+- **testing/test-update-stories.sh** - Test scripts for user story updates
+
+## Usage
+
+For detailed usage of each script, run it with the `--help` flag:
 
 ```bash
-# Make the script executable first
-chmod +x scripts/test-update-stories.sh
-
-# Run the tests
-./scripts/test-update-stories.sh
+node scripts/user-stories/migrate-user-stories.js --help
 ```
 
-## Requirements Annotation Script
+For more comprehensive documentation on working with user stories and GitHub issues, see:
 
-The `annotate-requirements-docs.js` script annotates user stories in core requirement documents with their complexity and priority based on the mapping defined in the story-complexity-mapping.js file.
+- [GitHub Sync Guide](/docs/requirements/github-sync-guide.md)
+- [User Story Template](/docs/workflows/user-story-template.md)
 
-### Usage
+## Environment Variables
+
+Some scripts require environment variables to be set:
+
+- **GITHUB_TOKEN** - GitHub API token for authentication
 
 ```bash
-# Annotate all requirement documents
-node scripts/annotate-requirements-docs.js
+export GITHUB_TOKEN=your_github_token
 ```
+
+## Modular Architecture
+
+The user story scripts have been refactored into a modular architecture:
+
+```
+/user-stories
+  /modules
+    config.js       - Configuration and constants
+    fs-utils.js     - File system utilities
+    github.js       - GitHub API interactions
+    parsers.js      - Parsers for CSV and markdown files
+    processor.js    - Main processor logic for domains
+```
+
+This modular approach makes the code more maintainable and easier to extend with new functionality in the future.
