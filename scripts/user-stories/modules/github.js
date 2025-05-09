@@ -3,6 +3,15 @@ import https from 'https';
 import { graphql } from '@octokit/graphql';
 import { OWNER, REPO, TOKEN, PROJECT_BOARD_URL } from './config.js';
 
+// Constants for ProjectV2 custom fields
+export const PROJECT_FIELD_NAME_PRIORITY = "Priority";
+export const PROJECT_FIELD_NAME_SIZE = "Size";
+export const PROJECT_FIELD_PRIORITY_OPTIONS = { HIGH: "High", MEDIUM: "Medium", LOW: "Low" };
+export const PROJECT_FIELD_SIZE_OPTIONS = { S: "S", M: "M", L: "L" };
+
+// Simple in-memory cache for project details
+const projectCache = {};
+
 // Initialize Octokit GraphQL client
 const octokit = graphql.defaults({
   headers: {
@@ -25,7 +34,7 @@ export async function verifyLabels() {
         'Accept': 'application/vnd.github.v3+json'
       }
     };
-    
+
     const labels = await new Promise((resolve, reject) => {
       const req = https.request(options, res => {
         let responseData = '';
@@ -45,13 +54,13 @@ export async function verifyLabels() {
       req.on('error', reject);
       req.end();
     });
-    
+
     // Check for complexity labels
     const complexityLabels = ['complexity:small', 'complexity:medium', 'complexity:large'];
     const missingLabels = complexityLabels.filter(
       label => !labels.some(l => l.name === label)
     );
-    
+
     if (missingLabels.length > 0) {
       console.warn(`Warning: Missing complexity labels: ${missingLabels.join(', ')}`);
       console.warn('Run "node scripts/github/setup-github-labels.js" to create all required labels before proceeding.');
@@ -70,7 +79,7 @@ export async function checkExistingStories(domain) {
     console.log(`Checking for existing stories in domain: ${domain}...`);
     const labels = [`domain:${domain}`, 'user-story'];
     const labelsParam = `labels=${labels.map(encodeURIComponent).join(',')}`;
-    
+
     const options = {
       hostname: 'api.github.com',
       path: `/repos/${OWNER}/${REPO}/issues?${labelsParam}&state=all&per_page=100`,
@@ -81,7 +90,7 @@ export async function checkExistingStories(domain) {
         'Accept': 'application/vnd.github.v3+json'
       }
     };
-    
+
     const existingIssues = await new Promise((resolve, reject) => {
       const req = https.request(options, res => {
         let responseData = '';
@@ -101,7 +110,7 @@ export async function checkExistingStories(domain) {
       req.on('error', reject);
       req.end();
     });
-    
+
     console.log(`Found ${existingIssues.length} existing stories for domain: ${domain}`);
     return existingIssues.map(issue => issue.title);
   } catch (err) {
@@ -158,7 +167,7 @@ export async function filterExistingStories(userStories, domain) {
       }
       return !exists;
     });
-    
+
     console.log(`Found ${userStories.length - filtered.length} existing stories that will be skipped.`);
     return filtered;
   } catch (error) {
@@ -237,14 +246,228 @@ export async function addIssueToProject(projectId, issueNodeId) {
     };
 
     const result = await octokit(mutation, variables);
-    console.log(`Added issue to project: ${result.addProjectV2ItemById.item.id}`);
-    return true;
+    const itemId = result.addProjectV2ItemById.item.id;
+    console.log(`Added issue to project: ${itemId}`);
+    return itemId; // Return the item ID for subsequent updates
   } catch (error) {
     console.error(`Error adding issue to project: ${error.message}`);
-    return false;
+    return null;
   }
 }
 
+
+// Cache key generation
+function getProjectCacheKey(projectId) {
+  return `project_${projectId}`;
+}
+
+// Helper function to get ProjectV2 field and option IDs
+async function getProjectFieldAndOptionIds(projectId) {
+  const cacheKey = getProjectCacheKey(projectId);
+  if (projectCache[cacheKey]?.fieldIds) {
+    console.log(`Using cached project field and option IDs for project ${projectId}`);
+    return projectCache[cacheKey].fieldIds;
+  }
+
+  console.log(`Fetching project field and option IDs for project ${projectId}...`);
+  const query = `
+    query($projectNodeId: ID!) {
+      node(id: $projectNodeId) {
+        ... on ProjectV2 {
+          fields(first: 50) {
+            nodes {
+              ... on ProjectV2Field {
+                id
+                name
+              }
+              ... on ProjectV2SingleSelectField {
+                id
+                name
+                options {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    projectNodeId: projectId,
+  };
+
+  try {
+    const result = await octokit(query, variables);
+    const fields = result.node?.fields?.nodes || [];
+
+    const priorityField = fields.find(field => field.name === PROJECT_FIELD_NAME_PRIORITY);
+    const sizeField = fields.find(field => field.name === PROJECT_FIELD_NAME_SIZE);
+
+    const fieldIds = {
+      priorityFieldId: priorityField?.id,
+      priorityOptionIds: {},
+      sizeFieldId: sizeField?.id,
+      sizeOptionIds: {}
+    };
+
+    if (priorityField && priorityField.__typename === 'ProjectV2SingleSelectField') {
+      for (const option of priorityField.options) {
+        fieldIds.priorityOptionIds[option.name] = option.id;
+      }
+      // Check if all expected options are found
+      for (const expectedOption of Object.values(PROJECT_FIELD_PRIORITY_OPTIONS)) {
+        if (!fieldIds.priorityOptionIds[expectedOption]) {
+          console.warn(`Warning: Priority option "${expectedOption}" not found for field "${PROJECT_FIELD_NAME_PRIORITY}" in project ${projectId}.`);
+        }
+      }
+    } else if (priorityField) {
+       console.warn(`Warning: Field "${PROJECT_FIELD_NAME_PRIORITY}" found but is not a Single Select field in project ${projectId}.`);
+    } else {
+      console.warn(`Warning: Priority field "${PROJECT_FIELD_NAME_PRIORITY}" not found in project ${projectId}.`);
+    }
+
+    if (sizeField && sizeField.__typename === 'ProjectV2SingleSelectField') {
+      for (const option of sizeField.options) {
+        fieldIds.sizeOptionIds[option.name] = option.id;
+      }
+       // Check if all expected options are found
+       for (const expectedOption of Object.values(PROJECT_FIELD_SIZE_OPTIONS)) {
+        if (!fieldIds.sizeOptionIds[expectedOption]) {
+          console.warn(`Warning: Size option "${expectedOption}" not found for field "${PROJECT_FIELD_NAME_SIZE}" in project ${projectId}.`);
+        }
+      }
+    } else if (sizeField) {
+      console.warn(`Warning: Field "${PROJECT_FIELD_NAME_SIZE}" found but is not a Single Select field in project ${projectId}.`);
+    } else {
+      console.warn(`Warning: Size field "${PROJECT_FIELD_NAME_SIZE}" not found in project ${projectId}.`);
+    }
+
+    // Store in cache
+    if (!projectCache[cacheKey]) {
+      projectCache[cacheKey] = {};
+    }
+    projectCache[cacheKey].fieldIds = fieldIds;
+
+    return fieldIds;
+
+  } catch (error) {
+    console.error(`Error fetching project field and option IDs: ${error.message}`);
+    return null;
+  }
+}
+
+// New Exported Function: updateIssueProjectCustomFields
+/**
+ * Updates custom fields for a project item (issue or pull request) on a ProjectV2 board.
+ *
+ * @param {string} projectId - The node_id of the ProjectV2 board.
+ * @param {string} itemNodeId - The node_id of the item (issue or pull request) within the project.
+ * @param {object} values - An object containing the custom field values to set.
+ * @param {string} [values.priorityValue] - The value for the "Priority" field ("High", "Medium", "Low").
+ * @param {string} [values.sizeValue] - The value for the "Size" field ("S", "M", "L").
+ * @returns {Promise<boolean>} True if updates were attempted (regardless of individual success), false if project or field IDs could not be retrieved.
+ */
+export async function updateIssueProjectCustomFields(projectId, itemNodeId, { priorityValue, sizeValue }) {
+  if (!projectId || !itemNodeId) {
+    console.error('Cannot update custom fields: Missing project ID or item ID.');
+    return false;
+  }
+
+  const fieldAndOptionIds = await getProjectFieldAndOptionIds(projectId);
+  if (!fieldAndOptionIds) {
+    console.error('Cannot update custom fields: Could not retrieve project field and option IDs.');
+    return false;
+  }
+
+  let updateAttempted = false;
+
+  // Update Priority field
+  if (priorityValue) {
+    updateAttempted = true;
+    const priorityFieldId = fieldAndOptionIds.priorityFieldId;
+    const priorityOptionId = fieldAndOptionIds.priorityOptionIds[priorityValue];
+
+    if (priorityFieldId && priorityOptionId) {
+      console.log(`Updating Priority field for item ${itemNodeId} to "${priorityValue}"...`);
+      const mutation = `
+        mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+          updateProjectV2ItemFieldValue(input: {
+            projectId: $projectId
+            itemId: $itemId
+            fieldId: $fieldId
+            value: {
+              singleSelectOptionId: $optionId
+            }
+          }) {
+            projectV2Item {
+              id
+            }
+          }
+        }
+      `;
+      const variables = {
+        projectId: projectId,
+        itemId: itemNodeId,
+        fieldId: priorityFieldId,
+        optionId: priorityOptionId,
+      };
+      try {
+        await octokit(mutation, variables);
+        console.log(`Successfully updated Priority for item ${itemNodeId}.`);
+      } catch (error) {
+        console.error(`Error updating Priority for item ${itemNodeId}: ${error.message}`);
+      }
+    } else {
+      console.warn(`Skipping Priority update for item ${itemNodeId}: Field or option ID not found.`);
+    }
+  }
+
+  // Update Size field
+  if (sizeValue) {
+    updateAttempted = true;
+    const sizeFieldId = fieldAndOptionIds.sizeFieldId;
+    const sizeOptionId = fieldAndOptionIds.sizeOptionIds[sizeValue];
+
+    if (sizeFieldId && sizeOptionId) {
+      console.log(`Updating Size field for item ${itemNodeId} to "${sizeValue}"...`);
+      const mutation = `
+        mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+          updateProjectV2ItemFieldValue(input: {
+            projectId: $projectId
+            itemId: $itemId
+            fieldId: $fieldId
+            value: {
+              singleSelectOptionId: $optionId
+            }
+          }) {
+            projectV2Item {
+              id
+            }
+          }
+        }
+      `;
+      const variables = {
+        projectId: projectId,
+        itemId: itemNodeId,
+        fieldId: sizeFieldId,
+        optionId: sizeOptionId,
+      };
+      try {
+        await octokit(mutation, variables);
+        console.log(`Successfully updated Size for item ${itemNodeId}.`);
+      } catch (error) {
+        console.error(`Error updating Size for item ${itemNodeId}: ${error.message}`);
+      }
+    } else {
+      console.warn(`Skipping Size update for item ${itemNodeId}: Field or option ID not found.`);
+    }
+  }
+
+  return updateAttempted;
+}
 
 
 // Create GitHub issues for user stories
@@ -281,24 +504,35 @@ export async function createIssuesForUserStories(userStories) {
     console.error('Could not retrieve project ID. Skipping project assignment.');
   }
 
-  
+
   for (const [index, story] of userStories.entries()) {
     try {
       console.log(`Creating issue ${index + 1}/${count}: ${story.title}`);
       const issue = await createIssue(story);
       console.log(`Created issue #${issue.number}: ${issue.html_url}`);
 
-      // Add issue to project board if project ID was fetched successfully
-      if (projectId) {
-        // The createIssue function using REST API doesn't return the Node ID directly.
-        // We need to fetch the issue again using GraphQL to get the Node ID.
-        const issueNodeId = await getIssueNodeId(issue.number);
-        if (issueNodeId) {
-          await addIssueToProject(projectId, issueNodeId);
+      // Add issue to project board and get the item ID
+      // The createIssue function using REST API doesn't return the Node ID directly.
+      // We need to fetch the issue again using GraphQL to get the Node ID.
+      const issueNodeId = await getIssueNodeId(issue.number); // Need to keep getIssueNodeId for this
+      if (issueNodeId) {
+        const itemNodeId = await addIssueToProject(projectId, issueNodeId);
+
+        if (itemNodeId) {
+          // Update custom fields if values are provided in the story object
+          if (story.priority || story.size) { // Assuming story object has priority and size properties
+             await updateIssueProjectCustomFields(projectId, itemNodeId, {
+               priorityValue: story.priority,
+               sizeValue: story.size
+             });
+          }
         } else {
-          console.warn(`Could not get Node ID for issue #${issue.number}. Skipping project assignment for this issue.`);
+          console.warn(`Could not add issue #${issue.number} to project or get item ID. Skipping custom field assignment.`);
         }
+      } else {
+        console.warn(`Could not get Node ID for issue #${issue.number}. Skipping project assignment and custom field assignment for this issue.`);
       }
+
 
       created++;
       await new Promise(r => setTimeout(r, 1000)); // Add a delay to avoid hitting API rate limits

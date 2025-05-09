@@ -6,8 +6,6 @@ import { updateIssue } from './github-issue-utils.js';
 import {
   extractDomainFromIssue,
 } from './story-validation-utils.js';
-import { getProjectId, addIssueToProject, getIssueNodeId } from './user-stories/modules/github.js';
-import { PROJECT_BOARD_URL } from './user-stories/modules/config.js';
 
 // Process issues - Refactored to use CSV data for complexity/priority
 export async function processIssues(issues, loadedCsvData, issueTemplateContent, dryRun = false) {
@@ -198,6 +196,7 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
                     "journal-interface": "Journal Interface",
                     "utilities-and-helpers": "Utilities and Helpers",
                     "devtools": "Devtools",
+                    "decision-relevance": "Decision Relevance System",
                     "decision-relevance-system": "Decision Relevance System",
                     "inventory-system": "Inventory System",
                     "lore-management-system": "Lore Management System",
@@ -310,25 +309,6 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
           // updateIssue function in github-issue-utils.js needs to handle merging these with existing labels.
           await updateIssue(issue, body, complexityLabel, priorityLabel, titleToUpdate);
           console.log(`✅ Updated issue #${issue.number}`);
-
-          // Add issue to project board if it has a priority label
-          // Add issue to project board if it has a priority label (determined from CSV or default) and it's not post-mvp
-          if (priorityLabel && priorityLabel !== 'priority:post-mvp') {
-            const projectId = await getProjectId(PROJECT_BOARD_URL);
-            if (projectId) {
-              const issueNodeId = await getIssueNodeId(issue.number);
-              if (issueNodeId) {
-                await addIssueToProject(projectId, issueNodeId);
-              } else {
-                console.warn(`Could not get Node ID for issue #${issue.number}. Skipping project assignment for this issue.`);
-              }
-            } else {
-              console.warn(`Could not retrieve project ID. Skipping project assignment for issue #${issue.number}.`);
-            }
-          } else {
-            console.log(`Issue #${issue.number} has 'priority:post-mvp' label. Skipping project assignment.`);
-          }
-
         } else {
           console.log(`Would update issue #${issue.number} (dry run)`);
         }

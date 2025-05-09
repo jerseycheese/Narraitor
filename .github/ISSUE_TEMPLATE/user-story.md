@@ -49,6 +49,11 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 - [ ] Character Interface
 - [ ] Journal Interface
 - [ ] Utilities and Helpers
+- [ ] Devtools
+- [ ] Decision Relevance System
+- [ ] Inventory System
+- [ ] Lore Management System
+- [ ] Player Decision System
 - [ ] Other: _________
 
 ## Definition of Done
@@ -62,5 +67,5 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 - [ ] Acceptance criteria verified
 
 ## Related Issues/Stories
-<!-- Link to any related issues or stories -->
+<!-- Link to any related issues or stories - Each issue number should be prefixed with # to create a link -->
 {{RELATED_ISSUES_LIST}}

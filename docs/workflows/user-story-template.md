@@ -3,7 +3,7 @@ title: User Story Template for GitHub Issues
 aliases: [GitHub Issue Template, Story Template]
 tags: [narraitor, workflows, templates]
 created: 2025-04-29
-updated: 2025-05-08
+updated: 2025-05-09
 ---
 
 # User Story Template for GitHub Issues
@@ -57,3 +57,8 @@ As a [type of user], I want [goal/need] so that [benefit/value].
 
 ## Related Documentation
 - [Related document link]
+
+## Related Issues/Stories
+<!-- Link to related issues using the # prefix to create clickable links -->
+- #[Issue Number]
+- #[Issue Number]

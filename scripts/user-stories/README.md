@@ -82,3 +82,21 @@ node update-user-stories.js --issue=123
 ```
 
 For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](/docs/requirements/github-sync-guide.md).
+========
+
+## Processing Issues
+
+The `process-issues.js` script is used to process GitHub issues, fetching data from CSV files and applying updates (in non-dry run mode).
+
+```bash
+# Process issues with a dry run (no changes to GitHub)
+node scripts/user-stories/process-issues.js --dry-run
+
+# Process issues, skipping the first 100 and limiting to the next 50
+node scripts/user-stories/process-issues.js --skip 100 --limit 50
+
+# Process issues with help message
+node scripts/user-stories/process-issues.js --help
+```
+
+For more comprehensive documentation on working with user stories and GitHub issues, see the [GitHub Sync Guide](/docs/requirements/github-sync-guide.md).

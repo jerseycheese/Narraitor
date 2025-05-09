@@ -358,6 +358,39 @@ export function parseUserStoriesFromMarkdown(filePath, domainType) {
 }
 
 /**
+ * Formats issue numbers in the Related Issues/Stories field to create clickable GitHub links.
+ * It converts plain issue numbers or issue numbers with # prefix to properly formatted GitHub issue links.
+ * 
+ * @param {string} relatedIssues - Raw related issues string from CSV, potentially containing newlines
+ * @returns {string} - Formatted related issues string with proper GitHub issue links
+ */
+function formatRelatedIssues(relatedIssues) {
+  if (!relatedIssues || relatedIssues === 'N/A') {
+    return '';
+  }
+  
+  // Split by newline and process each issue number
+  const issueLines = relatedIssues.split(/\\n|\n/).filter(line => line.trim());
+  
+  // Format each issue number to ensure it has a # prefix for GitHub linking
+  return issueLines.map(issueLine => {
+    // If it already starts with #, return as is
+    if (issueLine.trim().startsWith('#')) {
+      return issueLine.trim();
+    }
+    
+    // Otherwise, add # prefix if it's a number
+    const issueNumber = issueLine.trim().replace(/^#?/, '');
+    if (/^\d+$/.test(issueNumber)) {
+      return `#${issueNumber}`;
+    }
+    
+    // If not a number, return as is
+    return issueLine.trim();
+  }).join('\n');
+}
+
+/**
  * Converts an array of user story objects into an array of GitHub issue objects,
  * formatting the content according to a predefined template.
  * Handles formatting of list-based fields like Acceptance Criteria, Technical Requirements,
@@ -471,6 +504,22 @@ export function convertUserStoriesToGithubIssues(userStories) {
       }
       
       body = body.replace(/## Estimated Complexity[\s\S]*?(?=\n##|$)/, complexityText);
+    }
+    
+    // Format and add related issues with proper GitHub links
+    if (story.relatedIssues && story.relatedIssues !== 'N/A') {
+      const formattedRelatedIssues = formatRelatedIssues(story.relatedIssues);
+      if (formattedRelatedIssues) {
+        // Find the Related Issues/Stories section and replace it
+        const relatedIssuesSection = body.match(/## Related Issues\/Stories[\s\S]*?(?=\n##|$)/);
+        if (relatedIssuesSection) {
+          const newRelatedIssuesSection = `## Related Issues/Stories\n<!-- Link to any related issues or stories - Each issue number is prefixed with # to create a clickable link -->\n${formattedRelatedIssues}`;
+          body = body.replace(/## Related Issues\/Stories[\s\S]*?(?=\n##|$)/, newRelatedIssuesSection);
+        } else {
+          // If the section doesn't exist, add it at the end
+          body += `\n\n## Related Issues/Stories\n<!-- Link to any related issues or stories - Each issue number is prefixed with # to create a clickable link -->\n${formattedRelatedIssues}`;
+        }
+      }
     }
     
     return {

@@ -221,11 +221,13 @@ async function verifyLabels() {
 
 // Fetch issues from GitHub
 export async function fetchIssues(labels = ['user-story']) {
-  return new Promise((resolve, reject) => {
-    const labelsParam = `labels=${labels.map(encodeURIComponent).join(',')}`;
+  let allIssues = [];
+  let url = `/repos/${OWNER}/${REPO}/issues?labels=${labels.map(encodeURIComponent).join(',')}&state=open&per_page=100`;
+
+  while (url) {
     const options = {
       hostname: 'api.github.com',
-      path: `/repos/${OWNER}/${REPO}/issues?${labelsParam}&state=open&per_page=100`,
+      path: url,
       method: 'GET',
       headers: {
         'User-Agent': 'User-Story-Update-Script',
@@ -233,26 +235,47 @@ export async function fetchIssues(labels = ['user-story']) {
         'Accept': 'application/vnd.github.v3+json'
       }
     };
-    
-    const req = https.request(options, res => {
-      let responseData = '';
-      res.on('data', chunk => (responseData += chunk));
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            resolve(JSON.parse(responseData));
-          } catch (err) {
-            reject(new Error(`Failed to parse response: ${err.message}`));
+
+    const { data, nextUrl } = await new Promise((resolve, reject) => {
+      const req = https.request(options, res => {
+        let responseData = '';
+        res.on('data', chunk => (responseData += chunk));
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            try {
+              const linkHeader = res.headers.link;
+              let nextUrl = null;
+              if (linkHeader) {
+                const links = linkHeader.split(', ');
+                const nextLink = links.find(link => link.endsWith('rel="next"'));
+                if (nextLink) {
+                  const nextMatch = nextLink.match(/<(.*)>; rel="next"/);
+                  if (nextMatch && nextMatch[1]) {
+                    // Extract just the path and query from the full URL
+                    const nextUrlObject = new URL(nextMatch[1]);
+                    nextUrl = `${nextUrlObject.pathname}${nextUrlObject.search}`;
+                  }
+                }
+              }
+              resolve({ data: JSON.parse(responseData), nextUrl });
+            } catch (err) {
+              reject(new Error(`Failed to parse response or link header: ${err.message}`));
+            }
+          } else {
+            reject(new Error(`Failed to fetch issues (Status: ${res.statusCode}): ${responseData}`));
           }
-        } else {
-          reject(new Error(`Failed to fetch issues: ${responseData}`));
-        }
+        });
       });
+
+      req.on('error', reject);
+      req.end();
     });
-    
-    req.on('error', reject);
-    req.end();
-  });
+
+    allIssues = allIssues.concat(data);
+    url = nextUrl; // Set url to the next page's url, or null if no next page
+  }
+
+  return allIssues;
 }
 
 // Fetch a single issue by number
