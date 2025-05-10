@@ -2,6 +2,7 @@
  * Core type definitions for the Narraitor application
  */
 
+export type EntityID = string;
 // Export all type definitions from domain-specific files
 // export * from './world.types';
 // export * from './character.types';

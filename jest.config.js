@@ -1,27 +1,26 @@
-import nextJest from 'next/jest.js';
-
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: './',
-});
-
-// Add any custom config to be passed to Jest
-const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+const config = {
+  preset: 'ts-jest',
   testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    // Add any other necessary module mocks if Next.js specific imports cause issues
+    // For example, for CSS modules or static assets if not handled by ts-jest/jsdom
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy', // Handles CSS imports
   },
   testMatch: [
-    '**/tests/unit/**/*.test.{ts,tsx}',
-    '**/tests/integration/**/*.test.{ts,tsx}',
+    // Adjusted to be more specific to avoid potential conflicts if 'tests' dir is used later
+    '<rootDir>/src/**/*.test.{ts,tsx}',
   ],
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/**/*.stories.{js,jsx,ts,tsx}',
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
   ],
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
+  },
+  // ts-jest preset usually handles the transform, but can be explicit if needed
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(customJestConfig);
+export default config;
