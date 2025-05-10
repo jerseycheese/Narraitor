@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.js",
+    "test:prompt-templates": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.js src/lib/promptTemplates/promptTemplateManager.test.ts"
   },
   "dependencies": {
     "next": "15.3.1",
