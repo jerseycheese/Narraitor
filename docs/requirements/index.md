@@ -47,7 +47,7 @@ This directory contains lean requirements documentation for Narraitor systems, f
 - **Focused**: Include only what's necessary for MVP
 - **Clear Boundaries**: Explicitly state what's included and excluded
 - **Action-Oriented**: Written to facilitate direct conversion to issues
-- **Testable**: Include measurable acceptance criteria 
+- **Testable**: Include measurable acceptance criteria
 - **Living**: Update as requirements evolve based on development insights
 
 ## How to Maintain
@@ -118,3 +118,17 @@ graph TD
 ### Phase 2
 1. Game Session Interface
 2. Journal Interface
+
+## Guidance on Non-Prescriptive Writing
+
+### For Technical Requirements:
+*   Don’t provide specific implementation details like UI component names, state management approaches, and coding patterns.
+*   Focus on describing the capabilities needed, not how to implement them.
+*   Express requirements in terms of what the system must do or support, not how it should be built.
+*   Keep language straightforward and avoid prescribing technical approaches.
+
+### For Implementation Considerations Column:
+*   Provide context and factors to consider during implementation.
+*   Avoid dictating specific implementation methods.
+*   Remove specific component names, file references, and implementation instructions.
+*   Focus on user experience factors and high-level approaches.

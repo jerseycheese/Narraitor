@@ -46,19 +46,26 @@ export function parseCsvRows(csvPath) {
     });
 
     // Basic validation/mapping to expected keys for consistency downstream
-    return records.map(row => ({
-      titleSummary: row['User Story Title Summary'] || '',
-      userStory: row['User Story'] || '',
-      priority: row['Priority'] || '',
-      complexity: row['Estimated Complexity'] || '',
-      acceptanceCriteriaRaw: row['Acceptance Criteria'] || '', // Keep raw AC string
-      gitHubIssueLink: row['GitHub Issue Link'] || '',
-      relatedIssues: row['Related Issues/Stories'] || '', // Add Related Issues/Stories
-      technicalRequirements: row['Technical Requirements'] || '', // Add Technical Requirements
-      implementationConsiderations: row['Implementation Considerations'] || '', // Add Implementation Considerations
-      // Add other columns if needed later
-      relatedDocumentation: row['Related Documentation'] || '', // Add Related Documentation
-    }));
+    return records.map(row => {
+        const gitHubLinkFromCsv = row['GitHub Issue Link'] || ''; // Get the raw value
+
+        // ADD THIS LOGGING BLOCK
+        if (gitHubLinkFromCsv.includes('128')) { // Log if "128" is in the link
+        }
+
+        return {
+            titleSummary: row['User Story Title Summary'] || '',
+            userStory: row['User Story'] || '',
+            priority: row['Priority'] || '',
+            complexity: row['Estimated Complexity'] || '',
+            acceptanceCriteriaRaw: row['Acceptance Criteria'] || '',
+            gitHubIssueLink: gitHubLinkFromCsv, // Use the variable we logged
+            relatedIssues: row['Related Issues/Stories'] || '',
+            technicalRequirements: row['Technical Requirements'] || '',
+            implementationConsiderations: row['Implementation Considerations'] || '',
+            relatedDocumentation: row['Related Documentation'] || '',
+        };
+    });
 
   } catch (error) {
     console.error(`Error parsing CSV file ${csvPath}: ${error.message}`);

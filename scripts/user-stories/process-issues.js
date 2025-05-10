@@ -1,56 +1,36 @@
 // process-issues.js
 // Processes GitHub issues
 
-import fs from 'fs';
-import path from 'path';
-import { updateIssue, listIssues } from '../github/github-issue-utils.js';
-import {
-  extractDomainFromIssue,
-  extractUserStoryFromIssue
-} from './story-validation-utils.js';
-import { parseCsvRows } from './modules/parsers.js'; // Import parseCsvRows
-
-// Add argument parsing
-const args = process.argv.slice(2);
-let skip = 0;
-let limit = null;
-let dryRun = false;
-
-// Basic argument parsing
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--skip' && args[i + 1]) {
-    skip = parseInt(args[i + 1], 10);
-    i++; // Skip the next argument as it's the value
-  } else if (args[i] === '--limit' && args[i + 1]) {
-    limit = parseInt(args[i + 1], 10);
-    i++; // Skip the next argument as it's the value
-  } else if (args[i] === '--dry-run') {
-    dryRun = true;
-  } else if (args[i] === '--help') {
-    console.log(`
-Usage: node scripts/user-stories/process-issues.js [options]
-
-Options:
-  --skip <number>   Number of issues to skip (default: 0)
-  --limit <number>  Maximum number of issues to process after skipping
-  --dry-run         Perform a dry run without updating GitHub issues
-  --help            Show this help message
-`);
-    process.exit(0);
-  }
-}
-
+import { updateIssue } from '../github/github-issue-utils.js';
 
 // Process issues - enhanced version that always uses getStoryComplexityAndPriority
-export async function processIssues(issues, dryRun = false) {
-  // Import these from the main file to avoid circular dependencies
-  const {
-    fixDocumentationLinks,
-    addImplementationNotes,
-    generateImplementationNotes
-  } = await import('../update-user-stories.js');
+import {
+  fixDocumentationLinks,
+  addImplementationNotes,
+  generateImplementationNotes,
+  updateComplexity,
+  updatePriority,
+  normalizePriority,
+  OWNER,
+  REPO
+} from '../update-user-stories.js';
 
-  console.log(`Found ${issues.length} user story issues to update.`);
+// Helper function to format text to a Markdown list
+function formatToMarkdownList(text) {
+  if (!text) return ''; // Return empty string for empty/null input
+  return text.split('\\n').map(item => `- ${item.trim()}`).join('\n');
+}
+
+// Helper function to strip frontmatter from the template
+function stripFrontmatter(template) {
+  // Matches YAML frontmatter between --- delimiters
+  const frontmatterRegex = /^---\n([\s\S]*?)\n---\n/;
+  return template.replace(frontmatterRegex, '');
+}
+
+// Process issues - enhanced version using pre-loaded CSV data and template
+export async function processIssues(issues, loadedCsvData, issueTemplateContent, dryRun = false) {
+  console.log(`Found ${issues.length} user story issues to process.`);
   if (dryRun) {
     console.log(`DRY RUN MODE - No issues will be updated.`);
   }
@@ -59,182 +39,137 @@ export async function processIssues(issues, dryRun = false) {
   let complexityUpdated = 0;
   let priorityUpdated = 0;
 
+  // Strip frontmatter from template before processing
+  const cleanTemplate = stripFrontmatter(issueTemplateContent);
+
   for (const [index, issue] of issues.entries()) {
     try {
       console.log(`\nProcessing issue #${issue.number}: ${issue.title} (${index + 1}/${issues.length})`);
-      let body = issue.body;
-      let hasChanges = false;
 
-      // 1. Extract domain and user story text
-      const domain = extractDomainFromIssue(issue);
-      const storyText = extractUserStoryFromIssue(issue);
-      console.log(`- Domain: ${domain}`);
-      console.log(`- Story: ${storyText.substring(0, 50)}...`);
+       // Get CSV data for the current issue
+       const csvRowData = loadedCsvData.get(issue.html_url);
 
-      // 2. Find and read complexity and priority from the corresponding CSV file
-      const domainFileName = `${domain.toLowerCase().replace(/\s+/g, '-')}-user-stories.csv`;
-      console.log(`- Searching for CSV file: ${domainFileName} in docs/requirements/`);
+       if (!csvRowData) {
+         console.warn(`- CSV data not found for issue #${issue.number} via URL ${issue.html_url}`);
+         skipped++;
+         continue; // Skip to the next issue
+       }
 
-      // Use Node.js fs to find the CSV file in known subdirectories.
-      // This replaces the previous searchFiles tool usage.
-      const baseDir = 'docs/requirements/';
-      const subDirs = ['core', 'ui', 'integrations']; // Known subdirectories to search within
-      let csvPath = null;
+       // 1. Implement Title Update
+       let newTitle = issue.title;
+       if (csvRowData.titleSummary) {
+         newTitle = csvRowData.titleSummary;
+         console.log(`- Title change detected: "${issue.title}" -> "${newTitle}"`);
+       } else {
+          console.log(`- No title change needed.`);
+       }
 
-      for (const subDir of subDirs) {
-        const potentialCsvPath = path.join(baseDir, subDir, domainFileName);
-        // Check if the file exists at the potential path
-        if (fs.existsSync(potentialCsvPath)) {
-          csvPath = potentialCsvPath;
-          break; // Found the file, no need to check other directories
-        }
-      }
+       // 2. Implement Body Update with Placeholder Replacement
+       let newBody = cleanTemplate;
 
-      let csvRows = [];
+       // Replace placeholders with CSV data, using || '' for fallbacks
+       newBody = newBody.replace('As a [type of user], I want [goal/need] so that [benefit/value].', csvRowData.userStory || '');
+       newBody = newBody.replace('{{ACCEPTANCE_CRITERIA_LIST}}', formatToMarkdownList(csvRowData.acceptanceCriteriaRaw || ''));
+       newBody = newBody.replace('{{TECHNICAL_REQUIREMENTS_LIST}}', formatToMarkdownList(csvRowData.technicalRequirements || ''));
+       newBody = newBody.replace('{{IMPLEMENTATION_CONSIDERATIONS}}', formatToMarkdownList(csvRowData.implementationConsiderations || ''));
+       const relatedDocsText = csvRowData.relatedDocumentation ? csvRowData.relatedDocumentation.split(',').map(doc => doc.trim()).filter(doc => doc).map(doc => `- ${doc}`).join('\n') : '';
+       newBody = newBody.replace('{{RELATED_DOCUMENTATION_LIST}}', relatedDocsText);
+       newBody = newBody.replace('{{RELATED_ISSUES_LIST}}', formatToMarkdownList(csvRowData.relatedIssues || ''));
 
-      if (csvPath) {
-        console.log(`- Found CSV file at: ${csvPath}`);
-        try {
-          // Read and parse the CSV file content
-          // parseCsvRows is assumed to take a file path based on current usage
-          csvRows = parseCsvRows(csvPath);
-        } catch (e) {
-          console.error(`- Error reading or parsing CSV file ${csvPath}: ${e.message}`);
-          // Continue with empty csvRows if parsing fails to avoid stopping the script
-        }
-      } else {
-        console.log(`- CSV file not found for domain: ${domain}`);
-      }
+       // Apply existing body modifiers
+       newBody = fixDocumentationLinks(newBody);
+       const implementationNotes = generateImplementationNotes({ body: newBody }); // Pass the potentially updated body
+       newBody = addImplementationNotes(newBody, implementationNotes);
 
-      let complexity = 'Unknown';
-      let priority = 'Unknown';
+       // Update Complexity and Priority checkboxes
+       newBody = updateComplexity(newBody, csvRowData.complexity);
+       newBody = updatePriority(newBody, csvRowData.priority);
 
-      if (csvRows.length > 0) {
-        // Find the row in the CSV that matches the GitHub issue title.
-        // We remove trailing periods from the issue title before trimming and comparing
-        // to handle data inconsistencies like issue #124.
-        const matchingRow = csvRows.find(row => row.userStory.trim() === issue.title.replace(/\.$/, '').trim());
+       if (newBody !== issue.body) {
+         console.log(`- Body changes detected.`);
+       } else {
+          console.log(`- No body changes needed.`);
+       }
 
-        if (matchingRow) {
-          complexity = matchingRow.complexity.trim() || 'Unknown';
-          priority = matchingRow.priority.trim() || 'Unknown';
-          console.log(`- Found matching row in ${csvPath}. Complexity: ${complexity}, Priority: ${priority}`);
-        } else {
-          console.log(`- No matching row found in ${csvPath} for issue title: ${issue.title}`);
-        }
-      } else {
-        console.log(`- No data found in CSV at ${csvPath} or file not found/error reading.`);
-      }
+       // 3. Refine Label Generation
+       const complexity = csvRowData.complexity;
+       const priority = normalizePriority(csvRowData.priority); // Use normalizePriority
 
-      // Format labels
-      const complexityLabel = complexity !== 'Unknown' ? `complexity:${complexity.toLowerCase()}` : null;
-      const priorityLabel = priority !== 'Unknown' ? `priority:${priority.toLowerCase().replace(/\s+|\(|\)/g, '-')}` : null;
+       const complexityLabel = complexity ? `complexity:${complexity.toLowerCase().trim()}` : null;
+       const priorityLabel = priority ? `priority:${priority.toLowerCase().trim().replace(/\s+|\(|\)/g, '-')}` : null;
 
-      // 3. Fix documentation links
-      const bodyWithFixedLinks = fixDocumentationLinks(body);
-      if (bodyWithFixedLinks !== body) {
-        console.log(`- Fixed documentation links`);
-        body = bodyWithFixedLinks;
-        hasChanges = true;
-      }
+       let finalLabelsArray = issue.labels.map(label => label.name);
 
-      // 4. Add implementation notes
-      const implementationNotes = generateImplementationNotes(issue);
-      const bodyWithImplNotes = addImplementationNotes(body, implementationNotes);
-      if (bodyWithImplNotes !== body) {
-        console.log(`- Added implementation notes: ${implementationNotes.map(n => `\n  * ${n}`).join('')}`);
-        body = bodyWithImplNotes;
-        hasChanges = true;
-      }
+       // Filter out existing complexity and priority labels
+       finalLabelsArray = finalLabelsArray.filter(label =>
+         !label.startsWith('complexity:') && !label.startsWith('priority:')
+       );
 
+       // Add new complexity and priority labels if they exist
+       if (complexityLabel) {
+         finalLabelsArray.push(complexityLabel);
+       }
+       if (priorityLabel) {
+         finalLabelsArray.push(priorityLabel);
+       }
 
+       // Check if labels have changed
+       const originalLabelsSet = new Set(issue.labels.map(label => label.name));
+       const finalLabelsSet = new Set(finalLabelsArray);
+       const labelsChanged = !(originalLabelsSet.size === finalLabelsSet.size &&
+                                [...originalLabelsSet].every(label => finalLabelsSet.has(label)));
 
+       if (labelsChanged) {
+         console.log(`- Label changes detected: [${issue.labels.map(label => label.name).join(', ')}] -> [${finalLabelsArray.join(', ')}]`);
+       } else {
+          console.log(`- No label changes needed.`);
+       }
 
-      if (hasChanges || complexityLabel || priorityLabel) { // Check if labels changed too
-        if (!dryRun) {
-          // Update issue with body and labels
-          await updateIssue(issue, body, complexityLabel, priorityLabel);
-          console.log(`✅ Updated issue #${issue.number}`);
-          if (complexityLabel) complexityUpdated++;
-          if (priorityLabel) priorityUpdated++;
-        } else {
-          console.log(`Would update issue #${issue.number} (dry run)`);
-        }
-        updated++;
-      } else {
-        console.log(`⏭️ No changes needed for issue #${issue.number}`);
-        skipped++;
-      }
+       // 4. Correct updateIssue Call
+       const updatePayload = {};
+       if (newTitle !== issue.title) {
+         updatePayload.title = newTitle;
+       }
+       if (newBody !== issue.body) { // Compare against original body
+         updatePayload.body = newBody;
+       }
+       if (labelsChanged) {
+         updatePayload.labels = finalLabelsArray;
+       }
 
-      // Add a small delay to prevent rate limiting
-      await new Promise(r => setTimeout(r, 1000));
+       if (Object.keys(updatePayload).length > 0) {
+         if (!dryRun) {
+           // Assuming updateIssue signature is (owner, repo, issueNumber, data)
+           await updateIssue(OWNER, REPO, issue.number, updatePayload);
+           console.log(`✅ Updated issue #${issue.number}`);
+           if (updatePayload.labels) {
+              if (complexityLabel) complexityUpdated++;
+              if (priorityLabel) priorityUpdated++;
+           }
+         } else {
+           console.log(`Would update issue #${issue.number} with payload:`, updatePayload, '(dry run)');
+         }
+         updated++;
+       } else {
+         console.log(`⏭️ No changes needed for issue #${issue.number}`);
+         skipped++;
+       }
 
-    } catch (err) {
-      console.error(`❌ Error processing issue #${issue.number}: ${err.message}`);
-      errors++;
-    }
-  }
+       // Add a small delay to prevent rate limiting
+       await new Promise(r => setTimeout(r, 1000));
 
-  return {
-    updated,
-    skipped,
-    errors,
-    total: issues.length,
-    complexityUpdated,
-    priorityUpdated
-  };
-}
-
-// Main execution block (assuming this script is the entry point)
-async function main() {
- const issuesToProcess = [];
- let currentPage = Math.floor(skip / 100) + 1;
- let issuesFetchedCount = 0;
- const remainingToFetch = limit === null ? Infinity : limit;
- const startIndexOnPage = skip % 100;
-
- console.log(`Fetching issues starting from index ${skip} (page ${currentPage}, starting index on page ${startIndexOnPage}).`);
-
- while (issuesFetchedCount < remainingToFetch) {
-   const pageIssues = await listIssues(currentPage, 100);
-
-   if (pageIssues.length === 0) {
-     // No more issues to fetch
-     break;
+     } catch (err) {
+       console.error(`❌ Error processing issue #${issue.number}: ${err.message}`);
+       errors++;
+     }
    }
 
-   let relevantIssues = pageIssues;
-   if (currentPage === Math.floor(skip / 100) + 1) {
-     // For the first page we fetch, apply the starting index offset
-     relevantIssues = pageIssues.slice(startIndexOnPage);
-   }
-
-   // Add relevant issues, respecting the overall limit
-   const issuesToAddCount = Math.min(relevantIssues.length, remainingToFetch - issuesFetchedCount);
-   issuesToProcess.push(...relevantIssues.slice(0, issuesToAddCount));
-   issuesFetchedCount += issuesToAddCount;
-
-   if (issuesFetchedCount >= remainingToFetch) {
-       break; // Reached the limit
-   }
-
-   currentPage++;
+   return {
+     updated,
+     skipped,
+     errors,
+     total: issues.length,
+     complexityUpdated,
+     priorityUpdated
+   };
  }
-
-
- console.log(`Processing ${issuesToProcess.length} issues (skipping ${skip}, limiting to ${limit === null ? 'all' : limit}).`);
-
- // Call the main processing function
- const results = await processIssues(issuesToProcess, dryRun);
-
- console.log(`\nProcessing complete.`);
- console.log(`Results:`);
- console.log(`- Total issues considered (after skip/limit): ${issuesToProcess.length}`);
- console.log(`- Issues updated: ${results.updated}`);
- console.log(`- Issues skipped (no changes needed): ${results.skipped}`);
- console.log(`- Errors: ${results.errors}`);
- console.log(`- Complexity labels updated: ${results.complexityUpdated}`);
- console.log(`- Priority labels updated: ${results.priorityUpdated}`);
-}
-
-main().catch(console.error);

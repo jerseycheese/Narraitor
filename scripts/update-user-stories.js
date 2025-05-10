@@ -1,25 +1,52 @@
-// User Story Update Script (Enhanced Version)
+// update-user-stories.js
+// Main script for synchronizing CSV user story data with GitHub issues
+// 
 // This script updates existing user story issues with correct documentation links,
-// implementation notes, and complexity/priority estimates.
-// All complexity and priority values are sourced from getStoryComplexityAndPriority() mapping.
+// implementation notes, and complexity/priority estimates from CSV data.
+//
+// Features:
+// - Updates GitHub issues from CSV data
+// - Fixes documentation links in issues
+// - Adds implementation notes based on story content
+// - Updates complexity and priority based on CSV data
+// - Handles rate limiting for GitHub API
+//
+// Usage:
+//   node scripts/update-user-stories.js [options]
+//
+// Options:
+//   --dry-run      Test run without making changes
+//   --limit N      Limit to N issues
+//   --force        Bypass label verification
+//   --validate     Run in validation mode
+//   --issue=N      Process specific issue number
 
-import https from 'https';
-import fs from 'fs'; // Added
-import path from 'path'; // Added
+import fs from 'fs';
+import path from 'path';
+import {
+  OWNER,
+  REPO,
+  DEBUG_MODE
+} from './user-stories/modules/config.js';
+import {
+  findAllCsvFiles,
+  extractIssueNumber
+} from './user-stories/modules/csv-utils.js';
+import {
+  fetchAllIssues,
+  fetchIssueByNumber,
+  verifyLabels
+} from './user-stories/modules/github-api.js';
 import {
   validateIssuesAgainstDocs
 } from './story-validation-utils.js';
 import {
   processIssues
 } from './process-issues.js';
-import { parseCsvRows } from './user-stories/modules/parsers.js'; // Added
+import { parseCsvRows } from './user-stories/modules/parsers.js';
 
-const OWNER = 'jerseycheese';
-const REPO = 'narraitor';
+// Get GitHub token from environment variables
 const TOKEN = process.env.GITHUB_TOKEN;
-
-// Debug flag - set to true to enable extra logging
-const DEBUG = false;
 
 // Generate implementation notes based on user story content and technical requirements
 export function generateImplementationNotes(story) {
@@ -74,6 +101,8 @@ export function generateImplementationNotes(story) {
 
 // Fix documentation links in issue body
 export function fixDocumentationLinks(body) {
+  if (!body) return body;
+  
   // This regex finds the documentation link and captures the domain name (supports relative and absolute URLs)
   const linkRegex = /- \[([^.]+)\.md\]\(\s*(?:https:\/\/github\.com\/[\w-]+\/[\w-]+\/blob\/(?:main|develop)\/)?docs\/requirements\/core\/([^)]+)\.md\s*\) - Source requirements document/;
   const linkMatch = body.match(linkRegex);
@@ -88,12 +117,13 @@ export function fixDocumentationLinks(body) {
   
   // Handle HTML anchor tags for documentation links
   const htmlLinkRegex = /<a\s+href="(?:https:\/\/github\.com\/[\w-]+\/[\w-]+\/blob\/(?:main|develop)\/)?(?:\/|\.\.\/)?docs\/requirements\/core\/([^"]+)\.md">([^<]+)<\/a>/g;
-  body = body.replace(htmlLinkRegex, `<a href="https://github.com/${OWNER}/${REPO}/blob/develop/docs/requirements/core/$1.md">$2</a>`);
-  return body;
+  return body.replace(htmlLinkRegex, `<a href="https://github.com/${OWNER}/${REPO}/blob/develop/docs/requirements/core/$1.md">$2</a>`);
 }
 
 // Add implementation notes to issue body
 export function addImplementationNotes(body, notes) {
+  if (!body) return body;
+  
   const implNotesRegex = /## Implementation Notes\n<!-- Add guidance on implementation approach, architecture considerations, etc. -->\n([^#]*)/;
   const implNotesMatch = body.match(implNotesRegex);
   
@@ -110,6 +140,8 @@ export function addImplementationNotes(body, notes) {
 
 // Update estimated complexity in issue body
 export function updateComplexity(body, complexity) {
+  if (!body) return body;
+  
   const compRegex = /## Estimated Complexity[\s\S]*?(?=\n##|$)/;
   const match = body.match(compRegex);
   if (match) {
@@ -127,6 +159,8 @@ export function updateComplexity(body, complexity) {
 
 // Update priority in issue body
 export function updatePriority(body, priority) {
+  if (!body) return body;
+  
   const priRegex = /## Priority[\s\S]*?(?=\n##|$)/;
   const match = body.match(priRegex);
   if (match) {
@@ -143,197 +177,10 @@ export function updatePriority(body, priority) {
   return body;
 }
 
-// Verify labels in repository - Enhanced version with case-insensitive comparison
-async function verifyLabels() {
-  try {
-    // Check for complexity and priority labels
-    console.log('Checking for required labels...');
-    const options = {
-      hostname: 'api.github.com',
-      path: `/repos/${OWNER}/${REPO}/labels?per_page=100`,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'User-Story-Update-Script',
-        'Authorization': `token ${TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    };
-    
-    const labels = await new Promise((resolve, reject) => {
-      const req = https.request(options, res => {
-        let responseData = '';
-        res.on('data', chunk => (responseData += chunk));
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            try {
-              const parsedLabels = JSON.parse(responseData);
-              if (DEBUG) {
-                console.log(`Received ${parsedLabels.length} labels from GitHub`);
-                console.log(`Labels: ${parsedLabels.map(l => l.name).join(', ')}`);
-              }
-              resolve(parsedLabels);
-            } catch (err) {
-              reject(new Error(`Failed to parse response: ${err.message}`));
-            }
-          } else {
-            reject(new Error(`Failed to get labels: ${responseData}`));
-          }
-        });
-      });
-      req.on('error', reject);
-      req.end();
-    });
-    
-    // Normalize label names for more reliable comparison (lowercase, trim)
-    const normalizedLabels = labels.map(l => ({ ...l, name: l.name.toLowerCase().trim() }));
-    
-    // Define required labels (all lowercase)
-    const requiredLabels = [
-      'complexity:small', 'complexity:medium', 'complexity:large',
-      'priority:high', 'priority:medium', 'priority:low', 'priority:post-mvp'
-    ];
-    
-    // Find missing labels with case-insensitive comparison
-    const missingLabels = requiredLabels.filter(
-      requiredLabel => !normalizedLabels.some(l => l.name === requiredLabel)
-    );
-    
-    if (missingLabels.length > 0) {
-      console.warn(`Warning: Missing required labels: ${missingLabels.join(', ')}`);
-      console.warn('Run "node scripts/github-label-creator.js" to create all required labels before proceeding.');
-      
-      // Debug output of all actual labels for diagnosis
-      if (DEBUG) {
-        console.log('Existing labels:', normalizedLabels.map(l => l.name).join(', '));
-      }
-      
-      return false;
-    }
-    
-    console.log('All required labels exist.');
-    return true;
-  } catch (err) {
-    console.warn(`Warning: Could not verify labels: ${err.message}`);
-    console.warn('Run "node scripts/github-label-creator.js" to ensure all required labels exist.');
-    return false;
-  }
-}
-
-// Fetch issues from GitHub
-export async function fetchIssues(labels = ['user-story']) {
-  let allIssues = [];
-  let url = `/repos/${OWNER}/${REPO}/issues?labels=${labels.map(encodeURIComponent).join(',')}&state=open&per_page=100`;
-
-  while (url) {
-    const options = {
-      hostname: 'api.github.com',
-      path: url,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'User-Story-Update-Script',
-        'Authorization': `token ${TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    };
-
-    const { data, nextUrl } = await new Promise((resolve, reject) => {
-      const req = https.request(options, res => {
-        let responseData = '';
-        res.on('data', chunk => (responseData += chunk));
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            try {
-              const linkHeader = res.headers.link;
-              let nextUrl = null;
-              if (linkHeader) {
-                const links = linkHeader.split(', ');
-                const nextLink = links.find(link => link.endsWith('rel="next"'));
-                if (nextLink) {
-                  const nextMatch = nextLink.match(/<(.*)>; rel="next"/);
-                  if (nextMatch && nextMatch[1]) {
-                    // Extract just the path and query from the full URL
-                    const nextUrlObject = new URL(nextMatch[1]);
-                    nextUrl = `${nextUrlObject.pathname}${nextUrlObject.search}`;
-                  }
-                }
-              }
-              resolve({ data: JSON.parse(responseData), nextUrl });
-            } catch (err) {
-              reject(new Error(`Failed to parse response or link header: ${err.message}`));
-            }
-          } else {
-            reject(new Error(`Failed to fetch issues (Status: ${res.statusCode}): ${responseData}`));
-          }
-        });
-      });
-
-      req.on('error', reject);
-      req.end();
-    });
-
-    allIssues = allIssues.concat(data);
-    url = nextUrl; // Set url to the next page's url, or null if no next page
-  }
-
-  return allIssues;
-}
-
-// Fetch a single issue by number
-export async function fetchIssueByNumber(issueNumber) {
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: 'api.github.com',
-      path: `/repos/${OWNER}/${REPO}/issues/${issueNumber}`,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'User-Story-Update-Script',
-        'Authorization': `token ${TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    };
-
-    const req = https.request(options, res => {
-      let responseData = '';
-      res.on('data', chunk => (responseData += chunk));
-      res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            resolve(JSON.parse(responseData));
-          } catch (err) {
-            reject(new Error(`Failed to parse issue data: ${err.message}`));
-          }
-        } else {
-          reject(new Error(`Failed to fetch issue: ${responseData}`));
-        }
-      });
-    });
-    req.on('error', reject);
-    req.end();
-  });
-}
-
-// Helper function to recursively find CSV files
-function findAllCsvFiles(startPath, filter = /.+-user-stories\.csv$/) {
-  let results = [];
-  try {
-    const files = fs.readdirSync(startPath);
-    files.forEach(file => {
-      const filename = path.join(startPath, file);
-      const stat = fs.lstatSync(filename);
-      if (stat.isDirectory()) {
-        results = results.concat(findAllCsvFiles(filename, filter));
-      } else if (filter.test(filename)) {
-        results.push(filename);
-      }
-    });
-  } catch (error) {
-     console.error(`Error reading directory ${startPath}: ${error.message}`);
-  }
-  return results;
-}
-
 // Helper function to normalize priority strings
-function normalizePriority(priorityStr) {
+export function normalizePriority(priorityStr) {
+  if (!priorityStr) return 'Medium'; // Default
+  
   const lowerPriority = priorityStr.toLowerCase();
   if (lowerPriority.includes('high')) return 'High';
   if (lowerPriority.includes('medium')) return 'Medium';
@@ -342,6 +189,37 @@ function normalizePriority(priorityStr) {
   return 'Medium'; // Default if unknown format
 }
 
+// Find CSV row by issue number - flexible matching
+function findCsvRowByIssueNumber(loadedCsvRows, issueNumber) {
+  // First try to find by full URL
+  const fullUrl = `https://github.com/${OWNER}/${REPO}/issues/${issueNumber}`;
+  
+  for (const [url, rowData] of loadedCsvRows.entries()) {
+    // Try exact URL match
+    if (url === fullUrl) {
+      return rowData;
+    }
+    
+    // Look for issue number in Related Issues/Stories
+    if (rowData.relatedIssues) {
+      const relatedIssues = rowData.relatedIssues.split(/[\n,]/).map(issue => issue.trim());
+      if (relatedIssues.includes(`#${issueNumber}`)) {
+        // Check if this row doesn't have its own GitHub issue link
+        if (!rowData.gitHubIssueLink || rowData.gitHubIssueLink.trim() === '') {
+          return rowData;
+        }
+      }
+    }
+    
+    // Check if the URL contains the issue number at the end
+    if (url.endsWith(`/${issueNumber}`)) {
+      return rowData;
+    }
+  }
+  
+  // If no match found, try to find by title match or user story content
+  return null;
+}
 
 // Main function
 async function main() {
@@ -357,7 +235,7 @@ async function main() {
   const limitIndex = args.indexOf('--limit');
   const limit = limitIndex !== -1 && args[limitIndex + 1] ? parseInt(args[limitIndex + 1], 10) : null;
   const force = args.includes('--force'); // Flag to bypass label verification
-  const validate = args.includes('--validate'); // New flag to run validation mode
+  const validate = args.includes('--validate'); // Flag to run validation mode
   
   // Issue number to process
   let specificIssueNum = null;
@@ -365,9 +243,6 @@ async function main() {
     if (args[i] === '--issue') {
       if (i + 1 < args.length && !isNaN(parseInt(args[i + 1], 10))) {
         specificIssueNum = parseInt(args[i + 1], 10);
-        // To prevent '--issue' from being processed again if it's also part of another arg like --issue-related
-        // we can consume the next argument if it was used as a value.
-        // However, for this specific script, simply breaking is likely sufficient.
         break;
       }
     } else if (args[i].startsWith('--issue=')) {
@@ -391,11 +266,22 @@ async function main() {
     // Only verify labels if not in force mode
     let labelsExist = true;
     if (!force) {
-      // Verify labels first
-      labelsExist = await verifyLabels();
-      if (!labelsExist && !dryRun) {
-        console.error('Required labels are missing. Run "node scripts/github-label-creator.js" first or use --force to bypass verification.');
-        process.exit(1);
+      // Verify required labels
+      const requiredLabels = [
+        'complexity:small', 'complexity:medium', 'complexity:large',
+        'priority:high', 'priority:medium', 'priority:low', 'priority:post-mvp'
+      ];
+      
+      const labelCheck = await verifyLabels(OWNER, REPO, requiredLabels, TOKEN);
+      labelsExist = labelCheck.exists;
+      
+      if (!labelsExist) {
+        console.error('Required labels are missing:', labelCheck.missing.join(', '));
+        console.error('Run "node scripts/github-label-creator.js" first or use --force to bypass verification.');
+        
+        if (!dryRun) {
+          process.exit(1);
+        }
       }
     }
 
@@ -417,12 +303,16 @@ async function main() {
     console.log('\nLoading User Story data from CSV files...');
     const csvFiles = findAllCsvFiles(path.resolve(process.cwd(), 'docs/requirements'));
     const loadedCsvData = new Map();
+    const allCsvRows = [];
     let totalCsvRows = 0;
 
     for (const csvPath of csvFiles) {
       const rows = parseCsvRows(csvPath);
       totalCsvRows += rows.length;
       for (const row of rows) {
+        // Store all rows for flexible matching
+        allCsvRows.push(row);
+        
         if (row.gitHubIssueLink && row.gitHubIssueLink.startsWith('https://github.com/')) {
            // Normalize URL slightly in case of trailing slashes etc.
            const normalizedUrl = row.gitHubIssueLink.trim().replace(/\/$/, '');
@@ -430,9 +320,6 @@ async function main() {
            row.priority = normalizePriority(row.priority); // Normalize priority
            row.complexity = row.complexity || 'Medium'; // Default complexity if empty
            loadedCsvData.set(normalizedUrl, row);
-        } else {
-           // Optionally log rows without valid links if needed for debugging
-           // console.warn(`Skipping row without valid GitHub link in ${csvPath}: ${row.titleSummary}`);
         }
       }
     }
@@ -446,12 +333,21 @@ async function main() {
     // Process specific issue if requested
     if (specificIssueNum) {
       console.log(`\nFetching specific issue #${specificIssueNum}...`);
-      const issue = await fetchIssueByNumber(specificIssueNum);
+      const issue = await fetchIssueByNumber(OWNER, REPO, specificIssueNum, TOKEN);
       console.log(`Processing single issue #${issue.number}`);
       
       if (validate) {
         await validateIssuesAgainstDocs([issue], dryRun);
       } else {
+        // Try to find CSV row using flexible matching
+        if (!loadedCsvData.has(issue.html_url)) {
+          const matchedRow = findCsvRowByIssueNumber(loadedCsvData, specificIssueNum);
+          if (matchedRow) {
+            // Add to loadedCsvData with the correct URL
+            loadedCsvData.set(issue.html_url, matchedRow);
+          }
+        }
+        
         // Pass loadedCsvData to processIssues
         await processIssues([issue], loadedCsvData, issueTemplateContent, dryRun);
       }
@@ -462,7 +358,7 @@ async function main() {
     
     // Fetch user story issues
     console.log(`\nFetching user story issues...`);
-    let issues = await fetchIssues(['user-story']);
+    let issues = await fetchAllIssues(OWNER, REPO, ['user-story'], 'open', TOKEN);
     
     // Apply limit if specified
     if (limit && limit < issues.length) {
@@ -497,40 +393,32 @@ async function main() {
         console.log('\nAll issues are consistent with requirement docs!');
       }
       
-      process.exit(0);
+      process.exit(0); // Exit after validation
     }
     
-    // Confirm before proceeding
-    if (!dryRun) {
-      console.log(`\nReady to update ${issues.length} issues. Continue? (y/n)`);
-      const proceed = await new Promise(resolve =>
-        process.stdin.once('data', data => resolve(data.toString().trim().toLowerCase() === 'y'))
-      );
-      
-      if (!proceed) {
-        console.log('Operation cancelled');
-        process.exit(0);
+    // Apply flexible matching for each issue
+    for (const issue of issues) {
+      if (!loadedCsvData.has(issue.html_url)) {
+        const matchedRow = findCsvRowByIssueNumber(loadedCsvData, issue.number);
+        if (matchedRow) {
+          // Add to loadedCsvData with the correct URL
+          loadedCsvData.set(issue.html_url, matchedRow);
+        }
       }
     }
     
     // Process issues
+    console.log(`\nProcessing ${issues.length} user story issues...`);
     // Pass loadedCsvData to processIssues
-    const result = await processIssues(issues, loadedCsvData, issueTemplateContent, dryRun);
+    await processIssues(issues, loadedCsvData, issueTemplateContent, dryRun);
     
-    // Show summary
-    console.log(`\nSummary:`);
-    console.log(`- Updated: ${result.updated}`);
-    console.log(`- Skipped (no changes needed): ${result.skipped}`);
-    console.log(`- Errors: ${result.errors}`);
-    console.log(`- Total processed: ${result.total}`);
-    console.log(`- Priority labels updated: ${result.priorityUpdated || 0}`);
-    console.log(`- Complexity labels updated: ${result.complexityUpdated || 0}`);
+    console.log('\nUser story update script finished.');
     
-  } catch (err) {
-    console.error('Error:', err.message);
+  } catch (error) {
+    console.error(`\nAn error occurred: ${error.message}`);
     process.exit(1);
   }
 }
 
-// Start execution
+// Execute the main function
 main();
