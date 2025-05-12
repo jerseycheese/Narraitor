@@ -19,10 +19,18 @@ const config = {
     '<rootDir>/.next/',
   ],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
-    '^.+\\.js$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
+    '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', { 
+      tsconfig: {
+        module: 'esnext',
+        target: 'esnext',
+        moduleResolution: 'node',
+        allowJs: true,
+        esModuleInterop: true,
+      }
+    }],
   },
-  // ts-jest preset usually handles the transform, but can be explicit if needed
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };
 
 export default config;

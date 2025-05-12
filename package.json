@@ -10,8 +10,8 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.js",
-    "test:prompt-templates": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.js src/lib/promptTemplates/promptTemplateManager.test.ts"
+    "test": "jest --config=jest.config.cjs",
+    "test:prompt-templates": "jest --config=jest.config.cjs src/lib/promptTemplates/promptTemplateManager.test.ts"
   },
   "dependencies": {
     "csv-parse": "^5.6.0",

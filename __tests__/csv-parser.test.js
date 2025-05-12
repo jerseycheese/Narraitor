@@ -1,5 +1,6 @@
+// Import dependencies
 import fs from 'fs';
-import { parseCsvRows } from '../scripts/user-stories/modules/csv-parser';
+import { parseCsvRows } from '../scripts/user-stories/modules/csv-parser.js';
 
 describe('parseCsvRows', () => {
   beforeEach(() => {

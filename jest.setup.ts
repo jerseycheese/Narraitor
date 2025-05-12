@@ -1,6 +1,3 @@
-console.log('Executing jest.setup.js');
-console.log('typeof exports:', typeof exports);
-console.log('typeof module:', typeof module);
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
@@ -22,12 +19,16 @@ jest.mock('next/navigation', () => ({
 // Set up any global mocks or configuration here
 
 // Mock crypto.randomUUID for Jest environment (jsdom)
+if (typeof global.self === 'undefined') {
+  global.self = global;
+}
+
 Object.defineProperty(global.self, 'crypto', {
   value: {
     randomUUID: () => {
       // A simple UUID v4-like generator for testing
       let d = new Date().getTime(); // Timestamp
-      let d2 = (performance && performance.now && performance.now() * 1000) || 0; // High-precision timestamp
+      let d2 = (typeof performance !== 'undefined' && performance.now && performance.now() * 1000) || 0; // High-precision timestamp
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
         let r = Math.random() * 16; // random number between 0 and 16
         if (d > 0) {
@@ -44,4 +45,5 @@ Object.defineProperty(global.self, 'crypto', {
     },
   },
   writable: true, // Allow further modifications if needed by other tests
+  configurable: true,
 });

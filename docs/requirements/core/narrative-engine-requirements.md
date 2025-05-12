@@ -23,6 +23,7 @@ The Narrative Engine is the core storytelling system in Narraitor, responsible f
 - **Error Handling**: Gracefully handle AI service failures
 - **Narrative Formatting**: Apply appropriate formatting to narrative text
 - **Fallback Content**: Provide pre-written content when AI fails
+- **Context Inclusion**: Provide world and character details for AI generation
 
 ## Data Model
 
@@ -121,6 +122,37 @@ interface NarrativeErrorInfo {
 - **State Management**: Persists narrative state between sessions
 - **AI Service**: Generates narrative content through API integration
 - **Decision Tracking**: Records and references player choices
+- **Context System**: Provides structured world and character context to AI prompts
+
+## Context Inclusion System
+
+The Context Inclusion System ensures AI prompts have relevant world and character information:
+
+### Components
+- **ContextBuilder**: Formats world and character data into structured markdown sections
+- **ContextPrioritizer**: Manages token limits and prioritizes context elements based on configurable weights
+- **PromptContextManager**: Integrates with existing prompt templates to deliver context
+
+### Features
+- Automatically includes relevant world information (genre, description, attributes, skills)
+- Incorporates character information (name, level, attributes, skills, inventory)
+- Prioritizes the most relevant context when space is limited
+- Updates automatically when underlying data changes
+- Supports different prioritization for different prompt types (narrative, decision, summary)
+- Handles token limits gracefully with content truncation when needed
+
+### Integration
+The context system integrates seamlessly with the existing prompt template system:
+```typescript
+const contextManager = new PromptContextManager();
+const context = contextManager.generateContext({
+  promptType: 'narrative',
+  world: worldData,
+  character: characterData,
+  recentEvents: narrativeHistory,
+  tokenLimit: 500
+});
+```
 
 ## MVP Scope Boundaries
 
@@ -140,6 +172,11 @@ interface NarrativeErrorInfo {
   - Important character information
   - Recent decisions and outcomes
   - Current location/setting
+- Context inclusion system with:
+  - Structured world context (genre, attributes, skills)
+  - Character context (stats, inventory, skills)
+  - Token-aware prioritization
+  - Prompt-type specific weighting
 - History tracking that records:
   - All narrative segments
   - Player decisions and selections
@@ -184,6 +221,8 @@ interface NarrativeErrorInfo {
 - Narrative image generation
 - Importance ranking for narrative events
 - Multiple narrative modes beyond normal and basic dialogue
+- Context caching for performance optimization
+- Advanced token estimation beyond char/4 heuristic
 
 ## User Stories
 For detailed user stories, please see the [Narrative Engine User Stories CSV file](./narrative-engine-user-stories.csv).
