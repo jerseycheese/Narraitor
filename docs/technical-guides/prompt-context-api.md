@@ -252,6 +252,73 @@ The system gracefully handles missing or invalid data:
 - Invalid token limits default to 1000 tokens
 - Empty data structures return empty strings without errors
 
+## Token Management
+
+### estimateTokenCount
+
+```typescript
+estimateTokenCount(text: string): number
+```
+
+**Description**: Estimates the number of tokens in a given text string using a simplified approach that splits text on whitespace and punctuation.
+
+**Parameters**:
+- `text: string` - The text to estimate token count for
+
+**Returns**: `number` - The estimated number of tokens in the text, or 0 if text is empty/null/undefined
+
+**Example**:
+```typescript
+import { estimateTokenCount } from '@/lib/promptContext';
+
+const text = "This is a sample text to estimate token count.";
+const tokenCount = estimateTokenCount(text);
+console.log(`Estimated tokens: ${tokenCount}`);
+```
+
+### generateContext
+
+```typescript
+generateContext(options: ContextOptions): Promise<GenerateResult>
+```
+
+**Description**: Generates context for AI prompts based on provided options. Builds context elements from world and character data, adds events and current situation, then prioritizes based on token limits.
+
+**Parameters**:
+- `options: ContextOptions` - Context generation options
+  - `promptType?: string` - Type of prompt ('narrative', 'decision', 'summary')
+  - `world?: WorldContext | null` - World configuration data
+  - `character?: CharacterContext | null` - Character data
+  - `recentEvents?: string[]` - Recent game events
+  - `currentSituation?: string` - Current game situation
+  - `tokenLimit?: number` - Maximum tokens (default: 1000)
+
+**Returns**: `Promise<GenerateResult>` - An object containing:
+  - `context: string` - The final context string
+  - `estimatedTokenCount: number` - Original estimated token count before prioritization
+  - `finalTokenCount: number` - Actual token count of the final context
+  - `contextRetentionPercentage: number` - Percentage of original context retained after prioritization
+
+**Example**:
+```typescript
+import { PromptContextManager } from '@/lib/promptContext';
+
+const manager = new PromptContextManager();
+
+const result = await manager.generateContext({
+  promptType: 'narrative',
+  world: worldData,
+  character: characterData,
+  recentEvents: ['Defeated the dragon', 'Found treasure'],
+  tokenLimit: 500
+});
+
+console.log(`Context: ${result.context}`);
+console.log(`Estimated tokens: ${result.estimatedTokenCount}`);
+console.log(`Final tokens: ${result.finalTokenCount}`);
+console.log(`Retention percentage: ${result.contextRetentionPercentage}%`);
+```
+
 ## Performance Considerations
 
 - Context generation is synchronous and lightweight
