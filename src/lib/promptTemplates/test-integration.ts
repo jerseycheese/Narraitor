@@ -93,7 +93,11 @@ try {
   console.log('UNEXPECTED: This should have thrown an error');
 } catch (error) {
   console.log('Expected Error for Undefined Variable:');
-  console.log(error.message);
+  if (error instanceof Error) {
+    console.log(error.message);
+  } else {
+    console.log('An unknown error occurred:', error);
+  }
 }
 
 console.log('\n7. Testing template updating...');

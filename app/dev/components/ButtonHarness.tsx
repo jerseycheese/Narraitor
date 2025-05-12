@@ -1,10 +1,9 @@
-/* eslint-disable no-unused-vars, @typescript-eslint/no-unused-vars */
 import { Button } from '../../../src/stories/Button';
 
 export function ButtonHarness() {
-  // Stage 1: Isolation – …
-  // Stage 2: Test Harness – …
-  // Stage 3: Integration – …
+  // Stage 1: Isolation – Render the Button component
+  // Stage 2: Test Harness – Add controls and variations
+  // Stage 3: Integration – Integrate with state or context
 
-  return null;
+  return <Button primary label="Button Harness" />;
 }
