@@ -10,10 +10,10 @@ import {
   generateImplementationNotes,
   updateComplexity,
   updatePriority,
-  normalizePriority,
-  OWNER,
-  REPO
 } from '../update-user-stories.js';
+
+import { OWNER, REPO } from './modules/config.js';
+import { normalizePriority } from '../utils/csv-data-utils.js';
 
 // Helper function to format text to a Markdown list
 function formatToMarkdownList(text) {
@@ -29,8 +29,7 @@ function stripFrontmatter(template) {
 }
 
 // Process issues - enhanced version using pre-loaded CSV data and template
-export async function processIssues(issues, loadedCsvData, issueTemplateContent, dryRun = false) {
-  console.log(`Found ${issues.length} user story issues to process.`);
+export async function processIssues(issues, loadedCsvData, issueTemplateContent, dryRun = false, validateOnly = false) {
   if (dryRun) {
     console.log(`DRY RUN MODE - No issues will be updated.`);
   }
@@ -49,10 +48,11 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
        // Get CSV data for the current issue
        const csvRowData = loadedCsvData.get(issue.html_url);
 
-       if (!csvRowData) {
-         console.warn(`- CSV data not found for issue #${issue.number} via URL ${issue.html_url}`);
-         skipped++;
-         continue; // Skip to the next issue
+       if (csvRowData) {
+       } else {
+           console.warn(`- CSV data not found for issue #${issue.number} via URL ${issue.html_url}`);
+           skipped++;
+           continue; // Skip to the next issue
        }
 
        // 1. Implement Title Update
@@ -75,8 +75,23 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
        const relatedDocsText = csvRowData.relatedDocumentation ? csvRowData.relatedDocumentation.split(',').map(doc => doc.trim()).filter(doc => doc).map(doc => `- ${doc}`).join('\n') : '';
        newBody = newBody.replace('{{RELATED_DOCUMENTATION_LIST}}', relatedDocsText);
        newBody = newBody.replace('{{RELATED_ISSUES_LIST}}', formatToMarkdownList(csvRowData.relatedIssues || ''));
+ 
+       // Replace Plain Language Summary placeholder
+       const plainLanguageSummaryText = csvRowData['Plain Language Summary'] || ''; // Use the correct column name
+       const plsPlaceholder = '{{PLAIN_LANGUAGE_SUMMARY_PLACEHOLDER}}';
 
-       // Apply existing body modifiers
+       if (newBody.includes(plsPlaceholder)) {
+           newBody = newBody.replace(plsPlaceholder, plainLanguageSummaryText);
+           if (dryRun) { // Use the correct dryRun variable in scope
+               console.log(`- DRY RUN: Plain Language Summary placeholder FOUND and REPLACED with (first 50 chars of csvRowData['Plain Language Summary']): "${plainLanguageSummaryText.substring(0, 50)}..."`);
+           }
+       } else {
+           if (dryRun) { // Use the correct dryRun variable in scope
+               console.log(`- DRY RUN: Plain Language Summary placeholder NOT FOUND in template body.`);
+           }
+       }
+ 
+        // Apply existing body modifiers
        newBody = fixDocumentationLinks(newBody);
        const implementationNotes = generateImplementationNotes({ body: newBody }); // Pass the potentially updated body
        newBody = addImplementationNotes(newBody, implementationNotes);
@@ -137,8 +152,19 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
          updatePayload.labels = finalLabelsArray;
        }
 
+       if (dryRun) {
+         console.log(`\n--- Proposed Issue Body (Dry Run) for Issue #${issue.number} ---`);
+         console.log(newBody);
+         console.log(`--- End Proposed Issue Body ---`);
+       }
+
        if (Object.keys(updatePayload).length > 0) {
-         if (!dryRun) {
+         if (dryRun && !validateOnly) { // Explicitly check dryRun and not validateOnly
+             console.log(`\n--- Proposed Issue Body (Dry Run) for Issue #${issue.number} ---`);
+             console.log(newBody);
+             console.log(`--- End Proposed Issue Body ---`);
+             console.log(`Would update issue #${issue.number} with payload:`, updatePayload, '(dry run)');
+         } else if (!dryRun) { // Live run
            // Assuming updateIssue signature is (owner, repo, issueNumber, data)
            await updateIssue(OWNER, REPO, issue.number, updatePayload);
            console.log(`✅ Updated issue #${issue.number}`);
@@ -146,8 +172,8 @@ export async function processIssues(issues, loadedCsvData, issueTemplateContent,
               if (complexityLabel) complexityUpdated++;
               if (priorityLabel) priorityUpdated++;
            }
-         } else {
-           console.log(`Would update issue #${issue.number} with payload:`, updatePayload, '(dry run)');
+         } else { // This would be for validateOnly dry runs if they have different logging
+             console.log(`Would update issue #${issue.number} with payload:`, updatePayload, '(dry run - validate only)');
          }
          updated++;
        } else {

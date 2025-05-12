@@ -1,3 +1,6 @@
+console.log('Executing jest.setup.js');
+console.log('typeof exports:', typeof exports);
+console.log('typeof module:', typeof module);
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 

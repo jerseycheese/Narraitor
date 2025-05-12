@@ -169,11 +169,11 @@ interface DerivedStatistic {
 For detailed user stories, please see the [Character System User Stories CSV file](./character-system-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The character creation implementation in `/app/components/CharacterCreation` provides a solid example for the wizard-based approach
-- The character recovery system in `/app/components/GameSessionContent.tsx` (particularly the `useCharacterExtraction` hook) demonstrates effective pattern for recovering progress
-- The character state management in `/app/reducers/character/characterReducer.ts` offers a structure for managing character data
-- The character sheet component in `/app/components/CharacterSheetContent.tsx` shows how to display character information effectively, including potential areas for derived stats.
-- The inventory system in BootHillGM (`/app/components/Inventory.tsx` and related files) could serve as a template for MVP inventory implementation.
+- The character creation implementation in `src/app/components/CharacterCreation` provides a solid example for the wizard-based approach
+- The character recovery system in `src/app/components/GameSessionContent.tsx` (particularly the `useCharacterExtraction` hook) demonstrates effective pattern for recovering progress
+- The character state management in `src/app/reducers/character/characterReducer.ts` offers a structure for managing character data
+- The character sheet component in `src/app/components/CharacterSheetContent.tsx` shows how to display character information effectively, including potential areas for derived stats.
+- The inventory system in BootHillGM (`src/app/components/Inventory.tsx` and related files) could serve as a template for MVP inventory implementation.
 
 ## Status
 - [x] Requirements defined

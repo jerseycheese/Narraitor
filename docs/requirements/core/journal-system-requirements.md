@@ -134,11 +134,11 @@ interface JournalSession {
 For detailed user stories, please see the [Journal System User Stories CSV file](./journal-system-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The journal implementation in `/app/components/JournalViewer.tsx` provides a solid foundation for the journal interface
-- The journal stories in `/app/components/JournalViewer.stories.tsx` demonstrate how to test journal UI components
-- The journal reducer in `/app/reducers/journal/journalReducer.ts` offers patterns for state management
+- The journal implementation in `src/app/components/JournalViewer.tsx` provides a solid foundation for the journal interface
+- The journal stories in `src/app/components/JournalViewer.stories.tsx` demonstrate how to test journal UI components
+- The journal reducer in `src/app/reducers/journal/journalReducer.ts` offers patterns for state management
 - The journal entry creation triggered by narrative events in BootHillGM shows effective integration patterns
-- The narrative summary service in `/app/services/ai/narrativeSummaryService.ts` demonstrates how to generate entry summaries
+- The narrative summary service in `src/app/services/ai/narrativeSummaryService.ts` demonstrates how to generate entry summaries
 - The formatting used in BootHillGM's journal display provides useful patterns for proper text formatting
 
 ## Status

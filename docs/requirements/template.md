@@ -1,12 +1,15 @@
 ---
-title: [System Name] Requirements
+title: [Domain Name] Requirements
 aliases: [Alternative Names]
-tags: [narraitor, requirements, system-name]
+tags: [narraitor, requirements, domain-name]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---
 
-# [System Name] Requirements
+# [Domain Name] Requirements
+
+## Plain Language Summary
+A simple 1-3 sentence explanation of this system for non-technical stakeholders.
 
 ## Overview
 Brief description of the system and its purpose within Narraitor.
@@ -33,6 +36,10 @@ How users will interact with this system.
 
 ## Integration Points
 How this system connects with other systems.
+
+## Implementation Considerations
+- [Consideration 1]
+- [Consideration 2]
 
 ## MVP Scope Boundaries
 

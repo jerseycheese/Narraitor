@@ -59,7 +59,7 @@ The Utilities and Helpers module provides a collection of reusable functions, to
 - **DevTools**: Provide utility functions for the DevTools component
 
 ## Related Systems
-For a comprehensive development environment, these utilities work in conjunction with the **DevTools** system which provides a UI-based debugging interface. While these utilities provide programmatic functions that can be used throughout the application, the DevTools system provides a user interface for debugging and testing. See [DevTools Requirements](./devtools.md) for more information.
+For a comprehensive development environment, these utilities work in conjunction with the **DevTools** system which provides a UI-based debugging interface. While these utilities provide programmatic functions that can be used throughout the application, the DevTools system provides a user interface for debugging and testing. See [DevTools Requirements](./devtools-requirements.md) for more information.
 
 ## MVP Scope Boundaries
 

@@ -217,11 +217,11 @@ type Action<T extends string, P = void> = P extends void
 For detailed user stories, please see the [State Management User Stories CSV file](./state-management-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The campaign state management in `/app/components/CampaignStateManager.tsx` offers a proven approach to managing game campaigns
-- The state provider pattern in `/app/context/GameStateProvider.tsx` demonstrates effective context-based state management
-- The error recovery in `/app/components/GameSessionContent.tsx` shows robust error handling for state failures
-- The reducer implementation in `/app/reducers/rootReducer.ts` provides a pattern for organizing domain-specific reducers
-- The game actions adapter in `/app/reducers/gameActionsAdapter.ts` shows how to create type-safe action handling
+- The campaign state management in `src/app/components/CampaignStateManager.tsx` offers a proven approach to managing game campaigns
+- The state provider pattern in `src/app/context/GameStateProvider.tsx` demonstrates effective context-based state management
+- The error recovery in `src/app/components/GameSessionContent.tsx` shows robust error handling for state failures
+- The reducer implementation in `src/app/reducers/rootReducer.ts` provides a pattern for organizing domain-specific reducers
+- The game actions adapter in `src/app/reducers/gameActionsAdapter.ts` shows how to create type-safe action handling
 
 ## Status
 - [x] Requirements defined

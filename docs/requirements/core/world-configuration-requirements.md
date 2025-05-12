@@ -156,9 +156,9 @@ interface WorldTheme {
 For detailed user stories, please see the [World Configuration User Stories CSV file](./world-configuration-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The BootHillGM project doesn't have an explicit world configuration system as it uses a fixed western setting. However, the state management approach in `/app/reducers/gameReducer.ts` could provide patterns for managing world state.
-- The error handling in `/app/components/ErrorBoundary.tsx` could be adapted for world configuration validation.
-- The AI prompt construction in `/app/services/ai/promptBuilder.ts` could serve as a reference for building world description analysis prompts.
+- The BootHillGM project doesn't have an explicit world configuration system as it uses a fixed western setting. However, the state management approach in `src/app/reducers/gameReducer.ts` could provide patterns for managing world state.
+- The error handling in `src/app/components/ErrorBoundary.tsx` could be adapted for world configuration validation.
+- The AI prompt construction in `src/app/services/ai/promptBuilder.ts` could serve as a reference for building world description analysis prompts.
 
 ## Status
 - [x] Requirements defined

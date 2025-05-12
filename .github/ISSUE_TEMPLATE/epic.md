@@ -6,6 +6,9 @@ labels: epic
 assignees: ''
 ---
 
+## Plain Language Summary
+<!-- A simple 1-2 sentence explanation of this epic for non-technical stakeholders -->
+
 ## Epic Description
 <!-- A clear and concise description of what this epic is about -->
 

@@ -1,10 +1,13 @@
 ---
 name: Enhancement
 about: Suggest an enhancement to an existing feature
-title: "[ENHANCEMENT] "
+title: ""
 labels: enhancement
 assignees: ''
 ---
+
+## Plain Language Summary
+<!-- A simple 1-2 sentence explanation of this enhancement for non-technical stakeholders -->
 
 ## Current Feature
 <!-- Describe the current feature that you want to enhance -->

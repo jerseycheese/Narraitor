@@ -1,10 +1,13 @@
 ---
 name: User Story
 about: Create a user story for feature development
-title: "[USER STORY] As a [type of user], I want [goal/need] so that [benefit/value]"
+title: "As a [type of user], I want [goal/need] so that [benefit/value]"
 labels: user-story
 assignees: ''
 ---
+
+## Plain Language Summary
+{{PLAIN_LANGUAGE_SUMMARY_PLACEHOLDER}}
 
 ## User Story
 As a [type of user], I want [goal/need] so that [benefit/value].

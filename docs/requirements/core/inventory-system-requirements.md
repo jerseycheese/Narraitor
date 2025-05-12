@@ -107,10 +107,10 @@ interface InventoryCategory {
 For detailed user stories, please see the [Inventory System User Stories CSV file](./inventory-system-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The inventory implementation in `/app/components/Inventory.tsx` provides a proven structure for inventory management, which can be referenced for the basic MVP list view and add/remove logic, as well as potentially category display.
-- The inventory reducer in `/app/reducers/inventory/inventoryReducer.ts` offers a solid model for inventory state management patterns, including categories.
+- The inventory implementation in `src/app/components/Inventory.tsx` provides a proven structure for inventory management, which can be referenced for the basic MVP list view and add/remove logic, as well as potentially category display.
+- The inventory reducer in `src/app/reducers/inventory/inventoryReducer.ts` offers a solid model for inventory state management patterns, including categories.
 - BootHillGM's integration of items with narrative choices (though more advanced than MVP) and journal integration can serve as a conceptual reference.
-- The AI service implementation in BootHillGM (`/app/services/ai/aiService.ts`) can be referenced for patterns on integrating AI for tasks like categorization.
+- The AI service implementation in BootHillGM (`src/app/services/ai/aiService.ts`) can be referenced for patterns on integrating AI for tasks like categorization.
 
 ## Status
 - [x] Requirements defined

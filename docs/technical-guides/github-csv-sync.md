@@ -15,32 +15,36 @@ The Narraitor project maintains user stories in both GitHub issues and CSV files
 
 ### Core Scripts
 
-- **update-user-stories.js** - Primary synchronization script
-- **find-duplicates.js** - Identifies inconsistencies
-- **cleanup-duplicates.js** - Resolves duplicate issues
-- **fix-csv-mismatches.js** - Fixes CSV references
-- **fix-remaining-issues.js** - Validates remaining issues
-- **final-csv-fixes.js** - Applies specific fixes
+- **scripts/update-user-stories.js** - Primary synchronization script
+- **scripts/user-stories/migrate-user-stories.js** - Migrates user stories from CSV to GitHub issues
+- **scripts/validate-user-stories.js** - Validates consistency between docs and issues
 
 ### Support Modules
 
-- **config.js** - Centralized configuration
-- **github-api.js** - GitHub API utilities
-- **csv-utils.js** - CSV file utilities
-- **parsers.js** - Parsers for CSV and markdown files
+- **scripts/user-stories/modules/config.js** - Centralized configuration
+- **scripts/user-stories/modules/github-api.js** - GitHub API utilities
+- **scripts/user-stories/modules/csv-utils.js** - CSV file utilities
+- **scripts/user-stories/modules/parsers.js** - Parsers for CSV and markdown files
+- **scripts/user-stories/modules/processor.js** - Logic for processing issues and requirements
+- **scripts/user-stories/modules/github-issue-converter.js** - Converts issue data to CSV format
+- **scripts/user-stories/modules/legacy-parsers.js** - Parsers for older issue formats
+- **scripts/user-stories/modules/markdown-parser.js** - Parses markdown content
+- **scripts/user-stories/modules/parser-utils.js** - Utility functions for parsers
+- **scripts/utils/cli-parser.js** - Parses command line arguments
+- **scripts/utils/csv-data-utils.js** - Utility functions for CSV data
+- **scripts/utils/issue-body-formats.js** - Defines expected issue body formats
+- **scripts/utils/issue-body-utils.js** - Utility functions for issue body content
 
 ## Data Flow
 
-```
-+---------------+      +-----------------+      +------------------+
-| CSV Files     |----->| Synchronization |----->| GitHub Issues    |
-| (Requirements)|      | Scripts         |      | (Implementation) |
-+---------------+      +-----------------+      +------------------+
-                              ^
-                              |
-                      +-------+-------+
-                      | Issue Template |
-                      +---------------+
+```mermaid
+graph TD
+    A[CSV Files] --> B[migrate-user-stories.js]
+    B --> C[GitHub Issues]
+    C --> D[update-user-stories.js]
+    D --> C
+    A --> E[validate-user-stories.js]
+    C --> E
 ```
 
 ## Integration Points
@@ -48,12 +52,16 @@ The Narraitor project maintains user stories in both GitHub issues and CSV files
 ### CSV Files
 
 CSV files in `docs/requirements/*/` follow this standard structure:
-- **titleSummary** - Title of the user story
-- **userStory** - The user story text
-- **acceptanceCriteriaRaw** - Acceptance criteria
-- **complexity** - Estimated complexity (Small, Medium, Large)
-- **priority** - Priority level (High, Medium, Low, Post-MVP)
-- **gitHubIssueLink** - Link to the GitHub issue
+- `User Story Title Summary` - Title of the user story
+- `User Story` - The user story text
+- `Priority` - Priority level (High, Medium, Low, Post-MVP)
+- `Estimated Complexity` - Estimated complexity (Small, Medium, Large)
+- `Acceptance Criteria` - Acceptance criteria (newline-separated)
+- `Technical Requirements` - Technical implementation details (newline-separated)
+- `Implementation Considerations` - Implementation considerations (newline-separated)
+- `Related Issues/Stories` - Related issue or story numbers (newline-separated)
+- `Related Documentation` - Comma-separated paths to related documentation files
+- `GitHub Issue Link` - Link to the GitHub issue
 
 ### GitHub Issues
 
@@ -69,45 +77,14 @@ GitHub issues use the template in `.github/ISSUE_TEMPLATE/user-story.md` with th
 
 ## Process Details
 
-### Stage 1: Analysis
+### Stage 1: Migration (CSV to GitHub)
 
-1. **find-duplicates.js**
-   - Scans all user story GitHub issues
-   - Identifies issues with identical titles
-   - Finds CSV rows referencing the same issue
-   - Detects CSV rows without valid GitHub issue links
+1. **migrate-user-stories.js**
+   - Reads CSV user story data
+   - Creates new GitHub issues for rows without a GitHub Issue Link
+   - Updates the CSV file with the new GitHub Issue Link
 
-Output: `duplicate-analysis.json` containing:
-- `duplicateIssues` - Issues with identical titles
-- `multiReferencedIssues` - Issues referenced by multiple CSV rows
-- `rowsWithoutIssues` - CSV rows without valid GitHub issues
-
-### Stage 2: Cleanup
-
-1. **cleanup-duplicates.js**
-   - Closes duplicate GitHub issues
-   - Comments on closed issues referencing the primary issue
-   - Updates CSV files to reference the primary issues
-   - Fixes corrupted GitHub issue links in CSV files
-
-2. **fix-csv-mismatches.js**
-   - Updates CSV rows with mismatched titles
-   - Creates GitHub issues for CSV rows with invalid links
-   - Updates CSV rows to reference the newly created issues
-
-### Stage 3: Validation
-
-1. **fix-remaining-issues.js**
-   - Verifies that all issues have consistent references
-   - Identifies any remaining CSV rows without valid GitHub issues
-   - Reports inconsistencies for manual review
-
-2. **final-csv-fixes.js**
-   - Applies specific fixes for edge cases
-   - Updates CSV titles to match GitHub issues
-   - Creates GitHub issues for special cases
-
-### Stage 4: Synchronization
+### Stage 2: Synchronization (GitHub to GitHub/CSV)
 
 1. **update-user-stories.js**
    - Verifies required GitHub labels exist
@@ -115,9 +92,19 @@ Output: `duplicate-analysis.json` containing:
    - Loads all CSV user story data
    - For each GitHub issue:
      - Finds matching CSV row
-     - Updates implementation notes
-     - Updates complexity and priority markers
-     - Fixes documentation links
+     - Updates issue body with correct user story text, acceptance criteria, technical requirements, and implementation notes
+     - Updates complexity and priority labels based on CSV values
+     - Updates documentation links to use absolute URLs to the `develop` branch
+     - Assigns issues to the configured project board (except post-mvp)
+
+### Stage 3: Validation
+
+1. **validate-user-stories.js**
+   - Compares data in CSV files and GitHub issues
+   - Identifies inconsistencies in titles, complexity, priority, and links
+   - Reports unmatched requirements or issues
+
+## Error Handling
 
 ## Error Handling
 
@@ -147,6 +134,7 @@ The scripts handle these common error scenarios:
 
 Most scripts support these common options:
 
+- `--issueType=<type>` - Specify the issue type category (e.g., user-stories, migration)
 - `--dry-run` - Test run without making changes
 - `--limit N` - Limit processing to N items
 - `--force` - Bypass validation checks

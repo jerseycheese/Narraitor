@@ -5,6 +5,9 @@ title: '[BUG] '
 labels: bug
 ---
 
+## Plain Language Summary
+<!-- A simple 1-2 sentence explanation of this bug for non-technical stakeholders -->
+
 ## Description
 <!-- Provide a clear and concise description of the bug -->
 

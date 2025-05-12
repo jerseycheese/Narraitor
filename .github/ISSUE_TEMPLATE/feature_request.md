@@ -1,9 +1,12 @@
 ---
 name: Feature Request
 about: Suggest a new feature for Narraitor
-title: '[FEATURE] '
+title: ''
 labels: enhancement
 ---
+
+## Plain Language Summary
+<!-- A simple 1-2 sentence explanation of this feature for non-technical stakeholders -->
 
 ## Description
 <!-- Provide a clear and concise description of the feature -->

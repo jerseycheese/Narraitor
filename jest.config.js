@@ -2,7 +2,7 @@
 const config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     // Add any other necessary module mocks if Next.js specific imports cause issues
@@ -12,13 +12,15 @@ const config = {
   testMatch: [
     // Adjusted to be more specific to avoid potential conflicts if 'tests' dir is used later
     '<rootDir>/src/**/*.test.{ts,tsx}',
+    '<rootDir>/__tests__/**/*.test.{js,jsx,ts,tsx}',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
   ],
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
+    '^.+\\.js$': ['ts-jest', { tsconfig: 'tsconfig.json' }],
   },
   // ts-jest preset usually handles the transform, but can be explicit if needed
 };

@@ -189,14 +189,14 @@ interface NarrativeErrorInfo {
 For detailed user stories, please see the [Narrative Engine User Stories CSV file](./narrative-engine-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The narrative context implementation in `/app/context/NarrativeContext.tsx` and related hooks provide a proven structure for narrative state management
-- The optimization in `/app/components/GamePromptWithOptimizedContext.tsx` demonstrates effective token usage management
-- The AI service in `/app/services/ai/aiService.ts` shows patterns for reliable AI integration with fallbacks
-- The response parsing in `/app/services/ai/responseParser.ts` offers techniques for handling AI outputs
-- The prompt construction in `/app/services/ai/promptBuilder.ts` provides templates for effective AI prompting
-- The narrative formatting in `/app/components/NarrativeDisplay.tsx` shows how to properly display formatted text
-- The error handling in `/app/components/GameSessionContent.tsx` demonstrates recovery from AI service failures
-- The fallback generation in `/app/services/ai/fallback/fallbackDecisionGenerator.ts` provides patterns for creating backup content
+- The narrative context implementation in `src/app/context/NarrativeContext.tsx` and related hooks provide a proven structure for narrative state management
+- The optimization in `src/app/components/GamePromptWithOptimizedContext.tsx` demonstrates effective token usage management
+- The AI service in `src/app/services/ai/aiService.ts` shows patterns for reliable AI integration with fallbacks
+- The response parsing in `src/app/services/ai/responseParser.ts` offers techniques for handling AI outputs
+- The prompt construction in `src/app/services/ai/promptBuilder.ts` provides templates for effective AI prompting
+- The narrative formatting in `src/app/components/NarrativeDisplay.tsx` shows how to properly display formatted text
+- The error handling in `src/app/components/GameSessionContent.tsx` demonstrates recovery from AI service failures
+- The fallback generation in `src/app/services/ai/fallback/fallbackDecisionGenerator.ts` provides patterns for creating backup content
 
 ## Status
 - [x] Requirements defined

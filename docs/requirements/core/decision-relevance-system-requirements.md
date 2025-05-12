@@ -93,7 +93,7 @@ interface NarrativeContext {
 For detailed user stories, please see the [Decision Relevance System User Stories CSV file](./decision-relevance-system-user-stories.csv).
 
 ## BootHillGM Reference Code
-- The BootHillGM project doesn't have a dedicated Decision Relevance System, as its narrative is more linear. However, the context management approach in `/app/components/GamePromptWithOptimizedContext.tsx` and the decision tracking in `/app/reducers/gameReducer.ts` could provide some conceptual reference for managing relevant information for the AI.
+- The BootHillGM project doesn't have a dedicated Decision Relevance System, as its narrative is more linear. However, the context management approach in `src/app/components/GamePromptWithOptimizedContext.tsx` and the decision tracking in `src/app/reducers/gameReducer.ts` could provide some conceptual reference for managing relevant information for the AI.
 
 ## Status
 - [x] Requirements defined

@@ -36,6 +36,10 @@ component-name-element
 
 Example: `button-primary`
 
+## File & Module Naming Patterns
+- Modules under `scripts/user-stories/modules/` use kebab-case, e.g., `csv-utils.js`, `parser-utils.js`.
+- Utility scripts under `scripts/utils/` use kebab-case, e.g., `cli-parser.js`, `issue-body-utils.js`.
+- React component filenames use PascalCase, e.g., `DevToolsPanel.tsx`, `GameControlSection.tsx`.
 ## General Guidelines
 
 *   Maintain existing Tailwind classes where used.  
