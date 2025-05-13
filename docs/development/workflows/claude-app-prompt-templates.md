@@ -691,7 +691,8 @@ I've completed this feature:
 
 ## Request
 Help me prepare GitHub issue/epic updates/creation/closures using your Github MCP tools.
-* Do not change existing issue body content, other than adding strikeouts + updates, or checking checkboxes
+* Use strikeouts + updates when updating/editing existing text
+* Check checkboxes that should be checked now (eg. Acceptance Criteria)
 * All other commentary should be in issue comments
 * Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
 * Use the templates in /Users/jackhaas/Projects/narraitor/.github/ISSUE_TEMPLATE
