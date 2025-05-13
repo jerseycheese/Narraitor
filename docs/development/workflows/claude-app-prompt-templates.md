@@ -687,7 +687,7 @@ I've completed this feature:
 [PASTE IMPLEMENTATION SUMMARY]
 
 ## Request
-Help me prepare GitHub issue updates/creation/closure and draft a commit message.
+Help me prepare GitHub issue updates/creation/closure using your Github MCP tools.
 * Do not change existing issue body content, other than adding strikeouts + updates, or checking checkboxes
 * All other commentary should be in issue comments
 * Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
