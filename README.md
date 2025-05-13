@@ -22,6 +22,7 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 
 - Node.js (v18 or later)
 - npm
+- Google Gemini API key (for AI features)
 
 ### Installation
 
@@ -32,6 +33,10 @@ cd narraitor
 
 # Install dependencies
 npm install
+
+# Configure environment variables
+cp .env.example .env.local
+# Edit .env.local and add your NEXT_PUBLIC_GEMINI_API_KEY
 
 # Start the development server
 npm run dev
@@ -47,6 +52,9 @@ npm run storybook
 
 # Run tests
 npm run test
+
+# Run specific test suites
+npm run test:prompt-templates
 ```
 
 ## Architecture
@@ -55,9 +63,21 @@ Narraitor follows a domain-driven design approach with clear separation of conce
 
 - **World Configuration**: Define settings, rules, and parameters
 - **Character System**: Create and manage characters
-- **Narrative Engine**: AI-driven storytelling
+- **Narrative Engine**: AI-driven storytelling with template system
 - **Journal System**: Track gameplay events
 - **State Management**: Persist game state between sessions
+- **AI Service Integration**: Google Gemini integration for dynamic content generation
+
+## AI Service Integration
+
+Narraitor uses Google Gemini AI for dynamic narrative generation. Configure the service by setting environment variables:
+
+```bash
+# .env.local
+NEXT_PUBLIC_GEMINI_API_KEY=your-api-key
+```
+
+The AI service integrates with the template system to generate contextual narratives based on world and character data. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
 
 ## License
 
