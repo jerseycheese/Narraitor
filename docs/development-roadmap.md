@@ -3,7 +3,7 @@ title: Narraitor Development Roadmap
 aliases: [Roadmap, Implementation Plan]
 tags: [narraitor, documentation, planning, roadmap]
 created: 2025-04-27
-updated: 2025-04-30
+updated: 2025-05-13
 ---
 
 # Narraitor Development Roadmap
@@ -55,7 +55,14 @@ This roadmap outlines the development phases for the Narraitor project, focusing
 - [ ] Implement skill selection (max 8 skills per character)
 - [ ] Create test characters for each world
 
-### 1.6 Narrative Engine
+### 1.6 Basic Inventory System
+- [ ] Implement inventory state reducer
+- [ ] Create simple item management
+- [ ] Develop inventory UI component
+- [ ] Add item categorization
+- [ ] Create basic item interaction
+
+### 1.7 Narrative Engine
 - [ ] Set up Google Gemini AI integration
 - [ ] Create prompt template system
 - [ ] Implement context management (preserving 5-10 narrative segments)
@@ -63,7 +70,7 @@ This roadmap outlines the development phases for the Narraitor project, focusing
 - [ ] Add scene transition handling
 - [ ] Create error recovery mechanisms with retries and fallback content
 
-### 1.7 Journal System
+### 1.8 Journal System
 - [ ] Implement basic journal state reducer
 - [ ] Create automatic entry generation
 - [ ] Develop simple journal viewer component
@@ -71,7 +78,7 @@ This roadmap outlines the development phases for the Narraitor project, focusing
 - [ ] Implement new/unread entry indicators and session date grouping
 - [ ] Add filtering by entry type and significance
 
-### 1.8 Basic UI Components
+### 1.9 Basic UI Components
 - [ ] Create navigation structure
 - [ ] Implement world selection interface
 - [ ] Develop game session UI
@@ -124,12 +131,12 @@ This roadmap outlines the development phases for the Narraitor project, focusing
 - [ ] Add combat log functionality
 - [ ] Create simple combat UI
 
-### 3.3 Inventory System
-- [ ] Implement inventory state reducer
-- [ ] Create item management
-- [ ] Develop item effects and usage
-- [ ] Add item visualization
-- [ ] Create item interaction UI
+### 3.3 Advanced Inventory System
+- [ ] Add item effects and usage
+- [ ] Implement equipment system
+- [ ] Add item weight and encumbrance
+- [ ] Create item trading/economy
+- [ ] Develop crafting system
 
 ### 3.4 Enhanced Visualization
 - [ ] Improve character portraits
@@ -174,12 +181,13 @@ The MVP will be considered complete when:
 
 1. Users can create worlds by providing freeform descriptions that are processed by AI to suggest attributes and skills
 2. Character creation works with a minimal attribute/skill system
-3. The narrative engine generates appropriate content for different worlds
-4. The journal system records game events
-5. The state management system persists game state between sessions
-6. The application runs with acceptable performance
-7. Core user journeys are covered by tests
-8. Documentation is sufficient for understanding the codebase
+3. Basic inventory system allows characters to carry items
+4. The narrative engine generates appropriate content for different worlds
+5. The journal system records game events
+6. The state management system persists game state between sessions
+7. The application runs with acceptable performance
+8. Core user journeys are covered by tests
+9. Documentation is sufficient for understanding the codebase
 
 ## Future Enhancements (Post-MVP)
 
@@ -188,7 +196,7 @@ The MVP will be considered complete when:
 - More sophisticated character development
 - Advanced world customization options including tone settings
 - Combat systems for different genres
-- Expanded inventory and equipment systems
+- Expanded inventory with equipment and effects
 - Complex relationship tracking between characters
 - Quest and objective management
 - Map and location visualization

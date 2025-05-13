@@ -176,6 +176,8 @@ Please provide:
 3. A verification list of what is covered and what is not
 
 Please only test what's explicitly in the spec - don't test edge cases or features outside the defined scope.
+
+Use write_file to create the tests before you're done.
 ```
 
 ## Implementation Phase

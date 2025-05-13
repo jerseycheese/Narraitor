@@ -2,10 +2,53 @@
  * Core type definitions for the Narraitor application
  */
 
-export type EntityID = string;
-// Export all type definitions from domain-specific files
-// export * from './world.types';
-// export * from './character.types';
-// export * from './narrative.types';
-// export * from './journal.types';
-// export * from './common.types';
+// Re-export all types from their respective files
+export type { EntityID, Timestamp, TimestampedEntity, NamedEntity } from './common.types';
+export type { World, WorldAttribute, WorldSkill, WorldSettings } from './world.types';
+export type { 
+  Character,
+  CharacterAttribute,
+  CharacterSkill,
+  CharacterBackground,
+  CharacterRelationship,
+  CharacterStatus
+} from './character.types';
+export type { 
+  Inventory,
+  InventoryItem,
+  InventoryCategory
+} from './inventory.types';
+export type { 
+  NarrativeSegment, 
+  Decision, 
+  DecisionOption, 
+  DecisionRequirement, 
+  Consequence, 
+  NarrativeMetadata 
+} from './narrative.types';
+export type { 
+  JournalEntry, 
+  JournalEntryType, 
+  RelatedEntity, 
+  JournalMetadata 
+} from './journal.types';
+export type { 
+  GameSession, 
+  SessionState, 
+  SavePoint, 
+  NarrativeContext 
+} from './session.types';
+export type { 
+  AIContext, 
+  AIPromptContext, 
+  AIConstraint 
+} from './ai-context.types';
+
+// Export type guards
+export { 
+  isWorld, 
+  isCharacter, 
+  isInventoryItem, 
+  isNarrativeSegment, 
+  isJournalEntry 
+} from './type-guards';
