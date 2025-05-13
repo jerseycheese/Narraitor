@@ -148,6 +148,39 @@ Run tests with:
 npm test src/lib/promptContext
 ```
 
+## Token Management
+
+The prompt context system includes token management capabilities to ensure generated context fits within specified token limits:
+
+```typescript
+import { PromptContextManager, estimateTokenCount } from '@/lib/promptContext';
+
+// Estimate tokens for any text string
+const text = "This is a sample text to estimate token count.";
+const tokens = estimateTokenCount(text); // Returns approximate token count
+
+// Generate context with token metrics
+const manager = new PromptContextManager();
+const result = await manager.generateContext({
+  promptType: 'narrative',
+  world: worldData,
+  character: characterData,
+  recentEvents: ['Defeated the dragon', 'Found treasure'],
+  tokenLimit: 500
+});
+
+// Access token metrics
+console.log(`Estimated tokens: ${result.estimatedTokenCount}`);
+console.log(`Final tokens: ${result.finalTokenCount}`);
+console.log(`Retention percentage: ${result.contextRetentionPercentage}%`);
+```
+
+The token management system provides:
+- Token estimation for any text string
+- Automatic prioritization of content to fit token limits
+- Metrics on original vs. final token counts
+- Percentage of context retained after prioritization
+
 ## API Documentation
 
 For detailed API documentation, see [Prompt Context API Guide](/docs/technical-guides/prompt-context-api.md).

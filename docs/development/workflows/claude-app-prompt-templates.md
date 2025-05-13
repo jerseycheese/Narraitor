@@ -678,7 +678,7 @@ TESTING INTEGRATION NOTES
 ## GitHub Issue Management
 
 ```
-# GitHub Issue Management Request
+# GitHub Issue Wrapup Request
 
 ## Context
 I've completed this feature:
@@ -686,7 +686,11 @@ I've completed this feature:
 [PASTE IMPLEMENTATION SUMMARY]
 
 ## Request
-Help me prepare GitHub issue updates and draft a commit message.
+Help me prepare GitHub issue updates/creation/closure and draft a commit message.
+* Do not change existing issue body content, other than adding strikeouts + updates, or checking checkboxes
+* All other commentary should be in issue comments
+* Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
+* Use the templates in /Users/jackhaas/Projects/narraitor/.github/ISSUE_TEMPLATE
 
 ## Scope Focus
 - Focus only on what was actually implemented
@@ -714,8 +718,7 @@ Feature completed with the following changes:
 All tests are passing and the feature has been manually verified.
 ```
 
-FOLLOW-UP ISSUES
-Create these issues:
+ISSUES HANDLED
 1. Title: [issue title]
    Description: [brief description]
    Labels: [labels]
@@ -723,20 +726,3 @@ Create these issues:
 2. Title: [issue title]
    Description: [brief description]
    Labels: [labels]
-
-COMMIT MESSAGE
-```
-[type](scope): Brief description
-
-- Change detail 1
-- Change detail 2
-
-Issue: #[number]
-```
-```
-
-## Related Documents
-- [[updated-claude-app-workflow|Updated Claude App Workflow]]
-- [[coding-naming-conventions|Coding Naming Conventions]]
-- [[claude-app-mcp-optimization|MCP Optimization Guide]]
-- [[user-story-workflow|User Story Workflow]]

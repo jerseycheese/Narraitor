@@ -20,7 +20,8 @@ jest.mock('next/navigation', () => ({
 
 // Mock crypto.randomUUID for Jest environment (jsdom)
 if (typeof global.self === 'undefined') {
-  global.self = global;
+  // Type assertion to satisfy TypeScript's type checking
+  global.self = global as unknown as Window & typeof globalThis;
 }
 
 Object.defineProperty(global.self, 'crypto', {
