@@ -6,3 +6,4 @@ export * from './config';
 export * from './errors';
 export { AIPromptProcessor } from './aiPromptProcessor';
 export { GeminiClient } from './geminiClient';
+export { ResponseFormatter } from './responseFormatter';

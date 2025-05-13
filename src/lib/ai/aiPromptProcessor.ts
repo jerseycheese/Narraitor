@@ -3,6 +3,7 @@
 import { PromptTemplateManager } from '../promptTemplates/promptTemplateManager';
 import { AIConfig, AIResponse, AIPromptProcessorOptions } from './types';
 import { GeminiClient } from './geminiClient';
+import { ResponseFormatter } from './responseFormatter';
 
 /**
  * Integration layer between PromptTemplateManager and AI service
@@ -12,6 +13,7 @@ export class AIPromptProcessor {
   private templateManager: PromptTemplateManager;
   private client: GeminiClient;
   private config: AIConfig;
+  private formatter: ResponseFormatter;
 
   /**
    * Creates a new AIPromptProcessor instance
@@ -32,13 +34,14 @@ export class AIPromptProcessor {
       maxRetries: options.config.maxRetries,
       timeout: options.config.timeout
     });
+    this.formatter = new ResponseFormatter();
   }
 
   /**
    * Processes a template and sends it to the AI service
    * @param templateId - ID of the template to process
    * @param variables - Variables to substitute in the template
-   * @returns Promise resolving to AI response
+   * @returns Promise resolving to AI response with formatted content
    * @throws Error if template not found or AI service fails
    */
   async processAndSend(templateId: string, variables: Record<string, string>): Promise<AIResponse> {
@@ -54,14 +57,23 @@ export class AIPromptProcessor {
     }
 
     // Send to AI service
+    let response: AIResponse;
     try {
-      const response = await this.client.generateContent(processedPrompt);
-      return response;
+      response = await this.client.generateContent(processedPrompt);
     } catch (error) {
       if (error instanceof Error) {
         throw error;
       }
       throw new Error('Unknown error occurred');
+    }
+
+    // Apply formatting based on template type
+    try {
+      const formattingOptions = this.formatter.getFormattingOptionsForTemplate(templateId);
+      return this.formatter.format(response, formattingOptions);
+    } catch {
+      // If formatting fails, return the original response
+      return response;
     }
   }
 }

@@ -72,6 +72,64 @@ All content filters are set to `BLOCK_NONE` for maximum creative freedom:
 - HARM_CATEGORY_HARASSMENT
 - HARM_CATEGORY_DANGEROUS_CONTENT
 
+## Text Formatting Integration
+
+The AI service now includes automatic text formatting for improved readability of AI-generated content.
+
+### ResponseFormatter
+
+Formats AI responses based on template type with appropriate styling options.
+
+```typescript
+const formatter = new ResponseFormatter();
+const formattedResponse = formatter.format(aiResponse, {
+  formatDialogue: true,
+  enableItalics: true
+});
+```
+
+### Template-Specific Formatting
+
+Different template types apply different formatting options:
+
+- **Narrative**: Dialogue formatting + italics
+- **Dialogue**: Dialogue formatting only  
+- **Journal**: Italics only
+- **Default**: No formatting
+
+### Updated AIResponse Interface
+
+```typescript
+interface AIResponse {
+  content: string;
+  finishReason: string;
+  promptTokens?: number;
+  completionTokens?: number;
+  formattedContent?: string;  // NEW: Formatted version of content
+  formattingOptions?: FormattingOptions;  // NEW: Applied formatting options
+}
+```
+
+### Usage with AIPromptProcessor
+
+Formatting is automatically applied based on template type:
+
+```typescript
+const response = await processor.processAndSend('narrative-scene', variables);
+console.log(response.formattedContent); // Automatically formatted
+```
+
+### Formatting Options
+
+```typescript
+interface FormattingOptions {
+  preserveLineBreaks?: boolean;
+  formatDialogue?: boolean;  
+  enableItalics?: boolean;
+  paragraphSpacing?: 'single' | 'double';
+}
+```
+
 ## Error Handling
 
 ### Retry Logic
@@ -146,13 +204,14 @@ const processor = new AIPromptProcessor({
   config: getAIConfig()
 });
 
-// Generate content
+// Generate content with automatic formatting
 try {
   const response = await processor.processAndSend('narrative-intro', {
     characterName: 'John the Brave',
     location: 'Narraitor Castle'
   });
-  console.log(response.content);
+  console.log(response.content);          // Raw content
+  console.log(response.formattedContent); // Formatted content
 } catch (error) {
   console.error('AI generation failed:', error.message);
 }
@@ -174,6 +233,8 @@ const emptyResponse = mockResponses.empty;
 
 ```bash
 npm test src/lib/ai/__tests__/geminiClient.test.ts
+npm test src/lib/ai/__tests__/responseFormatter.test.ts
+npm test src/lib/ai/__tests__/aiPromptProcessor.test.ts
 ```
 
 ## API Reference
@@ -195,6 +256,8 @@ interface AIResponse {
   finishReason: string;
   promptTokens?: number;
   completionTokens?: number;
+  formattedContent?: string;
+  formattingOptions?: FormattingOptions;
 }
 
 interface GenerationConfig {
@@ -207,6 +270,13 @@ interface GenerationConfig {
 interface SafetySetting {
   category: string;
   threshold: string;
+}
+
+interface FormattingOptions {
+  preserveLineBreaks?: boolean;
+  formatDialogue?: boolean;
+  enableItalics?: boolean;
+  paragraphSpacing?: 'single' | 'double';
 }
 ```
 
