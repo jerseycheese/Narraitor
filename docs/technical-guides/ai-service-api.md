@@ -2,13 +2,28 @@
 
 ## Overview
 
-The AI Service Integration provides a bridge between the PromptTemplateManager and Google Gemini AI service for dynamic narrative generation.
+The AI Service Integration provides a bridge between the Narraitor application and Google's Generative AI (Gemini) service for dynamic narrative generation.
 
 ## Core Components
 
+### GeminiClient
+
+Low-level client for direct communication with the Google Generative AI SDK.
+
+```typescript
+const client = new GeminiClient({
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  modelName: 'gemini-2.0-flash',
+  maxRetries: 3,
+  timeout: 30000
+});
+
+const response = await client.generateContent('Generate a story');
+```
+
 ### AIPromptProcessor
 
-Main integration class that processes templates and sends them to the AI service.
+High-level integration that processes templates and manages AI requests.
 
 ```typescript
 const processor = new AIPromptProcessor({
@@ -17,18 +32,51 @@ const processor = new AIPromptProcessor({
 });
 ```
 
-### Configuration
+## Configuration
 
-Uses environment variables for API configuration:
+### Environment Variables
 
 - `NEXT_PUBLIC_GEMINI_API_KEY` - Google Gemini API key
-- Model: `gemini-1.5-flash-latest` (default)
-- Max Retries: 3
-- Timeout: 30000ms
 
-### Error Handling
+### Default Configuration
 
-The system categorizes errors as retryable or non-retryable:
+```typescript
+export const getAIConfig = (): AIConfig => {
+  return {
+    geminiApiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '',
+    modelName: 'gemini-2.0-flash',
+    maxRetries: 3,
+    timeout: 30000
+  };
+};
+```
+
+### Generation Settings
+
+```typescript
+export const getGenerationConfig = (): GenerationConfig => {
+  return {
+    temperature: 0.7,
+    topP: 1.0,
+    topK: 40,
+    maxOutputTokens: 2048
+  };
+};
+```
+
+### Safety Settings
+
+All content filters are set to `BLOCK_NONE` for maximum creative freedom:
+- HARM_CATEGORY_SEXUALLY_EXPLICIT
+- HARM_CATEGORY_HATE_SPEECH  
+- HARM_CATEGORY_HARASSMENT
+- HARM_CATEGORY_DANGEROUS_CONTENT
+
+## Error Handling
+
+### Retry Logic
+
+The system implements automatic retry with exponential backoff for transient errors:
 
 **Retryable errors:**
 - Network errors
@@ -40,11 +88,45 @@ The system categorizes errors as retryable or non-retryable:
 - Invalid API key
 - Invalid request format
 
-## Usage Example
+### Error Types
+
+```typescript
+interface AIServiceError {
+  code: string;
+  message: string;
+  retryable: boolean;
+}
+```
+
+## Usage Examples
+
+### Basic Content Generation
+
+```typescript
+import { GeminiClient } from '@/lib/ai';
+
+const config = {
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  modelName: 'gemini-2.0-flash',
+  maxRetries: 3,
+  timeout: 30000
+};
+
+const client = new GeminiClient(config);
+
+try {
+  const response = await client.generateContent('Tell me a story');
+  console.log(response.content);
+} catch (error) {
+  console.error('Generation failed:', error.message);
+}
+```
+
+### With Template Processing
 
 ```typescript
 import { AIPromptProcessor, getAIConfig } from '@/lib/ai';
-import { PromptTemplateManager } from '@/lib/promptTemplates';
+import { PromptTemplateManager, PromptType } from '@/lib/promptTemplates';
 
 // Initialize template manager
 const templateManager = new PromptTemplateManager();
@@ -68,31 +150,13 @@ const processor = new AIPromptProcessor({
 try {
   const response = await processor.processAndSend('narrative-intro', {
     characterName: 'John the Brave',
-    location: 'Narraitor'
+    location: 'Narraitor Castle'
   });
   console.log(response.content);
 } catch (error) {
   console.error('AI generation failed:', error.message);
 }
 ```
-
-## Error Types
-
-### AIServiceError
-```typescript
-interface AIServiceError {
-  code: string;
-  message: string;
-  retryable: boolean;
-}
-```
-
-### Common Error Codes
-- `NETWORK_ERROR` - Network connection issues
-- `TIMEOUT` - Request exceeded timeout
-- `RATE_LIMIT` - Too many requests
-- `AUTH_ERROR` - Authentication failed
-- `INVALID_REQUEST` - Invalid request format
 
 ## Testing
 
@@ -106,9 +170,59 @@ const successResponse = mockResponses.success;
 const emptyResponse = mockResponses.empty;
 ```
 
+### Running Tests
+
+```bash
+npm test src/lib/ai/__tests__/geminiClient.test.ts
+```
+
+## API Reference
+
+### Interfaces
+
+```typescript
+interface AIServiceConfig {
+  apiKey: string;
+  modelName: string;
+  maxRetries: number;
+  timeout: number;
+  generationConfig?: GenerationConfig;
+  safetySettings?: SafetySetting[];
+}
+
+interface AIResponse {
+  content: string;
+  finishReason: string;
+  promptTokens?: number;
+  completionTokens?: number;
+}
+
+interface GenerationConfig {
+  temperature?: number;
+  topP?: number;
+  topK?: number;
+  maxOutputTokens?: number;
+}
+
+interface SafetySetting {
+  category: string;
+  threshold: string;
+}
+```
+
+## Migration from Previous SDK
+
+This implementation uses the new `@google/genai` SDK (currently in preview) which is recommended by Google. Key differences:
+
+- Import: `import { GoogleGenAI } from '@google/genai'`
+- Client initialization: `new GoogleGenAI({ apiKey })`
+- Content generation: `genAI.models.generateContent()`
+
 ## Future Enhancements
 
-- Token usage tracking
-- Response caching
+- Token usage tracking and cost monitoring
+- Response caching for improved performance
+- Support for streaming responses
 - Multiple AI provider support
 - Advanced retry strategies
+- Context window management

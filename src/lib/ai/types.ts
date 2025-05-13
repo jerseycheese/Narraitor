@@ -8,6 +8,8 @@ export interface AIServiceConfig {
   modelName: string;
   maxRetries: number;
   timeout: number;
+  generationConfig?: GenerationConfig;
+  safetySettings?: SafetySetting[];
 }
 
 /**
@@ -27,6 +29,24 @@ export interface AIResponse {
   finishReason: string;
   promptTokens?: number;
   completionTokens?: number;
+}
+
+/**
+ * Generation configuration for AI model
+ */
+export interface GenerationConfig {
+  temperature?: number;
+  topP?: number;
+  topK?: number;
+  maxOutputTokens?: number;
+}
+
+/**
+ * Safety settings for AI model
+ */
+export interface SafetySetting {
+  category: string;
+  threshold: string;
 }
 
 /**

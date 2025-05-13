@@ -1,6 +1,6 @@
 // src/lib/ai/config.ts
 
-import { AIConfig } from './types';
+import { AIConfig, GenerationConfig, SafetySetting } from './types';
 
 /**
  * Gets AI configuration from environment variables
@@ -14,4 +14,30 @@ export const getAIConfig = (): AIConfig => {
     maxRetries: 3,
     timeout: 30000
   };
+};
+
+/**
+ * Gets generation configuration for AI model
+ * @returns Generation configuration
+ */
+export const getGenerationConfig = (): GenerationConfig => {
+  return {
+    temperature: 0.7,
+    topP: 1.0,
+    topK: 40,
+    maxOutputTokens: 2048
+  };
+};
+
+/**
+ * Gets safety settings for AI model
+ * @returns Safety settings array
+ */
+export const getSafetySettings = (): SafetySetting[] => {
+  return [
+    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+  ];
 };

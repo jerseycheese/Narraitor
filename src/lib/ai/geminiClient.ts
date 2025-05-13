@@ -1,17 +1,27 @@
 // src/lib/ai/geminiClient.ts
 
+import { GoogleGenAI } from '@google/genai';
 import { AIResponse, AIServiceConfig } from './types';
 import { isRetryableError } from './errors';
+import { getGenerationConfig, getSafetySettings } from './config';
 
 /**
  * Client for Google Gemini AI service
- * This is a placeholder implementation since the actual SDK is not installed
+ * Using the new @google/genai SDK
  */
 export class GeminiClient {
   private config: AIServiceConfig;
+  private genAI: GoogleGenAI;
   
   constructor(config: AIServiceConfig) {
-    this.config = config;
+    this.config = {
+      ...config,
+      generationConfig: config.generationConfig || getGenerationConfig(),
+      safetySettings: config.safetySettings || getSafetySettings()
+    };
+    
+    // Initialize Google Generative AI with new SDK pattern
+    this.genAI = new GoogleGenAI({ apiKey: this.config.apiKey });
   }
 
   /**
@@ -25,8 +35,6 @@ export class GeminiClient {
 
     while (attempts < this.config.maxRetries) {
       try {
-        // Placeholder implementation for tests
-        // In real implementation, this would use Google Generative AI SDK
         const response = await this.makeRequest(prompt);
         return response;
       } catch (error) {
@@ -48,18 +56,23 @@ export class GeminiClient {
   }
 
   /**
-   * Makes the actual API request (placeholder for tests)
-   * @param prompt - The prompt to send (unused in placeholder)
+   * Makes the actual API request using Google Generative AI SDK
+   * @param prompt - The prompt to send
    * @returns Promise resolving to AI response
    */
   private async makeRequest(prompt: string): Promise<AIResponse> {
-    // Placeholder implementation - prompt parameter will be used in actual implementation
-    // Tests will mock this behavior
-    void prompt; // Explicitly void the parameter to satisfy linter
+    const response = await this.genAI.models.generateContent({
+      model: this.config.modelName,
+      contents: prompt,
+      config: {
+        generationConfig: this.config.generationConfig,
+        safetySettings: this.config.safetySettings
+      }
+    });
     
     return {
-      content: 'Generated response',
-      finishReason: 'STOP',
+      content: response.text || '',
+      finishReason: response.result?.finishReason || 'STOP',
       promptTokens: undefined,
       completionTokens: undefined
     };
