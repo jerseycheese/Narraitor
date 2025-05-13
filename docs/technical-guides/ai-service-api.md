@@ -156,6 +156,87 @@ interface AIServiceError {
 }
 ```
 
+### User-Friendly Error Handling
+
+The AI service includes a user-friendly error display system that maps technical errors to human-readable messages.
+
+#### Error Display Component
+
+The ErrorMessage component provides user-friendly error display:
+
+```typescript
+import ErrorMessage from '@/lib/components/ErrorMessage';
+
+function MyComponent() {
+  const [error, setError] = useState<Error | null>(null);
+  
+  const handleRetry = async () => {
+    setError(null);
+    // Retry logic
+  };
+  
+  return (
+    <div>
+      <ErrorMessage 
+        error={error}
+        onRetry={handleRetry}
+        onDismiss={() => setError(null)}
+      />
+      {/* Other content */}
+    </div>
+  );
+}
+```
+
+#### Error Mapping
+
+Technical errors are automatically mapped to user-friendly messages:
+
+- Network errors → "Connection Problem"
+- Timeout errors → "Request Timed Out"  
+- Rate limit errors → "Too Many Requests"
+- Authentication errors → "Authentication Error"
+- Unknown errors → "Something Went Wrong"
+
+#### Integration Example
+
+```typescript
+function NarrativeGenerator() {
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(false);
+  
+  const generateNarrative = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await processor.processAndSend('narrative-scene', {
+        scene: 'tavern',
+        character: 'hero'
+      });
+      // Handle successful response
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <div>
+      <ErrorMessage 
+        error={error}
+        onRetry={generateNarrative}
+        onDismiss={() => setError(null)}
+      />
+      <button onClick={generateNarrative} disabled={loading}>
+        Generate Narrative
+      </button>
+    </div>
+  );
+}
+```
+
 ## Usage Examples
 
 ### Basic Content Generation
@@ -235,6 +316,7 @@ const emptyResponse = mockResponses.empty;
 npm test src/lib/ai/__tests__/geminiClient.test.ts
 npm test src/lib/ai/__tests__/responseFormatter.test.ts
 npm test src/lib/ai/__tests__/aiPromptProcessor.test.ts
+npm test src/lib/ai/__tests__/userFriendlyErrors.test.ts
 ```
 
 ## API Reference
@@ -277,6 +359,13 @@ interface FormattingOptions {
   formatDialogue?: boolean;
   enableItalics?: boolean;
   paragraphSpacing?: 'single' | 'double';
+}
+
+interface UserFriendlyError {
+  title: string;
+  message: string;
+  actionLabel?: string;
+  retryable: boolean;
 }
 ```
 
