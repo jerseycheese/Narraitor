@@ -331,7 +331,7 @@ I've implemented this feature and all automated tests are now passing:
 [PASTE COMPONENT SUMMARY]
 
 ## Request
-Help me plan manual testing steps to verify this implementation works as expected in real usage.
+Help me plan manual testing steps to verify this implementation works as expected in real usage, given the current state of the codebase.
 
 ## Scope Boundaries
 - Only test functionality within the defined scope
@@ -688,7 +688,7 @@ I've completed this feature:
 [PASTE IMPLEMENTATION SUMMARY]
 
 ## Request
-Help me prepare GitHub issue updates/creation/closure using your Github MCP tools.
+Help me prepare GitHub issue/epic updates/creation/closures using your Github MCP tools.
 * Do not change existing issue body content, other than adding strikeouts + updates, or checking checkboxes
 * All other commentary should be in issue comments
 * Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
