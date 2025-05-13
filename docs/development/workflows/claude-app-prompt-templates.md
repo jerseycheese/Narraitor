@@ -48,11 +48,12 @@ Help me select and analyze the next task to implement, following KISS principles
 
 ## Information Access
 Please use MCP tools to:
-1. Review open issues at https://github.com/jerseycheese/narraitor/issues
-2. Review the roadmap at `/Users/jackhaas/Projects/narraitor/docs/development-roadmap.md`
-3. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
-4. Check project structure at `/Users/jackhaas/Projects/narraitor/src`
-5. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
+1. Review the Github project at https://github.com/users/jerseycheese/projects/3
+2. Review open issues at https://github.com/jerseycheese/narraitor/issues
+3. Review the roadmap at `/Users/jackhaas/Projects/narraitor/docs/development-roadmap.md`
+4. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
+5. Check project structure at `/Users/jackhaas/Projects/narraitor/src`
+6. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
 
 ## Scope Constraints
 - Focus only on the current issue without adding enhancements
