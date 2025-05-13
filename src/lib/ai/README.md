@@ -7,6 +7,7 @@ This module provides integration with Google's Generative AI (Gemini) for dynami
 The AI service integration consists of several key components:
 - `GeminiClient`: Handles direct communication with the Google Generative AI SDK
 - `AIPromptProcessor`: Processes templates and manages AI requests
+- `ResponseFormatter`: Formats AI responses with context-appropriate text styling
 - Configuration utilities for managing API settings
 - Comprehensive error handling with retry logic
 
@@ -43,7 +44,7 @@ const response = await client.generateContent('Tell me a story');
 console.log(response.content);
 ```
 
-### With Template Processing
+### With Template Processing and Formatting
 
 ```typescript
 import { AIPromptProcessor, getAIConfig } from '@/lib/ai';
@@ -59,6 +60,10 @@ const response = await processor.processAndSend('narrative-intro', {
   characterName: 'Hero',
   location: 'Castle'
 });
+
+// Access both raw and formatted content
+console.log(response.content);          // Raw AI response
+console.log(response.formattedContent); // Formatted with dialogue and italics
 ```
 
 ## API Reference
@@ -76,6 +81,19 @@ generateContent(prompt: string): Promise<AIResponse>
 ```
 
 Generates content based on the provided prompt with automatic retry logic for transient errors.
+
+### ResponseFormatter
+
+#### Methods
+```typescript
+format(response: AIResponse, options?: FormattingOptions): AIResponse
+getFormattingOptionsForTemplate(templateType: string): FormattingOptions
+```
+
+Formats AI responses based on template type:
+- **Narrative**: Dialogue formatting + italics
+- **Dialogue**: Dialogue formatting only
+- **Journal**: Italics only
 
 ### Configuration Options
 
@@ -119,6 +137,8 @@ The module includes comprehensive test coverage with mocked SDK interactions:
 
 ```bash
 npm test src/lib/ai/__tests__/geminiClient.test.ts
+npm test src/lib/ai/__tests__/responseFormatter.test.ts
+npm test src/lib/ai/__tests__/aiPromptProcessor.test.ts
 ```
 
 ## Future Enhancements

@@ -1,5 +1,7 @@
 // src/lib/ai/types.ts
 
+import { FormattingOptions } from '../utils/textFormatter';
+
 /**
  * Configuration interface for AI service
  */
@@ -29,6 +31,8 @@ export interface AIResponse {
   finishReason: string;
   promptTokens?: number;
   completionTokens?: number;
+  formattedContent?: string;
+  formattingOptions?: FormattingOptions;
 }
 
 /**

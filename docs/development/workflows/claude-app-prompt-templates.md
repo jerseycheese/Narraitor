@@ -373,8 +373,9 @@ Help me review, clean up, and document this implementation.
 Please use MCP to:
 1. Review the implemented files
 2. Check for cleanup opportunities
-3. Review existing documentation structure in `/Users/jackhaas/Projects/narraitor/docs`
-4. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+3. Check for overly large files (>400 lines) that should be refactored into smaller files
+4. Review existing documentation structure in `/Users/jackhaas/Projects/narraitor/docs`
+5. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
 
 ## Output Format
 Please provide a response with these sections:
