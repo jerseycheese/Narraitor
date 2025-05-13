@@ -105,8 +105,7 @@ interface AIResponse {
   finishReason: string;
   promptTokens?: number;
   completionTokens?: number;
-  formattedContent?: string;  // NEW: Formatted version of content
-  formattingOptions?: FormattingOptions;  // NEW: Applied formatting options
+  formattedContent?: string;
 }
 ```
 
@@ -121,14 +120,6 @@ console.log(response.formattedContent); // Automatically formatted
 
 ### Formatting Options
 
-```typescript
-interface FormattingOptions {
-  preserveLineBreaks?: boolean;
-  formatDialogue?: boolean;  
-  enableItalics?: boolean;
-  paragraphSpacing?: 'single' | 'double';
-}
-```
 
 ## Error Handling
 
@@ -329,43 +320,6 @@ interface AIServiceConfig {
   modelName: string;
   maxRetries: number;
   timeout: number;
-  generationConfig?: GenerationConfig;
-  safetySettings?: SafetySetting[];
-}
-
-interface AIResponse {
-  content: string;
-  finishReason: string;
-  promptTokens?: number;
-  completionTokens?: number;
-  formattedContent?: string;
-  formattingOptions?: FormattingOptions;
-}
-
-interface GenerationConfig {
-  temperature?: number;
-  topP?: number;
-  topK?: number;
-  maxOutputTokens?: number;
-}
-
-interface SafetySetting {
-  category: string;
-  threshold: string;
-}
-
-interface FormattingOptions {
-  preserveLineBreaks?: boolean;
-  formatDialogue?: boolean;
-  enableItalics?: boolean;
-  paragraphSpacing?: 'single' | 'double';
-}
-
-interface UserFriendlyError {
-  title: string;
-  message: string;
-  actionLabel?: string;
-  retryable: boolean;
 }
 ```
 
