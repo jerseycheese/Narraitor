@@ -11,6 +11,7 @@ export const createMockWorld = (overrides = {}): WorldContext => ({
   skills: [
     { id: 'skill-1', name: 'Swordsmanship', description: 'Blade mastery' }
   ],
+  lore: [], // Added for testing complex structures
   ...overrides
 });
 
@@ -25,5 +26,7 @@ export const createMockCharacter = (overrides = {}): CharacterContext => ({
   skills: [
     { skillId: 'skill-1', name: 'Swordsmanship', value: 3 }
   ],
+  inventory: [], // Assuming inventory is part of base CharacterContext
+  knownPeople: [], // Added for testing complex structures
   ...overrides
 });

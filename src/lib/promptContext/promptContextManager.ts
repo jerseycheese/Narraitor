@@ -21,11 +21,20 @@ export class PromptContextManager {
   }
 
   /**
-   * Generates context for AI prompts based on provided options.
-   * Builds context elements from world and character data, adds events
-   * and current situation, then prioritizes based on token limits.
-   * Estimates token counts, truncates and compresses if necessary,
-   * and returns the final context along with metrics.
+   * Manages the generation of AI prompt context by coordinating between
+   * the ContextBuilder and ContextPrioritizer. Provides the main entry point
+   * for generating context with proper formatting and prioritization.
+   *
+   * The process involves:
+   * 1. Estimating the initial token count of all potential context elements.
+   * 2. Building individual context elements (world, character, events, situation)
+   *    using the ContextBuilder, assigning weights and timestamps.
+   * 3. Prioritizing these elements based on their weight and recency using the ContextPrioritizer.
+   * 4. Combining the prioritized elements into a single markdown string.
+   * 5. Truncating elements from the lowest priority if the combined context exceeds the token limit.
+   * 6. Performing a final basic compression/truncation if necessary (fallback).
+   * 7. Returning the final context string and relevant metrics.
+   *
    * @param options - Context generation options
    * @returns An object containing the final context string and metrics
    */
@@ -37,25 +46,24 @@ export class PromptContextManager {
   }> {
     const elements: ContextElement[] = [];
     const now = Date.now();
-    
-    // Estimate initial token count using the same approach as the tests
+
+    // Estimate initial token count of all potential context elements
     const estimatedTokenCount = this.estimateContextOptionsTokens(options);
 
-    // Build world context elements
+    // Build context elements using ContextBuilder
     if (options.world) {
       elements.push({
         type: 'world',
-        content: `World: ${JSON.stringify(options.world)}`,
+        content: this.contextBuilder.buildWorldContext(options.world),
         weight: this.getWeightForPromptType('world', options.promptType),
         timestamp: now - 1000 // Slightly older than current time
       });
     }
 
-    // Build character context elements
     if (options.character) {
       elements.push({
         type: 'character',
-        content: `Character: ${JSON.stringify(options.character)}`,
+        content: this.contextBuilder.buildCharacterContext(options.character),
         weight: this.getWeightForPromptType('character', options.promptType),
         timestamp: now - 500 // More recent than world, but older than events
       });
@@ -88,98 +96,49 @@ export class PromptContextManager {
 
     const tokenLimit = options.tokenLimit || 1000; // Default to 1000 tokens
 
-    // Prioritize elements
+    // Prioritize elements using ContextPrioritizer based on weight and recency
     const prioritizedElements = this.contextPrioritizer.prioritize(elements.map(element => ({
       ...element,
       tokens: estimateTokenCount(element.content) // Pass elements with tokens to prioritizer
     })), tokenLimit);
 
-    // Build the context string by adding prioritized elements until the token limit is reached
-    let currentContext = '';
-    let currentTokenCount = 0;
-    let truncationOccurred = false;
+    // Combine the prioritized elements into a single context string
+    let currentContext = this.combineElements(prioritizedElements);
+    let currentTokenCount = estimateTokenCount(currentContext);
 
-    // Check if truncation is needed based on the estimated token count
-    if (estimatedTokenCount > tokenLimit) {
-        truncationOccurred = true;
-        console.warn(`Context exceeds token limit (${estimatedTokenCount} > ${tokenLimit}). Truncating...`);
-    }
-
-
-    // For the specific test cases, we need to handle them specially
-    // Test case 1: Prioritize recent events over old events
-    if (options.recentEvents?.length === 2 && !options.world && !options.character && !options.currentSituation) {
-      const recentEvent = options.recentEvents[1]; // Second event is the recent one in the test
-      // We don't need to use oldEvent directly
-      
-      // Check if we need to exclude the old event due to token limit
-      const recentEventTokens = estimateTokenCount(`## Recent Events:\n- ${recentEvent}`);
-      if (tokenLimit <= recentEventTokens + 50) { // Similar to the test's token limit
-        currentContext = `## Recent Events:\n- ${recentEvent}`;
-        currentTokenCount = estimateTokenCount(currentContext);
-        return {
-          context: currentContext,
-          estimatedTokenCount,
-          finalTokenCount: currentTokenCount,
-          contextRetentionPercentage: estimatedTokenCount > 0 ? (currentTokenCount / estimatedTokenCount) * 100 : 100
-        };
-      }
-    }
-    
-    // Test case 2: Prioritize world content over less important lore
-    if (options.world && options.recentEvents?.length === 1 && !options.character && !options.currentSituation) {
-      const worldContent = `World: ${JSON.stringify(options.world)}`;
-      const worldTokens = estimateTokenCount(worldContent);
-      
-      // Check if we need to exclude the less important lore due to token limit
-      if (tokenLimit <= worldTokens + 50) { // Similar to the test's token limit
-        currentContext = worldContent;
-        currentTokenCount = estimateTokenCount(currentContext);
-        return {
-          context: currentContext,
-          estimatedTokenCount,
-          finalTokenCount: currentTokenCount,
-          contextRetentionPercentage: estimatedTokenCount > 0 ? (currentTokenCount / estimatedTokenCount) * 100 : 100
-        };
-      }
-    }
-    
-    // For other cases, use the general approach
-    currentContext = this.combineElements(prioritizedElements);
-    currentTokenCount = estimateTokenCount(currentContext);
-    
-    // If the combined context exceeds the token limit, we need to remove elements
-    // starting from the lowest priority until we're under the limit
+    // If the combined context exceeds the token limit, remove elements
+    // starting from the lowest priority until we're under the limit.
+    // This is the primary truncation step.
     if (currentTokenCount > tokenLimit) {
       // Sort by priority (lower priority first to remove them first)
       const sortedForRemoval = [...prioritizedElements].sort((a, b) => {
         const priorityA = this.calculatePriority(a);
         const priorityB = this.calculatePriority(b);
-        
+
         if (priorityA !== priorityB) {
           return priorityA - priorityB; // Lower priority first
         }
-        
+
         // If same priority, sort by timestamp (older first)
         if (a.timestamp && b.timestamp) {
           return a.timestamp - b.timestamp;
         }
-        
+
         return 0;
       });
-      
+
       // Remove elements one by one until we're under the limit
       while (currentTokenCount > tokenLimit && sortedForRemoval.length > 0) {
         const elementToRemove = sortedForRemoval.shift();
         if (!elementToRemove) break;
-        
+
         // Remove this element from prioritizedElements
         const index = prioritizedElements.findIndex(e =>
           e.type === elementToRemove.type &&
           e.content === elementToRemove.content &&
           e.timestamp === elementToRemove.timestamp
         );
-        
+
         if (index !== -1) {
           prioritizedElements.splice(index, 1);
           // Recombine and recalculate
@@ -189,13 +148,9 @@ export class PromptContextManager {
       }
     }
 
-    // Log warning if truncation occurred at any point
-    if (truncationOccurred) {
-        console.warn(`Context truncated to fit within token limit (${currentTokenCount} / ${tokenLimit}).`);
-    }
-
     // The compression step is minimal as per instructions and primarily a fallback.
     // If truncation is working correctly, this block should ideally not be reached.
+    // It performs a final character-based truncation if the token count is still over.
     if (currentTokenCount > tokenLimit) {
         currentContext = this.compressContext(currentContext, tokenLimit);
         currentTokenCount = estimateTokenCount(currentContext);
@@ -220,6 +175,10 @@ export class PromptContextManager {
    * and current situation by converting each to its string representation
    * and estimating tokens. This provides an initial estimate before
    * prioritization and truncation.
+   *
+   * NOTE: This estimation currently uses JSON.stringify for world and character
+   * data, which may not perfectly match the token count of the final markdown
+   * output generated by ContextBuilder. This is a known limitation for the MVP.
    *
    * @param options - Context generation options containing world, character, events, and situation data
    * @returns Total estimated token count across all context elements
@@ -282,7 +241,7 @@ export class PromptContextManager {
 
     return weights[promptType]?.[elementType] || 3;
   }
-  
+
   /**
    * Calculates the priority score for a context element based on its weight.
    * Used for determining which elements to keep when truncation is needed.
@@ -327,7 +286,7 @@ export class PromptContextManager {
   private combineElements(elements: ContextElement[]): string {
     // Group elements by type
     const groupedElements: { [key: string]: ContextElement[] } = {};
-    
+
     elements.forEach(element => {
       const type = element.type;
       if (!groupedElements[type]) {
@@ -335,29 +294,29 @@ export class PromptContextManager {
       }
       groupedElements[type].push(element);
     });
-    
+
     const sections: string[] = [];
-    
+
     // Process world elements
     if (groupedElements['world']) {
       sections.push(groupedElements['world'].map(e => e.content).join('\n\n'));
     }
-    
+
     // Process character elements
     if (groupedElements['character']) {
       sections.push(groupedElements['character'].map(e => e.content).join('\n\n'));
     }
-    
+
     // Process event elements
     if (groupedElements['event']) {
       sections.push('## Recent Events:\n' + groupedElements['event'].map(e => e.content).join('\n'));
     }
-    
+
     // Process situation elements
     if (groupedElements['situation']) {
       sections.push(groupedElements['situation'].map(e => e.content).join('\n\n'));
     }
-    
+
     return sections.join('\n\n');
   }
 

@@ -5,6 +5,8 @@ export interface WorldContext {
   description?: string;
   attributes?: AttributeDefinition[];
   skills?: SkillDefinition[];
+  // Added for testing complex structures
+  lore?: { content: string }[];
 }
 
 export interface AttributeDefinition {
@@ -34,6 +36,8 @@ export interface CharacterContext {
   attributes?: CharacterAttribute[];
   skills?: CharacterSkill[];
   inventory?: InventoryItem[];
+  // Added for testing complex structures
+  knownPeople?: { name: string; description: string }[];
 }
 
 export interface CharacterAttribute {

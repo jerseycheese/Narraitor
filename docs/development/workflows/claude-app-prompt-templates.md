@@ -687,11 +687,12 @@ I've completed this feature:
 [PASTE IMPLEMENTATION SUMMARY]
 
 ## Request
-Help me prepare GitHub issue updates/creation/closure and draft a commit message.
+Help me prepare GitHub issue updates/creation/closure. Use MCP tools to do so.
 * Do not change existing issue body content, other than adding strikeouts + updates, or checking checkboxes
 * All other commentary should be in issue comments
 * Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
 * Use the templates in /Users/jackhaas/Projects/narraitor/.github/ISSUE_TEMPLATE
+* Review revelant Related issues and update them accordingly
 
 ## Scope Focus
 - Focus only on what was actually implemented
