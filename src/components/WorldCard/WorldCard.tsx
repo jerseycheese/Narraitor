@@ -18,7 +18,17 @@ const WorldCard: React.FC<WorldCardProps> = ({ world, onSelect, onDelete }) => {
   };
 
   return (
-    <div data-testid="world-card" onClick={handleCardClick}>
+    <div
+      data-testid="world-card"
+      onClick={handleCardClick}
+      style={{
+        border: '1px solid #ccc',
+        padding: '10px',
+        margin: '10px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+      }}
+    >
       <h3 data-testid="world-card-name">{world.name}</h3>
       <p data-testid="world-card-description">{world.description}</p>
       <p data-testid="world-card-theme">Theme: {world.theme}</p>
