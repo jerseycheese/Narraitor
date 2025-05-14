@@ -7,11 +7,13 @@ import { World } from '../types/world.types';
  */
 
 // Define the initial state for the world store
+const getCurrentTimestamp = (): string => new Date().toISOString();
+
 const initialWorldState: World = {
   id: '',
   name: '',
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: getCurrentTimestamp(),
+  updatedAt: getCurrentTimestamp(),
   theme: '',
   attributes: [],
   skills: [],
