@@ -2,35 +2,12 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { World } from '../../../types/world.types';
-import type { WorldStore } from '../../../state/worldStore';
 
 // Create mock functions at the module level
 const mockFetchWorlds = jest.fn();
 const mockSetCurrentWorld = jest.fn();
 const mockDeleteWorld = jest.fn();
-
-// Import the actual worldStore to get its type
-import { worldStore as actualWorldStore } from '../../../state/worldStore';
-
-// Type the mocked worldStore properly
-type MockedWorldStore = jest.MockedFunction<typeof actualWorldStore> & {
-  getState: jest.MockedFunction<() => Pick<WorldStore, 'fetchWorlds' | 'setCurrentWorld' | 'deleteWorld'>>;
-};
-
-jest.mock('../../../state/worldStore', () => {
-  const mockWorldStore = jest.fn() as unknown as MockedWorldStore;
-
-  // Add getState to the mock with proper typing
-  mockWorldStore.getState = jest.fn().mockReturnValue({
-    fetchWorlds: mockFetchWorlds,
-    setCurrentWorld: mockSetCurrentWorld,
-    deleteWorld: mockDeleteWorld,
-  });
-
-  return {
-    worldStore: mockWorldStore,
-  };
-});
+const mockGetState = jest.fn();
 
 // Mock the child components
 jest.mock('../../WorldList/WorldList', () => {
@@ -72,20 +49,56 @@ jest.mock('../../DeleteConfirmationDialog/DeleteConfirmationDialog', () => {
   };
 });
 
+// Mock worldStore properly
+type MockWorldStore = {
+  worlds: Record<string, World>;
+  currentWorldId: string | null;
+  loading: boolean;
+  error: string | null;
+  fetchWorlds: jest.Mock;
+  setCurrentWorld: jest.Mock;
+  deleteWorld: jest.Mock;
+};
+
+let mockState: MockWorldStore = {
+  worlds: {},
+  currentWorldId: null,
+  loading: false,
+  error: null,
+  fetchWorlds: mockFetchWorlds,
+  setCurrentWorld: mockSetCurrentWorld,
+  deleteWorld: mockDeleteWorld,
+};
+
+// Mock the worldStore
+jest.mock('../../../state/worldStore', () => ({
+  worldStore: jest.fn((selector) => {
+    if (typeof selector === 'function') {
+      return selector(mockState);
+    }
+    return mockState;
+  })
+}));
+
+// Define type for worldStore function
+type WorldStoreFunction = {
+  (selector: (state: MockWorldStore) => unknown): unknown;
+  getState: () => MockWorldStore;
+};
+
+// Mock getState for the store
+(jest.requireMock('../../../state/worldStore').worldStore as WorldStoreFunction).getState = mockGetState;
+
 // Import after mocks are set up
 import WorldListScreen from '../WorldListScreen';
-import { worldStore } from '../../../state/worldStore';
-
-
-const mockedWorldStore = worldStore as MockedWorldStore;
 
 describe('WorldListScreen', () => {
   beforeEach(() => {
     // Clear all mocks
     jest.clearAllMocks();
-
-    // Set up default mock implementation
-    mockedWorldStore.mockImplementation((selector: (state: WorldStore) => unknown) => selector({
+    
+    // Reset mock state
+    mockState = {
       worlds: {},
       currentWorldId: null,
       loading: false,
@@ -93,80 +106,22 @@ describe('WorldListScreen', () => {
       fetchWorlds: mockFetchWorlds,
       setCurrentWorld: mockSetCurrentWorld,
       deleteWorld: mockDeleteWorld,
-      createWorld: jest.fn(),
-      updateWorld: jest.fn(),
-      addAttribute: jest.fn(),
-      updateAttribute: jest.fn(),
-      removeAttribute: jest.fn(),
-      addSkill: jest.fn(),
-      updateSkill: jest.fn(),
-      removeSkill: jest.fn(),
-      updateSettings: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-    }));
-
-    // Reset getState
-    mockedWorldStore.getState.mockReturnValue({
-      fetchWorlds: mockFetchWorlds,
-      setCurrentWorld: mockSetCurrentWorld,
-      deleteWorld: mockDeleteWorld,
-    });
+    };
+    
+    // Setup getState to return current mock state
+    mockGetState.mockReturnValue(mockState);
   });
 
   test('renders loading indicator when loading', () => {
-    mockedWorldStore.mockImplementationOnce((selector: (state: WorldStore) => unknown) => selector({
-      worlds: {},
-      currentWorldId: null,
-      loading: true,
-      error: null,
-      fetchWorlds: mockFetchWorlds,
-      setCurrentWorld: mockSetCurrentWorld,
-      deleteWorld: mockDeleteWorld,
-      createWorld: jest.fn(),
-      updateWorld: jest.fn(),
-      addAttribute: jest.fn(),
-      updateAttribute: jest.fn(),
-      removeAttribute: jest.fn(),
-      addSkill: jest.fn(),
-      updateSkill: jest.fn(),
-      removeSkill: jest.fn(),
-      updateSettings: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-    }));
+    mockState.loading = true;
 
     render(<WorldListScreen />);
     expect(screen.getByTestId('world-list-screen-loading-indicator')).toBeInTheDocument();
   });
 
   test('renders error message when there is an error', () => {
-    mockedWorldStore.mockImplementationOnce((selector: (state: WorldStore) => unknown) => selector({
-      worlds: {},
-      currentWorldId: null,
-      loading: false,
-      error: 'Failed to fetch worlds',
-      fetchWorlds: mockFetchWorlds,
-      setCurrentWorld: mockSetCurrentWorld,
-      deleteWorld: mockDeleteWorld,
-      createWorld: jest.fn(),
-      updateWorld: jest.fn(),
-      addAttribute: jest.fn(),
-      updateAttribute: jest.fn(),
-      removeAttribute: jest.fn(),
-      addSkill: jest.fn(),
-      updateSkill: jest.fn(),
-      removeSkill: jest.fn(),
-      updateSettings: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-    }));
+    mockState.loading = false;
+    mockState.error = 'Failed to fetch worlds';
 
     render(<WorldListScreen />);
     expect(screen.getByTestId('world-list-screen-error-message')).toBeInTheDocument();
@@ -209,28 +164,9 @@ describe('WorldListScreen', () => {
       },
     };
 
-    mockedWorldStore.mockImplementationOnce((selector: (state: WorldStore) => unknown) => selector({
-      worlds: mockWorlds,
-      currentWorldId: null,
-      loading: false,
-      error: null,
-      fetchWorlds: mockFetchWorlds,
-      setCurrentWorld: mockSetCurrentWorld,
-      deleteWorld: mockDeleteWorld,
-      createWorld: jest.fn(),
-      updateWorld: jest.fn(),
-      addAttribute: jest.fn(),
-      updateAttribute: jest.fn(),
-      removeAttribute: jest.fn(),
-      addSkill: jest.fn(),
-      updateSkill: jest.fn(),
-      removeSkill: jest.fn(),
-      updateSettings: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-    }));
+    mockState.worlds = mockWorlds;
+    mockState.loading = false;
+    mockState.error = null;
 
     render(<WorldListScreen />);
     expect(screen.getByTestId('world-list-container')).toBeInTheDocument();
@@ -240,6 +176,10 @@ describe('WorldListScreen', () => {
   });
 
   test('renders empty message when no worlds are available', () => {
+    mockState.worlds = {};
+    mockState.loading = false;
+    mockState.error = null;
+
     render(<WorldListScreen />);
     expect(screen.getByTestId('world-list-empty-message')).toBeInTheDocument();
     expect(screen.getByTestId('world-list-container')).toBeInTheDocument();
@@ -267,29 +207,9 @@ describe('WorldListScreen', () => {
       },
     };
 
-    // Set up the initial render with worlds
-    mockedWorldStore.mockImplementation((selector: (state: WorldStore) => unknown) => selector({
-      worlds: mockWorlds,
-      currentWorldId: null,
-      loading: false,
-      error: null,
-      fetchWorlds: mockFetchWorlds,
-      setCurrentWorld: mockSetCurrentWorld,
-      deleteWorld: mockDeleteWorld,
-      createWorld: jest.fn(),
-      updateWorld: jest.fn(),
-      addAttribute: jest.fn(),
-      updateAttribute: jest.fn(),
-      removeAttribute: jest.fn(),
-      addSkill: jest.fn(),
-      updateSkill: jest.fn(),
-      removeSkill: jest.fn(),
-      updateSettings: jest.fn(),
-      reset: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn(),
-      setLoading: jest.fn(),
-    }));
+    mockState.worlds = mockWorlds;
+    mockState.loading = false;
+    mockState.error = null;
 
     render(<WorldListScreen />);
 

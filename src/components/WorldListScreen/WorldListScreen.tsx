@@ -5,13 +5,10 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import { World } from '../../types/world.types';
 
 const WorldListScreen: React.FC = () => {
-  const { worlds, loading, error } = worldStore(state => {
-    return {
-      worlds: Object.values(state.worlds), // Convert the Record to an array
-      loading: state.loading,
-      error: state.error,
-    };
-  });
+  // Use the store without shallow comparison
+  const state = worldStore();
+  const worlds = Object.values(state.worlds);
+  const { loading, error } = state;
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
