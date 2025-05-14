@@ -3,11 +3,11 @@
  * This module provides access to all domain-specific stores and persistence configuration.
  */
 
-export * from './worldStore';
-export * from './characterStore';
-export * from './inventoryStore';
-export * from './narrativeStore';
-export * from './journalStore';
-export * from './sessionStore';
-export * from './aiContextStore';
-export * from './persistence';
+export { worldStore } from './worldStore';
+export { characterStore } from './characterStore';
+export { inventoryStore } from './inventoryStore';
+export { narrativeStore } from './narrativeStore';
+export { journalStore } from './journalStore';
+export { sessionStore } from './sessionStore';
+export { aiContextStore } from './aiContextStore';
+export { persistConfig } from './persistence';

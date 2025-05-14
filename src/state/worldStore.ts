@@ -1,31 +1,327 @@
 import { create } from 'zustand';
-import { World } from '../types/world.types';
+import { World, WorldAttribute, WorldSkill, WorldSettings } from '../types/world.types';
+import { EntityID } from '../types/common.types';
+import { generateUniqueId } from '../lib/utils/generateId';
 
 /**
- * World store for managing world state in the Narraitor application.
- * Implements MVP functionality with basic state initialization only.
+ * World store interface with state and actions
  */
+interface WorldStore {
+  // State
+  worlds: Record<EntityID, World>;
+  currentWorldId: EntityID | null;
+  error: string | null;
+  loading: boolean;
 
-// Define the initial state for the world store
-const getCurrentTimestamp = (): string => new Date().toISOString();
+  // Actions
+  createWorld: (world: Omit<World, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateWorld: (id: EntityID, updates: Partial<World>) => void;
+  deleteWorld: (id: EntityID) => void;
+  setCurrentWorld: (id: EntityID) => void;
+  
+  // Attribute management
+  addAttribute: (worldId: EntityID, attribute: Omit<WorldAttribute, 'id' | 'worldId'>) => void;
+  updateAttribute: (worldId: EntityID, attributeId: EntityID, updates: Partial<WorldAttribute>) => void;
+  removeAttribute: (worldId: EntityID, attributeId: EntityID) => void;
+  
+  // Skill management
+  addSkill: (worldId: EntityID, skill: Omit<WorldSkill, 'id' | 'worldId'>) => void;
+  updateSkill: (worldId: EntityID, skillId: EntityID, updates: Partial<WorldSkill>) => void;
+  removeSkill: (worldId: EntityID, skillId: EntityID) => void;
+  
+  // Settings management
+  updateSettings: (worldId: EntityID, settings: Partial<WorldSettings>) => void;
+  
+  // State management
+  reset: () => void;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+  setLoading: (loading: boolean) => void;
+}
 
-const initialWorldState: World = {
-  id: '',
-  name: '',
-  createdAt: getCurrentTimestamp(),
-  updatedAt: getCurrentTimestamp(),
-  theme: '',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 0,
-    maxSkills: 0,
-    attributePointPool: 0,
-    skillPointPool: 0,
-  },
+// Initial state
+const initialState = {
+  worlds: {},
+  currentWorldId: null,
+  error: null,
+  loading: false,
 };
 
-// Define the World Store
-export const worldStore = create<World>()(() => ({
-  ...initialWorldState,
+// World Store implementation
+export const worldStore = create<WorldStore>()((set) => ({
+  ...initialState,
+
+  // Create world
+  createWorld: (worldData) => {
+    if (!worldData.name || worldData.name.trim() === '') {
+      throw new Error('World name is required');
+    }
+
+    const worldId = generateUniqueId('world');
+    const now = new Date().toISOString();
+    
+    const newWorld: World = {
+      ...worldData,
+      id: worldId,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    set((state) => ({
+      worlds: {
+        ...state.worlds,
+        [worldId]: newWorld,
+      },
+    }));
+
+    return worldId;
+  },
+
+  // Update world
+  updateWorld: (id, updates) => set((state) => {
+    if (!state.worlds[id]) {
+      return { error: 'World not found' };
+    }
+
+    const updatedWorld: World = {
+      ...state.worlds[id],
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [id]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Delete world
+  deleteWorld: (id) => set((state) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [id]: _deletedWorld, ...remainingWorlds } = state.worlds;
+    
+    return {
+      worlds: remainingWorlds,
+      currentWorldId: state.currentWorldId === id ? null : state.currentWorldId,
+    };
+  }),
+
+  // Set current world
+  setCurrentWorld: (id) => set((state) => {
+    if (!state.worlds[id]) {
+      return { 
+        error: 'World not found',
+        currentWorldId: null,
+      };
+    }
+
+    return {
+      currentWorldId: id,
+      error: null,
+    };
+  }),
+
+  // Add attribute
+  addAttribute: (worldId, attributeData) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    if (world.attributes.length >= world.settings.maxAttributes) {
+      return { error: 'Maximum attributes limit reached' };
+    }
+
+    const attributeId = generateUniqueId('attr');
+    const newAttribute: WorldAttribute = {
+      ...attributeData,
+      id: attributeId,
+      worldId,
+    };
+
+    const updatedWorld: World = {
+      ...world,
+      attributes: [...world.attributes, newAttribute],
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Update attribute
+  updateAttribute: (worldId, attributeId, updates) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    const updatedAttributes = world.attributes.map((attr) =>
+      attr.id === attributeId ? { ...attr, ...updates } : attr
+    );
+
+    const updatedWorld: World = {
+      ...world,
+      attributes: updatedAttributes,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Remove attribute
+  removeAttribute: (worldId, attributeId) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    const filteredAttributes = world.attributes.filter(
+      (attr) => attr.id !== attributeId
+    );
+
+    const updatedWorld: World = {
+      ...world,
+      attributes: filteredAttributes,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Add skill
+  addSkill: (worldId, skillData) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    if (world.skills.length >= world.settings.maxSkills) {
+      return { error: 'Maximum skills limit reached' };
+    }
+
+    const skillId = generateUniqueId('skill');
+    const newSkill: WorldSkill = {
+      ...skillData,
+      id: skillId,
+      worldId,
+    };
+
+    const updatedWorld: World = {
+      ...world,
+      skills: [...world.skills, newSkill],
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Update skill
+  updateSkill: (worldId, skillId, updates) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    const updatedSkills = world.skills.map((skill) =>
+      skill.id === skillId ? { ...skill, ...updates } : skill
+    );
+
+    const updatedWorld: World = {
+      ...world,
+      skills: updatedSkills,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Remove skill
+  removeSkill: (worldId, skillId) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    const filteredSkills = world.skills.filter(
+      (skill) => skill.id !== skillId
+    );
+
+    const updatedWorld: World = {
+      ...world,
+      skills: filteredSkills,
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // Update settings
+  updateSettings: (worldId, settings) => set((state) => {
+    const world = state.worlds[worldId];
+    if (!world) {
+      return { error: 'World not found' };
+    }
+
+    const updatedWorld: World = {
+      ...world,
+      settings: {
+        ...world.settings,
+        ...settings,
+      },
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      worlds: {
+        ...state.worlds,
+        [worldId]: updatedWorld,
+      },
+      error: null,
+    };
+  }),
+
+  // State management actions
+  reset: () => set(() => initialState),
+  setError: (error) => set(() => ({ error })),
+  clearError: () => set(() => ({ error: null })),
+  setLoading: (loading) => set(() => ({ loading })),
 }));
