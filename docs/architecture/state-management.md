@@ -10,42 +10,309 @@ updated: 2025-05-13
 
 ## Overview
 
-This document outlines the state management approach for the Narraitor application. The architecture follows a domain-driven design with separate state management for each core domain, combined with a persistence layer using IndexedDB.
+The Narraitor application uses Zustand for state management, following a domain-driven design with separate stores for each core domain. This architecture provides type-safe, reactive state management with built-in persistence capabilities (planned for IndexedDB integration).
 
 ## State Management Principles
 
-1. **Domain Separation**: Each domain has its own state, reducer, and actions
+1. **Domain Separation**: Each domain has its own Zustand store
 2. **Immutable Updates**: State updates follow immutable patterns
-3. **Type Safety**: All state operations are fully typed
-4. **Persistence**: State changes are automatically persisted
-5. **Context Providers**: State is made available via React Context
+3. **Type Safety**: All state operations are fully typed with TypeScript
+4. **Persistence Ready**: Architecture supports automatic persistence (IndexedDB planned)
+5. **Reactive Updates**: Components automatically re-render on state changes
 
 ## Architecture Diagram
 
 ```mermaid
 graph TD
-    A[App State] --> B[World Domain]
-    A --> C[Character Domain]
-    A --> D[Narrative Domain]
-    A --> E[Journal Domain]
-    A --> F[AI Domain]
+    A[UI Components] --> B[Zustand Stores]
+    B --> C[World Store]
+    B --> D[Character Store]
+    B --> E[Inventory Store]
+    B --> F[Narrative Store]
+    B --> G[Journal Store]
+    B --> H[Session Store]
+    B --> I[AI Context Store]
     
-    B --> G[Persistence Layer]
-    C --> G
-    D --> G
-    E --> G
-    F --> G
+    J[Persistence Layer] --> B
+    J --> K[IndexedDB]
     
-    G --> H[IndexedDB]
-    
-    I[UI Components] --> A
+    L[Type System] --> B
+    M[Utils] --> B
+```
+
+## Zustand Store Implementation
+
+Each domain is implemented as a separate Zustand store with consistent patterns:
+
+### Store Structure Pattern
+
+```typescript
+interface StoreInterface {
+  // State
+  entities: Record<EntityID, Entity>;
+  currentEntityId: EntityID | null;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  createEntity: (data: Omit<Entity, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateEntity: (id: EntityID, updates: Partial<Entity>) => void;
+  deleteEntity: (id: EntityID) => void;
+  setCurrentEntity: (id: EntityID) => void;
+  
+  // State management
+  reset: () => void;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+  setLoading: (loading: boolean) => void;
+}
+```
+
+## Implemented Stores
+
+### 1. World Store (`worldStore.ts`)
+Manages game worlds with their attributes, skills, and settings.
+
+```typescript
+interface WorldStore {
+  // State
+  worlds: Record<EntityID, World>;
+  currentWorldId: EntityID | null;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  createWorld: (world: Omit<World, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateWorld: (id: EntityID, updates: Partial<World>) => void;
+  deleteWorld: (id: EntityID) => void;
+  setCurrentWorld: (id: EntityID) => void;
+  
+  // Attribute management
+  addAttribute: (worldId: EntityID, attribute: Omit<WorldAttribute, 'id' | 'worldId'>) => void;
+  updateAttribute: (worldId: EntityID, attributeId: EntityID, updates: Partial<WorldAttribute>) => void;
+  removeAttribute: (worldId: EntityID, attributeId: EntityID) => void;
+  
+  // Skill management
+  addSkill: (worldId: EntityID, skill: Omit<WorldSkill, 'id' | 'worldId'>) => void;
+  updateSkill: (worldId: EntityID, skillId: EntityID, updates: Partial<WorldSkill>) => void;
+  removeSkill: (worldId: EntityID, skillId: EntityID) => void;
+  
+  // Settings management
+  updateSettings: (worldId: EntityID, settings: Partial<WorldSettings>) => void;
+}
+```
+
+### 2. Character Store (`characterStore.ts`)
+Handles player and NPC characters with their attributes, skills, and backgrounds.
+
+```typescript
+interface CharacterStore {
+  // State
+  characters: Record<EntityID, Character>;
+  currentCharacterId: EntityID | null;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  createCharacter: (character: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
+  deleteCharacter: (id: EntityID) => void;
+  setCurrentCharacter: (id: EntityID) => void;
+  
+  // Attribute management
+  addAttribute: (characterId: EntityID, attribute: Omit<CharacterAttribute, 'id' | 'characterId'>) => void;
+  updateAttribute: (characterId: EntityID, attributeId: EntityID, updates: Partial<CharacterAttribute>) => void;
+  removeAttribute: (characterId: EntityID, attributeId: EntityID) => void;
+  
+  // Skill management
+  addSkill: (characterId: EntityID, skill: Omit<CharacterSkill, 'id' | 'characterId'>) => void;
+}
+```
+
+### 3. Inventory Store (`inventoryStore.ts`)
+Manages character inventories and item operations.
+
+```typescript
+interface InventoryStore {
+  // State
+  items: Record<EntityID, InventoryItem>;
+  characterInventories: Record<EntityID, EntityID[]>;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  addItem: (characterId: EntityID, item: Omit<InventoryItem, 'id' | 'characterId'>) => EntityID;
+  updateItem: (itemId: EntityID, updates: Partial<InventoryItem>) => void;
+  removeItem: (itemId: EntityID) => void;
+  transferItem: (itemId: EntityID, toCharacterId: EntityID) => void;
+  
+  // Query actions
+  getCharacterItems: (characterId: EntityID) => InventoryItem[];
+  getEquippedItems: (characterId: EntityID) => InventoryItem[];
+  calculateTotalWeight: (characterId: EntityID) => number;
+}
+```
+
+### 4. Narrative Store (`narrativeStore.ts`)
+Handles narrative segments and story progression.
+
+```typescript
+interface NarrativeStore {
+  // State
+  segments: Record<EntityID, NarrativeSegment>;
+  sessionSegments: Record<EntityID, EntityID[]>;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  addSegment: (sessionId: EntityID, segment: Omit<NarrativeSegment, 'id' | 'sessionId' | 'createdAt'>) => EntityID;
+  updateSegment: (segmentId: EntityID, updates: Partial<NarrativeSegment>) => void;
+  deleteSegment: (segmentId: EntityID) => void;
+  
+  // Query actions
+  getSessionSegments: (sessionId: EntityID) => NarrativeSegment[];
+}
+```
+
+### 5. Journal Store (`journalStore.ts`)
+Manages journal entries and quest tracking.
+
+```typescript
+interface JournalStore {
+  // State
+  entries: Record<EntityID, JournalEntry>;
+  sessionEntries: Record<EntityID, EntityID[]>;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  addEntry: (sessionId: EntityID, entry: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>) => EntityID;
+  updateEntry: (entryId: EntityID, updates: Partial<JournalEntry>) => void;
+  deleteEntry: (entryId: EntityID) => void;
+  markAsRead: (entryId: EntityID) => void;
+  
+  // Query actions
+  getSessionEntries: (sessionId: EntityID) => JournalEntry[];
+  getEntriesByType: (type: JournalEntryType) => JournalEntry[];
+}
+```
+
+### 6. Session Store (`sessionStore.ts`)
+Manages game sessions and their state.
+
+```typescript
+interface SessionStore {
+  // State
+  sessions: Record<EntityID, GameSession>;
+  activeSessionId: EntityID | null;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  createSession: (worldId: EntityID, characterId: EntityID) => EntityID;
+  updateSession: (sessionId: EntityID, updates: Partial<GameSession>) => void;
+  endSession: (sessionId: EntityID) => void;
+  setActiveSession: (sessionId: EntityID) => void;
+}
+```
+
+### 7. AI Context Store (`aiContextStore.ts`)
+Manages AI prompt contexts and constraints.
+
+```typescript
+interface AIContextStore {
+  // State
+  contexts: Record<EntityID, AIContext>;
+  activeContextId: EntityID | null;
+  error: string | null;
+  loading: boolean;
+
+  // Actions
+  createContext: (sessionId: EntityID) => EntityID;
+  updateContext: (contextId: EntityID, updates: Partial<AIContext>) => void;
+  addPromptContext: (contextId: EntityID, promptContext: AIPromptContext) => void;
+  clearContext: (contextId: EntityID) => void;
+}
+```
+
+## Usage Examples
+
+### Basic Store Usage
+
+```typescript
+import { worldStore } from '@/state/worldStore';
+
+// Create a world
+const worldId = worldStore.getState().createWorld({
+  name: 'Middle Earth',
+  theme: 'fantasy',
+  attributes: [],
+  skills: [],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 8,
+    attributePointPool: 27,
+    skillPointPool: 20
+  }
+});
+
+// Update world
+worldStore.getState().updateWorld(worldId, { 
+  name: 'Middle Earth - Extended' 
+});
+
+// Access state in components
+function WorldSelector() {
+  const worlds = worldStore((state) => Object.values(state.worlds));
+  const currentWorldId = worldStore((state) => state.currentWorldId);
+  const setCurrentWorld = worldStore((state) => state.setCurrentWorld);
+  
+  return (
+    <select 
+      value={currentWorldId || ''} 
+      onChange={(e) => setCurrentWorld(e.target.value)}
+    >
+      {worlds.map(world => (
+        <option key={world.id} value={world.id}>
+          {world.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+
+### Cross-Store Integration
+
+```typescript
+import { worldStore } from '@/state/worldStore';
+import { characterStore } from '@/state/characterStore';
+import { sessionStore } from '@/state/sessionStore';
+
+// Create a new game session
+function createGameSession(worldId: EntityID, characterId: EntityID) {
+  // Verify world exists
+  const world = worldStore.getState().worlds[worldId];
+  if (!world) {
+    throw new Error('World not found');
+  }
+  
+  // Verify character exists and belongs to world
+  const character = characterStore.getState().characters[characterId];
+  if (!character || character.worldId !== worldId) {
+    throw new Error('Character not found or does not belong to world');
+  }
+  
+  // Create session
+  const sessionId = sessionStore.getState().createSession(worldId, characterId);
+  
+  return sessionId;
+}
 ```
 
 ## Type System Integration
 
-The state management system is built on top of the comprehensive type system defined in `/src/types`. This ensures type safety across all state operations.
-
-### Core Type Definitions
+All stores use the comprehensive type system defined in `/src/types`:
 
 ```typescript
 import { 
@@ -55,456 +322,180 @@ import {
   JournalEntry,
   GameSession,
   EntityID 
-} from '@/types';
+} from '../types';
 ```
 
-### Type-Safe State Structures
+### Type Safety
 
-Each domain state interface uses the core types from the type system:
+1. **Strict Typing**: All store interfaces and actions are fully typed
+2. **Type Guards**: Validation functions ensure data integrity
+3. **Generics**: Reusable patterns for common operations
+4. **Discriminated Unions**: Clear action type definitions
 
-#### World Domain State
+## Error Handling
+
+Each store implements consistent error handling:
+
 ```typescript
-interface WorldState {
-  worlds: Record<EntityID, World>;  // Using EntityID from types
-  currentWorldId: EntityID | null;
-  loading: boolean;
-  error: string | null;
-}
+// Example from worldStore
+addAttribute: (worldId, attributeData) => set((state) => {
+  const world = state.worlds[worldId];
+  if (!world) {
+    return { error: 'World not found' };
+  }
+
+  if (world.attributes.length >= world.settings.maxAttributes) {
+    return { error: 'Maximum attributes limit reached' };
+  }
+
+  // ... continue with operation
+});
 ```
 
-#### Character Domain State
+## Testing
+
+All stores have comprehensive test coverage:
+
+- Unit tests for each action
+- Integration tests for cross-store operations
+- Error case testing
+- State validation testing
+
+Example test:
+
 ```typescript
-interface CharacterState {
-  characters: Record<EntityID, Character>;
-  currentCharacterId: EntityID | null;
-  selectedCharacterIds: EntityID[];
-  loading: boolean;
-  error: string | null;
-}
+describe('worldStore', () => {
+  it('should create a new world', () => {
+    const { createWorld, worlds } = worldStore.getState();
+    
+    const worldId = createWorld({
+      name: 'Test World',
+      theme: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: defaultWorldSettings
+    });
+    
+    expect(worlds[worldId]).toBeDefined();
+    expect(worlds[worldId].name).toBe('Test World');
+  });
+});
 ```
 
-#### Narrative Domain State
-```typescript
-interface NarrativeState {
-  sessions: Record<EntityID, GameSession>;
-  segments: Record<EntityID, NarrativeSegment>;
-  currentSessionId: EntityID | null;
-  loading: boolean;
-  error: string | null;
-}
-```
+## Performance Considerations
 
-#### Journal Domain State
-```typescript
-interface JournalState {
-  entries: Record<EntityID, JournalEntry>;
-  filters: JournalFilters;
-  sortOrder: 'chronological' | 'significance';
-  loading: boolean;
-  error: string | null;
-}
+1. **Selective Subscriptions**: Components only subscribe to needed state slices
+2. **Memoization**: Complex selectors use memoization where appropriate
+3. **Batch Updates**: Multiple state changes can be batched
+4. **Shallow Comparison**: Zustand uses shallow comparison for efficiency
 
-interface JournalFilters {
-  types: JournalEntryType[];
-  significance?: 'major' | 'minor';
-  isRead?: boolean;
-  sessionId?: EntityID;
-}
-```
+## Future Enhancements
 
-#### AI Domain State
-```typescript
-interface AiState {
-  provider: 'google' | 'openai' | 'mock';
-  settings: AiSettings;
-  contexts: Record<EntityID, AIContext>;  // Using AIContext from types
-  loading: boolean;
-  error: string | null;
-}
-```
-
-## Zustand Integration (Future)
-
-When implementing state management with Zustand, the type system will provide the foundation:
+### IndexedDB Persistence
+The next phase (issue #340) will add persistence:
 
 ```typescript
-import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { World, Character, GameSession, EntityID } from '@/types';
 
-interface GameStore {
-  // State using core types
-  worlds: Record<EntityID, World>;
-  characters: Record<EntityID, Character>;
-  activeSession: GameSession | null;
-  
-  // Type-safe actions
-  addWorld: (world: World) => void;
-  updateCharacter: (id: EntityID, updates: Partial<Character>) => void;
-  createSession: (worldId: EntityID, characterId: EntityID) => void;
-  
-  // Selectors
-  getWorldById: (id: EntityID) => World | undefined;
-  getCharactersByWorld: (worldId: EntityID) => Character[];
-}
-
-const useGameStore = create<GameStore>()(
+export const worldStore = create<WorldStore>()(
   persist(
     (set, get) => ({
-      // State
-      worlds: {},
-      characters: {},
-      activeSession: null,
-      
-      // Actions
-      addWorld: (world) => set((state) => ({
-        worlds: { ...state.worlds, [world.id]: world }
-      })),
-      
-      updateCharacter: (id, updates) => set((state) => ({
-        characters: {
-          ...state.characters,
-          [id]: { ...state.characters[id], ...updates }
-        }
-      })),
-      
-      createSession: (worldId, characterId) => {
-        const session: GameSession = {
-          id: generateUniqueId('session'),
-          worldId,
-          characterId,
-          state: {
-            status: 'active',
-            lastActivity: new Date().toISOString()
-          },
-          narrativeHistory: [],
-          currentContext: {
-            recentSegments: [],
-            activeCharacters: [characterId]
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        
-        set({ activeSession: session });
-      },
-      
-      // Selectors
-      getWorldById: (id) => get().worlds[id],
-      
-      getCharactersByWorld: (worldId) => 
-        Object.values(get().characters).filter(c => c.worldId === worldId)
+      // ... existing implementation
     }),
     {
-      name: 'narraitor-game-state',
+      name: 'narraitor-world-state',
+      storage: createIndexedDBStorage(), // Custom adapter
       partialize: (state) => ({
         worlds: state.worlds,
-        characters: state.characters,
-        activeSession: state.activeSession
+        currentWorldId: state.currentWorldId
       })
     }
   )
 );
 ```
 
-## Type-Safe Actions
-
-Domain-specific actions are defined using discriminated unions with proper typing:
+### State Migration
+Future updates will include state migration utilities:
 
 ```typescript
-// Example for World Domain
-type WorldAction = 
-  | { type: 'ADD_WORLD'; payload: World }
-  | { type: 'UPDATE_WORLD'; payload: { id: EntityID; updates: Partial<World> } }
-  | { type: 'DELETE_WORLD'; payload: EntityID }
-  | { type: 'SET_CURRENT_WORLD'; payload: EntityID }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };
+const migrations = {
+  1: (state) => {
+    // Migrate from v0 to v1
+    return { ...state, version: 1 };
+  }
+};
 ```
 
-## Type Guards for State Validation
+## Best Practices
 
-When loading state from persistence, type guards ensure data integrity:
+1. **Keep Stores Focused**: Each store handles one domain
+2. **Use Actions**: Don't modify state directly
+3. **Handle Errors**: All actions include error handling
+4. **Validate Input**: Check data before state updates
+5. **Test Thoroughly**: Write tests for all actions
+6. **Document Types**: Keep interfaces well-documented
 
+## Common Patterns
+
+### Entity Management Pattern
 ```typescript
-import { isWorld, isCharacter, isJournalEntry } from '@/types';
-
-// Example: Loading world from IndexedDB
-async function loadWorld(id: EntityID): Promise<World | null> {
-  const data = await db.get('worlds', id);
+// Used across all stores for CRUD operations
+const createEntity = (data) => {
+  const id = generateUniqueId(prefix);
+  const now = new Date().toISOString();
   
-  if (isWorld(data)) {
-    return data;
-  }
+  const entity = {
+    ...data,
+    id,
+    createdAt: now,
+    updatedAt: now
+  };
   
-  console.error('Invalid world data loaded from storage');
-  return null;
-}
-
-// Example: Validating state on hydration
-function hydrateState(savedState: unknown): GameState | null {
-  if (!savedState || typeof savedState !== 'object') {
-    return null;
-  }
+  set((state) => ({
+    entities: { ...state.entities, [id]: entity }
+  }));
   
-  const state = savedState as any;
-  
-  // Validate worlds
-  if (state.worlds) {
-    const validWorlds: Record<EntityID, World> = {};
-    
-    for (const [id, world] of Object.entries(state.worlds)) {
-      if (isWorld(world)) {
-        validWorlds[id] = world;
-      }
-    }
-    
-    state.worlds = validWorlds;
-  }
-  
-  // Validate characters
-  if (state.characters) {
-    const validCharacters: Record<EntityID, Character> = {};
-    
-    for (const [id, character] of Object.entries(state.characters)) {
-      if (isCharacter(character)) {
-        validCharacters[id] = character;
-      }
-    }
-    
-    state.characters = validCharacters;
-  }
-  
-  return state as GameState;
-}
+  return id;
+};
 ```
 
-## Persistence Layer with Types
-
-The persistence layer uses the type system for data validation:
-
-### IndexedDB Schema
-
+### Nested Entity Updates
 ```typescript
-import { World, Character, GameSession, JournalEntry } from '@/types';
-
-interface DbSchema {
-  worlds: {
-    key: EntityID;
-    value: World;
-    indexes: {
-      'by-theme': string;
-      'by-created': string;
-    };
-  };
-  characters: {
-    key: EntityID;
-    value: Character;
-    indexes: {
-      'by-world': EntityID;
-      'by-player': EntityID;
-    };
-  };
-  sessions: {
-    key: EntityID;
-    value: GameSession;
-    indexes: {
-      'by-world': EntityID;
-      'by-character': EntityID;
-      'by-status': string;
-    };
-  };
-  journal: {
-    key: EntityID;
-    value: JournalEntry;
-    indexes: {
-      'by-session': EntityID;
-      'by-type': JournalEntryType;
-      'by-significance': string;
-    };
-  };
-}
-```
-
-## State Access Patterns with Types
-
-### Type-Safe Hooks
-
-Each domain provides custom hooks with proper typing:
-
-```typescript
-// Example for World Domain
-export function useWorlds(): World[] {
-  const { state } = useContext(WorldContext);
-  return Object.values(state.worlds);
-}
-
-export function useWorld(id: EntityID): World | undefined {
-  const { state } = useContext(WorldContext);
-  return state.worlds[id];
-}
-
-export function useWorldActions() {
-  const { dispatch } = useContext(WorldContext);
+// Pattern for updating nested entities (attributes, skills, etc.)
+const updateNestedEntity = (parentId, entityId, updates) => set((state) => {
+  const parent = state.entities[parentId];
+  if (!parent) {
+    return { error: 'Parent not found' };
+  }
+  
+  const updatedNested = parent.nestedEntities.map((entity) =>
+    entity.id === entityId ? { ...entity, ...updates } : entity
+  );
   
   return {
-    addWorld: (world: Omit<World, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const newWorld: World = {
-        ...world,
-        id: generateUniqueId('world'),
-        createdAt: new Date().toISOString(),
+    entities: {
+      ...state.entities,
+      [parentId]: {
+        ...parent,
+        nestedEntities: updatedNested,
         updatedAt: new Date().toISOString()
-      };
-      
-      dispatch({ type: 'ADD_WORLD', payload: newWorld });
-    },
-    
-    updateWorld: (id: EntityID, updates: Partial<World>) => {
-      dispatch({
-        type: 'UPDATE_WORLD',
-        payload: { id, updates }
-      });
-    },
-    
-    deleteWorld: (id: EntityID) => {
-      dispatch({ type: 'DELETE_WORLD', payload: id });
+      }
     }
   };
-}
-```
-
-### Type-Safe Selectors
-
-For complex state derivation with proper typing:
-
-```typescript
-// Example for Character Domain
-export function useCharactersByWorld(worldId: EntityID): Character[] {
-  const { state } = useContext(CharacterContext);
-  
-  return useMemo(
-    () => Object.values(state.characters).filter(
-      character => character.worldId === worldId
-    ),
-    [state.characters, worldId]
-  );
-}
-
-// Example for Journal Domain
-export function useJournalEntriesByType(
-  type: JournalEntryType,
-  sessionId?: EntityID
-): JournalEntry[] {
-  const { state } = useContext(JournalContext);
-  
-  return useMemo(() => {
-    let entries = Object.values(state.entries).filter(
-      entry => entry.type === type
-    );
-    
-    if (sessionId) {
-      entries = entries.filter(entry => entry.sessionId === sessionId);
-    }
-    
-    return entries;
-  }, [state.entries, type, sessionId]);
-}
-```
-
-## Testing with Types
-
-### Testing Type-Safe Reducers
-
-```typescript
-import { worldReducer, WorldAction, WorldState } from '@/state/world';
-import { World } from '@/types';
-
-describe('World Reducer', () => {
-  it('should handle ADD_WORLD action', () => {
-    const initialState: WorldState = {
-      worlds: {},
-      currentWorldId: null,
-      loading: false,
-      error: null
-    };
-    
-    const newWorld: World = {
-      id: 'world-1',
-      name: 'Test World',
-      theme: 'fantasy',
-      attributes: [],
-      skills: [],
-      settings: {
-        maxAttributes: 6,
-        maxSkills: 8,
-        attributePointPool: 27,
-        skillPointPool: 20
-      },
-      createdAt: '2025-01-01T00:00:00Z',
-      updatedAt: '2025-01-01T00:00:00Z'
-    };
-    
-    const action: WorldAction = {
-      type: 'ADD_WORLD',
-      payload: newWorld
-    };
-    
-    const newState = worldReducer(initialState, action);
-    
-    expect(newState.worlds[newWorld.id]).toEqual(newWorld);
-    expect(Object.keys(newState.worlds)).toHaveLength(1);
-  });
 });
 ```
 
-### Testing Type Validation
+## Developer Tools
 
-```typescript
-import { isWorld, isCharacter } from '@/types';
-import { loadStateFromStorage } from '@/state/persistence';
+Zustand provides excellent developer experience:
 
-describe('State Persistence', () => {
-  it('should validate loaded data with type guards', async () => {
-    const mockData = {
-      worlds: {
-        'world-1': { /* invalid world data */ },
-        'world-2': createMockWorld() // valid world data
-      },
-      characters: {
-        'char-1': { /* invalid character data */ },
-        'char-2': createMockCharacter() // valid character data
-      }
-    };
-    
-    const validatedState = await loadStateFromStorage(mockData);
-    
-    // Only valid data should be loaded
-    expect(Object.keys(validatedState.worlds)).toHaveLength(1);
-    expect(Object.keys(validatedState.characters)).toHaveLength(1);
-    expect(validatedState.worlds['world-2']).toBeDefined();
-    expect(validatedState.characters['char-2']).toBeDefined();
-  });
-});
-```
+- React DevTools integration
+- Time-travel debugging
+- State snapshots
+- Action logging
 
-## Best Practices for Type-Safe State Management
+## Migration Status
 
-1. **Always use type guards** when loading data from external sources
-2. **Define strict action types** using discriminated unions
-3. **Create type-safe selectors** with proper memoization
-4. **Validate state on persistence** to prevent corrupted data
-5. **Use generics** for reusable state patterns
-6. **Document complex type relationships** in code comments
-
-## Migration Guide
-
-When migrating from the current state management to Zustand:
-
-1. Map existing reducers to Zustand actions
-2. Convert Context providers to Zustand stores
-3. Update hooks to use Zustand selectors
-4. Implement persistence middleware
-5. Add type validation on hydration
-6. Update tests for new state patterns
-
-The type system provides a solid foundation for this migration, ensuring type safety throughout the process.
+✅ **Completed**: All stores implemented with Zustand
+⏳ **Next**: IndexedDB persistence (issue #340)
+🔮 **Future**: State synchronization, optimistic updates

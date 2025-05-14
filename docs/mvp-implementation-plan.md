@@ -3,7 +3,7 @@ title: MVP Implementation Plan
 aliases: [Implementation Strategy, MVP Strategy]
 tags: [narraitor, implementation, planning]
 created: 2025-04-29
-updated: 2025-04-30
+updated: 2025-05-13
 ---
 
 # Narraitor MVP Implementation Plan
@@ -72,14 +72,18 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Integration with game session UI
 - Proper formatting for journal entries
 
-### State Management (MVP)
-- React Context + useReducer pattern for all domains
-- TypeScript-based type safety throughout
-- IndexedDB persistence with auto-save (every 5 minutes and after major events)
-- Campaign management (create, list, load, delete)
-- Error handling with storage failure detection and recovery
-- Component hooks for clean state access
-- Safe resume functionality for interrupted sessions
+### State Management (MVP) ✅
+- ~~React Context + useReducer pattern for all domains~~
+- **Zustand stores for all domain state management** ✅
+- TypeScript-based type safety throughout ✅
+- All 7 stores implemented with full CRUD operations ✅
+- Error handling and validation for all stores ✅
+- Loading state management ✅
+- Reset functionality for all stores ✅
+- Component hooks for clean state access ✅
+- IndexedDB persistence with auto-save - **Next Phase (#340)**
+- Campaign management (create, list, load, delete) - **Next Phase**
+- Safe resume functionality for interrupted sessions - **Next Phase**
 
 ### Game Session UI (MVP)
 - Responsive narrative display with markdown formatting
@@ -110,20 +114,24 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 
 ## Implementation Phases
 
-### Phase 1: Project Setup and Infrastructure
-- Initialize Next.js 14 project with TypeScript
-- Configure ESLint, Prettier, and EditorConfig
-- Set up Jest and React Testing Library
-- Configure Storybook for component development
-- Create domain-driven project structure
-- Set up state management architecture
-- Implement IndexedDB persistence layer
-- Create core UI components library
-- Build error boundary system
-- Set up development diagnostics
+### Phase 1: Project Setup and Infrastructure ✅
+- Initialize Next.js 14 project with TypeScript ✅
+- Configure ESLint, Prettier, and EditorConfig ✅
+- Set up Jest and React Testing Library ✅
+- Configure Storybook for component development ✅
+- Create domain-driven project structure ✅
+- **Set up state management architecture** ✅
+- Implement IndexedDB persistence layer - **Next Phase (#340)**
+- Create core UI components library - **In Progress**
+- Build error boundary system - **In Progress**
+- Set up development diagnostics - **In Progress**
 
 ### Phase 2: World Configuration System
-- Implement world configuration reducer and types
+- **World store implementation** ✅
+- **World CRUD operations** ✅
+- **Attribute and skill management** ✅
+- **World settings management** ✅
+- **Test coverage for world store** ✅
 - Create world creation form for freeform descriptions
 - Build world description analyzer using Google Gemini
 - Implement attribute and skill suggestion system
@@ -135,7 +143,11 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Build validation and error handling
 
 ### Phase 3: Character System
-- Implement character state reducer and types
+- **Character store implementation** ✅
+- **Character CRUD operations** ✅
+- **Character attribute management** ✅
+- **Character skill management** ✅
+- **Test coverage for character store** ✅
 - Create 4-step character creation wizard
 - Develop attribute allocation interface with validation
 - Build skill selection interface with attribute linking
@@ -143,10 +155,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Implement character detail view
 - Add basic character editing functionality
 - Implement character deletion with confirmation
-- Develop basic inventory management
+- **Basic inventory management** ✅ (via inventory store)
 - Create basic derived statistics calculation
 - Build character creation progress recovery
-- Create validation and error handling
 
 ### Phase 4: AI Service Integration
 - Implement Google Gemini API client
@@ -160,7 +171,10 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Create response formatting system
 
 ### Phase 5: Narrative Engine
-- Implement narrative state reducer and types
+- **Narrative store implementation** ✅
+- **Narrative segment CRUD operations** ✅
+- **Session-based segment organization** ✅
+- **Test coverage for narrative store** ✅
 - Create narrative context management system
 - Develop player choice interface components
 - Build narrative history tracking
@@ -173,15 +187,22 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Create retry mechanism for failed generation
 
 ### Phase 6: Journal System
-- Implement journal entry data model and reducer
+- **Journal store implementation** ✅
+- **Journal entry CRUD operations** ✅
+- **Entry type categorization** ✅
+- **Read/unread state management** ✅
+- **Test coverage for journal store** ✅
 - Create automatic entry creation system
 - Build journal list view component
 - Develop journal entry detail component
-- Implement entry categorization
 - Build mobile-responsive journal interface
 - Create journal entry formatting
 
 ### Phase 7: Game Session Integration
+- **Session store implementation** ✅
+- **Session CRUD operations** ✅
+- **Active session management** ✅
+- **Test coverage for session store** ✅
 - Create game session container component
 - Integrate narrative display with AI service
 - Connect player choices to narrative progression
@@ -194,8 +215,9 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Add save indicators and confirmation
 
 ### Phase 8: Testing and Refinement
-- Complete unit test coverage for all components
-- Add integration tests for system interactions
+- **Complete unit test coverage for all stores** ✅
+- **Integration tests for cross-store operations** ✅
+- Add integration tests for UI components
 - Implement end-to-end tests for critical flows
 - Address performance bottlenecks
 - Improve error handling and recovery
@@ -207,12 +229,12 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 
 ## Development Approach
 
-### TDD Workflow
-1. Create GitHub issues from requirements documents
-2. Define clear acceptance criteria for each issue
-3. Write tests to define expected behavior
-4. Implement minimal code to pass tests
-5. Refactor while maintaining test coverage
+### TDD Workflow ✅
+1. Create GitHub issues from requirements documents ✅
+2. Define clear acceptance criteria for each issue ✅
+3. Write tests to define expected behavior ✅
+4. Implement minimal code to pass tests ✅
+5. Refactor while maintaining test coverage ✅
 6. Conduct code reviews against established standards
 7. Merge with CI/CD validation
 
@@ -225,14 +247,14 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 6. Document component API and usage patterns
 7. Integrate into application flow
 
-### State Management
-1. Define domain-specific state types and interfaces
-2. Create typed actions for all state mutations
-3. Implement pure reducers with immutable updates
-4. Add persistence layer with proper error handling
-5. Create selector functions for derived data
-6. Build custom hooks for component access
-7. Add state validation and integrity checks
+### State Management ✅
+1. Define domain-specific state types and interfaces ✅
+2. Create typed actions for all state mutations ✅
+3. Implement stores with immutable updates ✅
+4. Create selector functions for derived data ✅
+5. Build custom hooks for component access ✅
+6. Add state validation and integrity checks ✅
+7. Add persistence layer with proper error handling - **Next Phase (#340)**
 
 ### AI Integration
 1. Create modular AI service with specialized generators
@@ -260,8 +282,8 @@ flowchart TD
 
 1. **Framework**: Next.js 14+ with App Router
 2. **Language**: TypeScript with strict typing
-3. **State Management**: React Context + useReducer pattern
-4. **Persistence**: IndexedDB via idb library
+3. **State Management**: ~~React Context + useReducer pattern~~ **Zustand stores** ✅
+4. **Persistence**: IndexedDB via idb library - **Next Phase**
 5. **UI Framework**: Tailwind CSS with world theming
 6. **Testing**: Jest + React Testing Library + Playwright
 7. **AI Integration**: Google Gemini API
@@ -271,193 +293,51 @@ flowchart TD
 11. **Error Recovery**: Comprehensive error handling with recovery options
 12. **Accessibility**: WCAG 2.1 AA compliance
 
-## BootHillGM Reference Code
+## Implementation Status
 
-Several components from the BootHillGM project will serve as valuable references:
+### Completed ✅
+- Project setup and configuration
+- State management architecture with Zustand
+- All 7 domain stores (World, Character, Inventory, Narrative, Journal, Session, AI Context)
+- Full CRUD operations for all stores
+- Type safety and validation
+- Error handling patterns
+- Unit tests for all stores
+- Integration tests for cross-store operations
+- State management documentation
 
-1. **AI Integration**: The `/app/services/ai/aiService.ts` implementation provides a proven architecture for AI integration with proper error handling and fallbacks
-2. **Error Recovery**: The session recovery in `/app/components/GameSessionContent.tsx` offers robust patterns for handling errors and crashes
-3. **State Management**: The campaign state management in `/app/components/CampaignStateManager.tsx` provides a tested approach for game save management
-4. **Narrative Interface**: The narrative display in `/app/components/NarrativeDisplay.tsx` demonstrates effective formatting
-5. **Journal System**: The journal implementation in `/app/components/JournalViewer.tsx` shows useful patterns for history tracking
-6. **Character Creation**: The wizard approach in `/app/components/CharacterCreation` offers a solid foundation
-7. **Debug Tools**: The debug panel in `/app/components/Debug/DevToolsPanel.tsx` provides valuable patterns for development diagnostics
+### In Progress 🔄
+- Core UI component library
+- Error boundary implementation
+- Development diagnostics
 
-These components should be examined closely during implementation to leverage proven solutions.
+### Next Up 📋
+- IndexedDB persistence layer (#340)
+- World creation UI components
+- Character creation wizard
+- AI service integration
+- Narrative display components
 
-## MVP Deliverables
+## Updated Timeline
 
-1. **Working Application**
-   - AI-assisted world creation system
-   - Character creation and management system
-   - AI-driven narrative engine with player choices
-   - Journal system for game history tracking
-   - Robust state persistence and campaign management
-   - Responsive, accessible UI with world theming
-   - Error recovery and session management
+- **Week 1-2**: ~~Project setup and state management~~ ✅
+- **Week 3-4**: World and Character UI components
+- **Week 5-6**: AI service integration
+- **Week 7-8**: Narrative engine and Journal UI
+- **Week 9-10**: Game session integration
+- **Week 11-12**: Testing, polish, and deployment
 
-2. **Documentation**
-   - System architecture documentation
-   - User guides for key features
-   - Component library in Storybook
-   - Type definitions and interfaces
-   - Development workflows and patterns
-   - Error handling guidelines
+## Current Blockers
 
-3. **Test Coverage**
-   - Unit tests for all components and functions
-   - Integration tests for system interactions
-   - End-to-end tests for critical user journeys
-   - Accessibility tests with axe-core
-   - Performance benchmarks for critical operations
-   - Error recovery path testing
+None - Issue #340 (IndexedDB persistence) is now unblocked and ready for implementation.
 
-## Success Criteria
+## Recent Changes
 
-The MVP will be considered successful when:
-
-1. Users can create worlds by providing freeform descriptions that are analyzed by AI
-2. Users can review and customize AI-suggested attributes and skills
-3. Users can create characters with attributes and skills defined by the world
-4. The narrative engine generates coherent, world-appropriate content
-5. Player choices meaningfully influence subsequent narrative
-6. The journal system records and categorizes game events
-7. The state management system reliably persists game state
-8. The UI is responsive across desktop and mobile devices
-9. The system recovers gracefully from errors and crashes
-10. All core user journeys pass end-to-end tests
-11. The codebase follows established best practices and standards
-12. The application performs well with acceptable loading times
-13. Users can recover from interrupted sessions without significant data loss
-
-## Risk Management
-
-### Technical Risks
-
-1. **AI Integration Challenges**
-   - **Risk**: Google Gemini API limitations, inconsistent output, or token cost concerns
-   - **Mitigation**: Create robust prompt templates, implement fallback content, add retry mechanisms, optimize context management
-   - **Contingency**: Prepare alternative AI providers or simplified rule-based fallbacks
-
-2. **IndexedDB Complexity**
-   - **Risk**: Challenges with IndexedDB implementation, browser compatibility issues
-   - **Mitigation**: Use established library (idb), implement comprehensive error handling, add storage quota management
-   - **Contingency**: Create localStorage fallback for critical data
-
-3. **Performance Bottlenecks**
-   - **Risk**: Slow application performance with large datasets or complex state
-   - **Mitigation**: Implement state normalization, use selector memoization, optimize renders
-   - **Contingency**: Add state pruning for older entries, implement pagination
-
-4. **Next.js App Router Limitations**
-   - **Risk**: Unexpected limitations or performance issues with App Router
-   - **Mitigation**: Keep up with Next.js updates, test core functionality early
-   - **Contingency**: Prepare fallback to Pages Router if necessary
-
-5. **Error Recovery Complexity**
-   - **Risk**: Difficulty implementing robust error recovery for all failure scenarios
-   - **Mitigation**: Prioritize recovery for critical paths, implement comprehensive logging
-   - **Contingency**: Simplify recovery options and focus on data preservation
-
-### Project Risks
-
-1. **Scope Creep**
-   - **Risk**: Feature expansion beyond MVP boundaries
-   - **Mitigation**: Strict adherence to requirements, regular scope review, clear documentation of out-of-scope features
-   - **Contingency**: Maintain prioritized backlog for post-MVP enhancements
-
-2. **Technical Debt**
-   - **Risk**: Shortcuts to meet timeline leading to future issues
-   - **Mitigation**: Maintain TDD discipline, enforce code standards, regular refactoring
-   - **Contingency**: Schedule technical debt sprints after MVP if necessary
-
-3. **Solo Developer Bottlenecks**
-   - **Risk**: Development slowdowns due to solo developer context
-   - **Mitigation**: Focused implementation plan, regular progress tracking, clear documentation
-   - **Contingency**: Identify features that could be simplified if timeline is threatened
-
-4. **AI Prompt Engineering Challenges**
-   - **Risk**: Difficulty creating effective prompts for world creation and narrative
-   - **Mitigation**: Iterative prompt development, extensive testing with varied inputs
-   - **Contingency**: Develop simplified prompt templates with more structure
-
-## Post-MVP Priorities
-
-### Near-Term Enhancements
-
-1. **UI/UX Refinements**
-   - Enhanced visual theme system
-   - Improved responsive design
-   - Advanced accessibility features
-   - User preference settings
-
-2. **Content Enhancements**
-   - Additional world templates
-   - More sophisticated prompt engineering
-   - Character portrait generation
-   - Tone settings for narrative style customization
-
-3. **Functional Improvements**
-   - Advanced character advancement
-   - Decision impact visualization
-   - Journal improvements with search
-   - More detailed narrative context management
-
-4. **Inventory System Integration**
-   - Basic inventory management
-   - Item properties and categories
-   - Equipment system
-   - Integration with narrative choices
-
-### Long-Term Roadmap Items
-
-1. **NPC System**
-   - NPC creation and management
-   - Relationship tracking
-   - Dialogue system improvements
-   - NPC memory and personality
-
-2. **World Building Tools**
-   - Location management
-   - Faction and organization systems
-   - Custom mechanics beyond attributes/skills
-   - World history generation
-
-3. **Advanced Narrative Features**
-   - Multiple storylines
-   - Procedural quest generation
-   - Advanced narrative planning
-   - Custom story templates
-   - Character arcs and development
-
-4. **Combat System** (Optional)
-   - Turn-based combat mechanics
-   - Combat stats derived from attributes
-   - Initiative and action systems
-   - Equipment effects in combat
-
-5. **Sharing and Community**
-   - World sharing capabilities
-   - Character sharing
-   - Campaign publishing
-   - Community features
-   - Rating and feedback system
-
-## Getting Started
-
-To begin MVP implementation:
-
-1. Set up development environment with recommended tools
-2. Initialize Next.js 14 project with TypeScript configuration
-3. Configure ESLint, Prettier, and testing framework
-4. Create initial project structure based on domain-driven design
-5. Implement core state management architecture
-6. Configure Storybook for component development
-7. Create GitHub issues from refined requirements
-8. Begin implementing World Configuration System with AI assistance
+1. **State Management Migration**: Successfully migrated from proposed Context/useReducer pattern to Zustand stores
+2. **Documentation Update**: Updated all state management documentation to reflect Zustand implementation
+3. **Test Coverage**: Added comprehensive test coverage for all stores
+4. **Issue Tracking**: Updated GitHub issues to reflect completion of #339
 
 ## Conclusion
 
-This MVP implementation plan provides a comprehensive roadmap for developing the Narraitor application. By focusing on AI-assisted world creation from freeform descriptions, the project aims to deliver a flexible narrative RPG framework that can truly adapt to any fictional world the user wishes to explore.
-
-The plan maintains a balanced approach between feature scope and quality, with special attention to error handling, recovery mechanisms, and user experience. Through disciplined development practices and incremental delivery, the MVP will establish a solid foundation for future enhancements while providing a fully functional application.
+The MVP implementation is progressing well with the state management foundation now complete. The Zustand-based architecture provides a solid foundation for the UI components and features to be built on top. With all stores implemented and tested, the project is ready to move forward with the persistence layer and UI implementation phases.
