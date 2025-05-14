@@ -13,6 +13,8 @@ const config = {
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
+    '<rootDir>/pages/',  // Ignore old pages directory
+    '<rootDir>/app/',    // Ignore old app directory
   ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {

@@ -1,6 +1,8 @@
-/// &lt;reference types="../../../src/types/global.d.ts" />
+'use client';
+
+/// <reference types="../../../../types/global.d.ts" />
 import React from 'react';
-import { World } from '../../../src/types/world.types';
+import { World } from '@/types/world.types';
 
 // Define the type for worldListTestUtils
 interface WorldListTestUtils {
@@ -63,7 +65,7 @@ export default function WorldListScreenPage() {
         async addTestWorlds() {
           console.log('Adding test worlds...');
           try {
-            const { worldStore } = await import('../../../src/state/worldStore');
+            const { worldStore } = await import('@/state/worldStore');
             const store = worldStore.getState();
 
             // Add test worlds
@@ -103,7 +105,7 @@ export default function WorldListScreenPage() {
         async clearWorlds() {
           console.log('Clearing worlds...');
           try {
-            const { worldStore } = await import('../../../src/state/worldStore');
+            const { worldStore } = await import('@/state/worldStore');
             const store = worldStore.getState();
 
             // Clear all worlds
@@ -118,7 +120,7 @@ export default function WorldListScreenPage() {
         async setLoadingState(loading: boolean) {
           console.log(`Setting loading state to: ${loading}`);
           try {
-            const { worldStore } = await import('../../../src/state/worldStore');
+            const { worldStore } = await import('@/state/worldStore');
             const store = worldStore.getState();
             store.setLoading(loading);
             console.log('Loading state updated');
@@ -129,7 +131,7 @@ export default function WorldListScreenPage() {
         async setErrorState(error: string | null) {
           console.log(`Setting error state to: ${error}`);
           try {
-            const { worldStore } = await import('../../../src/state/worldStore');
+            const { worldStore } = await import('@/state/worldStore');
             const store = worldStore.getState();
             store.setError(error);
             console.log('Error state updated');
@@ -138,7 +140,7 @@ export default function WorldListScreenPage() {
           }
         },
         inspectStore() {
-          import('../../../src/state/worldStore').then(({ worldStore }) => {
+          import('@/state/worldStore').then(({ worldStore }) => {
             const state = worldStore.getState();
             console.log('Current store state:', state);
           });
