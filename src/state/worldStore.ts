@@ -6,7 +6,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 /**
  * World store interface with state and actions
  */
-interface WorldStore {
+export interface WorldStore {
   // State
   worlds: Record<EntityID, World>;
   currentWorldId: EntityID | null;
@@ -18,6 +18,7 @@ interface WorldStore {
   updateWorld: (id: EntityID, updates: Partial<World>) => void;
   deleteWorld: (id: EntityID) => void;
   setCurrentWorld: (id: EntityID) => void;
+  fetchWorlds: () => Promise<void>; // Add fetchWorlds action
   
   // Attribute management
   addAttribute: (worldId: EntityID, attribute: Omit<WorldAttribute, 'id' | 'worldId'>) => void;
@@ -324,4 +325,13 @@ export const worldStore = create<WorldStore>()((set) => ({
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
+
+  // Fetch worlds action (placeholder implementation)
+  fetchWorlds: async () => {
+    set({ loading: true, error: null });
+    // Simulate fetching data
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // TODO: Implement actual data fetching logic
+    set({ loading: false });
+  },
 }));
