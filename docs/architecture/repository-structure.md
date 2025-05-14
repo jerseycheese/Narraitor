@@ -3,16 +3,16 @@ title: Repository Structure
 aliases: [GitHub Structure, File Organization]
 tags: [narraitor, documentation, architecture, github]
 created: 2025-04-28
-updated: 2025-04-28
+updated: 2025-05-14
 ---
 
 # Narraitor Repository Structure
 
 ## Overview
 
-This document outlines the recommended file and directory structure for the Narraitor GitHub repository. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
+This document outlines the current file and directory structure for the Narraitor GitHub repository after the App Router migration. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
 
-## Structure
+## Current Structure
 
 ```
 narraitor/
@@ -21,62 +21,89 @@ narraitor/
 │   │   └── ci.yml               # Basic CI for tests and builds
 │   └── PULL_REQUEST_TEMPLATE.md # Enforce the TDD approach
 ├── src/
-│   ├── app/                     # Next.js App Router
-│   │   ├── layout.tsx           # Root layout
-│   │   ├── page.tsx             # Landing page
-│   │   ├── world/               # World management routes
-│   │   │   ├── create/          # World creation wizard
-│   │   │   ├── [id]/            # Single world view/edit
-│   │   │   └── page.tsx         # World selection
-│   │   ├── character/           # Character routes
-│   │   │   ├── create/          # Character creation wizard
-│   │   │   ├── [id]/            # Character view/edit
-│   │   │   └── page.tsx         # Character selection
-│   │   └── play/                # Game session routes
-│   │       ├── [id]/            # Specific game session
-│   │       └── journal/         # Journal routes
-│   ├── domains/                 # Domain-specific logic
-│   │   ├── world/               # World domain
-│   │   │   ├── actions.ts       # World-specific actions
-│   │   │   ├── reducer.ts       # World state reducer 
-│   │   │   ├── hooks.ts         # World-specific hooks
-│   │   │   └── types.ts         # World-specific types
-│   │   ├── character/           # Character domain
-│   │   ├── narrative/           # Narrative domain
-│   │   ├── journal/             # Journal domain
-│   │   └── ai/                  # AI service domain
+│   ├── app/                     # Next.js App Router (migrated from pages/)
+│   │   ├── layout.tsx           # Root layout (replaces pages/_app.tsx)
+│   │   ├── page.tsx             # Home page
+│   │   ├── error.tsx            # Error boundary
+│   │   ├── loading.tsx          # Loading state
+│   │   ├── globals.css          # Global styles
+│   │   ├── about/               # About page
+│   │   │   └── page.tsx
+│   │   ├── simple-test/         # Test pages
+│   │   │   └── page.tsx
+│   │   ├── test/
+│   │   │   └── page.tsx
+│   │   └── dev/                 # Development test harnesses
+│   │       ├── page.tsx         # Dev index
+│   │       ├── layout.tsx       # Dev layout
+│   │       ├── world-list-screen/
+│   │       │   └── page.tsx
+│   │       ├── test-nested/
+│   │       │   └── page.tsx
+│   │       ├── controls/
+│   │       │   └── page.tsx
+│   │       └── mocks/
+│   │           └── page.tsx
 │   ├── components/              # Shared UI components
 │   │   ├── ui/                  # Basic UI components
 │   │   ├── world/               # World-related components
 │   │   ├── character/           # Character components
 │   │   └── narrative/           # Narrative components
-│   ├── lib/                     # Shared utilities
+│   ├── lib/                     # Shared utilities and services
 │   │   ├── ai-service.ts        # AI integration abstraction
 │   │   ├── persistence.ts       # IndexedDB functionality
 │   │   └── utils.ts             # General utilities
-│   ├── state/                   # Global state management
-│   │   ├── provider.tsx         # State provider component
-│   │   ├── reducer.ts           # Root reducer
-│   │   └── initial-state.ts     # Initial app state
-│   ├── types/                   # Shared type definitions
+│   ├── state/                   # State management (Zustand)
+│   │   ├── worldStore.ts        # World state
+│   │   ├── characterStore.ts    # Character state
+│   │   ├── narrativeStore.ts    # Narrative state
+│   │   ├── journalStore.ts      # Journal state
+│   │   └── inventoryStore.ts    # Inventory state
+│   ├── types/                   # TypeScript type definitions
+│   │   ├── world.types.ts
+│   │   ├── character.types.ts
 │   │   └── index.ts             # Type exports
-│   └── templates/               # World templates for MVP
-│       ├── western.ts
-│       ├── sitcom.ts
-│       └── adventure.ts
+│   └── utils/                   # Helper functions
 ├── public/                      # Static assets
-├── tests/                       # Test files
-│   ├── unit/                    # Unit tests
-│   ├── integration/             # Integration tests
-│   └── e2e/                     # End-to-end tests
+│   ├── styles.css              # Temporary styles (CSS issue workaround)
+│   └── favicon.ico
+├── __tests__/                   # Test files
+├── docs/                        # Project documentation
+│   ├── architecture/
+│   │   ├── app-router-migration.md  # NEW: Migration documentation
+│   │   └── repository-structure.md  # THIS FILE
+│   └── technical-guides/
 ├── .eslintrc.js                 # ESLint configuration
 ├── .prettierrc                  # Prettier configuration
-├── jest.config.js               # Jest configuration
-├── next.config.js               # Next.js configuration
-├── tailwind.config.js           # Tailwind CSS configuration
+├── jest.config.cjs              # Jest configuration
+├── next.config.ts               # Next.js configuration
+├── tailwind.config.ts           # Tailwind CSS configuration
 ├── tsconfig.json                # TypeScript configuration
 └── package.json                 # Dependencies and scripts
 ```
+
+## Migration Changes
+
+### From Pages Router to App Router
+
+The application has been migrated from Next.js Pages Router to App Router. Key changes include:
+
+1. **Page Structure**: 
+   - `pages/` → `src/app/`
+   - Each route now has its own directory with `page.tsx`
+   - Layouts use `layout.tsx` files
+
+2. **Special Files**:
+   - `pages/_app.tsx` → `src/app/layout.tsx`
+   - Added `error.tsx` for error boundaries
+   - Added `loading.tsx` for loading states
+
+3. **Client Components**:
+   - Components using hooks or browser APIs need `'use client'` directive
+
+4. **Test Harnesses**:
+   - Migrated from `pages/dev/` to `src/app/dev/`
+   - Maintained all functionality and test utilities
 
 ## Key Organization Principles
 
@@ -91,86 +118,69 @@ The repository is organized around key domains (world, character, narrative, jou
 
 ### App Router Structure
 
-The `app` directory follows Next.js 14 App Router conventions with:
+The `app` directory follows Next.js 14+ App Router conventions with:
 
 1. Page components for routes (`page.tsx`)
 2. Layouts for consistent UI shells (`layout.tsx`)
 3. Dynamic routes with parameters (`[id]`)
 4. Nested routes that reflect the application hierarchy
+5. Server Components by default for better performance
 
 ### Clear Separation of Concerns
 
-1. **Domain Logic**: Business rules and state management in `domains/`
+1. **Domain Logic**: State management in `state/` using Zustand
 2. **UI Components**: Reusable interface elements in `components/`
-3. **Utilities**: Shared functionality in `lib/`
+3. **Utilities**: Shared functionality in `lib/` and `utils/`
 4. **Types**: Shared type definitions in `types/`
 5. **Routes**: Application pages in `app/`
 
 ### Testing Organization
 
-Tests follow the same structure as the application code but are kept in a separate `tests` directory to keep the source directory clean and focused.
+Tests are located in `__tests__/` directory with a structure that mirrors the source code.
 
-## Implementation Approach
+## State Management
 
-### Phase 1: Repository Setup
+The application uses Zustand for state management with domain-specific stores:
 
-1. Initialize the Next.js project with TypeScript
-2. Configure ESLint, Prettier, and other tooling
-3. Set up the basic folder structure
-4. Create GitHub repository and configure branch protection
-5. Add CI workflow for testing
+- `worldStore.ts`: World configuration state
+- `characterStore.ts`: Character management state
+- `narrativeStore.ts`: Narrative engine state
+- `journalStore.ts`: Journal system state
+- `inventoryStore.ts`: Inventory management state
 
-### Phase 2: Core Infrastructure
+Each store follows Zustand patterns and can be used in client components with the `'use client'` directive.
 
-1. Implement shared type definitions
-2. Set up state management architecture
-3. Create persistence layer with IndexedDB
-4. Implement basic UI components
-5. Set up routing and layouts
+## Development Workflow
 
-### Phase 3: Domain Implementation
+### Test Harnesses
 
-Implement each domain incrementally, starting with World domain:
+Development test harnesses are available at `/dev/*`:
 
-1. Define domain-specific types
-2. Create reducers and actions
-3. Implement basic UI components
-4. Create domain-specific hooks
-5. Connect to persistence layer
+1. `/dev` - Index of all test harnesses
+2. `/dev/world-list-screen` - World list component testing
+3. `/dev/test` - Basic component testing
+4. `/dev/test-nested` - Nested routing tests
+5. `/dev/controls` - Developer controls interface
+6. `/dev/mocks` - Mock services testing
 
-## Rationale for Structure
+### Known Issues
 
-### Why Domain-Driven Organization?
-
-This approach is chosen specifically for Narraitor because:
-
-1. The application has clearly defined domain boundaries (world, character, narrative, journal)
-2. Each domain has its own state, actions, and UI concerns
-3. It will make it easier to implement and maintain the MVP
-4. Future extensions (NPC system, combat, inventory) can be added as new domains
-
-### Why App Router vs. Pages Router?
-
-App Router provides several benefits for Narraitor:
-
-1. Better support for nested layouts (important for the game interface)
-2. Improved data loading and state management
-3. Better performance through server components
-4. More flexible routing patterns for dynamic game sessions
-
-## Next Steps
-
-1. Initialize the repository with this structure
-2. Implement the core type definitions
-3. Set up state management foundation
-4. Create basic UI components
-5. Implement the World domain
+1. **CSS/Tailwind Configuration**: Currently experiencing issues with Tailwind CSS v4 and PostCSS in the App Router. Using inline styles as a temporary workaround.
 
 ## Future Considerations
 
-While this structure is optimized for the MVP, it can evolve as the project grows:
+While this structure supports the current MVP, it can evolve as the project grows:
 
-1. **Storybook Integration**: Add Storybook for component development in Phase 2
-2. **Microservice Architecture**: Domain structure simplifies future extraction into services
-3. **Additional Domains**: New domains can be added for NPC system, inventory, etc.
-4. **Internationalization**: i18n support can be added within the app directory
+1. **CSS Resolution**: Fix Tailwind CSS v4 configuration or downgrade to v3
+2. **Test Updates**: Update all test files to use new App Router paths
+3. **Additional Domains**: New domains can be added for future features
+4. **Performance Optimization**: Leverage React Server Components more effectively
+5. **Error Handling**: Enhance error boundaries with better user feedback
+
+## Next Steps
+
+1. Fix CSS/Tailwind configuration issue
+2. Update test file imports
+3. Clean up legacy Pages Router directories
+4. Optimize for React Server Components
+5. Enhance documentation with migration learnings

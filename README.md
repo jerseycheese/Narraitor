@@ -57,6 +57,36 @@ npm run test
 npm run test:prompt-templates
 ```
 
+### Development Test Harnesses
+
+The application includes test harnesses for interactive component testing:
+
+- `/dev` - Development test harness index
+- `/dev/world-list-screen` - World list component test harness
+- `/dev/test` - Basic test component
+- `/dev/test-nested` - Nested routing test
+- `/dev/controls` - Developer controls interface
+- `/dev/mocks` - Mock services testing
+
+## Project Structure
+
+The project uses Next.js App Router (Next.js 13+) with the following structure:
+
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Home page
+│   ├── error.tsx          # Error boundary
+│   ├── loading.tsx        # Loading state
+│   └── dev/               # Development test harnesses
+├── components/            # Shared UI components
+├── lib/                   # Utility functions and services
+├── state/                # State management (Zustand stores)
+├── types/                # TypeScript type definitions
+└── utils/                # Helper functions
+```
+
 ## Architecture
 
 Narraitor follows a domain-driven design approach with clear separation of concerns:
@@ -65,8 +95,16 @@ Narraitor follows a domain-driven design approach with clear separation of conce
 - **Character System**: Create and manage characters
 - **Narrative Engine**: AI-driven storytelling with template system
 - **Journal System**: Track gameplay events
-- **State Management**: Persist game state between sessions
+- **State Management**: Persist game state between sessions using Zustand
 - **AI Service Integration**: Google Gemini integration for dynamic content generation
+
+### App Router Migration
+
+The application has been migrated from Next.js Pages Router to App Router, leveraging:
+- React Server Components for improved performance
+- Nested layouts for better code organization
+- Built-in error boundaries and loading states
+- Metadata API for SEO optimization
 
 ## AI Service Integration
 
