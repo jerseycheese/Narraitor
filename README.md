@@ -9,6 +9,7 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 ## Features
 
 - World configuration system for defining settings, rules, and parameters
+- **NEW**: World Creation Wizard with AI-assisted attribute and skill suggestions
 - Character creation and management system with attributes and skills
 - AI-driven narrative engine for dynamic storytelling
 - Journal system for tracking gameplay events
@@ -62,9 +63,8 @@ npm run test:prompt-templates
 The application includes test harnesses for interactive component testing:
 
 - `/dev` - Development test harness index
-- `/dev/world-list-screen` - World list component test harness
+- `/dev/world-creation-wizard` - World Creation Wizard test harness
 - `/dev/test` - Basic test component
-- `/dev/test-nested` - Nested routing test
 - `/dev/controls` - Developer controls interface
 - `/dev/mocks` - Mock services testing
 
@@ -92,6 +92,9 @@ src/
 Narraitor follows a domain-driven design approach with clear separation of concerns:
 
 - **World Configuration**: Define settings, rules, and parameters
+  - Multi-step wizard for creating worlds
+  - AI-assisted attribute and skill generation
+  - Default attributes and skills for quick setup
 - **Character System**: Create and manage characters
 - **Narrative Engine**: AI-driven storytelling with template system
 - **Journal System**: Track gameplay events

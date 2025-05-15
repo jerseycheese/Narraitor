@@ -62,7 +62,7 @@ describe('worldStore', () => {
   });
 
   describe('updateWorld', () => {
-    test('should update existing world', () => {
+    test('should update existing world', async () => {
       const worldData = {
         name: 'Original World',
         theme: 'fantasy',
@@ -79,8 +79,8 @@ describe('worldStore', () => {
       const worldId = worldStore.getState().createWorld(worldData);
       const originalUpdatedAt = worldStore.getState().worlds[worldId].updatedAt;
 
-      // Wait a moment to ensure timestamp difference
-      jest.advanceTimersByTime(1);
+      // Add a small delay to ensure different timestamps
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       worldStore.getState().updateWorld(worldId, { name: 'Updated World' });
       const state = worldStore.getState();

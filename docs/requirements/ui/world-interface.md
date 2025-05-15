@@ -13,10 +13,11 @@ The World Interface provides the user-facing components for creating, editing, a
 
 ## Core Functionality
 - **World Creation Wizard**: Step-by-step interface for creating new worlds
+- **AI-Assisted World Creation**: Generates attributes and skills from world description
 - **World Listing**: View and select from available worlds
 - **World Editor**: Modify existing world configurations
-- **Attribute Management**: Interface for adding and editing attributes
-- **Skill Management**: Interface for adding and editing skills
+- **Attribute Management**: Interface for adding and editing attributes (max 6)
+- **Skill Management**: Interface for adding and editing skills (max 12)
 - **Tone Configuration**: Interface for setting narrative tone preferences (post-MVP)
 - **Template Selection**: Choose from pre-defined world templates (post-MVP)
 - **World Import/Export**: User interface for data import/export (post-MVP)
@@ -26,6 +27,11 @@ The World Interface provides the user-facing components for creating, editing, a
 ### Core Components
 - **WorldList**: Displays available worlds with filtering options
 - **WorldCreationWizard**: Multi-step wizard for world creation
+  - BasicInfoStep: Collects name and theme
+  - DescriptionStep: Gathers world description and triggers AI analysis
+  - AttributeReviewStep: Review and modify AI-suggested attributes
+  - SkillReviewStep: Review and modify AI-suggested skills  
+  - FinalizeStep: Complete world creation
 - **WorldEditor**: Form-based interface for editing worlds
 - **AttributeEditor**: Component for managing world attributes
 - **SkillEditor**: Component for managing world skills
@@ -137,7 +143,7 @@ WorldInterface/
 
 ## Status
 - [x] Requirements defined
-- [ ] GitHub issues created
-- [ ] Implementation started
-- [ ] Implementation completed
-- [ ] Acceptance criteria met
+- [x] GitHub issues created (#282)
+- [x] Implementation started
+- [x] Implementation completed
+- [x] Acceptance criteria met

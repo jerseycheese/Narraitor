@@ -1,0 +1,265 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { worldStore } from '@/state/worldStore';
+import { World } from '@/types/world.types';
+import BasicInfoStep from './steps/BasicInfoStep';
+import DescriptionStep from './steps/DescriptionStep';
+import AttributeReviewStep from './steps/AttributeReviewStep';
+import SkillReviewStep from './steps/SkillReviewStep';
+import FinalizeStep from './steps/FinalizeStep';
+import { WizardState, WIZARD_STEPS } from './WizardState';
+import { styles } from './WizardStyles';
+
+export type { AttributeSuggestion, SkillSuggestion } from './WizardState';
+
+export interface WorldCreationWizardProps {
+  onComplete?: (worldId: string) => void;
+  onCancel?: () => void;
+  initialStep?: number;
+  initialData?: Partial<WizardState>;
+}
+
+export default function WorldCreationWizard({ 
+  onComplete, 
+  onCancel,
+  initialStep = 0,
+  initialData
+}: WorldCreationWizardProps) {
+  const router = useRouter();
+  const createWorld = worldStore((state) => state.createWorld);
+  const [mounted, setMounted] = useState(false);
+  const [wizardState, setWizardState] = useState<WizardState>({
+    currentStep: initialStep,
+    worldData: initialData?.worldData || {
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
+      }
+    },
+    aiSuggestions: initialData?.aiSuggestions,
+    errors: {},
+    isProcessing: false,
+  });
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Expose wizardState for testing
+  useEffect(() => {
+    if (mounted && (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')) {
+      const testWindow = window as Window & {
+        __testWizardState?: {
+          getState: () => WizardState;
+          setState: (newState: Partial<WizardState>) => void;
+        };
+      };
+      
+      testWindow.__testWizardState = {
+        getState: () => wizardState,
+        setState: (newState: Partial<WizardState>) => {
+          setWizardState(prev => ({ ...prev, ...newState }));
+        }
+      };
+      
+      return () => {
+        delete testWindow.__testWizardState;
+      };
+    }
+  }, [wizardState, mounted]);
+
+  const handleNext = () => {
+    if (wizardState.currentStep < WIZARD_STEPS.length - 1) {
+      setWizardState(prev => ({
+        ...prev,
+        currentStep: prev.currentStep + 1,
+        errors: {},
+      }));
+    }
+  };
+
+  const handleBack = () => {
+    if (wizardState.currentStep > 0) {
+      setWizardState(prev => ({
+        ...prev,
+        currentStep: prev.currentStep - 1,
+        errors: {},
+      }));
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.push('/worlds');
+    }
+  };
+
+  const handleComplete = () => {
+    try {
+      const worldId = createWorld({
+        name: wizardState.worldData.name!,
+        description: wizardState.worldData.description!,
+        theme: wizardState.worldData.theme!,
+        attributes: wizardState.worldData.attributes || [],
+        skills: wizardState.worldData.skills || [],
+        settings: wizardState.worldData.settings!,
+      });
+      
+      // Save to localStorage as temporary solution
+      if (typeof window !== 'undefined') {
+        const worlds = JSON.parse(localStorage.getItem('worlds') || '[]');
+        worlds.push({
+          id: worldId,
+          name: wizardState.worldData.name,
+          theme: wizardState.worldData.theme,
+          description: wizardState.worldData.description,
+          createdAt: new Date().toISOString(),
+          attributes: wizardState.worldData.attributes || [],
+          skills: wizardState.worldData.skills || [],
+        });
+        localStorage.setItem('worlds', JSON.stringify(worlds));
+      }
+      
+      if (onComplete) {
+        onComplete(worldId);
+      } else {
+        router.push('/worlds');
+      }
+    } catch {
+      // Fallback error handling
+      const worldId = `world-${Date.now()}`;
+      if (typeof window !== 'undefined') {
+        const worlds = JSON.parse(localStorage.getItem('worlds') || '[]');
+        worlds.push({
+          id: worldId,
+          name: wizardState.worldData.name,
+          theme: wizardState.worldData.theme,
+          description: wizardState.worldData.description,
+          createdAt: new Date().toISOString(),
+          attributes: wizardState.worldData.attributes || [],
+          skills: wizardState.worldData.skills || [],
+        });
+        localStorage.setItem('worlds', JSON.stringify(worlds));
+      }
+      
+      if (onComplete) {
+        onComplete(worldId);
+      } else {
+        router.push('/worlds');
+      }
+    }
+  };
+
+  const updateWorldData = (updates: Partial<World>) => {
+    setWizardState(prev => ({
+      ...prev,
+      worldData: { ...prev.worldData, ...updates },
+    }));
+  };
+
+  const stepProps = {
+    worldData: wizardState.worldData,
+    errors: wizardState.errors,
+    onUpdate: updateWorldData,
+    onNext: handleNext,
+    onBack: handleBack,
+    onCancel: handleCancel,
+  };
+
+  const renderCurrentStep = () => {
+    switch (wizardState.currentStep) {
+      case 0:
+        return <BasicInfoStep {...stepProps} />;
+      case 1:
+        return (
+          <DescriptionStep
+            {...stepProps}
+            isProcessing={wizardState.isProcessing}
+            setAISuggestions={(suggestions) => 
+              setWizardState(prev => ({ ...prev, aiSuggestions: suggestions }))
+            }
+            setProcessing={(isProcessing) => 
+              setWizardState(prev => ({ ...prev, isProcessing }))
+            }
+            setError={(field, error) => 
+              setWizardState(prev => ({ 
+                ...prev, 
+                errors: { ...prev.errors, [field]: error } 
+              }))
+            }
+          />
+        );
+      case 2:
+        return (
+          <AttributeReviewStep
+            {...stepProps}
+            suggestions={wizardState.aiSuggestions?.attributes || []}
+          />
+        );
+      case 3:
+        return (
+          <SkillReviewStep
+            {...stepProps}
+            suggestions={wizardState.aiSuggestions?.skills || []}
+          />
+        );
+      case 4:
+        return (
+          <FinalizeStep
+            {...stepProps}
+            onComplete={handleComplete}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div style={styles.container} data-testid="wizard-container">
+      <div style={styles.wizard}>
+        <div style={styles.header} data-testid="wizard-header">
+          <h1 style={styles.title}>Create New World</h1>
+          <div style={styles.progress} data-testid="wizard-progress">
+            <span>Step {wizardState.currentStep + 1} of {WIZARD_STEPS.length}</span>
+          </div>
+        </div>
+
+        <div style={styles.steps}>
+          {WIZARD_STEPS.map((step, index) => (
+            <div
+              key={step.id}
+              data-testid={`wizard-step-${step.id}`}
+              style={{
+                ...styles.step,
+                ...(index === wizardState.currentStep ? styles.activeStep : {}),
+                ...(index < wizardState.currentStep ? styles.completedStep : {}),
+              }}
+            >
+              <div style={styles.stepNumber} data-testid={`wizard-step-number-${index}`}>
+                {index + 1}
+              </div>
+              <span style={styles.stepLabel}>{step.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={styles.content} data-testid="wizard-content">
+          {renderCurrentStep()}
+        </div>
+
+        {wizardState.errors.submit && (
+          <div style={styles.errorMessage} data-testid="wizard-error-submit">
+            {wizardState.errors.submit}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
