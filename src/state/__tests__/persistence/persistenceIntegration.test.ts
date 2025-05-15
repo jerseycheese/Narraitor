@@ -83,8 +83,12 @@ describe('Persistence Integration - MVP', () => {
 
   describe('basic persistence functionality', () => {
     test('should persist character store data', async () => {
+      // Use Jest's fake timers
+      jest.useFakeTimers();
+      
       // Give the store time to initialize
-      await new Promise(resolve => setTimeout(resolve, 100));
+      jest.advanceTimersByTime(100);
+      await Promise.resolve(); // Ensure all pending promises are resolved
       
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
