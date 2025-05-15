@@ -1,8 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldCard from '../WorldCard';
-
 import { World } from '../../../types/world.types';
+
+// No need to mock dependencies anymore
+// We'll pass them directly to the component
 
 const mockWorld: World = {
   id: '1',
@@ -37,5 +39,32 @@ describe('WorldCard', () => {
     render(<WorldCard world={mockWorld} onSelect={mockOnSelect} onDelete={jest.fn()} />);
     fireEvent.click(screen.getByTestId('world-card')); // Assuming the card itself is clickable
     expect(mockOnSelect).toHaveBeenCalledWith(mockWorld.id);
+  });
+
+  // New test for Play functionality
+  test('sets current world and navigates to game session when Play is clicked', () => {
+    // Setup mocks
+    const mockSetCurrentWorld = jest.fn();
+    const mockRouterPush = jest.fn();
+    
+    // Directly pass mock dependencies to the component
+    render(
+      <WorldCard 
+        world={mockWorld} 
+        onSelect={jest.fn()} 
+        onDelete={jest.fn()}
+        _storeActions={{ setCurrentWorld: mockSetCurrentWorld }}
+        _router={{ push: mockRouterPush }}
+      />
+    );
+    
+    // Find and click the Play button
+    fireEvent.click(screen.getByTestId('world-card-actions-play-button'));
+    
+    // Verify world is set as current world
+    expect(mockSetCurrentWorld).toHaveBeenCalledWith(mockWorld.id);
+    
+    // Verify navigation to game session page
+    expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/play`);
   });
 });

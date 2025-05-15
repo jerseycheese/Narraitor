@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldList from './WorldList';
+import MockWorldList from './MockWorldList';
 import { World } from '../../types/world.types';
 
+// Using the MockWorldList component instead of the real WorldList
+// This avoids Next.js router issues in Storybook
 const meta = {
   title: 'Narraitor/World/WorldList',
-  component: WorldList,
+  component: MockWorldList,
   parameters: {
     layout: 'centered',
     docs: {
@@ -14,7 +16,7 @@ const meta = {
     }
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof WorldList>;
+} satisfies Meta<typeof MockWorldList>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -57,15 +59,37 @@ const mockWorlds: World[] = [
 export const Default: Story = {
   args: {
     worlds: mockWorlds,
-    onSelectWorld: () => alert('Select World'),
-    onDeleteWorld: () => alert('Delete World'),
+    onSelectWorld: (id) => console.log(`Selected world: ${id}`),
+    onDeleteWorld: (id) => console.log(`Delete world: ${id}`),
+    onPlayWorld: (id) => console.log(`Play world: ${id}`),
   },
 };
 
 export const Empty: Story = {
   args: {
     worlds: [],
-    onSelectWorld: () => alert('Select World'),
-    onDeleteWorld: () => alert('Delete World'),
+    onSelectWorld: (id) => console.log(`Selected world: ${id}`),
+    onDeleteWorld: (id) => console.log(`Delete world: ${id}`),
+    onPlayWorld: (id) => console.log(`Play world: ${id}`),
+  },
+};
+
+// Add a story that demonstrates the Play functionality
+export const WithPlayAction: Story = {
+  args: {
+    worlds: [mockWorlds[0]], // Just use one world for clarity
+    onSelectWorld: (id) => console.log(`Selected world: ${id}`),
+    onDeleteWorld: (id) => console.log(`Delete world: ${id}`),
+    onPlayWorld: (id) => {
+      console.log(`Play world: ${id}`);
+      console.log(`[Storybook] Would navigate to: /world/${id}/play`);
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Demonstrates the Play button functionality for worlds'
+      }
+    }
   },
 };
