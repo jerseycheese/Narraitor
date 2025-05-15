@@ -1,0 +1,203 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import WorldCreationWizard from './WorldCreationWizard';
+
+const meta: Meta<typeof WorldCreationWizard> = {
+  title: 'Narraitor/World/WorldCreationWizard',
+  component: WorldCreationWizard,
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component: 'Multi-step wizard for creating new worlds with AI-assisted attribute and skill suggestions'
+      }
+    },
+    nextjs: {
+      appDirectory: true,
+    },
+  },
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof WorldCreationWizard>;
+
+// Default wizard state
+export const Default: Story = {
+  args: {},
+};
+
+// Story showing the basic info step
+export const BasicInfoStep: Story = {
+  args: {
+    initialStep: 0,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the first step of the wizard where users enter basic world information'
+      }
+    }
+  }
+};
+
+// Story showing the description step
+export const DescriptionStep: Story = {
+  args: {
+    initialStep: 1,
+    initialData: {
+      worldData: {
+        name: 'Fantasy Kingdom',
+        theme: 'fantasy',
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        }
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the step where users provide a detailed world description for AI analysis'
+      }
+    }
+  }
+};
+
+// Story showing the attribute review step
+export const AttributeReviewStep: Story = {
+  args: {
+    initialStep: 2,
+    initialData: {
+      worldData: {
+        name: 'Fantasy Kingdom',
+        theme: 'fantasy',
+        description: 'A magical world filled with wizards and warriors',
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        }
+      },
+      aiSuggestions: {
+        attributes: [
+          { name: 'Strength', description: 'Physical power and endurance', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
+          { name: 'Intelligence', description: 'Mental acuity and reasoning', minValue: 1, maxValue: 10, category: 'Mental', accepted: false },
+          { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
+          { name: 'Charisma', description: 'Social influence and charm', minValue: 1, maxValue: 10, category: 'Social', accepted: false },
+          { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
+          { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
+        ],
+        skills: []
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the attribute review step where users can select and modify suggested attributes'
+      }
+    }
+  }
+};
+
+// Story showing the skill review step
+export const SkillReviewStep: Story = {
+  args: {
+    initialStep: 3,
+    initialData: {
+      worldData: {
+        name: 'Fantasy Kingdom',
+        theme: 'fantasy',
+        description: 'A magical world filled with wizards and warriors',
+        attributes: [
+          { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
+          { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
+        ],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        }
+      },
+      aiSuggestions: {
+        attributes: [],
+        skills: [
+          { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false },
+          { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeName: 'Agility', accepted: false },
+          { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
+          { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
+          { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
+          { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeName: 'Strength', accepted: false },
+          { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
+          { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeName: 'Constitution', accepted: false },
+          { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
+          { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
+          { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Strength', accepted: false },
+          { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
+        ]
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the skill review step where users can select and modify suggested skills'
+      }
+    }
+  }
+};
+
+// Story showing the finalize step
+export const FinalizeStep: Story = {
+  args: {
+    initialStep: 4,
+    initialData: {
+      worldData: {
+        name: 'Fantasy Kingdom',
+        theme: 'fantasy',
+        description: 'A magical world filled with wizards and warriors',
+        attributes: [
+          { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
+          { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
+        ],
+        skills: [
+          { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' },
+          { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' },
+        ],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        }
+      }
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the final step where users review and confirm their world before creation'
+      }
+    }
+  }
+};
+
+// Mobile responsive view
+export const Mobile: Story = {
+  args: {},
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'Shows how the wizard appears on mobile devices'
+      }
+    }
+  }
+};

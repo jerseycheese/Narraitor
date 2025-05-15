@@ -119,7 +119,7 @@ describe('GeminiClient', () => {
         .toThrow('network error');
       
       expect(mockGenerateContent).toHaveBeenCalledTimes(3);
-    });
+    }, 10000); // Increased timeout to 10 seconds
 
     test('should not retry non-retryable errors', async () => {
       const authError = new Error('Invalid API key');

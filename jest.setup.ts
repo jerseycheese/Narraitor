@@ -1,22 +1,33 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
+// DIAGNOSTIC: Log environment variable
+console.log('[jest.setup.ts] NEXT_PUBLIC_GEMINI_API_KEY before setting:', process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+
+// Mock the worldStore module
+jest.mock('@/state/worldStore');
+
+// DIAGNOSTIC: Check if the mock was registered
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockRegistry = (jest as any)._mockRegistry || {};
+console.log('[jest.setup.ts] Mock registry contains worldStore:', '@/state/worldStore' in mockRegistry);
+
 // Mock the next/navigation hooks
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    pathname: '/test-path',
-  }),
-  usePathname: () => '/test-path',
-  useSearchParams: () => new URLSearchParams(),
-}));
+jest.mock('next/navigation', () => {
+  const actualNav = jest.requireActual('next/navigation');
+  return {
+    ...actualNav,
+    useRouter: jest.fn(),
+    usePathname: jest.fn(() => '/test-path'),
+    useSearchParams: jest.fn(() => new URLSearchParams()),
+  };
+});
 
 // Set up any global mocks or configuration here
+process.env.NEXT_PUBLIC_GEMINI_API_KEY = 'MOCK_API_KEY';
+
+// DIAGNOSTIC: Confirm environment variable was set
+console.log('[jest.setup.ts] NEXT_PUBLIC_GEMINI_API_KEY after setting:', process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
 // Mock crypto.randomUUID for Jest environment (jsdom)
 if (typeof global.self === 'undefined') {
