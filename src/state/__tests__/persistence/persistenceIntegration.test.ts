@@ -86,10 +86,6 @@ describe('Persistence Integration - MVP', () => {
       // Use Jest's fake timers
       jest.useFakeTimers();
       
-      // Give the store time to initialize
-      jest.advanceTimersByTime(100);
-      await Promise.resolve(); // Ensure all pending promises are resolved
-      
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
       
@@ -109,8 +105,9 @@ describe('Persistence Integration - MVP', () => {
         status: { hp: 100, mp: 50, stamina: 100 }
       });
 
-      // Wait for persist middleware
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Advance timers and flush promises
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
 
       // Check if character was persisted
       const characterPersisted = mockStorage.setItem.mock.calls.some(
@@ -118,11 +115,14 @@ describe('Persistence Integration - MVP', () => {
       );
       
       expect(characterPersisted).toBe(true);
-    });
+      
+      // Clean up
+      jest.useRealTimers();
+    }, 10000);
 
     test('should maintain data relationships between stores', async () => {
-      // Give the stores time to initialize
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Use Jest's fake timers
+      jest.useFakeTimers();
       
       // Clear the mock after initialization
       mockStorage.setItem.mockClear();
@@ -157,8 +157,9 @@ describe('Persistence Integration - MVP', () => {
         status: { hp: 100, mp: 50, stamina: 100 }
       });
 
-      // Allow async operations to complete
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Advance timers and flush promises
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
 
       // Check if the character was persisted with the correct world reference
       const characterStoreCall = mockStorage.setItem.mock.calls.find(
@@ -173,7 +174,10 @@ describe('Persistence Integration - MVP', () => {
         const character = characterData.state.characters[characterId];
         expect(character.worldId).toBe(worldId);
       }
-    });
+      
+      // Clean up
+      jest.useRealTimers();
+    }, 10000);
   });
 
   describe('error handling and fallback', () => {
@@ -203,6 +207,9 @@ describe('Persistence Integration - MVP', () => {
     });
 
     test('should handle persistence errors gracefully', async () => {
+      // Use Jest's fake timers
+      jest.useFakeTimers();
+      
       // Simulate persistence errors
       const error = new DOMException('SecurityError');
       mockStorage.getItem.mockRejectedValue(error);
@@ -224,9 +231,15 @@ describe('Persistence Integration - MVP', () => {
 
       expect(worldId).toBeDefined();
       
+      // Advance timers and flush promises
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+      
       // Verify store attempted to persist
-      await new Promise(resolve => setTimeout(resolve, 500));
       expect(mockStorage.setItem).toHaveBeenCalled();
-    });
+      
+      // Clean up
+      jest.useRealTimers();
+    }, 10000);
   });
 });
