@@ -7,7 +7,7 @@ export default function WorldsPage() {
   const router = useRouter();
 
   const handleCreateWorld = () => {
-    router.push('/test-harness'); // or whatever route you want for creating worlds
+    router.push('/test-harness'); // TODO: Replace '/test-harness' with the final intended route for creating worlds
   };
 
   return (
