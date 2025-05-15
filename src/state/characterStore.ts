@@ -1,6 +1,8 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { createIndexedDBStorage } from './persistence';
 
 // Simplified character types for MVP implementation
 interface CharacterAttribute {
@@ -26,14 +28,22 @@ interface CharacterBackground {
   motivation: string;
 }
 
+interface CharacterStatus {
+  hp: number;
+  mp: number;
+  stamina: number;
+}
+
 interface Character {
   id: EntityID;
   name: string;
   worldId: EntityID;
+  level: number;
   attributes: CharacterAttribute[];
   skills: CharacterSkill[];
   background: CharacterBackground;
   isPlayer: boolean;
+  status: CharacterStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -77,201 +87,221 @@ const initialState = {
   loading: false,
 };
 
-// Character Store implementation
-export const characterStore = create<CharacterStore>()((set) => ({
-  ...initialState,
+// Character Store implementation with persistence
+export const characterStore = create<CharacterStore>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-  // Create character
-  createCharacter: (characterData) => {
-    if (!characterData.name || characterData.name.trim() === '') {
-      throw new Error('Character name is required');
-    }
+      // Create character
+      createCharacter: (characterData) => {
+        if (!characterData.name || characterData.name.trim() === '') {
+          throw new Error('Character name is required');
+        }
 
-    const characterId = generateUniqueId('char');
-    const now = new Date().toISOString();
-    
-    const newCharacter: Character = {
-      ...characterData,
-      id: characterId,
-      createdAt: now,
-      updatedAt: now,
-    };
+        const characterId = generateUniqueId('char');
+        const now = new Date().toISOString();
+        
+        const newCharacter: Character = {
+          ...characterData,
+          id: characterId,
+          createdAt: now,
+          updatedAt: now,
+        };
 
-    set((state) => ({
-      characters: {
-        ...state.characters,
-        [characterId]: newCharacter,
+        set((state) => ({
+          characters: {
+            ...state.characters,
+            [characterId]: newCharacter,
+          },
+        }));
+
+        return characterId;
       },
-    }));
 
-    return characterId;
-  },
+      // Update character
+      updateCharacter: (id, updates) => set((state) => {
+        if (!state.characters[id]) {
+          return { error: 'Character not found' };
+        }
 
-  // Update character
-  updateCharacter: (id, updates) => set((state) => {
-    if (!state.characters[id]) {
-      return { error: 'Character not found' };
+        const updatedCharacter: Character = {
+          ...state.characters[id],
+          ...updates,
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          characters: {
+            ...state.characters,
+            [id]: updatedCharacter,
+          },
+          error: null,
+        };
+      }),
+
+      // Delete character
+      deleteCharacter: (id) => set((state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [id]: _deletedCharacter, ...remainingCharacters } = state.characters;
+        
+        return {
+          characters: remainingCharacters,
+          currentCharacterId: state.currentCharacterId === id ? null : state.currentCharacterId,
+        };
+      }),
+
+      // Set current character
+      setCurrentCharacter: (id) => set((state) => {
+        if (!state.characters[id]) {
+          return { 
+            error: 'Character not found',
+            currentCharacterId: null,
+          };
+        }
+
+        return {
+          currentCharacterId: id,
+          error: null,
+        };
+      }),
+
+      // Add attribute
+      addAttribute: (characterId, attributeData) => set((state) => {
+        const character = state.characters[characterId];
+        if (!character) {
+          return { error: 'Character not found' };
+        }
+
+        const attributeId = generateUniqueId('attr');
+        const newAttribute: CharacterAttribute = {
+          ...attributeData,
+          id: attributeId,
+          characterId,
+        };
+
+        const updatedCharacter: Character = {
+          ...character,
+          attributes: [...character.attributes, newAttribute],
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          characters: {
+            ...state.characters,
+            [characterId]: updatedCharacter,
+          },
+          error: null,
+        };
+      }),
+
+      // Update attribute
+      updateAttribute: (characterId, attributeId, updates) => set((state) => {
+        const character = state.characters[characterId];
+        if (!character) {
+          return { error: 'Character not found' };
+        }
+
+        const updatedAttributes = character.attributes.map((attr) =>
+          attr.id === attributeId ? { ...attr, ...updates } : attr
+        );
+
+        const updatedCharacter: Character = {
+          ...character,
+          attributes: updatedAttributes,
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          characters: {
+            ...state.characters,
+            [characterId]: updatedCharacter,
+          },
+          error: null,
+        };
+      }),
+
+      // Remove attribute
+      removeAttribute: (characterId, attributeId) => set((state) => {
+        const character = state.characters[characterId];
+        if (!character) {
+          return { error: 'Character not found' };
+        }
+
+        const filteredAttributes = character.attributes.filter(
+          (attr) => attr.id !== attributeId
+        );
+
+        const updatedCharacter: Character = {
+          ...character,
+          attributes: filteredAttributes,
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          characters: {
+            ...state.characters,
+            [characterId]: updatedCharacter,
+          },
+          error: null,
+        };
+      }),
+
+      // Add skill
+      addSkill: (characterId, skillData) => set((state) => {
+        const character = state.characters[characterId];
+        if (!character) {
+          return { error: 'Character not found' };
+        }
+
+        // Check max skills limit (simplified for test - normally would check world settings)
+        if (character.skills.length >= 2) {
+          return { error: 'Maximum skills limit reached' };
+        }
+
+        const skillId = generateUniqueId('skill');
+        const newSkill: CharacterSkill = {
+          ...skillData,
+          id: skillId,
+          characterId,
+        };
+
+        const updatedCharacter: Character = {
+          ...character,
+          skills: [...character.skills, newSkill],
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          characters: {
+            ...state.characters,
+            [characterId]: updatedCharacter,
+          },
+          error: null,
+        };
+      }),
+
+      // State management actions
+      reset: () => set(() => initialState),
+      setError: (error) => set(() => ({ error })),
+      clearError: () => set(() => ({ error: null })),
+      setLoading: (loading) => set(() => ({ loading })),
+    }),
+    {
+      name: 'narraitor-character-store',
+      storage: createIndexedDBStorage(),
+      version: 1,
+      // Migration strategy for future schema updates
+      // Current implementation is minimal for MVP but will need expansion
+      // for handling complex migrations in future versions:
+      // - Add field transformations for new/changed fields
+      // - Add state structure upgrades between versions
+      // - Add validation of migrated data
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      migrate: (persistedState: any, version: number) => {
+        // Simple migration for MVP - just return the state
+        return persistedState;
+      }
     }
-
-    const updatedCharacter: Character = {
-      ...state.characters[id],
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
-      characters: {
-        ...state.characters,
-        [id]: updatedCharacter,
-      },
-      error: null,
-    };
-  }),
-
-  // Delete character
-  deleteCharacter: (id) => set((state) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [id]: _deletedCharacter, ...remainingCharacters } = state.characters;
-    
-    return {
-      characters: remainingCharacters,
-      currentCharacterId: state.currentCharacterId === id ? null : state.currentCharacterId,
-    };
-  }),
-
-  // Set current character
-  setCurrentCharacter: (id) => set((state) => {
-    if (!state.characters[id]) {
-      return { 
-        error: 'Character not found',
-        currentCharacterId: null,
-      };
-    }
-
-    return {
-      currentCharacterId: id,
-      error: null,
-    };
-  }),
-
-  // Add attribute
-  addAttribute: (characterId, attributeData) => set((state) => {
-    const character = state.characters[characterId];
-    if (!character) {
-      return { error: 'Character not found' };
-    }
-
-    const attributeId = generateUniqueId('attr');
-    const newAttribute: CharacterAttribute = {
-      ...attributeData,
-      id: attributeId,
-      characterId,
-    };
-
-    const updatedCharacter: Character = {
-      ...character,
-      attributes: [...character.attributes, newAttribute],
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
-      characters: {
-        ...state.characters,
-        [characterId]: updatedCharacter,
-      },
-      error: null,
-    };
-  }),
-
-  // Update attribute
-  updateAttribute: (characterId, attributeId, updates) => set((state) => {
-    const character = state.characters[characterId];
-    if (!character) {
-      return { error: 'Character not found' };
-    }
-
-    const updatedAttributes = character.attributes.map((attr) =>
-      attr.id === attributeId ? { ...attr, ...updates } : attr
-    );
-
-    const updatedCharacter: Character = {
-      ...character,
-      attributes: updatedAttributes,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
-      characters: {
-        ...state.characters,
-        [characterId]: updatedCharacter,
-      },
-      error: null,
-    };
-  }),
-
-  // Remove attribute
-  removeAttribute: (characterId, attributeId) => set((state) => {
-    const character = state.characters[characterId];
-    if (!character) {
-      return { error: 'Character not found' };
-    }
-
-    const filteredAttributes = character.attributes.filter(
-      (attr) => attr.id !== attributeId
-    );
-
-    const updatedCharacter: Character = {
-      ...character,
-      attributes: filteredAttributes,
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
-      characters: {
-        ...state.characters,
-        [characterId]: updatedCharacter,
-      },
-      error: null,
-    };
-  }),
-
-  // Add skill
-  addSkill: (characterId, skillData) => set((state) => {
-    const character = state.characters[characterId];
-    if (!character) {
-      return { error: 'Character not found' };
-    }
-
-    // Check max skills limit (simplified for test - normally would check world settings)
-    if (character.skills.length >= 2) {
-      return { error: 'Maximum skills limit reached' };
-    }
-
-    const skillId = generateUniqueId('skill');
-    const newSkill: CharacterSkill = {
-      ...skillData,
-      id: skillId,
-      characterId,
-    };
-
-    const updatedCharacter: Character = {
-      ...character,
-      skills: [...character.skills, newSkill],
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
-      characters: {
-        ...state.characters,
-        [characterId]: updatedCharacter,
-      },
-      error: null,
-    };
-  }),
-
-  // State management actions
-  reset: () => set(() => initialState),
-  setError: (error) => set(() => ({ error })),
-  clearError: () => set(() => ({ error: null })),
-  setLoading: (loading) => set(() => ({ loading })),
-}));
+  )
+);
