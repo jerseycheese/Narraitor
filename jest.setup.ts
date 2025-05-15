@@ -2,16 +2,18 @@
 import '@testing-library/jest-dom';
 
 // DIAGNOSTIC: Log environment variable
-console.log('[jest.setup.ts] NEXT_PUBLIC_GEMINI_API_KEY before setting:', process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-
+if (process.env.DEBUG_JEST_SETUP === 'true') {
+  console.log('[jest.setup.ts] NEXT_PUBLIC_GEMINI_API_KEY before setting:', process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+}
 // Mock the worldStore module
 jest.mock('@/state/worldStore');
 
 // DIAGNOSTIC: Check if the mock was registered
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockRegistry = (jest as any)._mockRegistry || {};
-console.log('[jest.setup.ts] Mock registry contains worldStore:', '@/state/worldStore' in mockRegistry);
-
+if (process.env.DEBUG_JEST_SETUP === 'true') {
+  console.log('[jest.setup.ts] Mock registry contains worldStore:', '@/state/worldStore' in mockRegistry);
+}
 // Mock the next/navigation hooks
 jest.mock('next/navigation', () => {
   const actualNav = jest.requireActual('next/navigation');
