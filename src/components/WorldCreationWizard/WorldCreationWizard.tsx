@@ -10,7 +10,6 @@ import AttributeReviewStep from './steps/AttributeReviewStep';
 import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
 import { WizardState, WIZARD_STEPS } from './WizardState';
-import { styles } from './WizardStyles';
 
 export type { AttributeSuggestion, SkillSuggestion } from './WizardState';
 
@@ -222,40 +221,36 @@ export default function WorldCreationWizard({
   };
 
   return (
-    <div style={styles.container} data-testid="wizard-container">
-      <div style={styles.wizard}>
-        <div style={styles.header} data-testid="wizard-header">
-          <h1 style={styles.title}>Create New World</h1>
-          <div style={styles.progress} data-testid="wizard-progress">
+    <div className="min-h-screen p-4" data-testid="wizard-container">
+      <div className="max-w-3xl mx-auto bg-white rounded shadow">
+        <div className="p-4 border-b" data-testid="wizard-header">
+          <h1 className="text-2xl font-bold">Create New World</h1>
+          <div className="text-sm text-gray-500" data-testid="wizard-progress">
             <span>Step {wizardState.currentStep + 1} of {WIZARD_STEPS.length}</span>
           </div>
         </div>
 
-        <div style={styles.steps}>
+        <div className="flex p-4 border-b">
           {WIZARD_STEPS.map((step, index) => (
             <div
               key={step.id}
               data-testid={`wizard-step-${step.id}`}
-              style={{
-                ...styles.step,
-                ...(index === wizardState.currentStep ? styles.activeStep : {}),
-                ...(index < wizardState.currentStep ? styles.completedStep : {}),
-              }}
+              className="flex-1 flex items-center gap-2"
             >
-              <div style={styles.stepNumber} data-testid={`wizard-step-number-${index}`}>
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center" data-testid={`wizard-step-number-${index}`}>
                 {index + 1}
               </div>
-              <span style={styles.stepLabel}>{step.label}</span>
+              <span className="text-sm">{step.label}</span>
             </div>
           ))}
         </div>
 
-        <div style={styles.content} data-testid="wizard-content">
+        <div className="p-4" data-testid="wizard-content">
           {renderCurrentStep()}
         </div>
 
         {wizardState.errors.submit && (
-          <div style={styles.errorMessage} data-testid="wizard-error-submit">
+          <div className="p-4 m-4 bg-red-100 text-red-600 rounded" data-testid="wizard-error-submit">
             {wizardState.errors.submit}
           </div>
         )}

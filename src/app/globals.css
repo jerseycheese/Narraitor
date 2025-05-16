@@ -1,3 +1,8 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global styles */
 :root {
   --background: #ffffff;
@@ -11,113 +16,27 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
+/* Base styles */
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
 }
 
-/* Reset styles */
-* {
-  box-sizing: border-box;
+/* Custom components */
+@layer components {
+  /* You can define reusable component classes here */
 }
 
-/* App Router Migration styles */
-.p-8 {
-  padding: 2rem;
-}
-
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
-
-.space-y-2 > * + * {
-  margin-top: 0.5rem;
-}
-
-.block {
-  display: block;
-}
-
-.p-4 {
-  padding: 1rem;
-}
-
-.bg-blue-100 {
-  background-color: #dbeafe;
-}
-
-.hover\:bg-blue-200:hover {
-  background-color: #bfdbfe;
-}
-
-.rounded {
-  border-radius: 0.25rem;
-}
-
-.text-gray-600 {
-  color: #718096;
-}
-
-.antialiased {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Error page styles */
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.min-h-screen {
-  min-height: 100vh;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.bg-blue-500 {
-  background-color: #3b82f6;
-}
-
-.text-white {
-  color: #ffffff;
-}
-
-.hover\:bg-blue-600:hover {
-  background-color: #2563eb;
-}
-
-.text-red-600 {
-  color: #dc2626;
+/* Custom utilities */
+@layer utilities {
+  /* You can define custom utility classes here */
 }

@@ -107,15 +107,15 @@ export default function DescriptionStep({
 
   return (
     <div data-testid="description-step">
-      <h2 style={styles.stepTitle}>Describe Your World</h2>
-      <p style={styles.stepDescription}>
+      <h2 className="text-xl font-bold mb-4">Describe Your World</h2>
+      <p className="mb-4">
         Provide a detailed description of your world. Include information about the setting, tone, 
         major themes, and any unique aspects. This will help us suggest appropriate attributes and skills.
       </p>
 
-      <div style={styles.formGroup}>
-        <label htmlFor="worldFullDescription" style={styles.label}>
-          Full Description <span style={styles.required}>*</span>
+      <div className="mb-4 relative">
+        <label htmlFor="worldFullDescription" className="block mb-1">
+          Full Description <span className="text-red-500">*</span>
         </label>
         <textarea
           id="worldFullDescription"
@@ -124,42 +124,42 @@ export default function DescriptionStep({
           onChange={handleDescriptionChange}
           placeholder="Describe your world in detail..."
           rows={12}
-          style={styles.textarea}
+          className="w-full p-2 border rounded min-h-[200px]"
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? 'description-error' : undefined}
           disabled={isProcessing}
         />
-        <div style={styles.charCount} data-testid="description-char-count">
+        <div className="text-right text-sm mt-1" data-testid="description-char-count">
           {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
         </div>
         {errors.description && (
-          <span id="description-error" data-testid="description-error" style={styles.error}>
+          <span id="description-error" data-testid="description-error" className="text-red-500">
             {errors.description}
           </span>
         )}
       </div>
 
       {errors.ai && (
-        <div style={styles.warning} data-testid="ai-warning">
+        <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded" data-testid="ai-warning">
           {errors.ai}
         </div>
       )}
 
       {isProcessing && (
-        <div style={styles.processingOverlay} data-testid="processing-overlay">
-          <div style={styles.processingContent}>
-            <div style={styles.spinner}></div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10" data-testid="processing-overlay">
+          <div className="bg-white p-8 rounded text-center shadow">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full mx-auto mb-4 animate-spin"></div>
             <p>Analyzing your world description...</p>
           </div>
         </div>
       )}
 
-      <div style={styles.actions}>
+      <div className="flex justify-between mt-6">
         <button
           type="button"
           data-testid="step-back-button"
           onClick={onBack}
-          style={styles.backButton}
+          className="px-4 py-2 border rounded"
           disabled={isProcessing}
         >
           Back
@@ -168,7 +168,7 @@ export default function DescriptionStep({
           type="button"
           data-testid="step-cancel-button"
           onClick={onCancel}
-          style={styles.cancelButton}
+          className="px-4 py-2 border rounded"
           disabled={isProcessing}
         >
           Cancel
@@ -177,7 +177,7 @@ export default function DescriptionStep({
           type="button"
           data-testid="step-next-button"
           onClick={validateAndNext}
-          style={styles.nextButton}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
           disabled={isProcessing}
         >
           {isProcessing ? 'Analyzing...' : 'Next'}
@@ -187,121 +187,3 @@ export default function DescriptionStep({
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  stepTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    marginBottom: '0.5rem',
-  },
-  stepDescription: {
-    color: '#6b7280',
-    marginBottom: '1.5rem',
-    lineHeight: '1.5',
-  },
-  formGroup: {
-    marginBottom: '1.5rem',
-    position: 'relative',
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: '0.5rem',
-  },
-  required: {
-    color: '#ef4444',
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.75rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '1rem',
-    resize: 'vertical',
-    transition: 'border-color 0.15s',
-    minHeight: '200px',
-  },
-  charCount: {
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    marginTop: '0.5rem',
-    textAlign: 'right',
-  },
-  error: {
-    display: 'block',
-    fontSize: '0.875rem',
-    color: '#ef4444',
-    marginTop: '0.25rem',
-  },
-  warning: {
-    padding: '0.75rem 1rem',
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
-    borderRadius: '0.375rem',
-    marginBottom: '1rem',
-    fontSize: '0.875rem',
-  },
-  processingOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  processingContent: {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '0.5rem',
-    textAlign: 'center',
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-  },
-  spinner: {
-    width: '3rem',
-    height: '3rem',
-    border: '3px solid #e5e7eb',
-    borderTop: '3px solid #3b82f6',
-    borderRadius: '50%',
-    margin: '0 auto 1rem',
-    animation: 'spin 1s linear infinite',
-  },
-  actions: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-  },
-  backButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-  cancelButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-    marginLeft: 'auto',
-  },
-  nextButton: {
-    padding: '0.5rem 1rem',
-    border: 'none',
-    borderRadius: '0.375rem',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-};
