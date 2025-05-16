@@ -1,0 +1,8 @@
+/* Import Tailwind CSS directly */
+@import '../src/app/globals.css';
+
+/* Ensure Tailwind v4 directives */
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+
+/* Additional Storybook-specific styles can be added here */

@@ -13,10 +13,17 @@ const config: StorybookConfig = {
   ],
   "framework": {
     "name": "@storybook/experimental-nextjs-vite",
-    "options": {}
+    "options": {
+      // Add PostCSS options if needed
+    }
   },
   "staticDirs": [
     "../public"
-  ]
+  ],
+  // Ensure Tailwind CSS is processed properly
+  "viteFinal": async (config) => {
+    // Return the modified config
+    return config;
+  }
 };
 export default config;

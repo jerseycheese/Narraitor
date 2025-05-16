@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Narraitor",
@@ -11,8 +12,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body style={{ fontFamily: 'Arial, Helvetica, sans-serif', margin: 0, padding: 0 }}>
+    <html lang="en" className="antialiased">
+      <body className="font-sans m-0 p-0">
         {children}
       </body>
     </html>

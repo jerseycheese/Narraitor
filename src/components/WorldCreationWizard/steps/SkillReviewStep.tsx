@@ -132,69 +132,67 @@ export default function SkillReviewStep({
 
   return (
     <div data-testid="skill-review-step">
-      <h2 style={styles.stepTitle}>Review Skills</h2>
-      <p style={styles.stepDescription}>
+      <h2 className="text-xl font-bold mb-4">Review Skills</h2>
+      <p className="mb-4">
         Based on your description, we&apos;ve suggested these skills. You can accept, modify, or reject each one. Select up to 12 skills for your world.
       </p>
 
-      <div style={styles.skillList}>
+      <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
-          <div key={index} style={styles.skillCard} data-testid={`skill-card-${index}`}>
-            <div style={styles.skillHeader}>
+          <div key={index} className="border p-4 rounded" data-testid={`skill-card-${index}`}>
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id={`skill-${index}`}
                 data-testid={`skill-checkbox-${index}`}
                 checked={suggestion.accepted}
                 onChange={() => handleToggleSkill(index)}
-                style={styles.checkbox}
+                className="w-5 h-5"
               />
-              <label htmlFor={`skill-${index}`} style={styles.skillTitle}>
+              <label htmlFor={`skill-${index}`} className="font-medium flex-1">
                 {suggestion.name}
               </label>
-              <span style={{
-                ...styles.difficultyBadge,
-                backgroundColor: 
-                  suggestion.difficulty === 'easy' ? '#10b981' :
-                  suggestion.difficulty === 'medium' ? '#f59e0b' : 
-                  '#ef4444'
-              }}>
+              <span className={`px-2 py-1 rounded text-xs text-white uppercase font-medium ${
+                suggestion.difficulty === 'easy' ? 'bg-green-500' :
+                suggestion.difficulty === 'medium' ? 'bg-yellow-500' : 
+                'bg-red-500'
+              }`}>
                 {suggestion.difficulty}
               </span>
             </div>
             
             {suggestion.accepted && (
-              <div style={styles.skillDetails}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Name</label>
+              <div className="mt-4 pl-7">
+                <div className="mb-3">
+                  <label className="block mb-1">Name</label>
                   <input
                     type="text"
                     data-testid={`skill-name-input-${index}`}
                     value={suggestion.name}
                     onChange={(e) => handleModifySkill(index, 'name', e.target.value)}
-                    style={styles.input}
+                    className="w-full p-2 border rounded"
                   />
                 </div>
                 
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Description</label>
+                <div className="mb-3">
+                  <label className="block mb-1">Description</label>
                   <textarea
                     data-testid={`skill-description-textarea-${index}`}
                     value={suggestion.description}
                     onChange={(e) => handleModifySkill(index, 'description', e.target.value)}
                     rows={2}
-                    style={styles.textarea}
+                    className="w-full p-2 border rounded"
                   />
                 </div>
                 
-                <div style={styles.selectGroup}>
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Learning Curve</label>
+                <div className="flex gap-4 mb-3">
+                  <div className="flex-1">
+                    <label className="block mb-1">Learning Curve</label>
                     <select
                       data-testid={`skill-difficulty-select-${index}`}
                       value={suggestion.difficulty}
                       onChange={(e) => handleModifySkill(index, 'difficulty', e.target.value)}
-                      style={styles.select}
+                      className="w-full p-2 border rounded"
                     >
                       <option value="easy">Easy</option>
                       <option value="medium">Medium</option>
@@ -202,13 +200,13 @@ export default function SkillReviewStep({
                     </select>
                   </div>
                   
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Linked Attribute</label>
+                  <div className="flex-1">
+                    <label className="block mb-1">Linked Attribute</label>
                     <select
                       data-testid={`skill-attribute-select-${index}`}
                       value={suggestion.linkedAttributeName || ''}
                       onChange={(e) => handleModifySkill(index, 'linkedAttributeName', e.target.value)}
-                      style={styles.select}
+                      className="w-full p-2 border rounded"
                     >
                       <option value="">None</option>
                       {worldData.attributes?.map((attr) => (
@@ -225,20 +223,20 @@ export default function SkillReviewStep({
         ))}
       </div>
 
-      <div style={styles.summary} data-testid="skill-count-summary">
+      <div className="mt-4" data-testid="skill-count-summary">
         Selected skills: {acceptedCount} / 12
       </div>
 
       {errors.skills && (
-        <div style={styles.error}>{errors.skills}</div>
+        <div className="text-red-500">{errors.skills}</div>
       )}
 
-      <div style={styles.actions}>
+      <div className="flex justify-between mt-6">
         <button
           type="button"
           data-testid="step-back-button"
           onClick={onBack}
-          style={styles.backButton}
+          className="px-4 py-2 border rounded"
         >
           Back
         </button>
@@ -246,7 +244,7 @@ export default function SkillReviewStep({
           type="button"
           data-testid="step-cancel-button"
           onClick={onCancel}
-          style={styles.cancelButton}
+          className="px-4 py-2 border rounded"
         >
           Cancel
         </button>
@@ -254,7 +252,7 @@ export default function SkillReviewStep({
           type="button"
           data-testid="step-next-button"
           onClick={validateAndNext}
-          style={styles.nextButton}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           Next
         </button>
@@ -263,135 +261,3 @@ export default function SkillReviewStep({
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  stepTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    marginBottom: '0.5rem',
-  },
-  stepDescription: {
-    color: '#6b7280',
-    marginBottom: '1.5rem',
-  },
-  skillList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  skillCard: {
-    border: '1px solid #e5e7eb',
-    borderRadius: '0.375rem',
-    padding: '1rem',
-    transition: 'border-color 0.15s',
-  },
-  skillHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-  },
-  checkbox: {
-    width: '1.25rem',
-    height: '1.25rem',
-    cursor: 'pointer',
-  },
-  skillTitle: {
-    fontSize: '1rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    flex: 1,
-  },
-  difficultyBadge: {
-    padding: '0.25rem 0.5rem',
-    borderRadius: '0.25rem',
-    fontSize: '0.75rem',
-    color: 'white',
-    fontWeight: '500',
-    textTransform: 'uppercase',
-  },
-  skillDetails: {
-    marginTop: '1rem',
-    paddingLeft: '1.75rem',
-  },
-  formGroup: {
-    marginBottom: '0.75rem',
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: '0.25rem',
-  },
-  input: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-    resize: 'vertical',
-  },
-  selectGroup: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  select: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-    backgroundColor: 'white',
-  },
-  summary: {
-    marginTop: '1.5rem',
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    fontWeight: '500',
-  },
-  error: {
-    fontSize: '0.875rem',
-    color: '#ef4444',
-    marginTop: '0.5rem',
-  },
-  actions: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-  },
-  backButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-  cancelButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-    marginLeft: 'auto',
-  },
-  nextButton: {
-    padding: '0.5rem 1rem',
-    border: 'none',
-    borderRadius: '0.375rem',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-};

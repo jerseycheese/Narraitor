@@ -124,55 +124,55 @@ export default function AttributeReviewStep({
 
   return (
     <div data-testid="attribute-review-step">
-      <h2 style={styles.stepTitle}>Review Attributes</h2>
-      <p style={styles.stepDescription}>
+      <h2 className="text-xl font-bold mb-4">Review Attributes</h2>
+      <p className="mb-4">
         Based on your description, we&apos;ve suggested these attributes. You can accept, modify, or reject each one. Select up to 6 attributes for your world.
       </p>
 
-      <div style={styles.attributeList}>
+      <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
-          <div key={index} style={styles.attributeCard} data-testid={`attribute-card-${index}`}>
-            <div style={styles.attributeHeader}>
+          <div key={index} className="border p-4 rounded" data-testid={`attribute-card-${index}`}>
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id={`attribute-${index}`}
                 data-testid={`attribute-checkbox-${index}`}
                 checked={suggestion.accepted}
                 onChange={() => handleToggleAttribute(index)}
-                style={styles.checkbox}
+                className="w-5 h-5"
               />
-              <label htmlFor={`attribute-${index}`} style={styles.attributeTitle}>
+              <label htmlFor={`attribute-${index}`} className="font-medium">
                 {suggestion.name}
               </label>
             </div>
             
             {suggestion.accepted && (
-              <div style={styles.attributeDetails}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Name</label>
+              <div className="mt-4 pl-7">
+                <div className="mb-3">
+                  <label className="block mb-1">Name</label>
                   <input
                     type="text"
                     data-testid={`attribute-name-input-${index}`}
                     value={suggestion.name}
                     onChange={(e) => handleModifyAttribute(index, 'name', e.target.value)}
-                    style={styles.input}
+                    className="w-full p-2 border rounded"
                   />
                 </div>
                 
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Description</label>
+                <div className="mb-3">
+                  <label className="block mb-1">Description</label>
                   <textarea
                     data-testid={`attribute-description-textarea-${index}`}
                     value={suggestion.description}
                     onChange={(e) => handleModifyAttribute(index, 'description', e.target.value)}
                     rows={2}
-                    style={styles.textarea}
+                    className="w-full p-2 border rounded"
                   />
                 </div>
                 
-                <div style={styles.rangeGroup}>
-                  <div style={styles.rangeField}>
-                    <label style={styles.label}>Min Value</label>
+                <div className="flex gap-4 mb-3">
+                  <div className="flex-1">
+                    <label className="block mb-1">Min Value</label>
                     <input
                       type="number"
                       data-testid={`attribute-min-input-${index}`}
@@ -180,11 +180,11 @@ export default function AttributeReviewStep({
                       onChange={(e) => handleModifyAttribute(index, 'minValue', parseInt(e.target.value))}
                       min={1}
                       max={10}
-                      style={styles.numberInput}
+                      className="w-full p-2 border rounded"
                     />
                   </div>
-                  <div style={styles.rangeField}>
-                    <label style={styles.label}>Max Value</label>
+                  <div className="flex-1">
+                    <label className="block mb-1">Max Value</label>
                     <input
                       type="number"
                       data-testid={`attribute-max-input-${index}`}
@@ -192,7 +192,7 @@ export default function AttributeReviewStep({
                       onChange={(e) => handleModifyAttribute(index, 'maxValue', parseInt(e.target.value))}
                       min={1}
                       max={10}
-                      style={styles.numberInput}
+                      className="w-full p-2 border rounded"
                     />
                   </div>
                 </div>
@@ -202,20 +202,20 @@ export default function AttributeReviewStep({
         ))}
       </div>
 
-      <div style={styles.summary} data-testid="attribute-count-summary">
+      <div className="mt-4" data-testid="attribute-count-summary">
         Selected attributes: {acceptedCount} / 6
       </div>
 
       {errors.attributes && (
-        <div style={styles.error}>{errors.attributes}</div>
+        <div className="text-red-500">{errors.attributes}</div>
       )}
 
-      <div style={styles.actions}>
+      <div className="flex justify-between mt-6">
         <button
           type="button"
           data-testid="step-back-button"
           onClick={onBack}
-          style={styles.backButton}
+          className="px-4 py-2 border rounded"
         >
           Back
         </button>
@@ -223,7 +223,7 @@ export default function AttributeReviewStep({
           type="button"
           data-testid="step-cancel-button"
           onClick={onCancel}
-          style={styles.cancelButton}
+          className="px-4 py-2 border rounded"
         >
           Cancel
         </button>
@@ -231,7 +231,7 @@ export default function AttributeReviewStep({
           type="button"
           data-testid="step-next-button"
           onClick={validateAndNext}
-          style={styles.nextButton}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           Next
         </button>
@@ -240,128 +240,3 @@ export default function AttributeReviewStep({
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  stepTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    marginBottom: '0.5rem',
-  },
-  stepDescription: {
-    color: '#6b7280',
-    marginBottom: '1.5rem',
-  },
-  attributeList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  attributeCard: {
-    border: '1px solid #e5e7eb',
-    borderRadius: '0.375rem',
-    padding: '1rem',
-    transition: 'border-color 0.15s',
-  },
-  attributeHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-  },
-  checkbox: {
-    width: '1.25rem',
-    height: '1.25rem',
-    cursor: 'pointer',
-  },
-  attributeTitle: {
-    fontSize: '1rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
-  attributeDetails: {
-    marginTop: '1rem',
-    paddingLeft: '1.75rem',
-  },
-  formGroup: {
-    marginBottom: '0.75rem',
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: '0.25rem',
-  },
-  input: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-    resize: 'vertical',
-  },
-  rangeGroup: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  rangeField: {
-    flex: 1,
-  },
-  numberInput: {
-    width: '100%',
-    padding: '0.375rem 0.75rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    fontSize: '0.875rem',
-  },
-  summary: {
-    marginTop: '1.5rem',
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    fontWeight: '500',
-  },
-  error: {
-    fontSize: '0.875rem',
-    color: '#ef4444',
-    marginTop: '0.5rem',
-  },
-  actions: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginTop: '2rem',
-    gap: '1rem',
-  },
-  backButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-  cancelButton: {
-    padding: '0.5rem 1rem',
-    border: '1px solid #d1d5db',
-    borderRadius: '0.375rem',
-    backgroundColor: 'white',
-    color: '#374151',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-    marginLeft: 'auto',
-  },
-  nextButton: {
-    padding: '0.5rem 1rem',
-    border: 'none',
-    borderRadius: '0.375rem',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    cursor: 'pointer',
-    transition: 'background-color 0.15s',
-  },
-};
