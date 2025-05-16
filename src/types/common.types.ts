@@ -1,28 +1,39 @@
-// src/types/common.types.ts
+/**
+ * Common type definitions used across the application
+ */
 
 /**
- * Represents a unique identifier for entities in the system
+ * Entity ID type
  */
 export type EntityID = string;
 
 /**
- * Represents a timestamp in ISO 8601 format
+ * ISO datetime string type
  */
-export type Timestamp = string;
+export type ISODateString = string;
 
 /**
- * Base interface for entities with timestamps
- */
-export interface TimestampedEntity {
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
-
-/**
- * Base interface for entities with name and description
+ * Named entity interface
  */
 export interface NamedEntity {
   id: EntityID;
   name: string;
-  description?: string;
+  description: string;
+}
+
+/**
+ * Timestamped entity interface
+ */
+export interface TimestampedEntity {
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+}
+
+/**
+ * Result type for operations
+ */
+export interface OperationResult<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }

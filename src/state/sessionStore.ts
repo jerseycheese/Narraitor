@@ -1,142 +1,130 @@
 import { create } from 'zustand';
-import { GameSession, SessionState } from '../types/session.types';
-import { EntityID } from '../types/common.types';
-import { generateUniqueId } from '../lib/utils/generateId';
+import { SessionStore } from '../types/game.types';
 
 /**
- * Session store interface with state and actions
+ * Debug logging utility for sessionStore - only logs in development
  */
-interface SessionStore {
-  // State
-  sessions: Record<EntityID, GameSession>;
-  activeSessionId: EntityID | null;
-  error: string | null;
-  loading: boolean;
-
-  // Actions
-  createSession: (worldId: EntityID, characterId: EntityID) => EntityID;
-  updateSession: (sessionId: EntityID, updates: Partial<GameSession>) => void;
-  endSession: (sessionId: EntityID) => void;
-  setActiveSession: (sessionId: EntityID) => void;
-  
-  // State management
-  reset: () => void;
-  setError: (error: string | null) => void;
-  clearError: () => void;
-  setLoading: (loading: boolean) => void;
-}
-
-// Initial state
-const initialState = {
-  sessions: {},
-  activeSessionId: null,
-  error: null,
-  loading: false,
+const debugLog = (message: string, data?: unknown) => {
+  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
+    console.log(`[SessionStore] ${message}`, data);
+  }
 };
 
-// Session Store implementation
-export const sessionStore = create<SessionStore>()((set) => ({
+/**
+ * Initial state for the session store
+ */
+const initialState = {
+  status: 'initializing' as const,
+  currentSceneId: null,
+  playerChoices: [],
+  error: null,
+  worldId: null,
+};
+
+/**
+ * Session store for managing game session state
+ */
+export const sessionStore = create<SessionStore>((set, get) => ({
   ...initialState,
 
-  // Create session
-  createSession: (worldId, characterId) => {
-    const sessionId = generateUniqueId('session');
-    const now = new Date().toISOString();
+  // Initialize a new game session
+  initializeSession: async (worldId, onComplete) => {
+    debugLog('Initializing session for worldId:', worldId);
+    set(state => {
+      debugLog('Setting loading state from:', state);
+      return { status: 'loading', worldId, error: null };
+    });
     
-    const sessionState: SessionState = {
-      status: 'active',
-      lastActivity: now,
-    };
-
-    const newSession: GameSession = {
-      id: sessionId,
-      worldId,
-      characterId,
-      state: sessionState,
-      narrativeHistory: [],
-      currentContext: {
-        recentSegments: [],
-        activeCharacters: [characterId],
-      },
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    set((state) => ({
-      sessions: {
-        ...state.sessions,
-        [sessionId]: newSession,
-      },
-      activeSessionId: sessionId, // New sessions become active by default
-    }));
-
-    return sessionId;
+    try {
+      // Simulate loading time for development
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      debugLog('Session loaded, setting active state');
+      set(state => {
+        debugLog('Current state before setting active:', state);
+        return { 
+          status: 'active',
+          currentSceneId: 'initial-scene',
+          playerChoices: [
+            { id: 'choice-1', text: 'Option 1', isSelected: false },
+            { id: 'choice-2', text: 'Option 2', isSelected: false },
+          ],
+          error: null,
+        };
+      });
+      
+      debugLog('State updated to active:', get());
+      
+      if (onComplete) {
+        debugLog('Calling onComplete callback');
+        onComplete();
+      }
+    } catch (error) {
+      console.error('[SessionStore] Error initializing session:', error);
+      set({ 
+        status: 'initializing',
+        error: error instanceof Error ? error.message : 'Failed to initialize session',
+      });
+    }
   },
 
-  // Update session
-  updateSession: (sessionId, updates) => set((state) => {
-    if (!state.sessions[sessionId]) {
-      return { error: 'Session not found' };
-    }
+  // End the current session
+  endSession: () => {
+    debugLog('Ending session, resetting to initial state');
+    set(initialState);
+  },
 
-    const updatedSession: GameSession = {
-      ...state.sessions[sessionId],
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
+  // Set session status
+  setStatus: (status) => {
+    debugLog('Setting status to:', status);
+    set({ status });
+  },
 
-    return {
-      sessions: {
-        ...state.sessions,
-        [sessionId]: updatedSession,
-      },
-      error: null,
-    };
-  }),
+  // Set error message
+  setError: (error) => {
+    debugLog('Setting error:', error);
+    set({ error });
+  },
 
-  // End session
-  endSession: (sessionId) => set((state) => {
-    if (!state.sessions[sessionId]) {
-      return { error: 'Session not found' };
-    }
+  // Set player choices
+  setPlayerChoices: (choices) => {
+    debugLog('Setting player choices:', choices);
+    set({ playerChoices: choices });
+  },
 
-    const updatedSession: GameSession = {
-      ...state.sessions[sessionId],
-      state: {
-        ...state.sessions[sessionId].state,
-        status: 'completed',
-      },
-      updatedAt: new Date().toISOString(),
-    };
+  // Select a player choice
+  selectChoice: (choiceId) => {
+    debugLog('Selecting choice:', choiceId);
+    const { playerChoices } = get();
+    const updatedChoices = playerChoices.map(choice => ({
+      ...choice,
+      isSelected: choice.id === choiceId,
+    }));
+    
+    set({ playerChoices: updatedChoices });
+  },
 
-    return {
-      sessions: {
-        ...state.sessions,
-        [sessionId]: updatedSession,
-      },
-      activeSessionId: state.activeSessionId === sessionId ? null : state.activeSessionId,
-      error: null,
-    };
-  }),
+  // Clear player choices
+  clearPlayerChoices: () => {
+    debugLog('Clearing player choices');
+    set({ playerChoices: [] });
+  },
 
-  // Set active session
-  setActiveSession: (sessionId) => set((state) => {
-    if (!state.sessions[sessionId]) {
-      return { 
-        error: 'Session not found',
-        activeSessionId: null,
-      };
-    }
+  // Set current scene
+  setCurrentScene: (sceneId) => {
+    debugLog('Setting current scene:', sceneId);
+    set({ currentSceneId: sceneId });
+  },
 
-    return {
-      activeSessionId: sessionId,
-      error: null,
-    };
-  }),
+  // Pause the session
+  pauseSession: () => {
+    debugLog('Pausing session');
+    set({ status: 'paused' });
+  },
 
-  // State management actions
-  reset: () => set(() => initialState),
-  setError: (error) => set(() => ({ error })),
-  clearError: () => set(() => ({ error: null })),
-  setLoading: (loading) => set(() => ({ loading })),
+  // Resume the session
+  resumeSession: () => {
+    debugLog('Resuming session');
+    set({ status: 'active' });
+  },
 }));
