@@ -1,5 +1,14 @@
 import type { WorldStore } from '@/state/worldStore';
 
+/**
+ * Debug logging utility for testUtils - only logs in development when enabled
+ */
+const debugLog = (message: string) => {
+  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
+    console.log(`[TestUtils] ${message}`);
+  }
+};
+
 // Utility functions to help test the World List Screen Harness in the browser console
 
 export const testUtils = {
@@ -11,6 +20,7 @@ export const testUtils = {
     const testWorlds = [
       {
         name: 'Test Medieval Kingdom',
+        description: 'A test medieval fantasy kingdom for development purposes',
         theme: 'fantasy' as const,
         attributes: [],
         skills: [],
@@ -23,6 +33,7 @@ export const testUtils = {
       },
       {
         name: 'Test Space Colony',
+        description: 'A test sci-fi space colony for development purposes',
         theme: 'scifi' as const,
         attributes: [],
         skills: [],
@@ -40,7 +51,7 @@ export const testUtils = {
       store.createWorld(world);
     }
     
-    console.log('Added test worlds to store');
+    debugLog('Added test worlds to store');
   },
   
   // Clear all worlds from the store
@@ -56,7 +67,7 @@ export const testUtils = {
       }
     }
     
-    console.log('Cleared all worlds from store');
+    debugLog('Cleared all worlds from store');
   },
   
   // Trigger loading state
@@ -68,7 +79,7 @@ export const testUtils = {
       store.setLoading(loading);
     }
     
-    console.log(`Set loading state to: ${loading}`);
+    debugLog(`Set loading state to: ${loading}`);
   },
   
   // Trigger error state
@@ -80,7 +91,7 @@ export const testUtils = {
       store.setError(error);
     }
     
-    console.log(`Set error state to: ${error}`);
+    debugLog(`Set error state to: ${error}`);
   },
 };
 

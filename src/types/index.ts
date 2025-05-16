@@ -3,7 +3,7 @@
  */
 
 // Re-export all types from their respective files
-export type { EntityID, Timestamp, TimestampedEntity, NamedEntity } from './common.types';
+export type { EntityID, ISODateString, TimestampedEntity, NamedEntity } from './common.types';
 export type { World, WorldAttribute, WorldSkill, WorldSettings } from './world.types';
 export type { 
   Character,

@@ -1,6 +1,6 @@
 // src/types/session.types.ts
 
-import { EntityID, TimestampedEntity, Timestamp } from './common.types';
+import { EntityID, TimestampedEntity, ISODateString } from './common.types';
 
 /**
  * Represents a game session
@@ -19,7 +19,7 @@ export interface GameSession extends TimestampedEntity {
  */
 export interface SessionState {
   status: 'active' | 'paused' | 'completed';
-  lastActivity: Timestamp;
+  lastActivity: ISODateString;
   savePoint?: SavePoint;
 }
 
@@ -28,7 +28,7 @@ export interface SessionState {
  */
 export interface SavePoint {
   narrativeSegmentId: EntityID;
-  timestamp: Timestamp;
+  timestamp: ISODateString;
   description: string;
 }
 
