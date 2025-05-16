@@ -51,6 +51,10 @@ describe('WorldCreationWizard Integration - Full Flow', () => {
     
     render(<WorldCreationWizard />);
 
+    // Step 0: Template Step - click "Create My Own World" to continue
+    expect(screen.getByTestId('template-step')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('create-own-button'));
+
     // Step 1: Basic Info
     expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'My Fantasy World' } });

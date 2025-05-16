@@ -3,7 +3,7 @@ title: Storybook Workflow
 aliases: [Component-Driven Development]
 tags: [storybook, development, workflow, components]
 created: 2025-03-23
-updated: 2025-04-29
+updated: 2025-05-14
 ---
 
 # Storybook Workflow
@@ -74,14 +74,17 @@ import type { Meta, StoryObj } from '@storybook/react';
 import ComponentName from './ComponentName';
 
 const meta: Meta<typeof ComponentName> = {
-  title: 'Category/ComponentName',
+  title: 'Narraitor/[Category]/ComponentName',
   component: ComponentName,
   parameters: {
-    // For components using next/navigation
-    nextjs: {
-      appDirectory: true,
-    },
+    layout: 'centered',
+    docs: {
+      description: {
+        component: 'Brief description of what the component does'
+      }
+    }
   },
+  tags: ['autodocs'],
 };
 
 export default meta;
@@ -102,14 +105,48 @@ export const Variant: Story = {
 };
 ```
 
-## Component Categories
+## Story Naming Convention
+
+All stories should follow the hierarchical naming pattern:
+```
+title: 'Narraitor/[Category]/[ComponentName]'
+```
+
+This ensures all components appear under the "Narraitor" folder in Storybook's sidebar, organized by category.
+
+### Component Categories
 
 Follow these categories for organizing components:
 
-1. **Combat**: Combat system components (CombatControls, etc.)
-2. **Character**: Character-related components (CharacterSheet, etc.)
-3. **Journal**: Journal and narrative components (JournalViewer, etc.)
-4. **UI**: Reusable UI components (Button, Card, etc.)
+1. **World**: World-related components
+   - Example: `'Narraitor/World/WorldList'`
+   - Example: `'Narraitor/World/WorldCard'`
+   - Example: `'Narraitor/World/WorldListScreen'`
+
+2. **Character**: Character-related components
+   - Example: `'Narraitor/Character/CharacterSheet'`
+   - Example: `'Narraitor/Character/CharacterList'`
+
+3. **Combat**: Combat system components
+   - Example: `'Narraitor/Combat/CombatControls'`
+   - Example: `'Narraitor/Combat/AttackButton'`
+
+4. **Journal**: Journal and narrative components
+   - Example: `'Narraitor/Journal/JournalViewer'`
+   - Example: `'Narraitor/Journal/NoteEditor'`
+
+5. **Common**: Reusable UI components
+   - Example: `'Narraitor/Common/Button'`
+   - Example: `'Narraitor/Common/DeleteConfirmationDialog'`
+   - Example: `'Narraitor/Common/LoadingSpinner'`
+
+6. **AI**: AI-related components
+   - Example: `'Narraitor/AI/ResponseFormatter'`
+   - Example: `'Narraitor/AI/PromptBuilder'`
+
+7. **Game**: Game session components
+   - Example: `'Narraitor/Game/GameControls'`
+   - Example: `'Narraitor/Game/SessionManager'`
 
 ## Writing Effective Stories
 
@@ -394,6 +431,18 @@ const meta: Meta<typeof CharacterSheet> = {
 };
 ```
 
+### 4. Include Component Description
+Always add a docs description for the component:
+```tsx
+parameters: {
+  docs: {
+    description: {
+      component: 'A reusable button component with multiple variants'
+    }
+  }
+}
+```
+
 ## Common Issues and Solutions
 
 ### Next.js App Router Components
@@ -434,6 +483,26 @@ export const WithContext: Story = {
 ```js
 // .storybook/preview.js
 import '../app/globals.css';
+```
+
+### Store Integration in Storybook
+
+**Issue**: Components using Zustand stores cause infinite loops or state issues in Storybook.
+
+**Solution**: Create mock components without store dependencies for Storybook:
+```tsx
+// Mock version for Storybook
+const MockWorldListScreen = ({ worlds, loading, error }) => {
+  // Component logic without store
+  return <div>...</div>;
+};
+
+// Story uses mock component
+const meta = {
+  title: 'Narraitor/World/WorldListScreen',
+  component: MockWorldListScreen,
+  // ...
+};
 ```
 
 ## Related Documents

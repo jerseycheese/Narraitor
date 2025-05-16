@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import TemplateStep from './steps/TemplateStep';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
 import AttributeReviewStep from './steps/AttributeReviewStep';
@@ -40,6 +41,7 @@ export default function WorldCreationWizard({
       }
     },
     aiSuggestions: initialData?.aiSuggestions,
+    selectedTemplateId: initialData?.selectedTemplateId || null,
     errors: {},
     isProcessing: false,
   });
@@ -162,6 +164,13 @@ export default function WorldCreationWizard({
     }));
   };
 
+  const updateWizardState = (updates: Partial<WizardState>) => {
+    setWizardState(prev => ({
+      ...prev,
+      ...updates,
+    }));
+  };
+
   const stepProps = {
     worldData: wizardState.worldData,
     errors: wizardState.errors,
@@ -174,8 +183,19 @@ export default function WorldCreationWizard({
   const renderCurrentStep = () => {
     switch (wizardState.currentStep) {
       case 0:
-        return <BasicInfoStep {...stepProps} />;
+        return (
+          <TemplateStep
+            selectedTemplateId={wizardState.selectedTemplateId}
+            onUpdate={updateWizardState}
+            onNext={handleNext}
+            onBack={handleBack}
+            onCancel={handleCancel}
+            errors={wizardState.errors}
+          />
+        );
       case 1:
+        return <BasicInfoStep {...stepProps} />;
+      case 2:
         return (
           <DescriptionStep
             {...stepProps}
@@ -194,21 +214,21 @@ export default function WorldCreationWizard({
             }
           />
         );
-      case 2:
+      case 3:
         return (
           <AttributeReviewStep
             {...stepProps}
             suggestions={wizardState.aiSuggestions?.attributes || []}
           />
         );
-      case 3:
+      case 4:
         return (
           <SkillReviewStep
             {...stepProps}
             suggestions={wizardState.aiSuggestions?.skills || []}
           />
         );
-      case 4:
+      case 5:
         return (
           <FinalizeStep
             {...stepProps}

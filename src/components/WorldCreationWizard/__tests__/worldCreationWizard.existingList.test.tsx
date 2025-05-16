@@ -75,6 +75,12 @@ describe('WorldCreationWizard Integration - Existing List', () => {
       render(<WorldCreationWizard />);
     });
 
+    // Navigate past the template step first
+    await act(async () => {
+      // Navigate through template step
+      await fireEvent.click(await screen.findByTestId('create-own-button'));
+    });
+
     // Navigate to final step quickly
     await act(async () => {
       // Basic Info

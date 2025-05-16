@@ -70,21 +70,21 @@ The application includes test harnesses for interactive component testing:
 
 ## Project Structure
 
-The project uses Next.js App Router (Next.js 13+) with the following structure:
+The project uses Next.js App Router (Next.js 15+) with the following structure:
 
 ```
 src/
 ├── app/                    # Next.js App Router pages
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Home page
-│   ├── error.tsx          # Error boundary
-│   ├── loading.tsx        # Loading state
-│   └── dev/               # Development test harnesses
-├── components/            # Shared UI components
-├── lib/                   # Utility functions and services
-├── state/                # State management (Zustand stores)
-├── types/                # TypeScript type definitions
-└── utils/                # Helper functions
+│   ├── layout.tsx          # Root layout
+│   ├── page.tsx            # Home page
+│   ├── error.tsx           # Error boundary
+│   ├── loading.tsx         # Loading state
+│   └── dev/                # Development test harnesses
+├── components/             # Shared UI components
+├── lib/                    # Utility functions and services
+├── state/                  # State management (Zustand stores)
+├── types/                  # TypeScript type definitions
+└── utils/                  # Helper functions
 ```
 
 ## Architecture

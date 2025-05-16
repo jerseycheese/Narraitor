@@ -3,14 +3,14 @@ title: Repository Structure
 aliases: [GitHub Structure, File Organization]
 tags: [narraitor, documentation, architecture, github]
 created: 2025-04-28
-updated: 2025-05-14
+updated: 2025-05-16
 ---
 
 # Narraitor Repository Structure
 
 ## Overview
 
-This document outlines the current file and directory structure for the Narraitor GitHub repository after the App Router migration. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
+This document outlines the current file and directory structure for the Narraitor GitHub repository after the complete App Router migration. This structure is optimized for the MVP phase with a focus on clear organization, domain-driven boundaries, and scalability for future enhancements.
 
 ## Current Structure
 
@@ -21,8 +21,8 @@ narraitor/
 │   │   └── ci.yml               # Basic CI for tests and builds
 │   └── PULL_REQUEST_TEMPLATE.md # Enforce the TDD approach
 ├── src/
-│   ├── app/                     # Next.js App Router (migrated from pages/)
-│   │   ├── layout.tsx           # Root layout (replaces pages/_app.tsx)
+│   ├── app/                     # Next.js App Router
+│   │   ├── layout.tsx           # Root layout
 │   │   ├── page.tsx             # Home page
 │   │   ├── error.tsx            # Error boundary
 │   │   ├── loading.tsx          # Loading state
@@ -82,43 +82,13 @@ narraitor/
 └── package.json                 # Dependencies and scripts
 ```
 
-## Migration Changes
+## Migration Complete
 
-### From Pages Router to App Router
-
-The application has been migrated from Next.js Pages Router to App Router. Key changes include:
-
-1. **Page Structure**: 
-   - `pages/` → `src/app/`
-   - Each route now has its own directory with `page.tsx`
-   - Layouts use `layout.tsx` files
-
-2. **Special Files**:
-   - `pages/_app.tsx` → `src/app/layout.tsx`
-   - Added `error.tsx` for error boundaries
-   - Added `loading.tsx` for loading states
-
-3. **Client Components**:
-   - Components using hooks or browser APIs need `'use client'` directive
-
-4. **Test Harnesses**:
-   - Migrated from `pages/dev/` to `src/app/dev/`
-   - Maintained all functionality and test utilities
-
-## Key Organization Principles
-
-### Domain-Driven Organization
-
-The repository is organized around key domains (world, character, narrative, journal, AI) rather than technical concerns. This approach:
-
-1. Keeps related functionality together
-2. Aligns code structure with business domains
-3. Makes it easier to understand responsibilities
-4. Supports future modularity if needed
+The migration from Next.js Pages Router to App Router is now complete. All Pages Router components and code have been removed from the project, and the application now exclusively uses the App Router architecture.
 
 ### App Router Structure
 
-The `app` directory follows Next.js 14+ App Router conventions with:
+The `app` directory follows Next.js 15+ App Router conventions with:
 
 1. Page components for routes (`page.tsx`)
 2. Layouts for consistent UI shells (`layout.tsx`)
@@ -181,6 +151,5 @@ While this structure supports the current MVP, it can evolve as the project grow
 
 1. Fix CSS/Tailwind configuration issue
 2. Update test file imports
-3. Clean up legacy Pages Router directories
-4. Optimize for React Server Components
-5. Enhance documentation with migration learnings
+3. Optimize for React Server Components
+4. Enhance documentation with migration learnings
