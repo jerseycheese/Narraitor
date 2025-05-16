@@ -20,7 +20,7 @@ export default function FinalizeStep({
   onComplete,
 }: FinalizeStepProps) {
   // Logger function that can be easily disabled for production
-  const log = (message: string, data?: any) => {
+  const log = (message: string, data?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.log(message, data);
     }
@@ -32,7 +32,8 @@ export default function FinalizeStep({
       log('[FinalizeStep.tsx - handleComplete] Calling onComplete prop.');
       onComplete();
     } else {
-      log('[FinalizeStep.tsx - handleComplete] onComplete function is not provided', null, true);
+      log('[FinalizeStep.tsx - handleComplete] onComplete function is not provided');
+      console.error('[FinalizeStep.tsx - handleComplete] onComplete function is not provided');
     }
   };
   

@@ -12,11 +12,12 @@ describe('Tailwind CSS Configuration Integration', () => {
     
     // Read and check content
     const fileContent = fs.readFileSync(configPath, 'utf8');
-    expect(fileContent).toContain('export default {');
+    expect(fileContent).toContain('const postcssConfig = {');
     expect(fileContent).toContain('plugins: {');
     expect(fileContent).toContain('postcss-nested');
-    expect(fileContent).toContain('tailwindcss');
+    expect(fileContent).toContain('@tailwindcss/postcss');
     expect(fileContent).toContain('autoprefixer');
+    expect(fileContent).toContain('export default postcssConfig');
   });
   
   // Test Tailwind Configuration
@@ -82,9 +83,8 @@ describe('Tailwind CSS Configuration Integration', () => {
     expect(fs.existsSync(globalsPath)).toBe(true);
     
     const fileContent = fs.readFileSync(globalsPath, 'utf8');
-    expect(fileContent).toContain('@tailwind base');
-    expect(fileContent).toContain('@tailwind components');
-    expect(fileContent).toContain('@tailwind utilities');
+    expect(fileContent).toContain('@import "tailwindcss/preflight"');
+    expect(fileContent).toContain('@import "tailwindcss/utilities"');
   });
   
   // Test for no inline styles in layout.tsx

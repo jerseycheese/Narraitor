@@ -1,7 +1,6 @@
-/* Tailwind CSS directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 directives */
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 
 /* Global styles */
 :root {

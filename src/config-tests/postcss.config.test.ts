@@ -25,8 +25,9 @@ describe('PostCSS Configuration', () => {
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
     // More appropriate checks for ESM files
-    expect(fileContent).toContain('export default {');
+    expect(fileContent).toContain('const postcssConfig = {');
     expect(fileContent).toContain('plugins: {');
+    expect(fileContent).toContain('export default postcssConfig');
     
     // Check for balanced braces - simple check for correct syntax
     const openBraces = (fileContent.match(/{/g) || []).length;

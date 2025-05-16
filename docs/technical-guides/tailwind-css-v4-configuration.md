@@ -66,13 +66,12 @@ export default config;
 
 ### Global CSS Structure
 
-The `globals.css` file includes the necessary Tailwind directives:
+The `globals.css` file includes the necessary Tailwind CSS v4 directives:
 
 ```css
-/* Tailwind CSS directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 directives */
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 
 /* Global styles */
 :root {
@@ -112,6 +111,11 @@ The `globals.css` file includes the necessary Tailwind directives:
   /* Define custom utility classes here */
 }
 ```
+
+**Important Note:** Tailwind CSS v4 has changed the directive structure:
+- `@tailwind base` is replaced with `@import "tailwindcss/preflight"`
+- `@tailwind components` is no longer needed (or available) in v4
+- `@tailwind utilities` is replaced with `@import "tailwindcss/utilities"`
 
 ## Usage Guidelines
 
