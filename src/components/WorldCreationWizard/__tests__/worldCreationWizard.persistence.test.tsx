@@ -53,7 +53,10 @@ describe('WorldCreationWizard Integration - Persistence', () => {
     
     render(<WorldCreationWizard />);
 
-    // Complete all steps
+    // First, navigate past the template step by clicking 'Create My Own World'
+    fireEvent.click(screen.getByTestId('create-own-button'));
+
+    // Now continue with the basic info step
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Test World' } });
     fireEvent.change(screen.getByTestId('world-description-textarea'), { target: { value: 'This is a test description that meets the minimum requirement.' } });
     fireEvent.click(screen.getByTestId('step-next-button'));
@@ -85,7 +88,10 @@ describe('WorldCreationWizard Integration - Persistence', () => {
   test('persists selections when navigating between steps', async () => {
     render(<WorldCreationWizard />);
 
-    // Step 1: Enter basic info
+    // Step 1: Navigate past the template step by clicking 'Create My Own World'
+    fireEvent.click(screen.getByTestId('create-own-button'));
+    
+    // Step 2: Enter basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Persistent World' } });
     fireEvent.change(screen.getByTestId('world-description-textarea'), { target: { value: 'This is a test description that meets the minimum requirement.' } });
     fireEvent.change(screen.getByTestId('world-genre-select'), { target: { value: 'fantasy' } });

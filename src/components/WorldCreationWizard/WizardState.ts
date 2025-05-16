@@ -10,6 +10,7 @@ export interface WizardState {
   };
   errors: Record<string, string>;
   isProcessing: boolean;
+  selectedTemplateId?: string | null;
 }
 
 export interface AttributeSuggestion {
@@ -31,6 +32,7 @@ export interface SkillSuggestion {
 }
 
 export const WIZARD_STEPS = [
+  { id: 'template', label: 'Choose Template' },
   { id: 'basic-info', label: 'Basic Information' },
   { id: 'description', label: 'World Description' },
   { id: 'attributes', label: 'Review Attributes' },

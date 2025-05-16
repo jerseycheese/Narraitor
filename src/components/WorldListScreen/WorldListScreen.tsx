@@ -5,22 +5,43 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import { World } from '../../types/world.types';
 
 const WorldListScreen: React.FC = () => {
-  // Use the store without shallow comparison
-  const state = worldStore();
-  const worlds = Object.values(state.worlds);
-  const { loading, error } = state;
+  // Use useState to track the worlds
+  const [worlds, setWorlds] = useState<World[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
 
+  // Load worlds on component mount
   useEffect(() => {
-    const { fetchWorlds } = worldStore.getState();
-    fetchWorlds();
-  }, []); // Empty dependency array - only run once on mount
+    try {
+      // Get initial state
+      const state = worldStore.getState();
+      setWorlds(Object.values(state.worlds || {}));
+      setLoading(false);
+      
+      // Subscribe to state changes
+      const unsubscribe = worldStore.subscribe(() => {
+        const newState = worldStore.getState();
+        setWorlds(Object.values(newState.worlds || {}));
+      });
+      
+      // Clean up subscription
+      return () => unsubscribe();
+    } catch (err) {
+      console.error('Error loading worlds:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      setLoading(false);
+    }
+  }, []);
 
   const handleSelectWorld = (worldId: string) => {
-    const { setCurrentWorld } = worldStore.getState();
-    setCurrentWorld(worldId);
+    // Use setState to update the currentWorldId
+    worldStore.setState((state) => ({
+      ...state,
+      currentWorldId: worldId
+    }));
   };
 
   const handleDeleteClick = (worldId: string) => {
@@ -35,13 +56,21 @@ const WorldListScreen: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (worldToDeleteId) {
-      const { deleteWorld } = worldStore.getState();
-      deleteWorld(worldToDeleteId);
+      // Use setState to delete the world
+      worldStore.setState((state) => {
+        const newWorlds = { ...state.worlds };
+        delete newWorlds[worldToDeleteId];
+        return {
+          ...state,
+          worlds: newWorlds,
+          currentWorldId: state.currentWorldId === worldToDeleteId ? null : state.currentWorldId
+        };
+      });
     }
     handleCloseDeleteDialog();
   };
 
-  const worldToDelete = worlds.find((world: World) => world.id === worldToDeleteId);
+  const worldToDelete = worlds.find((world) => world.id === worldToDeleteId);
   const deleteMessage = worldToDelete
     ? `Are you sure you want to delete the world "${worldToDelete.name}"?`
     : 'Are you sure you want to delete this world?';
