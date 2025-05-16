@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import TemplateStep from '../TemplateStep';
 import { templates } from '../../../../lib/templates/worldTemplates';
 import { applyWorldTemplate } from '../../../../lib/templates/templateLoader';
@@ -70,6 +70,11 @@ describe('TemplateStep', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+  
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('renders the template step correctly', () => {
@@ -87,8 +92,9 @@ describe('TemplateStep', () => {
     render(<TemplateStep {...defaultProps} />);
     
     // Find the first template card and click it
-    const firstTemplateCard = screen.getByTestId(`template-card-${templates[0].id}`);
-    fireEvent.click(firstTemplateCard);
+    act(() => {
+      fireEvent.click(screen.getByTestId(`template-card-${templates[0].id}`));
+    });
     
     // State should be updated with the selected template
     expect(mockOnUpdate).toHaveBeenCalledWith({
@@ -102,12 +108,15 @@ describe('TemplateStep', () => {
     const createOwnButton = screen.getByTestId('create-own-button');
     expect(createOwnButton).toBeInTheDocument();
     
-    fireEvent.click(createOwnButton);
+    act(() => {
+      fireEvent.click(createOwnButton);
+    });
+    
     expect(mockOnUpdate).toHaveBeenCalledWith({ selectedTemplateId: null });
     expect(mockOnNext).toHaveBeenCalled();
   });
 
-  test('calls onNext with the selected template when next button is clicked', () => {
+  test('calls onNext with the selected template when next button is clicked', async () => {
     render(<TemplateStep {...defaultProps} selectedTemplateId={templates[0].id} />);
     
     // With template selected, next button should be enabled
@@ -115,10 +124,19 @@ describe('TemplateStep', () => {
     expect(nextButton).not.toBeDisabled();
     
     // Click the next button
-    fireEvent.click(nextButton);
+    act(() => {
+      fireEvent.click(nextButton);
+    });
     
-    // Check that applyWorldTemplate and onNext were called
+    // Check that applyWorldTemplate was called
     expect(applyWorldTemplate).toHaveBeenCalledWith(templates[0].id);
+    
+    // Fast-forward timers to execute the setTimeout
+    act(() => {
+      jest.runAllTimers();
+    });
+    
+    // Now check that onNext was called after the timeout
     expect(mockOnNext).toHaveBeenCalled();
   });
 
@@ -126,7 +144,10 @@ describe('TemplateStep', () => {
     render(<TemplateStep {...defaultProps} />);
     
     const cancelButton = screen.getByTestId('cancel-button');
-    fireEvent.click(cancelButton);
+    
+    act(() => {
+      fireEvent.click(cancelButton);
+    });
     
     expect(mockOnCancel).toHaveBeenCalled();
   });

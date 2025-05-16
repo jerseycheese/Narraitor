@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import WorldCreationWizard from '../WorldCreationWizard';
 import { applyWorldTemplate } from '@/lib/templates/templateLoader';
 
@@ -70,9 +70,15 @@ jest.mock('@/lib/templates/templateLoader', () => ({
 describe('WorldCreationWizard Template Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Use fake timers for all tests
+    jest.useFakeTimers();
   });
   
-  test('template selection and application flow', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+  
+  test('template selection and application flow', async () => {
     render(<WorldCreationWizard />);
     
     // Verify we start at template step
@@ -82,27 +88,48 @@ describe('WorldCreationWizard Template Integration', () => {
     expect(screen.getByTestId('next-button')).toBeDisabled();
     
     // Select a template
-    fireEvent.click(screen.getByTestId('template-card-fantasy'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('template-card-fantasy'));
+    });
     
     // Verify the Use Template button is now enabled
     expect(screen.getByTestId('next-button')).not.toBeDisabled();
     
     // Click Use Template button to apply template and move to next step
-    fireEvent.click(screen.getByTestId('next-button'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('next-button'));
+    });
     
     // Verify the template was applied
     expect(applyWorldTemplate).toHaveBeenCalledWith('fantasy');
+    
+    // Fast-forward timers to execute the setTimeout
+    act(() => {
+      jest.runAllTimers();
+    });
+    
+    // Wait for any additional async operations
+    await act(async () => {
+      await Promise.resolve();
+    });
     
     // Verify we moved to the next step (basic info)
     expect(screen.queryByTestId('template-step')).not.toBeInTheDocument();
   });
   
-  test('creating a world without template', () => {
+  test('creating a world without template', async () => {
     // Render with initial template step
     render(<WorldCreationWizard initialStep={0} />);
     
     // Click Create My Own World button
-    fireEvent.click(screen.getByTestId('create-own-button'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('create-own-button'));
+    });
+    
+    // Wait for any async operations
+    await act(async () => {
+      await Promise.resolve();
+    });
     
     // Verify the template was not applied
     expect(applyWorldTemplate).not.toHaveBeenCalled();
@@ -134,7 +161,9 @@ describe('WorldCreationWizard Template Integration', () => {
     render(<WorldCreationWizard onCancel={onCancelMock} />);
     
     // Click the cancel button
-    fireEvent.click(screen.getByTestId('cancel-button'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('cancel-button'));
+    });
     
     // Verify onCancel was called
     expect(onCancelMock).toHaveBeenCalled();
@@ -144,10 +173,14 @@ describe('WorldCreationWizard Template Integration', () => {
     render(<WorldCreationWizard />);
     
     // Select a specific template
-    fireEvent.click(screen.getByTestId('template-card-sitcom'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('template-card-sitcom'));
+    });
     
     // Apply template
-    fireEvent.click(screen.getByTestId('next-button'));
+    act(() => {
+      fireEvent.click(screen.getByTestId('next-button'));
+    });
     
     // Verify applyWorldTemplate was called with the correct template ID
     expect(applyWorldTemplate).toHaveBeenCalledWith('sitcom');

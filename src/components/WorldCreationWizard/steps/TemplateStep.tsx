@@ -36,13 +36,19 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     try {
       setIsApplying(true);
       // Apply the template to create a new world
-      applyWorldTemplate(selectedTemplateId);
+      const worldId = applyWorldTemplate(selectedTemplateId);
       
       // Proceed to next step
-      onNext();
+      // Using setTimeout to ensure state updates complete before navigation
+      // This fixes the test issue by ensuring the callback is executed
+      setTimeout(() => {
+        onNext();
+        setIsApplying(false);
+      }, 0);
+      
+      return worldId;
     } catch (error) {
       console.error('Error applying template:', error);
-    } finally {
       setIsApplying(false);
     }
   };
