@@ -16,11 +16,7 @@ const meta: Meta<typeof GlobalStylesDemo> = {
   // Add a decorator to force text colors in Storybook
   decorators: [
     (Story) => (
-      <div style={{ 
-        color: '#171717', 
-        backgroundColor: '#ffffff',
-        padding: '1rem',
-      }}>
+      <div className="text-neutral-900 bg-white p-4">
         <style>{`
           /* Force proper colors in Storybook */
           body, h1, h2, h3, h4, h5, h6, p, li, td, th, label, span {

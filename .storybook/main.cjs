@@ -1,14 +1,12 @@
 /**
  * Storybook Configuration for Narraitor
- * 
- * Minimal configuration focused on the GlobalStylesDemo component.
  */
 const path = require('path');
 
 module.exports = {
   stories: [
-    // Only include the GlobalStylesDemo story to avoid dependency issues
-    '../src/components/design-system/GlobalStylesDemo.stories.@(js|jsx|ts|tsx)'
+    // Include all stories from the project
+    '../src/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   addons: [
     '@storybook/addon-essentials'

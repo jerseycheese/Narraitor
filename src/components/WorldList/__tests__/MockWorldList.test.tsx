@@ -62,7 +62,7 @@ describe('MockWorldList', () => {
       />
     );
     expect(screen.getByTestId('world-list-empty-message')).toBeInTheDocument();
-    expect(screen.getByText('No worlds created yet.')).toBeInTheDocument();
+    expect(screen.getByText('No worlds created yet. Create your first world to get started.')).toBeInTheDocument();
   });
 
   // Test case for Play functionality

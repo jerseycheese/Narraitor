@@ -1,8 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { World } from '../../types/world.types';
-// Import components directly instead of WorldListScreen
-import WorldList from '../WorldList/WorldList';
+import MockWorldList from '../WorldList/MockWorldList'; // Import instead of actual WorldList
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 
 // Mock worlds data
@@ -90,7 +89,12 @@ const MockWorldListScreen = ({
 
   return (
     <div>
-      <WorldList worlds={worlds} onSelectWorld={handleSelectWorld} onDeleteWorld={handleDeleteClick} />
+      <MockWorldList 
+        worlds={worlds} 
+        onSelectWorld={handleSelectWorld} 
+        onDeleteWorld={handleDeleteClick}
+        onPlayWorld={(worldId) => console.log('Play world:', worldId)} 
+      />
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}

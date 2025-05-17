@@ -10,14 +10,14 @@ export default function DevPage() {
         <Link href="/dev/world-creation-wizard" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           World Creation Wizard Test Harness
         </Link>
-        <Link href="/dev/test" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
-          Test Component Harness
+        <Link href="/dev/devtools-test" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          DevTools Test Harness
         </Link>
-        <Link href="/dev/controls" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
-          Controls Test Harness
+        <Link href="/dev/world-card" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          World Card Test Harness
         </Link>
-        <Link href="/dev/mocks" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
-          Mocks Test Harness
+        <Link href="/dev/game-session" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          Game Session Test Harness
         </Link>
       </div>
     </div>
