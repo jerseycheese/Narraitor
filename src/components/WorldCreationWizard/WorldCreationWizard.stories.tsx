@@ -187,17 +187,4 @@ export const FinalizeStep: Story = {
   }
 };
 
-// Mobile responsive view
-export const Mobile: Story = {
-  args: {},
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1',
-    },
-    docs: {
-      description: {
-        story: 'Shows how the wizard appears on mobile devices'
-      }
-    }
-  }
-};
+

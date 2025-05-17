@@ -30,27 +30,31 @@ const MockWorldCard = ({
     <div
       data-testid="world-card"
       onClick={handleCardClick}
-      style={{
-        border: '1px solid #ccc',
-        padding: '10px',
-        margin: '10px',
-        borderRadius: '5px',
-        cursor: 'pointer',
+      className="card p-3 m-3 cursor-pointer"
+      style={{ 
+        borderRadius: 'var(--radius-md)',
+        boxShadow: 'var(--shadow-sm)'
       }}
     >
-      <h3 data-testid="world-card-name">{world.name}</h3>
-      <p data-testid="world-card-description">{world.description}</p>
-      <p data-testid="world-card-theme">Theme: {world.theme}</p>
-      <p data-testid="world-card-createdAt">Created: {new Date(world.createdAt).toLocaleDateString()}</p>
-      <p data-testid="world-card-updatedAt">Updated: {new Date(world.updatedAt).toLocaleDateString()}</p>
-      <div>
-        <button onClick={(e) => { e.stopPropagation(); handlePlayClick(); }} data-testid="world-card-actions-play-button">
+      <h3 data-testid="world-card-name" className="text-lg font-semibold">{world.name}</h3>
+      <p data-testid="world-card-description" className="mt-1">{world.description}</p>
+      <p data-testid="world-card-theme" className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>Theme: {world.theme}</p>
+      <p data-testid="world-card-createdAt" className="text-xs mt-2" style={{ color: 'var(--color-muted)' }}>Created: {new Date(world.createdAt).toLocaleDateString()}</p>
+      <p data-testid="world-card-updatedAt" className="text-xs" style={{ color: 'var(--color-muted)' }}>Updated: {new Date(world.updatedAt).toLocaleDateString()}</p>
+      <div className="mt-3 flex gap-2">
+        <button onClick={(e) => { e.stopPropagation(); handlePlayClick(); }} 
+          data-testid="world-card-actions-play-button"
+          className="btn btn-primary px-2 py-1 rounded text-sm">
           Play
         </button>
-        <button onClick={(e) => { e.stopPropagation(); }} data-testid="world-card-actions-edit-button">
+        <button onClick={(e) => { e.stopPropagation(); }} 
+          data-testid="world-card-actions-edit-button"
+          className="btn btn-secondary px-2 py-1 rounded text-sm">
           Edit
         </button>
-        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(); }} data-testid="world-card-actions-delete-button">
+        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(); }} 
+          data-testid="world-card-actions-delete-button"
+          className="btn btn-accent px-2 py-1 rounded text-sm">
           Delete
         </button>
       </div>
