@@ -23,7 +23,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
   _storeActions,
   _router
 }) => {
-  const router = useRouter();
+  // Only call useRouter if no mock is provided
+  const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
   const handleCardClick = () => {
