@@ -6,7 +6,16 @@ import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { World } from '../../types/world.types';
 
-const WorldListScreen: React.FC = () => {
+interface WorldListScreenProps {
+  _router?: {
+    push: (url: string) => void;
+  };
+  _storeActions?: {
+    setCurrentWorld: (id: string) => void;
+  };
+}
+
+const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions }) => {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +100,13 @@ const WorldListScreen: React.FC = () => {
 
   return (
     <main>
-      <WorldList worlds={worlds} onSelectWorld={handleSelectWorld} onDeleteWorld={handleDeleteClick} />
+      <WorldList 
+        worlds={worlds} 
+        onSelectWorld={handleSelectWorld} 
+        onDeleteWorld={handleDeleteClick}
+        _router={_router}
+        _storeActions={_storeActions}
+      />
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}

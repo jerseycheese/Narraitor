@@ -4,9 +4,8 @@
  */
 const storybookPostcssConfig = {
   plugins: {
-    'postcss-nested': {},
     '@tailwindcss/postcss': {},
-    autoprefixer: {},
+    'autoprefixer': {},
   },
 };
 
