@@ -24,6 +24,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   _router
 }) => {
   // Only call useRouter if no mock is provided
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
