@@ -3,7 +3,7 @@ title: Claude App Prompt Templates (Updated)
 aliases: [App Prompts, Claude Prompt Library, Updated Prompt Templates]
 tags: [development, workflow, claude, prompt, templates]
 created: 2025-04-28
-updated: 2025-04-29
+updated: 2025-05-14
 ---
 
 # Claude App Prompt Templates (Updated)
@@ -46,14 +46,26 @@ I'm working on the Narraitor project, a Next.js/React application for a narrativ
 ## Request
 Help me select and analyze the next task to implement, following KISS principles.
 
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
+
 ## Information Access
 Please use MCP tools to:
-1. Review the Github project at https://github.com/users/jerseycheese/projects/3
-2. Review open issues at https://github.com/jerseycheese/narraitor/issues
-3. Review the roadmap at `/Users/jackhaas/Projects/narraitor/docs/development-roadmap.md`
-4. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
-5. Check project structure at `/Users/jackhaas/Projects/narraitor/src`
-6. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
+1. Use @modelcontextprotocol/server-github and 
+	1. review the Github project at https://github.com/users/jerseycheese/projects/3
+	2. review open issues at https://github.com/jerseycheese/narraitor/issues
+2. Review the roadmap at `/Users/jackhaas/Projects/narraitor/docs/development-roadmap.md`
+3. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
+4. Check project structure at `/Users/jackhaas/Projects/narraitor/src`
+5. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
+6. Review our Storybook workflow for component development at `/Users/jackhaas/Projects/narraitor/docs/development/workflows/storybook-workflow.md`
 
 ## Scope Constraints
 - Focus only on the current issue without adding enhancements
@@ -65,12 +77,15 @@ Please use MCP tools to:
 ## Analysis Goals
 Based on this information, please:
 1. Identify the highest priority tasks
+	1. Don't limit yourself to looking at the first page of open issues in my issue queue.
+	2. Review the Github project's Backlog and any epic issues in progress
 2. Assess implementation complexity and dependencies
 3. Evaluate value to effort ratios
 4. Check alignment with roadmap goals
 5. Create a technical specification for implementation
 6. Provide a clear, step-by-step plan following TDD principles
 7. Identify existing utilities/helpers that can be leveraged
+8. Plan the Three-Stage Component Testing approach (Storybook → Test Harness → Integration)
 
 ## Output Format
 Please present your analysis as a markdown artifact with this structure:
@@ -101,9 +116,11 @@ INTERFACES
 
 IMPLEMENTATION STEPS
 1. [ ] Define test cases (TDD approach)
-2. [ ] Create Storybook stories (for UI components)
+2. [ ] Create Storybook stories (following our workflow guide)
 3. [ ] Implement minimum code to pass tests
-4. [ ] [Additional steps]
+4. [ ] Create test harness pages (/dev/[component-name])
+5. [ ] Integration testing
+6. [ ] [Additional steps]
 
 Existing Utilities to Leverage:
 - [utility/helper path]: [purpose and usage]
@@ -116,14 +133,17 @@ Files to Create:
 TEST PLAN
 1. Unit Tests:
    - [test scenario]
-2. Integration Tests:
-   - [test scenario]
-3. Storybook Stories (for UI components):
+2. Storybook Stories:
    - [story variants]
+3. Test Harness:
+   - [interactive testing scenarios]
+4. Integration Tests:
+   - [test scenario]
 
 SUCCESS CRITERIA
 - [ ] [criterion]
 - [ ] [criterion]
+- [ ] Stories follow 'Narraitor/[Category]/[Component]' naming
 
 TECHNICAL NOTES
 - [technical detail]
@@ -149,13 +169,24 @@ I'm implementing this technical spec:
 [PASTE SPEC ARTIFACT HERE]
 
 ## Request
-Help me define the tests for this feature before implementation, following strict TDD principles.
+Help me define the MVP tests for this feature before implementation, following strict TDD principles and the Three-Stage Component Testing approach.
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP tools to:
 1. Review existing test patterns at `/Users/jackhaas/Projects/narraitor/tests`
 2. Check component test examples at `/Users/jackhaas/Projects/narraitor/docs/technical-guides/component-testing.md`
 3. Review existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib` and test utilities
+4. Follow the Storybook workflow at `/Users/jackhaas/Projects/narraitor/docs/development/workflows/storybook-workflow.md`
 
 ## Test Requirements
 1. Write tests before implementation (TDD approach)
@@ -163,7 +194,10 @@ Please use MCP tools to:
 3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
 4. Use data-testid attributes for element selection
 5. Keep tests focused and minimal (KISS approach)
-6. For UI components, include Storybook story definitions alongside tests
+6. Plan for Three-Stage Component Testing:
+   - Stage 1: Storybook isolation
+   - Stage 2: Test harness integration
+   - Stage 3: System integration
 
 ## Output Format
 Please provide:
@@ -171,7 +205,8 @@ Please provide:
    - Test file structure
    - Test cases covering functionality
    - Clear data-testid names following our convention
-   - Storybook story definitions for UI components
+   - Storybook story definitions (following 'Narraitor/[Category]/[Component]' naming)
+   - Test harness plan (/dev/[component-name])
 2. An explanation of your testing approach
 3. A verification list of what is covered and what is not
 
@@ -195,14 +230,25 @@ And I've defined these tests:
 [PASTE TEST ARTIFACT HERE]
 
 ## Request
-Help me implement this specification to make the tests pass, following KISS principles and leveraging existing utilities.
+Help me implement this MVP specification to make the tests pass, following KISS principles and leveraging existing utilities.
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP tools to:
 1. Review related files at [specific paths]
 2. Check our existing patterns for similar components
 3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
-4. Review and leverage existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib` 
+4. Review and leverage existing utilities and helpers in `/Users/jackhaas/Projects/narraitor/src/lib`
+5. Follow the Storybook workflow at `/Users/jackhaas/Projects/narraitor/docs/development/workflows/storybook-workflow.md`
 
 ## Scope Constraints
 - Implement ONLY what's specified in the technical spec
@@ -219,7 +265,10 @@ Please use MCP tools to:
 3. Clean code principles
 4. Error handling for specified cases only
 5. Stay within the defined scope boundaries
-6. For UI components, implement alongside Storybook stories
+6. For UI components:
+   - Implement alongside Storybook stories
+   - Follow the Three-Stage Component Testing approach
+   - Create test harness pages (/dev/[component-name])
 7. Leverage existing utilities rather than creating new ones
 8. Maintain simple, readable code over clever optimizations
 
@@ -238,88 +287,16 @@ Used Utilities/Helpers:
 - [path to utility/helper]: [how it was used]
 
 CODE CHANGES
-```[language]
 [Actual code changes]
-```
 
 STORYBOOK STORIES (for UI components)
-```[language]
-[Storybook story code]
-```
-```
+[Storybook story code following 'Narraitor/[Category]/[Component]' naming]
 
-## Build Phase
-
-```
-# Build Phase Request
-
-## Context
-I've implemented this component:
-
-[PASTE COMPONENT CODE]
-
-## Request
-Help me resolve any potential build issues before moving to testing.
-
-## Information Access
-Please use MCP tools to:
-1. Check related component implementations
-2. Review our TypeScript configuration
-3. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
-
-## Scope Constraints
-- Fix only build-related issues
-- Do not enhance functionality
-- Do not refactor unrelated code
-- Stay within the original implementation approach
-
-## Output Format
-Please provide a summary in this format:
-
-Note: This phase can also be handled in your IDE using Cline/Roo with auto-approve enabled.
-```
-
-## Test Fixes Phase
-
-```
-# Test Fixes Request
-
-## Context
-My implementation is now building successfully, but I need to fix the tests:
-
-[PASTE COMPONENT AND TEST CODE]
-
-## Request
-Help me fix any failing tests without changing the core functionality.
-
-## Scope Boundaries
-- Fix only the failing tests for existing functionality
-- Do not add tests for features not yet implemented
-- Do not suggest component changes that would extend functionality
-- Focus on making current tests pass, not on test coverage gaps
-
-## Information Access
-Please use MCP tools to:
-1. Review the failing test file
-2. Examine the component implementation
-3. Review similar test patterns if needed
-4. Use existing utils and helpers in `/Users/jackhaas/Projects/narraitor/tests`
-5. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
-
-## Test Requirements
-1. Use Jest and React Testing Library
-2. Follow our existing test patterns
-3. Test only implemented functionality
-4. Fix only the failing tests
-5. Maintain good test isolation
-
-## Output Format
-Please provide:
-1. Analysis of why tests are failing
-2. Updated test code as an artifact
-3. Only necessary component modifications to make tests pass
-
-Note: This phase can also be handled in your IDE using Cline/Roo with auto-approve enabled.
+TEST HARNESS PLAN
+Path: /dev/[component-name]
+Interactive features:
+- [feature 1]
+- [feature 2]
 ```
 
 ## Manual Testing
@@ -335,18 +312,46 @@ I've implemented this feature and all automated tests are now passing:
 ## Request
 Help me plan manual testing steps to verify this implementation works as expected in real usage, given the current state of the codebase.
 
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
+
 ## Scope Boundaries
 - Only test functionality within the defined scope
 - Focus on user experience and edge cases automated tests might miss
 - Do not suggest testing features outside the implemented scope
 
+## Three-Stage Manual Testing
+1. **Storybook Testing**:
+   - Review all story variants
+   - Test interactive controls
+   - Verify visual appearance
+
+2. **Test Harness Testing** (/dev/[component-name]):
+   - Test with more realistic data
+   - Verify state transitions
+   - Check edge cases interactively
+
+3. **System Integration Testing**:
+   - Test within the full application
+   - Verify with real data
+   - Check parent component interactions
+
 ## Output Format
 Please provide a testing plan including:
-1. User scenarios to test
-2. Edge cases to verify
-3. Visual/UX aspects to check
-4. Integration points to validate
-5. Potential issues to watch for
+1. Storybook scenarios to verify
+2. Test harness interactions to check
+3. Integration points to validate
+4. User scenarios to test
+5. Edge cases to verify
+6. Visual/UX aspects to check
+7. Potential issues to watch for
 
 These steps will help ensure the implementation works correctly in the real application environment.
 ```
@@ -364,6 +369,18 @@ I've implemented this feature:
 ## Request
 Help me review, clean up, and document this implementation.
 
+[PASTE LIST OF CHANGED FILES]
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
+
 ## Scope Boundaries
 - Focus only on the implemented code
 - Do not suggest refactoring or restructuring
@@ -373,17 +390,23 @@ Help me review, clean up, and document this implementation.
 
 ## Information Access
 Please use MCP to:
-1. Review the implemented files
+1. Review the implemented files and any related Github issue(s)
 2. Check for cleanup opportunities
 3. Check for overly large files (>400 lines) that should be refactored into smaller files
 4. Review existing documentation structure in `/Users/jackhaas/Projects/narraitor/docs`
 5. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+6. Verify adherence to Storybook workflow guide
+7. Check test harness implementation if applicable
 
 ## Output Format
 Please provide a response with these sections:
 
 CLEANUP & DOCS
 GitHub Issue: #[number] [title]
+
+COMPLETENESS
+- [ ] Github issue Acceptance Criteria is all complete and verified
+- [ ] Three-Stage Component Testing completed (Storybook → Test Harness → Integration)
 
 CODE REVIEW
 Quality:
@@ -399,14 +422,17 @@ Documentation:
 - [ ] API documentation
 - [ ] Architecture changes
 - [ ] System documentation
+- [ ] Storybook stories documented
 
 TEST COVERAGE
 - Unit Tests: [coverage]
+- Storybook Stories: [coverage]
+- Test Harness: [status]
 - Integration Tests: [coverage]
 - Edge Cases: [list]
 - Missing Coverage: [areas]
 
-GITHUB UPDATES
+GITHUB UPDATES https://github.com/jerseycheese/Narraitor
 Issues to Close:
 - [ ] #[number]: [completion notes]
 
@@ -416,14 +442,13 @@ Issues to Create:
   Description: [details]
 
 Commit Message:
-```
+
 [type](scope): Brief description
 
 - Change detail 1
 - Change detail 2
 
 Issue: #[number]
-```
 ```
 
 ## Component Refactoring
@@ -460,6 +485,17 @@ Priority order:
 2. [ ] Type safety maintenance
 3. [ ] File organization
 4. [ ] Test coverage preservation
+5. [ ] Storybook stories maintenance
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP to:
@@ -468,6 +504,7 @@ Please use MCP to:
 3. Check similar components for patterns
 4. Use existing utils and helpers in `/Users/jackhaas/Projects/narraitor/tests` or `/Users/jackhaas/Projects/narraitor/src/utils`
 5. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+6. Maintain Storybook structure per our workflow guide
 
 ## Requirements
 ### Must Have
@@ -477,6 +514,7 @@ Please use MCP to:
 - Clear component boundaries
 - Type safety
 - Existing test coverage
+- Storybook stories continue working
 
 ## Risk Assessment
 ### Safe to Split Out
@@ -497,7 +535,8 @@ Please provide:
 1. Analysis of current issues
 2. Refactored component as an artifact
 3. Any necessary test updates
-4. Before/after comparison highlighting organization improvements
+4. Updated Storybook stories if needed
+5. Before/after comparison highlighting organization improvements
 ```
 
 ## Bug Fix Request
@@ -520,6 +559,16 @@ Help me diagnose and fix this specific issue only.
 - Do not modify unrelated functionality
 - Focus only on the minimum changes needed
 
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
+
 ## Information Access
 Please use MCP to:
 1. Examine related components at [paths]
@@ -528,13 +577,15 @@ Please use MCP to:
 4. Check project documentation in `/Users/jackhaas/Projects/narraitor/docs`
 5. Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
 6. Use existing utils and helpers in `/Users/jackhaas/Projects/narraitor/tests` or `/Users/jackhaas/Projects/narraitor/src/utils`
+7. Check Storybook stories for the component
 
 ## Output Format
 Please provide:
 1. Root cause analysis
 2. Minimal fix implementation as an artifact
 3. Test updates to prevent regression
-4. Verification steps specific to this bug
+4. Storybook story updates if needed
+5. Verification steps specific to this bug
 ```
 
 ## Feature-Specific Implementation
@@ -570,6 +621,17 @@ I need to implement this specific feature:
 - Must only modify listed files
 - Must implement exactly what's specified, no more
 - Follow our naming conventions in `/Users/jackhaas/Projects/narraitor/docs/technical-guides/coding-naming-conventions.md`
+- Follow the Three-Stage Component Testing approach for UI components
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP to:
@@ -577,12 +639,15 @@ Please use MCP to:
 2. Review similar implementations
 3. Check existing patterns
 4. Use existing utils and helpers in `/Users/jackhaas/Projects/narraitor/tests` or `/Users/jackhaas/Projects/narraitor/src/utils`
+5. Follow Storybook workflow guide for UI components
 
 ## Output Format
 Please provide:
 1. Implementation code that strictly adheres to requirements
 2. Test code for specified functionality only
-3. Verification that implementation meets all constraints
+3. Storybook stories for UI components
+4. Test harness plan if applicable
+5. Verification that implementation meets all constraints
 ```
 
 ## IDE-Based Build & Test Request (Cline/Roo)
@@ -598,10 +663,21 @@ I'm implementing this feature via Cline/Roo in my IDE to conserve Claude.ai usag
 ## Request
 Help me efficiently fix build issues and test failures via the IDE.
 
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
+
 ## Process
 1. First fix any build errors until the code compiles
 2. Then address test failures one by one
 3. Loop through build and test phases until both are successful
+4. Verify Storybook stories compile and display correctly
 
 ## Scope Boundaries
 - Fix only issues that prevent building or passing tests
@@ -621,6 +697,7 @@ Please start with:
 2. A plan to address build issues first
 3. Specific changes to fix each issue
 4. A clear indication when we're transitioning to test fixes
+5. Verification steps for Storybook stories
 ```
 
 ## Storybook Integration
@@ -634,7 +711,17 @@ I've implemented this UI component:
 [PASTE COMPONENT CODE]
 
 ## Request
-Help me create comprehensive Storybook stories for this component following our component-driven development approach.
+Help me create comprehensive Storybook stories for this component following our component-driven development approach and Three-Stage Component Testing.
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP tools to:
@@ -649,23 +736,29 @@ Please use MCP tools to:
 4. Show loading, error, and empty states
 5. Follow KISS principles in story implementation
 6. Use ArgTypes for interactive controls
-7. Organize within the correct category
+7. Organize within the correct category using 'Narraitor/[Category]/[Component]' naming
+8. Plan for Three-Stage Component Testing implementation
+
+## Test Harness Planning
+After Storybook stories, plan a test harness at /dev/[component-name] for Stage 2 testing
 
 ## Output Format
 Please provide:
 
 STORYBOOK STORIES
 File: [component].stories.tsx
-Category: [UI/Character/World/etc.]
-
-```tsx
+Category: Narraitor/[Category]/[Component]
 [Complete Storybook stories code]
-```
 
 DOCUMENTATION
-```tsx
 [JSDoc or prop table code]
-```
+
+TEST HARNESS PLAN
+Path: /dev/[component-name]
+Features to test:
+- [Interactive feature 1]
+- [State transition 1]
+- [Edge case 1]
 
 COMPONENT VARIANTS COVERED
 - [ ] Default state
@@ -676,7 +769,7 @@ COMPONENT VARIANTS COVERED
 - [ ] Additional variants: [list]
 
 TESTING INTEGRATION NOTES
-[Notes on how these stories relate to component tests]
+[Notes on how these stories relate to component tests and the Three-Stage approach]
 ```
 
 ## GitHub Issue Management
@@ -691,7 +784,7 @@ I've completed this feature:
 
 ## Request
 Help me prepare GitHub issue/epic updates/creation/closures using your Github MCP tools.
-* Use strikeouts + updates when updating/editing existing text
+* Use strikeouts when updating/editing existing text
 * Check checkboxes that should be checked now (eg. Acceptance Criteria)
 * All other commentary should be in issue comments
 * Search for whether an issue already exists before creating a new one; combine new issues into existing, related tickets if it makes sense to
@@ -701,6 +794,17 @@ Help me prepare GitHub issue/epic updates/creation/closures using your Github MC
 - Focus only on what was actually implemented
 - Do not suggest enhancements outside the original scope
 - Keep issue comments focused on completed work
+- Mention completion of Three-Stage Component Testing if applicable
+
+## Preferred MCP Tools
+
+When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
+
+- **sequentialthinking**: For planning and structuring responses.
+- **mcp-obsidian**: For referencing project documentation and notes.
+- **memory**: For building and querying context.
+- **@modelcontextprotocol-server-github**: For GitHub interaction.
+- **brave-search**: For research and finding best practices.
 
 ## Information Access
 Please use MCP to:
@@ -714,14 +818,18 @@ Please provide:
 GITHUB ISSUE UPDATE
 Issue #[number]
 Status Update:
-```
+
 Feature completed with the following changes:
 - [change 1]
 - [change 2]
 - [change 3]
 
+Three-Stage Component Testing completed:
+- [ ] Storybook stories created
+- [ ] Test harness implemented
+- [ ] Integration tested
+
 All tests are passing and the feature has been manually verified.
-```
 
 ISSUES HANDLED
 1. Title: [issue title]
@@ -731,3 +839,12 @@ ISSUES HANDLED
 2. Title: [issue title]
    Description: [brief description]
    Labels: [labels]
+```
+
+## Related Documents
+- [[claude-app-workflow|Claude App Workflow]]
+- [[claude-app-workflow-handoffs|Claude App Workflow Handoffs]]
+- [[claude-app-mcp-optimization|Claude App MCP Tool Optimization]]
+- [[claude-dev-workflow|Claude Dev Terminal Workflow]]
+- [[tdd-workflow|Test-Driven Development Workflow]]
+- [[storybook-workflow|Storybook Workflow & Component-Driven Development]]

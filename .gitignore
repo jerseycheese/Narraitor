@@ -63,3 +63,6 @@ docs/.obsidian
 
 # Docs
 docs/development/workflows
+
+# Claude Code session state
+.claude/claude.json

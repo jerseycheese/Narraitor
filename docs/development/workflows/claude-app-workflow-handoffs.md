@@ -3,7 +3,7 @@ title: Claude App Workflow Handoffs
 aliases: [Chat Transition Templates, Handoff Templates]
 tags: [development, workflow, claude, process, transitions, handoffs]
 created: 2025-04-28
-updated: 2025-04-29
+updated: 2025-05-14
 ---
 
 # Claude App Workflow Handoffs
@@ -25,7 +25,7 @@ These templates help maintain continuity when you need to start a new chat due t
 
 ### Request in Current Chat
 ```
-We're approaching the chat length limit. Could you create a summary artifact of our task analysis and technical spec that I can use to continue implementation in a fresh chat? Include explicit scope boundaries detailing what is and isn't included in this task.
+We're approaching the chat length limit. Could you create a summary artifact of our task analysis and technical spec that I can use to continue implementation in a fresh chat? Include explicit scope boundaries detailing what is and isn't included in this task. Also include our Three-Stage Component Testing approach if applicable to UI components.
 ```
 
 ### Expected Artifact Content
@@ -67,8 +67,15 @@ Utilities/Helpers to Leverage:
 Implementation Steps:
 1. Define tests (TDD approach)
 2. Create Storybook stories (for UI components)
-3. Implement minimum code to pass tests
-4. [Additional steps]
+3. Implement test harness (/dev/[component-name])
+4. Implement minimum code to pass tests
+5. Integration testing
+6. [Additional steps]
+
+Three-Stage Component Testing:
+- Stage 1: Storybook isolation
+- Stage 2: Test harness integration
+- Stage 3: System integration
 
 Data Flow:
 [Brief description of data flow]
@@ -76,6 +83,7 @@ Data Flow:
 ## Context Notes
 - [Any special consideration 1]
 - [Any special consideration 2]
+- Follow Storybook workflow guide at /docs/development/workflows/storybook-workflow.md
 ```
 
 ### Starting the New Chat
@@ -86,10 +94,11 @@ I'm continuing work on a Narraitor task from a previous chat. Here's the technic
 
 Let's proceed with implementation, following our TDD and KISS principles:
 1. Write tests first
-2. Create Storybook stories for UI components
-3. Implement the minimum code needed to pass tests
-4. Keep components under 300 lines
-5. Use existing utilities/helpers from `/users/jackhaas/projects/narraitor/src/lib` where appropriate
+2. Create Storybook stories for UI components (follow our workflow guide)
+3. Implement test harness pages where applicable
+4. Implement the minimum code needed to pass tests
+5. Keep components under 300 lines
+6. Use existing utilities/helpers from `/users/jackhaas/projects/narraitor/src/lib` where appropriate
 
 Important: Focus ONLY on what's defined within the scope boundaries. Do NOT add features, optimizations, or enhancements outside the defined scope.
 ```
@@ -98,7 +107,7 @@ Important: Focus ONLY on what's defined within the scope boundaries. Do NOT add 
 
 ### Request in Current Chat
 ```
-We're approaching the chat length limit. Could you create a summary artifact of our implementation progress and remaining test issues that I can use to continue in a fresh chat? Include specific scope boundaries to prevent feature creep.
+We're approaching the chat length limit. Could you create a summary artifact of our implementation progress and remaining test issues that I can use to continue in a fresh chat? Include specific scope boundaries to prevent feature creep and the status of our Three-Stage Component Testing.
 ```
 
 ### Expected Artifact Content
@@ -130,14 +139,16 @@ Failing Tests:
 - [Test 3]: [Issue description]
 - [Test 4]: [Issue description]
 
-## Storybook Status (for UI components)
-- [Story 1]: [Status - Complete/Needs updates]
-- [Story 2]: [Status - Complete/Needs updates]
+## Three-Stage Component Testing Status
+- [ ] Stage 1: Storybook stories [Complete/In Progress]
+- [ ] Stage 2: Test harness at /dev/[component-name] [Complete/In Progress]
+- [ ] Stage 3: System integration [Complete/In Progress]
 
 ## Next Steps
 1. Fix test [Test 3] by addressing [specific issue]
 2. Complete implementation of [remaining component]
 3. Add test coverage for [edge case]
+4. Create test harness page if not done
 
 ## Implementation Notes
 - [Important note about implementation approach]
@@ -150,7 +161,7 @@ I'm continuing work on test fixes for a Narraitor feature from a previous chat. 
 
 [Paste the summary artifact]
 
-Let's focus on fixing the failing tests, starting with [specific test]. Remember to maintain our KISS principles and ensure we've got appropriate Storybook stories for UI components.
+Let's focus on fixing the failing tests, starting with [specific test]. Remember to maintain our KISS principles and ensure we've completed the Three-Stage Component Testing approach.
 
 Important: Fix only the specified issues without adding functionality beyond the defined scope boundaries.
 ```
@@ -159,7 +170,7 @@ Important: Fix only the specified issues without adding functionality beyond the
 
 ### Request in Current Chat
 ```
-We're approaching the chat length limit. Could you create a summary artifact of our test fixes and current build issues that I can use to continue in a fresh chat? Include the specific scope boundaries that we need to maintain.
+We're approaching the chat length limit. Could you create a summary artifact of our test fixes and current build issues that I can use to continue in a fresh chat? Include the specific scope boundaries that we need to maintain and the Three-Stage Component Testing status.
 ```
 
 ### Expected Artifact Content
@@ -182,6 +193,11 @@ What is NOT included:
 - All unit tests: [Passing/Some failing]
 - Integration tests: [Passing/Some failing]
 - Remaining test issues: [List any]
+
+## Three-Stage Component Testing
+- [ ] Storybook stories: [Status]
+- [ ] Test harness: [Status]
+- [ ] System integration: [Status]
 
 ## Current Build Issues
 Error 1:
@@ -206,7 +222,8 @@ Probable cause: [Brief analysis]
 ## Next Steps
 1. Address build error in [specific file]
 2. Fix remaining test issue with [specific test]
-3. Verify build completes successfully
+3. Verify Storybook stories compile
+4. Implement test harness if needed
 ```
 
 ### Starting the New Chat
@@ -224,7 +241,7 @@ Important: Fix only the specified build errors without modifying functionality o
 
 ### Request in Current Chat
 ```
-We're approaching the chat length limit. Could you create a summary artifact of our implementation and build fixes to use for cleanup and documentation in a fresh chat? Include the scope boundaries we need to maintain during cleanup.
+We're approaching the chat length limit. Could you create a summary artifact of our implementation and build fixes to use for cleanup and documentation in a fresh chat? Include the scope boundaries we need to maintain during cleanup and confirm Three-Stage Component Testing completion.
 ```
 
 ### Expected Artifact Content
@@ -247,6 +264,11 @@ What is NOT included:
 - [Component 1]: [Brief description]
 - [Component 2]: [Brief description]
 
+## Three-Stage Component Testing - Completed
+- [x] Stage 1: Storybook stories created
+- [x] Stage 2: Test harness implemented at /dev/[component-name]
+- [x] Stage 3: System integration tested
+
 ## Technical Approach
 [Brief description of implementation approach]
 
@@ -254,6 +276,7 @@ What is NOT included:
 - Component sizes: [All under 300 lines?]
 - Test-driven: [Were tests written first?]
 - Storybook stories: [Created for UI components?]
+- Test harness: [Implemented for interactive testing?]
 - Utilities used: [List of utilities leveraged]
 
 ## Cleanup Needed
@@ -265,6 +288,7 @@ What is NOT included:
 - Update [specific documentation file]
 - Add JSDoc comments to [specific functions]
 - Create usage examples for [specific component]
+- Update Storybook workflow guide if applicable
 
 ## GitHub Issue
 Issue #[number]: [title]
@@ -273,7 +297,7 @@ Status: Ready to close after documentation
 
 ### Starting the New Chat
 ```
-I've completed implementation of a Narraitor feature and now need to handle cleanup and documentation. Here's the implementation summary with scope boundaries:
+I've completed implementation of a Narraitor feature. Now I need to handle cleanup and documentation. Here's the implementation summary with scope boundaries:
 
 [Paste the summary artifact]
 
@@ -323,11 +347,18 @@ What is NOT included:
 - Tests written first: [Yes/No/Partial]
 - Component size compliance: [Under 300 lines?]
 - Storybook stories status: [Complete/Incomplete]
+- Test harness status: [Complete/Incomplete/N/A]
 - Utilities leveraged: [List utilities used]
+
+## Three-Stage Component Testing
+- [ ] Stage 1: Storybook isolation
+- [ ] Stage 2: Test harness integration
+- [ ] Stage 3: System integration
 
 ## Technical Context
 - [Important technical detail 1]
 - [Important technical detail 2]
+- Following Storybook workflow guide
 
 ## Pending Decisions
 - [Decision point 1]
@@ -336,13 +367,21 @@ What is NOT included:
 
 ### Starting the New Chat
 ```
-I'm continuing work on a Narraitor task from a previous chat. Here's our current progress with scope boundaries:
+I'm continuing work on a Narraitor task from a previous chat.
+[Paste the Github issue URL]
+Here's our current progress with scope boundaries:
 
 [Paste the summary artifact]
 
 Let's continue with [specific next step], following our TDD and KISS principles (tests first, keep it simple, components under 300 lines, use existing utilities).
 
 Important: Focus only on the functionality defined in the scope boundaries. Do not add features or enhancements beyond what's specified.
+
+Review the Github issue with @modelcontextprotocol/server-github and use read_file for context first.
+
+[Paste the list of changed files]
+
+The path to project is /Users/jackhaas/Projects/narraitor
 ```
 
 ## Best Practices for Effective Handoffs with Scope Control
@@ -351,12 +390,14 @@ Important: Focus only on the functionality defined in the scope boundaries. Do n
 2. **Be Specific About What NOT to Do**: List specific technical approaches or enhancements to avoid
 3. **Reinforce Scope in Each New Chat**: Start each new chat with a reminder about scope limitations
 4. **Reference Existing Patterns**: Point to specific files/patterns that should be followed
-5. **Request Summaries Proactively**: Don't wait until you hit the limit
-6. **Be Specific About Next Steps**: Include clear direction for the next chat
-7. **Include Critical Context**: Technical decisions, approaches, and constraints
-8. **Save Artifacts**: Copy summary artifacts to a local file for safekeeping
-9. **Reference Related Files**: Include specific file paths in summaries
-10. **Reinforce KISS & TDD Principles**: Always mention these in handoffs
+5. **Include Three-Stage Testing Status**: Always track progress through the three stages for UI components
+6. **Request Summaries Proactively**: Don't wait until you hit the limit
+7. **Be Specific About Next Steps**: Include clear direction for the next chat
+8. **Include Critical Context**: Technical decisions, approaches, and constraints
+9. **Save Artifacts**: Copy summary artifacts to a local file for safekeeping
+10. **Reference Related Files**: Include specific file paths in summaries
+11. **Reinforce KISS & TDD Principles**: Always mention these in handoffs
+12. **Reference Workflow Guides**: Especially the Storybook workflow for UI components
 
 ## Responding to Scope Creep in New Chats
 
@@ -366,9 +407,11 @@ If a new chat begins implementing features outside the defined scope, respond wi
 I notice you're adding [specific feature/enhancement] which is outside our defined scope boundaries. 
 Please remove this addition and focus only on [specific in-scope task]. 
 We specifically decided not to include [out-of-scope item] in this implementation.
+For UI components, ensure we're following the Three-Stage Component Testing approach.
 ```
 
 ## Related Documents
 - [[claude-app-workflow|Claude App Workflow]]
 - [[claude-app-prompt-templates|Prompt Templates]]
 - [[claude-app-mcp-optimization|MCP Optimization Guide]]
+- [[storybook-workflow|Storybook Workflow & Component-Driven Development]]
