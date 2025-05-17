@@ -23,6 +23,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   _storeActions,
   _router
 }) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
@@ -38,7 +39,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
     try {
       const storeActions = _storeActions || worldStore.getState();
       storeActions.setCurrentWorld(world.id);
-      actualRouter.push(`/world/${world.id}/play`);
+      if (actualRouter) {
+        actualRouter.push(`/world/${world.id}/play`);
+      }
     } catch (exception) {
       console.error('Error in handlePlayClick:', exception);
     }

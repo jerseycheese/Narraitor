@@ -56,7 +56,7 @@ const westernWorld: World = {
 };
 
 // Create a wrapper component that provides both router and store mocks
-const WorldCardWrapper = (args: any) => {
+const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
   const mockRouter = {
     push: (url: string) => {
       console.log(`[Storybook] Navigating to: ${url}`);
