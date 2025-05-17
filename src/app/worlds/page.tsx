@@ -11,31 +11,24 @@ export default function WorldsPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', padding: '2rem' }}>
-      <div style={{ maxWidth: '64rem', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+    <main className="min-h-screen bg-gray-100 p-8">
+      <div className="max-w-4xl mx-auto">
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold">
             My Worlds
           </h1>
           <button
             onClick={handleCreateWorld}
             data-testid="create-world-button"
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              borderRadius: '0.375rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '500',
-            }}
+            className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
           >
             Create World
           </button>
-        </div>
-        <WorldListScreen />
+        </header>
+        <section>
+          <WorldListScreen />
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

@@ -1,41 +1,215 @@
-/* Tailwind CSS v4 directives */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+/* Import Tailwind CSS without layer syntax for better compatibility */
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/utilities.css";
 
 /* Global styles */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Core color variables */
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --color-primary: #2563eb;
+  --color-secondary: #4f46e5;
+  --color-accent: #f97316;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  
+  /* Typography variables */
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'Courier New', monospace;
+  
+  /* Spacing variables */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  
+  /* Design element variables */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* Base styles */
-@layer base {
-  body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  * {
-    box-sizing: border-box;
-  }
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
 }
 
-/* Custom components */
-@layer components {
-  /* You can define reusable component classes here */
+* {
+  box-sizing: border-box;
 }
 
-/* Custom utilities */
-@layer utilities {
-  /* You can define custom utility classes here */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-4);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-foreground);
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
+
+p {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+  color: var(--color-foreground);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+  background-color: var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+code {
+  padding: 0.125rem 0.25rem;
+}
+
+pre {
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-8) 0;
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--space-4) 0;
+}
+
+th, td {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  text-align: left;
+  color: var(--color-foreground);
+}
+
+th {
+  background-color: var(--color-border);
+  font-weight: 600;
+}
+
+/* Custom component classes */
+.card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-md);
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.btn {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: white;
+  border: none;
+}
+
+/* Utility classes */
+.text-balanced {
+  text-wrap: balance;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
