@@ -68,12 +68,14 @@ const WorldCard: React.FC<WorldCardProps> = ({
         >
           {world.description}
         </p>
-        <p 
-          data-testid="world-card-theme" 
-          className="inline-block px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
-        >
-          Theme: {world.theme}
-        </p>
+        {world.theme && (
+          <p 
+            data-testid="world-card-theme" 
+            className="inline-block px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
+          >
+            Theme: {world.theme}
+          </p>
+        )}
       </div>
       <footer className="mt-4 pt-3 border-t border-gray-200">
         <div className="flex justify-between text-sm text-gray-600 mb-3">

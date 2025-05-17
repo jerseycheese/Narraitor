@@ -76,8 +76,8 @@ describe('WorldCard', () => {
     // Empty description should render empty
     expect(screen.getByTestId('world-card-description')).toHaveTextContent('');
     
-    // Empty theme should still show "Theme:" (without space after colon)
-    expect(screen.getByTestId('world-card-theme')).toHaveTextContent('Theme:');
+    // Empty theme should not render the theme element at all
+    expect(screen.queryByTestId('world-card-theme')).not.toBeInTheDocument();
   });
 
   // Test case for triggering selection

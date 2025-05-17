@@ -35,7 +35,7 @@ The `WorldCard` component displays all required world information in a well-stru
 ### Visual Design
 - **Name**: Displayed as a blue header (`text-blue-800`) for emphasis
 - **Description**: Standard gray text (`text-gray-700`)
-- **Genre/Theme**: Blue badge with light blue background (`bg-blue-50`)
+- **Genre/Theme**: Blue badge with light blue background (`bg-blue-100`)
 - **Timestamps**: Small gray text in the footer
 - **Hover State**: Border changes to blue with shadow effect
 
