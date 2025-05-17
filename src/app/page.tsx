@@ -11,19 +11,13 @@ export default function HomePage() {
   }, [router]);
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      backgroundColor: '#f3f4f6'
-    }}>
-      <div style={{ textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">
           Narraitor
         </h1>
-        <p style={{ color: '#6b7280' }}>Redirecting to worlds...</p>
+        <p className="text-gray-500">Redirecting to worlds...</p>
       </div>
-    </div>
+    </main>
   );
 }

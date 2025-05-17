@@ -83,8 +83,8 @@ describe('Tailwind CSS Configuration Integration', () => {
     expect(fs.existsSync(globalsPath)).toBe(true);
     
     const fileContent = fs.readFileSync(globalsPath, 'utf8');
-    expect(fileContent).toContain('@import "tailwindcss/preflight"');
-    expect(fileContent).toContain('@import "tailwindcss/utilities"');
+    expect(fileContent).toContain('@import "tailwindcss/preflight.css"');
+    expect(fileContent).toContain('@import "tailwindcss/utilities.css"');
   });
   
   // Test for no inline styles in layout.tsx

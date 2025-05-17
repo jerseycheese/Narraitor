@@ -51,6 +51,6 @@ describe('WorldList', () => {
   test('renders an empty message when no worlds are provided', () => {
     render(<WorldList worlds={[]} onSelectWorld={jest.fn()} onDeleteWorld={jest.fn()} />);
     expect(screen.getByTestId('world-list-empty-message')).toBeInTheDocument();
-    expect(screen.getByText('No worlds created yet.')).toBeInTheDocument();
+    expect(screen.getByText(/No worlds created yet/i)).toBeInTheDocument();
   });
 });

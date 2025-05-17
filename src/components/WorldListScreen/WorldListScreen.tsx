@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { worldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
@@ -5,29 +7,23 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import { World } from '../../types/world.types';
 
 const WorldListScreen: React.FC = () => {
-  // Use useState to track the worlds
   const [worlds, setWorlds] = useState<World[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
 
-  // Load worlds on component mount
   useEffect(() => {
     try {
-      // Get initial state
       const state = worldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
       setLoading(false);
       
-      // Subscribe to state changes
       const unsubscribe = worldStore.subscribe(() => {
         const newState = worldStore.getState();
         setWorlds(Object.values(newState.worlds || {}));
       });
       
-      // Clean up subscription
       return () => unsubscribe();
     } catch (err) {
       console.error('Error loading worlds:', err);
@@ -37,7 +33,6 @@ const WorldListScreen: React.FC = () => {
   }, []);
 
   const handleSelectWorld = (worldId: string) => {
-    // Use setState to update the currentWorldId
     worldStore.setState((state) => ({
       ...state,
       currentWorldId: worldId
@@ -56,7 +51,6 @@ const WorldListScreen: React.FC = () => {
 
   const handleConfirmDelete = () => {
     if (worldToDeleteId) {
-      // Use setState to delete the world
       worldStore.setState((state) => {
         const newWorlds = { ...state.worlds };
         delete newWorlds[worldToDeleteId];
@@ -76,15 +70,27 @@ const WorldListScreen: React.FC = () => {
     : 'Are you sure you want to delete this world?';
 
   if (loading) {
-    return <div data-testid="world-list-screen-loading-indicator">Loading worlds...</div>;
+    return (
+      <section className="p-8 text-center" data-testid="world-list-screen-loading-indicator">
+        <div className="animate-pulse">
+          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Loading Worlds</h2>
+          <p className="text-gray-500">Please wait while we load your worlds...</p>
+        </div>
+      </section>
+    );
   }
 
   if (error) {
-    return <div data-testid="world-list-screen-error-message">Error: {error}</div>;
+    return (
+      <section className="p-6 border border-red-300 rounded-lg bg-red-50" data-testid="world-list-screen-error-message">
+        <h2 className="text-xl font-semibold text-red-700 mb-2">Error Loading Worlds</h2>
+        <p className="text-red-600">Error: {error}</p>
+      </section>
+    );
   }
 
   return (
-    <div>
+    <main>
       <WorldList worlds={worlds} onSelectWorld={handleSelectWorld} onDeleteWorld={handleDeleteClick} />
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
@@ -92,7 +98,7 @@ const WorldListScreen: React.FC = () => {
         onConfirm={handleConfirmDelete}
         message={deleteMessage}
       />
-    </div>
+    </main>
   );
 };
 

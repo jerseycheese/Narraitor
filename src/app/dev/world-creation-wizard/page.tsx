@@ -39,80 +39,76 @@ export default function WorldCreationWizardTestHarness() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>
+    <main className="p-8">
+      <h1 className="text-4xl font-bold mb-8">
         World Creation Wizard Test Harness
       </h1>
 
       {/* Controls */}
-      <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: '#f3f4f6', borderRadius: '0.5rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Test Controls</h2>
+      <section className="mb-8 p-4 bg-gray-100 rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Test Controls</h2>
         
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-            AI Response Delay (ms):
-            <input
-              type="number"
-              value={mockAIDelay}
-              onChange={(e) => setMockAIDelay(Number(e.target.value))}
-              style={{ marginLeft: '0.5rem', padding: '0.25rem' }}
-            />
-          </label>
-        </div>
+        <form className="mb-4">
+          <div className="mb-4">
+            <label className="block mb-2">
+              AI Response Delay (ms):
+              <input
+                type="number"
+                value={mockAIDelay}
+                onChange={(e) => setMockAIDelay(Number(e.target.value))}
+                className="ml-2 p-1"
+              />
+            </label>
+          </div>
 
-        <div style={{ marginBottom: '1rem' }}>
-          <label>
-            <input
-              type="checkbox"
-              checked={mockAIError}
-              onChange={(e) => setMockAIError(e.target.checked)}
-              style={{ marginRight: '0.5rem' }}
-            />
-            Simulate AI Error
-          </label>
-        </div>
+          <div className="mb-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={mockAIError}
+                onChange={(e) => setMockAIError(e.target.checked)}
+                className="mr-2"
+              />
+              Simulate AI Error
+            </label>
+          </div>
 
-        <button
-          onClick={resetWizard}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '0.375rem',
-            cursor: 'pointer',
-          }}
-        >
-          Reset Wizard
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={resetWizard}
+            className="py-2 px-4 bg-blue-500 text-white border-none rounded-md cursor-pointer hover:bg-blue-600 transition-colors"
+          >
+            Reset Wizard
+          </button>
+        </form>
+      </section>
 
       {/* Results */}
       {wizardResult && (
-        <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: '#d1fae5', borderRadius: '0.5rem' }}>
-          <h3 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Result:</h3>
+        <section className="mb-8 p-4 bg-green-100 rounded-lg">
+          <h3 className="font-bold mb-2">Result:</h3>
           <p>{wizardResult}</p>
-        </div>
+        </section>
       )}
 
       {/* Wizard */}
       {showWizard && (
-        <div style={{ border: '1px solid #e5e7eb', borderRadius: '0.5rem', overflow: 'hidden' }}>
+        <section className="border border-gray-200 rounded-lg overflow-hidden">
           <WorldCreationWizard onComplete={handleComplete} onCancel={handleCancel} />
-        </div>
+        </section>
       )}
 
       {/* State Inspector */}
-      <div style={{ marginTop: '2rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+      <aside className="mt-8">
+        <h2 className="text-xl font-bold mb-4">
           Mock Data Reference
         </h2>
-        <div style={{ backgroundColor: '#f9fafb', padding: '1rem', borderRadius: '0.375rem' }}>
-          <pre style={{ fontSize: '0.875rem' }}>
+        <div className="bg-gray-50 p-4 rounded-md">
+          <pre className="text-sm">
             {JSON.stringify({ mockAttributes, mockSkills }, null, 2)}
           </pre>
         </div>
-      </div>
-    </div>
+      </aside>
+    </main>
   );
 }
