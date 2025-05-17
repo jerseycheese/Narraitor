@@ -66,6 +66,12 @@ const meta: Meta<typeof WorldList> = {
     onDeleteWorld: { action: 'deleted' },
   },
   args: {
+    onSelectWorld: (worldId: string) => {
+      console.log(`[Storybook] World selected: ${worldId}`);
+    },
+    onDeleteWorld: (worldId: string) => {
+      console.log(`[Storybook] World deleted: ${worldId}`);
+    },
     _router: {
       push: (url: string) => {
         console.log(`[Storybook] Navigating to: ${url}`);
