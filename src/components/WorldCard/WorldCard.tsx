@@ -24,6 +24,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   _router
 }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
+  // If a custom `_router` is provided (e.g., for testing), bypass `useRouter` and use `_router` instead.
   const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
