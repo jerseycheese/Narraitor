@@ -64,5 +64,6 @@ docs/.obsidian
 # Docs
 docs/development/workflows
 
-# Claude Code session state
+# Claude Code
 .claude/claude.json
+.claude-handoffs
