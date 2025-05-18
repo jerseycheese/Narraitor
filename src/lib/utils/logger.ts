@@ -23,7 +23,7 @@ const LOG_COLORS: LogColors = {
 
 export class Logger {
   private context: string;
-  private isEnabled: boolean;
+  public isEnabled: boolean;
 
   constructor(context: string) {
     this.context = context;

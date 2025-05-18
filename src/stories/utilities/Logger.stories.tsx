@@ -21,18 +21,15 @@ type Story = StoryObj;
 const LoggerDemo: React.FC = () => {
   const [componentName, setComponentName] = useState('DemoComponent');
   const [logOutput, setLogOutput] = useState<string[]>([]);
-  const [isLoggingEnabled, setIsLoggingEnabled] = useState(process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true');
+  const [isLoggingEnabled, setIsLoggingEnabled] = useState(true);
   
-  // Mock the environment variable for this demo
-  React.useEffect(() => {
-    if (isLoggingEnabled) {
-      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
-    } else {
-      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'false';
-    }
-  }, [isLoggingEnabled]);
-  
-  const logger = React.useMemo(() => new Logger(componentName), [componentName, isLoggingEnabled]);
+  // Create a logger that we can control for the demo
+  const logger = React.useMemo(() => {
+    const log = new Logger(componentName);
+    // Override the isEnabled property for demo purposes
+    log.isEnabled = isLoggingEnabled;
+    return log;
+  }, [componentName, isLoggingEnabled]);
 
   // Override console methods to capture output
   React.useEffect(() => {
@@ -89,7 +86,10 @@ const LoggerDemo: React.FC = () => {
         <p className="font-semibold">Logger Configuration</p>
         <p>NEXT_PUBLIC_DEBUG_LOGGING: {process.env.NEXT_PUBLIC_DEBUG_LOGGING || 'undefined'}</p>
         <p>NODE_ENV: {process.env.NODE_ENV}</p>
-        <p>Logging is: {isLoggingEnabled ? 'ENABLED' : 'DISABLED'}</p>
+        <p>Demo Logging is: {isLoggingEnabled ? 'ENABLED' : 'DISABLED'}</p>
+        <p className="text-sm text-gray-600 mt-1">
+          Note: This demo overrides the environment variable for testing purposes.
+        </p>
         <button
           onClick={() => setIsLoggingEnabled(!isLoggingEnabled)}
           className={`mt-2 px-4 py-2 rounded text-white ${
