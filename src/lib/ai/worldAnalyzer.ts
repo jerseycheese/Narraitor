@@ -95,11 +95,19 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       analysis = JSON.parse(response.content);
     } catch {
       // Fallback to extract JSON from response if not pure JSON
-      const jsonMatch = response.content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysis = JSON.parse(jsonMatch[0]);
+      // Look for JSON wrapped in markdown code blocks
+      const codeBlockMatch = response.content.match(/```json\n?([\s\S]*?)\n?```/);
+      if (codeBlockMatch) {
+        analysis = JSON.parse(codeBlockMatch[1]);
       } else {
-        throw new Error('Failed to parse AI response as JSON');
+        // Look for JSON object anywhere in the content
+        // Use a more precise regex to find JSON objects
+        const jsonMatch = response.content.match(/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/);
+        if (jsonMatch) {
+          analysis = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('Failed to parse AI response as JSON');
+        }
       }
     }
     
@@ -123,7 +131,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     }));
     
     return { attributes, skills };
-  } catch {
+  } catch (error) {
     // Return default suggestions as fallback
     return {
       attributes: [
