@@ -113,13 +113,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       console.log('Initial parse failed, attempting to extract JSON from markdown...');
       
       // Remove markdown code blocks if present
-      let cleanContent = response.content;
-      if (cleanContent.includes('```json')) {
-        cleanContent = cleanContent.replace(/```json\s*(\{[\s\S]*\})\s*```/g, '$1');
-      } else if (cleanContent.includes('```')) {
-        cleanContent = cleanContent.replace(/```\s*(\{[\s\S]*\})\s*```/g, '$1');
-      }
-      
+      const cleanContent = cleanMarkdownCodeBlocks(response.content);
       // Try parsing again
       try {
         analysis = JSON.parse(cleanContent);
