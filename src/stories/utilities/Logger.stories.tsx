@@ -132,21 +132,21 @@ const LoggerDemo: React.FC = () => {
       </div>
 
       <div className="mt-4">
-        <p className="font-semibold mb-2">Console Output (captured):</p>
+        <div className="font-semibold mb-2">Console Output (captured):</div>
         <div className="bg-slate-800 text-slate-100 p-4 rounded font-mono text-sm max-h-64 overflow-y-auto border border-slate-700">
           {logOutput.length === 0 ? (
-            <p className="text-white">No logs captured yet. Click the buttons above to test logging.</p>
+            <span className="text-white block">No logs captured yet. Click the buttons above to test logging.</span>
           ) : (
             logOutput.map((log, index) => (
-              <div key={index} className="mb-1 text-slate-100">
+              <div key={index} className="mb-1 text-white">
                 {log}
               </div>
             ))
           )}
         </div>
-        <p className="text-sm text-gray-600 mt-2">
+        <div className="text-sm text-gray-600 mt-2">
           Note: Logs only appear when NEXT_PUBLIC_DEBUG_LOGGING=true and NODE_ENV !== 'production'
-        </p>
+        </div>
       </div>
 
       <div className="mt-4 p-4 bg-gray-100 rounded">
