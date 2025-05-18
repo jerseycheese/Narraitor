@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "github": {
+      "name": "github",
+      "type": "github",
+      "url": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
+      "version": "latest"
+    }
+  }
+}
