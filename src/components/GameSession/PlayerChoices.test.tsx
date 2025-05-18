@@ -35,7 +35,7 @@ describe('PlayerChoices', () => {
       />
     );
 
-    const firstChoice = screen.getByRole('button', { name: /Talk to the mysterious figure/ });
+    const firstChoice = screen.getByRole('radio', { name: /Talk to the mysterious figure/ });
     fireEvent.click(firstChoice);
 
     expect(mockOnChoiceSelected).toHaveBeenCalledWith('choice-1');
@@ -50,9 +50,9 @@ describe('PlayerChoices', () => {
       />
     );
 
-    const buttons = screen.getAllByRole('button');
-    buttons.forEach(button => {
-      expect(button).toBeDisabled();
+    const radios = screen.getAllByRole('radio');
+    radios.forEach(radio => {
+      expect(radio).toBeDisabled();
     });
   });
 

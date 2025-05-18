@@ -12,13 +12,23 @@ describe('useGameSessionState', () => {
     currentSceneId: 'scene-001',
     playerChoices: [
       { id: 'choice-1', text: 'Choice 1', isSelected: false }
-    ]
+    ],
+    initializeSession: jest.fn(),
+    pauseSession: jest.fn(),
+    resumeSession: jest.fn(),
+    endSession: jest.fn(),
+    selectChoice: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock getState to return our test state
     (sessionStore.getState as jest.Mock).mockReturnValue(mockStoreState);
+    (sessionStore as any).pauseSession = jest.fn();
+    (sessionStore as any).resumeSession = jest.fn();
+    (sessionStore as any).endSession = jest.fn();
+    (sessionStore as any).selectChoice = jest.fn();
+    (sessionStore as any).initializeSession = jest.fn();
   });
 
   test('initializes with session store state', () => {

@@ -55,10 +55,13 @@ describe('GameSessionActive', () => {
   });
 
   test('renders session status', () => {
+    const world = { name: 'Fantasy Realm', theme: 'Medieval Fantasy' };
+    
     render(
       <GameSessionActive 
         narrative={mockNarrative}
         onChoiceSelected={mockOnChoiceSelected}
+        world={world}
         status="active"
       />
     );
