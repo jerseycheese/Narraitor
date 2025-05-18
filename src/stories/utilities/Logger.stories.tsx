@@ -18,9 +18,17 @@ export default meta;
 type Story = StoryObj;
 
 // Demo component to showcase logger functionality
+interface LogEntry {
+  level: string;
+  timestamp: string;
+  context: string;
+  message: string;
+  style: string | null;
+}
+
 const LoggerDemo: React.FC = () => {
   const [componentName, setComponentName] = useState('DemoComponent');
-  const [logOutput, setLogOutput] = useState<string[]>([]);
+  const [logOutput, setLogOutput] = useState<LogEntry[]>([]);
   const [isLoggingEnabled, setIsLoggingEnabled] = useState(true);
   
   // Create a logger that we can control for the demo
@@ -39,8 +47,40 @@ const LoggerDemo: React.FC = () => {
     const originalError = console.error;
 
     const captureLog = (level: string) => (...args: any[]) => {
-      const message = args.join(' ');
-      setLogOutput(prev => [...prev, `${level}: ${message}`]);
+      // Check if this is a formatted log from our logger
+      if (typeof args[0] === 'string' && args[0].includes('%c')) {
+        // Extract the actual message, skipping the format string and style
+        const formatString = args[0];
+        const style = args[1];
+        const messageArgs = args.slice(2);
+        
+        // Parse the format string to get the actual message
+        const messageMatch = formatString.match(/\[([^\]]+)\]\s+([A-Z]+)\s+\[([^\]]+)\]/);
+        if (messageMatch) {
+          const [, timestamp, , context] = messageMatch;
+          // Filter out any objects that are just data
+          const message = messageArgs
+            .filter(arg => typeof arg !== 'object' || arg === null)
+            .join(' ');
+          setLogOutput(prev => [...prev, {
+            level,
+            timestamp,
+            context,
+            message: message || messageArgs[0]?.toString() || '',
+            style
+          }]);
+        }
+      } else {
+        // Regular console log
+        const message = args.join(' ');
+        setLogOutput(prev => [...prev, {
+          level,
+          message,
+          style: null,
+          timestamp: new Date().toISOString(),
+          context: 'Console'
+        }]);
+      }
       
       // Still call the original method
       switch(level) {
@@ -73,7 +113,7 @@ const LoggerDemo: React.FC = () => {
   }, []);
 
   const handleLog = (level: 'debug' | 'info' | 'warn' | 'error', message: string) => {
-    logger[level](message, { timestamp: Date.now() });
+    logger[level](message);
   };
 
   const clearLogs = () => {
@@ -154,11 +194,25 @@ const LoggerDemo: React.FC = () => {
           {logOutput.length === 0 ? (
             <span className="text-white block">No logs captured yet. Click the buttons above to test logging.</span>
           ) : (
-            logOutput.map((log, index) => (
-              <div key={index} className="mb-1 text-white">
-                {log}
-              </div>
-            ))
+            logOutput.map((log, index) => {
+              const levelColors = {
+                'DEBUG': 'text-gray-400',
+                'INFO': 'text-blue-400',
+                'WARN': 'text-yellow-400',
+                'ERROR': 'text-red-400'
+              };
+              
+              return (
+                <div key={index} className="mb-1 flex items-start">
+                  <span className="text-gray-500">[{log.timestamp}]</span>
+                  <span className={`ml-2 font-bold ${levelColors[log.level] || 'text-white'}`}>
+                    {log.level.padEnd(5)}
+                  </span>
+                  <span className="ml-2 text-gray-400">[{log.context}]</span>
+                  <span className="ml-2 text-white">{log.message}</span>
+                </div>
+              );
+            })
           )}
         </div>
         <div className="text-sm text-gray-600 mt-2">
