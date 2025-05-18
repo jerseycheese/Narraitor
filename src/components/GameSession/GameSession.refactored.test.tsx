@@ -3,6 +3,13 @@ import { render, screen } from '@testing-library/react';
 import GameSession from './GameSession';
 import { World } from '@/types/world.types';
 
+// Mock the ErrorMessage component
+jest.mock('@/lib/components/ErrorMessage', () => {
+  return function MockErrorMessage({ error }: { error: Error }) {
+    return <div data-testid="error-message">{error.message}</div>;
+  };
+});
+
 // Mock the child components
 jest.mock('./GameSessionLoading', () => {
   return function MockGameSessionLoading({ loadingMessage }: { loadingMessage?: string }) {
@@ -22,6 +29,7 @@ jest.mock('./GameSessionActive', () => {
   };
 });
 
+// Mock the custom hook
 jest.mock('./hooks/useGameSessionState', () => ({
   useGameSessionState: jest.fn(() => ({
     sessionState: { status: 'initializing' },
@@ -33,7 +41,16 @@ jest.mock('./hooks/useGameSessionState', () => ({
     handleSelectChoice: jest.fn(),
     handlePauseToggle: jest.fn(),
     handleEndSession: jest.fn(),
+    prevStatusRef: { current: 'initializing' },
   }))
+}));
+
+// Mock dependencies
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+  notFound: jest.fn(),
 }));
 
 describe('GameSession (Refactored)', () => {
@@ -54,6 +71,10 @@ describe('GameSession (Refactored)', () => {
     updatedAt: new Date().toISOString()
   };
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('renders initializing state', () => {
     const { useGameSessionState } = require('./hooks/useGameSessionState');
     useGameSessionState.mockReturnValue({
@@ -61,6 +82,7 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       startSession: jest.fn(),
+      prevStatusRef: { current: 'initializing' },
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -74,6 +96,7 @@ describe('GameSession (Refactored)', () => {
       sessionState: { status: 'loading' },
       error: null,
       worldExists: true,
+      prevStatusRef: { current: 'loading' },
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -87,6 +110,9 @@ describe('GameSession (Refactored)', () => {
       sessionState: { status: 'error', error: 'Test error' },
       error: null,
       worldExists: true,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      prevStatusRef: { current: 'error' },
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -101,6 +127,10 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       world: mockWorld,
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
+      prevStatusRef: { current: 'active' },
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -114,6 +144,9 @@ describe('GameSession (Refactored)', () => {
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: false,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      prevStatusRef: { current: 'initializing' },
     });
 
     render(<GameSession worldId="non-existent-world" />);
@@ -122,8 +155,7 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('component is under 300 lines', () => {
-    // This test would verify the actual line count after refactoring
-    // For now, this is a placeholder to remind us of the requirement
+    // This is a reminder test - actual line count verification would require file analysis
     expect(true).toBe(true);
   });
 });

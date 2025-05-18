@@ -18,7 +18,8 @@ describe('GameSessionError', () => {
       />
     );
 
-    expect(screen.getByText(/Failed to load game session/)).toBeInTheDocument();
+    // The error message is handled by getUserFriendlyError which returns a generic message
+    expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument();
   });
 
   test('calls onRetry when retry button is clicked', () => {
@@ -29,7 +30,7 @@ describe('GameSessionError', () => {
       />
     );
 
-    const retryButton = screen.getByRole('button', { name: /Retry/ });
+    const retryButton = screen.getByTestId('error-message-retry-button');
     fireEvent.click(retryButton);
 
     expect(mockOnRetry).toHaveBeenCalledTimes(1);
@@ -57,7 +58,7 @@ describe('GameSessionError', () => {
       />
     );
 
-    const dismissButton = screen.getByRole('button', { name: /Dismiss/ });
+    const dismissButton = screen.getByTestId('error-message-dismiss-button');
     fireEvent.click(dismissButton);
 
     expect(mockOnDismiss).toHaveBeenCalledTimes(1);

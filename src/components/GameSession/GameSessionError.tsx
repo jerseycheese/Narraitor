@@ -19,7 +19,7 @@ const GameSessionError: React.FC<GameSessionErrorProps> = ({
       <ErrorMessage 
         error={new Error(error)}
         onRetry={onRetry}
-        onDismiss={onDismiss}
+        onDismiss={onDismiss || (() => {})}
       />
     </div>
   );
