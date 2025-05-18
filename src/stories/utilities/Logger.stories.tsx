@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Logger from '@/lib/utils/logger';
 
 const meta: Meta = {
-  title: 'Utilities/Logger',
+  title: 'Narraitor/Utilities/Logger',
   parameters: {
     docs: {
       description: {
