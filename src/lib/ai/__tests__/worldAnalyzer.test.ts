@@ -1,17 +1,18 @@
 import { analyzeWorldDescription } from '../worldAnalyzer';
-import { AIPromptProcessor } from '@/lib/ai/aiPromptProcessor';
+import { GeminiClient } from '../geminiClient';
 
-// Mock the AI prompt processor
-jest.mock('@/lib/ai/aiPromptProcessor');
+// Mock the GeminiClient
+jest.mock('../geminiClient');
+jest.mock('../config');
 
 describe('worldAnalyzer', () => {
-  const mockProcess = jest.fn();
+  const mockGenerateContent = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock the constructor and process method
-    (AIPromptProcessor as jest.Mock).mockImplementation(() => ({
-      processAndSend: mockProcess, // Corrected method name
+    // Reset the mock implementation
+    (GeminiClient as jest.Mock).mockImplementation(() => ({
+      generateContent: mockGenerateContent,
     }));
   });
 
@@ -22,29 +23,22 @@ describe('worldAnalyzer', () => {
         attributes: [
           { name: 'Magic', description: 'Control over supernatural forces', minValue: 1, maxValue: 10, category: 'Supernatural' },
           { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
-          { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' }, // Changed from Conflict to Dragons
+          { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
         ],
         skills: [],
       }),
     };
 
-    mockProcess.mockResolvedValue(mockResponse);
+    mockGenerateContent.mockResolvedValue(mockResponse);
 
     await analyzeWorldDescription(description);
 
-    // The first argument to processAndSend is the templateId
-    // The second argument is an object of variables, where one variable is 'prompt'
-    expect(mockProcess).toHaveBeenCalledWith(
-      'world-analysis', // templateId
-      expect.objectContaining({
-        prompt: expect.stringContaining('Analyze the following world description')
-      })
+    // Verify that the prompt is sent correctly to the AI service
+    expect(mockGenerateContent).toHaveBeenCalledWith(
+      expect.stringContaining('Analyze the following world description')
     );
-    expect(mockProcess).toHaveBeenCalledWith(
-      'world-analysis', // templateId
-      expect.objectContaining({
-        prompt: expect.stringContaining(description)
-      })
+    expect(mockGenerateContent).toHaveBeenCalledWith(
+      expect.stringContaining(description)
     );
   });
 
@@ -68,7 +62,7 @@ describe('worldAnalyzer', () => {
       }),
     };
 
-    mockProcess.mockResolvedValue(mockResponse);
+    mockGenerateContent.mockResolvedValue(mockResponse);
 
     const result = await analyzeWorldDescription('Test description');
 
@@ -127,7 +121,7 @@ describe('worldAnalyzer', () => {
       That should work for your world.`,
     };
 
-    mockProcess.mockResolvedValue(mockResponse);
+    mockGenerateContent.mockResolvedValue(mockResponse);
 
     const result = await analyzeWorldDescription('Test description');
 
@@ -136,7 +130,7 @@ describe('worldAnalyzer', () => {
   });
 
   test('returns default suggestions on AI failure', async () => {
-    mockProcess.mockRejectedValue(new Error('AI service unavailable'));
+    mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
 
     const result = await analyzeWorldDescription('Test description');
 
@@ -180,7 +174,7 @@ describe('worldAnalyzer', () => {
       }),
     };
 
-    mockProcess.mockResolvedValue(mockResponse);
+    mockGenerateContent.mockResolvedValue(mockResponse);
 
     const result = await analyzeWorldDescription('Test description');
 
@@ -194,7 +188,7 @@ describe('worldAnalyzer', () => {
   });
 
   test('handles network errors gracefully', async () => {
-    mockProcess.mockRejectedValue(new Error('Network error'));
+    mockGenerateContent.mockRejectedValue(new Error('Network error'));
 
     const result = await analyzeWorldDescription('Test description');
 

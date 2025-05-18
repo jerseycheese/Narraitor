@@ -1,18 +1,20 @@
 import { analyzeWorldDescription } from '../worldAnalyzer';
-import { AIPromptProcessor } from '../aiPromptProcessor';
+import { GeminiClient } from '../geminiClient';
 
-// Mock the AIPromptProcessor
-jest.mock('../aiPromptProcessor');
+// Mock the GeminiClient
+jest.mock('../geminiClient');
+// Mock the config
+jest.mock('../config');
 
 describe('worldAnalyzer - AI Suggestions', () => {
-  let mockProcessAndSend: jest.Mock;
+  let mockGenerateContent: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockProcessAndSend = jest.fn();
-    (AIPromptProcessor as jest.MockedClass<typeof AIPromptProcessor>).mockImplementation(() => ({
-      processAndSend: mockProcessAndSend,
-    } as unknown as AIPromptProcessor));
+    mockGenerateContent = jest.fn();
+    (GeminiClient as jest.Mock).mockImplementation(() => ({
+      generateContent: mockGenerateContent,
+    }));
   });
 
   describe('analyzeWorldDescription', () => {
@@ -55,14 +57,14 @@ describe('worldAnalyzer - AI Suggestions', () => {
         })
       };
 
-      mockProcessAndSend.mockResolvedValue(mockAIResponse);
+      mockGenerateContent.mockResolvedValue(mockAIResponse);
 
       const result = await analyzeWorldDescription(worldDescription);
 
-      // Verify the AI processor was called correctly
-      expect(mockProcessAndSend).toHaveBeenCalledWith('world-analysis', {
-        prompt: expect.stringContaining(worldDescription)
-      });
+      // Verify the AI client was called correctly
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        expect.stringContaining(worldDescription)
+      );
 
       // Verify attributes are returned with correct structure
       expect(result.attributes).toHaveLength(2);
@@ -113,10 +115,11 @@ describe('worldAnalyzer - AI Suggestions', () => {
         These suggestions fit the cyberpunk theme.`
       };
 
-      mockProcessAndSend.mockResolvedValue(mockAIResponse);
+      mockGenerateContent.mockResolvedValue(mockAIResponse);
 
       const result = await analyzeWorldDescription(worldDescription);
 
+      // JSON is successfully extracted from the response
       expect(result.attributes).toHaveLength(1);
       expect(result.attributes[0].name).toBe('Cyber Enhancement');
       expect(result.skills).toHaveLength(1);
@@ -127,7 +130,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
       const worldDescription = 'A unique world';
       
       // Simulate AI failure
-      mockProcessAndSend.mockRejectedValue(new Error('AI service unavailable'));
+      mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
 
       const result = await analyzeWorldDescription(worldDescription);
 
@@ -152,7 +155,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
         content: 'Invalid JSON response'
       };
 
-      mockProcessAndSend.mockResolvedValue(mockAIResponse);
+      mockGenerateContent.mockResolvedValue(mockAIResponse);
 
       const result = await analyzeWorldDescription(worldDescription);
 
@@ -174,7 +177,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
         })
       };
 
-      mockProcessAndSend.mockResolvedValue(mockAIResponse);
+      mockGenerateContent.mockResolvedValue(mockAIResponse);
 
       const result = await analyzeWorldDescription(worldDescription);
 

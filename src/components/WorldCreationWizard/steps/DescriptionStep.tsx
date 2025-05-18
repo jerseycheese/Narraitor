@@ -52,14 +52,18 @@ export default function DescriptionStep({
 
     // Start AI processing
     setProcessing(true);
+    console.log('Starting AI analysis...');
+    console.log('API key exists:', !!process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
     try {
       // Call AI analyzer
       const suggestions = await analyzeWorldDescription(description);
+      console.log('AI suggestions received:', suggestions);
       setAISuggestions(suggestions);
       onNext();
-    } catch {
+    } catch (error) {
       // Handle AI failure with fallback
+      console.error('AI analysis error:', error);
       setError('ai', 'AI suggestions unavailable. Providing default options.');
       
       // Provide default suggestions
@@ -148,8 +152,10 @@ export default function DescriptionStep({
       {isProcessing && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10" data-testid="processing-overlay">
           <div className="bg-white p-8 rounded text-center shadow">
-            <div className="w-12 h-12 border-4 border-gray-200 border-t-blue-500 rounded-full mx-auto mb-4 animate-spin"></div>
-            <p>Analyzing your world description...</p>
+            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent mx-auto mb-4" role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+            <p aria-live="polite">Analyzing your world description...</p>
           </div>
         </div>
       )}

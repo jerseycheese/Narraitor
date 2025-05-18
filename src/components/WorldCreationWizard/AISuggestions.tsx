@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AttributeSuggestion, SkillSuggestion } from './WorldCreationWizard';
+import { AttributeSuggestion, SkillSuggestion } from './WizardState';
 
 interface AISuggestionsProps {
   loading: boolean;
@@ -27,8 +27,10 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <div role="status" className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        <p className="mt-4 text-gray-600">Analyzing world description...</p>
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+        <p className="mt-2 text-gray-600" aria-live="polite">Analyzing world description...</p>
       </div>
     );
   }
