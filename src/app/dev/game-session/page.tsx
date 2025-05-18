@@ -134,19 +134,15 @@ export default function GameSessionTestHarness() {
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <div className="bg-slate-800 p-4 rounded overflow-auto">
-          <code className="text-slate-100 text-xs block whitespace-pre font-mono">
-            {JSON.stringify(currentState, null, 2)}
-          </code>
+        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+          {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <div className="bg-slate-800 p-4 rounded overflow-auto">
-          <code className="text-slate-100 text-xs block whitespace-pre font-mono">
-            {JSON.stringify(mockWorld, null, 2)}
-          </code>
+        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+          {JSON.stringify(mockWorld, null, 2)}
         </div>
       </div>
     </div>
