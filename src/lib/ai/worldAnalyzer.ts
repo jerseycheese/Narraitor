@@ -1,6 +1,6 @@
-import { AIPromptProcessor } from '@/lib/ai/aiPromptProcessor';
+import { GeminiClient } from '@/lib/ai/geminiClient';
+import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
-import { PromptTemplateManager } from '@/lib/promptTemplates/promptTemplateManager';
 
 export interface WorldAnalysisResult {
   attributes: AttributeSuggestion[];
@@ -29,16 +29,15 @@ interface AIAnalysisResponse {
 }
 
 export async function analyzeWorldDescription(description: string): Promise<WorldAnalysisResult> {
+  console.log('analyzeWorldDescription called with:', description.substring(0, 50) + '...');
+  
   try {
-    const processor = new AIPromptProcessor({
-      templateManager: new PromptTemplateManager(),
-      config: {
-        geminiApiKey: process.env.GEMINI_API_KEY || '',
-        modelName: 'gemini-pro',
-        maxRetries: 3,
-        timeout: 30000
-      }
-    });
+    const config = getAIConfig();
+    console.log('Using AI config:', { modelName: config.modelName, timeout: config.timeout });
+    
+    if (!config.geminiApiKey) {
+      throw new Error('API key is not configured');
+    }
     
     const prompt = `
       Analyze the following world description and suggest appropriate attributes and skills for a role-playing game.
@@ -87,24 +86,45 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       }
     `;
     
-    const response = await processor.processAndSend('world-analysis', { prompt });
+    console.log('Calling AI service directly...');
+    // Call the AI service directly with proper configuration
+    const client = new GeminiClient({
+      apiKey: config.geminiApiKey,
+      modelName: config.modelName,
+      maxRetries: config.maxRetries,
+      timeout: config.timeout,
+      generationConfig: getGenerationConfig(),
+      safetySettings: getSafetySettings()
+    });
+    
+    // Add a small delay to ensure loading overlay appears
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const response = await client.generateContent(prompt);
+    console.log('Response received:', response);
     
     // Parse the JSON response
     let analysis: AIAnalysisResponse;
     try {
+      // First try to parse directly
       analysis = JSON.parse(response.content);
+      console.log('Parsed analysis:', analysis);
     } catch {
+      console.log('Initial parse failed, attempting to extract JSON from markdown...');
+      
       // Fallback to extract JSON from response if not pure JSON
       // Look for JSON wrapped in markdown code blocks
       const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
         analysis = JSON.parse(codeBlockMatch[1]);
+        console.log('Successfully parsed from code block');
       } else {
         // Look for JSON object anywhere in the content
         // Use a more flexible regex that allows nested objects
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
+          console.log('Successfully extracted JSON using regex');
         } else {
           throw new Error('Failed to parse AI response as JSON');
         }
@@ -131,7 +151,8 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     }));
     
     return { attributes, skills };
-  } catch {
+  } catch (error) {
+    console.error('Error in analyzeWorldDescription:', error);
     // Return default suggestions as fallback
     return {
       attributes: [

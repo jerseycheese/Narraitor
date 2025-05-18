@@ -10,6 +10,18 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn().mockReturnValue('/worlds/create'),
 }));
 
+// Mock worldAnalyzer
+jest.mock('@/lib/ai/worldAnalyzer', () => ({
+  analyzeWorldDescription: jest.fn().mockResolvedValue({
+    attributes: [
+      { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, accepted: false }
+    ],
+    skills: [
+      { name: 'Combat', description: 'Fighting ability', difficulty: 'medium', accepted: false }
+    ]
+  })
+}));
+
 // Mock the worldStore
 jest.mock('../../../state/worldStore', () => {
   const createWorldMock = jest.fn().mockReturnValue('world-123');
