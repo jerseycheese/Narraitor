@@ -21,7 +21,18 @@ type Story = StoryObj;
 const LoggerDemo: React.FC = () => {
   const [componentName, setComponentName] = useState('DemoComponent');
   const [logOutput, setLogOutput] = useState<string[]>([]);
-  const logger = React.useMemo(() => new Logger(componentName), [componentName]);
+  const [isLoggingEnabled, setIsLoggingEnabled] = useState(process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true');
+  
+  // Mock the environment variable for this demo
+  React.useEffect(() => {
+    if (isLoggingEnabled) {
+      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
+    } else {
+      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'false';
+    }
+  }, [isLoggingEnabled]);
+  
+  const logger = React.useMemo(() => new Logger(componentName), [componentName, isLoggingEnabled]);
 
   // Override console methods to capture output
   React.useEffect(() => {
@@ -72,8 +83,6 @@ const LoggerDemo: React.FC = () => {
     setLogOutput([]);
   };
 
-  const isLoggingEnabled = process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true';
-
   return (
     <div className="p-4 space-y-4">
       <div className="bg-yellow-100 border border-yellow-400 p-3 rounded mb-4">
@@ -81,6 +90,14 @@ const LoggerDemo: React.FC = () => {
         <p>NEXT_PUBLIC_DEBUG_LOGGING: {process.env.NEXT_PUBLIC_DEBUG_LOGGING || 'undefined'}</p>
         <p>NODE_ENV: {process.env.NODE_ENV}</p>
         <p>Logging is: {isLoggingEnabled ? 'ENABLED' : 'DISABLED'}</p>
+        <button
+          onClick={() => setIsLoggingEnabled(!isLoggingEnabled)}
+          className={`mt-2 px-4 py-2 rounded text-white ${
+            isLoggingEnabled ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'
+          }`}
+        >
+          {isLoggingEnabled ? 'Disable Logging' : 'Enable Logging'}
+        </button>
       </div>
 
       <div className="space-y-2">
@@ -145,7 +162,8 @@ const LoggerDemo: React.FC = () => {
           )}
         </div>
         <div className="text-sm text-gray-600 mt-2">
-          Note: Logs only appear when NEXT_PUBLIC_DEBUG_LOGGING=true and NODE_ENV !== 'production'
+          Note: Use the "Enable Logging" button above to test the logger in this story.
+          In production, logs only appear when NEXT_PUBLIC_DEBUG_LOGGING=true and NODE_ENV !== 'production'
         </div>
       </div>
 
