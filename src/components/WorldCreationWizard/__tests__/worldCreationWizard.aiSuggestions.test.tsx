@@ -173,7 +173,7 @@ describe('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // The accepted attribute should be reflected in the world creation
     await waitFor(() => {
-      expect(screen.getByText(/Review Skills/i)).toBeInTheDocument();
+      expect(screen.getByTestId('skill-review-step')).toBeInTheDocument();
     });
   });
 
