@@ -113,14 +113,12 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       console.log('Initial parse failed, attempting to extract JSON from markdown...');
       
       // Remove markdown code blocks if present
-      const cleanContent = cleanMarkdownCodeBlocks(response.content);
-      // Try parsing again
-      try {
-        analysis = JSON.parse(cleanContent);
-        console.log('Successfully parsed cleaned content');
-      } catch (error) {
-        console.error('Error parsing cleaned content:', error);
-        // Final fallback to extract JSON from response
+      const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        analysis = JSON.parse(codeBlockMatch[1]);
+        console.log('Successfully parsed from code block');
+      } else {
+        // Try to find JSON object anywhere in the content
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
@@ -151,7 +149,8 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     }));
     
     return { attributes, skills };
-  } catch {
+  } catch (error) {
+    console.error('Error in analyzeWorldDescription:', error);
     // Return default suggestions as fallback
     return {
       attributes: [
