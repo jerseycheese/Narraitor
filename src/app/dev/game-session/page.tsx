@@ -112,7 +112,12 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
-            sessionStore.getState().initializeSession(mockWorld.id, handleSessionStart);
+            const store = sessionStore.getState();
+            if (store.initializeSession) {
+              store.initializeSession(mockWorld.id, handleSessionStart);
+            } else {
+              logger.error('initializeSession method not found');
+            }
           }}
         >
           Start Session
@@ -146,6 +151,9 @@ export default function GameSessionTestHarness() {
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
         <p className="text-sm text-gray-600 mb-2">
           Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
+        </p>
+        <p className="text-sm text-gray-600 mb-2">
+          Store methods: {Object.keys(sessionStore.getState()).filter(key => typeof sessionStore.getState()[key] === 'function').join(', ')}
         </p>
         <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
