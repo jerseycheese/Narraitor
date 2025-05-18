@@ -6,6 +6,7 @@ import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
 import { GameSessionState } from '@/types/game.types';
 import ErrorMessage from '@/lib/components/ErrorMessage';
+import Logger from '@/lib/utils/logger';
 
 interface GameSessionProps {
   worldId: string;
@@ -33,14 +34,10 @@ const GameSession: React.FC<GameSessionProps> = ({
   _stores,
   _router,
 }) => {
-  // Debug logging utility - only logs in development mode when enabled
-  const debugLog = React.useCallback((message: string, data?: unknown) => {
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log(`[GameSession] ${message}`, data);
-    }
-  }, []);
+  // Create logger instance for this component
+  const logger = React.useMemo(() => new Logger('GameSession'), []);
   
-  debugLog('Component rendering with worldId:', worldId);
+  logger.debug('Component rendering with worldId:', worldId);
   
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
@@ -103,7 +100,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   const handleSelectChoice = (choiceId: string) => {
     if (!sessionState.playerChoices) return;
     
-    debugLog('Selecting choice:', choiceId);
+    logger.debug('Selecting choice:', choiceId);
     
     // Update local state immediately for visual feedback
     setSessionState(prev => {
@@ -141,10 +138,10 @@ const GameSession: React.FC<GameSessionProps> = ({
     
     // Update the store based on the action
     if (pausedRef.current) {
-      debugLog('Pausing session');
+      logger.debug('Pausing session');
       sessionStoreState.pauseSession?.();
     } else {
-      debugLog('Resuming session');
+      logger.debug('Resuming session');
       sessionStoreState.resumeSession?.();
     }
   };
@@ -278,19 +275,19 @@ const GameSession: React.FC<GameSessionProps> = ({
     if (!isClient) return; // Skip on server-side
     if (initRef.current) return; // Skip if already initialized
     
-    debugLog('init effect - worldExists:', worldExists);
-    debugLog('init effect - worldId:', worldId);
+    logger.debug('init effect - worldExists:', worldExists);
+    logger.debug('init effect - worldId:', worldId);
     
     if (worldExists) {
       try {
-        debugLog('Starting session initialization');
+        logger.debug('Starting session initialization');
         // Mark as initialized to prevent duplicate calls
         initRef.current = true;
         
         if (typeof sessionStoreState.initializeSession === 'function') {
           try {
             const initPromise = sessionStoreState.initializeSession(worldId, () => {
-              debugLog('Session initialized successfully');
+              logger.info('Session initialized successfully');
               if (onSessionStart) {
                 onSessionStart();
               }
@@ -299,7 +296,7 @@ const GameSession: React.FC<GameSessionProps> = ({
             // Handle Promise if returned
             if (initPromise && typeof initPromise.catch === 'function') {
               initPromise.catch(err => {
-                console.error('[GameSession] Async error in initializeSession:', err);
+                logger.error('Async error in initializeSession:', err);
                 const newError = err instanceof Error ? err : new Error('Failed to initialize session');
                 setError(newError);
                 setSessionState(prev => ({
@@ -309,7 +306,7 @@ const GameSession: React.FC<GameSessionProps> = ({
               });
             }
           } catch (err) {
-            console.error('[GameSession] Error in initializeSession try/catch:', err);
+            logger.error('Error in initializeSession try/catch:', err);
             const newError = err instanceof Error ? err : new Error('Failed to initialize session');
             setError(newError);
             setSessionState(prev => ({
@@ -318,7 +315,7 @@ const GameSession: React.FC<GameSessionProps> = ({
             }));
           }
         } else {
-          console.error('[GameSession] initializeSession is not a function');
+          logger.error('initializeSession is not a function');
           setError(new Error('Session initialization is not available'));
           setSessionState(prev => ({
             ...prev,
@@ -326,7 +323,7 @@ const GameSession: React.FC<GameSessionProps> = ({
           }));
         }
       } catch (err) {
-        console.error('[GameSession] Error in initializeSession:', err);
+        logger.error('Error in initializeSession:', err);
         const newError = err instanceof Error ? err : new Error('Failed to initialize session');
         setError(newError);
         setSessionState(prev => ({
@@ -335,9 +332,9 @@ const GameSession: React.FC<GameSessionProps> = ({
         }));
       }
     } else {
-      debugLog('World does not exist, skipping initialization');
+      logger.warn('World does not exist, skipping initialization');
     }
-  }, [worldId, sessionStoreState, onSessionStart, worldExists, isClient, debugLog]);
+  }, [worldId, sessionStoreState, onSessionStart, worldExists, isClient, logger]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -361,7 +358,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  debugLog('Rendering with session state:', sessionState);
+  logger.debug('Rendering with session state:', sessionState);
   
   // Client-side only checks from here on
   if (!worldExists) {

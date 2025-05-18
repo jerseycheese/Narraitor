@@ -1,14 +1,11 @@
 import { create } from 'zustand';
 import { SessionStore } from '../types/game.types';
+import Logger from '@/lib/utils/logger';
 
 /**
- * Debug logging utility for sessionStore - only logs in development
+ * Create logger instance for this store
  */
-const debugLog = (message: string, data?: unknown) => {
-  if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-    console.log(`[SessionStore] ${message}`, data);
-  }
-};
+const logger = new Logger('SessionStore');
 
 /**
  * Initial state for the session store
@@ -29,9 +26,9 @@ export const sessionStore = create<SessionStore>((set, get) => ({
 
   // Initialize a new game session
   initializeSession: async (worldId, onComplete) => {
-    debugLog('Initializing session for worldId:', worldId);
+    logger.debug('Initializing session for worldId:', worldId);
     set(state => {
-      debugLog('Setting loading state from:', state);
+      logger.debug('Setting loading state from:', state);
       return { status: 'loading', worldId, error: null };
     });
     
@@ -39,9 +36,9 @@ export const sessionStore = create<SessionStore>((set, get) => ({
       // Simulate loading time for development
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      debugLog('Session loaded, setting active state');
+      logger.debug('Session loaded, setting active state');
       set(state => {
-        debugLog('Current state before setting active:', state);
+        logger.debug('Current state before setting active:', state);
         return { 
           status: 'active',
           currentSceneId: 'initial-scene',
@@ -53,14 +50,14 @@ export const sessionStore = create<SessionStore>((set, get) => ({
         };
       });
       
-      debugLog('State updated to active:', get());
+      logger.debug('State updated to active:', get());
       
       if (onComplete) {
-        debugLog('Calling onComplete callback');
+        logger.debug('Calling onComplete callback');
         onComplete();
       }
     } catch (error) {
-      console.error('[SessionStore] Error initializing session:', error);
+      logger.error('Error initializing session:', error);
       set({ 
         status: 'initializing',
         error: error instanceof Error ? error.message : 'Failed to initialize session',
@@ -70,31 +67,31 @@ export const sessionStore = create<SessionStore>((set, get) => ({
 
   // End the current session
   endSession: () => {
-    debugLog('Ending session, resetting to initial state');
+    logger.debug('Ending session, resetting to initial state');
     set(initialState);
   },
 
   // Set session status
   setStatus: (status) => {
-    debugLog('Setting status to:', status);
+    logger.debug('Setting status to:', status);
     set({ status });
   },
 
   // Set error message
   setError: (error) => {
-    debugLog('Setting error:', error);
+    logger.debug('Setting error:', error);
     set({ error });
   },
 
   // Set player choices
   setPlayerChoices: (choices) => {
-    debugLog('Setting player choices:', choices);
+    logger.debug('Setting player choices:', choices);
     set({ playerChoices: choices });
   },
 
   // Select a player choice
   selectChoice: (choiceId) => {
-    debugLog('Selecting choice:', choiceId);
+    logger.debug('Selecting choice:', choiceId);
     const { playerChoices } = get();
     const updatedChoices = playerChoices.map(choice => ({
       ...choice,
@@ -106,25 +103,25 @@ export const sessionStore = create<SessionStore>((set, get) => ({
 
   // Clear player choices
   clearPlayerChoices: () => {
-    debugLog('Clearing player choices');
+    logger.debug('Clearing player choices');
     set({ playerChoices: [] });
   },
 
   // Set current scene
   setCurrentScene: (sceneId) => {
-    debugLog('Setting current scene:', sceneId);
+    logger.debug('Setting current scene:', sceneId);
     set({ currentSceneId: sceneId });
   },
 
   // Pause the session
   pauseSession: () => {
-    debugLog('Pausing session');
+    logger.debug('Pausing session');
     set({ status: 'paused' });
   },
 
   // Resume the session
   resumeSession: () => {
-    debugLog('Resuming session');
+    logger.debug('Resuming session');
     set({ status: 'active' });
   },
 }));
