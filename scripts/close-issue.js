@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Generic script to close GitHub issues following project conventions
-import { getIssue, updateIssue, addIssueComment } from './user-stories/modules/github-api.js';
+import { fetchIssueByNumber, updateIssue, addIssueComment } from './user-stories/modules/github-api.js';
 
 async function closeIssue() {
   const issueNumber = process.argv[2];
@@ -24,7 +24,7 @@ async function closeIssue() {
   
   try {
     // Get the current issue to update it properly
-    const issue = await getIssue(owner, repo, issueNumber, token);
+    const issue = await fetchIssueByNumber(owner, repo, issueNumber, token);
     
     // Check all unchecked acceptance criteria checkboxes
     let updatedBody = issue.body;
