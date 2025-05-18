@@ -124,7 +124,8 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       try {
         analysis = JSON.parse(cleanContent);
         console.log('Successfully parsed cleaned content');
-      } catch {
+      } catch (error) {
+        console.error('Error parsing cleaned content:', error);
         // Final fallback to extract JSON from response
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
