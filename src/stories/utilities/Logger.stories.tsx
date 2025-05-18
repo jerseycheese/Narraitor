@@ -23,7 +23,6 @@ interface LogEntry {
   timestamp: string;
   context: string;
   message: string;
-  style: string | null;
 }
 
 const LoggerDemo: React.FC = () => {
