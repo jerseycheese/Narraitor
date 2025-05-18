@@ -31,6 +31,21 @@ export default function GameSessionTestHarness() {
   const [currentState, setCurrentState] = useState({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
   
+  // Create mock world for testing
+  const createTestWorld = React.useCallback(() => {
+    const worlds = worldStore.getState().worlds || {};
+    
+    // Always recreate the test world
+    worldStore.setState({
+      worlds: {
+        ...worlds,
+        [mockWorld.id]: { ...mockWorld, updatedAt: new Date().toISOString() }
+      }
+    });
+    
+    logger.info('Test world created/recreated');
+  }, [logger]);
+  
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
     // Set client state
@@ -52,21 +67,6 @@ export default function GameSessionTestHarness() {
       clearInterval(intervalId);
     };
   }, [createTestWorld]);
-  
-  // Create mock world for testing
-  const createTestWorld = React.useCallback(() => {
-    const worlds = worldStore.getState().worlds || {};
-    
-    // Always recreate the test world
-    worldStore.setState({
-      worlds: {
-        ...worlds,
-        [mockWorld.id]: { ...mockWorld, updatedAt: new Date().toISOString() }
-      }
-    });
-    
-    logger.info('Test world created/recreated');
-  }, [logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');
