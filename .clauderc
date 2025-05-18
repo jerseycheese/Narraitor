@@ -1,0 +1,7 @@
+{
+  "session": {
+    "autoAcceptEdits": true,
+    "autoApproveCommands": true,
+    "autoCreateFiles": true
+  }
+}

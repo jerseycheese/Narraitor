@@ -1,0 +1,44 @@
+I'll guide you through a complete workflow for implementing issue #$ARGUMENTS, with manual review points by default.
+
+To run in auto mode (no review stops, automatically proceed), use `/project:do-issue-auto $ARGUMENTS` instead.
+
+Let's start the workflow:
+
+```
+Update Todos
+  ☐ Create feature branch for issue #$ARGUMENTS
+  ☐ Analyze issue #$ARGUMENTS
+  ☐ Create tests based on issue analysis
+  ☐ Implement functionality based on tests
+  ☐ Create documentation
+  ☐ Final verification and PR creation
+```
+
+## STEP 0: CREATE FEATURE BRANCH
+
+First, I'll use our helper script to manage the feature branch creation:
+
+```bash
+# Use the helper script to manage branch (interactive mode)
+./scripts/claude-branch.sh $ARGUMENTS
+```
+
+This script will:
+1. Check if the branch exists
+2. If it exists, provide interactive options:
+   - Use the existing branch (continue previous work)
+   - Delete and recreate the branch (clean start)
+   - Create a new branch with timestamp (avoid conflicts)
+3. If it doesn't exist, create it from develop or main branch
+
+This approach gives us flexibility in handling existing branches. All changes will be made on the feature branch, allowing easy rollback if needed.
+
+## STEP 1: ANALYZE ISSUE
+
+I'll analyze GitHub issue #$ARGUMENTS from the jerseycheese/narraitor repository.
+
+First, let me fetch the issue details using the MCP GitHub tool:
+
+<function_calls>
+<invoke name="get_issue">
+<parameter name="owner">jerseycheese

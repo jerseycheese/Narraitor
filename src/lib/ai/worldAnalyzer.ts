@@ -109,20 +109,17 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       // First try to parse directly
       analysis = JSON.parse(response.content);
       console.log('Parsed analysis:', analysis);
-    } catch {
-      console.log('Initial parse failed, attempting to extract JSON from markdown...');
-      
-      // Remove markdown code blocks if present
+      // Fallback to extract JSON from response if not pure JSON
+      // Look for JSON wrapped in markdown code blocks
       const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
         analysis = JSON.parse(codeBlockMatch[1]);
-        console.log('Successfully parsed from code block');
       } else {
-        // Try to find JSON object anywhere in the content
+        // Look for JSON object anywhere in the content
+        // Use a more flexible regex that allows nested objects
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
-          console.log('Successfully extracted JSON using regex');
         } else {
           throw new Error('Failed to parse AI response as JSON');
         }
