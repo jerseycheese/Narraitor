@@ -245,7 +245,7 @@ export const Default: Story = {
 };
 
 const CustomContextDemo = () => {
-  const logger = new Logger('CustomComponent');
+  const logger = React.useMemo(() => new Logger('CustomComponent'), []);
   React.useEffect(() => {
     logger.info('Component mounted with custom context');
     return () => {
