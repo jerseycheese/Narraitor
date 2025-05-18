@@ -5,6 +5,7 @@ import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
+import Logger from '@/lib/utils/logger';
 
 // Mock world
 const mockWorld: World = {
@@ -28,6 +29,7 @@ export default function GameSessionTestHarness() {
   const [showRealComponent, setShowRealComponent] = useState(true);
   const [isClient, setIsClient] = useState(false);
   const [currentState, setCurrentState] = useState({});
+  const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
   
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
@@ -72,17 +74,11 @@ export default function GameSessionTestHarness() {
   };
   
   const handleSessionStart = () => {
-    // Only log in development mode when debug logging is enabled
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('[GameSessionTestHarness] Session started');
-    }
+    logger.info('Session started');
   };
   
   const handleSessionEnd = () => {
-    // Only log in development mode when debug logging is enabled
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('[GameSessionTestHarness] Session ended');
-    }
+    logger.info('Session ended');
   };
   
   if (!isClient) {
@@ -138,16 +134,20 @@ export default function GameSessionTestHarness() {
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <pre className="bg-gray-800 text-white p-2 rounded text-xs">
-          {JSON.stringify(currentState, null, 2)}
-        </pre>
+        <div className="bg-slate-800 p-4 rounded overflow-auto">
+          <code className="text-slate-100 text-xs block whitespace-pre font-mono">
+            {JSON.stringify(currentState, null, 2)}
+          </code>
+        </div>
       </div>
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <pre className="bg-gray-800 text-white p-2 rounded text-xs">
-          {JSON.stringify(mockWorld, null, 2)}
-        </pre>
+        <div className="bg-slate-800 p-4 rounded overflow-auto">
+          <code className="text-slate-100 text-xs block whitespace-pre font-mono">
+            {JSON.stringify(mockWorld, null, 2)}
+          </code>
+        </div>
       </div>
     </div>
   );
