@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
 import { sessionStore } from '@/state/sessionStore';
+import { worldStore } from '@/state/worldStore';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
