@@ -94,6 +94,14 @@ const GameSession: React.FC<GameSessionProps> = ({
     actualRouter.push('/');
   };
   
+  // Manual session initialization
+  const startSession = () => {
+    logger.debug('Manual session start requested');
+    if (sessionStoreState.initializeSession) {
+      sessionStoreState.initializeSession(worldId, onSessionStart);
+    }
+  };
+  
   // Handle selection of a choice
   const handleSelectChoice = (choiceId: string) => {
     if (!sessionState.playerChoices) return;
@@ -265,74 +273,16 @@ const GameSession: React.FC<GameSessionProps> = ({
     };
   }, [sessionState.status, sessionState.error, isClient]);
   
-  // Track initialization to avoid repeated calls
-  const initRef = React.useRef(false);
-  
-  // Initialize session on mount - but only if world exists and we're on the client
+  // Initialize session on mount if it's the first time
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
-    if (initRef.current) return; // Skip if already initialized
     
     logger.debug('init effect - worldExists:', worldExists);
     logger.debug('init effect - worldId:', worldId);
+    logger.debug('init effect - status:', sessionState.status);
     
-    if (worldExists) {
-      try {
-        logger.debug('Starting session initialization');
-        // Mark as initialized to prevent duplicate calls
-        initRef.current = true;
-        
-        if (typeof sessionStoreState.initializeSession === 'function') {
-          try {
-            const initPromise = sessionStoreState.initializeSession(worldId, () => {
-              logger.info('Session initialized successfully');
-              if (onSessionStart) {
-                onSessionStart();
-              }
-            });
-            
-            // Handle Promise if returned
-            if (initPromise && typeof initPromise.catch === 'function') {
-              initPromise.catch(err => {
-                logger.error('Async error in initializeSession:', err);
-                const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-                setError(newError);
-                setSessionState(prev => ({
-                  ...prev,
-                  error: newError.message,
-                }));
-              });
-            }
-          } catch (err) {
-            logger.error('Error in initializeSession try/catch:', err);
-            const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-            setError(newError);
-            setSessionState(prev => ({
-              ...prev,
-              error: newError.message,
-            }));
-          }
-        } else {
-          logger.error('initializeSession is not a function');
-          setError(new Error('Session initialization is not available'));
-          setSessionState(prev => ({
-            ...prev,
-            error: 'Session initialization is not available',
-          }));
-        }
-      } catch (err) {
-        logger.error('Error in initializeSession:', err);
-        const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-        setError(newError);
-        setSessionState(prev => ({
-          ...prev,
-          error: newError.message,
-        }));
-      }
-    } else {
-      logger.warn('World does not exist, skipping initialization');
-    }
-  }, [worldId, sessionStoreState, onSessionStart, worldExists, isClient, logger]);
+    // Don't auto-initialize anymore - let the user click the button
+  }, [worldId, worldExists, isClient, logger, sessionState.status]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -380,7 +330,7 @@ const GameSession: React.FC<GameSessionProps> = ({
           <p className="text-gray-600 mb-4">No active game session.</p>
           <button 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            onClick={() => sessionStoreState.initializeSession(worldId, onSessionStart)}
+            onClick={startSession}
           >
             Start Session
           </button>
