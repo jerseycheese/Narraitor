@@ -135,7 +135,7 @@ const LoggerDemo: React.FC = () => {
         <p className="font-semibold mb-2">Console Output (captured):</p>
         <div className="bg-slate-800 text-slate-100 p-4 rounded font-mono text-sm max-h-64 overflow-y-auto border border-slate-700">
           {logOutput.length === 0 ? (
-            <p className="text-slate-400">No logs captured yet. Click the buttons above to test logging.</p>
+            <p className="text-white">No logs captured yet. Click the buttons above to test logging.</p>
           ) : (
             logOutput.map((log, index) => (
               <div key={index} className="mb-1 text-slate-100">
