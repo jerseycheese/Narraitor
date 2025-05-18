@@ -4,19 +4,16 @@ import path from 'path';
 // These tests won't pass until the PostCSS configuration is fixed
 describe('PostCSS Configuration', () => {
   // Adjust test to match the actual file format in use
-  test('postcss.config.mjs has plugins in correct order', () => {
+  test('postcss.config.mjs has correct Tailwind CSS v4 structure', () => {
     const filePath = path.resolve(process.cwd(), 'postcss.config.mjs');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
-    // Instead of using string indices, we'll verify the structure more reliably
-    expect(fileContent).toContain('postcss-nested');
+    // Tailwind CSS v4 uses a different plugin structure
     expect(fileContent).toContain('@tailwindcss/postcss');
     expect(fileContent).toContain('autoprefixer');
     
-    // Verify that postcss-nested comes before tailwindcss
-    const nestedIndex = fileContent.indexOf('postcss-nested');
-    const tailwindIndex = fileContent.indexOf('@tailwindcss/postcss');
-    expect(nestedIndex).toBeLessThan(tailwindIndex);
+    // Should NOT contain postcss-nested in v4 configuration
+    expect(fileContent).not.toContain('postcss-nested');
   });
   
   // Update syntax test to handle ESM format

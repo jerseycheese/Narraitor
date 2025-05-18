@@ -1,7 +1,6 @@
 // postcss.config.mjs
 const postcssConfig = {
   plugins: {
-    'postcss-nested': {},
     '@tailwindcss/postcss': {},
     'autoprefixer': {},
   },

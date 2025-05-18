@@ -1,110 +1,13 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { World } from '../../types/world.types';
+import WorldList from './WorldList';
 
-// Create mock components
-const MockWorldCard = ({
-  world,
-  onSelect,
-  onDelete,
-  onPlay
-}: {
-  world: World;
-  onSelect: (worldId: string) => void;
-  onDelete: (worldId: string) => void;
-  onPlay?: (worldId: string) => void;
-}) => {
-  return (
-    <div 
-      data-testid="world-card"
-      onClick={() => onSelect(world.id)}
-      className="card p-4 m-4 cursor-pointer"
-      style={{ borderRadius: 'var(--radius-md)' }}
-    >
-      <div>
-        <h3 className="text-xl font-bold mb-2">{world.name}</h3>
-        <p className="mb-2">{world.description}</p>
-        <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>Theme: {world.theme}</p>
-      </div>
-      <div className="mt-4 flex justify-between">
-        <div className="text-xs" style={{ color: 'var(--color-muted)' }}>
-          <span>Created: {new Date(world.createdAt).toLocaleDateString()}</span>
-          <span className="ml-2">Updated: {new Date(world.updatedAt).toLocaleDateString()}</span>
-        </div>
-        <div>
-          <button 
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              if (onPlay) onPlay(world.id);
-              else console.log('Play clicked');
-            }}
-            data-testid="world-card-actions-play-button"
-            className="btn btn-primary mx-1"
-          >Play</button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); console.log('Edit clicked') }}
-            className="btn btn-secondary mx-1"
-          >Edit</button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); onDelete(world.id) }}
-            className="btn btn-accent mx-1"
-          >Delete</button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Mock WorldList component for Storybook
-const MockWorldList = ({ 
-  worlds,
-  onSelectWorld,
-  onDeleteWorld,
-  onPlayWorld
-}: { 
-  worlds: World[]; 
-  onSelectWorld: (worldId: string) => void;
-  onDeleteWorld: (worldId: string) => void;
-  onPlayWorld?: (worldId: string) => void;
-}) => {
-  if (worlds.length === 0) {
-    return (
-      <div className="p-8 text-center rounded-lg" 
-        style={{ 
-          backgroundColor: 'var(--color-background)', 
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-        <h2 className="text-2xl font-semibold mb-3" style={{ color: 'var(--color-muted)' }}>No Worlds Available</h2>
-        <p style={{ color: 'var(--color-muted)' }}>No worlds created yet. Create your first world to get started.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div data-testid="world-list-container" className="mt-6">
-      <h2 className="text-2xl font-bold mb-4 pl-4" style={{ color: 'var(--color-foreground)' }}>Your Worlds</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {worlds.map((world) => (
-          <MockWorldCard
-            key={world.id}
-            world={world}
-            onSelect={onSelectWorld}
-            onDelete={onDeleteWorld}
-            onPlay={onPlayWorld}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Mock worlds data
+// Mock world data for stories
 const mockWorlds: World[] = [
   {
     id: '1',
     name: 'Fantasy Realm',
-    description: 'A magical world full of wonder',
+    description: 'A magical world full of wonder and dangerous quests',
     theme: 'Fantasy',
     attributes: [],
     skills: [],
@@ -119,9 +22,9 @@ const mockWorlds: World[] = [
   },
   {
     id: '2',
-    name: 'Sci-Fi Universe',
-    description: 'A futuristic world of technology',
-    theme: 'Sci-Fi',
+    name: 'Cyberpunk 2185',
+    description: 'A neon-lit dystopia where corporations rule and hackers fight back',
+    theme: 'Cyberpunk',
     attributes: [],
     skills: [],
     settings: {
@@ -133,38 +36,113 @@ const mockWorlds: World[] = [
     createdAt: '2023-01-02T10:00:00Z',
     updatedAt: '2023-01-02T10:00:00Z',
   },
+  {
+    id: '3',
+    name: 'Wild West Adventures',
+    description: 'Lawless frontiers where gunslinging and frontier justice reign',
+    theme: 'Western',
+    attributes: [],
+    skills: [],
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 100,
+      skillPointPool: 100,
+    },
+    createdAt: '2023-01-03T10:00:00Z',
+    updatedAt: '2023-01-04T14:30:00Z',
+  },
 ];
 
-const meta = {
+const meta: Meta<typeof WorldList> = {
   title: 'Narraitor/World/WorldList',
-  component: MockWorldList,
+  component: WorldList,
   parameters: {
     layout: 'padded',
-    docs: {
-      description: {
-        component: 'List of world cards for displaying and managing worlds'
-      }
-    }
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof MockWorldList>;
+  argTypes: {
+    onSelectWorld: { action: 'selected' },
+    onDeleteWorld: { action: 'deleted' },
+  },
+  args: {
+    onSelectWorld: (worldId: string) => {
+      console.log(`[Storybook] World selected: ${worldId}`);
+    },
+    onDeleteWorld: (worldId: string) => {
+      console.log(`[Storybook] World deleted: ${worldId}`);
+    },
+    _router: {
+      push: (url: string) => {
+        console.log(`[Storybook] Navigating to: ${url}`);
+        return Promise.resolve();
+      }
+    },
+    _storeActions: {
+      setCurrentWorld: (id: string) => {
+        console.log(`[Storybook] Setting current world: ${id}`);
+      }
+    }
+  }
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof WorldList>;
 
 export const Default: Story = {
   args: {
     worlds: mockWorlds,
-    onSelectWorld: (worldId) => console.log(`Selected world: ${worldId}`),
-    onDeleteWorld: (worldId) => console.log(`Delete world: ${worldId}`),
-    onPlayWorld: (worldId) => console.log(`Play world: ${worldId}`),
   },
 };
 
-export const Empty: Story = {
+export const SingleWorld: Story = {
+  args: {
+    worlds: [mockWorlds[0]],
+  },
+};
+
+export const EmptyList: Story = {
   args: {
     worlds: [],
-    onSelectWorld: (worldId) => console.log(`Selected world: ${worldId}`),
-    onDeleteWorld: (worldId) => console.log(`Delete world: ${worldId}`),
+  },
+};
+
+export const ManyWorlds: Story = {
+  args: {
+    worlds: [
+      ...mockWorlds,
+      {
+        id: '4',
+        name: 'Post-Apocalyptic Wasteland',
+        description: 'A harsh world after the fall of civilization',
+        theme: 'Post-Apocalyptic',
+        attributes: [],
+        skills: [],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 100,
+          skillPointPool: 100,
+        },
+        createdAt: '2023-02-01T10:00:00Z',
+        updatedAt: '2023-02-01T10:00:00Z',
+      },
+      {
+        id: '5',
+        name: 'Medieval Kingdom',
+        description: 'Knights, castles, and political intrigue',
+        theme: 'Medieval',
+        attributes: [],
+        skills: [],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 100,
+          skillPointPool: 100,
+        },
+        createdAt: '2023-02-02T10:00:00Z',
+        updatedAt: '2023-02-02T10:00:00Z',
+      },
+    ],
   },
 };

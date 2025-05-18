@@ -23,7 +23,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
   _storeActions,
   _router
 }) => {
-  const router = useRouter();
+  // Only call useRouter if no mock is provided
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
   const handleCardClick = () => {
@@ -38,7 +40,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
     try {
       const storeActions = _storeActions || worldStore.getState();
       storeActions.setCurrentWorld(world.id);
-      actualRouter.push(`/world/${world.id}/play`);
+      if (actualRouter) {
+        actualRouter.push(`/world/${world.id}/play`);
+      }
     } catch (exception) {
       console.error('Error in handlePlayClick:', exception);
     }
@@ -48,23 +52,46 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <article
       data-testid="world-card"
       onClick={handleCardClick}
-      className="border border-gray-300 p-4 m-4 rounded-md cursor-pointer hover:border-blue-400 hover:shadow-md transition-all"
+      className="border border-gray-300 p-4 m-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white"
     >
       <header>
-        <h2 data-testid="world-card-name" className="text-xl font-bold mb-2 text-blue-800">{world.name}</h2>
+        <h2 
+          data-testid="world-card-name" 
+          className="text-2xl font-bold mb-3 text-blue-800"
+        >
+          {world.name}
+        </h2>
       </header>
-      <div className="mb-4">
-        <p data-testid="world-card-description" className="text-gray-700 mb-2">{world.description}</p>
-        <p data-testid="world-card-theme" className="text-sm font-medium text-blue-600 inline-block px-2 py-1 bg-blue-50 rounded">
-          Theme: {world.theme}
+      <div className="mb-4 space-y-3">
+        <p 
+          data-testid="world-card-description" 
+          className="text-gray-700 leading-relaxed"
+        >
+          {world.description}
         </p>
+        {world.theme && (
+          <p 
+            data-testid="world-card-theme" 
+            className="inline-block px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
+          >
+            Theme: {world.theme}
+          </p>
+        )}
       </div>
-      <footer className="mt-3 pt-2 border-t border-gray-200">
-        <div className="flex justify-between text-xs text-gray-500 mb-2">
-          <time data-testid="world-card-createdAt">Created: {new Date(world.createdAt).toLocaleDateString()}</time>
-          <time data-testid="world-card-updatedAt">Updated: {new Date(world.updatedAt).toLocaleDateString()}</time>
+      <footer className="mt-4 pt-3 border-t border-gray-200">
+        <div className="flex justify-between text-sm text-gray-600 mb-3">
+          <time data-testid="world-card-createdAt">
+            Created: {new Date(world.createdAt).toLocaleDateString()}
+          </time>
+          <time data-testid="world-card-updatedAt">
+            Updated: {new Date(world.updatedAt).toLocaleDateString()}
+          </time>
         </div>
-        <WorldCardActions onPlay={handlePlayClick} onEdit={() => { /* TODO: Implement Edit action */ }} onDelete={handleDeleteClick} />
+        <WorldCardActions 
+          onPlay={handlePlayClick} 
+          onEdit={() => { /* TODO: Implement Edit action */ }} 
+          onDelete={handleDeleteClick} 
+        />
       </footer>
     </article>
   );

@@ -1,6 +1,8 @@
-/* Import Tailwind CSS without layer syntax for better compatibility */
-@import "tailwindcss/preflight.css";
-@import "tailwindcss/utilities.css";
+/* Import Tailwind CSS v4 with layers */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 /* Global styles */
 :root {

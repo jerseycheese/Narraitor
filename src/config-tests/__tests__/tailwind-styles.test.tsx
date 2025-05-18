@@ -11,10 +11,12 @@ describe('Tailwind CSS Configuration Integration', () => {
     const fileContent = fs.readFileSync(configPath, 'utf8');
     expect(fileContent).toContain('const postcssConfig = {');
     expect(fileContent).toContain('plugins: {');
-    expect(fileContent).toContain('postcss-nested');
     expect(fileContent).toContain('@tailwindcss/postcss');
     expect(fileContent).toContain('autoprefixer');
     expect(fileContent).toContain('export default postcssConfig');
+    
+    // Should NOT contain postcss-nested in v4 configuration
+    expect(fileContent).not.toContain('postcss-nested');
   });
   
   // Test Tailwind Configuration

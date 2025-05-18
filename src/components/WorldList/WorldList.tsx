@@ -6,9 +6,15 @@ interface WorldListProps {
   worlds: World[];
   onSelectWorld: (worldId: string) => void;
   onDeleteWorld: (worldId: string) => void;
+  _router?: {
+    push: (url: string) => void;
+  };
+  _storeActions?: {
+    setCurrentWorld: (id: string) => void;
+  };
 }
 
-const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWorld }) => {
+const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
   if (worlds.length === 0) {
     return (
       <section data-testid="world-list-empty-message" className="p-8 text-center bg-gray-50 rounded-lg">
@@ -28,6 +34,8 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWo
               world={world}
               onSelect={onSelectWorld}
               onDelete={onDeleteWorld}
+              _router={_router}
+              _storeActions={_storeActions}
             />
           </li>
         ))}
