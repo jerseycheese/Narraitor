@@ -57,16 +57,15 @@ export default function GameSessionTestHarness() {
   const createTestWorld = () => {
     const worlds = worldStore.getState().worlds || {};
     
-    // Check if world already exists
-    if (!worlds[mockWorld.id]) {
-      // Set the mock world in the store
-      worldStore.setState({
-        worlds: {
-          ...worlds,
-          [mockWorld.id]: mockWorld
-        }
-      });
-    }
+    // Always recreate the test world
+    worldStore.setState({
+      worlds: {
+        ...worlds,
+        [mockWorld.id]: { ...mockWorld, updatedAt: new Date().toISOString() }
+      }
+    });
+    
+    logger.info('Test world created/recreated');
   };
   
   const handleSessionStart = () => {
@@ -109,10 +108,25 @@ export default function GameSessionTestHarness() {
         </button>
         
         <button 
-          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
-          onClick={() => sessionStore.getState().endSession()}
+          className="px-4 py-2 bg-yellow-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Initialize a new session
+            logger.info('Starting new session');
+            sessionStore.getState().initializeSession(mockWorld.id, handleSessionStart);
+          }}
         >
-          Reset Session
+          Start Session
+        </button>
+        
+        <button 
+          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // End current session only
+            logger.info('Ending session');
+            sessionStore.getState().endSession();
+          }}
+        >
+          End Session
         </button>
       </div>
       
@@ -130,6 +144,9 @@ export default function GameSessionTestHarness() {
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
+        <p className="text-sm text-gray-600 mb-2">
+          Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
+        </p>
         <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
         </div>
