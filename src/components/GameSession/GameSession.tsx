@@ -37,8 +37,6 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Create logger instance for this component
   const logger = React.useMemo(() => new Logger('GameSession'), []);
   
-  logger.debug('Component rendering with worldId:', worldId);
-  
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   
@@ -341,11 +339,13 @@ const GameSession: React.FC<GameSessionProps> = ({
     if (!isClient) return; // Skip on server-side
     
     return () => {
-      if (onSessionEnd) {
+      // Only call onSessionEnd if the session is actually ending (status is 'ended')
+      const currentStatus = sessionStore.getState().status;
+      if (onSessionEnd && currentStatus === 'ended') {
         onSessionEnd();
       }
     };
-  }, [onSessionEnd, isClient]);
+  }, []); // Empty dependency array - only run on mount/unmount
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
@@ -358,7 +358,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  logger.debug('Rendering with session state:', sessionState);
   
   // Client-side only checks from here on
   if (!worldExists) {

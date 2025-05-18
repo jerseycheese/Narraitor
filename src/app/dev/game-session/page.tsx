@@ -39,9 +39,6 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
     
-    // Reset any existing session - only once at start
-    sessionStore.getState().endSession();
-    
     // Get initial state
     setCurrentState({...sessionStore.getState()});
     
@@ -53,7 +50,6 @@ export default function GameSessionTestHarness() {
     return () => {
       // Clean up
       clearInterval(intervalId);
-      // Don't end session here - it causes multiple calls
     };
   }, []);
   
