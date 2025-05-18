@@ -25,10 +25,19 @@ const mockWorld: World = {
   updatedAt: '2023-01-01T10:00:00Z',
 };
 
+type SessionStateDisplay = {
+  status?: string;
+  currentSceneId?: string | null;
+  playerChoices?: unknown[];
+  error?: string | null;
+  worldId?: string | null;
+  [key: string]: unknown;
+};
+
 export default function GameSessionTestHarness() {
   const [showRealComponent, setShowRealComponent] = useState(true);
   const [isClient, setIsClient] = useState(false);
-  const [currentState, setCurrentState] = useState({});
+  const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
   
   // Create mock world for testing
@@ -153,7 +162,10 @@ export default function GameSessionTestHarness() {
           Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
         </p>
         <p className="text-sm text-gray-600 mb-2">
-          Store methods: {Object.keys(sessionStore.getState()).filter(key => typeof sessionStore.getState()[key] === 'function').join(', ')}
+          Store methods: {Object.keys(sessionStore.getState()).filter(key => {
+            const value = sessionStore.getState()[key as keyof typeof sessionStore.getState];
+            return typeof value === 'function';
+          }).join(', ')}
         </p>
         <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}

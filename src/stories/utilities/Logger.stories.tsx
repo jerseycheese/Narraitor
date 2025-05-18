@@ -67,7 +67,7 @@ const LoggerDemo: React.FC = () => {
             timestamp,
             context,
             message: message || messageArgs[0]?.toString() || '',
-            style
+            style: typeof style === 'string' ? style : null
           }]);
         }
       } else {
@@ -195,7 +195,7 @@ const LoggerDemo: React.FC = () => {
             <span className="text-white block">No logs captured yet. Click the buttons above to test logging.</span>
           ) : (
             logOutput.map((log, index) => {
-              const levelColors = {
+              const levelColors: { [key: string]: string } = {
                 'DEBUG': 'text-gray-400',
                 'INFO': 'text-blue-400',
                 'WARN': 'text-yellow-400',
