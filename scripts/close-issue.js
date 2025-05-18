@@ -3,6 +3,72 @@
 // Generic script to close GitHub issues following project conventions
 import { fetchIssueByNumber, updateIssue, addIssueComment } from './user-stories/modules/github-api.js';
 
+async function parseRelatedIssues(issueBody) {
+  // Extract related issues from various sections of the issue body
+  const relatedIssues = new Set();
+  
+  // Common patterns to find related issues
+  const patterns = [
+    /Related Issues\/Stories:\s*\n([\s\S]*?)(?=\n\n|\n#|$)/i,
+    /Related to:?\s*#(\d+)/gi,
+    /Depends on:?\s*#(\d+)/gi,
+    /Blocks:?\s*#(\d+)/gi,
+    /References?:?\s*#(\d+)/gi
+  ];
+  
+  // Find issues in the "Related Issues/Stories" section
+  const relatedSection = issueBody.match(patterns[0]);
+  if (relatedSection) {
+    const issueNumbers = relatedSection[1].match(/#(\d+)/g);
+    if (issueNumbers) {
+      issueNumbers.forEach(num => relatedIssues.add(num.substring(1)));
+    }
+  }
+  
+  // Find issues using other common patterns
+  patterns.slice(1).forEach(pattern => {
+    let match;
+    while ((match = pattern.exec(issueBody)) !== null) {
+      relatedIssues.add(match[1]);
+    }
+  });
+  
+  return Array.from(relatedIssues);
+}
+
+async function updateRelatedIssues(owner, repo, closedIssueNumber, closedIssueTitle, relatedIssueNumbers, token) {
+  console.log('\nChecking for related issues to update...');
+  
+  if (relatedIssueNumbers.length === 0) {
+    console.log('No related issues found in the issue body.');
+    return;
+  }
+  
+  console.log(`Found ${relatedIssueNumbers.length} related issues: ${relatedIssueNumbers.join(', ')}`);
+  
+  for (const relatedIssueNumber of relatedIssueNumbers) {
+    try {
+      const relatedIssue = await fetchIssueByNumber(owner, repo, relatedIssueNumber, token);
+      
+      // Only update open issues
+      if (relatedIssue.state === 'open') {
+        const updateComment = `## Progress Update
+
+Issue #${closedIssueNumber} (${closedIssueTitle}) has been completed.
+
+This provides additional functionality that may be leveraged by this issue.`;
+        
+        await addIssueComment(owner, repo, relatedIssueNumber, updateComment, token);
+        console.log(`✓ Updated related issue #${relatedIssueNumber}`);
+      } else {
+        console.log(`- Skipped closed issue #${relatedIssueNumber}`);
+      }
+    } catch (error) {
+      console.error(`✗ Failed to update issue #${relatedIssueNumber}: ${error.message}`);
+    }
+  }
+}
+
 async function closeIssue() {
   const issueNumber = process.argv[2];
   const summaryComment = process.argv[3] || '';
@@ -63,6 +129,11 @@ All acceptance criteria have been met and tests are passing.`;
     console.log('- Updated acceptance criteria checkboxes');
     console.log('- Added completion comment');
     console.log('- Closed the issue');
+    
+    // Update related issues
+    const relatedIssueNumbers = await parseRelatedIssues(issue.body);
+    await updateRelatedIssues(owner, repo, issueNumber, issue.title, relatedIssueNumbers, token);
+    
   } catch (error) {
     console.error('Error closing issue:', error);
     process.exit(1);

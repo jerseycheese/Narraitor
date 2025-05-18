@@ -5,6 +5,7 @@ import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
+import Logger from '@/lib/utils/logger';
 
 // Mock world
 const mockWorld: World = {
@@ -24,10 +25,35 @@ const mockWorld: World = {
   updatedAt: '2023-01-01T10:00:00Z',
 };
 
+type SessionStateDisplay = {
+  status?: string;
+  currentSceneId?: string | null;
+  playerChoices?: unknown[];
+  error?: string | null;
+  worldId?: string | null;
+  [key: string]: unknown;
+};
+
 export default function GameSessionTestHarness() {
   const [showRealComponent, setShowRealComponent] = useState(true);
   const [isClient, setIsClient] = useState(false);
-  const [currentState, setCurrentState] = useState({});
+  const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
+  const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
+  
+  // Create mock world for testing
+  const createTestWorld = React.useCallback(() => {
+    const worlds = worldStore.getState().worlds || {};
+    
+    // Always recreate the test world
+    worldStore.setState({
+      worlds: {
+        ...worlds,
+        [mockWorld.id]: { ...mockWorld, updatedAt: new Date().toISOString() }
+      }
+    });
+    
+    logger.info('Test world created/recreated');
+  }, [logger]);
   
   // Set isClient to true once component mounts to avoid hydration mismatch
   useEffect(() => {
@@ -36,9 +62,6 @@ export default function GameSessionTestHarness() {
     
     // Create test world only once on initial mount
     createTestWorld();
-    
-    // Reset any existing session - only once at start
-    sessionStore.getState().endSession();
     
     // Get initial state
     setCurrentState({...sessionStore.getState()});
@@ -51,38 +74,15 @@ export default function GameSessionTestHarness() {
     return () => {
       // Clean up
       clearInterval(intervalId);
-      // Don't end session here - it causes multiple calls
     };
-  }, []);
-  
-  // Create mock world for testing
-  const createTestWorld = () => {
-    const worlds = worldStore.getState().worlds || {};
-    
-    // Check if world already exists
-    if (!worlds[mockWorld.id]) {
-      // Set the mock world in the store
-      worldStore.setState({
-        worlds: {
-          ...worlds,
-          [mockWorld.id]: mockWorld
-        }
-      });
-    }
-  };
+  }, [createTestWorld]);
   
   const handleSessionStart = () => {
-    // Only log in development mode when debug logging is enabled
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('[GameSessionTestHarness] Session started');
-    }
+    logger.info('Session started');
   };
   
   const handleSessionEnd = () => {
-    // Only log in development mode when debug logging is enabled
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('[GameSessionTestHarness] Session ended');
-    }
+    logger.info('Session ended');
   };
   
   if (!isClient) {
@@ -117,10 +117,30 @@ export default function GameSessionTestHarness() {
         </button>
         
         <button 
-          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
-          onClick={() => sessionStore.getState().endSession()}
+          className="px-4 py-2 bg-yellow-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Initialize a new session
+            logger.info('Starting new session');
+            const store = sessionStore.getState();
+            if (store.initializeSession) {
+              store.initializeSession(mockWorld.id, handleSessionStart);
+            } else {
+              logger.error('initializeSession method not found');
+            }
+          }}
         >
-          Reset Session
+          Start Session
+        </button>
+        
+        <button 
+          className="px-4 py-2 bg-red-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // End current session only
+            logger.info('Ending session');
+            sessionStore.getState().endSession();
+          }}
+        >
+          End Session
         </button>
       </div>
       
@@ -138,16 +158,25 @@ export default function GameSessionTestHarness() {
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <pre className="bg-gray-800 text-white p-2 rounded text-xs">
+        <p className="text-sm text-gray-600 mb-2">
+          Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
+        </p>
+        <p className="text-sm text-gray-600 mb-2">
+          Store methods: {Object.keys(sessionStore.getState()).filter(key => {
+            const value = sessionStore.getState()[key as keyof typeof sessionStore.getState];
+            return typeof value === 'function';
+          }).join(', ')}
+        </p>
+        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
-        </pre>
+        </div>
       </div>
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <pre className="bg-gray-800 text-white p-2 rounded text-xs">
+        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(mockWorld, null, 2)}
-        </pre>
+        </div>
       </div>
     </div>
   );

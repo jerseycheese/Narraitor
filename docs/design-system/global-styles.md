@@ -38,19 +38,21 @@ The global styles use Tailwind CSS v4 as a foundation and are organized into sev
 
 Our CSS variables can be used directly in JSX component styles or in CSS files. Here are some examples:
 
-### In Component Inline Styles
+### Style Guidelines
+
+**Important: No Inline Styles**
+- Always use Tailwind CSS utility classes for styling
+- Never use inline styles (style prop) in components
+- If Tailwind doesn't provide what you need, create a custom CSS class
+- This ensures consistency and maintainability across the codebase
+
+### In Tailwind Classes
 
 ```tsx
-// Example of using CSS variables in component inline styles
+// Example of using Tailwind classes - PREFERRED approach
 const CustomButton = ({ children }) => {
   return (
-    <button 
-      style={{ 
-        backgroundColor: 'var(--color-primary)',
-        padding: 'var(--space-2) var(--space-4)',
-        borderRadius: 'var(--radius-md)'
-      }}
-    >
+    <button className="bg-blue-600 px-4 py-2 rounded-md text-white hover:bg-blue-700">
       {children}
     </button>
   );
@@ -76,19 +78,21 @@ const CustomButton = ({ children }) => {
 
 ### With Tailwind CSS
 
-CSS variables can also be used alongside Tailwind classes:
+Always use Tailwind classes for styling - no inline styles:
 
 ```tsx
-// Example combining Tailwind classes with custom CSS variables
+// Example using only Tailwind classes
 const InfoPanel = ({ title, children }) => {
   return (
-    <div className="p-4 mb-4 rounded-md" style={{ backgroundColor: 'var(--color-secondary)', color: 'white' }}>
+    <div className="p-4 mb-4 rounded-md bg-purple-600 text-white">
       <h3 className="text-lg font-bold mb-2">{title}</h3>
       <div>{children}</div>
     </div>
   );
 };
 ```
+
+If you need to use CSS variables, create a custom CSS class instead of using inline styles.
 
 ## Semantic HTML
 

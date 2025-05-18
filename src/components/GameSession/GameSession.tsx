@@ -6,6 +6,7 @@ import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
 import { GameSessionState } from '@/types/game.types';
 import ErrorMessage from '@/lib/components/ErrorMessage';
+import Logger from '@/lib/utils/logger';
 
 interface GameSessionProps {
   worldId: string;
@@ -33,14 +34,8 @@ const GameSession: React.FC<GameSessionProps> = ({
   _stores,
   _router,
 }) => {
-  // Debug logging utility - only logs in development mode when enabled
-  const debugLog = React.useCallback((message: string, data?: unknown) => {
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log(`[GameSession] ${message}`, data);
-    }
-  }, []);
-  
-  debugLog('Component rendering with worldId:', worldId);
+  // Create logger instance for this component
+  const logger = React.useMemo(() => new Logger('GameSession'), []);
   
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
@@ -99,11 +94,19 @@ const GameSession: React.FC<GameSessionProps> = ({
     actualRouter.push('/');
   };
   
+  // Manual session initialization
+  const startSession = () => {
+    logger.debug('Manual session start requested');
+    if (sessionStoreState.initializeSession) {
+      sessionStoreState.initializeSession(worldId, onSessionStart);
+    }
+  };
+  
   // Handle selection of a choice
   const handleSelectChoice = (choiceId: string) => {
     if (!sessionState.playerChoices) return;
     
-    debugLog('Selecting choice:', choiceId);
+    logger.debug('Selecting choice:', choiceId);
     
     // Update local state immediately for visual feedback
     setSessionState(prev => {
@@ -141,10 +144,10 @@ const GameSession: React.FC<GameSessionProps> = ({
     
     // Update the store based on the action
     if (pausedRef.current) {
-      debugLog('Pausing session');
+      logger.debug('Pausing session');
       sessionStoreState.pauseSession?.();
     } else {
-      debugLog('Resuming session');
+      logger.debug('Resuming session');
       sessionStoreState.resumeSession?.();
     }
   };
@@ -270,85 +273,29 @@ const GameSession: React.FC<GameSessionProps> = ({
     };
   }, [sessionState.status, sessionState.error, isClient]);
   
-  // Track initialization to avoid repeated calls
-  const initRef = React.useRef(false);
-  
-  // Initialize session on mount - but only if world exists and we're on the client
+  // Initialize session on mount if it's the first time
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
-    if (initRef.current) return; // Skip if already initialized
     
-    debugLog('init effect - worldExists:', worldExists);
-    debugLog('init effect - worldId:', worldId);
+    logger.debug('init effect - worldExists:', worldExists);
+    logger.debug('init effect - worldId:', worldId);
+    logger.debug('init effect - status:', sessionState.status);
     
-    if (worldExists) {
-      try {
-        debugLog('Starting session initialization');
-        // Mark as initialized to prevent duplicate calls
-        initRef.current = true;
-        
-        if (typeof sessionStoreState.initializeSession === 'function') {
-          try {
-            const initPromise = sessionStoreState.initializeSession(worldId, () => {
-              debugLog('Session initialized successfully');
-              if (onSessionStart) {
-                onSessionStart();
-              }
-            });
-            
-            // Handle Promise if returned
-            if (initPromise && typeof initPromise.catch === 'function') {
-              initPromise.catch(err => {
-                console.error('[GameSession] Async error in initializeSession:', err);
-                const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-                setError(newError);
-                setSessionState(prev => ({
-                  ...prev,
-                  error: newError.message,
-                }));
-              });
-            }
-          } catch (err) {
-            console.error('[GameSession] Error in initializeSession try/catch:', err);
-            const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-            setError(newError);
-            setSessionState(prev => ({
-              ...prev,
-              error: newError.message,
-            }));
-          }
-        } else {
-          console.error('[GameSession] initializeSession is not a function');
-          setError(new Error('Session initialization is not available'));
-          setSessionState(prev => ({
-            ...prev,
-            error: 'Session initialization is not available',
-          }));
-        }
-      } catch (err) {
-        console.error('[GameSession] Error in initializeSession:', err);
-        const newError = err instanceof Error ? err : new Error('Failed to initialize session');
-        setError(newError);
-        setSessionState(prev => ({
-          ...prev,
-          error: newError.message,
-        }));
-      }
-    } else {
-      debugLog('World does not exist, skipping initialization');
-    }
-  }, [worldId, sessionStoreState, onSessionStart, worldExists, isClient, debugLog]);
+    // Don't auto-initialize anymore - let the user click the button
+  }, [worldId, worldExists, isClient, logger, sessionState.status]);
 
   // Clean up on unmount
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
     
     return () => {
-      if (onSessionEnd) {
+      // Only call onSessionEnd if the session is actually ending (status is 'ended')
+      const currentStatus = sessionStore.getState().status;
+      if (onSessionEnd && currentStatus === 'ended') {
         onSessionEnd();
       }
     };
-  }, [onSessionEnd, isClient]);
+  }, [isClient, onSessionEnd]); // Add dependencies as suggested
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
@@ -361,7 +308,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  debugLog('Rendering with session state:', sessionState);
   
   // Client-side only checks from here on
   if (!worldExists) {
@@ -376,14 +322,31 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  if (sessionState.status === 'initializing' || sessionState.status === 'loading') {
+  if (sessionState.status === 'initializing') {
+    return (
+      <div data-testid="game-session-initializing" className="p-4">
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
+          <p className="text-gray-600 mb-4">No active game session.</p>
+          <button 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={startSession}
+          >
+            Start Session
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (sessionState.status === 'loading') {
     return (
       <div data-testid="game-session-loading" className="p-4">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
             <span className="sr-only">Loading...</span>
           </div>
-          <p className="mt-2" aria-live="polite">Loading game session... {sessionState.status}</p>
+          <p className="mt-2" aria-live="polite">Loading game session...</p>
         </div>
       </div>
     );
@@ -400,6 +363,7 @@ const GameSession: React.FC<GameSessionProps> = ({
       </div>
     );
   }
+  
   
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
     // Get the world for the active session
