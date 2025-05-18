@@ -17,8 +17,8 @@ interface GameSessionProps {
   initialState?: Partial<GameSessionState>;
   // Optional testing props
   _stores?: {
-    worldStore: any;
-    sessionStore: any;
+    worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
+    sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
   };
   _router?: {
     push: (url: string) => void;

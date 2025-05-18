@@ -24,11 +24,11 @@ describe('useGameSessionState', () => {
     jest.clearAllMocks();
     // Mock getState to return our test state
     (sessionStore.getState as jest.Mock).mockReturnValue(mockStoreState);
-    (sessionStore as any).pauseSession = jest.fn();
-    (sessionStore as any).resumeSession = jest.fn();
-    (sessionStore as any).endSession = jest.fn();
-    (sessionStore as any).selectChoice = jest.fn();
-    (sessionStore as any).initializeSession = jest.fn();
+    (sessionStore as typeof sessionStore).pauseSession = jest.fn();
+    (sessionStore as typeof sessionStore).resumeSession = jest.fn();
+    (sessionStore as typeof sessionStore).endSession = jest.fn();
+    (sessionStore as typeof sessionStore).selectChoice = jest.fn();
+    (sessionStore as typeof sessionStore).initializeSession = jest.fn();
   });
 
   test('initializes with session store state', () => {

@@ -54,75 +54,56 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
+// Import the mocked hook
+import { useGameSessionState } from './hooks/useGameSessionState';
+const mockedUseGameSessionState = useGameSessionState as jest.MockedFunction<typeof useGameSessionState>;
+
 describe('GameSession', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('displays error when world does not exist', () => {
-    // Mock the hook to return worldExists: false
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: false,
+      world: undefined,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
       prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
-
+    
     render(<GameSession worldId="non-existent-world" />);
     
     expect(screen.getByTestId('game-session-error-container')).toBeInTheDocument();
   });
   
   test('shows initializing state initially', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: true,
-      startSession: jest.fn(),
-      prevStatusRef: { current: 'initializing' },
-    });
-
-    render(<GameSession worldId="test-world-id" />);
-    
-    expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
-    expect(screen.getByText('Session Not Started')).toBeInTheDocument();
-  });
-
-  test('displays loading state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
-      sessionState: { status: 'loading' },
-      error: null,
-      worldExists: true,
-      prevStatusRef: { current: 'loading' },
-    });
-
-    render(<GameSession worldId="test-world-id" />);
-    
-    expect(screen.getByTestId('game-session-loading')).toBeInTheDocument();
-  });
-
-  test('displays error state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
-      sessionState: { status: 'error', error: 'Test error' },
-      error: null,
-      worldExists: true,
+      world: undefined,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
-      prevStatusRef: { current: 'error' },
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
+      prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
-    render(<GameSession worldId="test-world-id" />);
-    
-    expect(screen.getByTestId('game-session-error')).toBeInTheDocument();
-  });
-
-  test('displays active state', () => {
     const testWorld: World = {
       id: 'test-world-id',
       name: 'Test World',
@@ -140,20 +121,23 @@ describe('GameSession', () => {
       updatedAt: new Date().toISOString()
     };
 
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
-      sessionState: { status: 'active' },
-      error: null,
-      worldExists: true,
-      world: testWorld,
-      handleSelectChoice: jest.fn(),
-      handlePauseToggle: jest.fn(),
-      handleEndSession: jest.fn(),
-      prevStatusRef: { current: 'active' },
-    });
-
-    render(<GameSession worldId="test-world-id" />);
+    render(
+      <GameSession 
+        worldId="test-world-id"
+        _stores={{
+          worldStore: {
+            worlds: {
+              'test-world-id': testWorld
+            },
+          },
+          sessionStore: {
+            status: 'initializing',
+          }
+        }}
+      />
+    );
     
-    expect(screen.getByTestId('game-session-active')).toBeInTheDocument();
+    expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
+    expect(screen.getByText('Session Not Started')).toBeInTheDocument();
   });
 });

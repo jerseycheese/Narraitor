@@ -14,8 +14,8 @@ interface UseGameSessionStateOptions {
   initialState?: Partial<GameSessionState>;
   router?: { push: (url: string) => void };
   _stores?: {
-    worldStore: any;
-    sessionStore: any;
+    worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
+    sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
   };
 }
 

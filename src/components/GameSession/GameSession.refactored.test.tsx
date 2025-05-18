@@ -53,6 +53,10 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
+// Import the mocked hook
+import { useGameSessionState } from './hooks/useGameSessionState';
+const mockedUseGameSessionState = useGameSessionState as jest.MockedFunction<typeof useGameSessionState>;
+
 describe('GameSession (Refactored)', () => {
   const mockWorld: World = {
     id: 'test-world-id',
@@ -76,13 +80,21 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('renders initializing state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: true,
+      world: undefined,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
       startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
       prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -91,12 +103,21 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('renders loading state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'loading' },
       error: null,
       worldExists: true,
+      world: undefined,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
       prevStatusRef: { current: 'loading' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -105,14 +126,21 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('renders error state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'error', error: 'Test error' },
       error: null,
       worldExists: true,
+      world: undefined,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
       prevStatusRef: { current: 'error' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -121,16 +149,21 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('renders active state', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'active' },
       error: null,
       worldExists: true,
       world: mockWorld,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      startSession: jest.fn(),
       handleSelectChoice: jest.fn(),
       handlePauseToggle: jest.fn(),
       handleEndSession: jest.fn(),
       prevStatusRef: { current: 'active' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
     render(<GameSession worldId="test-world-id" />);
@@ -139,14 +172,21 @@ describe('GameSession (Refactored)', () => {
   });
 
   test('renders world not found error', () => {
-    const { useGameSessionState } = require('./hooks/useGameSessionState');
-    useGameSessionState.mockReturnValue({
+    mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: false,
+      world: undefined,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
       prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
     });
 
     render(<GameSession worldId="non-existent-world" />);
