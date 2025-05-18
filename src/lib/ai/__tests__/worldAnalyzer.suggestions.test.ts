@@ -1,4 +1,4 @@
-import { analyzeWorldDescription, WorldAnalysisResult } from '../worldAnalyzer';
+import { analyzeWorldDescription } from '../worldAnalyzer';
 import { AIPromptProcessor } from '../aiPromptProcessor';
 
 // Mock the AIPromptProcessor
@@ -12,7 +12,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
     mockProcessAndSend = jest.fn();
     (AIPromptProcessor as jest.MockedClass<typeof AIPromptProcessor>).mockImplementation(() => ({
       processAndSend: mockProcessAndSend,
-    } as any));
+    } as unknown as AIPromptProcessor));
   });
 
   describe('analyzeWorldDescription', () => {

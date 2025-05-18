@@ -23,7 +23,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
   onRejectAttribute,
   onAcceptSkill,
   onRejectSkill,
-}: AISuggestionsProps) {
+}: AISuggestionsProps) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
@@ -143,4 +143,4 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
       )}
     </div>
   );
-}
+};
