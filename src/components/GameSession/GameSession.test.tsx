@@ -79,6 +79,7 @@ describe('GameSession', () => {
     );
     
     // Assert
-    expect(screen.getByTestId('game-session-loading')).toBeInTheDocument();
+    expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
+    expect(screen.getByText('Session Not Started')).toBeInTheDocument();
   });
 });

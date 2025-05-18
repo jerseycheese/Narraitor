@@ -57,7 +57,7 @@ export class Logger {
   /**
    * Logs a message with the specified level
    */
-  private log(level: LogLevel, ...args: any[]): void {
+  private log(level: LogLevel, ...args: unknown[]): void {
     if (!this.isEnabled) return;
 
     const prefix = this.formatPrefix(level);
@@ -85,28 +85,28 @@ export class Logger {
   /**
    * Logs a debug message
    */
-  debug(...args: any[]): void {
+  debug(...args: unknown[]): void {
     this.log(LogLevel.DEBUG, ...args);
   }
 
   /**
    * Logs an info message
    */
-  info(...args: any[]): void {
+  info(...args: unknown[]): void {
     this.log(LogLevel.INFO, ...args);
   }
 
   /**
    * Logs a warning message
    */
-  warn(...args: any[]): void {
+  warn(...args: unknown[]): void {
     this.log(LogLevel.WARN, ...args);
   }
 
   /**
    * Logs an error message
    */
-  error(...args: any[]): void {
+  error(...args: unknown[]): void {
     this.log(LogLevel.ERROR, ...args);
   }
 }

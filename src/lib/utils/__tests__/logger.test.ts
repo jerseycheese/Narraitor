@@ -1,4 +1,4 @@
-import { Logger, LogLevel } from '../logger';
+import { Logger } from '../logger';
 
 describe('Logger', () => {
   let consoleDebugSpy: jest.SpyInstance;
@@ -28,10 +28,12 @@ describe('Logger', () => {
     });
 
     test('creates logger with custom context', () => {
+      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
       const logger = new Logger('CustomContext');
       logger.debug('test message');
       expect(consoleDebugSpy).toHaveBeenCalledWith(
         expect.stringContaining('[CustomContext]'),
+        expect.any(String),
         'test message'
       );
     });
@@ -44,6 +46,7 @@ describe('Logger', () => {
       logger.debug('debug message');
       expect(consoleDebugSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Test]'),
+        expect.any(String),
         'debug message'
       );
     });
@@ -54,6 +57,7 @@ describe('Logger', () => {
       logger.info('info message');
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Test]'),
+        expect.any(String),
         'info message'
       );
     });
@@ -64,6 +68,7 @@ describe('Logger', () => {
       logger.warn('warning message');
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Test]'),
+        expect.any(String),
         'warning message'
       );
     });
@@ -74,6 +79,7 @@ describe('Logger', () => {
       logger.error('error message');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('[Test]'),
+        expect.any(String),
         'error message'
       );
     });
@@ -135,6 +141,7 @@ describe('Logger', () => {
       
       expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('[MyComponent]'),
+        expect.any(String),
         'test message'
       );
     });
@@ -146,6 +153,7 @@ describe('Logger', () => {
       logger.debug('message', data, 123);
       
       expect(consoleDebugSpy).toHaveBeenCalledWith(
+        expect.any(String),
         expect.any(String),
         'message',
         data,

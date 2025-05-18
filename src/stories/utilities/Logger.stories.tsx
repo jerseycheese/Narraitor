@@ -46,7 +46,7 @@ const LoggerDemo: React.FC = () => {
     const originalWarn = console.warn;
     const originalError = console.error;
 
-    const captureLog = (level: string) => (...args: any[]) => {
+    const captureLog = (level: string) => (...args: unknown[]) => {
       // Check if this is a formatted log from our logger
       if (typeof args[0] === 'string' && args[0].includes('%c')) {
         // Extract the actual message, skipping the format string and style
@@ -216,8 +216,8 @@ const LoggerDemo: React.FC = () => {
           )}
         </div>
         <div className="text-sm text-gray-600 mt-2">
-          Note: Use the "Enable Logging" button above to test the logger in this story.
-          In production, logs only appear when NEXT_PUBLIC_DEBUG_LOGGING=true and NODE_ENV !== 'production'
+          Note: Use the &quot;Enable Logging&quot; button above to test the logger in this story.
+          In production, logs only appear when NEXT_PUBLIC_DEBUG_LOGGING=true and NODE_ENV !== &apos;production&apos;
         </div>
       </div>
 
@@ -244,25 +244,27 @@ export const Default: Story = {
   render: () => <LoggerDemo />,
 };
 
+const CustomContextDemo = () => {
+  const logger = new Logger('CustomComponent');
+  React.useEffect(() => {
+    logger.info('Component mounted with custom context');
+    return () => {
+      logger.info('Component unmounting');
+    };
+  }, [logger]);
+  
+  return (
+    <div className="p-4">
+      <p>Check the console for logs with custom context.</p>
+      <p className="text-sm text-gray-600 mt-2">
+        Logger created with context: &apos;CustomComponent&apos;
+      </p>
+    </div>
+  );
+};
+
 export const WithCustomContext: Story = {
-  render: () => {
-    const logger = new Logger('CustomComponent');
-    React.useEffect(() => {
-      logger.info('Component mounted with custom context');
-      return () => {
-        logger.info('Component unmounting');
-      };
-    }, []);
-    
-    return (
-      <div className="p-4">
-        <p>Check the console for logs with custom context.</p>
-        <p className="text-sm text-gray-600 mt-2">
-          Logger created with context: 'CustomComponent'
-        </p>
-      </div>
-    );
-  },
+  render: () => <CustomContextDemo />,
 };
 
 export const LoggingDisabled: Story = {

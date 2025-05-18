@@ -51,10 +51,10 @@ export default function GameSessionTestHarness() {
       // Clean up
       clearInterval(intervalId);
     };
-  }, []);
+  }, [createTestWorld]);
   
   // Create mock world for testing
-  const createTestWorld = () => {
+  const createTestWorld = React.useCallback(() => {
     const worlds = worldStore.getState().worlds || {};
     
     // Always recreate the test world
@@ -66,7 +66,7 @@ export default function GameSessionTestHarness() {
     });
     
     logger.info('Test world created/recreated');
-  };
+  }, [logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');

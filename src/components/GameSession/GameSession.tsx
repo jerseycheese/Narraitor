@@ -295,7 +295,7 @@ const GameSession: React.FC<GameSessionProps> = ({
         onSessionEnd();
       }
     };
-  }, []); // Empty dependency array - only run on mount/unmount
+  }, [isClient, onSessionEnd]); // Add dependencies as suggested
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
