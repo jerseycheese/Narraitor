@@ -14,7 +14,7 @@ interface AISuggestionsProps {
   onRejectSkill: (skill: SkillSuggestion) => void;
 }
 
-export function AISuggestions({
+export const AISuggestions: React.FC<AISuggestionsProps> = ({
   loading,
   error,
   attributes,
