@@ -96,13 +96,13 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     } catch {
       // Fallback to extract JSON from response if not pure JSON
       // Look for JSON wrapped in markdown code blocks
-      const codeBlockMatch = response.content.match(/```json\n?([\s\S]*?)\n?```/);
+      const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
         analysis = JSON.parse(codeBlockMatch[1]);
       } else {
         // Look for JSON object anywhere in the content
-        // Use a more precise regex to find JSON objects
-        const jsonMatch = response.content.match(/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/);
+        // Use a more flexible regex that allows nested objects
+        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
         } else {
@@ -131,7 +131,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     }));
     
     return { attributes, skills };
-  } catch (error) {
+  } catch {
     // Return default suggestions as fallback
     return {
       attributes: [
