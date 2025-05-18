@@ -372,14 +372,31 @@ const GameSession: React.FC<GameSessionProps> = ({
     );
   }
   
-  if (sessionState.status === 'initializing' || sessionState.status === 'loading') {
+  if (sessionState.status === 'initializing') {
+    return (
+      <div data-testid="game-session-initializing" className="p-4">
+        <div className="text-center">
+          <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
+          <p className="text-gray-600 mb-4">No active game session.</p>
+          <button 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => sessionStoreState.initializeSession(worldId, onSessionStart)}
+          >
+            Start Session
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  if (sessionState.status === 'loading') {
     return (
       <div data-testid="game-session-loading" className="p-4">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
             <span className="sr-only">Loading...</span>
           </div>
-          <p className="mt-2" aria-live="polite">Loading game session... {sessionState.status}</p>
+          <p className="mt-2" aria-live="polite">Loading game session...</p>
         </div>
       </div>
     );
@@ -396,6 +413,7 @@ const GameSession: React.FC<GameSessionProps> = ({
       </div>
     );
   }
+  
   
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
     // Get the world for the active session

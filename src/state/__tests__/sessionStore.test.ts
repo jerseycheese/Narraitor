@@ -7,6 +7,15 @@ describe('sessionStore', () => {
   });
 
   it('initializes with default state', () => {
+    // Reset to a fresh store state
+    sessionStore.setState({
+      status: 'initializing',
+      currentSceneId: null,
+      playerChoices: [],
+      error: null,
+      worldId: null,
+    });
+    
     const state = sessionStore.getState();
     expect(state).toMatchObject({
       status: 'initializing',
