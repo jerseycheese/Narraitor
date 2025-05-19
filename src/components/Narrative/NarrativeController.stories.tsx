@@ -4,40 +4,76 @@ import { narrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
 import React, { useEffect } from 'react';
 
-// Mock Module Pattern for Storybook
-const mockGeminiClient = {
-  generateContent: () => Promise.resolve({
-    response: {
-      text: () => 'Generated narrative content',
-    },
-  }),
-};
+// Create a mock narrative controller that doesn't actually call the AI
+const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeController>> = ({
+  worldId,
+  sessionId,
+  onNarrativeGenerated,
+  triggerGeneration = true,
+  choiceId,
+  className
+}) => {
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  
+  const { getSessionSegments } = narrativeStore();
 
-const mockNarrativeGeneratorMethods = {
-  generateInitialScene: () => Promise.resolve({
-    content: 'You awaken in a mysterious forest. The air is thick with magic.',
-    segmentType: 'scene',
-  }),
-  generateSegment: () => Promise.resolve({
-    content: 'Your choice leads you deeper into the forest.',
-    segmentType: 'exploration',
-  }),
-};
+  // Load existing segments on mount
+  useEffect(() => {
+    const existingSegments = getSessionSegments(sessionId);
+    setSegments(existingSegments);
+  }, [sessionId, getSessionSegments]);
 
-// Mock the modules before importing the component
-import * as defaultGeminiClientModule from '@/lib/ai/defaultGeminiClient';
-import * as narrativeGeneratorModule from '@/lib/ai/narrativeGenerator';
+  // Simulate narrative generation
+  useEffect(() => {
+    if (triggerGeneration) {
+      setIsLoading(true);
+      
+      // Simulate async generation
+      const timer = setTimeout(() => {
+        const newSegment: NarrativeSegment = {
+          id: `seg-${Date.now()}`,
+          content: segments.length === 0 
+            ? 'You awaken in a mysterious forest. The air is thick with magic.'
+            : `Your choice leads you deeper into the forest. ${choiceId ? `(from choice: ${choiceId})` : ''}`,
+          type: segments.length === 0 ? 'scene' : 'exploration',
+          sessionId,
+          worldId,
+          timestamp: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        setSegments(prev => [...prev, newSegment]);
+        setIsLoading(false);
+        
+        if (onNarrativeGenerated) {
+          onNarrativeGenerated(newSegment);
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [triggerGeneration, worldId, sessionId, choiceId, segments.length, onNarrativeGenerated]);
 
-// Override the exports
-(defaultGeminiClientModule as any).createDefaultGeminiClient = () => mockGeminiClient;
-(narrativeGeneratorModule as any).NarrativeGenerator = class MockNarrativeGenerator {
-  generateInitialScene = mockNarrativeGeneratorMethods.generateInitialScene;
-  generateSegment = mockNarrativeGeneratorMethods.generateSegment;
+  // Import NarrativeHistory here to avoid circular dependencies
+  const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
+  
+  return (
+    <div className={`narrative-controller ${className || ''}`}>
+      <NarrativeHistory 
+        segments={segments}
+        isLoading={isLoading}
+        error={error || undefined}
+      />
+    </div>
+  );
 };
 
 const meta = {
   title: 'Narraitor/Narrative/NarrativeController',
-  component: NarrativeController,
+  component: MockNarrativeController as any,
   parameters: {
     layout: 'padded',
   },
@@ -76,7 +112,7 @@ const meta = {
       action: 'narrative-generated',
     },
   },
-} satisfies Meta<typeof NarrativeController>;
+} satisfies Meta<typeof MockNarrativeController>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -100,23 +136,6 @@ const WithExistingSegments: React.FC<{
   return <>{children}</>;
 };
 
-// Story wrapper to reset mocks
-const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useEffect(() => {
-    // Reset mocks to default behavior
-    mockNarrativeGeneratorMethods.generateInitialScene = () => Promise.resolve({
-      content: 'You awaken in a mysterious forest. The air is thick with magic.',
-      segmentType: 'scene',
-    });
-    mockNarrativeGeneratorMethods.generateSegment = () => Promise.resolve({
-      content: 'Your choice leads you deeper into the forest.',
-      segmentType: 'exploration',
-    });
-  }, []);
-  
-  return <>{children}</>;
-};
-
 // Basic narrative controller
 export const Default: Story = {
   args: {
@@ -124,7 +143,6 @@ export const Default: Story = {
     sessionId: 'session-1',
     triggerGeneration: true,
   },
-  decorators: [StoryWrapper],
 };
 
 // With existing history
@@ -135,7 +153,6 @@ export const WithHistory: Story = {
     triggerGeneration: false,
   },
   decorators: [
-    StoryWrapper,
     (Story, { args }) => (
       <WithExistingSegments
         sessionId={args.sessionId}
@@ -173,7 +190,6 @@ export const GeneratingFromChoice: Story = {
     choiceId: 'choice-1',
   },
   decorators: [
-    StoryWrapper,
     (Story, { args }) => (
       <WithExistingSegments
         sessionId={args.sessionId}
@@ -194,37 +210,53 @@ export const GeneratingFromChoice: Story = {
   ],
 };
 
-// Loading state
+// Loading state - special component that stays in loading
+const LoadingStory: React.FC<React.ComponentProps<typeof NarrativeController>> = (props) => {
+  const [isLoading] = React.useState(true);
+  const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
+  
+  return (
+    <div className={`narrative-controller ${props.className || ''}`}>
+      <NarrativeHistory 
+        segments={[]}
+        isLoading={isLoading}
+        error={undefined}
+      />
+    </div>
+  );
+};
+
 export const Loading: Story = {
   args: {
     worldId: 'world-1',
     sessionId: 'session-1',
     triggerGeneration: true,
   },
-  decorators: [
-    (Story) => {
-      // Override to simulate loading - never resolves
-      mockNarrativeGeneratorMethods.generateInitialScene = () => new Promise(() => {});
-      return <StoryWrapper><Story /></StoryWrapper>;
-    },
-  ],
+  render: (args) => <LoadingStory {...args} />,
 };
 
-// Error state
+// Error state - special component that shows error
+const ErrorStory: React.FC<React.ComponentProps<typeof NarrativeController>> = (props) => {
+  const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
+  
+  return (
+    <div className={`narrative-controller ${props.className || ''}`}>
+      <NarrativeHistory 
+        segments={[]}
+        isLoading={false}
+        error="Failed to generate narrative. Please try again."
+      />
+    </div>
+  );
+};
+
 export const Error: Story = {
   args: {
     worldId: 'world-1',
     sessionId: 'session-1',
     triggerGeneration: true,
   },
-  decorators: [
-    (Story) => {
-      // Override to simulate error
-      mockNarrativeGeneratorMethods.generateInitialScene = () => 
-        Promise.reject(new Error('Generation failed'));
-      return <StoryWrapper><Story /></StoryWrapper>;
-    },
-  ],
+  render: (args) => <ErrorStory {...args} />,
 };
 
 // With custom styling
@@ -235,7 +267,6 @@ export const CustomStyled: Story = {
     triggerGeneration: true,
     className: 'max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-lg',
   },
-  decorators: [StoryWrapper],
 };
 
 // Manual generation trigger
@@ -245,7 +276,6 @@ export const ManualTrigger: Story = {
     sessionId: 'session-1',
     triggerGeneration: false,
   },
-  decorators: [StoryWrapper],
   render: (args) => {
     const [trigger, setTrigger] = React.useState(false);
     
@@ -257,7 +287,7 @@ export const ManualTrigger: Story = {
         >
           Generate Narrative
         </button>
-        <NarrativeController {...args} triggerGeneration={trigger} />
+        <MockNarrativeController {...args} triggerGeneration={trigger} />
       </div>
     );
   },
@@ -273,5 +303,4 @@ export const WithCallback: Story = {
       console.log('Narrative generated:', segment);
     },
   },
-  decorators: [StoryWrapper],
 };
