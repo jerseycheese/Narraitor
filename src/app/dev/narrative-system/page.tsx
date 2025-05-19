@@ -246,14 +246,14 @@ export default function NarrativeSystemHarness() {
         <div>
           <h2 className="text-xl font-semibold mb-2">Store State</h2>
           <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
-            <pre>{JSON.stringify(narrativeStore.getState(), null, 2)}</pre>
+            <pre style={{ background: 'transparent' }}>{JSON.stringify(narrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         
         <div>
           <h2 className="text-xl font-semibold mb-2">Current Segments</h2>
           <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
-            <pre>{JSON.stringify(segments, null, 2)}</pre>
+            <pre style={{ background: 'transparent' }}>{JSON.stringify(segments, null, 2)}</pre>
           </div>
         </div>
       </div>
