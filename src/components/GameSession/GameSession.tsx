@@ -9,6 +9,7 @@ import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
 import GameSessionActive from './GameSessionActive';
+import GameSessionActiveWithNarrative from './GameSessionActiveWithNarrative';
 import ErrorMessage from '@/lib/components/ErrorMessage';
 
 interface GameSessionProps {
@@ -198,22 +199,19 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
-    // Mock narrative data until the real implementation is ready
-    const mockNarrative = {
-      text: 'You are in a dimly lit tavern. The air is thick with smoke and the scent of ale. A mysterious figure sits in the corner, watching you.',
-      choices: sessionState.playerChoices || []
-    };
-    
+    // Use the new narrative integration component
     return (
-      <GameSessionActive
-        narrative={mockNarrative}
-        onChoiceSelected={handleSelectChoice}
+      <GameSessionActiveWithNarrative
+        worldId={worldId}
+        sessionId={sessionState.id || `session-${Date.now()}`}
         world={world}
-        currentSceneId={sessionState.currentSceneId || undefined}
         status={sessionState.status}
+        onChoiceSelected={handleSelectChoice}
         onPause={handlePauseToggle}
         onResume={handlePauseToggle}
         onEnd={handleEndSession}
+        choices={sessionState.playerChoices || []}
+        triggerGeneration={sessionState.status === 'active'}
       />
     );
   }
