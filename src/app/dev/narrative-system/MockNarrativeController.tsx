@@ -23,35 +23,34 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasGenerated, setHasGenerated] = useState(false);
+  const [lastChoiceId, setLastChoiceId] = useState<string | null>(null);
 
   // Load existing segments on mount
   useEffect(() => {
     const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
     setSegments(existingSegments);
-    if (existingSegments.length > 0) {
-      setHasGenerated(true);
-    }
   }, [sessionId]);
 
   // Generate mock narrative
   useEffect(() => {
     if (triggerGeneration && !isLoading) {
-      const shouldGenerate = (segments.length === 0 && !hasGenerated) || choiceId;
+      // Generate if no segments or if we have a new choice
+      const shouldGenerate = segments.length === 0 || (choiceId && choiceId !== lastChoiceId);
       
       if (shouldGenerate) {
         setIsLoading(true);
         
         // Simulate async generation
         const timer = setTimeout(() => {
+          const choice = choiceId || 'explore';
           const content = segments.length === 0
             ? 'You find yourself at the entrance of a mysterious cave. The air is cool and damp, and you can hear the distant sound of dripping water echoing from within. Strange symbols are carved into the stone archway.'
-            : `You chose to ${choiceId}. The path ahead leads deeper into the unknown...`;
+            : `You chose to ${choice}. The path ahead leads deeper into the unknown. You notice more symbols glowing faintly in the darkness.`;
           
           const newSegment: NarrativeSegment = {
             id: `seg-${Date.now()}`,
             content,
-            type: segments.length === 0 ? 'scene' : choiceId ? 'exploration' : 'scene',
+            type: segments.length === 0 ? 'scene' : 'exploration',
             sessionId,
             worldId,
             timestamp: new Date().toISOString(),
@@ -72,7 +71,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
           });
           
           setIsLoading(false);
-          setHasGenerated(true);
+          setLastChoiceId(choiceId);
           
           if (onNarrativeGenerated) {
             onNarrativeGenerated(newSegment);
@@ -82,7 +81,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
         return () => clearTimeout(timer);
       }
     }
-  }, [triggerGeneration, choiceId, segments.length, hasGenerated, isLoading, worldId, sessionId, onNarrativeGenerated]);
+  }, [triggerGeneration, choiceId, segments.length, lastChoiceId, isLoading, worldId, sessionId, onNarrativeGenerated]);
 
   return (
     <div className={`narrative-controller ${className || ''}`}>

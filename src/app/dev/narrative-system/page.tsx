@@ -28,19 +28,19 @@ const mockWorld: World = {
 // Mock choices for testing
 const mockChoices: Choice[] = [
   {
-    id: 'choice-1',
+    id: 'enter-cave',
     text: 'Enter the cave',
     consequence: 'You step into the darkness...',
     requirements: [],
   },
   {
-    id: 'choice-2',
+    id: 'go-around',
     text: 'Go around the mountain',
     consequence: 'You take the longer path...',
     requirements: [],
   },
   {
-    id: 'choice-3',
+    id: 'set-up-camp',
     text: 'Set up camp',
     consequence: 'You decide to rest for the night...',
     requirements: [],
