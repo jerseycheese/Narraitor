@@ -19,6 +19,9 @@ export default function DevPage() {
         <Link href="/dev/game-session" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           Game Session Test Harness
         </Link>
+        <Link href="/dev/world-list-screen" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          World List Screen Test Harness
+        </Link>
       </div>
     </div>
   );

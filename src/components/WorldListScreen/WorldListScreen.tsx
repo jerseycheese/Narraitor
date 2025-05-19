@@ -111,7 +111,9 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
         isOpen={isDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
         onConfirm={handleConfirmDelete}
-        message={deleteMessage}
+        title="Delete World"
+        description={deleteMessage}
+        itemName={worldToDelete?.name || 'this world'}
       />
     </main>
   );

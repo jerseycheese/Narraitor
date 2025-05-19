@@ -36,11 +36,20 @@ jest.mock('../../WorldList/WorldList', () => {
 jest.mock('../../DeleteConfirmationDialog/DeleteConfirmationDialog', () => {
   return {
     __esModule: true,
-    default: ({ isOpen, onClose, onConfirm, message }: { isOpen: boolean, onClose: () => void, onConfirm: () => void, message: string }) => {
+    default: ({ isOpen, onClose, onConfirm, title, description, itemName }: { 
+      isOpen: boolean, 
+      onClose: () => void, 
+      onConfirm: () => void, 
+      title: string,
+      description: string,
+      itemName: string
+    }) => {
       if (!isOpen) return null;
       return (
         <div data-testid="delete-confirmation-dialog">
-          <p>{message}</p>
+          <h2>{title}</h2>
+          <p>{description}</p>
+          <p>{itemName}</p>
           <button onClick={onConfirm}>Confirm</button>
           <button onClick={onClose}>Cancel</button>
         </div>
@@ -273,7 +282,7 @@ describe('WorldListScreen', () => {
     });
 
     // Check for the correct message
-    expect(screen.getByText(/Are you sure you want to delete the world "World 1"\?/)).toBeInTheDocument();
+    expect(screen.getByText('Are you sure you want to delete the world "World 1"?')).toBeInTheDocument();
 
     // Simulate confirming deletion
     const confirmButton = screen.getByRole('button', { name: /Confirm/i });
