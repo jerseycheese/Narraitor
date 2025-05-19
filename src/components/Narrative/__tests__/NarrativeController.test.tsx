@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NarrativeController } from '../NarrativeController';
 import { narrativeStore } from '@/state/narrativeStore';
-import { useWorldStore } from '@/state/worldStore';
+import { worldStore } from '@/state/worldStore';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 
 jest.mock('@/state/narrativeStore');
@@ -24,7 +24,7 @@ describe('NarrativeController', () => {
     jest.clearAllMocks();
     mockNarrativeGenerator = new NarrativeGenerator() as jest.Mocked<NarrativeGenerator>;
     
-    (useWorldStore as unknown as jest.Mock).mockReturnValue({
+    (worldStore as unknown as jest.Mock).mockReturnValue({
       worlds: { 'world-123': mockWorld },
       currentWorldId: 'world-123'
     });

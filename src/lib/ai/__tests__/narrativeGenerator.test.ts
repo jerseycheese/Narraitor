@@ -1,23 +1,32 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { GeminiClient } from '../geminiClient';
-import { promptTemplateManager } from '../../promptTemplates';
-import { useWorldStore } from '@/state/worldStore';
+import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+import { worldStore } from '@/state/worldStore';
 
 jest.mock('../geminiClient');
-jest.mock('../../promptTemplates/promptTemplateManager');
+jest.mock('../../promptTemplates/narrativeTemplateManager');
+jest.mock('@/state/worldStore', () => ({
+  worldStore: {
+    getState: jest.fn()
+  }
+}));
 
 const mockWorld = {
   id: 'world-123',
   name: 'Mystical Forest',
   description: 'A dark, enchanted forest full of ancient magic',
-  genre: 'fantasy',
-  tone: 'mysterious',
-  attributes: {
-    magic: 'High',
-    danger: 'Moderate',
-    exploration: 'Extensive'
+  theme: 'fantasy',
+  attributes: [
+    { id: 'attr-1', name: 'Magic', description: 'Magical power', worldId: 'world-123', baseValue: 5, minValue: 0, maxValue: 10 },
+    { id: 'attr-2', name: 'Danger', description: 'Danger level', worldId: 'world-123', baseValue: 3, minValue: 0, maxValue: 10 }
+  ],
+  skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 20
   },
-  skillCategories: ['Magic', 'Survival', 'Nature']
+  createdAt: '2023-01-01',
+  updatedAt: '2023-01-01'
 };
 
 describe('NarrativeGenerator', () => {
@@ -26,18 +35,23 @@ describe('NarrativeGenerator', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGeminiClient = new GeminiClient() as jest.Mocked<GeminiClient>;
+    
+    // Create mocked client
+    mockGeminiClient = {
+      generateContent: jest.fn()
+    } as unknown as jest.Mocked<GeminiClient>;
+    
     narrativeGenerator = new NarrativeGenerator(mockGeminiClient);
-
-    // Mock world store
-    useWorldStore.setState({
-      worlds: { 'world-123': mockWorld },
-      currentWorldId: 'world-123'
-    });
 
     // Mock prompt template
     const mockTemplate = jest.fn().mockReturnValue('Generated prompt');
-    (promptTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
+    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
+    
+    // Mock world store
+    (worldStore.getState as jest.Mock).mockReturnValue({
+      worlds: { 'world-123': mockWorld },
+      currentWorldId: 'world-123'
+    });
   });
 
   describe('generateSegment', () => {
@@ -65,7 +79,7 @@ describe('NarrativeGenerator', () => {
       expect(result.content).toBe(mockAIResponse.content);
       expect(result.segmentType).toBe('scene');
       expect(result.metadata.mood).toBe('mysterious');
-      expect(promptTemplateManager.getTemplate).toHaveBeenCalledWith('narrative/scene');
+      expect(narrativeTemplateManager.getTemplate).toHaveBeenCalledWith('narrative/scene');
     });
 
     it('includes narrative context when provided', async () => {
@@ -129,7 +143,7 @@ describe('NarrativeGenerator', () => {
 
       expect(result.content).toContain('Mystical Forest');
       expect(result.segmentType).toBe('scene');
-      expect(promptTemplateManager.getTemplate).toHaveBeenCalledWith('narrative/initialScene');
+      expect(narrativeTemplateManager.getTemplate).toHaveBeenCalledWith('narrative/initialScene');
     });
   });
 });

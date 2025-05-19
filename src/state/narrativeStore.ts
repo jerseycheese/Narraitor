@@ -107,16 +107,16 @@ export const narrativeStore = create<NarrativeStore>()((set, get) => ({
     
     // Remove from session segments
     const sessionId = segment.sessionId;
-    const updatedSessionSegments = state.sessionSegments[sessionId]?.filter(
+    const updatedSessionSegments = sessionId ? (state.sessionSegments[sessionId]?.filter(
       (id) => id !== segmentId
-    ) || [];
+    ) || []) : [];
 
     return {
       segments: remainingSegments,
-      sessionSegments: {
+      sessionSegments: sessionId ? {
         ...state.sessionSegments,
         [sessionId]: updatedSessionSegments,
-      },
+      } : state.sessionSegments,
     };
   }),
 
