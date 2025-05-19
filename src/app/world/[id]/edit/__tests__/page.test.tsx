@@ -25,8 +25,8 @@ jest.mock('@/components/WorldEditor/WorldEditor', () => {
 describe('EditWorldPage - MVP Level Tests', () => {
   beforeEach(() => {
     // Reset the mock before each test
-    const { use } = require('react');
-    use.mockClear();
+    const mockReact = jest.requireMock('react');
+    mockReact.use.mockClear();
   });
 
   // Test that the page renders with basic structure
@@ -35,8 +35,8 @@ describe('EditWorldPage - MVP Level Tests', () => {
       id: 'test-world-123'
     });
     
-    const { use } = require('react');
-    use.mockImplementation(() => ({ id: 'test-world-123' }));
+    const mockReact = jest.requireMock('react');
+    mockReact.use.mockImplementation(() => ({ id: 'test-world-123' }));
 
     render(<EditWorldPage params={mockParams} />);
 
@@ -53,8 +53,8 @@ describe('EditWorldPage - MVP Level Tests', () => {
       id: 'world-456'
     });
     
-    const { use } = require('react');
-    use.mockImplementation(() => ({ id: 'world-456' }));
+    const mockReact = jest.requireMock('react');
+    mockReact.use.mockImplementation(() => ({ id: 'world-456' }));
 
     render(<EditWorldPage params={mockParams} />);
 

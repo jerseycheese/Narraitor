@@ -114,15 +114,35 @@ export const NonExistentWorld: Story = {
     (Story) => {
       // Override the store mock for this story
       const originalGetState = worldStore.getState;
-      worldStore.getState = () => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (worldStore as any).getState = () => ({
         worlds: {},
+        currentWorldId: null,
+        error: null,
+        loading: false,
+        createWorld: jest.fn(),
         updateWorld: jest.fn(),
+        deleteWorld: jest.fn(),
+        setCurrentWorld: jest.fn(),
+        fetchWorlds: jest.fn(),
+        addAttribute: jest.fn(),
+        updateAttribute: jest.fn(),
+        removeAttribute: jest.fn(),
+        addSkill: jest.fn(),
+        updateSkill: jest.fn(),
+        removeSkill: jest.fn(),
+        updateSettings: jest.fn(),
+        reset: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn(),
+        setLoading: jest.fn(),
       });
       
       const result = <Story />;
       
       // Restore original
-      worldStore.getState = originalGetState;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (worldStore as any).getState = originalGetState;
       
       return result;
     },

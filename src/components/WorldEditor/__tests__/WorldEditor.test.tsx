@@ -18,9 +18,29 @@ jest.mock('@/state/worldStore', () => ({
   },
 }));
 
+interface MockBasicInfoFormProps {
+  world: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onChange: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+interface MockAttributesFormProps {
+  attributes: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onChange: (attributes: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+interface MockSkillsFormProps {
+  skills: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onChange: (skills: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+interface MockSettingsFormProps {
+  settings: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onChange: (settings: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
 // Mock child components
 jest.mock('@/components/forms/WorldBasicInfoForm', () => {
-  return function MockWorldBasicInfoForm({ world, onChange }: any) {
+  return function MockWorldBasicInfoForm({ onChange }: MockBasicInfoFormProps) {
     return (
       <div data-testid="world-basic-info-form">
         Basic Info Form
@@ -33,7 +53,7 @@ jest.mock('@/components/forms/WorldBasicInfoForm', () => {
 });
 
 jest.mock('@/components/forms/WorldAttributesForm', () => {
-  return function MockWorldAttributesForm({ attributes, onChange }: any) {
+  return function MockWorldAttributesForm({ onChange }: MockAttributesFormProps) {
     return (
       <div data-testid="world-attributes-form">
         Attributes Form
@@ -46,7 +66,7 @@ jest.mock('@/components/forms/WorldAttributesForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSkillsForm', () => {
-  return function MockWorldSkillsForm({ skills, onChange }: any) {
+  return function MockWorldSkillsForm({ onChange }: MockSkillsFormProps) {
     return (
       <div data-testid="world-skills-form">
         Skills Form
@@ -59,7 +79,7 @@ jest.mock('@/components/forms/WorldSkillsForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSettingsForm', () => {
-  return function MockWorldSettingsForm({ settings, onChange }: any) {
+  return function MockWorldSettingsForm({ settings, onChange }: MockSettingsFormProps) {
     return (
       <div data-testid="world-settings-form">
         Settings Form

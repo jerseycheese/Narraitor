@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, use } from 'react';
+import React, { FC, use } from 'react';
 import WorldEditor from '@/components/WorldEditor/WorldEditor';
 
 interface EditWorldPageProps {
