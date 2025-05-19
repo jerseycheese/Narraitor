@@ -101,12 +101,9 @@ export default function NarrativeSystemHarness() {
 
   const handleChoiceSelected = (choiceId: string) => {
     if (showController) {
+      // In controller mode, just pass the choiceId to the controller
+      // The controller will handle the choice processing
       setSelectedChoice(choiceId);
-      setTriggerGeneration(true);
-      // Reset after trigger - use a longer timeout to ensure generation completes
-      setTimeout(() => {
-        setTriggerGeneration(false);
-      }, 1500);
     } else {
       // Manual generation for history view
       const choice = mockChoices.find(c => c.id === choiceId);
@@ -136,12 +133,14 @@ export default function NarrativeSystemHarness() {
   const handleClearSession = () => {
     narrativeStore.getState().reset();
     setSegments([]);
+    setSelectedChoice(null);
   };
 
   const handleNewSession = () => {
     const newSessionId = `session-${Date.now()}`;
     setSessionId(newSessionId);
     setSegments([]);
+    setSelectedChoice(null);
   };
 
   if (!isClient) {
