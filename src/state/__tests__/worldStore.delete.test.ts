@@ -8,7 +8,7 @@ jest.mock('../persistence', () => ({
   loadWorldStore: jest.fn(),
 }));
 
-const mockPersistence = require('../persistence');
+import * as mockPersistence from '../persistence';
 
 describe('worldStore - deleteWorld action', () => {
   let testWorld: World;
