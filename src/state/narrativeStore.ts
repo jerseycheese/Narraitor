@@ -129,6 +129,31 @@ export const narrativeStore = create<NarrativeStore>()((set, get) => ({
 
   // State management actions
   reset: () => set(() => initialState),
+  
+  // Clear a specific session's segments
+  clearSessionSegments: (sessionId) => {
+    const state = get();
+    const segmentIdsToRemove = state.sessionSegments[sessionId] || [];
+    
+    if (segmentIdsToRemove.length === 0) return;
+    
+    console.log(`Clearing ${segmentIdsToRemove.length} segments for session ${sessionId}`);
+    
+    // Remove segments from the segments record
+    const updatedSegments = { ...state.segments };
+    segmentIdsToRemove.forEach(id => {
+      delete updatedSegments[id];
+    });
+    
+    // Remove session from sessionSegments
+    const { [sessionId]: _, ...remainingSessionSegments } = state.sessionSegments;
+    
+    set({
+      segments: updatedSegments,
+      sessionSegments: remainingSessionSegments
+    });
+  },
+  
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),

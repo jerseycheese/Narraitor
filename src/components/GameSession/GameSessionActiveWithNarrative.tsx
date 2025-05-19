@@ -4,6 +4,7 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
+import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { NarrativeSegment } from '@/types/narrative.types';
 import PlayerChoices from './PlayerChoices';
 import SessionControls from './SessionControls';
@@ -74,15 +75,25 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
       
       <div className="mb-6 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">Story</h2>
-        {/* Always use NarrativeController for dynamic generation */}
-        <NarrativeController
-          key={controllerKey} // Add a stable key to prevent duplication
-          worldId={worldId}
+        {/* Use NarrativeHistoryManager instead of NarrativeController to fix duplication issues */}
+        <NarrativeHistoryManager
+          key={controllerKey}
           sessionId={sessionId}
-          triggerGeneration={triggerGeneration}
-          choiceId={selectedChoiceId}
-          onNarrativeGenerated={handleNarrativeGenerated}
         />
+        
+        {/* Hidden controller just to generate content */}
+        {triggerGeneration && (
+          <div style={{ display: 'none' }}>
+            <NarrativeController
+              key={`generator-${controllerKey}`}
+              worldId={worldId}
+              sessionId={sessionId}
+              triggerGeneration={triggerGeneration}
+              choiceId={selectedChoiceId}
+              onNarrativeGenerated={handleNarrativeGenerated}
+            />
+          </div>
+        )}
       </div>
 
       {choices && choices.length > 0 && (

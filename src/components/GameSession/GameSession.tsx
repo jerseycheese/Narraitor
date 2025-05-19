@@ -83,6 +83,12 @@ const GameSession: React.FC<GameSessionProps> = ({
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
     console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
     
+    // Import and use the narrative store
+    const { narrativeStore } = require('@/state/narrativeStore');
+    
+    // Clear any existing segments for this session ID to prevent duplicates
+    narrativeStore.getState().clearSessionSegments(sessionId);
+    
     // Update the session store
     if (sessionStore.getState().setSessionId) {
       sessionStore.getState().setSessionId(sessionId);
