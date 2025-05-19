@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { NarrativeController } from '@/components/Narrative/NarrativeController';
+import { MockNarrativeController } from './MockNarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { narrativeStore } from '@/state/narrativeStore';
 import { World, Choice } from '@/types/world.types';
@@ -68,19 +68,70 @@ export default function NarrativeSystemHarness() {
   }, [sessionId]);
 
   const handleGenerateNarrative = () => {
-    setTriggerGeneration(true);
-    // Reset trigger after a short delay
-    setTimeout(() => setTriggerGeneration(false), 100);
+    if (showController) {
+      setTriggerGeneration(true);
+      // Reset trigger after a short delay
+      setTimeout(() => setTriggerGeneration(false), 100);
+    } else {
+      // Manual generation for history view
+      const content = segments.length === 0
+        ? 'You find yourself at the entrance of a mysterious cave. The air is cool and damp, and you can hear the distant sound of dripping water echoing from within.'
+        : 'The story continues...';
+      
+      const newSegment: NarrativeSegment = {
+        id: `seg-${Date.now()}`,
+        content,
+        type: 'scene',
+        sessionId,
+        worldId: mockWorld.id,
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      narrativeStore.getState().addSegment(sessionId, {
+        content: newSegment.content,
+        type: newSegment.type,
+        worldId: newSegment.worldId,
+        timestamp: newSegment.timestamp,
+        updatedAt: newSegment.updatedAt
+      });
+    }
   };
 
   const handleChoiceSelected = (choiceId: string) => {
-    setSelectedChoice(choiceId);
-    setTriggerGeneration(true);
-    // Reset after trigger
-    setTimeout(() => {
-      setTriggerGeneration(false);
-      setSelectedChoice(null);
-    }, 100);
+    if (showController) {
+      setSelectedChoice(choiceId);
+      setTriggerGeneration(true);
+      // Reset after trigger
+      setTimeout(() => {
+        setTriggerGeneration(false);
+        setSelectedChoice(null);
+      }, 100);
+    } else {
+      // Manual generation for history view
+      const choice = mockChoices.find(c => c.id === choiceId);
+      const content = `You chose to ${choice?.text}. ${choice?.consequence}`;
+      
+      const newSegment: NarrativeSegment = {
+        id: `seg-${Date.now()}`,
+        content,
+        type: 'exploration',
+        sessionId,
+        worldId: mockWorld.id,
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      narrativeStore.getState().addSegment(sessionId, {
+        content: newSegment.content,
+        type: newSegment.type,
+        worldId: newSegment.worldId,
+        timestamp: newSegment.timestamp,
+        updatedAt: newSegment.updatedAt
+      });
+    }
   };
 
   const handleClearSession = () => {
@@ -155,7 +206,7 @@ export default function NarrativeSystemHarness() {
         <h2 className="text-xl font-semibold mb-4">Narrative</h2>
         <div className="border rounded p-4 bg-white min-h-[400px]">
           {showController ? (
-            <NarrativeController
+            <MockNarrativeController
               worldId={mockWorld.id}
               sessionId={sessionId}
               triggerGeneration={triggerGeneration}
