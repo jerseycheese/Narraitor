@@ -282,9 +282,6 @@ describe('WorldListScreen', () => {
     });
 
     // Check for the correct message
-    const deleteDialog = screen.getByTestId('delete-confirmation-dialog');
-    
-    // Check if the dialog contains the expected text
     expect(screen.getByText('Are you sure you want to delete the world "World 1"?')).toBeInTheDocument();
 
     // Simulate confirming deletion
