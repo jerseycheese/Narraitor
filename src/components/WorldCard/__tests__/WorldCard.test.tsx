@@ -114,4 +114,26 @@ describe('WorldCard', () => {
     // Verify navigation to game session page
     expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/play`);
   });
+
+  // Test for Edit functionality
+  test('navigates to edit page when Edit is clicked', () => {
+    // Setup mocks
+    const mockRouterPush = jest.fn();
+    
+    // Directly pass mock dependencies to the component
+    render(
+      <WorldCard 
+        world={mockWorld} 
+        onSelect={jest.fn()} 
+        onDelete={jest.fn()}
+        _router={{ push: mockRouterPush }}
+      />
+    );
+    
+    // Find and click the Edit button
+    fireEvent.click(screen.getByTestId('world-card-actions-edit-button'));
+    
+    // Verify navigation to edit page
+    expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/edit`);
+  });
 });

@@ -48,6 +48,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
     }
   };
 
+  const handleEditClick = () => {
+    try {
+      if (actualRouter) {
+        actualRouter.push(`/world/${world.id}/edit`);
+      }
+    } catch (exception) {
+      console.error('Error in handleEditClick:', exception);
+    }
+  };
+
   return (
     <article
       data-testid="world-card"
@@ -89,7 +99,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
         </div>
         <WorldCardActions 
           onPlay={handlePlayClick} 
-          onEdit={() => { /* TODO: Implement Edit action */ }} 
+          onEdit={handleEditClick} 
           onDelete={handleDeleteClick} 
         />
       </footer>
