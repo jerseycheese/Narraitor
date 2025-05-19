@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
