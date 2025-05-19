@@ -32,16 +32,49 @@ type Story = StoryObj<typeof meta>;
 // Full narrative system demo
 export const CompleteNarrativeSystem: Story = {
   render: () => {
+    const [segments, setSegments] = React.useState<any[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    
+    React.useEffect(() => {
+      // Simulate initial generation
+      const timer = setTimeout(() => {
+        setSegments([
+          {
+            id: 'seg-1',
+            content: 'Welcome to the Narrative System Demo. The story begins in a mystical realm where magic flows through every living thing.',
+            type: 'scene',
+            sessionId: 'demo-session',
+            worldId: 'demo-world',
+            timestamp: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          {
+            id: 'seg-2',
+            content: 'As you explore this new world, you encounter various characters and face important decisions that shape your journey.',
+            type: 'exploration',
+            sessionId: 'demo-session',
+            worldId: 'demo-world',
+            timestamp: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ]);
+        setIsLoading(false);
+      }, 1500);
+      
+      return () => clearTimeout(timer);
+    }, []);
+    
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Narrative System Demo</h1>
           
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <NarrativeController
-              worldId="demo-world"
-              sessionId="demo-session"
-              triggerGeneration={true}
+            <NarrativeHistory
+              segments={segments}
+              isLoading={isLoading}
               className="space-y-4"
             />
           </div>
