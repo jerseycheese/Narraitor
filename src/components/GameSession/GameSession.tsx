@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { sessionStore } from '@/state/sessionStore';
 import { GameSessionState } from '@/types/game.types';
+import { sessionStore } from '@/state/sessionStore';
+import { worldStore } from '@/state/worldStore';
+import { useGameSessionState } from './hooks/useGameSessionState';
+import GameSessionLoading from './GameSessionLoading';
+import GameSessionError from './GameSessionError';
+import GameSessionActive from './GameSessionActive';
 import ErrorMessage from '@/lib/components/ErrorMessage';
-import Logger from '@/lib/utils/logger';
 
 interface GameSessionProps {
   worldId: string;
@@ -34,35 +37,8 @@ const GameSession: React.FC<GameSessionProps> = ({
   _stores,
   _router,
 }) => {
-  // Create logger instance for this component
-  const logger = React.useMemo(() => new Logger('GameSession'), []);
-  
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  
-  // Track previous status for focus management
-  const prevStatusRef = React.useRef<GameSessionState['status']>('initializing');
-  
-  // Local state for component with manual updates
-  const [sessionState, setSessionState] = useState<Partial<GameSessionState>>({
-    status: 'initializing',
-    error: null,
-    currentSceneId: null,
-    playerChoices: [],
-    ...initialState,
-  });
-  
-  // Local state for error handling
-  const [error, setError] = useState<Error | null>(null);
-  
-  // Use provided stores or real stores for testing
-  const worldStoreState = _stores?.worldStore 
-    ? (typeof _stores.worldStore === 'function' ? _stores.worldStore() : _stores.worldStore) 
-    : worldStore.getState();
-  
-  const sessionStoreState = _stores?.sessionStore
-    ? (typeof _stores.sessionStore === 'function' ? _stores.sessionStore() : _stores.sessionStore)
-    : sessionStore.getState();
   
   // Use provided router or real router
   const actualRouter = _router || router;
@@ -72,142 +48,28 @@ const GameSession: React.FC<GameSessionProps> = ({
     setIsClient(true);
   }, []);
   
-  // Check if world exists - only on client-side
-  const worldExists = useMemo(() => {
-    if (!isClient) return true; // Default for SSR
-    return !!worldStoreState.worlds?.[worldId];
-  }, [worldStoreState.worlds, worldId, isClient]);
-  
-  // Handle retry
-  const handleRetry = () => {
-    setError(null);
-    setSessionState(prev => ({ ...prev, error: null }));
-    if (sessionStoreState.initializeSession) {
-      sessionStoreState.initializeSession(worldId, onSessionStart);
-    }
-  };
-
-  // Handle dismiss error
-  const handleDismissError = () => {
-    setError(null);
-    setSessionState(prev => ({ ...prev, error: null }));
-    actualRouter.push('/');
-  };
-  
-  // Manual session initialization
-  const startSession = () => {
-    logger.debug('Manual session start requested');
-    if (sessionStoreState.initializeSession) {
-      sessionStoreState.initializeSession(worldId, onSessionStart);
-    }
-  };
-  
-  // Handle selection of a choice
-  const handleSelectChoice = (choiceId: string) => {
-    if (!sessionState.playerChoices) return;
-    
-    logger.debug('Selecting choice:', choiceId);
-    
-    // Update local state immediately for visual feedback
-    setSessionState(prev => {
-      // Map through choices and update the selected one
-      const updatedChoices = prev.playerChoices?.map(choice => ({
-        ...choice,
-        isSelected: choice.id === choiceId,
-      }));
-      
-      return {
-        ...prev,
-        playerChoices: updatedChoices,
-      };
-    });
-    
-    // Then update store - would trigger narrative progression in a full implementation
-    if (sessionStoreState.selectChoice) {
-      sessionStoreState.selectChoice(choiceId);
-    }
-  };
-
-  // Use a ref to track paused state properly across renders
-  const pausedRef = React.useRef(false);
-  
-  // Handle pause/resume toggle
-  const handlePauseToggle = () => {
-    // Toggle the paused state
-    pausedRef.current = !pausedRef.current;
-    
-    // Update local state immediately
-    setSessionState(prev => ({ 
-      ...prev, 
-      status: pausedRef.current ? 'paused' : 'active' 
-    }));
-    
-    // Update the store based on the action
-    if (pausedRef.current) {
-      logger.debug('Pausing session');
-      sessionStoreState.pauseSession?.();
-    } else {
-      logger.debug('Resuming session');
-      sessionStoreState.resumeSession?.();
-    }
-  };
-
-  // Handle end session
-  const handleEndSession = () => {
-    sessionStoreState.endSession?.();
-    setSessionState(prev => ({ ...prev, status: 'ended' }));
-    actualRouter.push('/'); // Navigate back to home page
-    if (onSessionEnd) {
-      onSessionEnd();
-    }
-  };
-  
-  // Poll for session state updates to avoid subscription issues
-  useEffect(() => {
-    if (!isClient) return;
-    
-    // Function to update state from the store
-    const updateStateFromStore = () => {
-      const storeState = sessionStore.getState();
-      
-      // Only update if there's a meaningful change to avoid unnecessary re-renders
-      const shouldUpdate = 
-        !pausedRef.current && 
-        (storeState.status !== sessionState.status ||
-         storeState.error !== sessionState.error ||
-         storeState.currentSceneId !== sessionState.currentSceneId ||
-         JSON.stringify(storeState.playerChoices) !== JSON.stringify(sessionState.playerChoices));
-      
-      if (shouldUpdate) {
-        // Only update if we're not in a paused state that we control locally
-        setSessionState(prev => {
-          // If we have a local paused state, maintain it
-          const effectiveStatus = pausedRef.current ? 'paused' : storeState.status;
-          
-          // Store previous status for focus management
-          prevStatusRef.current = prev.status!;
-          
-          return {
-            ...prev,
-            status: effectiveStatus, // Use our effective status
-            error: storeState.error,
-            currentSceneId: storeState.currentSceneId,
-            playerChoices: storeState.playerChoices,
-          };
-        });
-      }
-    };
-    
-    // Update immediately
-    updateStateFromStore();
-    
-    // Then set up polling interval - use a longer interval to reduce console noise
-    const intervalId = setInterval(updateStateFromStore, 2000);
-    
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [isClient, sessionState.currentSceneId, sessionState.error, sessionState.playerChoices, sessionState.status]);
+  // Use the custom hook for state management
+  const {
+    sessionState,
+    error,
+    worldExists,
+    world,
+    prevStatusRef,
+    handleRetry,
+    handleDismissError,
+    startSession,
+    handleSelectChoice,
+    handlePauseToggle,
+    handleEndSession,
+  } = useGameSessionState({
+    worldId,
+    isClient,
+    onSessionStart,
+    onSessionEnd,
+    initialState,
+    router: actualRouter,
+    _stores,
+  });
   
   // Focus management for state transitions
   useEffect(() => {
@@ -271,19 +133,8 @@ const GameSession: React.FC<GameSessionProps> = ({
     return () => {
       document.body.removeChild(statusAnnouncer);
     };
-  }, [sessionState.status, sessionState.error, isClient]);
+  }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
   
-  // Initialize session on mount if it's the first time
-  useEffect(() => {
-    if (!isClient) return; // Skip on server-side
-    
-    logger.debug('init effect - worldExists:', worldExists);
-    logger.debug('init effect - worldId:', worldId);
-    logger.debug('init effect - status:', sessionState.status);
-    
-    // Don't auto-initialize anymore - let the user click the button
-  }, [worldId, worldExists, isClient, logger, sessionState.status]);
-
   // Clean up on unmount
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
@@ -295,19 +146,12 @@ const GameSession: React.FC<GameSessionProps> = ({
         onSessionEnd();
       }
     };
-  }, [isClient, onSessionEnd]); // Add dependencies as suggested
+  }, [isClient, onSessionEnd]);
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
-    return (
-      <div data-testid="game-session-loading" className="p-4" aria-live="polite" role="status">
-        <div className="text-center">
-          <p>Loading game session...</p>
-        </div>
-      </div>
-    );
+    return <GameSessionLoading />;
   }
-  
   
   // Client-side only checks from here on
   if (!worldExists) {
@@ -340,95 +184,37 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'loading') {
-    return (
-      <div data-testid="game-session-loading" className="p-4">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-          <p className="mt-2" aria-live="polite">Loading game session...</p>
-        </div>
-      </div>
-    );
+    return <GameSessionLoading />;
   }
   
   if (error || sessionState.error) {
     return (
-      <div data-testid="game-session-error">
-        <ErrorMessage 
-          error={error || new Error(sessionState.error || 'Unknown error')}
-          onRetry={handleRetry}
-          onDismiss={handleDismissError}
-        />
-      </div>
+      <GameSessionError 
+        error={(error?.message || sessionState.error || 'Unknown error')}
+        onRetry={handleRetry}
+        onDismiss={handleDismissError}
+      />
     );
   }
   
-  
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
-    // Get the world for the active session
-    const world = worldStoreState.worlds?.[worldId];
+    // Mock narrative data until the real implementation is ready
+    const mockNarrative = {
+      text: 'You are in a dimly lit tavern. The air is thick with smoke and the scent of ale. A mysterious figure sits in the corner, watching you.',
+      choices: sessionState.playerChoices || []
+    };
     
     return (
-      <div data-testid="game-session-active" className="p-4" role="region" aria-label="Game session">
-        <div className="mb-2">
-          <h1 className="text-2xl font-bold">{world?.name}</h1>
-          <p className="text-gray-600">{world?.theme}</p>
-          <p className="text-blue-600" aria-live="polite">Status: {sessionState.status}</p>
-        </div>
-        
-        <div className="mb-6 p-4 bg-gray-100 rounded">
-          <h2 className="text-xl font-bold mb-2">Current Scene</h2>
-          <p>Scene ID: {sessionState.currentSceneId || 'none'}</p>
-          <div aria-live="polite">
-            <p className="italic text-gray-600 mt-2">You are in a dimly lit tavern. The air is thick with smoke and the scent of ale. A mysterious figure sits in the corner, watching you.</p>
-          </div>
-        </div>
-
-        {sessionState.playerChoices && sessionState.playerChoices.length > 0 && (
-          <div data-testid="player-choices" className="mt-4">
-            <h3 className="text-lg font-semibold mb-2" id="choices-heading">What will you do?</h3>
-            <div className="space-y-2" role="radiogroup" aria-labelledby="choices-heading">
-              {sessionState.playerChoices.map(choice => (
-                <button
-                  key={choice.id}
-                  data-testid={`player-choice-${choice.id}`}
-                  className={`block w-full text-left p-3 border rounded 
-                    ${choice.isSelected 
-                      ? 'bg-blue-100 border-blue-500 font-bold' 
-                      : 'bg-white hover:bg-gray-50'}`}
-                  onClick={() => handleSelectChoice(choice.id)}
-                  aria-checked={choice.isSelected}
-                  role="radio"
-                >
-                  {choice.isSelected ? '➤ ' : ''}{choice.text}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6 flex justify-between">
-          <button 
-            data-testid="game-session-controls-pause" 
-            className={`px-4 py-2 rounded
-              ${pausedRef.current
-                ? 'bg-green-600 text-white' 
-                : 'bg-yellow-600 text-white'}`}
-            onClick={handlePauseToggle}
-            aria-pressed={pausedRef.current}
-          >
-            {pausedRef.current ? '▶️ Resume' : '⏸️ Pause'}
-          </button>
-          <button 
-            data-testid="game-session-controls-end" 
-            className="px-4 py-2 bg-red-600 text-white rounded"
-            onClick={handleEndSession}
-          >
-            End Session
-          </button>
-        </div>
-      </div>
+      <GameSessionActive
+        narrative={mockNarrative}
+        onChoiceSelected={handleSelectChoice}
+        world={world}
+        currentSceneId={sessionState.currentSceneId || undefined}
+        status={sessionState.status}
+        onPause={handlePauseToggle}
+        onResume={handlePauseToggle}
+        onEnd={handleEndSession}
+      />
     );
   }
   

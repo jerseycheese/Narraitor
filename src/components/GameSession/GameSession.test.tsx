@@ -11,6 +11,41 @@ jest.mock('@/lib/components/ErrorMessage', () => {
   };
 });
 
+// Mock the child components
+jest.mock('./GameSessionLoading', () => {
+  return function MockGameSessionLoading() {
+    return <div data-testid="game-session-loading">Loading game session...</div>;
+  };
+});
+
+jest.mock('./GameSessionError', () => {
+  return function MockGameSessionError({ error }: { error: string }) {
+    return <div data-testid="game-session-error">{error}</div>;
+  };
+});
+
+jest.mock('./GameSessionActive', () => {
+  return function MockGameSessionActive() {
+    return <div data-testid="game-session-active">Active session</div>;
+  };
+});
+
+// Mock the custom hook
+jest.mock('./hooks/useGameSessionState', () => ({
+  useGameSessionState: jest.fn(() => ({
+    sessionState: { status: 'initializing' },
+    error: null,
+    worldExists: true,
+    handleRetry: jest.fn(),
+    handleDismissError: jest.fn(),
+    startSession: jest.fn(),
+    handleSelectChoice: jest.fn(),
+    handlePauseToggle: jest.fn(),
+    handleEndSession: jest.fn(),
+    prevStatusRef: { current: 'initializing' },
+  }))
+}));
+
 // Mock dependencies
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -19,32 +54,56 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
+// Import the mocked hook
+import { useGameSessionState } from './hooks/useGameSessionState';
+const mockedUseGameSessionState = useGameSessionState as jest.MockedFunction<typeof useGameSessionState>;
+
 describe('GameSession', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test('displays error when world does not exist', () => {
-    // Arrange - simplified approach with direct props
-    render(
-      <GameSession 
-        worldId="non-existent-world"
-        _stores={{
-          worldStore: {
-            worlds: {},
-          },
-          sessionStore: {
-            status: 'initializing',
-            initializeSession: jest.fn(),
-          }
-        }}
-      />
-    );
+    mockedUseGameSessionState.mockReturnValue({
+      sessionState: { status: 'initializing' },
+      error: null,
+      worldExists: false,
+      world: undefined,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
+      prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
+    });
     
-    // Assert
+    render(<GameSession worldId="non-existent-world" />);
+    
     expect(screen.getByTestId('game-session-error-container')).toBeInTheDocument();
   });
   
-  test('shows loading state initially', () => {
-    // Arrange
-    // Mocking simplified with just enough to make the test pass
-    // Create a complete World object to satisfy TypeScript
+  test('shows initializing state initially', () => {
+    mockedUseGameSessionState.mockReturnValue({
+      sessionState: { status: 'initializing' },
+      error: null,
+      worldExists: true,
+      world: undefined,
+      handleRetry: jest.fn(),
+      handleDismissError: jest.fn(),
+      startSession: jest.fn(),
+      handleSelectChoice: jest.fn(),
+      handlePauseToggle: jest.fn(),
+      handleEndSession: jest.fn(),
+      prevStatusRef: { current: 'initializing' },
+      pausedRef: { current: false },
+      setError: jest.fn(),
+      setSessionState: jest.fn(),
+    });
+
     const testWorld: World = {
       id: 'test-world-id',
       name: 'Test World',
@@ -78,7 +137,6 @@ describe('GameSession', () => {
       />
     );
     
-    // Assert
     expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
     expect(screen.getByText('Session Not Started')).toBeInTheDocument();
   });
