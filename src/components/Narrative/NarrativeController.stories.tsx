@@ -63,13 +63,11 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
 }) => {
   const [segments, setSegments] = React.useState<NarrativeSegment[]>(mockSegments);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [hasGenerated, setHasGenerated] = React.useState(false);
   
-  // Generate new segment when triggered
+  // Generate initial narrative segment when triggered
   useEffect(() => {
-    if (triggerGeneration && !hasGenerated && segments.length === 0) {
+    if (triggerGeneration && segments.length === 0 && !isLoading) {
       setIsLoading(true);
-      setHasGenerated(true);
       
       const timer = setTimeout(() => {
         const newSegment: NarrativeSegment = {
@@ -93,7 +91,7 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
       
       return () => clearTimeout(timer);
     }
-  }, [triggerGeneration, hasGenerated, segments.length, sessionId, worldId, onNarrativeGenerated]);
+  }, [triggerGeneration, segments.length, isLoading, worldId, sessionId, onNarrativeGenerated]);
   
   return (
     <div className={`narrative-controller ${className || ''}`}>
