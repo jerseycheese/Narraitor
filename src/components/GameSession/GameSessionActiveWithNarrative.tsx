@@ -66,22 +66,14 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
       
       <div className="mb-6 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">Story</h2>
-        {existingSegments ? (
-          // Use NarrativeHistory if we have existing segments
-          <NarrativeHistory
-            segments={existingSegments}
-            isLoading={isGenerating}
-          />
-        ) : (
-          // Use NarrativeController for dynamic generation
-          <NarrativeController
-            worldId={worldId}
-            sessionId={sessionId}
-            triggerGeneration={triggerGeneration}
-            choiceId={selectedChoiceId}
-            onNarrativeGenerated={handleNarrativeGenerated}
-          />
-        )}
+        {/* Always use NarrativeController for dynamic generation */}
+        <NarrativeController
+          worldId={worldId}
+          sessionId={sessionId}
+          triggerGeneration={triggerGeneration}
+          choiceId={selectedChoiceId}
+          onNarrativeGenerated={handleNarrativeGenerated}
+        />
       </div>
 
       {choices && choices.length > 0 && (

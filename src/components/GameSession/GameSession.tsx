@@ -199,11 +199,15 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
-    // Use the new narrative integration component
+    // Use the new narrative integration component with a stable session ID
+    const stableSessionId = useMemo(() => 
+      sessionState.id || `session-${worldId}-${Date.now()}`,
+    [worldId, sessionState.id]);
+    
     return (
       <GameSessionActiveWithNarrative
         worldId={worldId}
-        sessionId={sessionState.id || `session-${Date.now()}`}
+        sessionId={stableSessionId}
         world={world}
         status={sessionState.status}
         onChoiceSelected={handleSelectChoice}
