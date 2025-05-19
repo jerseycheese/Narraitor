@@ -26,7 +26,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { addSegment, getSessionSegments } = narrativeStore();
+  // Access store methods in a way that works with testing
+  const addSegment = narrativeStore(state => state.addSegment);
+  const getSessionSegments = narrativeStore(state => state.getSessionSegments);
   const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
 
   // Track if we've already generated a narrative for this session

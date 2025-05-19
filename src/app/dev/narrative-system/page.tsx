@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { MockNarrativeController } from './MockNarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { narrativeStore } from '@/state/narrativeStore';
-import { World, Choice } from '@/types/world.types';
+import { World } from '@/types/world.types';
+// PlayerChoice import removed as it's not needed
 import { NarrativeSegment } from '@/types/narrative.types';
 
 // Mock world for testing
@@ -26,7 +27,7 @@ const mockWorld: World = {
 };
 
 // Mock choices for testing
-const mockChoices: Choice[] = [
+const mockChoices = [
   {
     id: 'enter-cave',
     text: 'Enter the cave',
@@ -84,17 +85,22 @@ export default function NarrativeSystemHarness() {
         type: 'scene',
         sessionId,
         worldId: mockWorld.id,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        metadata: {
+          tags: ['opening', 'scene'],
+          mood: 'mysterious'
+        }
       };
       
       narrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         worldId: newSegment.worldId,
-        timestamp: newSegment.timestamp,
-        updatedAt: newSegment.updatedAt
+        timestamp: new Date(), // Ensure we're using a Date object
+        updatedAt: newSegment.updatedAt,
+        metadata: newSegment.metadata
       });
     }
   };
@@ -112,20 +118,25 @@ export default function NarrativeSystemHarness() {
       const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
         content,
-        type: 'exploration',
+        type: 'action', // Changed from 'exploration' to match valid types
         sessionId,
         worldId: mockWorld.id,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        metadata: {
+          tags: ['choice', 'player-action'],
+          mood: 'mysterious'
+        }
       };
       
       narrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         worldId: newSegment.worldId,
-        timestamp: newSegment.timestamp,
-        updatedAt: newSegment.updatedAt
+        timestamp: new Date(), // Ensure we're using a Date object
+        updatedAt: newSegment.updatedAt,
+        metadata: newSegment.metadata
       });
     }
   };

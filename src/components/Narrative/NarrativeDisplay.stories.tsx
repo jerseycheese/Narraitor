@@ -37,7 +37,7 @@ const createMockSegment = (
   type,
   sessionId: 'session-1',
   worldId: 'world-1',
-  timestamp: new Date().toISOString(),
+  timestamp: new Date(),
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   metadata: {
@@ -92,15 +92,15 @@ export const Action: Story = {
   },
 };
 
-// Decision type
+// Decision type (using scene since decision is not a valid type)
 export const Decision: Story = {
   args: {
     segment: createMockSegment(
       'You stand at a crossroads. Three paths diverge into the darkness. Which way will you go?',
-      'decision',
+      'scene',
       {
         mood: 'tense',
-        tags: ['choice', 'crossroads'],
+        tags: ['choice', 'crossroads', 'decision'],
       }
     ),
   },
@@ -120,72 +120,72 @@ export const Transition: Story = {
   },
 };
 
-// Combat type
+// Combat type (using action since combat is not a valid type)
 export const Combat: Story = {
   args: {
     segment: createMockSegment(
       'The goblin charges at you, weapon raised! You must defend yourself!',
-      'combat',
+      'action',
       {
-        mood: 'intense',
-        tags: ['battle', 'goblin'],
+        mood: 'tense',
+        tags: ['battle', 'goblin', 'combat'],
       }
     ),
   },
 };
 
-// Exploration type
+// Exploration type (using scene since exploration is not a valid type)
 export const Exploration: Story = {
   args: {
     segment: createMockSegment(
       'You discover a hidden chamber behind the waterfall. Ancient runes cover the walls.',
-      'exploration',
+      'scene',
       {
-        mood: 'curious',
-        tags: ['discovery', 'secrets'],
+        mood: 'mysterious',
+        tags: ['discovery', 'secrets', 'exploration'],
       }
     ),
   },
 };
 
-// Resolution type
+// Resolution type (using transition since resolution is not a valid type)
 export const Resolution: Story = {
   args: {
     segment: createMockSegment(
       'With the artifact in hand, you complete your quest. The village is saved!',
-      'resolution',
+      'transition',
       {
-        mood: 'triumphant',
-        tags: ['victory', 'quest-complete'],
+        mood: 'mysterious',
+        tags: ['victory', 'quest-complete', 'resolution'],
       }
     ),
   },
 };
 
-// Character interaction type
+// Character interaction type (using dialogue since character_interaction is not a valid type)
 export const CharacterInteraction: Story = {
   args: {
     segment: createMockSegment(
       'The merchant eyes you suspiciously. "Looking for something special?"',
-      'character_interaction',
+      'dialogue',
       {
         characterIds: ['merchant-1'],
-        mood: 'guarded',
-        tags: ['merchant', 'shop'],
+        mood: 'neutral',
+        tags: ['merchant', 'shop', 'interaction'],
       }
     ),
   },
 };
 
-// Revelation type
+// Revelation type (using scene since revelation is not a valid type)
 export const Revelation: Story = {
   args: {
     segment: createMockSegment(
       'The truth hits you like lightning - the old man was the lost prince all along!',
-      'revelation',
+      'scene',
       {
-        mood: 'shocked',
-        tags: ['plot-twist', 'discovery'],
+        mood: 'mysterious',
+        tags: ['plot-twist', 'discovery', 'revelation'],
       }
     ),
   },
@@ -219,8 +219,8 @@ Above it all, the great Citadel of Stars rose into the clouds, its ancient walls
       'scene',
       {
         location: 'City of Aetheria',
-        mood: 'awe',
-        tags: ['city', 'description', 'worldbuilding'],
+        mood: 'emotional', // Changed from 'awe' to use a valid mood
+        tags: ['city', 'description', 'worldbuilding', 'awe'],
       }
     ),
   },

@@ -1,229 +1,302 @@
+import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeController } from './NarrativeController';
-import { narrativeStore } from '@/state/narrativeStore';
-import { NarrativeSegment } from '@/types/narrative.types';
-import React, { useEffect } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
+import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
   title: 'Narraitor/Narrative/NarrativeController',
   component: NarrativeController,
   parameters: {
-    layout: 'padded',
+    layout: 'centered',
+    docs: {
+      description: {
+        component: `
+        # NarrativeController
+        
+        The NarrativeController manages the generation, storage, and display of narrative content.
+        
+        ## Features
+        
+        - Automatically generates initial narrative on mount
+        - Maintains history of narrative segments
+        - Handles player choices to generate new narrative segments
+        - Displays loading and error states
+        
+        ## Usage
+        
+        \`\`\`jsx
+        <NarrativeController
+          worldId="world-123"
+          sessionId="session-456"
+          triggerGeneration={true}
+          choiceId="choice-123"
+          onNarrativeGenerated={(segment) => console.log('New segment:', segment)}
+        />
+        \`\`\`
+        `,
+      },
+    },
   },
-  decorators: [
-    (Story) => {
-      // Reset the narrative store before each story
-      useEffect(() => {
-        narrativeStore.getState().reset();
-      }, []);
-      return <Story />;
-    },
-  ],
   argTypes: {
-    worldId: {
-      description: 'ID of the world for narrative generation',
-      control: 'text',
-    },
-    sessionId: {
-      description: 'ID of the game session',
-      control: 'text',
-    },
-    triggerGeneration: {
-      description: 'Whether to trigger narrative generation',
-      control: 'boolean',
-    },
-    choiceId: {
-      description: 'ID of the choice that triggered this narrative',
-      control: 'text',
-    },
-    className: {
-      description: 'Additional CSS classes',
-      control: 'text',
-    },
-    onNarrativeGenerated: {
-      description: 'Callback when narrative is generated',
-      action: 'narrative-generated',
-    },
+    worldId: { control: 'text' },
+    sessionId: { control: 'text' },
+    triggerGeneration: { control: 'boolean' },
+    choiceId: { control: 'text' },
+    onNarrativeGenerated: { action: 'onNarrativeGenerated' },
+    className: { control: 'text' },
   },
 } satisfies Meta<typeof NarrativeController>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Basic narrative controller
+// Basic narrative controller demonstration
+function DefaultNarrativeControllerStory() {
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true); // Start with loading
+  
+  React.useEffect(() => {
+    // Simulate loading and generation
+    const timer = setTimeout(() => {
+      const newSegment: NarrativeSegment = {
+        id: 'seg-1',
+        content: 'Once upon a time, in a land far, far away, there lived a brave adventurer. The world was filled with magic and wonder, and each day brought new discoveries.',
+        type: 'scene',
+        sessionId: 'session-1',
+        worldId: 'world-1',
+        timestamp: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        metadata: {
+          tags: ['opening', 'introduction'],
+          mood: 'mysterious'
+        }
+      };
+      
+      setSegments([newSegment]);
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  return (
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-4">NarrativeController Demo</h2>
+      <div className="p-4 bg-white rounded-lg shadow-md">
+        <NarrativeHistory 
+          segments={segments}
+          isLoading={isLoading}
+        />
+      </div>
+    </div>
+  );
+}
+
 export const Default: Story = {
   args: {
     worldId: 'world-1',
     sessionId: 'session-1',
     triggerGeneration: true,
   },
-  render: () => {
-    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true); // Start with loading
-    
-    useEffect(() => {
-      // Simulate loading and generation
-      const timer = setTimeout(() => {
-        const newSegment: NarrativeSegment = {
-          id: 'seg-1',
-          content: 'You awaken in a mysterious forest. The air is thick with magic.',
-          type: 'scene',
-          sessionId: 'session-1',
-          worldId: 'world-1',
-          timestamp: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        setSegments([newSegment]);
-        setIsLoading(false); // Loading completes here
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }, []); // Empty deps - run once on mount
-    
-    return <NarrativeHistory segments={segments} isLoading={isLoading} />;
-  },
+  render: DefaultNarrativeControllerStory
 };
 
-// With existing history - directly show segments
-export const WithHistory: Story = {
-  render: () => {
-    const mockSegments: NarrativeSegment[] = [
-      {
-        id: 'seg-1',
-        content: 'You stand at the entrance of the ancient temple.',
-        type: 'scene',
-        sessionId: 'session-history',
-        worldId: 'world-1',
-        timestamp: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        id: 'seg-2',
-        content: 'The door creaks open, revealing a dark corridor.',
-        type: 'exploration',
-        sessionId: 'session-history',
-        worldId: 'world-1',
-        timestamp: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-    
-    return <NarrativeHistory segments={mockSegments} isLoading={false} />;
+// Narrative with multiple segments
+function WithExistingSegmentsStory() {
+  const mockSegments: NarrativeSegment[] = [
+    {
+      id: 'seg-1',
+      content: 'The morning sun filtered through the trees, casting dappled shadows on the forest floor.',
+      type: 'scene',
+      sessionId: 'session-multi',
+      worldId: 'world-1',
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: {
+        tags: ['opening', 'introduction'],
+        mood: 'mysterious'
+      }
+    },
+    {
+      id: 'seg-2',
+      content: 'You found a mysterious artifact half-buried in the dirt. It glowed with an inner light.',
+      type: 'action', // Changed from 'exploration' to match valid types
+      sessionId: 'session-multi',
+      worldId: 'world-1',
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: {
+        tags: ['discovery', 'artifact'],
+        mood: 'mysterious'
+      }
+    },
+    {
+      id: 'seg-3',
+      content: 'As you touched the artifact, a surge of energy coursed through your veins.',
+      type: 'action',
+      sessionId: 'session-multi',
+      worldId: 'world-1',
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: {
+        tags: ['action', 'magic'],
+        mood: 'tense'
+      }
+    },
+  ];
+  
+  return <NarrativeHistory segments={mockSegments} isLoading={false} />;
+}
+
+export const WithExistingSegments: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-multi',
+    triggerGeneration: false
   },
+  render: WithExistingSegmentsStory
 };
 
 // Generating next segment from choice
-export const GeneratingFromChoice: Story = {
-  render: () => {
-    const [segments, setSegments] = React.useState<NarrativeSegment[]>([
-      {
-        id: 'seg-1',
-        content: 'You face a fork in the road.',
-        type: 'decision',
+function GeneratingFromChoiceStory() {
+  const [segments, setSegments] = React.useState<NarrativeSegment[]>([
+    {
+      id: 'seg-1',
+      content: 'You face a fork in the road.',
+      type: 'scene', // Changed from 'decision' to match valid types
+      sessionId: 'session-choice',
+      worldId: 'world-1',
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: {
+        tags: ['choice', 'decision'],
+        mood: 'neutral'
+      }
+    }
+  ]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [currentChoice, setCurrentChoice] = React.useState<string | null>(null);
+  
+  const handleChoiceClick = (choice: string) => {
+    setCurrentChoice(choice);
+    setIsLoading(true);
+    
+    // Simulate choice-based generation
+    setTimeout(() => {
+      const newContent = choice === 'left'
+        ? 'You take the left path, which winds through a dense thicket. The air grows cooler.'
+        : 'You choose the right path, which ascends a gentle slope. The sun shines brighter here.';
+      
+      const newSegment: NarrativeSegment = {
+        id: `seg-${segments.length + 1}`,
+        content: newContent,
+        type: 'action', // Changed from 'exploration' to match valid types
         sessionId: 'session-choice',
         worldId: 'world-1',
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      },
-    ]);
-    const [isLoading, setIsLoading] = React.useState(true);
-    
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        const newSegment: NarrativeSegment = {
-          id: 'seg-2',
-          content: 'Your choice leads you deeper into the forest. (from choice: choice-1)',
-          type: 'exploration',
-          sessionId: 'session-choice',
-          worldId: 'world-1',
-          timestamp: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        setSegments(prev => [...prev, newSegment]);
-        setIsLoading(false);
-      }, 1000);
+        metadata: {
+          tags: ['choice', 'path'],
+          mood: 'neutral'
+        }
+      };
       
-      return () => clearTimeout(timer);
-    }, []);
-    
-    return <NarrativeHistory segments={segments} isLoading={isLoading} />;
+      setSegments(prev => [...prev, newSegment]);
+      setIsLoading(false);
+    }, 1500);
+  };
+  
+  return (
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-4">Narrative with Choices</h2>
+      <div className="p-4 bg-white rounded-lg shadow-md">
+        <NarrativeHistory 
+          segments={segments}
+          isLoading={isLoading}
+        />
+        
+        {!isLoading && !currentChoice && (
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <button
+              className="p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100"
+              onClick={() => handleChoiceClick('left')}
+            >
+              Take the left path
+            </button>
+            <button
+              className="p-3 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100"
+              onClick={() => handleChoiceClick('right')}
+            >
+              Take the right path
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export const GeneratingFromChoice: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-choice',
+    triggerGeneration: false
   },
+  render: GeneratingFromChoiceStory
 };
 
-// Loading state - perpetual loading
-export const Loading: Story = {
-  render: () => <NarrativeHistory segments={[]} isLoading={true} />,
+// Loading state
+function LoadingStateStory() {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-4">Loading State</h2>
+      <div className="p-4 bg-white rounded-lg shadow-md">
+        <NarrativeHistory 
+          segments={[]}
+          isLoading={true}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const LoadingState: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-loading',
+    triggerGeneration: true
+  },
+  render: LoadingStateStory
 };
 
 // Error state
-export const Error: Story = {
-  render: () => <NarrativeHistory segments={[]} isLoading={false} error="Failed to generate narrative. Please try again." />,
-};
-
-
-// Manual generation trigger
-export const ManualTrigger: Story = {
-  render: () => {
-    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
-    const [isLoading, setIsLoading] = React.useState(false);
-    
-    const handleGenerate = () => {
-      setIsLoading(true);
-      
-      setTimeout(() => {
-        const newSegment: NarrativeSegment = {
-          id: `seg-${Date.now()}`,
-          content: `Generated narrative segment #${segments.length + 1}`,
-          type: segments.length === 0 ? 'scene' : 'exploration',
-          sessionId: 'manual-session',
-          worldId: 'world-1',
-          timestamp: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        setSegments(prev => [...prev, newSegment]);
-        setIsLoading(false);
-      }, 1000);
-    };
-    
-    return (
-      <div className="space-y-4">
-        <button
-          onClick={handleGenerate}
-          disabled={isLoading}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-        >
-          Generate Next Narrative
-        </button>
-        <NarrativeHistory segments={segments} isLoading={isLoading} />
+function ErrorStateStory() {
+  return (
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-4">Error State</h2>
+      <div className="p-4 bg-white rounded-lg shadow-md">
+        <NarrativeHistory 
+          segments={[]}
+          isLoading={false}
+          error="Failed to generate narrative. Please try again."
+        />
       </div>
-    );
-  },
-};
+    </div>
+  );
+}
 
-// Multiple segments
-export const MultipleSegments: Story = {
-  render: () => {
-    const mockSegments: NarrativeSegment[] = Array.from({ length: 5 }, (_, i) => ({
-      id: `seg-${i}`,
-      content: `This is narrative segment ${i + 1}. ${i === 0 ? 'The journey begins in a misty forest.' : `The adventure continues with more discoveries.`}`,
-      type: i % 2 === 0 ? 'scene' : 'exploration',
-      sessionId: 'multi-session',
-      worldId: 'world-1',
-      timestamp: new Date(Date.now() - (5 - i) * 60000).toISOString(), // Stagger timestamps
-      createdAt: new Date(Date.now() - (5 - i) * 60000).toISOString(),
-      updatedAt: new Date(Date.now() - (5 - i) * 60000).toISOString(),
-    }));
-    
-    return <NarrativeHistory segments={mockSegments} isLoading={false} />;
+export const ErrorState: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-error',
+    triggerGeneration: false
   },
+  render: ErrorStateStory
 };

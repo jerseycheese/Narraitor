@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { NarrativeController } from './NarrativeController';
-import { NarrativeDisplay } from './NarrativeDisplay';
 import { NarrativeHistory } from './NarrativeHistory';
+import { NarrativeSegment } from '@/types/narrative.types';
+// NarrativeController and NarrativeDisplay are imported in docstrings but not directly used in this file
 
 const meta = {
   title: 'Narraitor/Narrative',
@@ -31,8 +31,8 @@ type Story = StoryObj<typeof meta>;
 
 // Full narrative system demo
 export const CompleteNarrativeSystem: Story = {
-  render: () => {
-    const [segments, setSegments] = React.useState<any[]>([]);
+  render: function NarrativeSystemStory() {
+    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     
     React.useEffect(() => {
@@ -45,19 +45,27 @@ export const CompleteNarrativeSystem: Story = {
             type: 'scene',
             sessionId: 'demo-session',
             worldId: 'demo-world',
-            timestamp: new Date().toISOString(),
+            timestamp: new Date(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            metadata: { 
+              tags: ['opening', 'introduction'], 
+              mood: 'mysterious' 
+            },
           },
           {
             id: 'seg-2',
             content: 'As you explore this new world, you encounter various characters and face important decisions that shape your journey.',
-            type: 'exploration',
+            type: 'action',  // Changed from exploration to match valid types
             sessionId: 'demo-session',
             worldId: 'demo-world',
-            timestamp: new Date().toISOString(),
+            timestamp: new Date(),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            metadata: { 
+              tags: ['exploration', 'journey'], 
+              mood: 'neutral' 
+            },
           },
         ]);
         setIsLoading(false);

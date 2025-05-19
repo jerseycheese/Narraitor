@@ -18,7 +18,8 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // We define error state but don't currently use setError - this is for future error handling
+  const [error] = useState<string | null>(null);
   
   // Get segments from the store
   const getSegments = narrativeStore(state => state.getSessionSegments);

@@ -23,6 +23,7 @@ interface NarrativeStore {
   
   // State management
   reset: () => void;
+  clearSessionSegments: (sessionId: EntityID) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
@@ -146,7 +147,8 @@ export const narrativeStore = create<NarrativeStore>()((set, get) => ({
     });
     
     // Remove session from sessionSegments
-    const { [sessionId]: _, ...remainingSessionSegments } = state.sessionSegments;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [sessionId]: removedSession, ...remainingSessionSegments } = state.sessionSegments;
     
     set({
       segments: updatedSegments,

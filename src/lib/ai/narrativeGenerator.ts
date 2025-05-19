@@ -1,4 +1,4 @@
-import { GeminiClient } from './geminiClient';
+import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { worldStore } from '@/state/worldStore';
 import {
@@ -9,7 +9,7 @@ import {
 import { World } from '@/types/world.types';
 
 export class NarrativeGenerator {
-  constructor(private geminiClient: GeminiClient) {}
+  constructor(private geminiClient: AIClient) {}
 
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { World } from '@/types/world.types';
-import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { NarrativeSegment } from '@/types/narrative.types';
@@ -38,12 +37,14 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   onPause,
   onResume,
   onEnd,
-  existingSegments,
+  /* existingSegments - not currently used */
   choices,
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
   const [isGenerating, setIsGenerating] = React.useState(true); // Start as generating
+  // We track generation for debugging - not used directly in render
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [generation, setGeneration] = React.useState(0);
   const [initialized, setInitialized] = React.useState(false);
   const controllerKey = React.useMemo(() => `controller-${sessionId}`, [sessionId]);

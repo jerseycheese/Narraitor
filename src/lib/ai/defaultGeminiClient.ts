@@ -1,9 +1,9 @@
 import { GeminiClient } from './geminiClient';
 import { getDefaultConfig } from './config';
-import { AIResponse } from './types';
+import { AIResponse, AIClient } from './types';
 
 // For development/test environments, use mock implementation
-class MockGeminiClient implements GeminiClient {
+class MockGeminiClient implements AIClient {
   async generateContent(prompt: string): Promise<AIResponse> {
     console.log('Using mock Gemini client');
     
