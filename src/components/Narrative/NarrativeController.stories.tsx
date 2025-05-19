@@ -17,25 +17,34 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   
-  const { getSessionSegments } = narrativeStore();
-
-  // Load existing segments on mount
-  useEffect(() => {
-    const existingSegments = getSessionSegments(sessionId);
-    setSegments(existingSegments);
-  }, [sessionId, getSessionSegments]);
+  // Removed - using the initialization effect below instead
 
   // Track if we've already generated for this trigger
   const [hasGenerated, setHasGenerated] = React.useState(false);
+  const [isInitialized, setIsInitialized] = React.useState(false);
+  
+  // Initialize from store on mount
+  useEffect(() => {
+    if (!isInitialized) {
+      const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
+      if (existingSegments.length > 0) {
+        setSegments(existingSegments);
+        setHasGenerated(true); // Don't generate if there are already segments
+      }
+      setIsInitialized(true);
+    }
+  }, [sessionId, isInitialized]);
   
   // Simulate narrative generation
   useEffect(() => {
-    if (triggerGeneration && !hasGenerated) {
+    let timer: NodeJS.Timeout;
+    
+    if (triggerGeneration && !hasGenerated && isInitialized) {
       setIsLoading(true);
       setHasGenerated(true);
       
       // Simulate async generation
-      const timer = setTimeout(() => {
+      timer = setTimeout(() => {
         const newSegment: NarrativeSegment = {
           id: `seg-${Date.now()}`,
           content: segments.length === 0 
@@ -50,23 +59,35 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
         };
         
         setSegments(prev => [...prev, newSegment]);
+        
+        // Add to store as well
+        narrativeStore.getState().addSegment(sessionId, {
+          content: newSegment.content,
+          type: newSegment.type,
+          worldId: newSegment.worldId,
+          timestamp: newSegment.timestamp,
+          updatedAt: newSegment.updatedAt
+        });
+        
         setIsLoading(false);
         
         if (onNarrativeGenerated) {
           onNarrativeGenerated(newSegment);
         }
       }, 1000);
-      
-      return () => clearTimeout(timer);
     }
-  }, [triggerGeneration, worldId, sessionId, choiceId, hasGenerated, onNarrativeGenerated]);
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [triggerGeneration, worldId, sessionId, choiceId, hasGenerated, isInitialized, segments.length, onNarrativeGenerated]);
   
   // Reset generation flag when trigger changes to false
   useEffect(() => {
-    if (!triggerGeneration) {
+    if (!triggerGeneration && hasGenerated) {
       setHasGenerated(false);
     }
-  }, [triggerGeneration]);
+  }, [triggerGeneration, hasGenerated]);
 
   // Import NarrativeHistory here to avoid circular dependencies
   const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
