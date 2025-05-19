@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NarrativeDisplay } from './NarrativeDisplay';
+import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { narrativeStore } from '@/state/narrativeStore';
@@ -11,6 +11,7 @@ interface NarrativeControllerProps {
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   triggerGeneration?: boolean;
   choiceId?: string; // ID of the choice that triggered this narrative
+  className?: string;
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
@@ -18,20 +19,27 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   sessionId,
   onNarrativeGenerated,
   triggerGeneration = true,
-  choiceId
+  choiceId,
+  className
 }) => {
-  const [currentSegment, setCurrentSegment] = useState<NarrativeSegment | null>(null);
+  const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { addSegment } = narrativeStore();
+  const { addSegment, getSessionSegments } = narrativeStore();
   const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
+
+  // Load existing segments on mount
+  useEffect(() => {
+    const existingSegments = getSessionSegments(sessionId);
+    setSegments(existingSegments);
+  }, [sessionId, getSessionSegments]);
 
   useEffect(() => {
     // Generate narrative when triggered
     if (triggerGeneration) {
-      if (!currentSegment) {
-        // Generate initial scene if no current segment
+      if (segments.length === 0) {
+        // Generate initial scene if no segments exist
         generateInitialNarrative();
       } else if (choiceId) {
         // Generate continuation based on choice
@@ -48,7 +56,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     try {
       const result = await narrativeGenerator.generateInitialScene(worldId, []);
       const now = new Date();
-      const segment: NarrativeSegment = {
+      const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
         content: result.content,
         type: result.segmentType,
@@ -58,18 +66,21 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString()
       };
       
-      setCurrentSegment(segment);
+      // Add to local state
+      setSegments(prev => [...prev, newSegment]);
+      
+      // Add to store
       addSegment(sessionId, {
-        content: segment.content,
-        type: segment.type,
-        characterIds: segment.characterIds || [],
-        metadata: segment.metadata,
-        updatedAt: segment.updatedAt,
-        timestamp: segment.timestamp
+        content: newSegment.content,
+        type: newSegment.type,
+        characterIds: newSegment.characterIds || [],
+        metadata: newSegment.metadata,
+        updatedAt: newSegment.updatedAt,
+        timestamp: newSegment.timestamp
       });
       
       if (onNarrativeGenerated) {
-        onNarrativeGenerated(segment);
+        onNarrativeGenerated(newSegment);
       }
     } catch {
       setError('Failed to generate narrative');
@@ -79,18 +90,21 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
-    if (!currentSegment) return;
+    if (segments.length === 0) return;
     
     setIsLoading(true);
     setError(null);
     
     try {
+      // Use recent segments for context (last 3-5 segments)
+      const recentSegments = segments.slice(-5);
+      
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
         characterIds: [],
         narrativeContext: {
-          recentSegments: [currentSegment],
+          recentSegments,
           currentSituation: `Player selected choice: ${triggeringChoiceId}`
         },
         generationParameters: {
@@ -100,7 +114,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       });
       
       const now = new Date();
-      const segment: NarrativeSegment = {
+      const newSegment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
         content: result.content,
         type: result.segmentType,
@@ -110,18 +124,21 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString()
       };
       
-      setCurrentSegment(segment);
+      // Add to local state
+      setSegments(prev => [...prev, newSegment]);
+      
+      // Add to store
       addSegment(sessionId, {
-        content: segment.content,
-        type: segment.type,
-        characterIds: segment.characterIds || [],
-        metadata: segment.metadata,
-        updatedAt: segment.updatedAt,
-        timestamp: segment.timestamp
+        content: newSegment.content,
+        type: newSegment.type,
+        characterIds: newSegment.characterIds || [],
+        metadata: newSegment.metadata,
+        updatedAt: newSegment.updatedAt,
+        timestamp: newSegment.timestamp
       });
       
       if (onNarrativeGenerated) {
-        onNarrativeGenerated(segment);
+        onNarrativeGenerated(newSegment);
       }
     } catch {
       setError('Failed to generate narrative');
@@ -131,11 +148,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   return (
-    <div className="narrative-controller">
-      <NarrativeDisplay 
-        segment={currentSegment} 
-        isLoading={isLoading} 
-        error={error || undefined} 
+    <div className={`narrative-controller ${className || ''}`}>
+      <NarrativeHistory 
+        segments={segments}
+        isLoading={isLoading}
+        error={error || undefined}
       />
     </div>
   );
