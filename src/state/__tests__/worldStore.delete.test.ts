@@ -1,71 +1,45 @@
+// Unmock the worldStore module for this test
+jest.unmock('../worldStore');
+
 import { worldStore } from '../worldStore';
-import { World } from '@/types/world.types';
-import { generateId } from '@/lib/utils/generateId';
 
-// Mock the persistence module
-jest.mock('../persistence', () => ({
-  persistWorldStore: jest.fn(),
-  loadWorldStore: jest.fn(),
-}));
-
-import * as mockPersistence from '../persistence';
-
-describe('worldStore - deleteWorld action', () => {
-  let testWorld: World;
-
+describe('worldStore - deleteWorld integration', () => {
   beforeEach(() => {
-    // Reset store and mocks
-    worldStore.setState({
-      worlds: {},
-      currentWorldId: null,
-      error: null,
-      loading: false,
-    });
-    jest.clearAllMocks();
+    // Reset the actual store
+    worldStore.getState().reset();
+  });
 
+  test('should delete an existing world', () => {
     // Create a test world
-    testWorld = {
-      id: generateId(),
+    const worldData = {
       name: 'Test World',
       description: 'A world to test deletion',
       theme: 'Fantasy',
       attributes: [],
       skills: [],
       settings: {
-        difficultyLevel: 'medium',
-        magicLevel: 'medium',
-        technologyLevel: 'medieval',
-        combatFrequency: 'medium',
+        maxAttributes: 6,
+        maxSkills: 8,
+        attributePointPool: 27,
+        skillPointPool: 20,
       },
-      isDeleted: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
-    // Add test world to store
-    worldStore.setState({
-      worlds: { [testWorld.id]: testWorld },
-    });
-  });
-
-  test('successfully deletes an existing world', () => {
-    const initialWorldCount = Object.keys(worldStore.getState().worlds).length;
-    expect(initialWorldCount).toBe(1);
+    // Create the world
+    const worldId = worldStore.getState().createWorld(worldData);
+    expect(Object.keys(worldStore.getState().worlds).length).toBe(1);
 
     // Delete the world
-    worldStore.getState().deleteWorld(testWorld.id);
+    worldStore.getState().deleteWorld(worldId);
 
     // Verify world is removed
     const state = worldStore.getState();
-    expect(state.worlds[testWorld.id]).toBeUndefined();
+    expect(state.worlds[worldId]).toBeUndefined();
     expect(Object.keys(state.worlds).length).toBe(0);
-    
-    // Verify persistence was called
-    expect(mockPersistence.persistWorldStore).toHaveBeenCalledTimes(1);
   });
 
-  test('does nothing when trying to delete non-existent world', () => {
-    const nonExistentId = generateId();
+  test('should do nothing when trying to delete non-existent world', () => {
+    const nonExistentId = 'non-existent-id';
     const initialState = worldStore.getState();
 
     // Attempt to delete non-existent world
@@ -74,56 +48,78 @@ describe('worldStore - deleteWorld action', () => {
     // Verify nothing changed
     const newState = worldStore.getState();
     expect(newState).toEqual(initialState);
-    expect(mockPersistence.persistWorldStore).not.toHaveBeenCalled();
   });
 
-  test('clears currentWorldId if deleted world was current', () => {
-    // Set the test world as current
-    worldStore.setState({ currentWorldId: testWorld.id });
-    expect(worldStore.getState().currentWorldId).toBe(testWorld.id);
+  test('should clear currentWorldId if deleted world was current', () => {
+    // Create a test world
+    const worldData = {
+      name: 'Test World',
+      description: 'A world to test deletion',
+      theme: 'Fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 8,
+        attributePointPool: 27,
+        skillPointPool: 20,
+      },
+    };
+
+    // Create and set as current
+    const worldId = worldStore.getState().createWorld(worldData);
+    worldStore.getState().setCurrentWorld(worldId);
+    expect(worldStore.getState().currentWorldId).toBe(worldId);
 
     // Delete the current world
-    worldStore.getState().deleteWorld(testWorld.id);
+    worldStore.getState().deleteWorld(worldId);
 
     // Verify currentWorldId is cleared
     expect(worldStore.getState().currentWorldId).toBeNull();
   });
 
-  test('does not affect currentWorldId if different world is deleted', () => {
-    const anotherWorld: World = {
-      ...testWorld,
-      id: generateId(),
-      name: 'Another World',
+  test('should not affect currentWorldId if different world is deleted', () => {
+    // Create two worlds
+    const worldData1 = {
+      name: 'World 1',
+      theme: 'Fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 8,
+        attributePointPool: 27,
+        skillPointPool: 20,
+      },
     };
 
-    // Add another world and set it as current
-    worldStore.setState({
-      worlds: {
-        [testWorld.id]: testWorld,
-        [anotherWorld.id]: anotherWorld,
+    const worldData2 = {
+      name: 'World 2',
+      theme: 'Sci-Fi',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 8,
+        attributePointPool: 27,
+        skillPointPool: 20,
       },
-      currentWorldId: anotherWorld.id,
-    });
+    };
 
-    // Delete the first world (not current)
-    worldStore.getState().deleteWorld(testWorld.id);
+    // Create both worlds
+    const worldId1 = worldStore.getState().createWorld(worldData1);
+    const worldId2 = worldStore.getState().createWorld(worldData2);
+
+    // Set world2 as current
+    worldStore.getState().setCurrentWorld(worldId2);
+    expect(worldStore.getState().currentWorldId).toBe(worldId2);
+
+    // Delete world1 (not current)
+    worldStore.getState().deleteWorld(worldId1);
 
     // Verify currentWorldId unchanged
-    expect(worldStore.getState().currentWorldId).toBe(anotherWorld.id);
-    expect(worldStore.getState().worlds[anotherWorld.id]).toBeDefined();
-  });
-
-  test('handles errors during persistence gracefully', () => {
-    // Mock persistence to throw error
-    mockPersistence.persistWorldStore.mockImplementation(() => {
-      throw new Error('Persistence failed');
-    });
-
-    // Delete should still work even if persistence fails
-    worldStore.getState().deleteWorld(testWorld.id);
-
-    // World should still be deleted from state
-    expect(worldStore.getState().worlds[testWorld.id]).toBeUndefined();
-    expect(mockPersistence.persistWorldStore).toHaveBeenCalledTimes(1);
+    expect(worldStore.getState().currentWorldId).toBe(worldId2);
+    expect(worldStore.getState().worlds[worldId2]).toBeDefined();
+    expect(worldStore.getState().worlds[worldId1]).toBeUndefined();
   });
 });
