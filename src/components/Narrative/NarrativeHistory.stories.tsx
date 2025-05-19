@@ -46,26 +46,7 @@ const createMockSegment = (
   updatedAt: new Date().toISOString(),
 });
 
-// Empty state
-export const Empty: Story = {
-  args: {
-    segments: [],
-    isLoading: false,
-  },
-};
 
-// Single segment
-export const SingleSegment: Story = {
-  args: {
-    segments: [
-      createMockSegment(
-        'seg-1',
-        'You find yourself standing at the entrance of a mysterious cave. The air is damp and cool, and you can hear the distant sound of dripping water echoing from within.'
-      ),
-    ],
-    isLoading: false,
-  },
-};
 
 // Multiple segments
 export const MultipleSegments: Story = {
@@ -151,16 +132,3 @@ export const MixedSegmentTypes: Story = {
   },
 };
 
-// With custom styling
-export const CustomStyling: Story = {
-  args: {
-    segments: [
-      createMockSegment(
-        'seg-1',
-        'You find yourself standing at the entrance of a mysterious cave. The air is damp and cool, and you can hear the distant sound of dripping water echoing from within.'
-      ),
-    ],
-    isLoading: false,
-    className: 'max-w-2xl mx-auto p-4 bg-gray-50 rounded-lg',
-  },
-};
