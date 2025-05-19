@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldSettingsForm from './WorldSettingsForm';
+import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 import { WorldSettings } from '@/types/world.types';
 
 const mockSettings: WorldSettings = {
@@ -10,7 +10,7 @@ const mockSettings: WorldSettings = {
 };
 
 const meta: Meta<typeof WorldSettingsForm> = {
-  title: 'Narraitor/World/Editor/WorldSettingsForm',
+  title: 'Narraitor/Forms/WorldSettingsForm',
   component: WorldSettingsForm,
   parameters: {
     layout: 'padded',

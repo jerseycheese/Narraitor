@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldAttributesForm from './WorldAttributesForm';
+import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import { WorldAttribute } from '@/types/world.types';
 
 const mockAttributes: WorldAttribute[] = [
@@ -26,7 +26,7 @@ const mockAttributes: WorldAttribute[] = [
 ];
 
 const meta: Meta<typeof WorldAttributesForm> = {
-  title: 'Narraitor/World/Editor/WorldAttributesForm',
+  title: 'Narraitor/Forms/WorldAttributesForm',
   component: WorldAttributesForm,
   parameters: {
     layout: 'padded',

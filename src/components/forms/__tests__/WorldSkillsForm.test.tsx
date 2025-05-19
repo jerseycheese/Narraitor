@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import WorldSkillsForm from '../WorldSkillsForm';
+import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 
 describe('WorldSkillsForm - MVP Level Tests', () => {

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import WorldBasicInfoForm from './WorldBasicInfoForm';
+import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import { World } from '@/types/world.types';
 
 const mockWorld: World = {
@@ -20,7 +20,7 @@ const mockWorld: World = {
 };
 
 const meta: Meta<typeof WorldBasicInfoForm> = {
-  title: 'Narraitor/World/Editor/WorldBasicInfoForm',
+  title: 'Narraitor/Forms/WorldBasicInfoForm',
   component: WorldBasicInfoForm,
   parameters: {
     layout: 'padded',

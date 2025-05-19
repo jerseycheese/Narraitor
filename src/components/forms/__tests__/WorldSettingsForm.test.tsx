@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import WorldSettingsForm from '../WorldSettingsForm';
+import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 import { WorldSettings } from '@/types/world.types';
 
 describe('WorldSettingsForm - MVP Level Tests', () => {

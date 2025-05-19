@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import WorldBasicInfoForm from '../WorldBasicInfoForm';
+import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import { World } from '@/types/world.types';
 
 describe('WorldBasicInfoForm - MVP Level Tests', () => {

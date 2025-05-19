@@ -19,7 +19,7 @@ jest.mock('@/state/worldStore', () => ({
 }));
 
 // Mock child components
-jest.mock('../WorldBasicInfoForm', () => {
+jest.mock('@/components/forms/WorldBasicInfoForm', () => {
   return function MockWorldBasicInfoForm({ world, onChange }: any) {
     return (
       <div data-testid="world-basic-info-form">
@@ -32,7 +32,7 @@ jest.mock('../WorldBasicInfoForm', () => {
   };
 });
 
-jest.mock('../WorldAttributesForm', () => {
+jest.mock('@/components/forms/WorldAttributesForm', () => {
   return function MockWorldAttributesForm({ attributes, onChange }: any) {
     return (
       <div data-testid="world-attributes-form">
@@ -45,7 +45,7 @@ jest.mock('../WorldAttributesForm', () => {
   };
 });
 
-jest.mock('../WorldSkillsForm', () => {
+jest.mock('@/components/forms/WorldSkillsForm', () => {
   return function MockWorldSkillsForm({ skills, onChange }: any) {
     return (
       <div data-testid="world-skills-form">
@@ -58,7 +58,7 @@ jest.mock('../WorldSkillsForm', () => {
   };
 });
 
-jest.mock('../WorldSettingsForm', () => {
+jest.mock('@/components/forms/WorldSettingsForm', () => {
   return function MockWorldSettingsForm({ settings, onChange }: any) {
     return (
       <div data-testid="world-settings-form">

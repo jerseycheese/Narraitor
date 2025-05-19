@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
-import WorldBasicInfoForm from './WorldBasicInfoForm';
-import WorldAttributesForm from './WorldAttributesForm';
-import WorldSkillsForm from './WorldSkillsForm';
-import WorldSettingsForm from './WorldSettingsForm';
+import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
+import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
+import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
+import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 
 interface WorldEditorProps {
   worldId: string;
