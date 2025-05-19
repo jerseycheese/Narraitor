@@ -27,8 +27,9 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-destructive rounded-lg p-6">
-        <p className="text-destructive">{error}</p>
+      <div className="p-6 border border-red-300 rounded-lg bg-red-50">
+        <h3 className="text-lg font-semibold text-red-700 mb-2">Error Generating Narrative</h3>
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
