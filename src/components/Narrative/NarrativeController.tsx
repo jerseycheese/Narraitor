@@ -29,25 +29,53 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const { addSegment, getSessionSegments } = narrativeStore();
   const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
 
-  // Load existing segments on mount
+  // Track if we've already generated a narrative for this session
+  const [initialGenerationCompleted, setInitialGenerationCompleted] = useState(false);
+  const [processedChoices, setProcessedChoices] = useState<Set<string>>(new Set());
+
+  // Load existing segments on mount and reset state when session changes
   useEffect(() => {
+    console.log(`NarrativeController initializing for session ${sessionId}`);
+    
+    // Reset state when session changes
+    setInitialGenerationCompleted(false);
+    setProcessedChoices(new Set());
+    setError(null);
+    
+    // Load segments for the current session
     const existingSegments = getSessionSegments(sessionId);
     setSegments(existingSegments);
+    
+    // If we already have segments, mark initial generation as completed
+    if (existingSegments.length > 0) {
+      setInitialGenerationCompleted(true);
+      console.log(`Loaded ${existingSegments.length} existing segments for session ${sessionId}`);
+    }
   }, [sessionId, getSessionSegments]);
 
   useEffect(() => {
     // Generate narrative when triggered
-    if (triggerGeneration) {
-      if (segments.length === 0) {
-        // Generate initial scene if no segments exist
+    if (triggerGeneration && !isLoading) {
+      if (segments.length === 0 && !initialGenerationCompleted) {
+        // Generate initial scene if no segments exist and we haven't generated one yet
+        console.log(`Generating initial narrative for session ${sessionId}`);
         generateInitialNarrative();
-      } else if (choiceId) {
-        // Generate continuation based on choice
+        setInitialGenerationCompleted(true);
+      } else if (choiceId && !processedChoices.has(choiceId)) {
+        // Generate continuation based on choice (only if we haven't processed this choice already)
+        console.log(`Generating narrative for choice ${choiceId}`);
         generateNextSegment(choiceId);
+        
+        // Mark this choice as processed
+        setProcessedChoices(prev => {
+          const updated = new Set(prev);
+          updated.add(choiceId);
+          return updated;
+        });
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerGeneration, choiceId]);
+  }, [triggerGeneration, choiceId, segments.length, isLoading]);
 
   const generateInitialNarrative = async () => {
     setIsLoading(true);
