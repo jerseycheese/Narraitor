@@ -27,7 +27,7 @@ export class NarrativeContextManager {
     // Simple token estimation: 1 token ≈ 4 characters
     const estimateTokens = (text: string) => Math.ceil(text.length / 4);
     
-    let contextParts: string[] = [];
+    const contextParts: string[] = [];
     let currentTokens = 0;
     
     // Add segments from most recent to oldest

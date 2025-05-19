@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { GeminiClient } from '@/lib/ai/geminiClient';
-import { useNarrativeStore } from '@/state/narrativeStore';
+import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
+import { narrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 interface NarrativeControllerProps {
@@ -18,8 +18,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const { addSegment } = useNarrativeStore();
-  const narrativeGenerator = new NarrativeGenerator(new GeminiClient());
+  const { addSegment } = narrativeStore();
+  const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
 
   useEffect(() => {
     // Generate initial scene on mount
@@ -32,17 +32,25 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     
     try {
       const result = await narrativeGenerator.generateInitialScene(worldId, []);
+      const now = new Date();
       const segment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
         content: result.content,
         type: result.segmentType,
         metadata: result.metadata,
-        timestamp: new Date()
+        timestamp: now,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString()
       };
       
       setCurrentSegment(segment);
-      addSegment(segment);
-    } catch (err) {
+      addSegment(sessionId, {
+        content: segment.content,
+        type: segment.type,
+        characterIds: segment.characterIds || [],
+        metadata: segment.metadata
+      });
+    } catch {
       setError('Failed to generate narrative');
     } finally {
       setIsLoading(false);
@@ -65,17 +73,25 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         }
       });
       
+      const now = new Date();
       const segment: NarrativeSegment = {
         id: `seg-${Date.now()}`,
         content: result.content,
         type: result.segmentType,
         metadata: result.metadata,
-        timestamp: new Date()
+        timestamp: now,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString()
       };
       
       setCurrentSegment(segment);
-      addSegment(segment);
-    } catch (err) {
+      addSegment(sessionId, {
+        content: segment.content,
+        type: segment.type,
+        characterIds: segment.characterIds || [],
+        metadata: segment.metadata
+      });
+    } catch {
       setError('Failed to generate narrative');
     } finally {
       setIsLoading(false);

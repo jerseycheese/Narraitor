@@ -22,7 +22,7 @@ export class NarrativeGenerator {
       const response = await this.geminiClient.generateContent(prompt);
       
       return this.formatResponse(response, request.generationParameters?.segmentType || 'scene');
-    } catch (error) {
+    } catch {
       throw new Error('Failed to generate narrative segment');
     }
   }
@@ -45,7 +45,7 @@ export class NarrativeGenerator {
       const response = await this.geminiClient.generateContent(prompt);
       
       return this.formatResponse(response, 'scene');
-    } catch (error) {
+    } catch {
       throw new Error('Failed to generate initial scene');
     }
   }
@@ -103,16 +103,17 @@ export class NarrativeGenerator {
   }
 
   private formatResponse(response: any, segmentType: string): NarrativeGenerationResult {
+    const aiResponse = response as { content?: string; metadata?: any; tokenUsage?: any };
     return {
-      content: response.content || '',
+      content: aiResponse.content || '',
       segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
-        characterIds: response.metadata?.characterIds || [],
-        location: response.metadata?.location,
-        mood: response.metadata?.mood || 'neutral',
-        tags: response.metadata?.tags || []
+        characterIds: aiResponse.metadata?.characterIds || [],
+        location: aiResponse.metadata?.location,
+        mood: aiResponse.metadata?.mood || 'neutral',
+        tags: aiResponse.metadata?.tags || []
       },
-      tokenUsage: response.tokenUsage
+      tokenUsage: aiResponse.tokenUsage
     };
   }
 }

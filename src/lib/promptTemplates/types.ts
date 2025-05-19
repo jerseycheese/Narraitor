@@ -29,7 +29,7 @@ export interface PromptTemplate {
   type: PromptType;
   content: string;
   variables: PromptVariable[];
-  generate?: (context: any) => string;
+  generate?: (context: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**

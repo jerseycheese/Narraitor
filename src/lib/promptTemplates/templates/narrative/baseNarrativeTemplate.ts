@@ -1,6 +1,6 @@
 import { PromptTemplate } from '../../types';
 
-export const baseNarrativeTemplate: PromptTemplate = (context: any) => {
+export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
     worldName,
     worldDescription,
@@ -25,7 +25,7 @@ Tone: ${tone}
 World Attributes: ${JSON.stringify(attributes)}
 
 ${narrativeContext ? `Previous Context:
-${narrativeContext.recentSegments?.map((seg: any) => seg.content).join('\n\n')}
+${narrativeContext.recentSegments?.map((seg: any) => seg.content).join('\n\n')} // eslint-disable-line @typescript-eslint/no-explicit-any
 
 Current Location: ${narrativeContext.currentLocation || 'Unknown'}
 Current Situation: ${narrativeContext.currentSituation || 'Continuing the story'}` : ''}

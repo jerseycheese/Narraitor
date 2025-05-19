@@ -1,9 +1,8 @@
 import { PromptTemplate } from '../../types';
 
-export const sceneTemplate: PromptTemplate = (context: any) => {
+export const sceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
     worldName,
-    worldDescription,
     genre,
     tone,
     narrativeContext,

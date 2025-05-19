@@ -14,14 +14,14 @@ class NarrativeTemplateManager extends PromptTemplateManager {
     });
   }
 
-  getTemplate(id: string): ((context: any) => string) {
+  getTemplate(id: string): ((context: any) => string) { // eslint-disable-line @typescript-eslint/no-explicit-any
     const template = super.getTemplate(id);
     if (!template) {
       throw new Error(`Template with id '${id}' not found`);
     }
     
     // Return the generate function if it exists, otherwise return a function that returns content
-    return template.generate || ((context: any) => template.content);
+    return template.generate || (() => template.content);
   }
 }
 

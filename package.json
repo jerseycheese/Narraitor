@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
+    "@octokit/rest": "^21.1.1",
     "csv-parse": "^5.6.0",
     "csv-stringify": "^6.5.2",
     "glob": "^11.0.2",

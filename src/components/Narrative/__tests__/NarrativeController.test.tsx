@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NarrativeController } from '../NarrativeController';
-import { useNarrativeStore } from '@/state/narrativeStore';
+import { narrativeStore } from '@/state/narrativeStore';
 import { useWorldStore } from '@/state/worldStore';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 
@@ -29,7 +29,7 @@ describe('NarrativeController', () => {
       currentWorldId: 'world-123'
     });
 
-    (useNarrativeStore as unknown as jest.Mock).mockReturnValue({
+    (narrativeStore as unknown as jest.Mock).mockReturnValue({
       segments: [],
       addSegment: jest.fn(),
       setError: jest.fn(),
