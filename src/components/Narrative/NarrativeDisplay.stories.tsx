@@ -3,7 +3,7 @@ import { NarrativeDisplay } from './NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
-  title: 'Components/Narrative/NarrativeDisplay',
+  title: 'Narrative/NarrativeDisplay',
   component: NarrativeDisplay,
   parameters: {
     layout: 'padded',

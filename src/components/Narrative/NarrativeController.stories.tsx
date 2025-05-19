@@ -29,7 +29,7 @@ jest.mock('@/lib/ai/narrativeGenerator', () => ({
 }));
 
 const meta = {
-  title: 'Components/Narrative/NarrativeController',
+  title: 'Narrative/NarrativeController',
   component: NarrativeController,
   parameters: {
     layout: 'padded',

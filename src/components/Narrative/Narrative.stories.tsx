@@ -5,7 +5,7 @@ import { NarrativeDisplay } from './NarrativeDisplay';
 import { NarrativeHistory } from './NarrativeHistory';
 
 const meta = {
-  title: 'Components/Narrative',
+  title: 'Narrative',
   parameters: {
     layout: 'fullscreen',
     docs: {
