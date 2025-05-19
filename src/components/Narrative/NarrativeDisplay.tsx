@@ -79,7 +79,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
       {segment.metadata?.location && (
         <div className="mt-4 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            📍 {segment.metadata.location}
+            {segment.metadata.location}
           </p>
         </div>
       )}
