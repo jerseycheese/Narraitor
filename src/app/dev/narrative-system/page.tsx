@@ -235,7 +235,7 @@ export default function NarrativeSystemHarness() {
               onClick={() => handleChoiceSelected(choice.id)}
             >
               <div className="font-semibold">{choice.text}</div>
-              <div className="text-sm text-gray-600 mt-2">{choice.consequence}</div>
+              <div className="text-sm mt-2">{choice.consequence}</div>
             </button>
           ))}
         </div>
