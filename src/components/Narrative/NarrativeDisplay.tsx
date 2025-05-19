@@ -41,25 +41,47 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const getSegmentStyles = (type: string) => {
     switch (type) {
       case 'dialogue':
-        return 'italic text-left pl-8 pr-4';
+        return {
+          container: 'border-l-4 border-blue-400 bg-blue-50 dark:bg-blue-900/20',
+          text: 'italic text-gray-700 dark:text-gray-300',
+          label: 'text-xs uppercase text-blue-600 dark:text-blue-400 font-semibold mb-2'
+        };
       case 'action':
-        return 'font-medium text-center';
+        return {
+          container: 'border-2 border-orange-300 bg-orange-50 dark:bg-orange-900/20',
+          text: 'font-medium text-gray-800 dark:text-gray-200',
+          label: 'text-xs uppercase text-orange-600 dark:text-orange-400 font-semibold mb-2'
+        };
       case 'transition':
-        return 'text-muted-foreground text-sm';
+        return {
+          container: 'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600',
+          text: 'text-gray-600 dark:text-gray-400 text-sm italic',
+          label: 'text-xs uppercase text-gray-500 font-semibold mb-2'
+        };
+      case 'scene':
       default:
-        return '';
+        return {
+          container: 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700',
+          text: 'text-gray-800 dark:text-gray-200',
+          label: 'text-xs uppercase text-gray-600 dark:text-gray-400 font-semibold mb-2'
+        };
     }
   };
 
+  const styles = getSegmentStyles(segment.type);
+
   return (
-    <div className={`narrative-segment p-6 rounded-lg bg-card ${getSegmentStyles(segment.type)}`}>
-      <p className="text-lg leading-relaxed whitespace-pre-wrap">
+    <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
+      <p className={styles.label}>{segment.type}</p>
+      <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
         {segment.content}
       </p>
       {segment.metadata?.location && (
-        <p className="text-sm text-muted-foreground mt-4">
-          Location: {segment.metadata.location}
-        </p>
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            📍 {segment.metadata.location}
+          </p>
+        </div>
       )}
     </div>
   );
