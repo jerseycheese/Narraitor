@@ -43,14 +43,21 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   selectedChoiceId,
 }) => {
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [generation, setGeneration] = React.useState(0);
+
+  React.useEffect(() => {
+    console.log(`[GameSessionActive] Session ID: ${sessionId}, WorldID: ${worldId}`);
+  }, [sessionId, worldId]);
 
   const handleNarrativeGenerated = (segment: NarrativeSegment) => {
-    console.log('Narrative generated:', segment);
+    console.log(`[GameSessionActive] Narrative generated for session ${sessionId}:`, segment);
     setIsGenerating(false);
   };
 
   const handleChoiceSelected = (choiceId: string) => {
+    console.log(`[GameSessionActive] Choice selected: ${choiceId}`);
     setIsGenerating(true);
+    setGeneration(prev => prev + 1);  // Increment generation counter
     onChoiceSelected(choiceId);
   };
 
