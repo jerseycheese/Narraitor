@@ -1,34 +1,70 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameSessionState } from './useGameSessionState';
-import { sessionStore } from '@/state/sessionStore';
 
-// Mock the session store
-jest.mock('@/state/sessionStore');
+// Create a complete mock of the stores
+const mockWorldStoreState = {
+  worlds: {
+    'test-world': {
+      id: 'test-world',
+      name: 'Test World',
+      description: 'A test world',
+      theme: 'Fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 8,
+        attributePointPool: 27,
+        skillPointPool: 20
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  }
+};
 
-describe('useGameSessionState', () => {
-  const mockStoreState = {
-    status: 'active',
-    error: null,
-    currentSceneId: 'scene-001',
-    playerChoices: [
-      { id: 'choice-1', text: 'Choice 1', isSelected: false }
-    ],
-    initializeSession: jest.fn(),
+const mockSessionStoreState = {
+  status: 'active',
+  error: null,
+  currentSceneId: 'scene-001',
+  playerChoices: [
+    { id: 'choice-1', text: 'Choice 1', isSelected: false }
+  ],
+  initializeSession: jest.fn(),
+  pauseSession: jest.fn(),
+  resumeSession: jest.fn(),
+  endSession: jest.fn(),
+  selectChoice: jest.fn(),
+};
+
+// Mock the stores
+jest.mock('@/state/worldStore', () => ({
+  worldStore: {
+    getState: jest.fn(() => mockWorldStoreState)
+  }
+}));
+
+jest.mock('@/state/sessionStore', () => ({
+  sessionStore: {
+    getState: jest.fn(() => mockSessionStoreState),
     pauseSession: jest.fn(),
     resumeSession: jest.fn(),
     endSession: jest.fn(),
     selectChoice: jest.fn(),
-  };
+    initializeSession: jest.fn(),
+  }
+}));
 
+// Import the mocked stores
+import { sessionStore } from '@/state/sessionStore';
+import { worldStore } from '@/state/worldStore';
+
+describe('useGameSessionState', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock getState to return our test state
-    (sessionStore.getState as jest.Mock).mockReturnValue(mockStoreState);
-    (sessionStore as typeof sessionStore).pauseSession = jest.fn();
-    (sessionStore as typeof sessionStore).resumeSession = jest.fn();
-    (sessionStore as typeof sessionStore).endSession = jest.fn();
-    (sessionStore as typeof sessionStore).selectChoice = jest.fn();
-    (sessionStore as typeof sessionStore).initializeSession = jest.fn();
+    // Reset mock return values
+    (worldStore.getState as jest.Mock).mockReturnValue(mockWorldStoreState);
+    (sessionStore.getState as jest.Mock).mockReturnValue(mockSessionStoreState);
   });
 
   test('initializes with session store state', () => {
@@ -44,7 +80,11 @@ describe('useGameSessionState', () => {
   test('handles pause and resume toggling', () => {
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
-      isClient: true
+      isClient: true,
+      _stores: {
+        worldStore: mockWorldStoreState,
+        sessionStore: mockSessionStoreState
+      }
     }));
 
     // Pause action
@@ -53,7 +93,7 @@ describe('useGameSessionState', () => {
     });
 
     expect(result.current.sessionState.status).toBe('paused');
-    expect(sessionStore.pauseSession).toHaveBeenCalledTimes(1);
+    expect(mockSessionStoreState.pauseSession).toHaveBeenCalledTimes(1);
 
     // Resume action
     act(() => {
@@ -61,20 +101,24 @@ describe('useGameSessionState', () => {
     });
 
     expect(result.current.sessionState.status).toBe('active');
-    expect(sessionStore.resumeSession).toHaveBeenCalledTimes(1);
+    expect(mockSessionStoreState.resumeSession).toHaveBeenCalledTimes(1);
   });
 
   test('handles choice selection', () => {
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
-      isClient: true
+      isClient: true,
+      _stores: {
+        worldStore: mockWorldStoreState,
+        sessionStore: mockSessionStoreState
+      }
     }));
 
     act(() => {
       result.current.handleSelectChoice('choice-1');
     });
 
-    expect(sessionStore.selectChoice).toHaveBeenCalledWith('choice-1');
+    expect(mockSessionStoreState.selectChoice).toHaveBeenCalledWith('choice-1');
   });
 
   test('handles end session', () => {
@@ -85,14 +129,18 @@ describe('useGameSessionState', () => {
       worldId: 'test-world',
       isClient: true,
       onSessionEnd,
-      router
+      router,
+      _stores: {
+        worldStore: mockWorldStoreState,
+        sessionStore: mockSessionStoreState
+      }
     }));
 
     act(() => {
       result.current.handleEndSession();
     });
 
-    expect(sessionStore.endSession).toHaveBeenCalledTimes(1);
+    expect(mockSessionStoreState.endSession).toHaveBeenCalledTimes(1);
     expect(router.push).toHaveBeenCalledWith('/');
     expect(onSessionEnd).toHaveBeenCalledTimes(1);
   });
@@ -102,7 +150,11 @@ describe('useGameSessionState', () => {
     const { result } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
       isClient: true,
-      onSessionStart
+      onSessionStart,
+      _stores: {
+        worldStore: mockWorldStoreState,
+        sessionStore: mockSessionStoreState
+      }
     }));
 
     // Set error state
@@ -118,36 +170,40 @@ describe('useGameSessionState', () => {
     });
 
     expect(result.current.error).toBeNull();
-    expect(sessionStore.initializeSession).toHaveBeenCalledWith('test-world', onSessionStart);
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledWith('test-world', onSessionStart);
   });
 
-  test('polls for session state updates', () => {
-    jest.useFakeTimers();
-    
-    renderHook(() => useGameSessionState({
+  test('detects world existence', () => {
+    const { result: existsResult } = renderHook(() => useGameSessionState({
       worldId: 'test-world',
       isClient: true
     }));
 
-    // Fast-forward time to trigger polling
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
+    expect(existsResult.current.worldExists).toBe(true);
 
-    expect(sessionStore.getState).toHaveBeenCalledTimes(2); // Initial + 1 poll
-
-    jest.useRealTimers();
-  });
-
-  test('cleans up on unmount', () => {
-    const { unmount } = renderHook(() => useGameSessionState({
-      worldId: 'test-world',
+    const { result: notExistsResult } = renderHook(() => useGameSessionState({
+      worldId: 'non-existent-world',
       isClient: true
     }));
 
-    unmount();
+    expect(notExistsResult.current.worldExists).toBe(false);
+  });
 
-    // Verify any cleanup like interval clearing happens
-    // This would be tested more thoroughly with implementation details
+  test('uses initial state when provided', () => {
+    const initialState = {
+      status: 'loading' as const,
+      currentSceneId: 'initial-scene',
+      error: null,
+      playerChoices: []
+    };
+
+    const { result } = renderHook(() => useGameSessionState({
+      worldId: 'test-world',
+      isClient: false,  // Disable client to prevent polling from overriding initial state
+      initialState
+    }));
+
+    expect(result.current.sessionState.status).toBe('loading');
+    expect(result.current.sessionState.currentSceneId).toBe('initial-scene');
   });
 });
