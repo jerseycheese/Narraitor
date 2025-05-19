@@ -25,10 +25,14 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
     setSegments(existingSegments);
   }, [sessionId, getSessionSegments]);
 
+  // Track if we've already generated for this trigger
+  const [hasGenerated, setHasGenerated] = React.useState(false);
+  
   // Simulate narrative generation
   useEffect(() => {
-    if (triggerGeneration) {
+    if (triggerGeneration && !hasGenerated) {
       setIsLoading(true);
+      setHasGenerated(true);
       
       // Simulate async generation
       const timer = setTimeout(() => {
@@ -55,7 +59,14 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
       
       return () => clearTimeout(timer);
     }
-  }, [triggerGeneration, worldId, sessionId, choiceId, segments.length, onNarrativeGenerated]);
+  }, [triggerGeneration, worldId, sessionId, choiceId, hasGenerated, onNarrativeGenerated]);
+  
+  // Reset generation flag when trigger changes to false
+  useEffect(() => {
+    if (!triggerGeneration) {
+      setHasGenerated(false);
+    }
+  }, [triggerGeneration]);
 
   // Import NarrativeHistory here to avoid circular dependencies
   const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
@@ -278,16 +289,24 @@ export const ManualTrigger: Story = {
   },
   render: (args) => {
     const [trigger, setTrigger] = React.useState(false);
+    const [key, setKey] = React.useState(0);
+    
+    const handleGenerate = () => {
+      setKey(prev => prev + 1); // Force new component instance
+      setTrigger(true);
+      // Reset trigger after a delay to allow for subsequent generations
+      setTimeout(() => setTrigger(false), 100);
+    };
     
     return (
       <div className="space-y-4">
         <button
-          onClick={() => setTrigger(true)}
+          onClick={handleGenerate}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
-          Generate Narrative
+          Generate Next Narrative
         </button>
-        <MockNarrativeController {...args} triggerGeneration={trigger} />
+        <MockNarrativeController key={key} {...args} triggerGeneration={trigger} />
       </div>
     );
   },
@@ -302,5 +321,86 @@ export const WithCallback: Story = {
     onNarrativeGenerated: (segment: NarrativeSegment) => {
       console.log('Narrative generated:', segment);
     },
+  },
+};
+
+// Continuous generation demo (for testing purposes only)
+export const ContinuousGeneration: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-1',
+    triggerGeneration: false,
+  },
+  render: (args) => {
+    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
+    const [isGenerating, setIsGenerating] = React.useState(false);
+    const intervalRef = React.useRef<NodeJS.Timeout>();
+    
+    const startGeneration = () => {
+      setIsGenerating(true);
+      let counter = 0;
+      
+      intervalRef.current = setInterval(() => {
+        const newSegment: NarrativeSegment = {
+          id: `seg-${Date.now()}`,
+          content: `Generated segment #${++counter}: The story continues with new adventures...`,
+          type: 'scene',
+          sessionId: args.sessionId,
+          worldId: args.worldId,
+          timestamp: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        setSegments(prev => [...prev, newSegment]);
+        
+        // Stop after 5 segments to prevent infinite generation
+        if (counter >= 5) {
+          stopGeneration();
+        }
+      }, 2000);
+    };
+    
+    const stopGeneration = () => {
+      setIsGenerating(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+    
+    React.useEffect(() => {
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }, []);
+    
+    const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
+    
+    return (
+      <div className="space-y-4">
+        <div className="flex gap-4">
+          <button
+            onClick={startGeneration}
+            disabled={isGenerating}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+          >
+            Start Continuous Generation
+          </button>
+          <button
+            onClick={stopGeneration}
+            disabled={!isGenerating}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+          >
+            Stop Generation
+          </button>
+          <span className="text-sm text-gray-600 self-center">
+            {isGenerating ? 'Generating...' : `${segments.length} segments generated`}
+          </span>
+        </div>
+        <NarrativeHistory segments={segments} isLoading={isGenerating} />
+      </div>
+    );
   },
 };
