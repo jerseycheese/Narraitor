@@ -131,16 +131,44 @@ export default function NarrativeSystemHarness() {
   };
 
   const handleClearSession = () => {
+    // Reset the narrative store
     narrativeStore.getState().reset();
+    
+    // Clear local state
     setSegments([]);
     setSelectedChoice(null);
+    
+    // Force a component refresh
+    if (showController) {
+      // Toggle controller off and on to force a fresh mount
+      setShowController(false);
+      setTimeout(() => setShowController(true), 50);
+    }
+    
+    console.log('Session cleared');
   };
 
   const handleNewSession = () => {
     const newSessionId = `session-${Date.now()}`;
+    
+    // Update session ID
     setSessionId(newSessionId);
+    
+    // Clear local state
     setSegments([]);
     setSelectedChoice(null);
+    
+    // Reset trigger to enable initial narrative generation
+    setTriggerGeneration(true);
+    setTimeout(() => setTriggerGeneration(false), 100);
+    
+    // Force a component refresh if in controller mode
+    if (showController) {
+      setShowController(false);
+      setTimeout(() => setShowController(true), 50);
+    }
+    
+    console.log(`New session created: ${newSessionId}`);
   };
 
   if (!isClient) {

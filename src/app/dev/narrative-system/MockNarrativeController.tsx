@@ -25,10 +25,14 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
   const [error, setError] = useState<string | null>(null);
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(new Set());
 
-  // Load existing segments on mount
+  // Load existing segments on mount and when sessionId changes
   useEffect(() => {
     const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
     setSegments(existingSegments);
+    
+    // Reset processed choices when session changes
+    setProcessedChoices(new Set());
+    console.log(`Loaded ${existingSegments.length} segments for session ${sessionId}`);
   }, [sessionId]);
 
   // Initial narrative generation
