@@ -1,20 +1,37 @@
 #!/bin/bash
 
-# Helper script to enable session-level auto-accept in Claude Code
-# This simulates the "Yes, and don't ask again this session" option
+# This script enables auto-accept for common operations in Claude Code
+# Usage: ./scripts/enable-auto-accept.sh
 
-echo "Enabling session-level auto-accept for Claude Code..."
+# Create directory if it doesn't exist
+mkdir -p .claude
 
-# Create or update the .clauderc file with auto-accept settings
-cat > .clauderc << EOF
+# Create settings file with permissions
+cat > .claude/settings.local.json << EOL
 {
-  "session": {
-    "autoAcceptEdits": true,
-    "autoApproveCommands": true,
-    "autoCreateFiles": true
-  }
+  "allowedTools": [
+    "Bash(npm run build)",
+    "Bash(npm run test*)",
+    "Bash(git*)",
+    "Edit(*)",
+    "Write(*)",
+    "WebFetch(*)",
+    "Grep(*)",
+    "LS(*)",
+    "Read(*)"
+  ]
 }
-EOF
+EOL
 
-echo "Session-level auto-accept enabled. The .clauderc file has been created/updated."
-echo "This setting should apply to all operations in the current Claude Code session."
+echo "✅ Auto-accept enabled for common operations"
+echo "Settings saved to .claude/settings.local.json"
+echo ""
+echo "The following permissions are now auto-accepted:"
+echo "- Executing npm build and test commands"
+echo "- Running git commands"
+echo "- Reading and listing files"
+echo "- Editing and creating files"
+echo "- Searching file contents"
+echo "- Fetching web content"
+echo ""
+echo "To disable, delete .claude/settings.local.json or edit it to remove specific permissions."

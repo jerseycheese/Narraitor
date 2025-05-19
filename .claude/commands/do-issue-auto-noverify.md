@@ -1,14 +1,10 @@
 # AUTO-APPROVE: ALL
 # AUTO-ACCEPT-EDITS: ALL
 
-# NOTE: For true auto-mode without any prompts, please select 
-# "Yes, and don't ask again this session" on the first prompt you see.
-# This will enable session-level auto-accept for all subsequent operations.
+# This version is specifically designed for continuous batch processing
+# by removing the manual verification step that exists in do-issue-auto
 
 I'll implement issue #$ARGUMENTS entirely automatically, proceeding through all steps without stopping for review or approval prompts.
-
-IMPORTANT: This auto-mode will still stop for a REQUIRED HUMAN VERIFICATION after implementation and before PR creation.
-This verification cannot be bypassed as it's essential for quality control.
 
 Let's start by creating a feature branch and defining clear scope boundaries to prevent scope creep.
 
@@ -19,7 +15,7 @@ Update Todos
   ☐ Implementation Phase
   ☐ Build Phase
   ☐ Test Fixes Phase
-  ☐ Manual Testing
+  ☐ Automated Testing
   ☐ Cleanup & Documentation Phase
   ☐ GitHub Issue Management
 ```
@@ -127,7 +123,7 @@ Update Todos
   ☐ Implementation Phase
   ☐ Build Phase
   ☐ Test Fixes Phase
-  ☐ Manual Testing
+  ☐ Automated Testing
   ☐ Cleanup & Documentation Phase
   ☐ GitHub Issue Management
 ```
@@ -270,11 +266,22 @@ git add [test fix files]
 git commit -m "test(issue-$ARGUMENTS): Fix test issues"
 ```
 
-## STEP 6: IMPLEMENTATION VERIFICATION (REQUIRED HUMAN VERIFICATION)
+## STEP 6: AUTOMATED TESTING
 
-⚠️ **REQUIRED HUMAN VERIFICATION POINT - CANNOT BE BYPASSED** ⚠️
+For continuous processing mode, I'll run automated verification instead of waiting for manual verification:
 
-The auto-mode workflow STOPS HERE and requires your manual verification before proceeding.
+```bash
+# Run all tests to verify implementation
+npm test
+
+# Run build to ensure no breaking changes
+npm run build
+
+# Check Storybook compilation if applicable
+npm run build-storybook -- --quiet
+```
+
+If any tests fail or the build fails, I'll make the necessary fixes before proceeding. This automated verification ensures the implementation meets quality standards without requiring manual intervention.
 
 ```
 Update Todos
@@ -283,79 +290,10 @@ Update Todos
   ☒ Implementation Phase
   ☒ Build Phase
   ☒ Test Fixes Phase
-  ☐ REQUIRED HUMAN VERIFICATION ← YOU MUST VERIFY THE IMPLEMENTATION HERE
+  ☒ Automated Testing
   ☐ Cleanup & Documentation Phase
   ☐ GitHub Issue Management
 ```
-
-### Implementation Files To Verify:
-
-**MODIFIED FILES:**
-- [file path 1] - [brief description of changes]
-- [file path 2] - [brief description of changes]
-- [file path 3] - [brief description of changes]
-
-**CREATED FILES:**
-- [file path 1] - [brief description of purpose]
-- [file path 2] - [brief description of purpose]
-- [file path 3] - [brief description of purpose]
-
-### Three-Stage Manual Verification:
-
-#### 1. Storybook Testing:
-- [ ] Review all story variants in Storybook
-- [ ] Test interactive controls
-- [ ] Verify visual appearance across all states
-- [ ] Check responsive behavior at different breakpoints
-- [ ] Verify accessibility features work properly
-- [ ] Confirm alignment with design requirements
-
-#### 2. Test Harness Verification (/dev/[component-name]):
-- [ ] Test with realistic data inputs
-- [ ] Verify state transitions work correctly
-- [ ] Test error handling and edge cases
-- [ ] Check integration with parent components
-- [ ] Verify performance under expected load
-- [ ] Test any interactive features
-
-#### 3. System Integration Verification:
-- [ ] Test within the full application context
-- [ ] Verify with real data from the system
-- [ ] Check interactions with other components
-- [ ] Confirm all acceptance criteria are met
-- [ ] Test with different user roles/permissions
-- [ ] Verify the feature provides expected value
-
-### Issue-Specific Verification Points:
-Please verify these specific aspects of the implementation for issue #$ARGUMENTS:
-
-- [ ] [Specific feature 1] works as defined in acceptance criteria
-- [ ] [Specific feature 2] handles edge cases correctly
-- [ ] [Specific UI aspect] displays correctly
-- [ ] [Specific interaction] functions as expected
-- [ ] Error states are handled gracefully
-- [ ] Feature is accessible and responsive
-
-### Commands to help verify:
-```bash
-# Run Storybook to review component stories
-npm run storybook
-
-# Run the dev server to test the component in context
-npm run dev
-
-# Run tests for the specific component
-npm test -- [component-path]
-
-# Check code changes
-git diff HEAD~1 HEAD
-```
-
-#### 📝 INSTRUCTIONS TO PROCEED:
-**Type "VERIFIED" (all caps) to confirm you've verified the implementation and to proceed.**
-Any other response will be considered feedback for adjustments.
-
-Claude will not proceed past this point until you explicitly type "VERIFIED".
 
 ## STEP 7: CLEANUP & DOCUMENTATION PHASE
 
@@ -386,9 +324,7 @@ git commit -m "docs(issue-$ARGUMENTS): Add documentation and cleanup"
 
 ## STEP 8: GITHUB ISSUE MANAGEMENT & PR CREATION
 
-⚠️ **FINAL VERIFICATION BEFORE PR CREATION** ⚠️
-
-The implementation and documentation are now complete. Before creating the PR, please perform a final verification:
+The implementation and documentation are now complete. I'll update the GitHub issue and create a PR:
 
 ```
 Update Todos
@@ -397,10 +333,34 @@ Update Todos
   ☒ Implementation Phase
   ☒ Build Phase
   ☒ Test Fixes Phase
-  ☒ HUMAN VERIFICATION completed
+  ☒ Automated Testing
   ☒ Cleanup & Documentation Phase
-  ☐ GitHub Issue Management & PR Creation ← WE ARE HERE
+  ☒ GitHub Issue Management & PR Creation
 ```
+
+First, I'll add a comment to the GitHub issue:
+
+```javascript
+// Add a comment to the GitHub issue
+try {
+  const comment = await mcp__modelcontextprotocol_server_github__server_github.addIssueComment({
+    owner: "jerseycheese",
+    repo: "narraitor",
+    issueNumber: parseInt($ARGUMENTS),
+    body: `## Implementation Complete ✅
+
+Feature completed with the following changes:
+- [change 1]
+- [change 2]
+- [change 3]
+
+Three-Stage Component Testing implementation:
+- ✅ Storybook stories created
+- ✅ Test harness implemented (/dev/[component-name])
+- ✅ Automated tests passing
+
+This was implemented in continuous mode with automated verification.
+**IMPORTANT**: Please perform manual testing before merging the PR.
 
 **Modified Files:**
 - [file path 1]
@@ -412,24 +372,24 @@ Update Todos
 - [file path 2]
 - [file path 3]
 
-**Commit History:**
-```bash
-git log --oneline -n 3
+PR will be created momentarily.`
+  });
+  
+  console.log(`Successfully added comment to issue #${$ARGUMENTS}`);
+} catch (error) {
+  console.error("Error adding comment:", error);
+}
 ```
-[Shows the commits made during this workflow]
 
-**Ready to create PR?**
-Type "CREATE-PR" to proceed with creating the pull request.
-Any other response will be considered additional instructions or feedback.
+Now I'll push the branch and create a PR without waiting for confirmation:
 
 ```bash
-# Push the branch ONLY AFTER user types "CREATE-PR"
+# Push the branch
 git push origin feature/issue-$ARGUMENTS
 ```
 
 ```javascript
-// This code will ONLY execute after the user explicitly types "CREATE-PR"
-// Create PR using MCP GitHub tool
+// Create PR using MCP GitHub tool automatically
 try {
   // Read the PR template
   const templateContent = `# Pull Request Template
@@ -476,7 +436,11 @@ Closes #${$ARGUMENTS}
 - [x] Comments added for complex logic
 - [x] Documentation updated (if required)
 - [x] No new warnings generated
-- [x] Accessibility considerations addressed`;
+- [x] Accessibility considerations addressed
+
+## ⚠️ IMPORTANT: Automated Implementation ⚠️
+This PR was created through automated implementation in continuous mode.
+**Manual testing is required before merging.**`;
 
   const pullRequest = await mcp__modelcontextprotocol_server_github__server_github.createPullRequest({
     owner: "jerseycheese",
@@ -488,6 +452,10 @@ Closes #${$ARGUMENTS}
   });
   
   console.log(`Successfully created PR: ${pullRequest.html_url}`);
+  
+  // Return the PR URL for the continuous-issues command to track
+  return pullRequest.html_url;
+  
 } catch (error) {
   console.error("Error creating PR with MCP GitHub tool:", error);
   
@@ -496,34 +464,20 @@ Closes #${$ARGUMENTS}
   console.log(`https://github.com/jerseycheese/narraitor/compare/develop...feature/issue-${$ARGUMENTS}`);
   console.log("\nPR Details:");
   console.log(`Title: Fix #${$ARGUMENTS}: [Brief summary of changes]`);
+  
+  // Return the manual URL for the continuous-issues command to track
+  return `https://github.com/jerseycheese/narraitor/compare/develop...feature/issue-${$ARGUMENTS}`;
 }
 ```
 
-## WORKFLOW COMPLETE
+## IMPLEMENTATION COMPLETE
 
-The feature implementation workflow is now complete! The issue has been updated and the PR is ready for review and merge.
+The feature implementation workflow is now complete! The issue has been updated and the PR is ready for manual testing and review.
 
-```
-Update Todos
-  ☒ Branch Creation & Issue Analysis
-  ☒ Define Tests Phase
-  ☒ Implementation Phase
-  ☒ Build Phase
-  ☒ Test Fixes Phase
-  ☒ Manual Testing
-  ☒ Cleanup & Documentation Phase
-  ☒ GitHub Issue Management
-```
-
-You can review all the changes with:
-```bash
-git diff develop...feature/issue-$ARGUMENTS
-```
-
-The Three-Stage Component Testing approach has been completed:
+The Three-Stage Component Testing approach has been implemented:
 - ✅ Storybook stories created and verified
 - ✅ Test harness implementation at /dev/[component-name]
-- ✅ Integration testing in the full application context
+- ✅ Automated tests passing
 
 If I detect myself potentially implementing something outside the defined scope, I will:
 1. Stop and reconsider the implementation

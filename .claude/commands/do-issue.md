@@ -6,15 +6,17 @@ Let's start the workflow:
 
 ```
 Update Todos
-  ☐ Create feature branch for issue #$ARGUMENTS
-  ☐ Analyze issue #$ARGUMENTS
-  ☐ Create tests based on issue analysis
-  ☐ Implement functionality based on tests
-  ☐ Create documentation
-  ☐ Final verification and PR creation
+  ☐ Branch Creation & Issue Analysis
+  ☐ Define Tests Phase
+  ☐ Implementation Phase
+  ☐ Build Phase
+  ☐ Test Fixes Phase
+  ☐ Manual Testing
+  ☐ Cleanup & Documentation Phase
+  ☐ GitHub Issue Management
 ```
 
-## STEP 0: CREATE FEATURE BRANCH
+## STEP 1: BRANCH CREATION & ISSUE ANALYSIS
 
 First, I'll use our helper script to manage the feature branch creation:
 
@@ -33,9 +35,7 @@ This script will:
 
 This approach gives us flexibility in handling existing branches. All changes will be made on the feature branch, allowing easy rollback if needed.
 
-## STEP 1: ANALYZE ISSUE
-
-I'll analyze GitHub issue #$ARGUMENTS from the jerseycheese/narraitor repository.
+Next, I'll analyze GitHub issue #$ARGUMENTS from the jerseycheese/narraitor repository.
 
 First, let me fetch the issue details using the GitHub API:
 ```bash
@@ -103,20 +103,22 @@ Focus on key acceptance criteria with targeted tests:
 
 ```
 Update Todos
-  ☒ Create feature branch for issue #$ARGUMENTS
-  ☒ Analyze issue #$ARGUMENTS
-  ☐ Create tests for [specific feature from analysis]
-  ☐ Implement [specific functionality from analysis]
-  ☐ Create documentation for [specific feature from analysis]
-  ☐ Final verification and PR creation
+  ☒ Branch Creation & Issue Analysis
+  ☐ Define Tests Phase
+  ☐ Implementation Phase
+  ☐ Build Phase
+  ☐ Test Fixes Phase
+  ☐ Manual Testing
+  ☐ Cleanup & Documentation Phase
+  ☐ GitHub Issue Management
 ```
 
 ## REVIEW POINT 1:
-I've completed the analysis of issue #$ARGUMENTS. 
+I've completed the Branch Creation & Issue Analysis phase for issue #$ARGUMENTS. 
 
-Type "C" to continue with TDD implementation, or provide feedback if you want me to adjust anything.
+Type "C" to continue with the Define Tests Phase, or provide feedback if you want me to adjust anything.
 
-## STEP 2: CREATE TESTS
+## STEP 2: DEFINE TESTS PHASE
 
 I'll now write focused tests that directly verify the acceptance criteria:
 
@@ -183,7 +185,7 @@ git add [test file 1] [test file 2] [test file 3]
 git commit -m "test(issue-$ARGUMENTS): Add tests for [feature description]"
 ```
 
-## STEP 3: TDD IMPLEMENTATION
+## STEP 3: IMPLEMENTATION PHASE
 
 I'll now implement the feature to make the tests pass:
 1. Implement the minimum code needed to pass tests (green phase)
@@ -208,7 +210,7 @@ git commit -m "feat(issue-$ARGUMENTS): Implement [feature description]"
 ```
 
 ## REVIEW POINT 2:
-I've completed the TDD implementation for issue #$ARGUMENTS.
+I've completed the Implementation Phase for issue #$ARGUMENTS.
 
 ### IMPLEMENTATION VERIFICATION
 - [ ] All Github issue Acceptance Criteria is complete
@@ -239,23 +241,86 @@ I've completed the TDD implementation for issue #$ARGUMENTS.
 - [file path 2]
 - [file path 3]
 
-Type "C" to continue with documentation, or provide feedback if you want me to adjust anything.
+Type "C" to continue with the Build Phase, or provide feedback if you want me to adjust anything.
 
-## STEP 4: MANUAL VERIFICATION (IMPORTANT)
+## STEP 4: BUILD PHASE
 
-This is a critical manual verification point to review the implementation before proceeding to documentation and PR creation. 
+I'll now verify the build success for the implementation:
+
+```bash
+# Run build to check for any TypeScript errors or warnings
+npm run build
+```
+
+I'll address any build issues that arise:
+
+- [ ] Fix TypeScript errors
+- [ ] Resolve import/export issues
+- [ ] Address any warnings
+
+[Build results and fixes will be provided here]
+
+Now I'll commit any build fixes:
+
+```bash
+# Commit build fixes if needed
+git add [build fix files]
+git commit -m "fix(issue-$ARGUMENTS): Fix build issues"
+```
+
+## STEP 5: TEST FIXES PHASE
+
+I'll now run tests to ensure everything passes:
+
+```bash
+# Run tests for the implemented component
+npm test [component test path]
+```
+
+I'll address any test failures:
+
+- [ ] Fix failing tests
+- [ ] Verify test coverage
+- [ ] Ensure all edge cases are covered
+
+[Test results and fixes will be provided here]
+
+Now I'll commit any test fixes:
+
+```bash
+# Commit test fixes if needed
+git add [test fix files]
+git commit -m "test(issue-$ARGUMENTS): Fix test issues"
+```
+
+```
+Update Todos
+  ☒ Branch Creation & Issue Analysis
+  ☒ Define Tests Phase
+  ☒ Implementation Phase
+  ☒ Build Phase
+  ☒ Test Fixes Phase
+  ☐ Manual Testing
+  ☐ Cleanup & Documentation Phase
+  ☐ GitHub Issue Management
+```
+
+## STEP 6: MANUAL TESTING
+
+This is a critical manual verification point to review the implementation before proceeding to the cleanup and documentation phase. 
 
 ⚠️ **IMPORTANT: The workflow stops here until you complete your review**
 
 ```
 Update Todos
-  ☒ Create feature branch for issue #$ARGUMENTS
-  ☒ Analyze issue #$ARGUMENTS
-  ☒ Create tests for [specific feature from analysis]
-  ☒ Implement [specific functionality from analysis]
-  ☐ Manual verification of implementation ← WE ARE HERE (WAITING FOR YOUR REVIEW)
-  ☐ Create documentation for [specific feature from analysis]
-  ☐ Final verification and PR creation
+  ☒ Branch Creation & Issue Analysis
+  ☒ Define Tests Phase
+  ☒ Implementation Phase
+  ☒ Build Phase
+  ☒ Test Fixes Phase
+  ☐ Manual Testing ← WE ARE HERE (WAITING FOR YOUR REVIEW)
+  ☐ Cleanup & Documentation Phase
+  ☐ GitHub Issue Management
 ```
 
 ### Implementation Files To Verify:
@@ -323,29 +388,53 @@ git diff HEAD~1 HEAD
 
 Claude will wait here for your verification. Please carefully review the implementation and tests.
 
-**Type "C" to continue with documentation and PR creation**, or provide feedback if you want me to adjust anything.
+**Type "C" to continue with Cleanup & Documentation phase**, or provide feedback if you want me to adjust anything.
 
 [Waiting for your response...]
 
-## STEP 4: CREATE DOCUMENTATION
+## STEP 7: CLEANUP & DOCUMENTATION PHASE
 
-I'll now create documentation for the implemented feature:
+I'll now clean up and document the implemented feature:
+
+1. **Cleanup**:
+   - Remove debug statements (console.log, etc.)
+   - Ensure code comments are clear and necessary
+   - Check for unused imports or variables
+   - Verify code formatting
+
+2. **Documentation**:
+   - Update component JSDoc comments
+   - Document props and interfaces
+   - Update README if needed
+   - Ensure Storybook stories are well-documented
 
 [Documentation details will be provided here]
 
-Now I'll commit the specific documentation files:
+Now I'll commit the cleanup and documentation changes:
 
 ```bash
 # List of files to commit
-git status --porcelain | grep "^[AM].*md"
+git status --porcelain | grep "^[AM].*md\|^[AM].*ts\|^[AM].*tsx"
 
-# Commit only the documentation files - you'll need to specify the actual files
+# Commit only the documentation files
 git add [documentation file 1] [documentation file 2]
-git commit -m "docs(issue-$ARGUMENTS): Add documentation for [feature description]"
+git commit -m "docs(issue-$ARGUMENTS): Add documentation and cleanup"
+```
+
+```
+Update Todos
+  ☒ Branch Creation & Issue Analysis
+  ☒ Define Tests Phase
+  ☒ Implementation Phase
+  ☒ Build Phase
+  ☒ Test Fixes Phase
+  ☒ Manual Testing
+  ☒ Cleanup & Documentation Phase
+  ☐ GitHub Issue Management
 ```
 
 ## REVIEW POINT 3:
-I've completed the documentation for issue #$ARGUMENTS. 
+I've completed the Cleanup & Documentation Phase for issue #$ARGUMENTS. 
 
 The implementation includes:
 - ✅ [Specific feature 1 implemented]
@@ -353,13 +442,13 @@ The implementation includes:
 - ✅ [Specific feature 3 implemented]
 - ✅ [Tests for core functionality]
 - ✅ [Required documentation]
-- ✅ [Essential component testing]
+- ✅ [Three-Stage Component Testing completed]
 
 All tests are passing and the component meets all acceptance criteria from the issue.
 
-Type "C" to continue with creating a PR, or provide feedback if you want me to adjust anything.
+Type "C" to continue with GitHub Issue Management, or provide feedback if you want me to adjust anything.
 
-## STEP 5: FINAL VERIFICATION & PR CREATION
+## STEP 8: GITHUB ISSUE MANAGEMENT
 
 **Verification Checklist**
 - Scope Boundaries:
@@ -372,7 +461,7 @@ Type "C" to continue with creating a PR, or provide feedback if you want me to a
 - Testing:
   - ✅ Tests focused on acceptance criteria
   - ✅ Core functionality fully tested
-  - ✅ No excessive test coverage beyond scope
+  - ✅ Three-Stage Component Testing completed
 - Documentation:
   - ✅ API/Props documented
   - ✅ Usage examples included
@@ -390,19 +479,56 @@ Type "C" to continue with creating a PR, or provide feedback if you want me to a
 
 **Commit History:**
 ```bash
-git log --oneline -n 3
+git log --oneline -n 5
 ```
 [Shows the commits made during this workflow]
 
-I'll now push the branch and create a PR using the MCP GitHub tool:
+I'll now update the GitHub issue with our implementation details:
 
-```bash
-git push origin feature/issue-$ARGUMENTS
+```javascript
+// Add a comment to the GitHub issue
+try {
+  const comment = await mcp__modelcontextprotocol_server_github__server_github.addIssueComment({
+    owner: "jerseycheese",
+    repo: "narraitor",
+    issueNumber: parseInt($ARGUMENTS),
+    body: `## Implementation Complete ✅
+
+Feature completed with the following changes:
+- [change 1]
+- [change 2]
+- [change 3]
+
+Three-Stage Component Testing completed:
+- ✅ Storybook stories created
+- ✅ Test harness implemented
+- ✅ Integration tested
+
+All tests are passing and the feature has been manually verified.
+
+**Modified Files:**
+- [file path 1]
+- [file path 2]
+- [file path 3]
+
+**Created Files:**
+- [file path 1]
+- [file path 2]
+- [file path 3]
+
+Let me know if you need any adjustments or have questions!`
+  });
+  
+  console.log(`Successfully added comment to issue #${$ARGUMENTS}`);
+} catch (error) {
+  console.error("Error adding comment:", error);
+}
 ```
 
-I'll now push the branch and create a PR using the MCP GitHub tool:
+Now I'll push the branch and create a PR:
 
 ```bash
+# Push the branch
 git push origin feature/issue-$ARGUMENTS
 ```
 
@@ -434,6 +560,11 @@ Closes #${$ARGUMENTS}
 - [x] All new code is tested
 - [x] All tests pass locally
 - [x] Test coverage maintained or improved
+
+## Three-Stage Component Testing
+- [x] Storybook stories created and tested
+- [x] Test harness (/dev/[component-name]) implemented
+- [x] Integration testing completed
 
 ## User Stories Addressed
 - Implemented features based on issue #${$ARGUMENTS}
@@ -474,9 +605,21 @@ Closes #${$ARGUMENTS}
 }
 ```
 
+```
+Update Todos
+  ☒ Branch Creation & Issue Analysis
+  ☒ Define Tests Phase
+  ☒ Implementation Phase
+  ☒ Build Phase
+  ☒ Test Fixes Phase
+  ☒ Manual Testing
+  ☒ Cleanup & Documentation Phase
+  ☒ GitHub Issue Management
+```
+
 ## WORKFLOW COMPLETE
 
-The feature implementation workflow is now complete! The PR is ready for review and merge.
+The feature implementation workflow is now complete! The issue has been updated and the PR is ready for review and merge.
 
 You can review all the changes with:
 ```bash
@@ -486,5 +629,10 @@ git diff develop...feature/issue-$ARGUMENTS
 If you want to make additional changes before merging, you can:
 1. Make the changes
 2. Add only the specific files you changed: `git add [specific file 1] [specific file 2]`
-3. Commit them: `git commit -m "chore(issue-$ARGUMENTS): Final adjustments"`
+3. Commit them with the appropriate type: `git commit -m "type(issue-$ARGUMENTS): Additional adjustments"`
 4. Push the changes: `git push origin feature/issue-$ARGUMENTS`
+
+The Three-Stage Component Testing approach has been completed:
+- ✅ Storybook stories created and verified
+- ✅ Test harness implementation at /dev/[component-name]
+- ✅ Integration testing in the full application context
