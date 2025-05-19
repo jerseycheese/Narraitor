@@ -81,7 +81,7 @@ const meta = {
     (Story) => {
       // Reset the narrative store before each story
       useEffect(() => {
-        narrativeStore.getState().clearAllSegments();
+        narrativeStore.getState().reset();
       }, []);
       return <Story />;
     },
