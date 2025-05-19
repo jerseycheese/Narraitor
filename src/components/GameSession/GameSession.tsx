@@ -84,12 +84,12 @@ const GameSession: React.FC<GameSessionProps> = ({
     console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
     
     // Update the session store
-    if (sessionStoreState.setSessionId) {
-      sessionStoreState.setSessionId(sessionId);
+    if (sessionStore.getState().setSessionId) {
+      sessionStore.getState().setSessionId(sessionId);
     }
     
     return sessionId;
-  }, [worldId, sessionState.id, sessionStoreState]);
+  }, [worldId, sessionState.id]);
   
   // Focus management for state transitions
   useEffect(() => {
