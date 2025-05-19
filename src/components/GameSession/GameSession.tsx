@@ -72,6 +72,11 @@ const GameSession: React.FC<GameSessionProps> = ({
     _stores,
   });
   
+  // Create a stable session ID that won't change on re-renders
+  const stableSessionId = useMemo(() => 
+    sessionState.id || `session-${worldId}-${Date.now()}`,
+  [worldId, sessionState.id]);
+  
   // Focus management for state transitions
   useEffect(() => {
     if (!isClient) return;
@@ -199,11 +204,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
-    // Use the new narrative integration component with a stable session ID
-    const stableSessionId = useMemo(() => 
-      sessionState.id || `session-${worldId}-${Date.now()}`,
-    [worldId, sessionState.id]);
-    
+    // Use the new narrative integration component
     return (
       <GameSessionActiveWithNarrative
         worldId={worldId}
