@@ -3,7 +3,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
-  title: 'Narrative/NarrativeHistory',
+  title: 'Narraitor/Narrative/NarrativeHistory',
   component: NarrativeHistory,
   parameters: {
     layout: 'padded',
