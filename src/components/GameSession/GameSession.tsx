@@ -101,7 +101,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     return () => {
       clearTimeout(focusTimeout);
     };
-  }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
+  }, [sessionState.status, sessionState.error, isClient]);
   
   // Create a screen reader announcer for important state changes
   useEffect(() => {
