@@ -1,35 +1,13 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
+import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 
 const meta = {
   title: 'Narraitor/Narrative/NarrativeController',
   component: NarrativeController,
   parameters: {
     layout: 'centered',
-    // Let's create a mock context that our component can use
-    mockNarrativeResponse: {
-      default: {
-        content: 'You find yourself standing at the edge of an ancient forest. The trees tower above you, their leaves whispering secrets in a language older than time itself.',
-        segmentType: 'scene',
-        metadata: {
-          characterIds: [],
-          location: 'Forest Edge',
-          mood: 'mysterious',
-          tags: ['forest', 'beginning', 'mystery']
-        }
-      },
-      continuation: {
-        content: 'As you venture deeper into the forest, the air grows thick with magic. Strange lights dance between the trees, and you hear the distant sound of ethereal music.',
-        segmentType: 'scene',
-        metadata: {
-          characterIds: [],
-          location: 'Deep Forest',
-          mood: 'mysterious',
-          tags: ['forest', 'magic', 'exploration']
-        }
-      }
-    }
   },
   tags: ['autodocs'],
   decorators: [
@@ -44,20 +22,25 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Since we can't easily mock dependencies in Storybook, let's create a wrapper component
-// that simulates the behavior we want to demonstrate
-const NarrativeControllerDemo: React.FC<{ 
-  worldId: string; 
-  sessionId: string;
+// Simulate how the NarrativeController would work with PlayerChoices
+const NarrativeGameSessionDemo: React.FC<{ 
   simulateError?: boolean;
   simulateDelay?: number;
-}> = ({ worldId, sessionId, simulateError, simulateDelay }) => {
-  const [mockSegment, setMockSegment] = React.useState<any>(null);
+}> = ({ simulateError, simulateDelay }) => {
+  const [currentSegment, setCurrentSegment] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [selectedChoice, setSelectedChoice] = React.useState<string | null>(null);
+
+  // Mock player choices
+  const mockChoices = [
+    { id: 'explore', text: 'Explore the ancient ruins ahead' },
+    { id: 'camp', text: 'Make camp for the night' },
+    { id: 'investigate', text: 'Investigate the strange sounds' }
+  ];
 
   React.useEffect(() => {
-    const loadNarrative = async () => {
+    const loadInitialNarrative = async () => {
       setLoading(true);
       setError(null);
       
@@ -71,66 +54,125 @@ const NarrativeControllerDemo: React.FC<{
         return;
       }
       
-      setMockSegment({
+      setCurrentSegment({
         id: 'seg-1',
-        content: 'You find yourself standing at the edge of an ancient forest. The trees tower above you, their leaves whispering secrets in a language older than time itself.',
+        content: 'You stand at the entrance to the Valley of Forgotten Dreams. Ancient stone pillars rise from the mist, their surfaces carved with symbols that seem to shift when you\'re not looking directly at them. The air is thick with magic and possibility.',
         type: 'scene',
         timestamp: new Date(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         metadata: {
           characterIds: [],
-          location: 'Forest Edge',
+          location: 'Valley Entrance',
           mood: 'mysterious',
-          tags: ['forest', 'beginning', 'mystery']
+          tags: ['exploration', 'beginning', 'mystery']
         }
       });
       setLoading(false);
     };
     
-    loadNarrative();
+    loadInitialNarrative();
   }, [simulateError, simulateDelay]);
 
-  // Use the actual components but provide mock data
+  const handleChoiceSelected = async (choiceId: string) => {
+    setSelectedChoice(choiceId);
+    setLoading(true);
+    
+    // Simulate narrative generation based on choice
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const narrativeResponses: Record<string, any> = {
+      explore: {
+        content: 'You step forward into the ruins. The ancient stones seem to hum with a forgotten power as you pass between the towering pillars. Ahead, a grand staircase descends into darkness, while to your right, a narrow path winds between crumbling walls.',
+        metadata: { location: 'Ancient Ruins', mood: 'mysterious' }
+      },
+      camp: {
+        content: 'You decide to set up camp before venturing further. As you gather wood for a fire, you notice strange markings on the nearby stones that glow faintly in the twilight. The night promises to be long and full of whispers.',
+        metadata: { location: 'Valley Camp', mood: 'tense' }
+      },
+      investigate: {
+        content: 'Following the mysterious sounds, you discover a hidden grotto behind a waterfall. Inside, bioluminescent plants cast an ethereal blue light on the walls, revealing more of those shifting symbols.',
+        metadata: { location: 'Hidden Grotto', mood: 'mysterious' }
+      }
+    };
+    
+    const response = narrativeResponses[choiceId];
+    setCurrentSegment({
+      id: `seg-${Date.now()}`,
+      content: response.content,
+      type: 'scene',
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: {
+        ...response.metadata,
+        characterIds: [],
+        tags: ['choice', choiceId]
+      }
+    });
+    setLoading(false);
+  };
+
   return (
-    <div className="narrative-controller space-y-6">
+    <div className="space-y-6">
+      {/* Narrative Display */}
       <NarrativeDisplay 
-        segment={mockSegment} 
+        segment={currentSegment} 
         isLoading={loading} 
         error={error} 
       />
       
-      {mockSegment && !loading && !error && (
-        <div className="flex justify-center">
-          <button
-            onClick={() => {
-              setMockSegment({
-                ...mockSegment,
-                id: 'seg-2',
-                content: 'As you venture deeper into the forest, the air grows thick with magic. Strange lights dance between the trees.',
-              });
-            }}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Continue
-          </button>
+      {/* Player Choices - mimicking the actual PlayerChoices component */}
+      {currentSegment && !loading && !error && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold mb-2">What will you do?</h3>
+          <div className="space-y-2">
+            {mockChoices.map((choice) => (
+              <button
+                key={choice.id}
+                className={`block w-full text-left p-3 border rounded transition-colors ${
+                  selectedChoice === choice.id
+                    ? 'bg-blue-100 border-blue-500 font-bold'
+                    : 'bg-white hover:bg-gray-50 cursor-pointer'
+                }`}
+                onClick={() => handleChoiceSelected(choice.id)}
+              >
+                {selectedChoice === choice.id ? '➤ ' : ''}{choice.text}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-// Import the display component we need
-import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
-
 export const Default: Story = {
-  render: () => <NarrativeControllerDemo worldId="world-story" sessionId="session-story" />,
+  render: () => <NarrativeGameSessionDemo />,
 };
 
 export const Loading: Story = {
-  render: () => <NarrativeControllerDemo worldId="world-story" sessionId="session-story" simulateDelay={10000} />,
+  render: () => <NarrativeGameSessionDemo simulateDelay={10000} />,
 };
 
 export const WithError: Story = {
-  render: () => <NarrativeControllerDemo worldId="world-story" sessionId="session-story" simulateError={true} />,
+  render: () => <NarrativeGameSessionDemo simulateError={true} />,
+};
+
+// Story showing just the NarrativeController component
+export const ComponentOnly: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    triggerGeneration: false // Don't auto-generate to prevent errors in Storybook
+  },
+  render: (args) => (
+    <div>
+      <p className="mb-4 text-sm text-gray-600">
+        This shows the NarrativeController component in isolation. 
+        In actual usage, it would be integrated with PlayerChoices for interaction.
+      </p>
+      <NarrativeController {...args} />
+    </div>
+  )
 };

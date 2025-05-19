@@ -8,11 +8,17 @@ import { NarrativeSegment } from '@/types/narrative.types';
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
+  onNarrativeGenerated?: (segment: NarrativeSegment) => void;
+  triggerGeneration?: boolean;
+  choiceId?: string; // ID of the choice that triggered this narrative
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
-  sessionId
+  sessionId,
+  onNarrativeGenerated,
+  triggerGeneration = true,
+  choiceId
 }) => {
   const [currentSegment, setCurrentSegment] = useState<NarrativeSegment | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,10 +28,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
 
   useEffect(() => {
-    // Generate initial scene on mount
-    generateInitialNarrative();
+    // Generate narrative when triggered
+    if (triggerGeneration) {
+      if (!currentSegment) {
+        // Generate initial scene if no current segment
+        generateInitialNarrative();
+      } else if (choiceId) {
+        // Generate continuation based on choice
+        generateNextSegment(choiceId);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [triggerGeneration, choiceId]);
 
   const generateInitialNarrative = async () => {
     setIsLoading(true);
@@ -53,6 +67,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: segment.updatedAt,
         timestamp: segment.timestamp
       });
+      
+      if (onNarrativeGenerated) {
+        onNarrativeGenerated(segment);
+      }
     } catch {
       setError('Failed to generate narrative');
     } finally {
@@ -60,7 +78,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
   };
 
-  const generateNextSegment = async () => {
+  const generateNextSegment = async (triggeringChoiceId: string) => {
     if (!currentSegment) return;
     
     setIsLoading(true);
@@ -72,7 +90,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         sessionId,
         characterIds: [],
         narrativeContext: {
-          recentSegments: [currentSegment]
+          recentSegments: [currentSegment],
+          currentSituation: `Player selected choice: ${triggeringChoiceId}`
+        },
+        generationParameters: {
+          segmentType: 'scene',
+          includedTopics: [triggeringChoiceId]
         }
       });
       
@@ -96,6 +119,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: segment.updatedAt,
         timestamp: segment.timestamp
       });
+      
+      if (onNarrativeGenerated) {
+        onNarrativeGenerated(segment);
+      }
     } catch {
       setError('Failed to generate narrative');
     } finally {
@@ -104,23 +131,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   return (
-    <div className="narrative-controller space-y-6">
+    <div className="narrative-controller">
       <NarrativeDisplay 
         segment={currentSegment} 
         isLoading={isLoading} 
         error={error || undefined} 
       />
-      
-      {currentSegment && !isLoading && !error && (
-        <div className="flex justify-center">
-          <button
-            onClick={generateNextSegment}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Continue
-          </button>
-        </div>
-      )}
     </div>
   );
 };
