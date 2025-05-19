@@ -34,8 +34,13 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
   // Generate mock narrative
   useEffect(() => {
     if (triggerGeneration && !isLoading) {
-      // Generate if no segments or if we have a new choice
-      const shouldGenerate = segments.length === 0 || (choiceId && choiceId !== lastChoiceId);
+      // Update lastChoiceId immediately to prevent duplicate generation
+      if (choiceId && choiceId !== lastChoiceId) {
+        setLastChoiceId(choiceId);
+      }
+      
+      // Generate if no segments or if triggerGeneration is true
+      const shouldGenerate = segments.length === 0 || triggerGeneration;
       
       if (shouldGenerate) {
         setIsLoading(true);
@@ -71,7 +76,6 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
           });
           
           setIsLoading(false);
-          setLastChoiceId(choiceId);
           
           if (onNarrativeGenerated) {
             onNarrativeGenerated(newSegment);

@@ -103,11 +103,10 @@ export default function NarrativeSystemHarness() {
     if (showController) {
       setSelectedChoice(choiceId);
       setTriggerGeneration(true);
-      // Reset after trigger
+      // Reset after trigger - use a longer timeout to ensure generation completes
       setTimeout(() => {
         setTriggerGeneration(false);
-        setSelectedChoice(null);
-      }, 100);
+      }, 1500);
     } else {
       // Manual generation for history view
       const choice = mockChoices.find(c => c.id === choiceId);
