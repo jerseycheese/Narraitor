@@ -7,6 +7,7 @@ export enum PromptType {
   NARRATIVE = 'NARRATIVE',
   DIALOGUE = 'DIALOGUE',
   QUEST = 'QUEST',
+  NarrativeGeneration = 'NARRATIVE_GENERATION'
 }
 
 /**
@@ -14,7 +15,9 @@ export enum PromptType {
  */
 export interface PromptVariable {
   name: string;
+  type: string;
   description: string;
+  required?: boolean;
 }
 
 /**
@@ -22,9 +25,11 @@ export interface PromptVariable {
  */
 export interface PromptTemplate {
   id: string;
+  name?: string;
   type: PromptType;
   content: string;
   variables: PromptVariable[];
+  generate?: (context: any) => string;
 }
 
 /**
