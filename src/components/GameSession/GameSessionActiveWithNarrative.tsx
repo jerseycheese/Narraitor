@@ -44,10 +44,11 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
 }) => {
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [generation, setGeneration] = React.useState(0);
+  const controllerKey = React.useMemo(() => `controller-${sessionId}`, [sessionId]);
 
   React.useEffect(() => {
-    console.log(`[GameSessionActive] Session ID: ${sessionId}, WorldID: ${worldId}`);
-  }, [sessionId, worldId]);
+    console.log(`[GameSessionActive] Session ID: ${sessionId}, WorldID: ${worldId}, Controller Key: ${controllerKey}`);
+  }, [sessionId, worldId, controllerKey]);
 
   const handleNarrativeGenerated = (segment: NarrativeSegment) => {
     console.log(`[GameSessionActive] Narrative generated for session ${sessionId}:`, segment);
@@ -75,6 +76,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
         <h2 className="text-xl font-bold mb-2">Story</h2>
         {/* Always use NarrativeController for dynamic generation */}
         <NarrativeController
+          key={controllerKey} // Add a stable key to prevent duplication
           worldId={worldId}
           sessionId={sessionId}
           triggerGeneration={triggerGeneration}

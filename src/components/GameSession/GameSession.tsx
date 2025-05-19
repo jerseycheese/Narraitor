@@ -74,10 +74,22 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
-    const sessionId = sessionState.id || `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
-    console.log(`[GameSession] Created stable session ID: ${sessionId}`);
+    if (sessionState.id) {
+      console.log(`[GameSession] Using existing session ID: ${sessionState.id}`);
+      return sessionState.id;
+    }
+    
+    // Create a new stable ID if one doesn't exist
+    const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
+    console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
+    
+    // Update the session store
+    if (sessionStoreState.setSessionId) {
+      sessionStoreState.setSessionId(sessionId);
+    }
+    
     return sessionId;
-  }, [worldId, sessionState.id]);
+  }, [worldId, sessionState.id, sessionStoreState]);
   
   // Focus management for state transitions
   useEffect(() => {
