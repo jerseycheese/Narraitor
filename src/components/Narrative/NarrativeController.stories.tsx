@@ -205,9 +205,19 @@ export const GeneratingFromChoice: Story = {
   },
 };
 
-// Loading state
+// Loading state - perpetual loading
 export const Loading: Story = {
   render: () => <NarrativeHistory segments={[]} isLoading={true} />,
+};
+
+// Initial state before any generation
+export const InitialState: Story = {
+  args: {
+    worldId: 'world-1',
+    sessionId: 'session-initial',
+    triggerGeneration: false,
+  },
+  render: (args) => <MockNarrativeController {...args} />,
 };
 
 // Error state
