@@ -16,16 +16,24 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
   const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error] = React.useState<string | null>(null);
+  const [initialized, setInitialized] = React.useState(false);
   
-  // Load existing segments on mount
+  // Load existing segments on mount with a small delay to ensure store is populated
   useEffect(() => {
-    const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
-    setSegments(existingSegments);
-  }, [sessionId]);
+    if (!initialized) {
+      const timer = setTimeout(() => {
+        const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
+        setSegments(existingSegments);
+        setInitialized(true);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [sessionId, initialized]);
 
   // Generate narrative when triggered
   useEffect(() => {
-    if (!triggerGeneration) return;
+    if (!triggerGeneration || !initialized) return;
     
     // Check if we should generate (only if no segments or choiceId provided)
     const shouldGenerate = segments.length === 0 || choiceId;
@@ -57,7 +65,7 @@ const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeCon
     }, 1000);
     
     return () => clearTimeout(timer);
-  }, [triggerGeneration, choiceId]); // Minimal deps to prevent re-runs
+  }, [triggerGeneration, choiceId, initialized, segments.length]); // Track deps properly
 
   const NarrativeHistory = require('./NarrativeHistory').NarrativeHistory;
   
@@ -125,12 +133,22 @@ const WithExistingSegments: React.FC<{
   sessionId: string;
 }> = ({ children, segments, sessionId }) => {
   useEffect(() => {
-    // Add mock segments to the store
+    // Clear previous segments and add new ones
+    narrativeStore.getState().reset();
+    
+    // Add mock segments to the store with proper structure
     segments.forEach((segment, index) => {
-      narrativeStore.getState().addSegment(sessionId, {
-        ...segment,
-        id: `mock-seg-${index}`,
-      } as Omit<NarrativeSegment, 'sessionId'>);
+      const segmentToAdd = {
+        content: segment.content,
+        type: segment.type,
+        worldId: segment.worldId,
+        timestamp: segment.timestamp,
+        updatedAt: segment.updatedAt,
+        characterIds: segment.characterIds || [],
+        metadata: segment.metadata || {}
+      };
+      
+      narrativeStore.getState().addSegment(sessionId, segmentToAdd);
     });
   }, [segments, sessionId]);
 
@@ -150,7 +168,7 @@ export const Default: Story = {
 export const WithHistory: Story = {
   args: {
     worldId: 'world-1',
-    sessionId: 'session-1',
+    sessionId: 'session-with-history',  // Unique session ID
     triggerGeneration: false,
   },
   decorators: [
