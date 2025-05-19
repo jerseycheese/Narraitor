@@ -51,59 +51,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Mock narrative controller for simulating behavior
-const MockNarrativeController: React.FC<React.ComponentProps<typeof NarrativeController> & { mockSegments?: NarrativeSegment[] }> = ({
-  worldId,
-  sessionId,
-  onNarrativeGenerated,
-  triggerGeneration = true,
-  choiceId,
-  className,
-  mockSegments = []
-}) => {
-  const [segments, setSegments] = React.useState<NarrativeSegment[]>(mockSegments);
-  const [isLoading, setIsLoading] = React.useState(false);
-  
-  // Generate initial narrative segment when triggered
-  useEffect(() => {
-    if (triggerGeneration && segments.length === 0 && !isLoading) {
-      setIsLoading(true);
-      
-      const timer = setTimeout(() => {
-        const newSegment: NarrativeSegment = {
-          id: `seg-${Date.now()}`,
-          content: 'You awaken in a mysterious forest. The air is thick with magic.',
-          type: 'scene',
-          sessionId,
-          worldId,
-          timestamp: new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        setSegments([newSegment]);
-        setIsLoading(false);
-        
-        if (onNarrativeGenerated) {
-          onNarrativeGenerated(newSegment);
-        }
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [triggerGeneration, segments.length, isLoading, worldId, sessionId, onNarrativeGenerated]);
-  
-  return (
-    <div className={`narrative-controller ${className || ''}`}>
-      <NarrativeHistory 
-        segments={segments}
-        isLoading={isLoading}
-        error={undefined}
-      />
-    </div>
-  );
-};
-
 // Basic narrative controller
 export const Default: Story = {
   args: {
@@ -111,24 +58,45 @@ export const Default: Story = {
     sessionId: 'session-1',
     triggerGeneration: true,
   },
-  render: (args) => <MockNarrativeController {...args} />,
+  render: () => {
+    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true); // Start with loading
+    
+    useEffect(() => {
+      // Simulate loading and generation
+      const timer = setTimeout(() => {
+        const newSegment: NarrativeSegment = {
+          id: 'seg-1',
+          content: 'You awaken in a mysterious forest. The air is thick with magic.',
+          type: 'scene',
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          timestamp: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        setSegments([newSegment]);
+        setIsLoading(false); // Loading completes here
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }, []); // Empty deps - run once on mount
+    
+    return <NarrativeHistory segments={segments} isLoading={isLoading} />;
+  },
 };
 
-// With existing history - directly pass segments as props
+// With existing history - directly show segments
 export const WithHistory: Story = {
-  args: {
-    worldId: 'world-1',
-    sessionId: 'session-with-history',
-    triggerGeneration: false,
-  },
-  render: (args) => {
+  render: () => {
     const mockSegments: NarrativeSegment[] = [
       {
         id: 'seg-1',
         content: 'You stand at the entrance of the ancient temple.',
         type: 'scene',
-        sessionId: args.sessionId,
-        worldId: args.worldId,
+        sessionId: 'session-history',
+        worldId: 'world-1',
         timestamp: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -137,69 +105,56 @@ export const WithHistory: Story = {
         id: 'seg-2',
         content: 'The door creaks open, revealing a dark corridor.',
         type: 'exploration',
-        sessionId: args.sessionId,
-        worldId: args.worldId,
+        sessionId: 'session-history',
+        worldId: 'world-1',
         timestamp: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
     ];
     
-    return <MockNarrativeController {...args} mockSegments={mockSegments} />;
+    return <NarrativeHistory segments={mockSegments} isLoading={false} />;
   },
 };
 
 // Generating next segment from choice
 export const GeneratingFromChoice: Story = {
-  args: {
-    worldId: 'world-1',
-    sessionId: 'session-with-choice',
-    triggerGeneration: true,
-    choiceId: 'choice-1',
-  },
-  render: (args) => {
-    const [segments, setSegments] = React.useState<NarrativeSegment[]>([]);
-    const [isLoading, setIsLoading] = React.useState(false);
-    
-    useEffect(() => {
-      // Set initial segment
-      setSegments([{
+  render: () => {
+    const [segments, setSegments] = React.useState<NarrativeSegment[]>([
+      {
         id: 'seg-1',
         content: 'You face a fork in the road.',
         type: 'decision',
-        sessionId: args.sessionId,
-        worldId: args.worldId,
+        sessionId: 'session-choice',
+        worldId: 'world-1',
         timestamp: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-      }]);
-      
-      // Generate next segment after a delay
-      if (args.triggerGeneration && args.choiceId) {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-          const newSegment: NarrativeSegment = {
-            id: `seg-${Date.now()}`,
-            content: `Your choice leads you deeper into the forest. (from choice: ${args.choiceId})`,
-            type: 'exploration',
-            sessionId: args.sessionId,
-            worldId: args.worldId,
-            timestamp: new Date().toISOString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          
-          setSegments(prev => [...prev, newSegment]);
-          setIsLoading(false);
-        }, 1000);
-        
-        return () => clearTimeout(timer);
-      }
-    }, [args]);
+      },
+    ]);
+    const [isLoading, setIsLoading] = React.useState(true);
     
-    return (
-      <NarrativeHistory segments={segments} isLoading={isLoading} />
-    );
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        const newSegment: NarrativeSegment = {
+          id: 'seg-2',
+          content: 'Your choice leads you deeper into the forest. (from choice: choice-1)',
+          type: 'exploration',
+          sessionId: 'session-choice',
+          worldId: 'world-1',
+          timestamp: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        setSegments(prev => [...prev, newSegment]);
+        setIsLoading(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }, []);
+    
+    return <NarrativeHistory segments={segments} isLoading={isLoading} />;
   },
 };
 
@@ -208,14 +163,9 @@ export const Loading: Story = {
   render: () => <NarrativeHistory segments={[]} isLoading={true} />,
 };
 
-// Initial state before any generation
+// Initial state - empty, no loading
 export const InitialState: Story = {
-  args: {
-    worldId: 'world-1',
-    sessionId: 'session-initial',
-    triggerGeneration: false,
-  },
-  render: (args) => <MockNarrativeController {...args} />,
+  render: () => <NarrativeHistory segments={[]} isLoading={false} />,
 };
 
 // Error state
@@ -225,13 +175,26 @@ export const Error: Story = {
 
 // With custom styling
 export const CustomStyled: Story = {
-  args: {
-    worldId: 'world-1',
-    sessionId: 'session-1',
-    triggerGeneration: true,
-    className: 'max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-lg',
+  render: () => {
+    const mockSegments: NarrativeSegment[] = [
+      {
+        id: 'seg-1',
+        content: 'A beautifully styled narrative segment.',
+        type: 'scene',
+        sessionId: 'session-styled',
+        worldId: 'world-1',
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+    
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
+        <NarrativeHistory segments={mockSegments} isLoading={false} />
+      </div>
+    );
   },
-  render: (args) => <MockNarrativeController {...args} />,
 };
 
 // Manual generation trigger
@@ -273,19 +236,6 @@ export const ManualTrigger: Story = {
       </div>
     );
   },
-};
-
-// With callback
-export const WithCallback: Story = {
-  args: {
-    worldId: 'world-1',
-    sessionId: 'session-1',
-    triggerGeneration: true,
-    onNarrativeGenerated: (segment: NarrativeSegment) => {
-      console.log('Narrative generated:', segment);
-    },
-  },
-  render: (args) => <MockNarrativeController {...args} />,
 };
 
 // Multiple segments
