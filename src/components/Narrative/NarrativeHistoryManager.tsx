@@ -23,19 +23,36 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   // Get segments from the store
   const getSegments = narrativeStore(state => state.getSessionSegments);
   
-  // Load segments on mount or when sessionId changes
+  // Subscribe to narrative store updates
   useEffect(() => {
-    console.log(`[NarrativeHistoryManager] Loading segments for session ${sessionId}`);
-    const existingSegments = getSegments(sessionId);
+    console.log(`[NarrativeHistoryManager] Setting up subscription for session ${sessionId}`);
     
-    // Remove duplicate segments before setting state
-    const uniqueSegments = removeDuplicateSegments(existingSegments);
+    // Initial load
+    const loadSegments = () => {
+      const existingSegments = getSegments(sessionId);
+      console.log(`[NarrativeHistoryManager] Loaded ${existingSegments.length} segments for session ${sessionId}`);
+      
+      // Remove duplicate segments before setting state
+      const uniqueSegments = removeDuplicateSegments(existingSegments);
+      
+      if (uniqueSegments.length !== existingSegments.length) {
+        console.log(`[NarrativeHistoryManager] Removed ${existingSegments.length - uniqueSegments.length} duplicate segments`);
+      }
+      
+      setSegments(uniqueSegments);
+    };
     
-    if (uniqueSegments.length !== existingSegments.length) {
-      console.log(`[NarrativeHistoryManager] Removed ${existingSegments.length - uniqueSegments.length} duplicate segments`);
-    }
+    // Load initial segments
+    loadSegments();
     
-    setSegments(uniqueSegments);
+    // Subscribe to store updates
+    const unsubscribe = narrativeStore.subscribe(loadSegments);
+    
+    // Cleanup on unmount
+    return () => {
+      console.log(`[NarrativeHistoryManager] Cleaning up subscription for session ${sessionId}`);
+      unsubscribe();
+    };
   }, [sessionId, getSegments]);
   
   // Remove duplicate segments based on content and type
@@ -55,6 +72,22 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     
     return uniqueSegments;
   };
+
+  // Show loading state if no segments yet
+  useEffect(() => {
+    if (segments.length === 0) {
+      setIsLoading(true);
+      
+      // Set a timeout to stop showing loading if it takes too long
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setIsLoading(false);
+    }
+  }, [segments.length]);
 
   return (
     <div className={`narrative-history-manager ${className || ''}`}>

@@ -43,12 +43,25 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
-  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isGenerating, setIsGenerating] = React.useState(true); // Start as generating
   const [generation, setGeneration] = React.useState(0);
+  const [initialized, setInitialized] = React.useState(false);
   const controllerKey = React.useMemo(() => `controller-${sessionId}`, [sessionId]);
-
+  
+  // Initialize the narrative on first load
   React.useEffect(() => {
     console.log(`[GameSessionActive] Session ID: ${sessionId}, WorldID: ${worldId}, Controller Key: ${controllerKey}`);
+    
+    // Set initial loading state and force initial generation
+    setIsGenerating(true);
+    
+    // Set a timeout to handle the initial narrative generation
+    const timer = setTimeout(() => {
+      console.log(`[GameSessionActive] Initial narrative generation timer fired`);
+      setInitialized(true);
+    }, 2000); // Give enough time for the narrative to be generated
+    
+    return () => clearTimeout(timer);
   }, [sessionId, worldId, controllerKey]);
 
   const handleNarrativeGenerated = (segment: NarrativeSegment) => {
@@ -81,19 +94,17 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
           sessionId={sessionId}
         />
         
-        {/* Hidden controller just to generate content */}
-        {triggerGeneration && (
-          <div style={{ display: 'none' }}>
-            <NarrativeController
-              key={`generator-${controllerKey}`}
-              worldId={worldId}
-              sessionId={sessionId}
-              triggerGeneration={triggerGeneration}
-              choiceId={selectedChoiceId}
-              onNarrativeGenerated={handleNarrativeGenerated}
-            />
-          </div>
-        )}
+        {/* Hidden controller just to generate content - always show it but hide from view */}
+        <div style={{ display: 'none' }}>
+          <NarrativeController
+            key={`generator-${controllerKey}`}
+            worldId={worldId}
+            sessionId={sessionId}
+            triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
+            choiceId={selectedChoiceId}
+            onNarrativeGenerated={handleNarrativeGenerated}
+          />
+        </div>
       </div>
 
       {choices && choices.length > 0 && (
