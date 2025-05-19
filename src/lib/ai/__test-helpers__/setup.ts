@@ -16,7 +16,7 @@ export const createMockTemplateManager = (): PromptTemplateManager => {
     id: 'narrative-test',
     type: PromptType.NARRATIVE,
     content: 'Test narrative for {{character}}',
-    variables: [{ name: 'character', description: 'Character name' }]
+    variables: [{ name: 'character', type: 'string', description: 'Character name' }]
   });
   
   manager.addTemplate({
@@ -24,8 +24,8 @@ export const createMockTemplateManager = (): PromptTemplateManager => {
     type: PromptType.DIALOGUE,
     content: 'Dialogue between {{speaker1}} and {{speaker2}}',
     variables: [
-      { name: 'speaker1', description: 'First speaker' },
-      { name: 'speaker2', description: 'Second speaker' }
+      { name: 'speaker1', type: 'string', description: 'First speaker' },
+      { name: 'speaker2', type: 'string', description: 'Second speaker' }
     ]
   });
   

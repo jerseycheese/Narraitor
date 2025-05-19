@@ -1,6 +1,6 @@
 import { GeminiClient } from './geminiClient';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
-import { useWorldStore } from '@/state/worldStore';
+import { worldStore } from '@/state/worldStore';
 import {
   NarrativeGenerationRequest,
   NarrativeGenerationResult,
@@ -73,7 +73,7 @@ export class NarrativeGenerator {
   }
 
   private getWorld(worldId: string): World {
-    const { worlds } = useWorldStore.getState();
+    const { worlds } = worldStore.getState();
     const world = worlds[worldId];
     
     if (!world) {
@@ -102,7 +102,9 @@ export class NarrativeGenerator {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private formatResponse(response: any, segmentType: string): NarrativeGenerationResult {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const aiResponse = response as { content?: string; metadata?: any; tokenUsage?: any };
     return {
       content: aiResponse.content || '',

@@ -24,6 +24,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   useEffect(() => {
     // Generate initial scene on mount
     generateInitialNarrative();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generateInitialNarrative = async () => {
@@ -48,7 +49,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         content: segment.content,
         type: segment.type,
         characterIds: segment.characterIds || [],
-        metadata: segment.metadata
+        metadata: segment.metadata,
+        updatedAt: segment.updatedAt,
+        timestamp: segment.timestamp
       });
     } catch {
       setError('Failed to generate narrative');
@@ -89,7 +92,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         content: segment.content,
         type: segment.type,
         characterIds: segment.characterIds || [],
-        metadata: segment.metadata
+        metadata: segment.metadata,
+        updatedAt: segment.updatedAt,
+        timestamp: segment.timestamp
       });
     } catch {
       setError('Failed to generate narrative');
@@ -103,7 +108,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       <NarrativeDisplay 
         segment={currentSegment} 
         isLoading={isLoading} 
-        error={error} 
+        error={error || undefined} 
       />
       
       {currentSegment && !isLoading && !error && (
