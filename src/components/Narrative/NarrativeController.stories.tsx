@@ -163,39 +163,11 @@ export const Loading: Story = {
   render: () => <NarrativeHistory segments={[]} isLoading={true} />,
 };
 
-// Initial state - empty, no loading
-export const InitialState: Story = {
-  render: () => <NarrativeHistory segments={[]} isLoading={false} />,
-};
-
 // Error state
 export const Error: Story = {
   render: () => <NarrativeHistory segments={[]} isLoading={false} error="Failed to generate narrative. Please try again." />,
 };
 
-// With custom styling
-export const CustomStyled: Story = {
-  render: () => {
-    const mockSegments: NarrativeSegment[] = [
-      {
-        id: 'seg-1',
-        content: 'A beautifully styled narrative segment.',
-        type: 'scene',
-        sessionId: 'session-styled',
-        worldId: 'world-1',
-        timestamp: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ];
-    
-    return (
-      <div className="max-w-4xl mx-auto p-6 bg-gray-100 rounded-lg shadow-lg">
-        <NarrativeHistory segments={mockSegments} isLoading={false} />
-      </div>
-    );
-  },
-};
 
 // Manual generation trigger
 export const ManualTrigger: Story = {
