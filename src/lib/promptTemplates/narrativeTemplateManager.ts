@@ -1,27 +1,30 @@
-import { PromptTemplateManager } from './promptTemplateManager';
 import { narrativeTemplates } from './templates/narrative';
 
-// Create a singleton instance with narrative templates pre-loaded
-class NarrativeTemplateManager extends PromptTemplateManager {
+// Create a simple manager for narrative templates
+class NarrativeTemplateManager {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private templates: Map<string, (context: any) => string> = new Map();
+
   constructor() {
-    super();
     this.loadNarrativeTemplates();
   }
 
   private loadNarrativeTemplates() {
     narrativeTemplates.forEach(template => {
-      this.addTemplate(template);
+      if (template.generate) {
+        this.templates.set(template.id, template.generate);
+      }
     });
   }
 
-  getTemplate(id: string): ((context: any) => string) { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const template = super.getTemplate(id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getTemplate(id: string): (context: any) => string {
+    const template = this.templates.get(id);
     if (!template) {
       throw new Error(`Template with id '${id}' not found`);
     }
     
-    // Return the generate function if it exists, otherwise return a function that returns content
-    return template.generate || (() => template.content);
+    return template;
   }
 }
 

@@ -35,8 +35,8 @@ export class NarrativeGenerator {
       const context = {
         worldName: world.name,
         worldDescription: world.description,
-        genre: world.genre,
-        tone: world.tone,
+        genre: world.theme,
+        tone: 'default',
         attributes: world.attributes,
         characterIds
       };
@@ -61,8 +61,8 @@ export class NarrativeGenerator {
       previousContent: from.content,
       previousType: from.type,
       worldName: world.name,
-      genre: world.genre,
-      tone: world.tone,
+      genre: world.theme,
+      tone: 'default',
       newLocation: to.narrativeContext?.currentLocation
     };
 
@@ -92,8 +92,8 @@ export class NarrativeGenerator {
     return {
       worldName: world.name,
       worldDescription: world.description,
-      genre: world.genre,
-      tone: world.tone,
+      genre: world.theme,
+      tone: 'default',
       attributes: world.attributes,
       characterIds: request.characterIds,
       sessionId: request.sessionId,
