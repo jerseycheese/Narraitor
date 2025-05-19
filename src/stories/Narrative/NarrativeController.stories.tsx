@@ -159,20 +159,41 @@ export const WithError: Story = {
   render: () => <NarrativeGameSessionDemo simulateError={true} />,
 };
 
-// Story showing just the NarrativeController component
-export const ComponentOnly: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    triggerGeneration: false // Don't auto-generate to prevent errors in Storybook
-  },
-  render: (args) => (
+// Create a wrapper that provides mock data directly to NarrativeDisplay
+const IsolatedNarrativeDemo: React.FC = () => {
+  const [mockSegment] = React.useState({
+    id: 'demo-seg-1',
+    content: 'The morning sun cast long shadows across the cobblestone streets of the ancient city. You can hear the distant sound of merchants setting up their stalls in the market square.',
+    type: 'scene' as const,
+    timestamp: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    metadata: {
+      characterIds: [],
+      location: 'Ancient City - Market District',
+      mood: 'relaxed' as const,
+      tags: ['morning', 'city', 'peaceful']
+    }
+  });
+
+  return (
     <div>
       <p className="mb-4 text-sm text-gray-600">
-        This shows the NarrativeController component in isolation. 
-        In actual usage, it would be integrated with PlayerChoices for interaction.
+        This shows the NarrativeController component with mock data. 
+        In actual usage, it would be integrated with PlayerChoices and connected to the AI service.
       </p>
-      <NarrativeController {...args} />
+      <div className="narrative-controller">
+        <NarrativeDisplay 
+          segment={mockSegment} 
+          isLoading={false} 
+          error={undefined} 
+        />
+      </div>
     </div>
-  )
+  );
+};
+
+// Story showing just the component with mock data
+export const ComponentOnly: Story = {
+  render: () => <IsolatedNarrativeDemo />
 };
