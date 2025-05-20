@@ -31,6 +31,9 @@ export interface WorldSkill extends NamedEntity {
   linkedAttributeId?: EntityID;
   difficulty: 'easy' | 'medium' | 'hard';
   category?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 /**

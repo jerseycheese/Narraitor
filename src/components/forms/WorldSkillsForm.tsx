@@ -23,7 +23,10 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       name: 'New Skill',
       description: 'Description of the new skill',
       difficulty: 'medium',
-      linkedAttributeId: attributes.length > 0 ? attributes[0].id : undefined
+      linkedAttributeId: attributes.length > 0 ? attributes[0].id : undefined,
+      baseValue: 5,  // Default base value
+      minValue: 1,   // Default minimum value
+      maxValue: 10   // Default maximum value
     };
     
     onChange([...skills, newSkill]);
@@ -143,6 +146,58 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                         </option>
                       ))}
                     </select>
+                  </div>
+                </div>
+                
+                <div className="mt-4 border-t pt-4">
+                  <h4 className="font-medium mb-2">Skill Range</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Base Value
+                      </label>
+                      <input
+                        type="number"
+                        min={skill.minValue}
+                        max={skill.maxValue}
+                        value={skill.baseValue}
+                        onChange={(e) => handleUpdateSkill(index, { 
+                          baseValue: parseInt(e.target.value) || skill.minValue
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Min Value
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={skill.maxValue - 1}
+                        value={skill.minValue}
+                        onChange={(e) => handleUpdateSkill(index, { 
+                          minValue: parseInt(e.target.value) || 1
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Max Value
+                      </label>
+                      <input
+                        type="number"
+                        min={skill.minValue + 1}
+                        value={skill.maxValue}
+                        onChange={(e) => handleUpdateSkill(index, { 
+                          maxValue: parseInt(e.target.value) || skill.minValue + 1
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>

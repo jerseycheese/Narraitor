@@ -17,6 +17,9 @@ export interface AttributeSuggestion extends AISuggestionBase {
 export interface SkillSuggestion extends AISuggestionBase {
   difficulty: 'easy' | 'medium' | 'hard';
   linkedAttributeName?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 export interface WorldAnalysisResult {
