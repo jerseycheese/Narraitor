@@ -1,0 +1,78 @@
+import React, { useState, useEffect } from 'react';
+import { WorldSkill } from '@/types/world.types';
+
+interface SkillRangeEditorProps {
+  skill: WorldSkill;
+  onChange: (updates: Partial<WorldSkill>) => void;
+  disabled?: boolean;
+  showLabels?: boolean;
+}
+
+const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
+  skill,
+  onChange,
+  disabled = false,
+  showLabels = true,
+}) => {
+  const [value, setValue] = useState(skill.baseValue);
+
+  // Sync with prop value when it changes
+  useEffect(() => {
+    setValue(skill.baseValue);
+  }, [skill.baseValue]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Parse value and ensure it's within range
+    let newValue = parseInt(e.target.value);
+    
+    // Clamp value to min/max range
+    if (isNaN(newValue)) newValue = skill.minValue;
+    if (newValue < skill.minValue) newValue = skill.minValue;
+    if (newValue > skill.maxValue) newValue = skill.maxValue;
+
+    setValue(newValue);
+    onChange({ baseValue: newValue });
+  };
+
+  // Calculate the position of the value bubble
+  const position = ((value - skill.minValue) / (skill.maxValue - skill.minValue)) * 100;
+
+  return (
+    <div className="py-2" data-testid="skill-range-editor">
+      {showLabels && (
+        <div className="flex justify-between mb-1 text-sm text-gray-600">
+          <span>Default Value</span>
+        </div>
+      )}
+      
+      <div className="relative">
+        <input
+          type="range"
+          min={skill.minValue}
+          max={skill.maxValue}
+          value={value}
+          onChange={handleChange}
+          disabled={disabled}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        />
+        
+        {/* Value display bubble */}
+        <div
+          className="absolute -top-7 flex items-center justify-center w-8 h-8 text-sm text-white bg-blue-500 rounded-full pointer-events-none transform -translate-x-1/2"
+          style={{ left: `${position}%` }}
+          data-testid="current-value"
+        >
+          {value}
+        </div>
+        
+        {/* Min/Max labels */}
+        <div className="flex justify-between mt-1 text-xs text-gray-500">
+          <span>{skill.minValue}</span>
+          <span>{skill.maxValue}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SkillRangeEditor;
