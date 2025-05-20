@@ -8,14 +8,22 @@ import { World } from '@/types/world.types';
 // PlayerChoice import removed as it's not needed
 import { NarrativeSegment } from '@/types/narrative.types';
 
-// Mock world for testing
+// Mock world for testing - Western theme to match test plan
 const mockWorld: World = {
   id: 'world-1',
-  name: 'Fantasy Realm',
-  description: 'A high fantasy world of magic and adventure',
-  theme: 'Fantasy',
-  attributes: [],
-  skills: [],
+  name: 'Frontier Legends',
+  description: 'A rugged Western world where outlaws and lawmen battle for control of the frontier',
+  theme: 'Western',
+  attributes: [
+    { id: 'attr-1', name: 'Grit', description: 'Mental and physical toughness', worldId: 'world-1', baseValue: 7, minValue: 1, maxValue: 10 },
+    { id: 'attr-2', name: 'Marksmanship', description: 'Accuracy with firearms', worldId: 'world-1', baseValue: 8, minValue: 1, maxValue: 10 },
+    { id: 'attr-3', name: 'Honor', description: 'Personal code and reputation', worldId: 'world-1', baseValue: 6, minValue: 1, maxValue: 10 }
+  ],
+  skills: [
+    { id: 'skill-1', name: 'Gunslinging', description: 'Quick-draw and shooting skill', worldId: 'world-1', difficulty: 'medium' },
+    { id: 'skill-2', name: 'Tracking', description: 'Following trails and finding targets', worldId: 'world-1', difficulty: 'medium' },
+    { id: 'skill-3', name: 'Horsemanship', description: 'Riding and horse care', worldId: 'world-1', difficulty: 'medium' }
+  ],
   settings: {
     maxAttributes: 10,
     maxSkills: 10,
@@ -26,24 +34,24 @@ const mockWorld: World = {
   updatedAt: '2023-01-01T10:00:00Z',
 };
 
-// Mock choices for testing
+// Mock choices for testing - Western-themed
 const mockChoices = [
   {
-    id: 'enter-cave',
-    text: 'Enter the cave',
-    consequence: 'You step into the darkness...',
+    id: 'enter-saloon',
+    text: 'Enter the saloon',
+    consequence: 'You push through the swinging doors...',
     requirements: [],
   },
   {
-    id: 'go-around',
-    text: 'Go around the mountain',
-    consequence: 'You take the longer path...',
+    id: 'visit-sheriff',
+    text: 'Visit the sheriff\'s office',
+    consequence: 'You head toward the law office...',
     requirements: [],
   },
   {
-    id: 'set-up-camp',
-    text: 'Set up camp',
-    consequence: 'You decide to rest for the night...',
+    id: 'check-stables',
+    text: 'Check the stables',
+    consequence: 'You decide to look after your horse...',
     requirements: [],
   },
 ];
@@ -53,7 +61,7 @@ export default function NarrativeSystemHarness() {
   const [triggerGeneration, setTriggerGeneration] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
-  const [showController, setShowController] = useState(false);
+  const [showController, setShowController] = useState(true); // Default to controller mode
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -70,10 +78,15 @@ export default function NarrativeSystemHarness() {
 
   const handleGenerateNarrative = () => {
     if (showController) {
+      console.log('Triggering narrative generation via controller');
       setTriggerGeneration(true);
-      // Reset trigger after a short delay
-      setTimeout(() => setTriggerGeneration(false), 100);
+      // Reset trigger after a longer delay to ensure it's processed
+      setTimeout(() => {
+        setTriggerGeneration(false);
+        console.log('Reset trigger generation flag');
+      }, 500);
     } else {
+      console.log('Manually generating narrative');
       // Manual generation for history view
       const content = segments.length === 0
         ? 'You find yourself at the entrance of a mysterious cave. The air is cool and damp, and you can hear the distant sound of dripping water echoing from within.'
@@ -169,17 +182,33 @@ export default function NarrativeSystemHarness() {
     setSegments([]);
     setSelectedChoice(null);
     
-    // Reset trigger to enable initial narrative generation
-    setTriggerGeneration(true);
-    setTimeout(() => setTriggerGeneration(false), 100);
+    // Clear any existing segments for the new session ID
+    // to prevent duplications
+    narrativeStore.getState().clearSessionSegments(newSessionId);
     
-    // Force a component refresh if in controller mode
+    console.log(`New session created and cleared: ${newSessionId}`);
+    
+    // Force a component refresh if in controller mode - wait a bit longer
     if (showController) {
       setShowController(false);
-      setTimeout(() => setShowController(true), 50);
+      
+      // Use a slightly longer delay to ensure state is cleared
+      setTimeout(() => {
+        setShowController(true);
+        
+        // Set trigger AFTER controller is mounted
+        setTimeout(() => {
+          console.log('Triggering generation for new session');
+          setTriggerGeneration(true);
+          
+          // Reset trigger after a reasonable delay
+          setTimeout(() => setTriggerGeneration(false), 500);
+        }, 200);
+      }, 300);
+    } else {
+      // For manual mode, no trigger needed
+      console.log('Ready for manual generation in new session');
     }
-    
-    console.log(`New session created: ${newSessionId}`);
   };
 
   if (!isClient) {

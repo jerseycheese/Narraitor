@@ -15,35 +15,74 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   error,
   className = ''
 }) => {
-  return (
-    <div className={`narrative-history space-y-4 ${className}`}>
-      {/* Show all previous segments */}
-      {segments.map((segment) => (
-        <NarrativeDisplay 
-          key={segment.id}
-          segment={segment}
-          isLoading={false}
-          error={undefined}
-        />
-      ))}
-      
-      {/* Show loading state for new segment */}
-      {isLoading && (
+  // Only render once to prevent flashing
+  const renderContent = () => {
+    // If we're loading with no segments, just show the loading indicator
+    if (isLoading && segments.length === 0) {
+      return (
         <NarrativeDisplay 
           segment={null}
           isLoading={true}
           error={undefined}
         />
-      )}
-      
-      {/* Show error if any */}
-      {error && !isLoading && (
+      );
+    }
+    
+    // If we have an error and we're not loading, show the error
+    if (error && !isLoading) {
+      return (
         <NarrativeDisplay 
           segment={null}
           isLoading={false}
           error={error}
         />
-      )}
+      );
+    }
+    
+    // If we have segments, render them
+    if (segments.length > 0) {
+      return (
+        <>
+          {segments.map((segment) => (
+            <NarrativeDisplay 
+              key={segment.id}
+              segment={segment}
+              isLoading={false}
+              error={undefined}
+            />
+          ))}
+          
+          {/* Loading indicator for additional segments */}
+          {isLoading && (
+            <NarrativeDisplay 
+              segment={null}
+              isLoading={true}
+              error={undefined}
+            />
+          )}
+        </>
+      );
+    }
+    
+    // Default to loading
+    return (
+      <NarrativeDisplay 
+        segment={null}
+        isLoading={true}
+        error={undefined}
+      />
+    );
+  };
+
+  return (
+    <div 
+      className={`narrative-history space-y-4 ${className}`}
+      style={{
+        opacity: 1, // Always 1 to prevent flashing
+        minHeight: '200px', // Ensures space is reserved
+      }}
+    >
+      {renderContent()}
     </div>
   );
 };

@@ -92,19 +92,6 @@ export const Action: Story = {
   },
 };
 
-// Decision type (using scene since decision is not a valid type)
-export const Decision: Story = {
-  args: {
-    segment: createMockSegment(
-      'You stand at a crossroads. Three paths diverge into the darkness. Which way will you go?',
-      'scene',
-      {
-        mood: 'tense',
-        tags: ['choice', 'crossroads', 'decision'],
-      }
-    ),
-  },
-};
 
 // Transition type
 export const Transition: Story = {
@@ -120,76 +107,10 @@ export const Transition: Story = {
   },
 };
 
-// Combat type (using action since combat is not a valid type)
-export const Combat: Story = {
-  args: {
-    segment: createMockSegment(
-      'The goblin charges at you, weapon raised! You must defend yourself!',
-      'action',
-      {
-        mood: 'tense',
-        tags: ['battle', 'goblin', 'combat'],
-      }
-    ),
-  },
-};
 
-// Exploration type (using scene since exploration is not a valid type)
-export const Exploration: Story = {
-  args: {
-    segment: createMockSegment(
-      'You discover a hidden chamber behind the waterfall. Ancient runes cover the walls.',
-      'scene',
-      {
-        mood: 'mysterious',
-        tags: ['discovery', 'secrets', 'exploration'],
-      }
-    ),
-  },
-};
 
-// Resolution type (using transition since resolution is not a valid type)
-export const Resolution: Story = {
-  args: {
-    segment: createMockSegment(
-      'With the artifact in hand, you complete your quest. The village is saved!',
-      'transition',
-      {
-        mood: 'mysterious',
-        tags: ['victory', 'quest-complete', 'resolution'],
-      }
-    ),
-  },
-};
 
-// Character interaction type (using dialogue since character_interaction is not a valid type)
-export const CharacterInteraction: Story = {
-  args: {
-    segment: createMockSegment(
-      'The merchant eyes you suspiciously. "Looking for something special?"',
-      'dialogue',
-      {
-        characterIds: ['merchant-1'],
-        mood: 'neutral',
-        tags: ['merchant', 'shop', 'interaction'],
-      }
-    ),
-  },
-};
 
-// Revelation type (using scene since revelation is not a valid type)
-export const Revelation: Story = {
-  args: {
-    segment: createMockSegment(
-      'The truth hits you like lightning - the old man was the lost prince all along!',
-      'scene',
-      {
-        mood: 'mysterious',
-        tags: ['plot-twist', 'discovery', 'revelation'],
-      }
-    ),
-  },
-};
 
 // Loading state
 export const Loading: Story = {

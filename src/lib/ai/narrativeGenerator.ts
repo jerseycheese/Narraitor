@@ -102,8 +102,7 @@ export class NarrativeGenerator {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private formatResponse(response: any, segmentType: string): NarrativeGenerationResult {
+  private formatResponse(response: { content?: string; tokenUsage?: number }, segmentType: string): NarrativeGenerationResult {
     // For mock client, generate metadata if not present
     const mood = this.getMoodForGenre(this.getWorldGenre());
     const location = this.getLocationForGenre(this.getWorldGenre());

@@ -104,13 +104,57 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
   };
 
+  // Parse content if it's in JSON format
+  const parseContent = (content: string): string => {
+    // Skip parsing if content is empty or not a string
+    if (!content || typeof content !== 'string') {
+      return content || '';
+    }
+    
+    // Check if content starts with ```json
+    if (content.trim().startsWith('```json')) {
+      try {
+        // Extract JSON string between backticks
+        const jsonStr = content.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        
+        // Pre-process JSON string to handle bad control characters
+        // Replace control characters that would cause JSON.parse to fail
+        const sanitizedJson = jsonStr.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ');
+        
+        try {
+          const parsed = JSON.parse(sanitizedJson);
+          
+          // If parsed successfully and has content property, return that
+          if (parsed && typeof parsed.content === 'string') {
+            return parsed.content;
+          }
+        } catch (jsonError) {
+          // If proper JSON parsing fails, try a more lenient approach using regex
+          // If strict parsing fails, try regex extraction
+          console.warn('Strict JSON parsing failed, trying regex extraction');
+          
+          // Use regex to extract content field directly
+          const contentMatch = jsonStr.match(/"content"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          if (contentMatch && contentMatch[1]) {
+            // Unescape any escaped quotes in the extracted content
+            return contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse code block content:', e);
+      }
+    }
+    return content;
+  };
+
   const styles = getSegmentStyles(segment.type);
+  const displayContent = parseContent(segment.content);
 
   return (
     <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
       <p className={styles.label}>{segment.type}</p>
       <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
-        {segment.content}
+        {displayContent}
       </p>
       {segment.metadata?.location && (
         <div className="mt-4 pt-4 border-t border-gray-200">

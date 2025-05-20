@@ -26,20 +26,49 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   
   // Subscribe to narrative store updates
   useEffect(() => {
-    console.log(`[NarrativeHistoryManager] Setting up subscription for session ${sessionId}`);
     
     // Initial load
     const loadSegments = () => {
       const existingSegments = getSegments(sessionId);
-      console.log(`[NarrativeHistoryManager] Loaded ${existingSegments.length} segments for session ${sessionId}`);
       
-      // Remove duplicate segments before setting state
-      const uniqueSegments = removeDuplicateSegments(existingSegments);
+      // ========= DIRECT FIX FOR MULTIPLE INITIAL SEGMENTS ==========
+      // First, identify all initial scenes by location
+      const initialScenes = existingSegments.filter(
+        segment => segment.type === 'scene' && 
+                  (segment.metadata?.location === 'Starting Location' || 
+                   segment.metadata?.location === 'Frontier Town')
+      );
       
-      if (uniqueSegments.length !== existingSegments.length) {
-        console.log(`[NarrativeHistoryManager] Removed ${existingSegments.length - uniqueSegments.length} duplicate segments`);
+      let processedSegments = [...existingSegments];
+      
+      // If we have multiple initial scenes, remove all but the most recent one
+      if (initialScenes.length > 1) {
+        
+        // Sort by timestamp (newest first)
+        initialScenes.sort((a, b) => 
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+        
+        // Keep only the newest initial scene
+        const keepScene = initialScenes[0];
+        
+        // Remove all other initial scenes
+        processedSegments = existingSegments.filter(segment => 
+          segment.id === keepScene.id || 
+          !(segment.type === 'scene' && 
+            (segment.metadata?.location === 'Starting Location' || 
+             segment.metadata?.location === 'Frontier Town'))
+        );
+        
       }
       
+      // Now apply regular deduplication as a second pass
+      const uniqueSegments = removeDuplicateSegments(processedSegments);
+      
+      if (uniqueSegments.length !== processedSegments.length) {
+      }
+      
+      // Set state with final deduplicated segments
       setSegments(uniqueSegments);
     };
     
@@ -51,13 +80,40 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     
     // Cleanup on unmount
     return () => {
-      console.log(`[NarrativeHistoryManager] Cleaning up subscription for session ${sessionId}`);
       unsubscribe();
     };
   }, [sessionId, getSegments]);
   
   // Remove duplicate segments based on content and type
+  // This is a more aggressive deduplication to fix the multiple initial segments issue
   const removeDuplicateSegments = (segments: NarrativeSegment[]): NarrativeSegment[] => {
+    // If we have more than one segment with type "scene" and location "Starting Location",
+    // only keep the most recent one
+    const initialScenes = segments.filter(
+      segment => segment.type === 'scene' && 
+                 segment.metadata?.location === 'Starting Location'
+    );
+    
+    if (initialScenes.length > 1) {
+      
+      // Sort by timestamp (newest first)
+      initialScenes.sort((a, b) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      
+      // Keep only the newest initial scene
+      const newestInitialScene = initialScenes[0];
+      
+      // Filter out all but the newest initial scene
+      const filtered = segments.filter(segment => 
+        segment.id === newestInitialScene.id || 
+        !(segment.type === 'scene' && segment.metadata?.location === 'Starting Location')
+      );
+      
+      return filtered;
+    }
+    
+    // For other types of segments, use normal deduplication
     const uniqueSegments: NarrativeSegment[] = [];
     const contentMap = new Map<string, boolean>();
     
@@ -74,27 +130,39 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     return uniqueSegments;
   };
 
-  // Show loading state if no segments yet
+  // State to track if we've stabilized the segments (no more deduplication needed)
+  const [stabilized, setStabilized] = useState(false);
+  
+  // Show loading state until segments are stabilized
   useEffect(() => {
-    if (segments.length === 0) {
-      setIsLoading(true);
-      
-      // Set a timeout to stop showing loading if it takes too long
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
-    } else {
+    // Always start in loading state when segments change
+    setIsLoading(true);
+    
+    // Create debounced stabilization (prevents flashing during load and deduplication)
+    const stabilizeTimer = setTimeout(() => {
+      setStabilized(true);
       setIsLoading(false);
-    }
-  }, [segments.length]);
+    }, 1000);  // Wait for 1 second to ensure all segments are loaded and deduplicated
+    
+    // Cleanup timer on unmount or when segments change again
+    return () => {
+      clearTimeout(stabilizeTimer);
+    };
+  }, [sessionId, segments.length]);
+  
+  // Reset stabilized state when session changes
+  useEffect(() => {
+    setStabilized(false);
+    setIsLoading(true);
+  }, [sessionId]);
 
   return (
     <div className={`narrative-history-manager ${className || ''}`}>
       <NarrativeHistory 
-        segments={segments}
-        isLoading={isLoading}
+        // Only show segments when they've stabilized
+        segments={stabilized ? segments : []}
+        // Always show loading animation until stabilized, regardless of whether we have segments
+        isLoading={isLoading || !stabilized}
         error={error || undefined}
       />
     </div>

@@ -44,10 +44,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     const instanceKey = `${sessionId}-${Date.now()}`;
     setSessionKey(instanceKey);
     
-    console.log(`[NarrativeController ${instanceKey}] Initializing for session ${sessionId}`);
+    // Initialize controller for the session
     
     // Reset state when session changes
-    setInitialGenerationCompleted(false);
     setProcessedChoices(new Set());
     setError(null);
     generateCount.current = 0;
@@ -56,10 +55,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     const existingSegments = getSessionSegments(sessionId);
     setSegments(existingSegments);
     
-    // If we already have segments, mark initial generation as completed
-    if (existingSegments.length > 0) {
-      setInitialGenerationCompleted(true);
-      console.log(`[NarrativeController ${instanceKey}] Loaded ${existingSegments.length} existing segments for session ${sessionId}`);
+    // Check if we already have an initial scene - more precise than just checking if any segments exist
+    const hasInitialScene = existingSegments.some(segment => 
+      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
+    );
+    
+    // Critical: mark initial generation as completed if we already have an initial scene
+    // This MUST be done before any effect that might trigger generation
+    setInitialGenerationCompleted(hasInitialScene);
+    
+    if (hasInitialScene) {
+      initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
+    } else if (existingSegments.length > 0) {
+    } else {
     }
 
     // Set mounted flag
@@ -68,7 +76,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     return () => {
       // Clear mounted flag when component unmounts
       mountedRef.current = false;
-      console.log(`[NarrativeController ${instanceKey}] Unmounting controller for session ${sessionId}`);
+      initialGenerationInitiated.current = false; // Reset generation init flag
     };
   }, [sessionId, getSessionSegments]);
 
@@ -84,7 +92,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       });
       
       if (hasDuplicates) {
-        console.log(`[NarrativeController ${sessionKey}] Detected duplicate segments, deduplicating...`);
         // Deduplicate by keeping only the first occurrence of each ID
         const uniqueSegments = [];
         const seenIds = new Set();
@@ -102,6 +109,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
   }, [segments, sessionKey]);
 
+  // Use a ref to track if we've initiated generation in this component instance
+  const initialGenerationInitiated = useRef(false);
+  
   // Primary generation effect
   useEffect(() => {
     // Skip if component is unmounted
@@ -110,28 +120,30 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // Generate narrative when triggered
     if (triggerGeneration && !isLoading) {
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
-      if (segments.length === 0 && !initialGenerationCompleted) {
-        generateCount.current += 1;
-        console.log(`[NarrativeController ${sessionKey}] Generating initial narrative #${generateCount.current} for session ${sessionId}`);
-        generateInitialNarrative();
+      if (segments.length === 0 && !initialGenerationCompleted && !initialGenerationInitiated.current) {
+        // Set both state and refs to prevent duplicate generation
         setInitialGenerationCompleted(true);
+        initialGenerationInitiated.current = true;
+        
+        generateCount.current += 1;
+        generateInitialNarrative();
       } 
       // Choice-based generation (only if we haven't processed this choice already)
       else if (choiceId && !processedChoices.has(choiceId)) {
-        generateCount.current += 1;
-        console.log(`[NarrativeController ${sessionKey}] Generating narrative #${generateCount.current} for choice ${choiceId}`);
-        generateNextSegment(choiceId);
-        
-        // Mark this choice as processed
+        // Mark this choice as processed BEFORE generating
+        // This prevents multiple generations from triggering
         setProcessedChoices(prev => {
           const updated = new Set(prev);
           updated.add(choiceId);
           return updated;
         });
+        
+        generateCount.current += 1;
+        generateNextSegment(choiceId);
       }
       // Log if we're skipping generation
       else if (segments.length > 0 && initialGenerationCompleted) {
-        console.log(`[NarrativeController ${sessionKey}] Skipping generation - already have ${segments.length} segments`);
+      } else {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -139,7 +151,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
 
   const generateInitialNarrative = async () => {
     const generationId = `initial-${Date.now()}`;
-    console.log(`[NarrativeController ${sessionKey}] Starting initial narrative generation ${generationId}`);
+    // CHECK FIRST: Don't generate an initial scene if one already exists
+    // Do a fresh check of the store to get the latest state
+    const existingSegments = getSessionSegments(sessionId);
+    const hasInitialScene = existingSegments.some(segment => 
+      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
+    );
+    
+    if (hasInitialScene) {
+      setInitialGenerationCompleted(true);
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(true);
     setError(null);
@@ -149,7 +172,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
-        console.log(`[NarrativeController ${sessionKey}] Skipping generation ${generationId} - component unmounted`);
         return;
       }
       
@@ -167,8 +189,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString()
       };
       
-      console.log(`[NarrativeController ${sessionKey}] Created new segment ${segmentId} for generation ${generationId}`);
-      
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
       
@@ -182,30 +202,25 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         timestamp: newSegment.timestamp
       });
       
-      console.log(`[NarrativeController ${sessionKey}] Added segment ${segmentId} to store for session ${sessionId}`);
-      
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
     } catch (err) {
-      console.error(`[NarrativeController ${sessionKey}] Error generating narrative:`, err);
+      console.error(`Error generating narrative:`, err);
       setError('Failed to generate narrative');
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
       }
-      console.log(`[NarrativeController ${sessionKey}] Completed generation ${generationId}`);
     }
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
     if (segments.length === 0) {
-      console.log(`[NarrativeController ${sessionKey}] Cannot generate next segment - no existing segments`);
       return;
     }
     
     const generationId = `choice-${triggeringChoiceId}-${Date.now()}`;
-    console.log(`[NarrativeController ${sessionKey}] Starting choice-based generation ${generationId}`);
     
     setIsLoading(true);
     setError(null);
@@ -230,7 +245,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
-        console.log(`[NarrativeController ${sessionKey}] Skipping generation ${generationId} - component unmounted`);
         return;
       }
       
@@ -248,8 +262,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         updatedAt: now.toISOString()
       };
       
-      console.log(`[NarrativeController ${sessionKey}] Created new segment ${segmentId} for generation ${generationId}`);
-      
       // Add to local state
       setSegments(prev => [...prev, newSegment]);
       
@@ -263,19 +275,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         timestamp: newSegment.timestamp
       });
       
-      console.log(`[NarrativeController ${sessionKey}] Added segment ${segmentId} to store for session ${sessionId}`);
-      
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
     } catch (err) {
-      console.error(`[NarrativeController ${sessionKey}] Error generating narrative:`, err);
+      console.error(`Error generating narrative:`, err);
       setError('Failed to generate narrative');
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
       }
-      console.log(`[NarrativeController ${sessionKey}] Completed generation ${generationId}`);
     }
   };
 

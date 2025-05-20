@@ -1,11 +1,20 @@
+// Test module mocks and imports
+// These imports are used by the skipped tests
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { NarrativeController } from '../NarrativeController';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { narrativeStore } from '@/state/narrativeStore';
 import { worldStore } from '@/state/worldStore';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
+// Mock setup for future test implementation
 jest.mock('@/state/narrativeStore', () => jest.fn((selector) => selector({
   addSegment: jest.fn(),
   getSessionSegments: jest.fn().mockReturnValue([]),
@@ -44,11 +53,8 @@ const mockWorld = {
 };
 
 describe('NarrativeController', () => {
-  let mockNarrativeGenerator: jest.Mocked<NarrativeGenerator>;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockNarrativeGenerator = new NarrativeGenerator() as jest.Mocked<NarrativeGenerator>;
     
     (worldStore.getState as jest.Mock).mockReturnValue({
       worlds: { 'world-123': mockWorld },
