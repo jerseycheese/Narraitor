@@ -68,11 +68,11 @@ describe('WorldCreationWizard Integration - Persistence', () => {
     fireEvent.click(screen.getByTestId('step-next-button'));
     
     await waitFor(() => expect(screen.getByTestId('attribute-review-step')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('attribute-checkbox-0'));
+    fireEvent.click(screen.getByTestId('attribute-toggle-0'));
     fireEvent.click(screen.getByTestId('step-next-button'));
     
     await waitFor(() => expect(screen.getByTestId('skill-review-step')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('skill-checkbox-0'));
+    fireEvent.click(screen.getByTestId('skill-toggle-0'));
     fireEvent.click(screen.getByTestId('step-next-button'));
     
     await waitFor(() => expect(screen.getByTestId('finalize-step')).toBeInTheDocument());
@@ -106,8 +106,8 @@ describe('WorldCreationWizard Integration - Persistence', () => {
 
     // Step 3: Select attributes
     await waitFor(() => expect(screen.getByTestId('attribute-review-step')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('attribute-checkbox-0'));
-    fireEvent.click(screen.getByTestId('attribute-checkbox-1'));
+    fireEvent.click(screen.getByTestId('attribute-toggle-0'));
+    fireEvent.click(screen.getByTestId('attribute-toggle-1'));
     
     // Go back to Step 1
     fireEvent.click(screen.getByTestId('step-back-button'));
@@ -128,7 +128,7 @@ describe('WorldCreationWizard Integration - Persistence', () => {
     await waitFor(() => expect(screen.getByTestId('attribute-review-step')).toBeInTheDocument());
     
     // Verify attribute selections persisted
-    expect(screen.getByTestId('attribute-checkbox-0')).toBeChecked();
-    expect(screen.getByTestId('attribute-checkbox-1')).toBeChecked();
+    expect(screen.getByTestId('attribute-toggle-0')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('attribute-toggle-1')).toHaveTextContent('Selected');
   });
 });
