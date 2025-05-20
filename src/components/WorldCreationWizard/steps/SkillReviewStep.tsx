@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { World, WorldSkill } from '@/types/world.types';
 import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
@@ -32,47 +33,67 @@ export default function SkillReviewStep({
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
         return {
           ...suggestion,
-          accepted: !!existingSkill
+          accepted: !!existingSkill,
+          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
         };
       });
     }
-    return [...suggestions];
+    return suggestions.map((suggestion, index) => ({
+      ...suggestion,
+      accepted: true, // Set to accepted by default
+      showDetails: index === 0 // Show details only for the first one
+    }));
   });
 
-  // Update local state when suggestions prop changes
+  // Update local state only on initial load or when suggestions change
   useEffect(() => {
+    // This should only run on initial mount or when suggestions change from parent
+    // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
       setLocalSuggestions(suggestions.map(suggestion => {
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
+        // If skill exists in worldData, use its acceptance state, otherwise default to true
+        const accepted = existingSkill ? true : (suggestion.accepted ?? true);
         return {
           ...suggestion,
-          accepted: !!existingSkill
+          accepted,
+          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
         };
       }));
     }
-  }, [suggestions, worldData.skills]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestions]); // Only depend on suggestions, not worldData.skills
 
   const handleToggleSkill = (index: number) => {
+    // Toggle the state in a new array
     const updatedSuggestions = [...localSuggestions];
-    updatedSuggestions[index].accepted = !updatedSuggestions[index].accepted;
+    updatedSuggestions[index] = {
+      ...updatedSuggestions[index],
+      accepted: !updatedSuggestions[index].accepted
+    };
+    
+    // Update local state
     setLocalSuggestions(updatedSuggestions);
     
-    // Update the worldData with accepted skills
+    // Convert to WorldSkill objects for the store
     const acceptedSkills: WorldSkill[] = updatedSuggestions
       .filter(s => s.accepted)
       .map(s => ({
         id: generateUniqueId('skill'),
-        worldId: '', // Will be set when world is created
+        worldId: '',
         name: s.name,
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        // Map linkedAttributeName to an actual attribute ID if needed
+        baseValue: 5, // Default to middle value
+        minValue: 1, // Fixed for MVP
+        maxValue: 10, // Fixed for MVP
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
       }));
     
+    // Update parent state
     onUpdate({ ...worldData, skills: acceptedSkills });
   };
 
@@ -91,6 +112,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
+        baseValue: 5, // Default to middle value
+        minValue: 1, // Fixed for MVP
+        maxValue: 10, // Fixed for MVP
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
@@ -100,10 +124,8 @@ export default function SkillReviewStep({
   };
 
   const validateAndNext = () => {
-    const acceptedCount = localSuggestions.filter(s => s.accepted).length;
-    
     // Check if more than 12 skills are selected
-    if (acceptedCount > 12) {
+    if (localSuggestions.filter(s => s.accepted).length > 12) {
       // Don't proceed if validation fails
       return;
     }
@@ -118,6 +140,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
+        baseValue: 5, // Default to middle value
+        minValue: 1, // Fixed for MVP
+        maxValue: 10, // Fixed for MVP
         linkedAttributeId: s.linkedAttributeName ?
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id :
           undefined,
@@ -139,30 +164,59 @@ export default function SkillReviewStep({
 
       <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
-          <div key={index} className="border p-4 rounded" data-testid={`skill-card-${index}`}>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`skill-${index}`}
-                data-testid={`skill-checkbox-${index}`}
-                checked={suggestion.accepted}
-                onChange={() => handleToggleSkill(index)}
-                className="w-5 h-5"
-              />
-              <label htmlFor={`skill-${index}`} className="font-medium flex-1">
-                {suggestion.name}
-              </label>
-              <span className={`px-2 py-1 rounded text-xs text-white uppercase font-medium ${
-                suggestion.difficulty === 'easy' ? 'bg-green-500' :
-                suggestion.difficulty === 'medium' ? 'bg-yellow-500' : 
-                'bg-red-500'
-              }`}>
-                {suggestion.difficulty}
-              </span>
+          <div 
+            key={index} 
+            className="border p-4 rounded" 
+            data-testid={`skill-card-${index}`}
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-testid={`skill-toggle-${index}`}
+                  onClick={() => handleToggleSkill(index)}
+                  className={`px-3 py-1 rounded-full ${
+                    suggestion.accepted 
+                      ? 'bg-green-100 text-green-700 border border-green-300' 
+                      : 'bg-gray-100 text-gray-500 border border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
+                </button>
+                <span className="font-medium">
+                  {suggestion.name}
+                </span>
+                <span className={`px-2 py-1 rounded text-xs text-white uppercase font-medium ${
+                  suggestion.difficulty === 'easy' ? 'bg-green-500' :
+                  suggestion.difficulty === 'medium' ? 'bg-yellow-500' : 
+                  'bg-red-500'
+                }`}>
+                  {suggestion.difficulty}
+                </span>
+              </div>
+              
+              {/* Add a details toggle button */}
+              <button 
+                type="button" 
+                className="text-sm text-blue-600 hover:underline focus:outline-none ml-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newSuggestions = [...localSuggestions];
+                  newSuggestions[index] = {
+                    ...newSuggestions[index],
+                    showDetails: !newSuggestions[index].showDetails
+                  };
+                  setLocalSuggestions(newSuggestions);
+                }}
+              >
+                {suggestion.showDetails ? 'Hide details' : 'Show details'}
+              </button>
             </div>
             
-            {suggestion.accepted && (
-              <div className="mt-4 pl-7">
+            {suggestion.showDetails && (
+              <div 
+                key={`skill-expanded-${index}`}
+                className="mt-4 pl-7">
                 <div className="mb-3">
                   <label className="block mb-1">Name</label>
                   <input
@@ -215,6 +269,41 @@ export default function SkillReviewStep({
                         </option>
                       ))}
                     </select>
+                  </div>
+                </div>
+                
+                {/* Default Value Range Editor */}
+                <div className="mt-4">
+                  {/* Create a temporary skill object for the range editor */}
+                  {worldData.skills?.some(skill => skill.name === suggestion.name) && (
+                    <SkillRangeEditor
+                      skill={{
+                        id: worldData.skills.find(skill => skill.name === suggestion.name)?.id || '',
+                        worldId: '',
+                        name: suggestion.name,
+                        description: suggestion.description,
+                        difficulty: suggestion.difficulty as 'easy' | 'medium' | 'hard',
+                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || 5,
+                        minValue: 1,
+                        maxValue: 10,
+                        category: suggestion.category,
+                        linkedAttributeId: worldData.skills.find(skill => skill.name === suggestion.name)?.linkedAttributeId
+                      }}
+                      onChange={(updates) => {
+                        // Find the skill in the worldData and update it
+                        const updatedSkills = worldData.skills?.map(skill => {
+                          if (skill.name === suggestion.name) {
+                            return { ...skill, ...updates };
+                          }
+                          return skill;
+                        });
+                        onUpdate({ ...worldData, skills: updatedSkills });
+                      }}
+                    />
+                  )}
+                  
+                  <div className="text-xs text-gray-500">
+                    <p>Min and max values are fixed at 1-10 for this version.</p>
                   </div>
                 </div>
               </div>

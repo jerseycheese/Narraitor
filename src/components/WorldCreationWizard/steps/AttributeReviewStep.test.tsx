@@ -79,8 +79,8 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    const firstCheckbox = screen.getByTestId('attribute-checkbox-0');
-    fireEvent.click(firstCheckbox);
+    const toggleButton = screen.getByTestId('attribute-toggle-0');
+    fireEvent.click(toggleButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -125,8 +125,8 @@ describe('AttributeReviewStep', () => {
 
     expect(screen.getByTestId('attribute-name-input-0')).toBeInTheDocument();
     expect(screen.getByTestId('attribute-description-textarea-0')).toBeInTheDocument();
-    expect(screen.getByTestId('attribute-min-input-0')).toBeInTheDocument();
-    expect(screen.getByTestId('attribute-max-input-0')).toBeInTheDocument();
+    // In the MVP, we only have a range editor with fixed min and max values
+    // No explicit min/max inputs are present anymore
   });
 
   test('allows editing attribute properties', () => {
@@ -382,8 +382,9 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('attribute-checkbox-0')).toBeChecked();
-    expect(screen.getByTestId('attribute-checkbox-1')).not.toBeChecked();
-    expect(screen.getByTestId('attribute-checkbox-2')).toBeChecked();
+    // Check that the toggle buttons show the correct state
+    expect(screen.getByTestId('attribute-toggle-0')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('attribute-toggle-1')).toHaveTextContent('Excluded');
+    expect(screen.getByTestId('attribute-toggle-2')).toHaveTextContent('Selected');
   });
 });

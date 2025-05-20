@@ -34,42 +34,57 @@ export default function AttributeReviewStep({
         return {
           ...suggestion,
           accepted: !!existingAttr,
+          showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
     }
-    return suggestions.map(suggestion => ({
+    return suggestions.map((suggestion, index) => ({
       ...suggestion,
       baseValue: Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
+      accepted: true, // Set to accepted by default
+      showDetails: index === 0, // Show details only for the first one
     }));
   });
 
-  // Update local state when suggestions prop changes
+  // Update local state only on initial load or when suggestions change
   useEffect(() => {
+    // This should only run on initial mount or when suggestions change from parent
+    // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
       setLocalSuggestions(suggestions.map(suggestion => {
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
+        // If attribute exists in worldData, use its acceptance state, otherwise default to true
+        const accepted = existingAttr ? true : (suggestion.accepted ?? true);
+        // For the first attribute, show details by default to give user a clue
         return {
           ...suggestion,
-          accepted: !!existingAttr,
+          accepted,
+          showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       }));
     }
-  }, [suggestions, worldData.attributes]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestions]); // Only depend on suggestions, not worldData.attributes
 
   const handleToggleAttribute = (index: number) => {
+    // Toggle the state in a new array
     const updatedSuggestions = [...localSuggestions];
-    updatedSuggestions[index].accepted = !updatedSuggestions[index].accepted;
+    updatedSuggestions[index] = {
+      ...updatedSuggestions[index],
+      accepted: !updatedSuggestions[index].accepted
+    };
     
+    // Update local state
     setLocalSuggestions(updatedSuggestions);
     
-    // Update the worldData with accepted attributes
-    const acceptedAttributes: WorldAttribute[] = updatedSuggestions
+    // Convert to WorldAttribute objects for the store
+    const acceptedAttributes = updatedSuggestions
       .filter(s => s.accepted)
       .map(s => ({
         id: generateUniqueId('attr'),
-        worldId: '', // Will be set when world is created
+        worldId: '',
         name: s.name,
         description: s.description,
         baseValue: s.baseValue,
@@ -78,6 +93,7 @@ export default function AttributeReviewStep({
         category: s.category,
       }));
     
+    // Update parent state
     onUpdate({ ...worldData, attributes: acceptedAttributes });
   };
 
@@ -138,31 +154,49 @@ export default function AttributeReviewStep({
         {localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
-            className="border p-4 rounded cursor-pointer" 
+            className="border p-4 rounded" 
             data-testid={`attribute-card-${index}`}
-            onClick={() => handleToggleAttribute(index)}
           >
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`attribute-${index}`}
-                data-testid={`attribute-checkbox-${index}`}
-                checked={suggestion.accepted}
-                onChange={() => handleToggleAttribute(index)}
-                onClick={(e) => e.stopPropagation()} // Only stop propagation, don't handle toggle here
-                className="w-5 h-5"
-              />
-              <label 
-                htmlFor={`attribute-${index}`} 
-                className="font-medium cursor-pointer"
-                onClick={(e) => e.stopPropagation()} // Allow label to trigger the checkbox normally
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-testid={`attribute-toggle-${index}`}
+                  onClick={() => handleToggleAttribute(index)}
+                  className={`px-3 py-1 rounded-full ${
+                    suggestion.accepted 
+                      ? 'bg-green-100 text-green-700 border border-green-300' 
+                      : 'bg-gray-100 text-gray-500 border border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
+                </button>
+                <span className="font-medium">
+                  {suggestion.name}
+                </span>
+              </div>
+              
+              {/* Add a details toggle button */}
+              <button 
+                type="button" 
+                className="text-sm text-blue-600 hover:underline focus:outline-none ml-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newSuggestions = [...localSuggestions];
+                  newSuggestions[index] = {
+                    ...newSuggestions[index],
+                    showDetails: !newSuggestions[index].showDetails
+                  };
+                  setLocalSuggestions(newSuggestions);
+                }}
               >
-                {suggestion.name}
-              </label>
+                {suggestion.showDetails ? 'Hide details' : 'Show details'}
+              </button>
             </div>
             
-            {suggestion.accepted && (
+            {suggestion.showDetails && (
               <div 
+                key={`attribute-expanded-${index}`}
                 className="mt-4 pl-7"
                 onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
               >
