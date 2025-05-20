@@ -47,31 +47,82 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [generation, setGeneration] = React.useState(0);
   const [initialized, setInitialized] = React.useState(false);
-  const controllerKey = React.useMemo(() => `controller-${sessionId}`, [sessionId]);
+  // Use a consistent key that doesn't change on remounts for the same session
+  const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
-  // Initialize the narrative on first load
+  // Initialize the narrative only once per session
+  // instead of clearing and recreating each time
   React.useEffect(() => {
-    console.log(`[GameSessionActive] Session ID: ${sessionId}, WorldID: ${worldId}, Controller Key: ${controllerKey}`);
+    // Initialize session with unique controller key
+    let isMounted = true;
     
-    // Set initial loading state and force initial generation
+    // Set initial loading state
     setIsGenerating(true);
     
-    // Set a timeout to handle the initial narrative generation
-    const timer = setTimeout(() => {
-      console.log(`[GameSessionActive] Initial narrative generation timer fired`);
-      setInitialized(true);
-    }, 2000); // Give enough time for the narrative to be generated
+    // Function to check existing narrative and set up if needed
+    const setupNarrative = async () => {
+      try {
+        // Dynamically import the narrativeStore to avoid circular dependencies
+        const { narrativeStore } = await import('@/state/narrativeStore');
+        
+        // Only proceed if still mounted
+        if (!isMounted) return;
+        
+        // Check if we already have segments for this session
+        const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
+        const hasInitialScene = existingSegments.some(segment => 
+          segment.type === 'scene' && 
+          (segment.metadata?.location === 'Starting Location' || 
+           segment.metadata?.location === 'Frontier Town')
+        );
+        
+        if (hasInitialScene) {
+          // If we already have an initial scene, just use it - no need to generate again
+          // Found existing initial scene, use it without generating a new one
+          setInitialized(true);
+          setIsGenerating(false);
+        }
+        else if (existingSegments.length > 0) {
+          // We have segments but no initial scene - unusual state - clean up and regenerate
+          // Found segments but no initial scene - unusual state - clean up
+          narrativeStore.getState().clearSessionSegments(sessionId);
+          
+          // Wait a short time to ensure the store update has completed
+          setTimeout(() => {
+            if (isMounted) {
+              // Set initialized flag to generate fresh narrative
+              setInitialized(true);
+            }
+          }, 500);
+        }
+        else {
+          // No segments at all - normal case for new session
+          // No existing segments found, will generate initial scene
+          setInitialized(true);
+        }
+      } catch (err) {
+        console.error(`Error setting up narrative:`, err);
+        // Set initialized anyway so we don't get stuck
+        setInitialized(true);
+      }
+    };
     
-    return () => clearTimeout(timer);
+    // Check existing narrative and set up if needed
+    setupNarrative();
+    
+    return () => {
+      // Mark component as unmounted to prevent state updates after unmounting
+      isMounted = false;
+    };
   }, [sessionId, worldId, controllerKey]);
 
   const handleNarrativeGenerated = (segment: NarrativeSegment) => {
-    console.log(`[GameSessionActive] Narrative generated for session ${sessionId}:`, segment);
+    // Narrative segment was successfully generated
     setIsGenerating(false);
   };
 
   const handleChoiceSelected = (choiceId: string) => {
-    console.log(`[GameSessionActive] Choice selected: ${choiceId}`);
+    // Player choice was selected
     setIsGenerating(true);
     setGeneration(prev => prev + 1);  // Increment generation counter
     onChoiceSelected(choiceId);
