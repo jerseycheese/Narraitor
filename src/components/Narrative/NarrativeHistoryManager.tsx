@@ -66,6 +66,8 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       const uniqueSegments = removeDuplicateSegments(processedSegments);
       
       if (uniqueSegments.length !== processedSegments.length) {
+        // This block is intentionally left empty. In the future, we may add logging
+        // or handle specific actions when deduplication changes occur.
       }
       
       // Set state with final deduplicated segments
