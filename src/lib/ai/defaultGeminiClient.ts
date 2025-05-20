@@ -10,34 +10,160 @@ class MockGeminiClient implements AIClient {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Generate appropriate response based on prompt content
+    // Extract world details from the prompt to generate more appropriate content
+    const worldName = this.extractDetail(prompt, 'called', '"');
+    const genre = this.extractDetail(prompt, 'creating the opening scene for a', 'story');
+    
+    // Generate appropriate response based on prompt content and world details
     const isInitialScene = prompt.includes('initialScene') || prompt.includes('opening scene');
     
     if (isInitialScene) {
+      // Generate a scene based on the genre/world name
+      const content = this.generateInitialSceneByGenre(genre?.trim(), worldName?.trim());
       return {
-        content: 'You find yourself at the entrance of a mysterious cave. The air is cool and damp, and you can hear the distant sound of dripping water echoing from within. Strange symbols are carved into the stone archway above you, hinting at ancient secrets waiting to be discovered.',
+        // Format as JSON response to match the expected format in the template
+        content: JSON.stringify({
+          content,
+          type: "scene",
+          metadata: {
+            mood: this.getMoodForGenre(genre?.trim()),
+            location: this.getLocationForGenre(genre?.trim()),
+            tags: ["opening", "introduction", genre?.trim() || "fantasy"]
+          }
+        }),
         finishReason: 'STOP',
         promptTokens: 100,
         completionTokens: 200
       };
     } else {
+      // Handle continuing narrative
+      const content = this.generateContinuationByGenre(genre?.trim());
       return {
-        content: 'As you venture deeper into the unknown, the path narrows and the walls glisten with moisture. The symbols on the walls seem to pulse with a faint blue light, responding to your presence. A sense of both wonder and trepidation fills you as you continue your exploration.',
+        content: JSON.stringify({
+          content,
+          type: "action",
+          metadata: {
+            mood: this.getMoodForGenre(genre?.trim()),
+            location: this.getLocationForGenre(genre?.trim()),
+            tags: ["continuation", genre?.trim() || "fantasy"]
+          }
+        }),
         finishReason: 'STOP',
         promptTokens: 120,
         completionTokens: 180
       };
     }
   }
+  
+  // Helper to extract details from the prompt
+  private extractDetail(prompt: string, prefix: string, suffix: string): string | null {
+    const prefixIndex = prompt.indexOf(prefix);
+    if (prefixIndex === -1) return null;
+    
+    const startIndex = prefixIndex + prefix.length;
+    const endIndex = prompt.indexOf(suffix, startIndex);
+    if (endIndex === -1) return null;
+    
+    return prompt.substring(startIndex, endIndex).trim();
+  }
+  
+  // Generate initial scene based on genre
+  private generateInitialSceneByGenre(genre?: string, worldName?: string): string {
+    const worldRef = worldName ? ` of ${worldName}` : '';
+    
+    switch(genre?.toLowerCase()) {
+      case 'fantasy':
+        return `The ancient forest of Eldoria stretched before you, a tapestry of emerald and gold bathed in dappled sunlight. Towering trees with trunks wider than castle towers reached toward the heavens, their canopies rustling with secrets as old as time itself. In the distance, the crystalline spires of the elven city${worldRef} glimmered like jewels, a beacon of magic and mystery in this realm of wonder and danger.`;
+      
+      case 'sci-fi':
+      case 'science fiction':
+        return `The observation deck offered a breathtaking view of Nexus Station${worldRef}, a massive orbital construct of gleaming metal and pulsing energy fields. Beyond it, the gas giant Cerulean VI dominated the starscape, its swirling azure storms casting an eerie blue glow throughout the chamber. Your neural implant pinged softly, alerting you to an incoming transmission – the mission briefing you'd been waiting for.`;
+      
+      case 'western':
+        return `The unforgiving sun beat down on the dusty main street of Redemption${worldRef}, the wooden buildings weathered by time and the harsh desert climate. A tumbleweed rolled lazily past the saloon, where piano notes spilled out alongside raucous laughter. Your hand instinctively moved to the revolver at your hip as you noticed several horses tied outside the sheriff's office – strangers had come to town.`;
+      
+      case 'horror':
+        return `The old mansion${worldRef} loomed against the night sky, its windows like dead eyes staring into your soul. A flash of lightning illuminated the decaying façade, revealing grotesque gargoyles that seemed to follow your movement. The iron gate creaked open at your touch, an invitation you knew you should refuse. Yet something pulled you forward, into the shadows that promised only dread and secrets better left buried.`;
+      
+      case 'cyberpunk':
+        return `Neon advertisements bathed the rain-slick streets of Night City${worldRef} in a kaleidoscope of unnatural colors, reflected in puddles of polluted water. The constant hum of the megacity vibrated through your cybernetic enhancements as you navigated the crowded undercity, corporate drones and street hustlers alike seeking shelter from the acid rain. Your HUD highlighted a message from a mysterious fixer – a job offer too lucrative to ignore, even with its obvious dangers.`;
+      
+      case 'steampunk':
+        return `Massive brass gears turned overhead as the airship docking tower of New Albion${worldRef} released clouds of steam into the already fog-thick sky. The cobblestone streets below teemed with life: inventors showcasing their latest mechanical marvels, aristocrats in their finest attire attended by clockwork servants, and urchins darting between steam vents for warmth. Your attention was drawn to the bulletin board where the Royal Society had posted a most unusual request.`;
+      
+      case 'post-apocalyptic':
+        return `The ruins of what was once a proud metropolis sprawled before you, nature reclaiming concrete and steel with vines and roots that cracked through foundations. This was all that remained of the old world${worldRef}, before the Fall. Your radiation counter ticked softly as you adjusted your makeshift mask and checked your dwindling supplies. In the distance, smoke rose from a settlement – perhaps friendly, perhaps not – but shelter was becoming a necessity as the contaminated storm clouds gathered on the horizon.`;
+      
+      default:
+        // Default to fantasy if genre not recognized
+        return `You stand at the threshold of a new adventure in the land${worldRef}, the path ahead shrouded in both promise and peril. The morning sun casts long shadows across the landscape, highlighting the ancient stones that mark the boundary between the known world and the wilderness beyond. A gentle breeze carries whispers of the stories waiting to be told, of treasures to be discovered, and of destinies to be fulfilled.`;
+    }
+  }
+  
+  // Generate continuation content based on genre
+  private generateContinuationByGenre(genre?: string): string {
+    switch(genre?.toLowerCase()) {
+      case 'fantasy':
+        return `As you venture deeper into the enchanted forest, the canopy thickens overhead, filtering the sunlight into ethereal beams that dance across the moss-covered ground. Ancient runes carved into the bark of the oldest trees begin to glow with a soft blue light, responding to your presence – or perhaps warning of it. The distant sound of melodic chimes reaches your ears, carried by a wind that seems to whisper forgotten names.`;
+      
+      case 'sci-fi':
+      case 'science fiction':
+        return `The security doors hiss open as your clearance is accepted, revealing a laboratory filled with holographic displays and experimental technology. Robotic assistants move with precise efficiency between workstations, while a quantum computer core pulses with energy at the center of the room. Your neural interface connects automatically to the local network, flooding your mind with data streams about the facility's current projects.`;
+      
+      case 'western':
+        return `You push through the saloon's swinging doors, and the piano music falters as all eyes turn to assess the newcomer. The air is thick with tobacco smoke and suspicion. A grizzled man at the bar touches the brim of his hat in acknowledgment, while a table of card players subtly adjust their postures, hands moving closer to concealed weapons. The bartender silently slides a glass your way – a small courtesy that might be the last you receive in these parts.`;
+      
+      case 'horror':
+        return `The floorboards creak beneath your feet as you move down the darkened hallway, the wallpaper peeling away like diseased skin. A child's laughter echoes from somewhere upstairs, though you know the house has been abandoned for decades. The temperature drops suddenly, your breath fogging in the air as the door behind you slams shut with unnatural force. In the corner of your eye, something shifts in the shadows – not moving away, but toward you.`;
+      
+      case 'cyberpunk':
+        return `The club's synthetic beats pound through your chest as you navigate through the crowd of augmented bodies and enhanced minds seeking temporary escape. Bartenders with mechanical arms mix drinks containing substances barely legal, while information brokers in shadowy booths trade data more valuable than currency. Your optic implants scan the faces, filtering through the AR overlays until they lock onto your target – the corporate defector with a head full of proprietary secrets.`;
+      
+      default:
+        return `As you continue your journey, the landscape transforms around you, revealing new wonders and challenges that test your resolve. Each step takes you further from the familiar and deeper into the unknown, where the rules you once knew may no longer apply. A sense of both anticipation and caution fills you as you survey the path ahead, knowing that choices made now will echo throughout your adventure.`;
+    }
+  }
+  
+  // Get appropriate mood for genre
+  private getMoodForGenre(genre?: string): string {
+    switch(genre?.toLowerCase()) {
+      case 'horror': return 'tense';
+      case 'fantasy': return 'mysterious';
+      case 'sci-fi': 
+      case 'science fiction': return 'mysterious';
+      case 'western': return 'tense';
+      case 'cyberpunk': return 'tense';
+      case 'post-apocalyptic': return 'tense';
+      case 'steampunk': return 'mysterious';
+      default: return 'neutral';
+    }
+  }
+  
+  // Get appropriate location for genre
+  private getLocationForGenre(genre?: string): string {
+    switch(genre?.toLowerCase()) {
+      case 'fantasy': return 'Enchanted Forest';
+      case 'sci-fi': 
+      case 'science fiction': return 'Space Station';
+      case 'western': return 'Frontier Town';
+      case 'horror': return 'Abandoned Mansion';
+      case 'cyberpunk': return 'Neon City';
+      case 'post-apocalyptic': return 'Ruins';
+      case 'steampunk': return 'Victorian Metropolis';
+      default: return 'Starting Location';
+    }
+  }
 }
 
 // Create a default instance of GeminiClient for narrative generation
 export const createDefaultGeminiClient = () => {
-  // In production, use real client
-  if (process.env.NODE_ENV === 'production' && process.env.GOOGLE_API_KEY) {
+  // Use real client when API key is available
+  if (process.env.GOOGLE_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    console.log("Using real Gemini client with API key");
     return new GeminiClient(getDefaultConfig());
   }
   
-  // Otherwise, use mock client for development/testing
+  // Use mock client when no API key or in development/testing
+  console.log("Using mock Gemini client (no API key or development environment)");
   return new MockGeminiClient();
 };

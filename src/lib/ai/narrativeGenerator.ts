@@ -105,17 +105,43 @@ export class NarrativeGenerator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private formatResponse(response: any, segmentType: string): NarrativeGenerationResult {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const aiResponse = response as { content?: string; metadata?: any; tokenUsage?: any };
+    let parsedResponse: any = { content: '', type: segmentType, metadata: {} };
+    
+    try {
+      // First, try to parse the content as JSON
+      if (typeof response.content === 'string') {
+        try {
+          parsedResponse = JSON.parse(response.content);
+        } catch (e) {
+          // If parsing fails, use the raw content
+          console.log("Failed to parse response as JSON, using raw content");
+          parsedResponse = {
+            content: response.content || '',
+            type: segmentType,
+            metadata: {}
+          };
+        }
+      }
+    } catch (error) {
+      console.error("Error formatting response:", error);
+      // Fallback to raw content if anything goes wrong
+      parsedResponse = {
+        content: response.content || '',
+        type: segmentType,
+        metadata: {}
+      };
+    }
+    
     return {
-      content: aiResponse.content || '',
-      segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
+      content: parsedResponse.content || '',
+      segmentType: (parsedResponse.type || segmentType) as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
-        characterIds: aiResponse.metadata?.characterIds || [],
-        location: aiResponse.metadata?.location,
-        mood: aiResponse.metadata?.mood || 'neutral',
-        tags: aiResponse.metadata?.tags || []
+        characterIds: parsedResponse.metadata?.characterIds || [],
+        location: parsedResponse.metadata?.location || '',
+        mood: parsedResponse.metadata?.mood || 'neutral',
+        tags: parsedResponse.metadata?.tags || []
       },
-      tokenUsage: aiResponse.tokenUsage
+      tokenUsage: response.tokenUsage
     };
   }
 }
