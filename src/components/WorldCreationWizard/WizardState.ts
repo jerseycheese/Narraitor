@@ -30,6 +30,9 @@ export interface SkillSuggestion {
   category?: string;
   linkedAttributeName?: string;
   accepted: boolean;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 export const WIZARD_STEPS = [

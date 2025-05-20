@@ -49,7 +49,11 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     linkedAttributeId: skill.linkedAttributes?.length > 0 
       ? attributes.find(a => a.name === skill.linkedAttributes[0])?.id 
       : undefined,
-    difficulty: 'medium' // Default difficulty level
+    difficulty: 'medium', // Default difficulty level
+    baseValue: 5, // Default middle value
+    minValue: 1, // Fixed min value for MVP
+    maxValue: 10, // Fixed max value for MVP
+    category: skill.category || 'General' // Use provided category or default to 'General'
   }));
   
   // Update the world store with the new world

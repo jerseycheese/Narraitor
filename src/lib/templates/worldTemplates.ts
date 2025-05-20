@@ -34,6 +34,7 @@ export interface SkillTemplate {
   maxValue: number;
   defaultValue: number;
   linkedAttributes: string[]; // For template loader
+  category?: string; // Optional category for the skill
 }
 
 export interface ThemeTemplate {

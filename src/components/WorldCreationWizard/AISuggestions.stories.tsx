@@ -57,6 +57,9 @@ const mockSkills: SkillSuggestion[] = [
     category: 'Magic',
     linkedAttributeName: 'Arcane Power',
     accepted: true,
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10
   },
   {
     name: 'Dragon Riding',
@@ -65,6 +68,9 @@ const mockSkills: SkillSuggestion[] = [
     category: 'Physical',
     linkedAttributeName: 'Dragon Affinity',
     accepted: false,
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10
   },
   {
     name: 'Alchemy',
@@ -73,6 +79,9 @@ const mockSkills: SkillSuggestion[] = [
     category: 'Magic',
     linkedAttributeName: 'Arcane Power',
     accepted: false,
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10
   },
 ];
 
