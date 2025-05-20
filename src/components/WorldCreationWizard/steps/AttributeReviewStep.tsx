@@ -148,17 +148,14 @@ export default function AttributeReviewStep({
                 id={`attribute-${index}`}
                 data-testid={`attribute-checkbox-${index}`}
                 checked={suggestion.accepted}
-                onChange={(e) => {
-                  // Prevent the onClick from firing twice
-                  e.stopPropagation(); 
-                  handleToggleAttribute(index);
-                }}
+                onChange={() => handleToggleAttribute(index)}
+                onClick={(e) => e.stopPropagation()} // Only stop propagation, don't handle toggle here
                 className="w-5 h-5"
               />
               <label 
                 htmlFor={`attribute-${index}`} 
-                className="font-medium"
-                onClick={(e) => e.stopPropagation()} // Prevent double toggle when clicking label
+                className="font-medium cursor-pointer"
+                onClick={(e) => e.stopPropagation()} // Allow label to trigger the checkbox normally
               >
                 {suggestion.name}
               </label>
