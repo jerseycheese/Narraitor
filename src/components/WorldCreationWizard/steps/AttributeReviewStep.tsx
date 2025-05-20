@@ -136,23 +136,39 @@ export default function AttributeReviewStep({
 
       <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
-          <div key={index} className="border p-4 rounded" data-testid={`attribute-card-${index}`}>
+          <div 
+            key={index} 
+            className="border p-4 rounded cursor-pointer" 
+            data-testid={`attribute-card-${index}`}
+            onClick={() => handleToggleAttribute(index)}
+          >
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id={`attribute-${index}`}
                 data-testid={`attribute-checkbox-${index}`}
                 checked={suggestion.accepted}
-                onChange={() => handleToggleAttribute(index)}
+                onChange={(e) => {
+                  // Prevent the onClick from firing twice
+                  e.stopPropagation(); 
+                  handleToggleAttribute(index);
+                }}
                 className="w-5 h-5"
               />
-              <label htmlFor={`attribute-${index}`} className="font-medium">
+              <label 
+                htmlFor={`attribute-${index}`} 
+                className="font-medium"
+                onClick={(e) => e.stopPropagation()} // Prevent double toggle when clicking label
+              >
                 {suggestion.name}
               </label>
             </div>
             
             {suggestion.accepted && (
-              <div className="mt-4 pl-7">
+              <div 
+                className="mt-4 pl-7"
+                onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
+              >
                 <div className="mb-3">
                   <label className="block mb-1">Name</label>
                   <input
