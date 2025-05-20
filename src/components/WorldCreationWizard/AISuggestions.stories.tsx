@@ -25,6 +25,7 @@ const mockAttributes: AttributeSuggestion[] = [
     description: 'Magical energy and spellcasting ability',
     minValue: 1,
     maxValue: 10,
+    baseValue: 5, // Default value (middle of range)
     category: 'Magical',
     accepted: false,
   },
@@ -33,6 +34,7 @@ const mockAttributes: AttributeSuggestion[] = [
     description: 'Connection to draconic beings',
     minValue: 1,
     maxValue: 10,
+    baseValue: 7, // Higher default value
     category: 'Magical',
     accepted: true,
   },
@@ -41,6 +43,7 @@ const mockAttributes: AttributeSuggestion[] = [
     description: 'Strength and endurance',
     minValue: 1,
     maxValue: 10,
+    baseValue: 3, // Lower default value
     category: 'Physical',
     accepted: false,
   },

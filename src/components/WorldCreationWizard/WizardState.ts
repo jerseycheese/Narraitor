@@ -18,6 +18,7 @@ export interface AttributeSuggestion {
   description: string;
   minValue: number;
   maxValue: number;
+  baseValue: number;
   category?: string;
   accepted: boolean;
 }

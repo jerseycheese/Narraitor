@@ -2,15 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import { WorldAttribute } from '@/types/world.types';
 
+// Updated to use 1-10 range for MVP
 const mockAttributes: WorldAttribute[] = [
   {
     id: 'attr-1',
     worldId: 'world-123',
     name: 'Strength',
     description: 'Physical power and muscle',
-    baseValue: 10,
+    baseValue: 7,
     minValue: 1,
-    maxValue: 20,
+    maxValue: 10,
     category: 'Physical',
   },
   {
@@ -18,9 +19,9 @@ const mockAttributes: WorldAttribute[] = [
     worldId: 'world-123',
     name: 'Intelligence',
     description: 'Mental acuity and reasoning',
-    baseValue: 10,
+    baseValue: 5,
     minValue: 1,
-    maxValue: 20,
+    maxValue: 10,
     category: 'Mental',
   },
 ];
@@ -32,7 +33,7 @@ const meta: Meta<typeof WorldAttributesForm> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Form for managing world attributes with add, edit, and remove functionality',
+        component: 'Form for managing world attributes with add, edit, and remove functionality. Includes range controls for setting attribute default values.',
       },
     },
   },
@@ -75,9 +76,9 @@ export const ManyAttributes: Story = {
         worldId: 'world-123',
         name: 'Agility',
         description: 'Speed and dexterity',
-        baseValue: 10,
+        baseValue: 3,
         minValue: 1,
-        maxValue: 20,
+        maxValue: 10,
         category: 'Physical',
       },
       {
@@ -85,9 +86,9 @@ export const ManyAttributes: Story = {
         worldId: 'world-123',
         name: 'Wisdom',
         description: 'Insight and judgment',
-        baseValue: 10,
+        baseValue: 9,
         minValue: 1,
-        maxValue: 20,
+        maxValue: 10,
         category: 'Mental',
       },
     ],
@@ -101,6 +102,53 @@ export const WithoutCategories: Story = {
       ...attr,
       category: undefined,
     })),
+    worldId: 'world-123',
+  },
+};
+
+export const WithDifferentDefaultValues: Story = {
+  args: {
+    attributes: [
+      {
+        id: 'attr-1',
+        worldId: 'world-123',
+        name: 'Strength',
+        description: 'Physical power and muscle',
+        baseValue: 8,
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+      },
+      {
+        id: 'attr-2',
+        worldId: 'world-123',
+        name: 'Intelligence',
+        description: 'Mental acuity and reasoning',
+        baseValue: 9,
+        minValue: 1,
+        maxValue: 10,
+        category: 'Mental',
+      },
+      {
+        id: 'attr-3',
+        worldId: 'world-123',
+        name: 'Charisma',
+        description: 'Social appeal and leadership',
+        baseValue: 2,
+        minValue: 1,
+        maxValue: 10,
+        category: 'Social',
+      },
+      {
+        id: 'attr-4',
+        worldId: 'world-123',
+        name: 'Luck',
+        description: 'Random chance and fortune',
+        baseValue: 5,
+        minValue: 1,
+        maxValue: 10,
+      },
+    ],
     worldId: 'world-123',
   },
 };

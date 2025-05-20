@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { World, WorldAttribute } from '@/types/world.types';
 import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 
 interface AttributeReviewStepProps {
   worldData: Partial<World>;
@@ -32,11 +33,15 @@ export default function AttributeReviewStep({
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
         return {
           ...suggestion,
-          accepted: !!existingAttr
+          accepted: !!existingAttr,
+          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
     }
-    return [...suggestions];
+    return suggestions.map(suggestion => ({
+      ...suggestion,
+      baseValue: Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
+    }));
   });
 
   // Update local state when suggestions prop changes
@@ -46,7 +51,8 @@ export default function AttributeReviewStep({
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
         return {
           ...suggestion,
-          accepted: !!existingAttr
+          accepted: !!existingAttr,
+          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       }));
     }
@@ -66,7 +72,7 @@ export default function AttributeReviewStep({
         worldId: '', // Will be set when world is created
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
@@ -88,7 +94,7 @@ export default function AttributeReviewStep({
         worldId: '',
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
@@ -98,7 +104,6 @@ export default function AttributeReviewStep({
   };
 
   const validateAndNext = () => {
-    
     // Update the world data regardless of validation outcome
     const acceptedAttributes: WorldAttribute[] = localSuggestions
       .filter(s => s.accepted)
@@ -107,7 +112,7 @@ export default function AttributeReviewStep({
         worldId: '',
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
@@ -169,32 +174,29 @@ export default function AttributeReviewStep({
                     className="w-full p-2 border rounded"
                   />
                 </div>
-                
-                <div className="flex gap-4 mb-3">
-                  <div className="flex-1">
-                    <label className="block mb-1">Min Value</label>
-                    <input
-                      type="number"
-                      data-testid={`attribute-min-input-${index}`}
-                      value={suggestion.minValue}
-                      onChange={(e) => handleModifyAttribute(index, 'minValue', parseInt(e.target.value))}
-                      min={1}
-                      max={10}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block mb-1">Max Value</label>
-                    <input
-                      type="number"
-                      data-testid={`attribute-max-input-${index}`}
-                      value={suggestion.maxValue}
-                      onChange={(e) => handleModifyAttribute(index, 'maxValue', parseInt(e.target.value))}
-                      min={1}
-                      max={10}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
+
+                {/* Fixed min/max range controls (for MVP) */}
+                <div className="my-4">
+                  <label className="block mb-1">Default Value</label>
+                  <AttributeRangeEditor
+                    attribute={{
+                      id: '',
+                      worldId: '',
+                      name: suggestion.name,
+                      description: suggestion.description,
+                      baseValue: suggestion.baseValue,
+                      minValue: 1, // Fixed for MVP
+                      maxValue: 10, // Fixed for MVP
+                    }}
+                    onChange={(updates) => {
+                      if (updates.baseValue !== undefined) {
+                        handleModifyAttribute(index, 'baseValue', updates.baseValue);
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Min and max values are fixed at 1-10 for this version.
+                  </p>
                 </div>
               </div>
             )}
@@ -239,4 +241,3 @@ export default function AttributeReviewStep({
     </div>
   );
 }
-
