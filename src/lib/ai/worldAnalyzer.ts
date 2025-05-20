@@ -137,7 +137,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       description: attr.description,
       minValue: attr.minValue || 1,
       maxValue: attr.maxValue || 10,
-      baseValue: Math.floor((attr.minValue || 1) + (attr.maxValue || 10) / 2), // Default value in the middle
+      baseValue: Math.floor(((attr.minValue || 1) + (attr.maxValue || 10)) / 2), // Default value in the middle
       category: attr.category,
       accepted: false,
     }));
