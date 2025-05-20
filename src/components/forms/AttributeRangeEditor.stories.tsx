@@ -72,27 +72,6 @@ export const Disabled: Story = {
   },
 };
 
-export const WithoutLabels: Story = {
-  args: {
-    attribute: defaultAttribute,
-    showLabels: false,
-  },
-};
-
-export const CustomAttribute: Story = {
-  args: {
-    attribute: {
-      id: 'attr-custom',
-      worldId: 'world-123',
-      name: 'Charisma',
-      description: 'Social presence and appeal',
-      baseValue: 7,
-      minValue: 1,
-      maxValue: 10,
-    },
-  },
-};
-
 export const InContextExample: Story = {
   render: () => {
     const attributes: WorldAttribute[] = [
