@@ -116,7 +116,11 @@ export class NarrativeGenerator {
         mood: mood,
         tags: [this.getWorldGenre() || 'fantasy', 'narrative']
       },
-      tokenUsage: response.tokenUsage
+      tokenUsage: response.tokenUsage && typeof response.tokenUsage === 'object' 
+        ? response.tokenUsage 
+        : response.tokenUsage 
+          ? { promptTokens: 0, completionTokens: 0, totalTokens: response.tokenUsage as number } 
+          : undefined
     };
   }
   

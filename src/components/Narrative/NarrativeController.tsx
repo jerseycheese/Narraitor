@@ -37,6 +37,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [processedChoices, setProcessedChoices] = useState<Set<string>>(new Set());
   const mountedRef = useRef(false);
   const generateCount = useRef(0);
+  // Use a ref to track if we've initiated generation in this component instance
+  const initialGenerationInitiated = useRef(false);
 
   // Load existing segments on mount and reset state when session changes
   useEffect(() => {
@@ -107,9 +109,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
   }, [segments, sessionKey]);
 
-  // Use a ref to track if we've initiated generation in this component instance
-  const initialGenerationInitiated = useRef(false);
-  
   // Primary generation effect
   useEffect(() => {
     // Skip if component is unmounted
@@ -148,7 +147,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   }, [triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);
 
   const generateInitialNarrative = async () => {
-    const generationId = `initial-${Date.now()}`;
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
@@ -217,8 +215,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     if (segments.length === 0) {
       return;
     }
-    
-    const generationId = `choice-${triggeringChoiceId}-${Date.now()}`;
     
     setIsLoading(true);
     setError(null);

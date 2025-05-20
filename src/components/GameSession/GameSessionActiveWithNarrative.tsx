@@ -70,10 +70,10 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
         
         // Check if we already have segments for this session
         const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
-        const hasInitialScene = existingSegments.some(segment => 
-          segment.type === 'scene' && 
-          (segment.metadata?.location === 'Starting Location' || 
-           segment.metadata?.location === 'Frontier Town')
+        const hasInitialScene = existingSegments.some(seg => 
+          seg.type === 'scene' && 
+          (seg.metadata?.location === 'Starting Location' || 
+           seg.metadata?.location === 'Frontier Town')
         );
         
         if (hasInitialScene) {
@@ -116,7 +116,8 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
     };
   }, [sessionId, worldId, controllerKey]);
 
-  const handleNarrativeGenerated = (segment: NarrativeSegment) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleNarrativeGenerated = (_: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
   };
@@ -140,14 +141,25 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
       
       <div className="mb-6 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">Story</h2>
-        {/* Use NarrativeHistoryManager instead of NarrativeController to fix duplication issues */}
+        {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
         <NarrativeHistoryManager
-          key={controllerKey}
+          key={`display-${controllerKey}`}
           sessionId={sessionId}
+          className="mb-4"
         />
         
-        {/* Hidden controller just to generate content - always show it but hide from view */}
-        <div style={{ display: 'none' }}>
+        {/* Loading indicator when generating */}
+        {isGenerating && (
+          <div className="text-center py-2">
+            <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent">
+              <span className="sr-only">Loading...</span>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">Generating story...</p>
+          </div>
+        )}
+        
+        {/* Hidden controller just to generate content - always include it but hide from view */}
+        <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
           <NarrativeController
             key={`generator-${controllerKey}`}
             worldId={worldId}

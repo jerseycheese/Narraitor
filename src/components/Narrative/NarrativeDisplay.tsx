@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 
@@ -127,23 +128,64 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           // If parsed successfully and has content property, return that
           if (parsed && typeof parsed.content === 'string') {
             return parsed.content;
+          } else if (parsed && typeof parsed.text === 'string') {
+            // Some models return 'text' instead of 'content'
+            return parsed.text;
+          } else if (parsed && typeof parsed === 'object') {
+            // If we have an object but no direct content field, check for nested structure
+            // Common for some AI response formats
+            if (parsed.response?.content) return parsed.response.content;
+            if (parsed.narrative?.content) return parsed.narrative.content;
+            if (parsed.scene?.description) return parsed.scene.description;
+            
+            // If it's just a string property, return the first one we find
+            for (const key in parsed) {
+              if (typeof parsed[key] === 'string' && parsed[key].length > 20) {
+                return parsed[key];
+              }
+            }
           }
-        } catch (jsonError) {
-          // If proper JSON parsing fails, try a more lenient approach using regex
-          // If strict parsing fails, try regex extraction
+        } catch (_) {
+          // If proper JSON parsing fails, try more lenient approaches
           console.warn('Strict JSON parsing failed, trying regex extraction');
           
-          // Use regex to extract content field directly
+          // First look for content field
           const contentMatch = jsonStr.match(/"content"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
           if (contentMatch && contentMatch[1]) {
-            // Unescape any escaped quotes in the extracted content
             return contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
           }
+          
+          // Then try text field
+          const textMatch = jsonStr.match(/"text"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
+          if (textMatch && textMatch[1]) {
+            return textMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+          }
+          
+          // As a last resort, try to extract any large string
+          const anyStringMatch = jsonStr.match(/"[^"]+"\s*:\s*"([^"]{20,}(?:\\.[^"]*)*)"/);
+          if (anyStringMatch && anyStringMatch[1]) {
+            return anyStringMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+          }
         }
-      } catch (e) {
-        console.error('Failed to parse code block content:', e);
+      } catch (error) {
+        console.error('Failed to parse code block content:', error);
       }
     }
+    
+    // Final check for raw JSON without code markers
+    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
+      try {
+        const parsed = JSON.parse(content);
+        if (parsed && typeof parsed.content === 'string') {
+          return parsed.content;
+        } else if (parsed && typeof parsed.text === 'string') {
+          return parsed.text;
+        }
+      } catch (_) {
+        // Ignore error, just return the content as-is
+      }
+    }
+    
     return content;
   };
 
