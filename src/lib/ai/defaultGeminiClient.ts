@@ -21,16 +21,8 @@ class MockGeminiClient implements AIClient {
       // Generate a scene based on the genre/world name
       const content = this.generateInitialSceneByGenre(genre?.trim(), worldName?.trim());
       return {
-        // Format as JSON response to match the expected format in the template
-        content: JSON.stringify({
-          content,
-          type: "scene",
-          metadata: {
-            mood: this.getMoodForGenre(genre?.trim()),
-            location: this.getLocationForGenre(genre?.trim()),
-            tags: ["opening", "introduction", genre?.trim() || "fantasy"]
-          }
-        }),
+        // Return the content directly, not as a JSON string
+        content,
         finishReason: 'STOP',
         promptTokens: 100,
         completionTokens: 200
@@ -39,15 +31,8 @@ class MockGeminiClient implements AIClient {
       // Handle continuing narrative
       const content = this.generateContinuationByGenre(genre?.trim());
       return {
-        content: JSON.stringify({
-          content,
-          type: "action",
-          metadata: {
-            mood: this.getMoodForGenre(genre?.trim()),
-            location: this.getLocationForGenre(genre?.trim()),
-            tags: ["continuation", genre?.trim() || "fantasy"]
-          }
-        }),
+        // Return the content directly, not as a JSON string
+        content,
         finishReason: 'STOP',
         promptTokens: 120,
         completionTokens: 180

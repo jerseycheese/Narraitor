@@ -104,44 +104,62 @@ export class NarrativeGenerator {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private formatResponse(response: any, segmentType: string): NarrativeGenerationResult {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let parsedResponse: any = { content: '', type: segmentType, metadata: {} };
-    
-    try {
-      // First, try to parse the content as JSON
-      if (typeof response.content === 'string') {
-        try {
-          parsedResponse = JSON.parse(response.content);
-        } catch (e) {
-          // If parsing fails, use the raw content
-          console.log("Failed to parse response as JSON, using raw content");
-          parsedResponse = {
-            content: response.content || '',
-            type: segmentType,
-            metadata: {}
-          };
-        }
-      }
-    } catch (error) {
-      console.error("Error formatting response:", error);
-      // Fallback to raw content if anything goes wrong
-      parsedResponse = {
-        content: response.content || '',
-        type: segmentType,
-        metadata: {}
-      };
-    }
+    // For mock client, generate metadata if not present
+    const mood = this.getMoodForGenre(this.getWorldGenre());
+    const location = this.getLocationForGenre(this.getWorldGenre());
     
     return {
-      content: parsedResponse.content || '',
-      segmentType: (parsedResponse.type || segmentType) as 'scene' | 'dialogue' | 'action' | 'transition',
+      content: response.content || '',
+      segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
-        characterIds: parsedResponse.metadata?.characterIds || [],
-        location: parsedResponse.metadata?.location || '',
-        mood: parsedResponse.metadata?.mood || 'neutral',
-        tags: parsedResponse.metadata?.tags || []
+        characterIds: [],
+        location: location,
+        mood: mood,
+        tags: [this.getWorldGenre() || 'fantasy', 'narrative']
       },
       tokenUsage: response.tokenUsage
     };
+  }
+  
+  // Helper methods for mock generation
+  private getWorldGenre(): string | null {
+    try {
+      const world = this.getWorld(worldStore.getState().currentWorldId || '');
+      return world?.theme?.toLowerCase() || null;
+    } catch {
+      return null;
+    }
+  }
+  
+  private getMoodForGenre(genre?: string | null): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' {
+    if (!genre) return 'neutral';
+    
+    switch(genre.toLowerCase()) {
+      case 'horror': return 'tense';
+      case 'fantasy': return 'mysterious';
+      case 'sci-fi': 
+      case 'science fiction': return 'mysterious';
+      case 'western': return 'tense';
+      case 'cyberpunk': return 'tense';
+      case 'post-apocalyptic': return 'tense';
+      case 'steampunk': return 'mysterious';
+      default: return 'neutral';
+    }
+  }
+  
+  private getLocationForGenre(genre?: string | null): string {
+    if (!genre) return 'Starting Location';
+    
+    switch(genre.toLowerCase()) {
+      case 'fantasy': return 'Enchanted Forest';
+      case 'sci-fi': 
+      case 'science fiction': return 'Space Station';
+      case 'western': return 'Frontier Town';
+      case 'horror': return 'Abandoned Mansion';
+      case 'cyberpunk': return 'Neon City';
+      case 'post-apocalyptic': return 'Ruins';
+      case 'steampunk': return 'Victorian Metropolis';
+      default: return 'Starting Location';
+    }
   }
 }
