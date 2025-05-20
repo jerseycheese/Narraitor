@@ -11,6 +11,7 @@ const logger = new Logger('SessionStore');
  * Initial state for the session store
  */
 const initialState = {
+  id: null,
   status: 'initializing' as const,
   currentSceneId: null,
   playerChoices: [],
@@ -123,5 +124,11 @@ export const sessionStore = create<SessionStore>((set, get) => ({
   resumeSession: () => {
     logger.debug('Resuming session');
     set({ status: 'active' });
+  },
+  
+  // Set session ID
+  setSessionId: (id) => {
+    logger.debug('Setting session ID:', id);
+    set({ id });
   },
 }));

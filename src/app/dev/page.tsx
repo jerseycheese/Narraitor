@@ -22,6 +22,9 @@ export default function DevPage() {
         <Link href="/dev/world-list-screen" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           World List Screen Test Harness
         </Link>
+        <Link href="/dev/narrative-system" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          Narrative System Test Harness
+        </Link>
       </div>
     </div>
   );

@@ -79,3 +79,10 @@ export interface AIPromptProcessorOptions {
   templateManager: import('../promptTemplates/promptTemplateManager').PromptTemplateManager;
   config: AIConfig;
 }
+
+/**
+ * Interface for AI clients (both real and mock)
+ */
+export interface AIClient {
+  generateContent(prompt: string): Promise<AIResponse>;
+}

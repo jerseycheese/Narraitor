@@ -41,3 +41,19 @@ export const getSafetySettings = (): SafetySetting[] => {
     { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
   ];
 };
+
+/**
+ * Gets default configuration for AI service
+ * @returns Complete AI service configuration
+ */
+export const getDefaultConfig = () => {
+  const aiConfig = getAIConfig();
+  return {
+    apiKey: aiConfig.geminiApiKey,
+    modelName: aiConfig.modelName,
+    maxRetries: aiConfig.maxRetries,
+    timeout: aiConfig.timeout,
+    generationConfig: getGenerationConfig(),
+    safetySettings: getSafetySettings()
+  };
+};

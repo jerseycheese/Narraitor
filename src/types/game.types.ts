@@ -14,6 +14,7 @@ export interface PlayerChoice {
  * Game session state interface
  */
 export interface GameSessionState {
+  id?: string | null;
   status: 'initializing' | 'loading' | 'active' | 'paused' | 'ended';
   currentSceneId: string | null;
   playerChoices: PlayerChoice[];
@@ -25,6 +26,7 @@ export interface GameSessionState {
  */
 export interface SessionStore {
   // State properties
+  id: string | null;
   status: GameSessionState['status'];
   currentSceneId: string | null;
   playerChoices: PlayerChoice[];
@@ -42,4 +44,5 @@ export interface SessionStore {
   setCurrentScene: (sceneId: string | null) => void;
   pauseSession: () => void;
   resumeSession: () => void;
+  setSessionId: (id: string) => void;
 }

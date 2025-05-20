@@ -7,13 +7,14 @@ import { EntityID, TimestampedEntity } from './common.types';
  */
 export interface NarrativeSegment extends TimestampedEntity {
   id: EntityID;
-  worldId: EntityID;
-  sessionId: EntityID;
+  worldId?: EntityID;
+  sessionId?: EntityID;
   content: string;
   type: 'scene' | 'dialogue' | 'action' | 'transition';
-  characterIds: EntityID[];
+  characterIds?: EntityID[];
   decisions?: Decision[];
   metadata: NarrativeMetadata;
+  timestamp: Date;
 }
 
 /**
@@ -62,6 +63,63 @@ export interface Consequence {
  * Metadata for narrative segments (simplified for MVP)
  */
 export interface NarrativeMetadata {
-  mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional';
+  mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
   tags: string[];
+  location?: string;
+  characterIds?: EntityID[];
+}
+
+/**
+ * Represents a narrative generation request
+ */
+export interface NarrativeGenerationRequest {
+  worldId: EntityID;
+  sessionId: EntityID;
+  characterIds: EntityID[];
+  narrativeContext?: NarrativeContext;
+  generationParameters?: GenerationParameters;
+}
+
+/**
+ * Represents narrative context for generation
+ */
+export interface NarrativeContext {
+  recentSegments: NarrativeSegment[];
+  currentLocation?: string;
+  currentSituation?: string;
+  importantEntities?: Array<{
+    id: EntityID;
+    type: string;
+    name: string;
+  }>;
+}
+
+/**
+ * Parameters for narrative generation
+ */
+export interface GenerationParameters {
+  desiredLength?: 'short' | 'medium' | 'long';
+  tone?: string;
+  segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
+  includedTopics?: string[];
+  excludedTopics?: string[];
+}
+
+/**
+ * Result of narrative generation
+ */
+export interface NarrativeGenerationResult {
+  content: string;
+  segmentType: 'scene' | 'dialogue' | 'action' | 'transition';
+  metadata: {
+    characterIds: EntityID[];
+    location?: string;
+    mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
+    tags: string[];
+  };
+  tokenUsage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
 }

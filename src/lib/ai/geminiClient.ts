@@ -1,7 +1,7 @@
 // src/lib/ai/geminiClient.ts
 
 import { GoogleGenAI } from '@google/genai';
-import { AIResponse, AIServiceConfig } from './types';
+import { AIResponse, AIServiceConfig, AIClient } from './types';
 import { isRetryableError } from './errors';
 import { getGenerationConfig, getSafetySettings } from './config';
 
@@ -9,7 +9,7 @@ import { getGenerationConfig, getSafetySettings } from './config';
  * Client for Google Gemini AI service
  * Using the new @google/genai SDK
  */
-export class GeminiClient {
+export class GeminiClient implements AIClient {
   private config: AIServiceConfig;
   private genAI: GoogleGenAI;
   
