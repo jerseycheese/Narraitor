@@ -66,8 +66,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     
     if (hasInitialScene) {
       initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
-    } else if (existingSegments.length > 0) {
-    } else {
     }
 
     // Set mounted flag
