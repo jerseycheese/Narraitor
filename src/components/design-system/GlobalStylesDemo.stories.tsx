@@ -18,14 +18,8 @@ const meta: Meta<typeof GlobalStylesDemo> = {
     (Story) => (
       <div className="text-neutral-900 bg-white p-4">
         <style>{`
-          /* Force proper colors in Storybook */
-          body, h1, h2, h3, h4, h5, h6, p, li, td, th, label, span {
-            color: #171717 !important;
-          }
-          
           /* Storybook-specific overrides to ensure readability */
           #storybook-root {
-            color: #171717;
             background-color: #ffffff;
           }
         `}</style>
