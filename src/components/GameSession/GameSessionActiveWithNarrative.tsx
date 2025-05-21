@@ -141,6 +141,16 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
     setCurrentDecision(decision);
+    
+    // Convert AI-generated decision to player choices format for the session
+    const playerChoices = decision.options.map(option => ({
+      id: option.id,
+      text: option.text,
+      isSelected: option.id === decision.selectedOptionId
+    }));
+    
+    // Update session store with AI-generated choices
+    sessionStore.getState().setPlayerChoices(playerChoices);
   };
 
   return (
