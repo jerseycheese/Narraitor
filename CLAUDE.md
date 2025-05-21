@@ -138,6 +138,32 @@ test('displays all required world information', () => {
 - Always use PR template from `.github/PULL_REQUEST_TEMPLATE.md`
 - Always target the `develop` branch in PRs, NEVER target `main`
 
+### GitHub Token Configuration and API Access
+- Use `./scripts/setup-github-token.sh` to configure GitHub access tokens:
+  - Automatically checks for existing tokens in multiple locations
+  - Validates the token against GitHub API
+  - Provides guided setup for creating new tokens
+  - Stores token in multiple locations for fallback access
+  - Handles token expiration and renewal
+
+- Token discovery order:
+  1. Environment variable (`GITHUB_TOKEN`)
+  2. `.env.local` file (for Claude Code access)
+  3. `.claude/.github_token` file (backup location)
+  4. GitHub CLI (`gh auth token`)
+
+- Use `./scripts/claude-github.sh` for pre-authenticated GitHub API commands:
+  - `./scripts/claude-github.sh issue 123` - Get issue details
+  - `./scripts/claude-github.sh close-issue 123 "Implementation complete"` - Close issue with comment
+  - `./scripts/claude-github.sh create-pr "Fix #123" "PR body" "branch-name" "develop"` - Create PR
+  - `./scripts/claude-github.sh repo` - Get repository details
+  - `./scripts/claude-github.sh prs` - List open pull requests
+
+- Authentication fallback mechanism:
+  - All scripts attempt multiple methods to find a valid token
+  - Auto-refreshes invalid/expired tokens when possible
+  - Provides clear error messages when authentication fails
+
 ### MCP GitHub Tools Usage
 Use the MCP GitHub tool for all GitHub operations:
 
