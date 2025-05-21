@@ -128,8 +128,8 @@ describe('WorldCreationWizard - AI Suggestions Integration', () => {
     expect(screen.getByText('Intelligence')).toBeInTheDocument();
     
     // Check that the description is shown
-    const strengthCheckbox = screen.getByTestId('attribute-checkbox-0');
-    fireEvent.click(strengthCheckbox);
+    const strengthToggle = screen.getByTestId('attribute-toggle-0');
+    fireEvent.click(strengthToggle);
     
     // After clicking, the description should be visible
     await waitFor(() => {
@@ -162,11 +162,14 @@ describe('WorldCreationWizard - AI Suggestions Integration', () => {
       expect(screen.getByTestId('attribute-review-step')).toBeInTheDocument();
     });
 
-    // Toggle attribute acceptance
-    const strengthCheckbox = screen.getByTestId('attribute-checkbox-0');
-    fireEvent.click(strengthCheckbox);
+    // Check if toggle exists and click it - it may already be selected by default
+    const strengthToggle = screen.getByTestId('attribute-toggle-0');
+    // Click twice to ensure we have a predictable state (unselect then select again)
+    fireEvent.click(strengthToggle); // First click - toggle off
+    fireEvent.click(strengthToggle); // Second click - toggle on
     
-    expect(strengthCheckbox).toBeChecked();
+    // Check the button text now shows as selected
+    expect(strengthToggle).toHaveTextContent('Selected');
     
     // Continue to skills step
     fireEvent.click(screen.getByTestId('step-next-button'));
@@ -234,8 +237,14 @@ describe('WorldCreationWizard - AI Suggestions Integration', () => {
       expect(screen.getByTestId('attribute-review-step')).toBeInTheDocument();
     });
 
-    // Accept some suggestions
-    fireEvent.click(screen.getByTestId('attribute-checkbox-0')); // Accept Strength
+    // Ensure Strength suggestion is selected (unselect then select to get a predictable state)
+    const attributeToggle = screen.getByTestId('attribute-toggle-0');
+    fireEvent.click(attributeToggle); // First click may unselect if already selected 
+    fireEvent.click(attributeToggle); // Second click - ensure it's selected
+    
+    // Ensure at least one attribute is selected before proceeding
+    expect(attributeToggle).toHaveTextContent('Selected');
+    
     fireEvent.click(screen.getByTestId('step-next-button'));
 
     // Skip through skills

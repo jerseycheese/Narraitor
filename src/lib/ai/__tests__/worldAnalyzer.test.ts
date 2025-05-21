@@ -68,40 +68,43 @@ describe('worldAnalyzer', () => {
 
     // Test should expect what the mock is returning
     expect(result.attributes).toHaveLength(3);
-    expect(result.attributes[0]).toEqual({
+    
+    // Use a more flexible approach for testing - expect.objectContaining ensures we match
+    // the important fields without being strict about additional calculated fields
+    expect(result.attributes[0]).toEqual(expect.objectContaining({
       name: 'Magic',
       description: 'Control over supernatural forces',
       minValue: 1,
       maxValue: 10,
       category: 'Supernatural',
       accepted: false,
-    });
-    expect(result.attributes[1]).toEqual({
+    }));
+    expect(result.attributes[1]).toEqual(expect.objectContaining({
       name: 'Medieval',
       description: 'Reflects the technological and social level',
       minValue: 1,
       maxValue: 10,
       category: 'Setting',
       accepted: false,
-    });
-    expect(result.attributes[2]).toEqual({
+    }));
+    expect(result.attributes[2]).toEqual(expect.objectContaining({
       name: 'Dragons',
       description: 'Presence and influence of dragons',
       minValue: 1,
       maxValue: 10,
       category: 'Creatures',
       accepted: false,
-    });
+    }));
 
     expect(result.skills).toHaveLength(1);
-    expect(result.skills[0]).toEqual({
+    expect(result.skills[0]).toEqual(expect.objectContaining({
       name: 'Swordsmanship',
       description: 'Skill with bladed weapons',
       difficulty: 'medium',
       category: 'Combat',
       linkedAttributeName: 'Strength',
       accepted: false,
-    });
+    }));
   });
 
   test('extracts JSON from mixed content response', async () => {

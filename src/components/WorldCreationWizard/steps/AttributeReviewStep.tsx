@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { World, WorldAttribute } from '@/types/world.types';
 import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 
 interface AttributeReviewStepProps {
   worldData: Partial<World>;
@@ -32,46 +33,67 @@ export default function AttributeReviewStep({
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
         return {
           ...suggestion,
-          accepted: !!existingAttr
+          accepted: !!existingAttr,
+          showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
+          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       });
     }
-    return [...suggestions];
+    return suggestions.map((suggestion, index) => ({
+      ...suggestion,
+      baseValue: Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
+      accepted: true, // Set to accepted by default
+      showDetails: index === 0, // Show details only for the first one
+    }));
   });
 
-  // Update local state when suggestions prop changes
+  // Update local state only on initial load or when suggestions change
   useEffect(() => {
+    // This should only run on initial mount or when suggestions change from parent
+    // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
       setLocalSuggestions(suggestions.map(suggestion => {
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
+        // If attribute exists in worldData, use its acceptance state, otherwise default to true
+        const accepted = existingAttr ? true : (suggestion.accepted ?? true);
+        // For the first attribute, show details by default to give user a clue
         return {
           ...suggestion,
-          accepted: !!existingAttr
+          accepted,
+          showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
+          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
       }));
     }
-  }, [suggestions, worldData.attributes]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestions]); // Only depend on suggestions, not worldData.attributes
 
   const handleToggleAttribute = (index: number) => {
+    // Toggle the state in a new array
     const updatedSuggestions = [...localSuggestions];
-    updatedSuggestions[index].accepted = !updatedSuggestions[index].accepted;
+    updatedSuggestions[index] = {
+      ...updatedSuggestions[index],
+      accepted: !updatedSuggestions[index].accepted
+    };
     
+    // Update local state
     setLocalSuggestions(updatedSuggestions);
     
-    // Update the worldData with accepted attributes
-    const acceptedAttributes: WorldAttribute[] = updatedSuggestions
+    // Convert to WorldAttribute objects for the store
+    const acceptedAttributes = updatedSuggestions
       .filter(s => s.accepted)
       .map(s => ({
         id: generateUniqueId('attr'),
-        worldId: '', // Will be set when world is created
+        worldId: '',
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
       }));
     
+    // Update parent state
     onUpdate({ ...worldData, attributes: acceptedAttributes });
   };
 
@@ -88,7 +110,7 @@ export default function AttributeReviewStep({
         worldId: '',
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
@@ -98,7 +120,6 @@ export default function AttributeReviewStep({
   };
 
   const validateAndNext = () => {
-    
     // Update the world data regardless of validation outcome
     const acceptedAttributes: WorldAttribute[] = localSuggestions
       .filter(s => s.accepted)
@@ -107,7 +128,7 @@ export default function AttributeReviewStep({
         worldId: '',
         name: s.name,
         description: s.description,
-        baseValue: Math.floor((s.minValue + s.maxValue) / 2),
+        baseValue: s.baseValue,
         minValue: s.minValue,
         maxValue: s.maxValue,
         category: s.category,
@@ -131,23 +152,54 @@ export default function AttributeReviewStep({
 
       <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
-          <div key={index} className="border p-4 rounded" data-testid={`attribute-card-${index}`}>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id={`attribute-${index}`}
-                data-testid={`attribute-checkbox-${index}`}
-                checked={suggestion.accepted}
-                onChange={() => handleToggleAttribute(index)}
-                className="w-5 h-5"
-              />
-              <label htmlFor={`attribute-${index}`} className="font-medium">
-                {suggestion.name}
-              </label>
+          <div 
+            key={index} 
+            className="border p-4 rounded" 
+            data-testid={`attribute-card-${index}`}
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-testid={`attribute-toggle-${index}`}
+                  onClick={() => handleToggleAttribute(index)}
+                  className={`px-3 py-1 rounded-full ${
+                    suggestion.accepted 
+                      ? 'bg-green-100 text-green-700 border border-green-300' 
+                      : 'bg-gray-100 text-gray-500 border border-gray-300'
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                >
+                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
+                </button>
+                <span className="font-medium">
+                  {suggestion.name}
+                </span>
+              </div>
+              
+              {/* Add a details toggle button */}
+              <button 
+                type="button" 
+                className="text-sm text-blue-600 hover:underline focus:outline-none ml-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newSuggestions = [...localSuggestions];
+                  newSuggestions[index] = {
+                    ...newSuggestions[index],
+                    showDetails: !newSuggestions[index].showDetails
+                  };
+                  setLocalSuggestions(newSuggestions);
+                }}
+              >
+                {suggestion.showDetails ? 'Hide details' : 'Show details'}
+              </button>
             </div>
             
-            {suggestion.accepted && (
-              <div className="mt-4 pl-7">
+            {suggestion.showDetails && (
+              <div 
+                key={`attribute-expanded-${index}`}
+                className="mt-4 pl-7"
+                onClick={(e) => e.stopPropagation()} // Prevent toggling when interacting with inputs
+              >
                 <div className="mb-3">
                   <label className="block mb-1">Name</label>
                   <input
@@ -169,32 +221,29 @@ export default function AttributeReviewStep({
                     className="w-full p-2 border rounded"
                   />
                 </div>
-                
-                <div className="flex gap-4 mb-3">
-                  <div className="flex-1">
-                    <label className="block mb-1">Min Value</label>
-                    <input
-                      type="number"
-                      data-testid={`attribute-min-input-${index}`}
-                      value={suggestion.minValue}
-                      onChange={(e) => handleModifyAttribute(index, 'minValue', parseInt(e.target.value))}
-                      min={1}
-                      max={10}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block mb-1">Max Value</label>
-                    <input
-                      type="number"
-                      data-testid={`attribute-max-input-${index}`}
-                      value={suggestion.maxValue}
-                      onChange={(e) => handleModifyAttribute(index, 'maxValue', parseInt(e.target.value))}
-                      min={1}
-                      max={10}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
+
+                {/* Fixed min/max range controls (for MVP) */}
+                <div className="my-4">
+                  <label className="block mb-1">Default Value</label>
+                  <AttributeRangeEditor
+                    attribute={{
+                      id: '',
+                      worldId: '',
+                      name: suggestion.name,
+                      description: suggestion.description,
+                      baseValue: suggestion.baseValue,
+                      minValue: 1, // Fixed for MVP
+                      maxValue: 10, // Fixed for MVP
+                    }}
+                    onChange={(updates) => {
+                      if (updates.baseValue !== undefined) {
+                        handleModifyAttribute(index, 'baseValue', updates.baseValue);
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Min and max values are fixed at 1-10 for this version.
+                  </p>
                 </div>
               </div>
             )}
@@ -239,4 +288,3 @@ export default function AttributeReviewStep({
     </div>
   );
 }
-

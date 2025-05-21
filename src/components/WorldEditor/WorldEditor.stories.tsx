@@ -49,6 +49,10 @@ const mockWorld: World = {
       description: 'Physical prowess',
       linkedAttributeId: 'attr-1',
       difficulty: 'medium',
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
+      category: 'Physical',
     },
   ],
   settings: {

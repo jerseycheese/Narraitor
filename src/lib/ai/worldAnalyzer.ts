@@ -137,8 +137,9 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       description: attr.description,
       minValue: attr.minValue || 1,
       maxValue: attr.maxValue || 10,
+      baseValue: Math.floor(((attr.minValue || 1) + (attr.maxValue || 10)) / 2), // Default value in the middle
       category: attr.category,
-      accepted: false,
+      accepted: false, // Default to not accepted, user must explicitly select
     }));
     
     const skills: SkillSuggestion[] = analysis.skills.map((skill: AISkill) => ({
@@ -147,7 +148,10 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       difficulty: skill.difficulty || 'medium',
       category: skill.category,
       linkedAttributeName: skill.linkedAttributeName,
-      accepted: false,
+      accepted: false, // Default to not accepted, user must explicitly select
+      baseValue: 5, // Default value
+      minValue: 1, // Fixed min for MVP
+      maxValue: 10, // Fixed max for MVP
     }));
     
     return { attributes, skills };
@@ -156,26 +160,26 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     // Return default suggestions as fallback
     return {
       attributes: [
-        { name: 'Strength', description: 'Physical power and endurance', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
-        { name: 'Intelligence', description: 'Mental acuity and reasoning', minValue: 1, maxValue: 10, category: 'Mental', accepted: false },
-        { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
-        { name: 'Charisma', description: 'Social influence and charm', minValue: 1, maxValue: 10, category: 'Social', accepted: false },
-        { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
-        { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, category: 'Physical', accepted: false },
+        { name: 'Strength', description: 'Physical power and endurance', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: false },
+        { name: 'Intelligence', description: 'Mental acuity and reasoning', minValue: 1, maxValue: 10, baseValue: 7, category: 'Mental', accepted: false },
+        { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: false },
+        { name: 'Charisma', description: 'Social influence and charm', minValue: 1, maxValue: 10, baseValue: 4, category: 'Social', accepted: false },
+        { name: 'Dexterity', description: 'Hand-eye coordination and precision', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: false },
+        { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: false },
       ],
       skills: [
-        { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false },
-        { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeName: 'Agility', accepted: false },
-        { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
-        { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
-        { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
-        { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeName: 'Strength', accepted: false },
-        { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
-        { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeName: 'Constitution', accepted: false },
-        { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false },
-        { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
-        { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Strength', accepted: false },
-        { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeName: 'Charisma', accepted: false },
+        { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeName: 'Agility', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeName: 'Constitution', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
       ],
     };
   }

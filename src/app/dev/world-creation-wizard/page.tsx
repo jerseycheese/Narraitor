@@ -12,15 +12,15 @@ export default function WorldCreationWizardTestHarness() {
 
   // Mock AI suggestions
   const mockAttributes: AttributeSuggestion[] = [
-    { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, accepted: false },
-    { name: 'Intelligence', description: 'Mental acuity', minValue: 1, maxValue: 10, accepted: false },
-    { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, accepted: false },
+    { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, accepted: false },
+    { name: 'Intelligence', description: 'Mental acuity', minValue: 1, maxValue: 10, baseValue: 7, accepted: false },
+    { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, baseValue: 3, accepted: false },
   ];
 
   const mockSkills: SkillSuggestion[] = [
-    { name: 'Combat', description: 'Fighting ability', difficulty: 'medium', accepted: false },
-    { name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', accepted: false },
-    { name: 'Persuasion', description: 'Social influence', difficulty: 'easy', accepted: false },
+    { name: 'Combat', description: 'Fighting ability', difficulty: 'medium', accepted: false, baseValue: 5, minValue: 1, maxValue: 10, category: 'Physical' },
+    { name: 'Stealth', description: 'Moving unseen', difficulty: 'hard', accepted: false, baseValue: 5, minValue: 1, maxValue: 10, category: 'Physical' },
+    { name: 'Persuasion', description: 'Social influence', difficulty: 'easy', accepted: false, baseValue: 5, minValue: 1, maxValue: 10, category: 'Social' },
   ];
 
   const handleComplete = (worldId: string) => {

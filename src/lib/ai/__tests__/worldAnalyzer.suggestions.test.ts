@@ -68,25 +68,29 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       // Verify attributes are returned with correct structure
       expect(result.attributes).toHaveLength(2);
-      expect(result.attributes[0]).toEqual({
+      expect(result.attributes[0]).toEqual(expect.objectContaining({
         name: 'Arcane Power',
         description: 'Magical energy and spellcasting ability',
         minValue: 1,
         maxValue: 10,
         category: 'Magical',
-        accepted: false
-      });
+        accepted: false,
+        baseValue: expect.any(Number)
+      }));
 
       // Verify skills are returned with correct structure
       expect(result.skills).toHaveLength(2);
-      expect(result.skills[0]).toEqual({
+      expect(result.skills[0]).toEqual(expect.objectContaining({
         name: 'Spellcasting',
         description: 'Ability to cast magical spells',
         difficulty: 'hard',
         category: 'Magic',
         linkedAttributeName: 'Arcane Power',
-        accepted: false
-      });
+        accepted: false,
+        baseValue: expect.any(Number),
+        minValue: expect.any(Number),
+        maxValue: expect.any(Number)
+      }));
     });
 
     it('should handle JSON response embedded in text', async () => {

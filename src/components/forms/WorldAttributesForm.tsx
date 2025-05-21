@@ -1,6 +1,7 @@
 import React from 'react';
 import { WorldAttribute } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import AttributeRangeEditor from './AttributeRangeEditor';
 
 interface WorldAttributesFormProps {
   attributes: WorldAttribute[];
@@ -15,14 +16,15 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
 }) => {
   // Add a new attribute
   const handleAddAttribute = () => {
+    // For MVP, min/max values are fixed at 1-10
     const newAttribute: WorldAttribute = {
       id: generateUniqueId('attr'),
       worldId,
       name: 'New Attribute',
       description: 'Description of the new attribute',
-      baseValue: 10,
-      minValue: 1,
-      maxValue: 20,
+      baseValue: 5, // Default to middle value
+      minValue: 1, // Fixed for MVP
+      maxValue: 10, // Fixed for MVP
     };
     
     onChange([...attributes, newAttribute]);
@@ -94,7 +96,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                   />
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description
                   </label>
@@ -106,42 +108,17 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                   />
                 </div>
                 
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Base
-                    </label>
-                    <input
-                      type="number"
-                      value={attribute.baseValue}
-                      onChange={(e) => handleUpdateAttribute(index, { baseValue: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Min
-                    </label>
-                    <input
-                      type="number"
-                      value={attribute.minValue}
-                      onChange={(e) => handleUpdateAttribute(index, { minValue: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Max
-                    </label>
-                    <input
-                      type="number"
-                      value={attribute.maxValue}
-                      onChange={(e) => handleUpdateAttribute(index, { maxValue: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
-                    />
-                  </div>
+                {/* Default Value Range Editor */}
+                <div className="md:col-span-2 mt-2">
+                  <AttributeRangeEditor 
+                    attribute={attribute}
+                    onChange={(updates) => handleUpdateAttribute(index, updates)}
+                  />
+                </div>
+                
+                {/* Display min and max values (fixed for MVP) */}
+                <div className="text-xs text-gray-500 md:col-span-2">
+                  <p>Min and max values are fixed at 1-10 for this version.</p>
                 </div>
               </div>
             </div>

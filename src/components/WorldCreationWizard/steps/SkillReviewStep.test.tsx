@@ -81,8 +81,8 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    const firstCheckbox = screen.getByTestId('skill-checkbox-0');
-    fireEvent.click(firstCheckbox);
+    const toggleButton = screen.getByTestId('skill-toggle-0');
+    fireEvent.click(toggleButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -426,8 +426,9 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('skill-checkbox-0')).toBeChecked();
-    expect(screen.getByTestId('skill-checkbox-1')).not.toBeChecked();
-    expect(screen.getByTestId('skill-checkbox-2')).toBeChecked();
+    // Check that the toggle buttons show the correct state
+    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Excluded');
+    expect(screen.getByTestId('skill-toggle-2')).toHaveTextContent('Selected');
   });
 });

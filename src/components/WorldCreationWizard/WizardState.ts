@@ -18,6 +18,7 @@ export interface AttributeSuggestion {
   description: string;
   minValue: number;
   maxValue: number;
+  baseValue: number;
   category?: string;
   accepted: boolean;
 }
@@ -29,6 +30,9 @@ export interface SkillSuggestion {
   category?: string;
   linkedAttributeName?: string;
   accepted: boolean;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 
 export const WIZARD_STEPS = [

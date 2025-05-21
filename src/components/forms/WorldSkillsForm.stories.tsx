@@ -32,6 +32,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'attr-1',
     difficulty: 'medium',
     category: 'Physical',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
   },
   {
     id: 'skill-2',
@@ -41,6 +44,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'attr-2',
     difficulty: 'easy',
     category: 'Mental',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
   },
 ];
 
@@ -107,6 +113,9 @@ export const AllDifficulties: Story = {
         name: 'Advanced Magic',
         description: 'Complex spell casting',
         difficulty: 'hard',
+        baseValue: 5,
+        minValue: 1,
+        maxValue: 10,
       },
     ],
     attributes: mockAttributes,
