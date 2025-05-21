@@ -9,14 +9,5 @@
   "memory": {
     "format": "markdown",
     "enabled": true
-  },
-  "autoApproveCommands": {
-    "curl": {
-      "patterns": [
-        "*api.github.com/repos/jerseycheese/narraitor/issues/*",
-        "*github.com*issues*",
-        "curl -s https://api.github.com/repos/jerseycheese/narraitor/issues/*"
-      ]
-    }
   }
 }
