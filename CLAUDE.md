@@ -138,6 +138,15 @@ test('displays all required world information', () => {
 - Always use PR template from `.github/PULL_REQUEST_TEMPLATE.md`
 - Always target the `develop` branch in PRs, NEVER target `main`
 
+### GitHub Token Configuration
+- Use `./scripts/setup-github-token.sh` to configure GitHub access tokens
+- GitHub token should be stored in `.env.local` for Claude Code access
+- All GitHub operations in scripts will use this token automatically
+- Use `./scripts/claude-github.sh` for pre-authenticated GitHub API access:
+  - `./scripts/claude-github.sh issue 123` - Get issue details
+  - `./scripts/claude-github.sh close-issue 123 "Implementation complete"` - Close issue with comment
+  - `./scripts/claude-github.sh create-pr "Fix #123" "PR body" "branch-name" "develop"` - Create PR
+
 ### MCP GitHub Tools Usage
 Use the MCP GitHub tool for all GitHub operations:
 
