@@ -5,6 +5,11 @@ import { World, WorldSkill } from '@/types/world.types';
 import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
+import { 
+  SKILL_MIN_VALUE, 
+  SKILL_MAX_VALUE, 
+  SKILL_DEFAULT_VALUE 
+} from '@/lib/constants/skillLevelDescriptions';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
@@ -85,9 +90,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
@@ -112,9 +117,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
@@ -140,9 +145,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ?
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id :
           undefined,
@@ -283,9 +288,9 @@ export default function SkillReviewStep({
                         name: suggestion.name,
                         description: suggestion.description,
                         difficulty: suggestion.difficulty as 'easy' | 'medium' | 'hard',
-                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || 5,
-                        minValue: 1,
-                        maxValue: 10,
+                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || SKILL_DEFAULT_VALUE,
+                        minValue: SKILL_MIN_VALUE,
+                        maxValue: SKILL_MAX_VALUE,
                         category: suggestion.category,
                         linkedAttributeId: worldData.skills.find(skill => skill.name === suggestion.name)?.linkedAttributeId
                       }}
@@ -299,11 +304,12 @@ export default function SkillReviewStep({
                         });
                         onUpdate({ ...worldData, skills: updatedSkills });
                       }}
+                      showLevelDescriptions={true}
                     />
                   )}
                   
                   <div className="text-xs text-gray-500">
-                    <p>Min and max values are fixed at 1-10 for this version.</p>
+                    <p>Values range from 1 (Novice) to 5 (Master).</p>
                   </div>
                 </div>
               </div>

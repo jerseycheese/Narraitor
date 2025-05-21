@@ -1,6 +1,14 @@
 import React from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { 
+  SKILL_MIN_VALUE, 
+  SKILL_MAX_VALUE, 
+  SKILL_DEFAULT_VALUE,
+  SKILL_LEVEL_DESCRIPTIONS,
+  getSkillLevelDescription 
+} from '@/lib/constants/skillLevelDescriptions';
+import SkillRangeEditor from './SkillRangeEditor';
 
 interface WorldSkillsFormProps {
   skills: WorldSkill[];
@@ -24,9 +32,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       description: 'Description of the new skill',
       difficulty: 'medium',
       linkedAttributeId: attributes.length > 0 ? attributes[0].id : undefined,
-      baseValue: 5,  // Default base value
-      minValue: 1,   // Default minimum value
-      maxValue: 10   // Default maximum value
+      baseValue: SKILL_DEFAULT_VALUE,  // Default base value
+      minValue: SKILL_MIN_VALUE,   // Default minimum value
+      maxValue: SKILL_MAX_VALUE   // Default maximum value
     };
     
     onChange([...skills, newSkill]);
@@ -150,54 +158,22 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 </div>
                 
                 <div className="mt-4 border-t pt-4">
-                  <h4 className="font-medium mb-2">Skill Range</h4>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Base Value
-                      </label>
-                      <input
-                        type="number"
-                        min={skill.minValue}
-                        max={skill.maxValue}
-                        value={skill.baseValue}
-                        onChange={(e) => handleUpdateSkill(index, { 
-                          baseValue: parseInt(e.target.value) || skill.minValue
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
-                      />
-                    </div>
+                  <h4 className="font-medium mb-2">Skill Default Level</h4>
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-500 mb-2">
+                      Set the default starting value for this skill. Skill values range from 1 (Novice) to 5 (Master).
+                    </p>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Min Value
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={skill.maxValue - 1}
-                        value={skill.minValue}
-                        onChange={(e) => handleUpdateSkill(index, { 
-                          minValue: parseInt(e.target.value) || 1
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Max Value
-                      </label>
-                      <input
-                        type="number"
-                        min={skill.minValue + 1}
-                        value={skill.maxValue}
-                        onChange={(e) => handleUpdateSkill(index, { 
-                          maxValue: parseInt(e.target.value) || skill.minValue + 1
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded"
-                      />
-                    </div>
+                    {/* Use the SkillRangeEditor component */}
+                    <SkillRangeEditor
+                      skill={{
+                        ...skill,
+                        minValue: SKILL_MIN_VALUE,
+                        maxValue: SKILL_MAX_VALUE,
+                      }}
+                      onChange={(updates) => handleUpdateSkill(index, updates)}
+                      showLevelDescriptions={true}
+                    />
                   </div>
                 </div>
               </div>

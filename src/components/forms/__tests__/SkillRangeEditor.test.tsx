@@ -2,6 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SkillRangeEditor from '../SkillRangeEditor';
 import { WorldSkill } from '@/types/world.types';
+import { 
+  SKILL_MIN_VALUE, 
+  SKILL_MAX_VALUE,
+  SKILL_LEVEL_DESCRIPTIONS 
+} from '@/lib/constants/skillLevelDescriptions';
 
 describe('SkillRangeEditor', () => {
   const mockSkill: WorldSkill = {
@@ -10,9 +15,9 @@ describe('SkillRangeEditor', () => {
     name: 'Test Skill',
     description: 'A test skill',
     difficulty: 'medium',
-    baseValue: 5,
-    minValue: 1,
-    maxValue: 10,
+    baseValue: 3,
+    minValue: SKILL_MIN_VALUE,
+    maxValue: SKILL_MAX_VALUE,
   };
 
   const mockOnChange = jest.fn();
@@ -30,7 +35,7 @@ describe('SkillRangeEditor', () => {
     );
 
     const valueDisplay = screen.getByTestId('current-value');
-    expect(valueDisplay).toHaveTextContent('5');
+    expect(valueDisplay).toHaveTextContent('3');
   });
 
   it('shows min and max values', () => {
@@ -41,10 +46,12 @@ describe('SkillRangeEditor', () => {
       />
     );
 
+    // With the current implementation, we now show all tick values 1-5
     const valueLabels = screen.getAllByText(/[0-9]+/);
-    expect(valueLabels).toHaveLength(3); // min, current, max
-    expect(valueLabels[1]).toHaveTextContent('1'); // min
-    expect(valueLabels[2]).toHaveTextContent('10'); // max
+    
+    // We should have all the labels including the current value
+    expect(screen.getByText('1')).toBeInTheDocument(); // min
+    expect(screen.getByText('5')).toBeInTheDocument(); // max
   });
 
   it('changes value when slider is moved', () => {
@@ -55,31 +62,32 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByRole('slider');
-    fireEvent.change(slider, { target: { value: '8' } });
+    const slider = screen.getByTestId('skill-range-slider');
+    fireEvent.change(slider, { target: { value: '4' } });
 
     const valueDisplay = screen.getByTestId('current-value');
-    expect(valueDisplay).toHaveTextContent('8');
-    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 8 });
+    expect(valueDisplay).toHaveTextContent('4');
+    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 4 });
   });
 
-  it('clamps values to min/max range', () => {
+  it('clamps values to 1-5 range even if skill has different min/max', () => {
+    const legacySkill = {
+      ...mockSkill,
+      minValue: 0,
+      maxValue: 10,
+      baseValue: 8,
+    };
+    
     render(
       <SkillRangeEditor 
-        skill={mockSkill} 
+        skill={legacySkill} 
         onChange={mockOnChange} 
       />
     );
 
-    const slider = screen.getByRole('slider');
-    
-    // Test value below minimum
-    fireEvent.change(slider, { target: { value: '-5' } });
-    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 1 });
-    
-    // Test value above maximum
-    fireEvent.change(slider, { target: { value: '15' } });
-    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 10 });
+    // The initial value should be clamped to 5 (the max allowed)
+    const valueDisplay = screen.getByTestId('current-value');
+    expect(valueDisplay).toHaveTextContent('5');
   });
 
   it('disables the slider when disabled prop is true', () => {
@@ -91,7 +99,7 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByRole('slider');
+    const slider = screen.getByTestId('skill-range-slider');
     expect(slider).toBeDisabled();
   });
 
@@ -115,9 +123,9 @@ describe('SkillRangeEditor', () => {
       />
     );
     
-    expect(screen.getByTestId('current-value')).toHaveTextContent('5');
+    expect(screen.getByTestId('current-value')).toHaveTextContent('3');
     
-    const updatedSkill = { ...mockSkill, baseValue: 7 };
+    const updatedSkill = { ...mockSkill, baseValue: 4 };
     rerender(
       <SkillRangeEditor 
         skill={updatedSkill} 
@@ -125,6 +133,54 @@ describe('SkillRangeEditor', () => {
       />
     );
     
-    expect(screen.getByTestId('current-value')).toHaveTextContent('7');
+    expect(screen.getByTestId('current-value')).toHaveTextContent('4');
+  });
+
+  it('shows tick marks for each skill level', () => {
+    render(
+      <SkillRangeEditor 
+        skill={mockSkill} 
+        onChange={mockOnChange}
+      />
+    );
+
+    // Check that we have tick marks for each of the 5 levels
+    SKILL_LEVEL_DESCRIPTIONS.forEach((level) => {
+      expect(screen.getByTestId(`tick-mark-${level.value}`)).toBeInTheDocument();
+    });
+  });
+  
+  it('displays skill level descriptions when showLevelDescriptions is true', () => {
+    render(
+      <SkillRangeEditor 
+        skill={mockSkill} 
+        onChange={mockOnChange}
+        showLevelDescriptions={true}
+      />
+    );
+
+    // Level for value 3 is "Competent"
+    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Competent');
+    expect(screen.getByTestId('skill-level-description')).toHaveTextContent('Solid performance in most situations');
+  });
+
+  it('updates level description when value changes', () => {
+    render(
+      <SkillRangeEditor 
+        skill={mockSkill} 
+        onChange={mockOnChange}
+        showLevelDescriptions={true}
+      />
+    );
+
+    // Initial level for value 3 is "Competent"
+    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Competent');
+    
+    // Change to level 5 "Master"
+    const slider = screen.getByTestId('skill-range-slider');
+    fireEvent.change(slider, { target: { value: '5' } });
+    
+    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Master');
+    expect(screen.getByTestId('skill-level-description')).toHaveTextContent('Complete mastery at professional level');
   });
 });
