@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldCreationWizard from './WorldCreationWizard';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof WorldCreationWizard> = {
   title: 'Narraitor/World/WorldCreationWizard',
@@ -26,15 +27,40 @@ export const Default: Story = {
   args: {},
 };
 
-// Story showing the basic info step
-export const BasicInfoStep: Story = {
+// Story showing the template selection step
+export const TemplateSelectionStep: Story = {
   args: {
     initialStep: 0,
   },
   parameters: {
     docs: {
       description: {
-        story: 'Shows the first step of the wizard where users enter basic world information'
+        story: 'Shows the first step of the wizard where users choose a world template'
+      }
+    }
+  }
+};
+
+// Story showing the basic info step
+export const BasicInfoStep: Story = {
+  args: {
+    initialStep: 1,
+    initialData: {
+      worldData: {
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        }
+      },
+      selectedTemplateId: "fantasy"
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the step where users enter basic world information'
       }
     }
   }
@@ -43,7 +69,7 @@ export const BasicInfoStep: Story = {
 // Story showing the description step
 export const DescriptionStep: Story = {
   args: {
-    initialStep: 1,
+    initialStep: 2,
     initialData: {
       worldData: {
         name: 'Fantasy Kingdom',
@@ -69,7 +95,7 @@ export const DescriptionStep: Story = {
 // Story showing the attribute review step
 export const AttributeReviewStep: Story = {
   args: {
-    initialStep: 2,
+    initialStep: 3,
     initialData: {
       worldData: {
         name: 'Fantasy Kingdom',
@@ -107,7 +133,7 @@ export const AttributeReviewStep: Story = {
 // Story showing the skill review step
 export const SkillReviewStep: Story = {
   args: {
-    initialStep: 3,
+    initialStep: 4,
     initialData: {
       worldData: {
         name: 'Fantasy Kingdom',
@@ -127,18 +153,18 @@ export const SkillReviewStep: Story = {
       aiSuggestions: {
         attributes: [],
         skills: [
-          { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeName: 'Agility', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeName: 'Constitution', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-          { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium' as SkillDifficulty, category: 'Combat', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard' as SkillDifficulty, category: 'Physical', linkedAttributeName: 'Agility', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy' as SkillDifficulty, category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium' as SkillDifficulty, category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium' as SkillDifficulty, category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy' as SkillDifficulty, category: 'Physical', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard' as SkillDifficulty, category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium' as SkillDifficulty, category: 'Physical', linkedAttributeName: 'Constitution', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard' as SkillDifficulty, category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium' as SkillDifficulty, category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium' as SkillDifficulty, category: 'Social', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+          { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy' as SkillDifficulty, category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
         ]
       }
     }
@@ -155,7 +181,7 @@ export const SkillReviewStep: Story = {
 // Story showing the finalize step
 export const FinalizeStep: Story = {
   args: {
-    initialStep: 4,
+    initialStep: 5,
     initialData: {
       worldData: {
         name: 'Fantasy Kingdom',
@@ -166,8 +192,8 @@ export const FinalizeStep: Story = {
           { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
         ],
         skills: [
-          { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10 },
-          { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard', baseValue: 5, minValue: 1, maxValue: 10 },
+          { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
+          { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
         ],
         settings: {
           maxAttributes: 10,

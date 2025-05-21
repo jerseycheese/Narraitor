@@ -56,7 +56,7 @@ describe('WorldAttributesForm - Range Selection', () => {
     );
 
     // Check if the current values are displayed
-    const valueDisplays = screen.getAllByTestId('current-value');
+    const valueDisplays = screen.getAllByTestId('attribute-range-editor-value');
     expect(valueDisplays[0]).toHaveTextContent('5');
     expect(valueDisplays[1]).toHaveTextContent('7');
   });

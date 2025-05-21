@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AISuggestions } from './AISuggestions';
 import { AttributeSuggestion, SkillSuggestion } from './WizardState';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof AISuggestions> = {
   title: 'Narraitor/World/AISuggestions',
@@ -53,7 +54,7 @@ const mockSkills: SkillSuggestion[] = [
   {
     name: 'Spellcasting',
     description: 'Ability to cast magical spells',
-    difficulty: 'hard',
+    difficulty: 'hard' as SkillDifficulty,
     category: 'Magic',
     linkedAttributeName: 'Arcane Power',
     accepted: true,
@@ -64,7 +65,7 @@ const mockSkills: SkillSuggestion[] = [
   {
     name: 'Dragon Riding',
     description: 'Skill in commanding and riding dragons',
-    difficulty: 'hard',
+    difficulty: 'hard' as SkillDifficulty,
     category: 'Physical',
     linkedAttributeName: 'Dragon Affinity',
     accepted: false,
@@ -75,7 +76,7 @@ const mockSkills: SkillSuggestion[] = [
   {
     name: 'Alchemy',
     description: 'Creating potions and magical items',
-    difficulty: 'medium',
+    difficulty: 'medium' as SkillDifficulty,
     category: 'Magic',
     linkedAttributeName: 'Arcane Power',
     accepted: false,

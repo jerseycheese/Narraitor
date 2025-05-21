@@ -5,6 +5,14 @@ import { World, WorldSkill } from '@/types/world.types';
 import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
+import { 
+  MIN_SKILL_VALUE as SKILL_MIN_VALUE, 
+  MAX_SKILL_VALUE as SKILL_MAX_VALUE, 
+  SKILL_DEFAULT_VALUE 
+} from '@/lib/constants/skillLevelDescriptions';
+import {
+  SKILL_DIFFICULTIES
+} from '@/lib/constants/skillDifficultyLevels';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
@@ -25,24 +33,21 @@ export default function SkillReviewStep({
   onBack,
   onCancel,
 }: SkillReviewStepProps) {
-  // Initialize state based on existing selections
+  // Initialize state based on existing selections - always accept all by default
   const [localSuggestions, setLocalSuggestions] = useState(() => {
-    // If we have existing skills in worldData, match them to suggestions
-    if (worldData.skills && worldData.skills.length > 0) {
-      return suggestions.map(suggestion => {
-        const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-        return {
-          ...suggestion,
-          accepted: !!existingSkill,
-          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
-        };
-      });
-    }
-    return suggestions.map((suggestion, index) => ({
-      ...suggestion,
-      accepted: true, // Set to accepted by default
-      showDetails: index === 0 // Show details only for the first one
-    }));
+    // Start with all suggestions accepted by default
+    return suggestions.map((suggestion, index) => {
+      // If we have existing skills in worldData, match them to suggestions
+      // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
+      return {
+        ...suggestion,
+        // Always default to true (accepted) - only set to false if explicitly rejected before
+        accepted: true,
+        showDetails: index === 0 // Show details only for the first one
+      };
+    });
   });
 
   // Update local state only on initial load or when suggestions change
@@ -50,14 +55,16 @@ export default function SkillReviewStep({
     // This should only run on initial mount or when suggestions change from parent
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
-      setLocalSuggestions(suggestions.map(suggestion => {
+      setLocalSuggestions(suggestions.map((suggestion, index) => {
+        // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-        // If skill exists in worldData, use its acceptance state, otherwise default to true
-        const accepted = existingSkill ? true : (suggestion.accepted ?? true);
+        // ALWAYS default to accepted (true) for better UX
+        const accepted = true;
         return {
           ...suggestion,
           accepted,
-          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
+          showDetails: index === 0 // Show details for the first one
         };
       }));
     }
@@ -85,9 +92,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
@@ -112,9 +119,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ? 
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
           undefined,
@@ -140,9 +147,9 @@ export default function SkillReviewStep({
         description: s.description,
         difficulty: s.difficulty,
         category: s.category,
-        baseValue: 5, // Default to middle value
-        minValue: 1, // Fixed for MVP
-        maxValue: 10, // Fixed for MVP
+        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+        minValue: SKILL_MIN_VALUE, // Fixed value
+        maxValue: SKILL_MAX_VALUE, // Fixed value
         linkedAttributeId: s.linkedAttributeName ?
           worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id :
           undefined,
@@ -248,9 +255,11 @@ export default function SkillReviewStep({
                       onChange={(e) => handleModifySkill(index, 'difficulty', e.target.value)}
                       className="w-full p-2 border rounded"
                     >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
+                      {SKILL_DIFFICULTIES.map(difficulty => (
+                        <option key={difficulty.value} value={difficulty.value}>
+                          {difficulty.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   
@@ -282,10 +291,10 @@ export default function SkillReviewStep({
                         worldId: '',
                         name: suggestion.name,
                         description: suggestion.description,
-                        difficulty: suggestion.difficulty as 'easy' | 'medium' | 'hard',
-                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || 5,
-                        minValue: 1,
-                        maxValue: 10,
+                        difficulty: suggestion.difficulty,
+                        baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || SKILL_DEFAULT_VALUE,
+                        minValue: SKILL_MIN_VALUE,
+                        maxValue: SKILL_MAX_VALUE,
                         category: suggestion.category,
                         linkedAttributeId: worldData.skills.find(skill => skill.name === suggestion.name)?.linkedAttributeId
                       }}
@@ -299,11 +308,12 @@ export default function SkillReviewStep({
                         });
                         onUpdate({ ...worldData, skills: updatedSkills });
                       }}
+                      showLevelDescriptions={true}
                     />
                   )}
                   
                   <div className="text-xs text-gray-500">
-                    <p>Min and max values are fixed at 1-10 for this version.</p>
+                    <p>Values range from 1 (Novice) to 5 (Master).</p>
                   </div>
                 </div>
               </div>

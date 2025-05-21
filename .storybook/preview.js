@@ -11,12 +11,7 @@ const styleOverrides = `
     color: #171717 !important;
     background-color: #ffffff !important;
   }
-  
-  /* Force all elements to use proper color */
-  h1, h2, h3, h4, h5, h6, p, li, td, th, label, div {
-    color: #171717 !important;
-  }
-
+    
   /* For all text inside stories */
   #storybook-root {
     color: #171717 !important;

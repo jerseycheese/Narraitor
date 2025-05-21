@@ -1,6 +1,7 @@
 import { Meta, StoryObj } from '@storybook/react';
 import SkillRangeEditor from './SkillRangeEditor';
 import { WorldSkill } from '@/types/world.types';
+import { MIN_SKILL_VALUE as SKILL_MIN_VALUE, MAX_SKILL_VALUE as SKILL_MAX_VALUE } from '@/lib/constants/skillLevelDescriptions';
 
 const meta: Meta<typeof SkillRangeEditor> = {
   title: 'Narraitor/Forms/SkillRangeEditor',
@@ -32,9 +33,9 @@ const defaultSkill: WorldSkill = {
   difficulty: 'medium',
   category: 'Physical',
   linkedAttributeId: 'attr-1',
-  baseValue: 5,
-  minValue: 1,
-  maxValue: 10,
+  baseValue: 3,
+  minValue: SKILL_MIN_VALUE,
+  maxValue: SKILL_MAX_VALUE,
 };
 
 export const Default: Story = {
@@ -43,28 +44,51 @@ export const Default: Story = {
     showLabels: true,
     disabled: false,
   },
+  name: 'Basic Skill Range Editor',
 };
 
-export const LowValue: Story = {
+export const WithLevelDescriptions: Story = {
   args: {
-    skill: {
-      ...defaultSkill,
-      baseValue: 2,
-    },
+    skill: defaultSkill,
     showLabels: true,
+    showLevelDescriptions: true,
     disabled: false,
   },
+  name: 'With Additional Level Descriptions',
 };
 
-export const HighValue: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      baseValue: 9,
-    },
-    showLabels: true,
-    disabled: false,
+export const SkillLevels: Story = {
+  render: (args) => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-sm font-medium mb-2">Novice (Level 1)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 1}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-2">Competent (Level 3)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 3}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-2">Master (Level 5)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 5}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+      </div>
+    );
   },
+  name: 'All Skill Levels',
 };
 
 export const Disabled: Story = {
@@ -73,25 +97,5 @@ export const Disabled: Story = {
     showLabels: true,
     disabled: true,
   },
-};
-
-export const NoLabels: Story = {
-  args: {
-    skill: defaultSkill,
-    showLabels: false,
-    disabled: false,
-  },
-};
-
-export const CustomRange: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      minValue: 0,
-      maxValue: 20,
-      baseValue: 10,
-    },
-    showLabels: true,
-    disabled: false,
-  },
+  name: 'Disabled State',
 };

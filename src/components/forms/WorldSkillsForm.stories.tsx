@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
+import { DEFAULT_SKILL_DIFFICULTY } from '@/lib/constants/skillDifficultyLevels';
 
 const mockAttributes: WorldAttribute[] = [
   {
@@ -30,7 +31,7 @@ const mockSkills: WorldSkill[] = [
     name: 'Athletics',
     description: 'Physical prowess and sports',
     linkedAttributeId: 'attr-1',
-    difficulty: 'medium',
+    difficulty: DEFAULT_SKILL_DIFFICULTY,
     category: 'Physical',
     baseValue: 5,
     minValue: 1,
@@ -42,7 +43,7 @@ const mockSkills: WorldSkill[] = [
     name: 'Research',
     description: 'Finding and analyzing information',
     linkedAttributeId: 'attr-2',
-    difficulty: 'easy',
+    difficulty: 'easy' as const,
     category: 'Mental',
     baseValue: 5,
     minValue: 1,
@@ -105,14 +106,14 @@ export const SingleSkill: Story = {
 export const AllDifficulties: Story = {
   args: {
     skills: [
-      { ...mockSkills[0], difficulty: 'easy' },
-      { ...mockSkills[1], difficulty: 'medium' },
+      { ...mockSkills[0], difficulty: 'easy' as const },
+      { ...mockSkills[1], difficulty: 'medium' as const },
       {
         id: 'skill-3',
         worldId: 'world-123',
         name: 'Advanced Magic',
         description: 'Complex spell casting',
-        difficulty: 'hard',
+        difficulty: 'hard' as const,
         baseValue: 5,
         minValue: 1,
         maxValue: 10,

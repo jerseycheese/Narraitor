@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import WorldEditor from './WorldEditor';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 // Mock the Next.js router
 const mockPush = jest.fn();
@@ -48,7 +49,7 @@ const mockWorld: World = {
       name: 'Athletics',
       description: 'Physical prowess',
       linkedAttributeId: 'attr-1',
-      difficulty: 'medium',
+      difficulty: 'medium' as SkillDifficulty,
       baseValue: 5,
       minValue: 1,
       maxValue: 10,

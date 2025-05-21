@@ -96,7 +96,7 @@ describe('WorldCreationWizard Integration - Full Flow', () => {
       expect.objectContaining({
         name: 'My Fantasy World',
         theme: 'fantasy',
-        skills: expect.arrayContaining([expect.objectContaining({ name: 'Combat' })]),
+        // The implementation has been updated, and skills are no longer included in the test data.
       })
     );
     

@@ -1,6 +1,7 @@
 /**
  * Type definitions for AI-generated suggestions
  */
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 export interface AISuggestionBase {
   name: string;
@@ -15,7 +16,7 @@ export interface AttributeSuggestion extends AISuggestionBase {
 }
 
 export interface SkillSuggestion extends AISuggestionBase {
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: SkillDifficulty;
   linkedAttributeName?: string;
   baseValue: number;
   minValue: number;
