@@ -3,27 +3,32 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { narrativeStore } from '@/state/narrativeStore';
-import { NarrativeSegment } from '@/types/narrative.types';
+import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
+  onChoicesGenerated?: (decision: Decision) => void;
   triggerGeneration?: boolean;
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
+  generateChoices?: boolean; // Whether to generate choices after narrative
 }
 
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
   sessionId,
   onNarrativeGenerated,
+  onChoicesGenerated,
   triggerGeneration = true,
   choiceId,
-  className
+  className,
+  generateChoices = true
 }) => {
   const [segments, setSegments] = useState<NarrativeSegment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingChoices, setIsGeneratingChoices] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Access store methods in a way that works with testing
@@ -201,6 +206,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
+      
+      // Generate choices if enabled
+      if (generateChoices && !isGeneratingChoices) {
+        generatePlayerChoices();
+      }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
       setError('Failed to generate narrative');
@@ -272,6 +282,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
+      
+      // Generate choices if enabled
+      if (generateChoices && !isGeneratingChoices) {
+        generatePlayerChoices();
+      }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
       setError('Failed to generate narrative');
@@ -282,11 +297,59 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     }
   };
 
+  /**
+   * Generate player choices based on current narrative context
+   */
+  const generatePlayerChoices = async () => {
+    if (!mountedRef.current || segments.length === 0) return;
+    
+    setIsGeneratingChoices(true);
+    
+    try {
+      // Use recent segments for context
+      const recentSegments = segments.slice(-5);
+      
+      // Create narrative context for choice generation
+      const narrativeContext: NarrativeContext = {
+        recentSegments,
+        currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
+      };
+      
+      // Generate choices
+      const decision = await narrativeGenerator.generatePlayerChoices(
+        worldId,
+        narrativeContext,
+        []
+      );
+      
+      // Skip if component unmounted during async operation
+      if (!mountedRef.current) return;
+      
+      // Add decision to store
+      narrativeStore.getState().addDecision(sessionId, {
+        prompt: decision.prompt,
+        options: decision.options
+      });
+      
+      // Notify parent component
+      if (onChoicesGenerated) {
+        onChoicesGenerated(decision);
+      }
+    } catch (error) {
+      console.error('Error generating player choices:', error);
+      setError('Failed to generate player choices');
+    } finally {
+      if (mountedRef.current) {
+        setIsGeneratingChoices(false);
+      }
+    }
+  };
+
   return (
     <div className={`narrative-controller ${className || ''}`}>
       <NarrativeHistory 
         segments={segments}
-        isLoading={isLoading}
+        isLoading={isLoading || isGeneratingChoices}
         error={error || undefined}
       />
     </div>

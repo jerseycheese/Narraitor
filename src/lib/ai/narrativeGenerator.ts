@@ -2,14 +2,21 @@ import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { worldStore } from '@/state/worldStore';
 import {
+  Decision,
+  NarrativeContext,
   NarrativeGenerationRequest,
   NarrativeGenerationResult,
   NarrativeSegment
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
+import { ChoiceGenerator } from './choiceGenerator';
 
 export class NarrativeGenerator {
-  constructor(private geminiClient: AIClient) {}
+  private choiceGenerator: ChoiceGenerator;
+  
+  constructor(private geminiClient: AIClient) {
+    this.choiceGenerator = new ChoiceGenerator(geminiClient);
+  }
 
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
@@ -163,6 +170,24 @@ export class NarrativeGenerator {
       case 'post-apocalyptic': return 'Ruins';
       case 'steampunk': return 'Victorian Metropolis';
       default: return 'Starting Location';
+    }
+  }
+  
+  /**
+   * Generate player choices based on the current narrative context
+   */
+  async generatePlayerChoices(worldId: string, narrativeContext: NarrativeContext, characterIds: string[]): Promise<Decision> {
+    try {
+      return await this.choiceGenerator.generateChoices({
+        worldId,
+        narrativeContext,
+        characterIds,
+        minOptions: 3,
+        maxOptions: 4
+      });
+    } catch (error) {
+      console.error('Error generating player choices:', error);
+      throw new Error('Failed to generate player choices');
     }
   }
 }

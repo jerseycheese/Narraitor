@@ -4,9 +4,11 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
-import { NarrativeSegment } from '@/types/narrative.types';
+import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import PlayerChoices from './PlayerChoices';
 import SessionControls from './SessionControls';
+import { narrativeStore } from '@/state/narrativeStore';
+import { PlayerChoiceSelector } from '@/components/Narrative';
 
 interface GameSessionActiveWithNarrativeProps {
   worldId: string;
@@ -47,6 +49,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [generation, setGeneration] = React.useState(0);
   const [initialized, setInitialized] = React.useState(false);
+  const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
@@ -126,7 +129,18 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
     // Player choice was selected
     setIsGenerating(true);
     setGeneration(prev => prev + 1);  // Increment generation counter
+    
+    // If we have a current decision, update its selected option
+    if (currentDecision) {
+      narrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
+    }
+    
     onChoiceSelected(choiceId);
+  };
+  
+  // Handle newly generated player choices
+  const handleChoicesGenerated = (decision: Decision) => {
+    setCurrentDecision(decision);
   };
 
   return (
@@ -167,17 +181,26 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
             choiceId={selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
+            onChoicesGenerated={handleChoicesGenerated}
+            generateChoices={true}
           />
         </div>
       </div>
 
-      {choices && choices.length > 0 && (
+      {/* Show AI-generated choices if available, otherwise fallback to static choices */}
+      {currentDecision ? (
+        <PlayerChoiceSelector
+          decision={currentDecision}
+          onSelect={handleChoiceSelected}
+          isDisabled={status !== 'active' || isGenerating}
+        />
+      ) : choices && choices.length > 0 ? (
         <PlayerChoices
           choices={choices}
           onChoiceSelected={handleChoiceSelected}
           isDisabled={status !== 'active' || isGenerating}
         />
-      )}
+      ) : null}
 
       {onPause && onResume && onEnd && (
         <SessionControls
