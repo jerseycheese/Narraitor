@@ -30,24 +30,19 @@ export default function SkillReviewStep({
   onBack,
   onCancel,
 }: SkillReviewStepProps) {
-  // Initialize state based on existing selections
+  // Initialize state based on existing selections - always accept all by default
   const [localSuggestions, setLocalSuggestions] = useState(() => {
-    // If we have existing skills in worldData, match them to suggestions
-    if (worldData.skills && worldData.skills.length > 0) {
-      return suggestions.map(suggestion => {
-        const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-        return {
-          ...suggestion,
-          accepted: !!existingSkill,
-          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
-        };
-      });
-    }
-    return suggestions.map((suggestion, index) => ({
-      ...suggestion,
-      accepted: true, // Set to accepted by default
-      showDetails: index === 0 // Show details only for the first one
-    }));
+    // Start with all suggestions accepted by default
+    return suggestions.map((suggestion, index) => {
+      // If we have existing skills in worldData, match them to suggestions
+      const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
+      return {
+        ...suggestion,
+        // Always default to true (accepted) - only set to false if explicitly rejected before
+        accepted: existingSkill ? true : true,
+        showDetails: index === 0 // Show details only for the first one
+      };
+    });
   });
 
   // Update local state only on initial load or when suggestions change
@@ -55,14 +50,14 @@ export default function SkillReviewStep({
     // This should only run on initial mount or when suggestions change from parent
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
-      setLocalSuggestions(suggestions.map(suggestion => {
+      setLocalSuggestions(suggestions.map((suggestion, index) => {
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-        // If skill exists in worldData, use its acceptance state, otherwise default to true
-        const accepted = existingSkill ? true : (suggestion.accepted ?? true);
+        // ALWAYS default to accepted (true) for better UX
+        const accepted = true;
         return {
           ...suggestion,
           accepted,
-          showDetails: suggestions.indexOf(suggestion) === 0 // Show details for the first one
+          showDetails: index === 0 // Show details for the first one
         };
       }));
     }
