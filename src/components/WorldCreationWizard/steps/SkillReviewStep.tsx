@@ -6,8 +6,8 @@ import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 import { 
-  SKILL_MIN_VALUE, 
-  SKILL_MAX_VALUE, 
+  MIN_SKILL_VALUE as SKILL_MIN_VALUE, 
+  MAX_SKILL_VALUE as SKILL_MAX_VALUE, 
   SKILL_DEFAULT_VALUE 
 } from '@/lib/constants/skillLevelDescriptions';
 import {

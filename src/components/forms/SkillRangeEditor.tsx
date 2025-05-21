@@ -3,8 +3,8 @@ import { WorldSkill } from '@/types/world.types';
 import RangeSlider, { LevelDescription } from '@/components/ui/RangeSlider';
 import { 
   SKILL_LEVEL_DESCRIPTIONS, 
-  SKILL_MIN_VALUE, 
-  SKILL_MAX_VALUE
+  MIN_SKILL_VALUE as SKILL_MIN_VALUE, 
+  MAX_SKILL_VALUE as SKILL_MAX_VALUE
 } from '@/lib/constants/skillLevelDescriptions';
 
 interface SkillRangeEditorProps {

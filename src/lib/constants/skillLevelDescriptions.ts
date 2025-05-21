@@ -13,6 +13,7 @@ export interface SkillLevelDescription {
 
 export const MIN_SKILL_VALUE = 1;
 export const MAX_SKILL_VALUE = 5;
+export const SKILL_DEFAULT_VALUE = 3;
 
 /**
  * Skill level descriptions for a 1-5 scale, used to provide meaningful
