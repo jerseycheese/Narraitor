@@ -9,7 +9,7 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 ## Features
 
 - World configuration system for defining settings, rules, and parameters
-- **NEW**: World Creation Wizard with AI-assisted attribute and skill suggestions
+- World Creation Wizard with AI-assisted attribute and skill suggestions
 - Character creation and management system with attributes and skills
 - AI-driven narrative engine for dynamic storytelling
 - Journal system for tracking gameplay events
