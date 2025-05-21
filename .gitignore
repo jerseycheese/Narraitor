@@ -65,4 +65,4 @@ docs/.obsidian
 docs/development/workflows
 
 # Claude Code
-.claude
+.claude/*
