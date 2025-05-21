@@ -92,7 +92,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
           value={value}
           onChange={handleChange}
           disabled={disabled}
-          className="w-full p-0"
+          className="w-full p-0 px-0 mx-0"
           data-testid="skill-range-slider"
         />
         
