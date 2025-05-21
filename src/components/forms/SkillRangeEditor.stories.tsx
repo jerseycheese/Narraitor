@@ -110,24 +110,6 @@ export const NoLabels: Story = {
   },
 };
 
-export const Compact: Story = {
-  args: {
-    skill: defaultSkill,
-    showLabels: true,
-    compact: true,
-    disabled: false,
-  },
-};
-
-export const CompactWithLevelDescriptions: Story = {
-  args: {
-    skill: defaultSkill,
-    showLabels: true,
-    showLevelDescriptions: true,
-    compact: true,
-    disabled: false,
-  },
-};
 
 // Legacy range example - will be clamped to 1-5 range
 export const LegacyRange: Story = {

@@ -13,7 +13,6 @@ interface SkillRangeEditorProps {
   disabled?: boolean;
   showLabels?: boolean;
   showLevelDescriptions?: boolean;
-  compact?: boolean;
 }
 
 const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
@@ -22,7 +21,6 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
   disabled = false,
   showLabels = true,
   showLevelDescriptions = false,
-  compact = false,
 }) => {
   // Enforce the 1-5 scale for skills
   const minValue = SKILL_MIN_VALUE;
@@ -69,7 +67,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
   const currentLevel = getSkillLevelDescription(value);
 
   return (
-    <div className={`${compact ? 'py-1' : 'py-2'}`} data-testid="skill-range-editor">
+    <div className="py-2" data-testid="skill-range-editor">
       {showLabels && (
         <div className="flex justify-between mb-1 text-sm text-gray-600">
           <span>Default Value</span>
@@ -90,6 +88,11 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
           onChange={handleChange}
           disabled={disabled}
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          style={{
+            // Ensure it works in all browsers with consistent stopping points
+            WebkitAppearance: 'none',
+            MozAppearance: 'none'
+          }}
           data-testid="skill-range-slider"
         />
         
@@ -102,12 +105,12 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
           {value}
         </div>
         
-        {/* Tick marks */}
+        {/* Tick marks - aligned with stopping points */}
         <div className="relative h-0">
           {SKILL_LEVEL_DESCRIPTIONS.map((level) => (
             <div 
               key={level.value}
-              className="absolute w-0.5 h-2 bg-gray-400 -mt-2"
+              className="absolute w-1 h-3 bg-gray-400 -mt-2.5"
               style={{ 
                 left: `${((level.value - minValue) / (maxValue - minValue)) * 100}%`,
                 transform: 'translateX(-50%)'
