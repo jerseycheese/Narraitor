@@ -4,7 +4,7 @@ import RangeSlider, { LevelDescription } from '@/components/ui/RangeSlider';
 import { 
   SKILL_LEVEL_DESCRIPTIONS, 
   SKILL_MIN_VALUE, 
-  SKILL_MAX_VALUE
+  SKILL_MAX_VALUE,
 } from '@/lib/constants/skillLevelDescriptions';
 
 interface SkillRangeEditorProps {
@@ -27,11 +27,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
   const maxValue = SKILL_MAX_VALUE;
   
   // If the skill's baseValue is outside our fixed range, adjust it
-  const initialValue = skill.baseValue < minValue 
-    ? minValue 
-    : skill.baseValue > maxValue 
-      ? maxValue 
-      : skill.baseValue;
+  const initialValue = Math.min(Math.max(skill.baseValue, minValue), maxValue);
   
   const handleChange = (value: number) => {
     onChange({ baseValue: value });
@@ -43,7 +39,7 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
     label: level.label,
     description: level.description
   }));
-  
+
   // Custom formatter to display value with level
   const valueFormatter = (value: number): string => {
     const level = levelDescriptions.find(level => level.value === value);
@@ -58,7 +54,6 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
       onChange={handleChange}
       disabled={disabled}
       showLabel={showLabels}
-      labelText="Default Value"
       levelDescriptions={levelDescriptions}
       showLevelDescription={showLevelDescriptions}
       valueFormatter={valueFormatter}

@@ -33,7 +33,7 @@ describe('AttributeRangeEditor', () => {
     expect(rangeInput).toHaveValue('5');
     
     // Check numeric display
-    const valueDisplay = screen.getByTestId('current-value');
+    const valueDisplay = screen.getByTestId('attribute-range-editor-value');
     expect(valueDisplay).toHaveTextContent('5');
   });
 
@@ -112,7 +112,7 @@ describe('AttributeRangeEditor', () => {
       />
     );
 
-    const currentValueIndicator = screen.getByTestId('current-value');
+    const currentValueIndicator = screen.getByTestId('attribute-range-editor-value');
     expect(currentValueIndicator).toBeInTheDocument();
     expect(currentValueIndicator).toHaveTextContent('5');
   });

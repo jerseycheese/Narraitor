@@ -4,10 +4,13 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { 
   SKILL_MIN_VALUE, 
   SKILL_MAX_VALUE, 
-  SKILL_DEFAULT_VALUE,
-  SKILL_LEVEL_DESCRIPTIONS,
-  getSkillLevelDescription 
+  SKILL_DEFAULT_VALUE 
 } from '@/lib/constants/skillLevelDescriptions';
+import {
+  SKILL_DIFFICULTIES,
+  DEFAULT_SKILL_DIFFICULTY,
+  SkillDifficulty
+} from '@/lib/constants/skillDifficultyLevels';
 import SkillRangeEditor from './SkillRangeEditor';
 
 interface WorldSkillsFormProps {
@@ -30,7 +33,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       worldId,
       name: 'New Skill',
       description: 'Description of the new skill',
-      difficulty: 'medium',
+      difficulty: DEFAULT_SKILL_DIFFICULTY,
       linkedAttributeId: attributes.length > 0 ? attributes[0].id : undefined,
       baseValue: SKILL_DEFAULT_VALUE,  // Default base value
       minValue: SKILL_MIN_VALUE,   // Default minimum value
@@ -126,13 +129,15 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     <select
                       value={skill.difficulty}
                       onChange={(e) => handleUpdateSkill(index, { 
-                        difficulty: e.target.value as 'easy' | 'medium' | 'hard' 
+                        difficulty: e.target.value as SkillDifficulty
                       })}
                       className="w-full px-3 py-2 border border-gray-300 rounded"
                     >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
+                      {SKILL_DIFFICULTIES.map(difficulty => (
+                        <option key={difficulty.value} value={difficulty.value}>
+                          {difficulty.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   

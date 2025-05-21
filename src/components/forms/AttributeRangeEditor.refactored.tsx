@@ -27,7 +27,6 @@ const AttributeRangeEditor: React.FC<AttributeRangeEditorProps> = ({
       onChange={handleChange}
       disabled={disabled}
       showLabel={showLabels}
-      labelText="Default Value"
       testId="attribute-range-editor"
     />
   );

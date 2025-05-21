@@ -4,8 +4,7 @@ import SkillRangeEditor from '../SkillRangeEditor';
 import { WorldSkill } from '@/types/world.types';
 import { 
   SKILL_MIN_VALUE, 
-  SKILL_MAX_VALUE,
-  SKILL_LEVEL_DESCRIPTIONS 
+  SKILL_MAX_VALUE
 } from '@/lib/constants/skillLevelDescriptions';
 
 describe('SkillRangeEditor', () => {
@@ -35,7 +34,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // Current value is displayed in a span with data-testid
-    const valueDisplay = screen.getByTestId('current-value');
+    const valueDisplay = screen.getByTestId('skill-range-editor-value');
     expect(valueDisplay).toBeInTheDocument();
   });
 
@@ -48,7 +47,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // Check for min/max on the input element
-    const slider = screen.getByTestId('skill-range-slider');
+    const slider = screen.getByTestId('skill-range-editor-slider');
     expect(slider).toHaveAttribute('min', '1');
     expect(slider).toHaveAttribute('max', '5');
   });
@@ -61,11 +60,11 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByTestId('skill-range-slider');
+    const slider = screen.getByTestId('skill-range-editor-slider');
     fireEvent.change(slider, { target: { value: '4' } });
 
     // Current value is displayed in a span with data-testid
-    const valueDisplay = screen.getByTestId('current-value');
+    const valueDisplay = screen.getByTestId('skill-range-editor-value');
     expect(valueDisplay).toBeInTheDocument();
     expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 4 });
   });
@@ -86,7 +85,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // The initial value should be clamped to 5 (the max allowed)
-    const valueDisplay = screen.getByTestId('current-value');
+    const valueDisplay = screen.getByTestId('skill-range-editor-value');
     expect(valueDisplay).toBeInTheDocument();
   });
 
@@ -99,7 +98,7 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByTestId('skill-range-slider');
+    const slider = screen.getByTestId('skill-range-editor-slider');
     expect(slider).toBeDisabled();
   });
 
@@ -123,7 +122,7 @@ describe('SkillRangeEditor', () => {
       />
     );
     
-    const initialValueDisplay = screen.getByTestId('current-value');
+    const initialValueDisplay = screen.getByTestId('skill-range-editor-value');
     expect(initialValueDisplay).toHaveTextContent('3');
     
     const updatedSkill = { ...mockSkill, baseValue: 4 };
@@ -135,7 +134,7 @@ describe('SkillRangeEditor', () => {
     );
     
     // Value should be updated
-    expect(screen.getByTestId('current-value')).toHaveTextContent('4');
+    expect(screen.getByTestId('skill-range-editor-value')).toHaveTextContent('4');
   });
 
   it('shows min and max level labels', () => {
@@ -147,8 +146,8 @@ describe('SkillRangeEditor', () => {
     );
 
     // Check that we have min and max labels
-    expect(screen.getByTestId('level-label-1')).toBeInTheDocument();
-    expect(screen.getByTestId('level-label-5')).toBeInTheDocument();
+    expect(screen.getByTestId('skill-range-editor-min-label')).toBeInTheDocument();
+    expect(screen.getByTestId('skill-range-editor-max-label')).toBeInTheDocument();
     
     // Should contain the label text
     expect(screen.getByText(/1 - Novice/)).toBeInTheDocument();
@@ -165,8 +164,8 @@ describe('SkillRangeEditor', () => {
     );
 
     // Level for value 3 is "Competent"
-    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Competent');
-    expect(screen.getByTestId('skill-level-description')).toHaveTextContent('Solid performance in most situations');
+    expect(screen.getByTestId('skill-range-editor-level-label')).toHaveTextContent('Competent');
+    expect(screen.getByTestId('skill-range-editor-description')).toHaveTextContent('Solid performance in most situations');
   });
 
   it('updates level description when value changes', () => {
@@ -179,13 +178,13 @@ describe('SkillRangeEditor', () => {
     );
 
     // Initial level for value 3 is "Competent"
-    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Competent');
+    expect(screen.getByTestId('skill-range-editor-level-label')).toHaveTextContent('Competent');
     
     // Change to level 5 "Master"
-    const slider = screen.getByTestId('skill-range-slider');
+    const slider = screen.getByTestId('skill-range-editor-slider');
     fireEvent.change(slider, { target: { value: '5' } });
     
-    expect(screen.getByTestId('skill-level-label')).toHaveTextContent('Master');
-    expect(screen.getByTestId('skill-level-description')).toHaveTextContent('Complete mastery at professional level');
+    expect(screen.getByTestId('skill-range-editor-level-label')).toHaveTextContent('Master');
+    expect(screen.getByTestId('skill-range-editor-description')).toHaveTextContent('Complete mastery at professional level');
   });
 });

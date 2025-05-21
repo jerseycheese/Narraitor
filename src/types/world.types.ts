@@ -1,6 +1,7 @@
 // src/types/world.types.ts
 
 import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 /**
  * Represents a game world configuration
@@ -29,7 +30,7 @@ export interface WorldAttribute extends NamedEntity {
 export interface WorldSkill extends NamedEntity {
   worldId: EntityID;
   linkedAttributeId?: EntityID;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: SkillDifficulty;
   category?: string;
   baseValue: number;
   minValue: number;

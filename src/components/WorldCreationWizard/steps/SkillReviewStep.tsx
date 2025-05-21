@@ -10,6 +10,9 @@ import {
   SKILL_MAX_VALUE, 
   SKILL_DEFAULT_VALUE 
 } from '@/lib/constants/skillLevelDescriptions';
+import {
+  SKILL_DIFFICULTIES
+} from '@/lib/constants/skillDifficultyLevels';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
@@ -35,11 +38,13 @@ export default function SkillReviewStep({
     // Start with all suggestions accepted by default
     return suggestions.map((suggestion, index) => {
       // If we have existing skills in worldData, match them to suggestions
+      // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
       return {
         ...suggestion,
         // Always default to true (accepted) - only set to false if explicitly rejected before
-        accepted: existingSkill ? true : true,
+        accepted: true,
         showDetails: index === 0 // Show details only for the first one
       };
     });
@@ -51,6 +56,8 @@ export default function SkillReviewStep({
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
       setLocalSuggestions(suggestions.map((suggestion, index) => {
+        // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
         // ALWAYS default to accepted (true) for better UX
         const accepted = true;
@@ -248,9 +255,11 @@ export default function SkillReviewStep({
                       onChange={(e) => handleModifySkill(index, 'difficulty', e.target.value)}
                       className="w-full p-2 border rounded"
                     >
-                      <option value="easy">Easy</option>
-                      <option value="medium">Medium</option>
-                      <option value="hard">Hard</option>
+                      {SKILL_DIFFICULTIES.map(difficulty => (
+                        <option key={difficulty.value} value={difficulty.value}>
+                          {difficulty.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   
@@ -282,7 +291,7 @@ export default function SkillReviewStep({
                         worldId: '',
                         name: suggestion.name,
                         description: suggestion.description,
-                        difficulty: suggestion.difficulty as 'easy' | 'medium' | 'hard',
+                        difficulty: suggestion.difficulty,
                         baseValue: worldData.skills.find(skill => skill.name === suggestion.name)?.baseValue || SKILL_DEFAULT_VALUE,
                         minValue: SKILL_MIN_VALUE,
                         maxValue: SKILL_MAX_VALUE,

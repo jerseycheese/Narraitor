@@ -1,5 +1,6 @@
 // WizardState.ts
 import { World } from '@/types/world.types';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 export interface WizardState {
   currentStep: number;
@@ -26,7 +27,7 @@ export interface AttributeSuggestion {
 export interface SkillSuggestion {
   name: string;
   description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: SkillDifficulty;
   category?: string;
   linkedAttributeName?: string;
   accepted: boolean;
