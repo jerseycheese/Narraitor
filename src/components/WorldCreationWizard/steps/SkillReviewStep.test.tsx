@@ -81,14 +81,21 @@ describe('SkillReviewStep', () => {
       />
     );
 
+    // First, check that it starts as Selected
     const toggleButton = screen.getByTestId('skill-toggle-0');
+    expect(toggleButton).toHaveTextContent('Selected');
+    
+    // Click to exclude it
     fireEvent.click(toggleButton);
-
+    
+    // Now check that it was excluded properly
+    expect(toggleButton).toHaveTextContent('Excluded');
+    
+    // Check that onUpdate was called with an empty skills array
+    // (since we excluded the only selected skill)
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        skills: expect.arrayContaining([
-          expect.objectContaining({ name: 'Combat' })
-        ])
+        skills: []
       })
     );
   });
@@ -364,7 +371,10 @@ describe('SkillReviewStep', () => {
     expect(mockOnNext).toHaveBeenCalled();
   });
 
-  test('persists selections after navigating away and back', () => {
+  test('manual skill selection works for existing world data', () => {
+    // In our updated design, all skills are Selected by default
+    // Let's verify we can toggle them off and on
+    
     const multipleSuggestions = [
       ...mockSuggestions,
       {
@@ -373,7 +383,6 @@ describe('SkillReviewStep', () => {
         difficulty: 'hard' as const,
         category: 'Rogue',
         linkedAttributeName: 'Agility',
-        accepted: false,
       },
       {
         name: 'Magic',
@@ -381,16 +390,10 @@ describe('SkillReviewStep', () => {
         difficulty: 'hard' as const,
         category: 'Mage',
         linkedAttributeName: 'Intelligence',
-        accepted: false,
       },
     ];
 
-    const suggestionsWithSelection = multipleSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0 || i === 2,
-    }));
-
-    const worldDataWithSelection = {
+    const worldDataWithSkills = {
       ...defaultWorldData,
       skills: [
         {
@@ -416,8 +419,8 @@ describe('SkillReviewStep', () => {
 
     render(
       <SkillReviewStep
-        worldData={worldDataWithSelection}
-        suggestions={suggestionsWithSelection}
+        worldData={worldDataWithSkills}
+        suggestions={multipleSuggestions}
         errors={{}}
         onUpdate={mockOnUpdate}
         onNext={mockOnNext}
@@ -426,7 +429,15 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    // Check that the toggle buttons show the correct state
+    // All skills should start as Selected
+    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('skill-toggle-2')).toHaveTextContent('Selected');
+    
+    // Toggle the middle skill off
+    fireEvent.click(screen.getByTestId('skill-toggle-1'));
+    
+    // Now check the state
     expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
     expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Excluded');
     expect(screen.getByTestId('skill-toggle-2')).toHaveTextContent('Selected');
