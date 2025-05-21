@@ -151,6 +151,62 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);
 
+  /**
+   * Generate player choices based on current narrative context
+   */
+  const generatePlayerChoices = async () => {
+    if (!mountedRef.current || segments.length === 0) return;
+    
+    console.log('Generating player choices for narrative context');
+    setIsGeneratingChoices(true);
+    
+    try {
+      // Use recent segments for context
+      const recentSegments = segments.slice(-5);
+      
+      // Create narrative context for choice generation
+      const narrativeContext: NarrativeContext = {
+        recentSegments,
+        currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
+      };
+      
+      console.log('Calling narrativeGenerator.generatePlayerChoices with', { worldId, segments: recentSegments.length });
+      
+      // Generate choices
+      const decision = await narrativeGenerator.generatePlayerChoices(
+        worldId,
+        narrativeContext,
+        []
+      );
+      
+      console.log('Generated player choices:', decision);
+      
+      // Skip if component unmounted during async operation
+      if (!mountedRef.current) return;
+      
+      // Add decision to store
+      narrativeStore.getState().addDecision(sessionId, {
+        prompt: decision.prompt,
+        options: decision.options
+      });
+      
+      // Notify parent component
+      if (onChoicesGenerated) {
+        console.log('Calling onChoicesGenerated with decision');
+        onChoicesGenerated(decision);
+      } else {
+        console.log('No onChoicesGenerated callback provided');
+      }
+    } catch (error) {
+      console.error('Error generating player choices:', error);
+      setError('Failed to generate player choices');
+    } finally {
+      if (mountedRef.current) {
+        setIsGeneratingChoices(false);
+      }
+    }
+  };
+
   const generateInitialNarrative = async () => {
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
@@ -207,9 +263,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
       
-      // Generate choices if enabled
-      if (generateChoices && !isGeneratingChoices) {
-        generatePlayerChoices();
+      // Generate choices if enabled - always generate for initial narrative
+      if (generateChoices) {
+        console.log('Initial narrative generated, now generating choices');
+        // Use setTimeout to ensure the narrative is processed before generating choices
+        setTimeout(() => generatePlayerChoices(), 500);
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
@@ -283,9 +341,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
       
-      // Generate choices if enabled
-      if (generateChoices && !isGeneratingChoices) {
-        generatePlayerChoices();
+      // Generate choices if enabled - always generate after a new segment
+      if (generateChoices) {
+        console.log('New narrative segment generated, now generating choices');
+        // Use setTimeout to ensure the narrative is processed before generating choices
+        setTimeout(() => generatePlayerChoices(), 500);
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
@@ -293,54 +353,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
-      }
-    }
-  };
-
-  /**
-   * Generate player choices based on current narrative context
-   */
-  const generatePlayerChoices = async () => {
-    if (!mountedRef.current || segments.length === 0) return;
-    
-    setIsGeneratingChoices(true);
-    
-    try {
-      // Use recent segments for context
-      const recentSegments = segments.slice(-5);
-      
-      // Create narrative context for choice generation
-      const narrativeContext: NarrativeContext = {
-        recentSegments,
-        currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
-      };
-      
-      // Generate choices
-      const decision = await narrativeGenerator.generatePlayerChoices(
-        worldId,
-        narrativeContext,
-        []
-      );
-      
-      // Skip if component unmounted during async operation
-      if (!mountedRef.current) return;
-      
-      // Add decision to store
-      narrativeStore.getState().addDecision(sessionId, {
-        prompt: decision.prompt,
-        options: decision.options
-      });
-      
-      // Notify parent component
-      if (onChoicesGenerated) {
-        onChoicesGenerated(decision);
-      }
-    } catch (error) {
-      console.error('Error generating player choices:', error);
-      setError('Failed to generate player choices');
-    } finally {
-      if (mountedRef.current) {
-        setIsGeneratingChoices(false);
       }
     }
   };
