@@ -44,6 +44,7 @@ export const Default: Story = {
     showLabels: true,
     disabled: false,
   },
+  name: 'Basic Skill Range Editor',
 };
 
 export const WithLevelDescriptions: Story = {
@@ -53,45 +54,41 @@ export const WithLevelDescriptions: Story = {
     showLevelDescriptions: true,
     disabled: false,
   },
+  name: 'With Additional Level Descriptions',
 };
 
-export const LowValue: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      baseValue: 1,
-    },
-    showLabels: true,
-    showLevelDescriptions: true,
-    disabled: false,
+export const SkillLevels: Story = {
+  render: (args) => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-sm font-medium mb-2">Novice (Level 1)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 1}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-2">Competent (Level 3)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 3}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-2">Master (Level 5)</h3>
+          <SkillRangeEditor
+            skill={{...defaultSkill, baseValue: 5}}
+            onChange={args.onChange}
+            showLevelDescriptions={true}
+          />
+        </div>
+      </div>
+    );
   },
-  name: 'Novice Level (1)',
-};
-
-export const MidValue: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      baseValue: 3,
-    },
-    showLabels: true,
-    showLevelDescriptions: true,
-    disabled: false,
-  },
-  name: 'Competent Level (3)',
-};
-
-export const HighValue: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      baseValue: 5,
-    },
-    showLabels: true,
-    showLevelDescriptions: true,
-    disabled: false,
-  },
-  name: 'Master Level (5)',
+  name: 'All Skill Levels',
 };
 
 export const Disabled: Story = {
@@ -100,28 +97,5 @@ export const Disabled: Story = {
     showLabels: true,
     disabled: true,
   },
-};
-
-export const NoLabels: Story = {
-  args: {
-    skill: defaultSkill,
-    showLabels: false,
-    disabled: false,
-  },
-};
-
-
-// Legacy range example - will be clamped to 1-5 range
-export const LegacyRange: Story = {
-  args: {
-    skill: {
-      ...defaultSkill,
-      minValue: 0,
-      maxValue: 10,
-      baseValue: 7,
-    },
-    showLabels: true,
-    disabled: false,
-  },
-  name: 'Legacy Range (Will be clamped to standard range)',
+  name: 'Disabled State',
 };
