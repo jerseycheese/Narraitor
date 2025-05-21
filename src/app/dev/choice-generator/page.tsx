@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { PlayerChoiceSelector } from '@/components/Narrative';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { worldStore } from '@/state/worldStore';
 
 // Sample narrative context for testing
 const createSampleNarrativeContext = (): NarrativeContext => {
@@ -33,7 +34,7 @@ const createSampleNarrativeContext = (): NarrativeContext => {
 
 // Test harness for choice generator
 export default function ChoiceGeneratorTestPage() {
-  const [worldId] = useState('sample-world');
+  const [worldId, setWorldId] = useState('test-world');
   const [isGenerating, setIsGenerating] = useState(false);
   const [decision, setDecision] = useState<Decision | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,12 +42,57 @@ export default function ChoiceGeneratorTestPage() {
   const [worldName, setWorldName] = useState('Fantasy World');
   const [worldDescription, setWorldDescription] = useState('A world of magic and adventure');
   const [worldTheme, setWorldTheme] = useState('fantasy');
+  
+  // Initialize a test world in the store if it doesn't exist
+  useEffect(() => {
+    // Check if the test world already exists
+    const worldExists = worldStore.getState().worlds[worldId];
+    
+    if (!worldExists) {
+      try {
+        // Create a test world
+        const newWorldId = worldStore.getState().createWorld({
+          name: worldName,
+          description: worldDescription,
+          theme: worldTheme,
+          attributes: {},
+          skills: {},
+          settings: {
+            playerCharacterEnabled: true,
+            multipleCharactersEnabled: false,
+            inventoryEnabled: true
+          }
+        });
+        
+        // Update the state with the new world ID
+        setWorldId(newWorldId);
+      } catch (error) {
+        console.error('Error creating test world:', error);
+        setError('Failed to create test world');
+      }
+    }
+  }, [worldId, worldName, worldDescription, worldTheme]);
 
   const generateChoices = async () => {
     setIsGenerating(true);
     setError(null);
 
     try {
+      // Update world properties if they've changed
+      const currentWorld = worldStore.getState().worlds[worldId];
+      if (currentWorld && (
+        currentWorld.name !== worldName ||
+        currentWorld.description !== worldDescription ||
+        currentWorld.theme !== worldTheme
+      )) {
+        worldStore.getState().updateWorld(worldId, {
+          name: worldName,
+          description: worldDescription,
+          theme: worldTheme
+        });
+      }
+      
+      // Generate choices using the narrative generator
       const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
       const generatedDecision = await narrativeGenerator.generatePlayerChoices(
         worldId,

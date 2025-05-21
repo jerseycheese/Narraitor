@@ -58,17 +58,6 @@ const selectedOptionDecision: Decision = {
   selectedOptionId: 'option-2',
 };
 
-const manyOptionsDecision: Decision = {
-  id: 'decision-4',
-  prompt: 'Choose your next action:',
-  options: [
-    { id: 'option-1', text: 'Investigate the strange artifact' },
-    { id: 'option-2', text: 'Speak with the village elder' },
-    { id: 'option-3', text: 'Rest at the inn' },
-    { id: 'option-4', text: 'Visit the marketplace' },
-    { id: 'option-5', text: 'Leave town' },
-  ],
-};
 
 export const Basic: Story = {
   args: {
@@ -87,13 +76,6 @@ export const WithHints: Story = {
 export const WithSelectedOption: Story = {
   args: {
     decision: selectedOptionDecision,
-    onSelect: (optionId) => console.log(`Selected option: ${optionId}`),
-  },
-};
-
-export const ManyOptions: Story = {
-  args: {
-    decision: manyOptionsDecision,
     onSelect: (optionId) => console.log(`Selected option: ${optionId}`),
   },
 };
