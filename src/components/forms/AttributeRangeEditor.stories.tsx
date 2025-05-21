@@ -114,7 +114,7 @@ export const InContextExample: Story = {
               <p className="text-sm text-gray-600 mb-3">{attribute.description}</p>
               <AttributeRangeEditor
                 attribute={attribute}
-                onChange={(updates) => console.log('Updated', attribute.name, updates)}
+                onChange={(updates) => action('updated')(`Attribute: ${attribute.name}`, updates)}
               />
             </div>
           ))}
