@@ -74,7 +74,8 @@ describe('worldAnalyzer - AI Suggestions', () => {
         minValue: 1,
         maxValue: 10,
         category: 'Magical',
-        accepted: false
+        accepted: false,
+        baseValue: expect.any(Number)
       }));
 
       // Verify skills are returned with correct structure
@@ -85,7 +86,10 @@ describe('worldAnalyzer - AI Suggestions', () => {
         difficulty: 'hard',
         category: 'Magic',
         linkedAttributeName: 'Arcane Power',
-        accepted: false
+        accepted: false,
+        baseValue: expect.any(Number),
+        minValue: expect.any(Number),
+        maxValue: expect.any(Number)
       }));
     });
 
