@@ -24,7 +24,8 @@ check_existing_token() {
   
   # Check .env.local file
   if [[ -f "$ENV_LOCAL" ]] && grep -q "GITHUB_TOKEN" "$ENV_LOCAL"; then
-    export GITHUB_TOKEN=$(grep "GITHUB_TOKEN" "$ENV_LOCAL" | cut -d= -f2)
+    # Extract token, removing any leading or trailing whitespace and quotes
+    export GITHUB_TOKEN=$(grep "GITHUB_TOKEN" "$ENV_LOCAL" | sed 's/^GITHUB_TOKEN=//' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//")
     echo "✅ Found GitHub token in .env.local file"
     return 0
   fi
@@ -50,22 +51,48 @@ check_existing_token() {
 # Validate token with GitHub API
 validate_token() {
   echo "🔍 Testing GitHub token..."
-  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user)
+  RESPONSE_FILE=$(mktemp)
+  HTTP_STATUS=$(curl -s -o "$RESPONSE_FILE" -w "%{http_code}" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user)
   
   if [[ "$HTTP_STATUS" -eq 200 ]]; then
     echo "✅ GitHub token is valid"
+    USERNAME=$(grep -o '"login"[^,]*' "$RESPONSE_FILE" | cut -d'"' -f4)
+    echo "✅ Authenticated as GitHub user: $USERNAME"
+    rm "$RESPONSE_FILE"
     return 0
   else
     echo "❌ GitHub token is invalid or expired (HTTP status: $HTTP_STATUS)"
+    ERROR_MSG=$(grep -o '"message"[^,]*' "$RESPONSE_FILE" | cut -d'"' -f4)
+    if [[ -n "$ERROR_MSG" ]]; then
+      echo "   Error details: $ERROR_MSG"
+    fi
+    rm "$RESPONSE_FILE"
+    
+    # Show token format hint if it looks malformed
+    if [[ ! "$GITHUB_TOKEN" =~ ^gh[ps]_[A-Za-z0-9]{36,}$ ]]; then
+      echo "⚠️ Token format appears incorrect. GitHub tokens should start with 'ghp_' or 'ghs_'"
+      echo "   and be followed by at least 36 characters."
+    fi
     return 1
   fi
 }
 
 # Get token from user if needed
 prompt_for_token() {
-  echo "Please enter a valid GitHub Personal Access Token (PAT):"
-  echo "(Token requires 'repo' scope, create one at https://github.com/settings/tokens/new)"
+  echo ""
+  echo "🔐 You need to create a GitHub Personal Access Token (PAT)"
+  echo "════════════════════════════════════════════════════════"
+  echo "1. Go to: https://github.com/settings/tokens/new"
+  echo "2. Note: 'Narraitor Claude Code Access'"
+  echo "3. Expiration: Select an appropriate expiration (90 days recommended)"
+  echo "4. Select scopes: [✓] repo (Full control of private repositories)"
+  echo "5. Click 'Generate token'"
+  echo "6. Copy the generated token and paste it below"
+  echo "════════════════════════════════════════════════════════"
+  echo ""
+  echo "Please enter your GitHub Personal Access Token:"
   read -s GITHUB_TOKEN
+  echo ""
   
   if [[ -z "$GITHUB_TOKEN" ]]; then
     echo "❌ No token provided"
@@ -98,96 +125,53 @@ save_token() {
   echo "✅ GitHub token saved to all locations"
 }
 
-# Update GitHub-related scripts to include token
-update_scripts() {
-  SCRIPTS_DIR="$PROJECT_ROOT/scripts"
-  
-  # Update claude-github.sh
-  GITHUB_SCRIPT="$SCRIPTS_DIR/claude-github.sh"
-  if [[ -f "$GITHUB_SCRIPT" ]]; then
-    # Check if script already includes token support
-    if ! grep -q "Authorization: token" "$GITHUB_SCRIPT"; then
-      echo "📝 Updating Claude GitHub script with token support..."
-      
-      # Create backup
-      cp "$GITHUB_SCRIPT" "${GITHUB_SCRIPT}.bak"
-      
-      # Update curl commands to include token header
-      sed -i '' 's/curl -s -H/curl -s -H "Authorization: token $GITHUB_TOKEN" -H/g' "$GITHUB_SCRIPT"
-      
-      # Add token loading at the top of the script
-      sed -i '' '2i\
-# Load GitHub token from environment or file\
-if [ -z "$GITHUB_TOKEN" ] && [ -f "'"$ENV_LOCAL"'" ]; then\
-  source "'"$ENV_LOCAL"'"\
-fi\
-if [ -z "$GITHUB_TOKEN" ] && [ -f "'"$GITHUB_TOKEN_FILE"'" ]; then\
-  GITHUB_TOKEN=$(cat "'"$GITHUB_TOKEN_FILE"'")\
-fi\
-' "$GITHUB_SCRIPT"
-
-      echo "✅ Updated $GITHUB_SCRIPT with token support"
-    else
-      echo "✓ $GITHUB_SCRIPT already has token support"
-    fi
-  fi
-  
-  # Update claude-pr.sh similarly if needed
-  PR_SCRIPT="$SCRIPTS_DIR/claude-pr.sh"
-  if [[ -f "$PR_SCRIPT" ]]; then
-    # Only update if it doesn't already have token support
-    if ! grep -q "GITHUB_TOKEN" "$PR_SCRIPT"; then
-      echo "📝 Updating Claude PR script with token support..."
-      cp "$PR_SCRIPT" "${PR_SCRIPT}.bak"
-      
-      # Add token-based PR creation example
-      sed -i '' '/mcp__modelcontextprotocol_server_github__server_github/a\
-  // If MCP tool isn\'t available, use curl as fallback\
-  if (typeof mcp__modelcontextprotocol_server_github__server_github === "undefined") {\
-    console.log("MCP GitHub tool not available, using curl fallback:");\
-    console.log(`curl -s -X POST \\\
-  -H "Authorization: token $GITHUB_TOKEN" \\\
-  -H "Accept: application/vnd.github.v3+json" \\\
-  -H "Content-Type: application/json" \\\
-  -d \'{"title":"$PR_TITLE","body":"$PR_BODY","head":"$BRANCH_NAME","base":"$BASE_BRANCH"}\' \\\
-  https://api.github.com/repos/jerseycheese/narraitor/pulls`);\
-  }\
-' "$PR_SCRIPT"
-      
-      echo "✅ Updated $PR_SCRIPT with token fallback"
-    else
-      echo "✓ $PR_SCRIPT already has token support"
-    fi
-  fi
-}
-
 # Main script execution
 main() {
+  # First try to use existing token
   if check_existing_token && validate_token; then
     echo "🎉 GitHub token is already configured and valid"
+    save_token  # Ensure token is saved in all locations
   else
     echo "⚠️ Need to set up a new GitHub token"
-    if prompt_for_token && validate_token; then
-      save_token
-      echo "🎉 GitHub token has been successfully configured"
-    else
-      echo "❌ Failed to configure GitHub token"
-      exit 1
-    fi
+    
+    # Try three times to get a valid token
+    MAX_ATTEMPTS=3
+    for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
+      echo "Attempt $attempt of $MAX_ATTEMPTS"
+      
+      if prompt_for_token; then
+        if validate_token; then
+          save_token
+          echo "🎉 GitHub token has been successfully configured"
+          break
+        else
+          echo "⚠️ Token validation failed. Please try again with a valid token."
+          if [[ $attempt -eq $MAX_ATTEMPTS ]]; then
+            echo "❌ Maximum attempts reached. Failed to configure GitHub token."
+            echo "Please try again later or contact your administrator for help."
+            exit 1
+          fi
+        fi
+      else
+        echo "❌ No token provided. Exiting."
+        exit 1
+      fi
+    done
   fi
-  
-  update_scripts
   
   echo ""
   echo "🔑 GitHub Token Configuration Summary:"
   echo "✅ Token is valid and accessible to scripts"
   echo "✅ Token is saved in .env.local for Claude Code"
   echo "✅ Token is saved in $GITHUB_TOKEN_FILE as backup"
-  echo "✅ Scripts have been updated with token support"
   echo ""
-  echo "You can now use GitHub features in Claude Code commands."
-  echo "To use this token in the current session, run:"
-  echo "  source .env.local"
+  echo "You can now use GitHub features in Claude Code commands:"
+  echo "  ./scripts/claude-github.sh issue 123       # Get issue details"
+  echo "  ./scripts/claude-github.sh close-issue 123 # Close an issue"
+  echo "  ./scripts/claude-pr.sh 123 branch-name     # Create a PR for issue"
+  echo ""
+  echo "To use this token in the current shell session, run:"
+  echo "  export GITHUB_TOKEN=\"$(cat $GITHUB_TOKEN_FILE)\""
 }
 
 main "$@"

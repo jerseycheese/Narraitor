@@ -4,18 +4,67 @@
 # This script allows Claude Code to make GitHub API calls without prompting for permission
 # Usage: ./claude-github.sh [command] [arguments...]
 
-# Load GitHub token from environment or file
-if [ -z "$GITHUB_TOKEN" ] && [ -f ".env.local" ]; then
-  source ".env.local"
-fi
-if [ -z "$GITHUB_TOKEN" ] && [ -f ".claude/.github_token" ]; then
-  GITHUB_TOKEN=$(cat ".claude/.github_token")
-fi
+# Get project root directory
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+CLAUDE_DIR="$PROJECT_ROOT/.claude"
+ENV_LOCAL="$PROJECT_ROOT/.env.local"
+GITHUB_TOKEN_FILE="$CLAUDE_DIR/.github_token"
 
-# Verify token is available
+# Load GitHub token from various sources
+load_github_token() {
+  # Check environment variable
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    return 0
+  fi
+  
+  # Check .env.local file
+  if [[ -f "$ENV_LOCAL" ]] && grep -q "GITHUB_TOKEN" "$ENV_LOCAL"; then
+    # Extract token, removing any leading or trailing whitespace and quotes
+    export GITHUB_TOKEN=$(grep "GITHUB_TOKEN" "$ENV_LOCAL" | sed 's/^GITHUB_TOKEN=//' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/^"//;s/"$//' | sed "s/^'//;s/'$//")
+    return 0
+  fi
+  
+  # Check token file
+  if [[ -f "$GITHUB_TOKEN_FILE" ]]; then
+    export GITHUB_TOKEN=$(cat "$GITHUB_TOKEN_FILE")
+    return 0
+  fi
+  
+  # Check gh CLI
+  if command -v gh &>/dev/null && gh auth status &>/dev/null; then
+    export GITHUB_TOKEN=$(gh auth token)
+    return 0
+  fi
+  
+  return 1
+}
+
+# Validate the GitHub token
+validate_github_token() {
+  if [ -z "$GITHUB_TOKEN" ]; then
+    return 1
+  fi
+  
+  # Make a simple API call to validate token
+  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user)
+  
+  if [[ "$HTTP_STATUS" -eq 200 ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Load the token
+load_github_token
+
+# Verify token is available and valid
 if [ -z "$GITHUB_TOKEN" ]; then
-  echo "Warning: No GitHub token found. API requests will be rate-limited and may fail."
+  echo "⚠️ Warning: No GitHub token found. API requests will be rate-limited and may fail."
   echo "Run ./scripts/setup-github-token.sh to configure your token."
+elif ! validate_github_token; then
+  echo "⚠️ Warning: GitHub token is invalid or expired."
+  echo "Run ./scripts/setup-github-token.sh to configure a new token."
 fi
 
 # Command: issue - Fetch a GitHub issue
