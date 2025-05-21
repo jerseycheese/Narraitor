@@ -80,59 +80,32 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
       )}
       
       <div className="relative">
-        <input
-          type="range"
-          min={minValue}
-          max={maxValue}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-          style={{
-            // Ensure it works in all browsers with consistent stopping points
-            WebkitAppearance: 'none',
-            MozAppearance: 'none'
-          }}
-          data-testid="skill-range-slider"
-        />
-        
-        {/* Value display bubble */}
-        <div
-          className="absolute -top-7 flex items-center justify-center w-8 h-8 text-sm text-white bg-blue-500 rounded-full pointer-events-none transform -translate-x-1/2"
-          style={{ left: `${position}%` }}
-          data-testid="current-value"
-        >
-          {value}
+        <div className="flex items-center space-x-2">
+          <span className="min-w-6 text-center" data-testid="current-value">{value}</span>
+          <input
+            type="range"
+            min={minValue}
+            max={maxValue}
+            value={value}
+            onChange={handleChange}
+            disabled={disabled}
+            className="flex-grow"
+            data-testid="skill-range-slider"
+          />
         </div>
         
-        {/* Tick marks - aligned with stopping points */}
-        <div className="relative h-0">
-          {SKILL_LEVEL_DESCRIPTIONS.map((level) => (
+        {/* Level labels */}
+        <div className="flex justify-between mt-2 text-xs text-gray-600">
+          {SKILL_LEVEL_DESCRIPTIONS.map(level => (
             <div 
               key={level.value}
-              className="absolute w-1 h-3 bg-gray-400 -mt-2.5"
-              style={{ 
-                left: `${((level.value - minValue) / (maxValue - minValue)) * 100}%`,
-                transform: 'translateX(-50%)'
-              }}
-              data-testid={`tick-mark-${level.value}`}
-            />
-          ))}
-        </div>
-        
-        {/* Min/Max labels */}
-        <div className="flex justify-between mt-1 text-xs text-gray-500">
-          <span>{minValue}</span>
-          {SKILL_LEVEL_DESCRIPTIONS.slice(1, -1).map(level => (
-            <span 
-              key={level.value}
-              className="text-gray-400"
-              data-testid={`level-tick-${level.value}`}
+              className="flex flex-col items-center"
+              data-testid={`level-label-${level.value}`}
             >
-              {level.value}
-            </span>
+              <span>{level.value}</span>
+              <span className={value === level.value ? "font-medium text-blue-600" : ""}>{level.label}</span>
+            </div>
           ))}
-          <span>{maxValue}</span>
         </div>
         
         {/* Level descriptions */}
