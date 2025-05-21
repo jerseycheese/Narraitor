@@ -39,7 +39,7 @@ describe('SkillRangeEditor', () => {
     expect(valueDisplay).toBeInTheDocument();
   });
 
-  it('shows min and max values', () => {
+  it('shows min and max values on slider', () => {
     render(
       <SkillRangeEditor 
         skill={mockSkill} 
@@ -47,12 +47,10 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    // With the current implementation, we now show all tick values 1-5
-    const valueLabels = screen.getAllByText(/[0-9]+/);
-    
-    // We should have all the labels including the current value
-    expect(screen.getByText('1')).toBeInTheDocument(); // min
-    expect(screen.getByText('5')).toBeInTheDocument(); // max
+    // Check for min/max on the input element
+    const slider = screen.getByTestId('skill-range-slider');
+    expect(slider).toHaveAttribute('min', '1');
+    expect(slider).toHaveAttribute('max', '5');
   });
 
   it('changes value when slider is moved', () => {
@@ -140,7 +138,7 @@ describe('SkillRangeEditor', () => {
     expect(screen.getByTestId('current-value')).toHaveTextContent('4');
   });
 
-  it('shows labels for each skill level', () => {
+  it('shows min and max level labels', () => {
     render(
       <SkillRangeEditor 
         skill={mockSkill} 
@@ -148,11 +146,13 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    // Check that we have labels for each of the 5 levels
-    SKILL_LEVEL_DESCRIPTIONS.forEach((level) => {
-      expect(screen.getByTestId(`level-label-${level.value}`)).toBeInTheDocument();
-      expect(screen.getByText(level.label)).toBeInTheDocument();
-    });
+    // Check that we have min and max labels
+    expect(screen.getByTestId('level-label-1')).toBeInTheDocument();
+    expect(screen.getByTestId('level-label-5')).toBeInTheDocument();
+    
+    // Should contain the label text
+    expect(screen.getByText(/1 - Novice/)).toBeInTheDocument();
+    expect(screen.getByText(/5 - Master/)).toBeInTheDocument();
   });
   
   it('displays skill level descriptions when showLevelDescriptions is true', () => {

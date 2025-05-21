@@ -80,32 +80,30 @@ const SkillRangeEditor: React.FC<SkillRangeEditorProps> = ({
       )}
       
       <div className="relative">
-        <div className="flex items-center space-x-2">
-          <span className="min-w-6 text-center" data-testid="current-value">{value}</span>
-          <input
-            type="range"
-            min={minValue}
-            max={maxValue}
-            value={value}
-            onChange={handleChange}
-            disabled={disabled}
-            className="flex-grow"
-            data-testid="skill-range-slider"
-          />
+        <div className="text-center mb-2">
+          <span className="inline-block px-4 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium" data-testid="current-value">
+            {value} - {getSkillLevelDescription(value)?.label}
+          </span>
         </div>
+        <input
+          type="range"
+          min={minValue}
+          max={maxValue}
+          value={value}
+          onChange={handleChange}
+          disabled={disabled}
+          className="w-full p-0"
+          data-testid="skill-range-slider"
+        />
         
-        {/* Level labels */}
-        <div className="flex justify-between mt-2 text-xs text-gray-600">
-          {SKILL_LEVEL_DESCRIPTIONS.map(level => (
-            <div 
-              key={level.value}
-              className="flex flex-col items-center"
-              data-testid={`level-label-${level.value}`}
-            >
-              <span>{level.value}</span>
-              <span className={value === level.value ? "font-medium text-blue-600" : ""}>{level.label}</span>
-            </div>
-          ))}
+        {/* Edge labels - just show min and max */}
+        <div className="flex justify-between mt-1 text-xs text-gray-600">
+          <span data-testid="level-label-1">
+            {minValue} - {SKILL_LEVEL_DESCRIPTIONS[0].label}
+          </span>
+          <span data-testid="level-label-5">
+            {maxValue} - {SKILL_LEVEL_DESCRIPTIONS[4].label}
+          </span>
         </div>
         
         {/* Level descriptions */}
