@@ -10,6 +10,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 
 - **GameSession** (`GameSession.tsx`): The main container component that orchestrates state and child components
 - **GameSessionActive** (`GameSessionActive.tsx`): Handles the active game session rendering
+- **GameSessionActiveWithNarrative** (`GameSessionActiveWithNarrative.tsx`): Enhanced active session with AI-driven narrative and choice generation
 - **GameSessionError** (`GameSessionError.tsx`): Error state component
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
 - **PlayerChoices** (`PlayerChoices.tsx`): Renders and handles player choices
@@ -42,6 +43,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 - **GameSessionLoading**: Shows loading spinner with customizable message
 - **GameSessionError**: Uses existing ErrorMessage component for consistency
 - **GameSessionActive**: Combines narrative, choices, and controls
+- **GameSessionActiveWithNarrative**: Enhanced active session component with integrated AI narrative generation and contextual choice systems
 
 ### useGameSessionState Hook
 - Encapsulates all state management logic
@@ -77,9 +79,31 @@ A test harness is available at `/dev/game-session-components` for interactive te
 - Screen reader announcements for status changes
 - Keyboard navigation support
 
+## AI Choice Generation Features
+
+The `GameSessionActiveWithNarrative` component includes:
+
+### Core AI Features
+- **Automated Choice Generation**: AI-powered player choices based on narrative context
+- **Contextual Integration**: Choices reflect recent story segments and world themes
+- **Smart Loading States**: Smooth transitions with "Generating your choices..." feedback
+- **Error Recovery**: Graceful fallbacks when AI generation fails
+
+### Technical Implementation
+- **Google Gemini AI**: Primary choice generation service
+- **Context Assembly**: Recent narrative segments provide story context
+- **Fallback System**: Pre-defined choices when AI is unavailable
+- **State Management**: Integrated with narrativeStore and sessionStore
+
+### User Experience
+- **No Jarring Transitions**: Eliminated "choice flashing" through proper loading states
+- **Contextual Choices**: AI generates options relevant to current story situation
+- **Error Resilience**: System continues functioning even with AI service issues
+
 ## Future Improvements
 
 - Context API for deeper component nesting
 - Performance optimization for narrative rendering
 - Enhanced loading states with progress indicators
 - Additional accessibility improvements
+- Character integration for personalized choice generation (linked to issues #116, #118, #121, #123, #124, #251)

@@ -4,9 +4,12 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
-import { NarrativeSegment } from '@/types/narrative.types';
+import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import PlayerChoices from './PlayerChoices';
 import SessionControls from './SessionControls';
+import { narrativeStore } from '@/state/narrativeStore';
+import { sessionStore } from '@/state/sessionStore';
+import { PlayerChoiceSelector } from '@/components/Narrative';
 
 interface GameSessionActiveWithNarrativeProps {
   worldId: string;
@@ -42,11 +45,10 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
-  const [isGenerating, setIsGenerating] = React.useState(true); // Start as generating
-  // We track generation for debugging - not used directly in render
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [generation, setGeneration] = React.useState(0);
+  const [isGenerating, setIsGenerating] = React.useState(true);
   const [initialized, setInitialized] = React.useState(false);
+  const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
+  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
@@ -75,6 +77,15 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
           (seg.metadata?.location === 'Starting Location' || 
            seg.metadata?.location === 'Frontier Town')
         );
+        
+        // Check for existing decisions in the store
+        const existingDecisions = narrativeStore.getState().getSessionDecisions(sessionId);
+        
+        // If we have existing decisions, use the latest one
+        if (existingDecisions.length > 0) {
+          const latestDecision = existingDecisions[existingDecisions.length - 1];
+          setCurrentDecision(latestDecision);
+        }
         
         if (hasInitialScene) {
           // If we already have an initial scene, just use it - no need to generate again
@@ -120,14 +131,74 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const handleNarrativeGenerated = (_: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
+    // Start generating choices
+    setIsGeneratingChoices(true);
+    
+    // Set a fallback timer to ensure choices eventually appear
+    setTimeout(() => {
+      // If we're still generating choices after 10 seconds, create fallback choices
+      if (isGeneratingChoices && !currentDecision) {
+        const fallbackId = `decision-timeout-${Date.now()}`;
+        const fallbackDecision: Decision = {
+          id: fallbackId,
+          prompt: "What will you do?",
+          options: [
+            { id: `option-${fallbackId}-1`, text: "Investigate further" },
+            { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
+            { id: `option-${fallbackId}-3`, text: "Move to a new location" }
+          ]
+        };
+        
+        setCurrentDecision(fallbackDecision);
+        setIsGeneratingChoices(false);
+      }
+    }, 10000); // 10 second timeout
   };
 
   const handleChoiceSelected = (choiceId: string) => {
     // Player choice was selected
     setIsGenerating(true);
-    setGeneration(prev => prev + 1);  // Increment generation counter
+    
+    // If we have a current decision, update its selected option
+    if (currentDecision) {
+      narrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
+    }
+    
     onChoiceSelected(choiceId);
   };
+  
+  // Handle newly generated player choices
+  const handleChoicesGenerated = (decision: Decision) => {
+    if (!decision || !decision.options || decision.options.length === 0) {
+      console.error('Invalid decision received:', decision);
+      setIsGeneratingChoices(false);
+      return;
+    }
+    
+    // Force update with a new object reference to ensure React detects the change
+    const decisionCopy: Decision = {
+      id: decision.id,
+      prompt: decision.prompt,
+      options: [...decision.options],
+      selectedOptionId: decision.selectedOptionId,
+    };
+    
+    // Update the current decision state with the copy
+    setCurrentDecision(decisionCopy);
+    // Stop the choice generation loading state
+    setIsGeneratingChoices(false);
+    
+    // Convert AI-generated decision to player choices format for the session
+    const playerChoices = decision.options.map(option => ({
+      id: option.id,
+      text: option.text,
+      isSelected: option.id === decision.selectedOptionId
+    }));
+    
+    // Update session store with AI-generated choices
+    sessionStore.getState().setPlayerChoices(playerChoices);
+  };
+  
 
   return (
     <div data-testid="game-session-active" className="p-4" role="region" aria-label="Game session">
@@ -148,15 +219,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
           className="mb-4"
         />
         
-        {/* Loading indicator when generating */}
-        {isGenerating && (
-          <div className="text-center py-2">
-            <div className="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-r-transparent">
-              <span className="sr-only">Loading...</span>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">Generating story...</p>
-          </div>
-        )}
+        {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
         
         {/* Hidden controller just to generate content - always include it but hide from view */}
         <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
@@ -167,16 +230,92 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
             choiceId={selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
+            onChoicesGenerated={handleChoicesGenerated}
+            generateChoices={true}
           />
         </div>
       </div>
 
-      {choices && choices.length > 0 && (
-        <PlayerChoices
-          choices={choices}
-          onChoiceSelected={handleChoiceSelected}
-          isDisabled={status !== 'active' || isGenerating}
-        />
+      {/* Show AI-generated choices, loading state, or fallback */}
+      {currentDecision ? (
+        <div className="player-choices-container">
+          <PlayerChoiceSelector
+            decision={currentDecision}
+            onSelect={handleChoiceSelected}
+            isDisabled={status !== 'active' || isGenerating}
+          />
+        </div>
+      ) : isGeneratingChoices ? (
+        <div className="player-choices-container">
+          <div className="p-4 border rounded bg-gray-50">
+            <div className="flex items-center space-x-2">
+              <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="text-sm text-gray-600">Generating your choices...</p>
+            </div>
+          </div>
+        </div>
+      ) : choices && choices.length > 0 ? (
+        <div className="player-choices-container">
+          <PlayerChoices
+            choices={choices}
+            onChoiceSelected={handleChoiceSelected}
+            isDisabled={status !== 'active' || isGenerating}
+          />
+        </div>
+      ) : (
+        <div className="player-choices-container">
+          <div className="p-4 border rounded bg-gray-50">
+            <p className="text-sm text-gray-600 mb-2">No choices available.</p>
+            <button 
+              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+              onClick={() => {
+                // Try to get latest decision from narrative store
+                const latestDecision = narrativeStore.getState().getLatestDecision(sessionId);
+                if (latestDecision) {
+                  console.log("Found latest decision in store:", latestDecision);
+                  setCurrentDecision(latestDecision);
+                } else {
+                  console.log("No decision found in store, creating fallback choices");
+                  
+                  // Create fallback choices manually
+                  const fallbackId = `decision-fallback-${Date.now()}`;
+                  const fallbackDecision: Decision = {
+                    id: fallbackId,
+                    prompt: "What will you do?",
+                    options: [
+                      { id: `option-${fallbackId}-1`, text: "Investigate further" },
+                      { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
+                      { id: `option-${fallbackId}-3`, text: "Move to a new location" }
+                    ]
+                  };
+                  
+                  // Save to store for future reference
+                  narrativeStore.getState().addDecision(sessionId, {
+                    prompt: fallbackDecision.prompt,
+                    options: fallbackDecision.options
+                  });
+                  
+                  // Update state
+                  setCurrentDecision(fallbackDecision);
+                  
+                  // Also update session store
+                  const playerChoices = fallbackDecision.options.map(option => ({
+                    id: option.id,
+                    text: option.text,
+                    isSelected: false
+                  }));
+                  sessionStore.getState().setPlayerChoices(playerChoices);
+                  
+                  console.log("Created and set fallback decision:", fallbackDecision);
+                }
+              }}
+            >
+              Generate Fallback Choices
+            </button>
+          </div>
+        </div>
       )}
 
       {onPause && onResume && onEnd && (

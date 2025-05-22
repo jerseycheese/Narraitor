@@ -39,7 +39,7 @@ describe('sessionStore', () => {
     expect(state.status).toBe('active');
     expect(state.worldId).toBe(worldId);
     expect(state.currentSceneId).toBe('initial-scene');
-    expect(state.playerChoices).toHaveLength(2);
+    expect(state.playerChoices).toHaveLength(0); // Empty initially - populated by AI choice generator
     expect(onComplete).toHaveBeenCalled();
   });
 
@@ -104,8 +104,14 @@ describe('sessionStore', () => {
   });
 
   it('allows selecting a player choice', async () => {
-    // Arrange - initialize a session first to get default choices
+    // Arrange - initialize a session and set up player choices
     await sessionStore.getState().initializeSession('test-world-id');
+    
+    const testChoices = [
+      { id: 'choice-1', text: 'Option 1', isSelected: false },
+      { id: 'choice-2', text: 'Option 2', isSelected: false },
+    ];
+    sessionStore.getState().setPlayerChoices(testChoices);
     
     // Act - select a choice
     sessionStore.getState().selectChoice('choice-1');

@@ -43,10 +43,7 @@ export const sessionStore = create<SessionStore>((set, get) => ({
         return { 
           status: 'active',
           currentSceneId: 'initial-scene',
-          playerChoices: [
-            { id: 'choice-1', text: 'Option 1', isSelected: false },
-            { id: 'choice-2', text: 'Option 2', isSelected: false },
-          ],
+          playerChoices: [], // Empty player choices - will be populated by AI choice generator
           error: null,
         };
       });
