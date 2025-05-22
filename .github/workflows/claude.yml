@@ -12,12 +12,11 @@ on:
 jobs:
   claude-response:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
-      - uses: anthropics/claude-code-action@beta
+      - uses: anthropics/claude-code-action@main
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Optional: add custom trigger phrase (default: @claude)
-          # trigger_phrase: "/claude"
-          # Optional: add assignee trigger for issues
-          # assignee_trigger: "claude"
