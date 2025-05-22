@@ -25,12 +25,12 @@ const EnvironmentInfo = () => {
   }, []);
   
   return (
-    <div className="mb-4 text-xs bg-yellow-50 p-2 rounded border border-yellow-200">
-      <h3 className="font-bold mb-1">Environment Info:</h3>
-      <div>NODE_ENV: {info.nodeEnv}</div>
-      <div>Is Client: {String(info.isClient)}</div>
-      <div>Is Development: {String(info.isDev)}</div>
-      <div>Window Location: {typeof window !== 'undefined' ? window.location.pathname : 'N/A'}</div>
+    <div className="devtools-panel mb-4 text-xs bg-slate-700 p-2 rounded border border-slate-600">
+      <h3 className="devtools-panel font-bold mb-1 text-slate-200">Environment Info:</h3>
+      <div className="devtools-panel text-slate-300">NODE_ENV: {info.nodeEnv}</div>
+      <div className="devtools-panel text-slate-300">Is Client: {String(info.isClient)}</div>
+      <div className="devtools-panel text-slate-300">Is Development: {String(info.isDev)}</div>
+      <div className="devtools-panel text-slate-300">Window Location: {typeof window !== 'undefined' ? window.location.pathname : 'N/A'}</div>
     </div>
   );
 };

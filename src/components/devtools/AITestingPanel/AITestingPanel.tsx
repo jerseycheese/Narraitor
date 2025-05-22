@@ -157,46 +157,46 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="devtools-panel bg-white p-2 rounded border border-gray-200">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2">World Override</h4>
+      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">World Override</h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="devtools-panel block !text-xs text-gray-600 !my-0 mb-0.5">World Name:</label>
+            <label htmlFor="world-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Name:</label>
             <input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full"
+              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
             />
           </div>
           <div>
-            <label htmlFor="world-theme" className="devtools-panel block !text-xs text-gray-600 !my-0 mb-0.5">World Theme:</label>
+            <label htmlFor="world-theme" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Theme:</label>
             <input
               id="world-theme"
               type="text"
               value={testConfig.worldOverride?.theme || ''}
               onChange={handleWorldThemeChange}
               placeholder="Enter world theme"
-              className="devtools-panel w-full"
+              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="devtools-panel bg-white p-2 rounded border border-gray-200">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2">Character Override</h4>
+      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="devtools-panel block !text-xs text-gray-600 !my-0 mb-0.5">Character Name:</label>
+          <label htmlFor="character-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">Character Name:</label>
           <input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="devtools-panel w-full"
+            className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
           />
         </div>
       </div>
