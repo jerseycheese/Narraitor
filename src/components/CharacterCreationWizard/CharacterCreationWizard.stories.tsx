@@ -10,6 +10,13 @@ const meta: Meta<typeof CharacterCreationWizard> = {
   component: CharacterCreationWizard,
   parameters: {
     layout: 'fullscreen',
+    nextjs: {
+      navigation: {
+        push: (url: string) => {
+          console.log('Navigation to:', url);
+        },
+      },
+    },
   },
   decorators: [
     (Story) => {

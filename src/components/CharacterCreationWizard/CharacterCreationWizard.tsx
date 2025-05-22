@@ -327,7 +327,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       {/* Progress indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          {stepTitles.map((title, index) => (
+          {stepTitles.map((_, index) => (
             <div
               key={index}
               className={`flex items-center ${index < stepTitles.length - 1 ? 'flex-1' : ''}`}
