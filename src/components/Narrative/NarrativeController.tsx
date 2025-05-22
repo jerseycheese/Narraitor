@@ -169,16 +169,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setIsGeneratingChoices(true);
     
     // Create fallback choices upfront - we'll use these immediately if something fails
-    const fallbackId = `decision-fallback-${Date.now()}`;
-    const fallbackDecision: Decision = {
-      id: fallbackId,
-      prompt: "What will you do now?",
-      options: [
-        { id: `option-${fallbackId}-1`, text: "Investigate the situation" },
-        { id: `option-${fallbackId}-2`, text: "Speak with someone nearby" },
-        { id: `option-${fallbackId}-3`, text: "Leave this area" }
-      ]
-    };
+    const fallbackDecision = createFallbackDecision();
     
     try {
       // Use recent segments for context - get from fresh data
