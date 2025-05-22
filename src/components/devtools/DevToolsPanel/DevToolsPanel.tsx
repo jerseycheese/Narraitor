@@ -13,14 +13,16 @@ const EnvironmentInfo = () => {
   const [info, setInfo] = useState({
     nodeEnv: '',
     isClient: false,
-    isDev: false
+    isDev: false,
+    location: 'N/A'
   });
   
   useEffect(() => {
     setInfo({
       nodeEnv: process.env.NODE_ENV || 'unknown',
       isClient: true,
-      isDev: process.env.NODE_ENV === 'development'
+      isDev: process.env.NODE_ENV === 'development',
+      location: typeof window !== 'undefined' ? window.location.pathname : 'N/A'
     });
   }, []);
   
@@ -30,7 +32,7 @@ const EnvironmentInfo = () => {
       <div className="devtools-panel text-slate-300">NODE_ENV: {info.nodeEnv}</div>
       <div className="devtools-panel text-slate-300">Is Client: {String(info.isClient)}</div>
       <div className="devtools-panel text-slate-300">Is Development: {String(info.isDev)}</div>
-      <div className="devtools-panel text-slate-300">Window Location: {typeof window !== 'undefined' ? window.location.pathname : 'N/A'}</div>
+      <div className="devtools-panel text-slate-300">Window Location: {info.location}</div>
     </div>
   );
 };
