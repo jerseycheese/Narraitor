@@ -1,6 +1,32 @@
 import type { World, Character, NarrativeContext, AITestConfig } from '../../types';
 
 /**
+ * Deep clone utility that works in both browser and Node.js environments
+ */
+function deepClone<T>(obj: T): T {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as T;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as T;
+  }
+  
+  const cloned = {} as T;
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      cloned[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return cloned;
+}
+
+/**
  * Creates a test context by merging base game components with test overrides
  */
 export function createTestContext(
@@ -35,20 +61,20 @@ export function mergeTestOverrides(
   narrativeContext: NarrativeContext;
 } {
   // Deep clone base objects to avoid mutations
-  const world: World = {
-    ...baseWorld,
-    ...testConfig.worldOverride
-  };
+  const world: World = Object.assign(
+    deepClone(baseWorld),
+    testConfig.worldOverride || {}
+  );
   
-  const character: Character = {
-    ...baseCharacter,
-    ...testConfig.characterOverride
-  };
+  const character: Character = Object.assign(
+    deepClone(baseCharacter),
+    testConfig.characterOverride || {}
+  );
   
-  const narrativeContext: NarrativeContext = {
-    ...baseNarrativeContext,
-    ...testConfig.narrativeContext
-  };
+  const narrativeContext: NarrativeContext = Object.assign(
+    deepClone(baseNarrativeContext),
+    testConfig.narrativeContext || {}
+  );
   
   return {
     world,

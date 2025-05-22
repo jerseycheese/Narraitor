@@ -46,7 +46,11 @@ export class RequestLogger {
       // Extract token usage if available in metadata
       if (response.metadata?.tokens && typeof response.metadata.tokens === 'object') {
         const tokens = response.metadata.tokens as Record<string, unknown>;
-        if (tokens.prompt && tokens.completion && tokens.total) {
+        if (
+          typeof tokens.prompt === 'number' && 
+          typeof tokens.completion === 'number' && 
+          typeof tokens.total === 'number'
+        ) {
           log.tokenUsage = tokens as { prompt: number; completion: number; total: number };
         }
       }
