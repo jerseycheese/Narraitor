@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
 import { StateSection } from '../StateSection';
+import { AITestingPanel } from '../AITestingPanel';
+import { CollapsibleSection } from '../CollapsibleSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -108,6 +110,11 @@ export const DevToolsPanel = () => {
         >
           <EnvironmentInfo />
           <StateSection defaultCollapsed={true} />
+          
+          {/* AI Testing Section */}
+          <CollapsibleSection title="AI Testing" defaultCollapsed={true}>
+            <AITestingPanel />
+          </CollapsibleSection>
         </div>
       )}
     </div>

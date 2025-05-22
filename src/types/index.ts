@@ -43,6 +43,13 @@ export type {
   AIPromptContext, 
   AIConstraint 
 } from './ai-context.types';
+export type {
+  AITestConfig,
+  AIRequestLog,
+  AIResponse,
+  TokenUsage,
+  TestScenario
+} from './ai-testing.types';
 
 // Export type guards
 export { 
