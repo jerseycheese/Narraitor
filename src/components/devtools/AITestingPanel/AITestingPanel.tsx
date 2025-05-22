@@ -153,60 +153,100 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   };
 
   return (
-    <div className={`ai-testing-panel space-y-3 ${className}`}>
-      <h3 className="text-sm font-medium">AI Testing Panel</h3>
+    <div className={className} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <h3 style={{ fontSize: '14px', fontWeight: '500', margin: '0 0 12px 0' }}>AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="world-override-section bg-white p-2 rounded border">
-        <h4 className="text-xs font-medium mb-2">World Override</h4>
-        <div className="space-y-1">
+      <div style={{ backgroundColor: 'white', padding: '8px', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
+        <h4 style={{ fontSize: '12px', fontWeight: '500', margin: '0 0 8px 0' }}>World Override</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <div>
-            <label htmlFor="world-name" className="block text-xs text-gray-600">World Name:</label>
+            <label htmlFor="world-name" style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginBottom: '2px' }}>World Name:</label>
             <input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="w-full text-xs px-2 py-1 border rounded"
+              style={{
+                width: '100%',
+                fontSize: '12px',
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                backgroundColor: 'white'
+              }}
             />
           </div>
           <div>
-            <label htmlFor="world-theme" className="block text-xs text-gray-600">World Theme:</label>
+            <label htmlFor="world-theme" style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginBottom: '2px' }}>World Theme:</label>
             <input
               id="world-theme"
               type="text"
               value={testConfig.worldOverride?.theme || ''}
               onChange={handleWorldThemeChange}
               placeholder="Enter world theme"
-              className="w-full text-xs px-2 py-1 border rounded"
+              style={{
+                width: '100%',
+                fontSize: '12px',
+                padding: '4px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '4px',
+                backgroundColor: 'white'
+              }}
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="character-override-section bg-white p-2 rounded border">
-        <h4 className="text-xs font-medium mb-2">Character Override</h4>
+      <div style={{ backgroundColor: 'white', padding: '8px', borderRadius: '4px', border: '1px solid #e5e7eb' }}>
+        <h4 style={{ fontSize: '12px', fontWeight: '500', margin: '0 0 8px 0' }}>Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="block text-xs text-gray-600">Character Name:</label>
+          <label htmlFor="character-name" style={{ display: 'block', fontSize: '12px', color: '#6b7280', marginBottom: '2px' }}>Character Name:</label>
           <input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="w-full text-xs px-2 py-1 border rounded"
+            style={{
+              width: '100%',
+              fontSize: '12px',
+              padding: '4px 8px',
+              border: '1px solid #d1d5db',
+              borderRadius: '4px',
+              backgroundColor: 'white'
+            }}
           />
         </div>
       </div>
 
       {/* Generate Button */}
-      <div className="generate-section">
+      <div style={{ marginTop: '12px' }}>
         <button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
-          className="w-full text-xs px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+          style={{
+            width: '100%',
+            fontSize: '12px',
+            padding: '8px 12px',
+            backgroundColor: isGenerating ? '#9ca3af' : '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: isGenerating ? 'not-allowed' : 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            if (!isGenerating) {
+              e.currentTarget.style.backgroundColor = '#2563eb';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isGenerating) {
+              e.currentTarget.style.backgroundColor = '#3b82f6';
+            }
+          }}
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
         </button>
@@ -214,29 +254,34 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="loading-section bg-yellow-50 p-2 rounded border border-yellow-200">
-          <p className="text-xs text-yellow-800">Generating narrative...</p>
+        <div style={{ backgroundColor: '#fefce8', padding: '8px', borderRadius: '4px', border: '1px solid #fed7aa' }}>
+          <p style={{ fontSize: '12px', color: '#92400e', margin: '0' }}>Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="error-section bg-red-50 p-2 rounded border border-red-200">
-          <p className="text-xs text-red-800">Error: {error}</p>
+        <div style={{ backgroundColor: '#fef2f2', padding: '8px', borderRadius: '4px', border: '1px solid #fecaca' }}>
+          <p style={{ fontSize: '12px', color: '#991b1b', margin: '0' }}>Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="results-section bg-green-50 p-2 rounded border border-green-200">
-          <h4 className="text-xs font-medium mb-2 text-green-800">Generated Results</h4>
-          <div className="narrative-text mb-2">
-            <p className="text-xs text-green-700">{result.text}</p>
+        <div style={{ backgroundColor: '#f0fdf4', padding: '8px', borderRadius: '4px', border: '1px solid #bbf7d0' }}>
+          <h4 style={{ fontSize: '12px', fontWeight: '500', margin: '0 0 8px 0', color: '#166534' }}>Generated Results</h4>
+          <div style={{ marginBottom: '8px' }}>
+            <p style={{ fontSize: '12px', color: '#15803d', margin: '0' }}>{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
-            <div className="choices-section">
-              <h5 className="text-xs font-medium mb-1 text-green-800">Choices:</h5>
-              <ul className="text-xs text-green-700 space-y-1">
+            <div>
+              <h5 style={{ fontSize: '12px', fontWeight: '500', margin: '0 0 4px 0', color: '#166534' }}>Choices:</h5>
+              <ul style={{ fontSize: '12px', color: '#15803d', margin: '0', padding: '0', listStyle: 'none' }}>
                 {result.choices.map((choice, index) => (
-                  <li key={index} className="pl-2 border-l-2 border-green-300">• {choice}</li>
+                  <li key={index} style={{ 
+                    paddingLeft: '8px', 
+                    borderLeft: '2px solid #86efac', 
+                    marginBottom: '4px',
+                    fontSize: '12px'
+                  }}>• {choice}</li>
                 ))}
               </ul>
             </div>

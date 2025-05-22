@@ -63,8 +63,20 @@ export const CollapsibleSection = ({
           data-testid="collapsible-section-toggle"
           onClick={toggleExpanded}
           aria-expanded={isExpanded}
-          className="focus-visible text-base font-bold ml-2 bg-white px-2 py-1 rounded border hover:bg-gray-50"
-          style={{ color: '#333' }}
+          className="focus-visible"
+          style={{ 
+            fontSize: '16px',
+            fontWeight: 'bold',
+            marginLeft: '8px',
+            backgroundColor: 'white',
+            color: '#333',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            border: '1px solid #d1d5db',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
         >
           {isExpanded ? '−' : '+'}
         </button>
