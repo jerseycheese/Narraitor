@@ -34,6 +34,24 @@ export default {
         { name: 'light', value: '#ffffff' },
       ],
     },
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/',
+        query: {},
+        push: (...args) => {
+          console.log('[Storybook] router.push called with:', args);
+          return Promise.resolve(true);
+        },
+        replace: (...args) => {
+          console.log('[Storybook] router.replace called with:', args);
+          return Promise.resolve(true);
+        },
+        back: () => {
+          console.log('[Storybook] router.back called');
+        },
+      },
+    },
   },
   // Add style tag to force colors
   decorators: [
