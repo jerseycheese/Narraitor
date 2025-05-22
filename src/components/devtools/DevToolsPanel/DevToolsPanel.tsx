@@ -74,31 +74,17 @@ export const DevToolsPanel = () => {
     return null;
   }
 
-  // Force visible styles
-  const baseStyle = {
-    position: 'fixed' as const,
-    bottom: 0, 
-    left: 0, 
-    right: 0,
-    backgroundColor: 'var(--color-background)',
-    borderColor: 'var(--color-border)',
-    borderWidth: '3px',
-    borderStyle: 'solid',
-    zIndex: 9999,
-    maxHeight: isOpen ? '50vh' : '40px'
-  };
-
   return (
     <div 
       data-testid="devtools-panel-container"
-      className={`overflow-hidden`}
-      style={baseStyle}
+      className={`fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 z-[9999] overflow-hidden ${
+        isOpen ? 'max-h-[50vh]' : 'h-12'
+      } min-h-12 shadow-lg`}
     >
       {/* Header with toggle button */}
       <div 
         data-testid="devtools-panel-header"
-        className="flex justify-between items-center p-2 border-b"
-        style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)' }}
+        className="flex justify-between items-center px-4 py-2 border-b border-gray-300 flex-shrink-0 bg-white h-12"
       >
         <div className="text-sm font-medium">
           Narraitor DevTools
@@ -118,8 +104,7 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="p-4 overflow-auto h-full"
-          style={{ maxHeight: 'calc(50vh - 40px)' }}
+          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)]"
         >
           <EnvironmentInfo />
           <StateSection defaultCollapsed={true} />

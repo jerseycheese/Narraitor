@@ -27,6 +27,7 @@ export class ChoiceGenerator {
    * Generate player choices based on narrative context
    */
   async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
+    
     try {
       const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3 } = params;
       const world = this.getWorld(worldId);
@@ -63,7 +64,7 @@ export class ChoiceGenerator {
       
       return decision;
     } catch (error) {
-      console.error('Error generating choices:', error);
+      console.error('Error generating AI choices:', error);
       return this.generateFallbackChoices(params.worldId, params.narrativeContext);
     }
   }
@@ -211,6 +212,7 @@ export class ChoiceGenerator {
     const world = worlds[worldId];
     
     if (!world) {
+      console.error('🔄 CHOICE GENERATOR: World not found:', worldId);
       throw new Error(`World not found: ${worldId}`);
     }
     
@@ -222,7 +224,14 @@ export class ChoiceGenerator {
    */
   private getTemplate(templateType: string) {
     const templateKey = `narrative/${templateType}`;
-    return narrativeTemplateManager.getTemplate(templateKey);
+    
+    try {
+      const template = narrativeTemplateManager.getTemplate(templateKey);
+      return template;
+    } catch (error) {
+      console.error('🔄 CHOICE GENERATOR: Template not found:', templateKey, error);
+      throw error;
+    }
   }
 
   /**

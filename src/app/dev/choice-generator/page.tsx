@@ -55,12 +55,13 @@ export default function ChoiceGeneratorTestPage() {
           name: worldName,
           description: worldDescription,
           theme: worldTheme,
-          attributes: {},
-          skills: {},
+          attributes: [],
+          skills: [],
           settings: {
-            playerCharacterEnabled: true,
-            multipleCharactersEnabled: false,
-            inventoryEnabled: true
+            maxAttributes: 10,
+            maxSkills: 10,
+            attributePointPool: 100,
+            skillPointPool: 100
           }
         });
         

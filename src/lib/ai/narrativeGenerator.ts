@@ -177,17 +177,47 @@ export class NarrativeGenerator {
    * Generate player choices based on the current narrative context
    */
   async generatePlayerChoices(worldId: string, narrativeContext: NarrativeContext, characterIds: string[]): Promise<Decision> {
+    console.log('🔄 NARRATIVE GENERATOR: generatePlayerChoices called with:', {
+      worldId,
+      narrativeContext: {
+        segmentCount: narrativeContext.recentSegments?.length || 0,
+        location: narrativeContext.currentLocation
+      },
+      characterIds
+    });
+    
     try {
-      return await this.choiceGenerator.generateChoices({
+      console.log('🔄 NARRATIVE GENERATOR: Delegating to choiceGenerator.generateChoices');
+      const result = await this.choiceGenerator.generateChoices({
         worldId,
         narrativeContext,
         characterIds,
         minOptions: 3,
         maxOptions: 4
       });
+      
+      console.log('🔄 NARRATIVE GENERATOR: Successfully generated choices:', {
+        id: result.id,
+        prompt: result.prompt,
+        optionsCount: result.options.length
+      });
+      
+      return result;
     } catch (error) {
-      console.error('Error generating player choices:', error);
-      throw new Error('Failed to generate player choices');
+      console.error('🔄 NARRATIVE GENERATOR: Error generating player choices:', error);
+      
+      // Instead of throwing, return fallback choices
+      console.log('🔄 NARRATIVE GENERATOR: Creating fallback choices due to error');
+      const fallbackId = `decision-fallback-${Date.now()}`;
+      return {
+        id: fallbackId,
+        prompt: "What will you do next?",
+        options: [
+          { id: `option-${fallbackId}-1`, text: "Investigate further" },
+          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
+          { id: `option-${fallbackId}-3`, text: "Move to a new location" }
+        ]
+      };
     }
   }
 }

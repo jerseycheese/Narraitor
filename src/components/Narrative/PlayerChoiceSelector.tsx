@@ -56,7 +56,7 @@ const PlayerChoiceSelector: React.FC<PlayerChoiceSelectorProps> = ({
           >
             {option.id === decision.selectedOptionId ? '➤ ' : ''}{option.text}
             {option.hint && (
-              <span className="block text-sm text-white mt-1">{option.hint}</span>
+              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
             )}
           </button>
         ))}

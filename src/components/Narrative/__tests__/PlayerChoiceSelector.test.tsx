@@ -80,12 +80,13 @@ describe('PlayerChoiceSelector', () => {
       />
     );
     
-    // Get option buttons
-    const selectedOption = screen.getByText('Run away');
+    // Get option buttons (selected option has "➤ " prefix)
+    const selectedOption = screen.getByText('➤ Run away');
     
     // Check that the selected option has the selected styling
-    expect(selectedOption.parentElement).toHaveClass('bg-blue-100');
-    expect(selectedOption.parentElement).toHaveAttribute('aria-checked', 'true');
+    // The selected option text is inside the button, so we check the button itself
+    expect(selectedOption).toHaveClass('bg-blue-100');
+    expect(selectedOption).toHaveAttribute('aria-checked', 'true');
   });
   
   it('renders option hints when available', () => {

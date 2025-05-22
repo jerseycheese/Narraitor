@@ -155,14 +155,34 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
    * Generate player choices based on current narrative context
    */
   const generatePlayerChoices = async () => {
-    if (!mountedRef.current || segments.length === 0) return;
+    if (!mountedRef.current) {
+      return;
+    }
     
-    console.log('Generating player choices for narrative context');
+    // Get fresh segments from the store instead of relying on component state
+    const currentSegments = narrativeStore.getState().getSessionSegments(sessionId);
+    
+    if (currentSegments.length === 0) {
+      return;
+    }
+    
     setIsGeneratingChoices(true);
     
+    // Create fallback choices upfront - we'll use these immediately if something fails
+    const fallbackId = `decision-fallback-${Date.now()}`;
+    const fallbackDecision: Decision = {
+      id: fallbackId,
+      prompt: "What will you do now?",
+      options: [
+        { id: `option-${fallbackId}-1`, text: "Investigate the situation" },
+        { id: `option-${fallbackId}-2`, text: "Speak with someone nearby" },
+        { id: `option-${fallbackId}-3`, text: "Leave this area" }
+      ]
+    };
+    
     try {
-      // Use recent segments for context
-      const recentSegments = segments.slice(-5);
+      // Use recent segments for context - get from fresh data
+      const recentSegments = currentSegments.slice(-5);
       
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
@@ -170,19 +190,35 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
       };
       
-      console.log('Calling narrativeGenerator.generatePlayerChoices with', { worldId, segments: recentSegments.length });
-      
-      // Generate choices
-      const decision = await narrativeGenerator.generatePlayerChoices(
-        worldId,
-        narrativeContext,
-        []
-      );
-      
-      console.log('Generated player choices:', decision);
+      // Generate choices with a 5-second timeout
+      let decision;
+      try {
+        // Set up a race between the AI generation and a timeout
+        const timeoutPromise = new Promise<Decision>((_, reject) => {
+          setTimeout(() => reject(new Error('AI choice generation timed out')), 5000);
+        });
+        
+        decision = await Promise.race([
+          narrativeGenerator.generatePlayerChoices(worldId, narrativeContext, []),
+          timeoutPromise
+        ]);
+        
+      } catch (error) {
+        console.error('⚡ CHOICE GENERATION: Generation failed or timed out, using fallback', error);
+        decision = fallbackDecision;
+      }
       
       // Skip if component unmounted during async operation
-      if (!mountedRef.current) return;
+      if (!mountedRef.current) {
+        return;
+      }
+      
+      // Verify decision structure and use fallback if invalid
+      if (!decision || !decision.options || decision.options.length === 0) {
+        console.error('⚡ CHOICE GENERATION: Invalid decision structure, using fallback');
+        decision = fallbackDecision;
+      }
+      
       
       // Add decision to store
       narrativeStore.getState().addDecision(sessionId, {
@@ -190,16 +226,58 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         options: decision.options
       });
       
-      // Notify parent component
-      if (onChoicesGenerated) {
-        console.log('Calling onChoicesGenerated with decision');
-        onChoicesGenerated(decision);
+      // Only notify parent component if we have AI-generated choices (not fallback)
+      if (decision !== fallbackDecision) {
+        
+        if (onChoicesGenerated) {
+          try {
+            // Create a deep copy of the decision to ensure React state updates
+            const decisionCopy = JSON.parse(JSON.stringify(decision));
+            onChoicesGenerated(decisionCopy);
+          } catch (error) {
+            console.error('⚡ CHOICE GENERATION: Error calling onChoicesGenerated:', error);
+          }
+        }
       } else {
-        console.log('No onChoicesGenerated callback provided');
       }
     } catch (error) {
-      console.error('Error generating player choices:', error);
+      console.error('⚡ CHOICE GENERATION: Unhandled error in generatePlayerChoices:', error);
       setError('Failed to generate player choices');
+      
+      // Even if we get an unhandled error, try to provide fallback choices
+      
+      try {
+        // Only try to create fallback choices if we haven't already added any for this session
+        const existingDecisions = narrativeStore.getState().getSessionDecisions(sessionId);
+        
+        if (existingDecisions.length === 0 && mountedRef.current) {
+          // Create and add fallback choices to the store
+          const fallbackId = `decision-fallback-error-${Date.now()}`;
+          const fallbackDecision: Decision = {
+            id: fallbackId,
+            prompt: "What will you do now?",
+            options: [
+              { id: `option-${fallbackId}-1`, text: "Investigate the situation" },
+              { id: `option-${fallbackId}-2`, text: "Speak with someone nearby" },
+              { id: `option-${fallbackId}-3`, text: "Move to a different area" }
+            ]
+          };
+          
+          // Add to store
+          narrativeStore.getState().addDecision(sessionId, {
+            prompt: fallbackDecision.prompt,
+            options: fallbackDecision.options
+          });
+          
+          // Notify parent
+          if (onChoicesGenerated && mountedRef.current) {
+            const decisionCopy = JSON.parse(JSON.stringify(fallbackDecision));
+            onChoicesGenerated(decisionCopy);
+          }
+        }
+      } catch (fallbackError) {
+        console.error('⚡ CHOICE GENERATION: Failed to provide fallback choices:', fallbackError);
+      }
     } finally {
       if (mountedRef.current) {
         setIsGeneratingChoices(false);
@@ -266,8 +344,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Generate choices if enabled - always generate for initial narrative
       if (generateChoices) {
         console.log('Initial narrative generated, now generating choices');
-        // Use setTimeout to ensure the narrative is processed before generating choices
-        setTimeout(() => generatePlayerChoices(), 500);
+        
+        // Start generating AI choices immediately without showing fallback choices first
+        setTimeout(() => {
+          console.log('⏱️ TIMEOUT: Now running delayed generatePlayerChoices for initial narrative');
+          generatePlayerChoices();
+        }, 500); // Reduced timeout since we're not showing immediate choices
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
@@ -344,8 +426,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Generate choices if enabled - always generate after a new segment
       if (generateChoices) {
         console.log('New narrative segment generated, now generating choices');
-        // Use setTimeout to ensure the narrative is processed before generating choices
-        setTimeout(() => generatePlayerChoices(), 500);
+        
+        // Start generating AI choices immediately without showing fallback choices first
+        setTimeout(() => {
+          console.log('⏱️ TIMEOUT: Now running delayed generatePlayerChoices for next segment');
+          generatePlayerChoices();
+        }, 500); // Reduced timeout since we're not showing immediate choices
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);

@@ -13,41 +13,55 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and 3-5 options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, worldDescription, genre, narrativeContext } = context;
+  const { worldName, genre, narrativeContext } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
-    ?.slice(-2)
+    ?.slice(-1) // Use only the latest segment to reduce context size
     .map(segment => segment.content)
     .join('\n\n') || '';
   
   // Extract current location for context
   const location = narrativeContext?.currentLocation || '';
   
+  // Create a more comprehensive context by including more of the narrative
+  // but still managing token usage intelligently
+  let shortContext = '';
+  if (recentContent.length <= 1000) {
+    // If content is reasonably short, use it all
+    shortContext = recentContent;
+  } else {
+    // For longer content, use first 400 chars + last 400 chars + middle indicator
+    const firstPart = recentContent.slice(0, 400);
+    const lastPart = recentContent.slice(-400);
+    shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
+  }
+  
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
-${worldDescription ? `World description: ${worldDescription}` : ''}
 ${genre ? `Genre: ${genre}` : ''}
 
-CURRENT CONTEXT:
-${recentContent}
+CURRENT CONTEXT (brief summary):
+${shortContext}
 ${location ? `Current location: ${location}` : ''}
 
 INSTRUCTIONS:
-1. Based on the narrative context, create a decision prompt and 3-4 distinct choice options that would be meaningful for the player
-2. Choices should be contextually appropriate and offer genuinely different paths forward
-3. Each choice should be concise (max 15 words) and written in second person ("Investigate the noise" not "You investigate the noise")
-4. Choices should represent actions the player can take, not just dialogue options
+Based on the ENTIRE narrative context (both beginning and end if provided), create 3 distinct action choices that:
+1. Reference specific elements from the current scene (characters, objects, events, locations)
+2. Offer meaningfully different paths forward in the story
+3. Are concise (under 15 words) and written as direct actions
+4. Consider both the immediate situation AND the broader story context
 
-FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
-Decision: [A single sentence question framed as "What will you do?" or similar]
+Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
+
+FORMAT:
+Decision: What will you do?
 
 Options:
-1. [First choice option]
-2. [Second choice option]
-3. [Third choice option]
-4. [Fourth choice option - optional]
+1. [First choice - action referencing specific story elements]
+2. [Second choice - different approach to the situation]
+3. [Third choice - alternative path considering story context]
 
-IMPORTANT: Only output the Decision and Options sections exactly as specified. Do not include any other text.`;
+Keep your response EXACTLY in this format. Only include the Decision and Options sections.`;
 };
 
 export default playerChoiceTemplate;

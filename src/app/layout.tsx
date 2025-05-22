@@ -19,7 +19,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <DevToolsProvider>
           {/* Add DevMockState to initialize development data */}
           <DevMockState />
-          {children}
+          <div className="min-h-screen pb-12 md:pb-14">
+            {children}
+          </div>
           <DevToolsPanel />
         </DevToolsProvider>
       </body>
