@@ -1,5 +1,5 @@
 import type { NarrativeContext, AITestConfig, AIRequestLog, AIResponse } from '../../types';
-import { generateId } from '../utils/generateId';
+import { generateUniqueId } from '../utils/generateId';
 
 /**
  * Logs AI requests and responses for debugging and testing purposes
@@ -16,7 +16,7 @@ export class RequestLogger {
     contextUsed: NarrativeContext,
     testConfig?: AITestConfig
   ): string {
-    const logId = generateId();
+    const logId = generateUniqueId('log');
     const log: AIRequestLog = {
       id: logId,
       timestamp: new Date(),
@@ -44,8 +44,11 @@ export class RequestLogger {
       log.responseTime = responseTime;
       
       // Extract token usage if available in metadata
-      if (response.metadata?.tokens) {
-        log.tokenUsage = response.metadata.tokens;
+      if (response.metadata?.tokens && typeof response.metadata.tokens === 'object') {
+        const tokens = response.metadata.tokens as Record<string, unknown>;
+        if (tokens.prompt && tokens.completion && tokens.total) {
+          log.tokenUsage = tokens as { prompt: number; completion: number; total: number };
+        }
       }
     }
   }

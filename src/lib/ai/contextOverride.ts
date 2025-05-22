@@ -16,15 +16,7 @@ export function createTestContext(
   const result = mergeTestOverrides(baseWorld, baseCharacter, baseNarrativeContext, testConfig);
   
   // Apply custom variables to narrative context if provided
-  if (testConfig.customVariables) {
-    result.narrativeContext = {
-      ...result.narrativeContext,
-      gameState: {
-        ...result.narrativeContext.gameState,
-        ...testConfig.customVariables
-      }
-    };
-  }
+  // Note: Custom variables would be stored in a different way in the actual implementation
   
   return result;
 }

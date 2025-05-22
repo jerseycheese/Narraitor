@@ -27,7 +27,7 @@ export interface AIRequestLog {
 export interface AIResponse {
   text: string;
   choices?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // Token usage tracking

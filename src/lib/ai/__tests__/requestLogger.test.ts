@@ -1,4 +1,4 @@
-import { RequestLogger, type AIRequestLog } from '../requestLogger';
+import { RequestLogger } from '../requestLogger';
 import type { NarrativeContext, AITestConfig } from '../../../types';
 
 describe('RequestLogger', () => {
@@ -10,11 +10,11 @@ describe('RequestLogger', () => {
 
   test('logs AI request with all required information', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
     const mockTestConfig: AITestConfig = {
@@ -29,11 +29,11 @@ describe('RequestLogger', () => {
 
   test('completes request log with response data', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
     const logId = logger.startRequest('test-template', 'Test prompt', mockContext);
@@ -54,11 +54,11 @@ describe('RequestLogger', () => {
 
   test('retrieves request logs in reverse chronological order', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
     // Create multiple requests
@@ -81,11 +81,11 @@ describe('RequestLogger', () => {
 
   test('filters logs by template ID', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
     logger.startRequest('scene-template', 'Scene prompt', mockContext);
@@ -99,11 +99,11 @@ describe('RequestLogger', () => {
 
   test('clears all logs', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
     logger.startRequest('template-1', 'Prompt 1', mockContext);
@@ -117,14 +117,14 @@ describe('RequestLogger', () => {
 
   test('handles incomplete requests gracefully', () => {
     const mockContext: NarrativeContext = {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      currentScene: 'Test scene',
-      previousChoices: [],
-      gameState: {}
+      recentSegments: [],
+      activeCharacters: ['char-1'],
+      currentLocation: 'Test area',
+      activeQuests: [],
+      mood: 'neutral'
     };
 
-    const logId = logger.startRequest('test-template', 'Test prompt', mockContext);
+    logger.startRequest('test-template', 'Test prompt', mockContext);
     
     // Don't complete the request
     const logs = logger.getLogs();
