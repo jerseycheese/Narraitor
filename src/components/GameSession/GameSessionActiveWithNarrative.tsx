@@ -137,7 +137,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
     // Set a fallback timer to ensure choices eventually appear
     setTimeout(() => {
       // If we're still generating choices after 10 seconds, create fallback choices
-      if (isGeneratingChoices && !currentDecision) {
+      if (isGeneratingChoicesRef.current && !currentDecisionRef.current) {
         const fallbackId = `decision-timeout-${Date.now()}`;
         const fallbackDecision: Decision = {
           id: fallbackId,
