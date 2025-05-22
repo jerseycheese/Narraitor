@@ -127,15 +127,53 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       const startTime = Date.now();
 
+      // Add realistic delay to show loading state (1.5-3 seconds)
+      const delay = 1500 + Math.random() * 1500;
+      await new Promise(resolve => setTimeout(resolve, delay));
+
+      // Generate context-aware narrative text
+      const worldName = testContext.world.name;
+      const worldTheme = testContext.world.theme;
+      const characterName = testContext.character.name;
+      
+      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
+
+      // Generate context-aware choices based on theme
+      const generateChoices = (theme: string = 'Fantasy'): string[] => {
+        const baseChoices = [
+          `Explore the ${theme.toLowerCase()} landscape ahead`,
+          `Study the ${worldName} surroundings more carefully`,
+          `Call upon ${characterName}'s inner strength`
+        ];
+
+        if (theme.toLowerCase().includes('fantasy')) {
+          return [
+            'Venture deeper into the magical forest',
+            'Seek out the ancient temple ruins',
+            'Cast a spell to reveal hidden paths'
+          ];
+        } else if (theme.toLowerCase().includes('sci-fi') || theme.toLowerCase().includes('space')) {
+          return [
+            'Scan the area with your tech equipment',
+            'Attempt to contact the orbital station',
+            'Investigate the strange energy readings'
+          ];
+        } else if (theme.toLowerCase().includes('steampunk')) {
+          return [
+            'Fire up your mechanical contraption',
+            'Navigate using the brass compass',
+            'Repair the damaged airship engine'
+          ];
+        } else {
+          return baseChoices;
+        }
+      };
+
       // Mock narrative generation for testing purposes
       const response: AIResponse = {
-        text: `Generated narrative for ${testContext.world.name} with character ${testContext.character.name}`,
-        choices: [
-          'Continue exploring the area',
-          'Rest and recover your strength',
-          'Search for clues about your past'
-        ],
-        metadata: { tokens: 150 }
+        text: narrativeText,
+        choices: generateChoices(worldTheme),
+        metadata: { tokens: 150 + Math.floor(Math.random() * 100) }
       };
 
       const responseTime = Date.now() - startTime;
