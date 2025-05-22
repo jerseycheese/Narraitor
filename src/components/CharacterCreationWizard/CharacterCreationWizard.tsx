@@ -280,7 +280,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     // Navigate to character detail
     router.push(`/characters/${characterId}`);
-  }, [state, worldId, createCharacter, clearAutoSave, router]);
+  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep]);
 
   if (!world) {
     return (

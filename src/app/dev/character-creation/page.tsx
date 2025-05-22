@@ -13,22 +13,22 @@ const testWorlds = {
     description: 'A high fantasy world for testing character creation',
     theme: 'fantasy',
     attributes: [
-      { id: 'attr-str', name: 'Strength', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-dex', name: 'Dexterity', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-con', name: 'Constitution', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-int', name: 'Intelligence', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-wis', name: 'Wisdom', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-cha', name: 'Charisma', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-str', name: 'Strength', description: 'Physical power', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-dex', name: 'Dexterity', description: 'Agility and reflexes', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-con', name: 'Constitution', description: 'Health and endurance', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-int', name: 'Intelligence', description: 'Reasoning and memory', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-wis', name: 'Wisdom', description: 'Awareness and insight', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-cha', name: 'Charisma', description: 'Force of personality', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
     ],
     skills: [
-      { id: 'skill-1', name: 'Swordsmanship', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-2', name: 'Archery', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-3', name: 'Magic', worldId: '', difficulty: 'hard' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-4', name: 'Stealth', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-5', name: 'Diplomacy', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-6', name: 'Survival', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-7', name: 'Healing', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-8', name: 'Alchemy', worldId: '', difficulty: 'hard' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-1', name: 'Swordsmanship', description: 'Skill with bladed weapons', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-2', name: 'Archery', description: 'Skill with ranged weapons', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-3', name: 'Magic', description: 'Arcane knowledge and spellcasting', worldId: '', difficulty: 'hard' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-4', name: 'Stealth', description: 'Moving unseen and unheard', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-5', name: 'Diplomacy', description: 'Social interaction and negotiation', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-6', name: 'Survival', description: 'Wilderness knowledge', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-7', name: 'Healing', description: 'Medical and restorative arts', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-8', name: 'Alchemy', description: 'Potion making and chemistry', worldId: '', difficulty: 'hard' as const, baseValue: 1, minValue: 1, maxValue: 5 },
     ],
     settings: {
       maxAttributes: 6,
@@ -42,18 +42,18 @@ const testWorlds = {
     description: 'A wild west world for testing character creation',
     theme: 'western',
     attributes: [
-      { id: 'attr-grit', name: 'Grit', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-draw', name: 'Quick Draw', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-ride', name: 'Riding', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-sharp', name: 'Sharpshooting', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
-      { id: 'attr-charm', name: 'Charm', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-grit', name: 'Grit', description: 'Toughness and determination', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-draw', name: 'Quick Draw', description: 'Speed and reflexes', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-ride', name: 'Riding', description: 'Horsemanship skill', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-sharp', name: 'Sharpshooting', description: 'Accuracy with firearms', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
+      { id: 'attr-charm', name: 'Charm', description: 'Personal magnetism', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
     ],
     skills: [
-      { id: 'skill-gun', name: 'Gunslinging', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-gamble', name: 'Gambling', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-track', name: 'Tracking', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-brawl', name: 'Brawling', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
-      { id: 'skill-intim', name: 'Intimidation', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-gun', name: 'Gunslinging', description: 'Skill with firearms', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-gamble', name: 'Gambling', description: 'Games of chance', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-track', name: 'Tracking', description: 'Following trails', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-brawl', name: 'Brawling', description: 'Unarmed combat', worldId: '', difficulty: 'easy' as const, baseValue: 1, minValue: 1, maxValue: 5 },
+      { id: 'skill-intim', name: 'Intimidation', description: 'Threatening presence', worldId: '', difficulty: 'medium' as const, baseValue: 1, minValue: 1, maxValue: 5 },
     ],
     settings: {
       maxAttributes: 5,
@@ -64,8 +64,10 @@ const testWorlds = {
   },
 };
 
+type TestWorldKey = keyof typeof testWorlds;
+
 export default function CharacterCreationTestPage() {
-  const [selectedWorld, setSelectedWorld] = useState<string>('fantasy');
+  const [selectedWorld, setSelectedWorld] = useState<TestWorldKey>('fantasy');
   const [testWorldId, setTestWorldId] = useState<string | null>(null);
   const { createWorld, setCurrentWorld } = worldStore();
 
@@ -86,7 +88,7 @@ export default function CharacterCreationTestPage() {
     setTestWorldId(createdId);
   }, [selectedWorld, createWorld, setCurrentWorld]);
 
-  const handleWorldChange = (worldType: string) => {
+  const handleWorldChange = (worldType: TestWorldKey) => {
     setSelectedWorld(worldType);
     setTestWorldId(null); // Force recreation
   };

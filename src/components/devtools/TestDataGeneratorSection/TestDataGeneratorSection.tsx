@@ -1,14 +1,12 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
 import { generateTestCharacter } from './generators/characterGenerator';
 import { generateTestWorld } from './generators/worldGenerator';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
   const { worlds, currentWorldId, createWorld } = worldStore();
-  const { createCharacter } = characterStore();
   
   const handleGenerateWorld = () => {
     const testWorld = generateTestWorld();

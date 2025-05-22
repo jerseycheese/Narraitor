@@ -65,7 +65,7 @@ export const generateTestCharacter = (world: World) => {
   const name = `${firstName} ${lastName}`;
   
   // Get appropriate history based on theme
-  const themeHistories = histories[world.theme] || histories.fantasy;
+  const themeHistories = histories[world.theme as keyof typeof histories] || histories.fantasy;
   const history = themeHistories[Math.floor(Math.random() * themeHistories.length)];
   
   // Generate attributes with random distribution
@@ -99,7 +99,7 @@ export const generateTestCharacter = (world: World) => {
   };
 };
 
-const distributePointsRandomly = (worldAttributes: any[], totalPoints: number) => {
+const distributePointsRandomly = (worldAttributes: World['attributes'], totalPoints: number) => {
   const result = worldAttributes.map(attr => ({
     attributeId: attr.id,
     name: attr.name,
@@ -121,7 +121,7 @@ const distributePointsRandomly = (worldAttributes: any[], totalPoints: number) =
   return result;
 };
 
-const selectRandomSkills = (worldSkills: any[], count: number) => {
+const selectRandomSkills = (worldSkills: World['skills'], count: number) => {
   const shuffled = [...worldSkills].sort(() => Math.random() - 0.5);
   const selectedCount = Math.min(count, shuffled.length);
   

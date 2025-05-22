@@ -2,16 +2,15 @@ import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
 
 interface BasicInfoStepProps {
-  data: any; // Using any for now, will be properly typed
-  onUpdate: (updates: any) => void;
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig: any;
+  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onUpdate,
-  onValidation,
 }) => {
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({ name: e.target.value });
@@ -52,7 +51,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter character name"
             />
-            {showErrors && validation.errors.map((error, index) => (
+            {showErrors && validation.errors.map((error: string, index: number) => (
               <p key={index} className="mt-1 text-sm text-red-600">
                 {error}
               </p>

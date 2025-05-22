@@ -4,9 +4,9 @@ import { EntityID } from '@/types/common.types';
 interface CharacterCreationState {
   currentStep: number;
   worldId: EntityID;
-  characterData: any;
-  validation: any;
-  pointPools: any;
+  characterData: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  validation: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  pointPools: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {

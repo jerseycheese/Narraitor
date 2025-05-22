@@ -1,16 +1,15 @@
 import React from 'react';
 
 interface BackgroundStepProps {
-  data: any;
-  onUpdate: (updates: any) => void;
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig: any;
+  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   data,
   onUpdate,
-  onValidation,
 }) => {
   const handleHistoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onUpdate({
@@ -119,7 +118,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       {/* Validation errors */}
       {showErrors && (
         <div className="bg-red-50 p-4 rounded">
-          {validation.errors.map((error, index) => (
+          {validation.errors.map((error: string, index: number) => (
             <p key={index} className="text-sm text-red-600">
               {error}
             </p>

@@ -132,6 +132,7 @@ const generateGenreAttributes = (genre: string) => {
   return attributeTemplates.map(attr => ({
     id: generateUniqueId('attr'),
     name: attr.name,
+    description: `The ${attr.name.toLowerCase()} attribute`,
     worldId: '', // Will be set when world is created
     baseValue: 10,
     minValue: 1,
@@ -183,9 +184,10 @@ const generateGenreSkills = (genre: string) => {
   return skillTemplates.map(skill => ({
     id: generateUniqueId('skill'),
     name: skill.name,
+    description: `The ${skill.name.toLowerCase()} skill`,
     worldId: '', // Will be set when world is created
     linkedAttributeId: undefined,
-    difficulty: skill.difficulty as any,
+    difficulty: skill.difficulty as 'easy' | 'medium' | 'hard',
     category: skill.category,
     baseValue: 1,
     minValue: 1,
