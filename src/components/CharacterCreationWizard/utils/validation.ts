@@ -20,7 +20,8 @@ export const validateCharacterName = (name: string, worldId: EntityID): Validati
     }
     
     // Check uniqueness within world
-    const { characters } = characterStore.getState();
+    const state = characterStore.getState?.() || characterStore();
+    const characters = state.characters || {};
     const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
     if (existingCharacters.some(c => c.name === name)) {
       errors.push('A character with this name already exists in this world');
