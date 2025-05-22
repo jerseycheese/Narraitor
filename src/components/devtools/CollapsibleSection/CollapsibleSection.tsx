@@ -63,8 +63,8 @@ export const CollapsibleSection = ({
           data-testid="collapsible-section-toggle"
           onClick={toggleExpanded}
           aria-expanded={isExpanded}
-          className="focus-visible text-base font-bold"
-          style={{ color: 'var(--color-foreground)' }}
+          className="focus-visible text-base font-bold ml-2 bg-white px-2 py-1 rounded border hover:bg-gray-50"
+          style={{ color: '#333' }}
         >
           {isExpanded ? '−' : '+'}
         </button>

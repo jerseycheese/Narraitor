@@ -106,14 +106,14 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)]"
+          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-gray-50 text-xs"
         >
           <EnvironmentInfo />
           <StateSection defaultCollapsed={true} />
           
           {/* AI Testing Section */}
-          <CollapsibleSection title="AI Testing" defaultCollapsed={true}>
-            <AITestingPanel />
+          <CollapsibleSection title="AI Testing" defaultCollapsed={true} className="text-xs">
+            <AITestingPanel className="text-xs" />
           </CollapsibleSection>
         </div>
       )}

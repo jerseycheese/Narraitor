@@ -153,53 +153,52 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   };
 
   return (
-    <div className={`ai-testing-panel ${className}`}>
-      <h3>AI Testing Panel</h3>
+    <div className={`ai-testing-panel space-y-3 ${className}`}>
+      <h3 className="text-sm font-medium">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="world-override-section">
-        <h4>World Override</h4>
-        <div>
-          <label htmlFor="world-name">World Name:</label>
-          <input
-            id="world-name"
-            type="text"
-            value={testConfig.worldOverride?.name || ''}
-            onChange={handleWorldNameChange}
-            placeholder="Enter world name"
-          />
-        </div>
-        <div>
-          <label htmlFor="world-theme">World Theme:</label>
-          <input
-            id="world-theme"
-            type="text"
-            value={testConfig.worldOverride?.theme || ''}
-            onChange={handleWorldThemeChange}
-            placeholder="Enter world theme"
-          />
+      <div className="world-override-section bg-white p-2 rounded border">
+        <h4 className="text-xs font-medium mb-2">World Override</h4>
+        <div className="space-y-1">
+          <div>
+            <label htmlFor="world-name" className="block text-xs text-gray-600">World Name:</label>
+            <input
+              id="world-name"
+              type="text"
+              value={testConfig.worldOverride?.name || ''}
+              onChange={handleWorldNameChange}
+              placeholder="Enter world name"
+              className="w-full text-xs px-2 py-1 border rounded"
+            />
+          </div>
+          <div>
+            <label htmlFor="world-theme" className="block text-xs text-gray-600">World Theme:</label>
+            <input
+              id="world-theme"
+              type="text"
+              value={testConfig.worldOverride?.theme || ''}
+              onChange={handleWorldThemeChange}
+              placeholder="Enter world theme"
+              className="w-full text-xs px-2 py-1 border rounded"
+            />
+          </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="character-override-section">
-        <h4>Character Override</h4>
+      <div className="character-override-section bg-white p-2 rounded border">
+        <h4 className="text-xs font-medium mb-2">Character Override</h4>
         <div>
-          <label htmlFor="character-name">Character Name:</label>
+          <label htmlFor="character-name" className="block text-xs text-gray-600">Character Name:</label>
           <input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
+            className="w-full text-xs px-2 py-1 border rounded"
           />
         </div>
-      </div>
-
-      {/* Narrative Context Section */}
-      <div className="narrative-context-section">
-        <h4>Narrative Context</h4>
-        <p>Custom narrative variables can be configured here.</p>
       </div>
 
       {/* Generate Button */}
@@ -207,6 +206,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
         <button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
+          className="w-full text-xs px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
         </button>
@@ -214,29 +214,29 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="loading-section">
-          <p>Generating narrative...</p>
+        <div className="loading-section bg-yellow-50 p-2 rounded border border-yellow-200">
+          <p className="text-xs text-yellow-800">Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="error-section">
-          <p>Error: {error}</p>
+        <div className="error-section bg-red-50 p-2 rounded border border-red-200">
+          <p className="text-xs text-red-800">Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="results-section">
-          <h4>Generated Results</h4>
-          <div className="narrative-text">
-            <p>{result.text}</p>
+        <div className="results-section bg-green-50 p-2 rounded border border-green-200">
+          <h4 className="text-xs font-medium mb-2 text-green-800">Generated Results</h4>
+          <div className="narrative-text mb-2">
+            <p className="text-xs text-green-700">{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div className="choices-section">
-              <h5>Choices:</h5>
-              <ul>
+              <h5 className="text-xs font-medium mb-1 text-green-800">Choices:</h5>
+              <ul className="text-xs text-green-700 space-y-1">
                 {result.choices.map((choice, index) => (
-                  <li key={index}>{choice}</li>
+                  <li key={index} className="pl-2 border-l-2 border-green-300">• {choice}</li>
                 ))}
               </ul>
             </div>
