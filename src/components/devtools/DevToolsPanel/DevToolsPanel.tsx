@@ -79,7 +79,7 @@ export const DevToolsPanel = () => {
       data-testid="devtools-panel-container"
       className={`fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 z-[9999] overflow-hidden ${
         isOpen ? 'max-h-[50vh]' : 'h-12'
-      } min-h-12 shadow-lg`}
+      } min-h-[3rem] shadow-lg`}
     >
       {/* Header with toggle button */}
       <div 
