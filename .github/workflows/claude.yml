@@ -7,7 +7,6 @@ on:
 
 jobs:
   claude-response:
-    # Only run if the comment mentions @claude
     if: contains(github.event.comment.body, '@claude')
     runs-on: ubuntu-latest
     permissions:
@@ -18,3 +17,4 @@ jobs:
       - uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Let the action use the installed GitHub app automatically
