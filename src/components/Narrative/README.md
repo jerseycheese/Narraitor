@@ -15,7 +15,7 @@ The main controller component that handles the generation of narrative segments 
 - `onChoicesGenerated` (function, optional): Callback when AI-generated player choices are available
 - `triggerGeneration` (boolean, optional): Flag to control when generation should occur, defaults to `true`
 - `choiceId` (string, optional): ID of the player choice that triggers a narrative response
-- `generateChoices` (boolean, optional): Whether to generate player choices after narrative segments, defaults to `false`
+- `generateChoices` (boolean, optional): Whether to generate player choices after narrative segments, defaults to `true`
 - `className` (string, optional): Additional CSS classes
 
 **Behavior:**
