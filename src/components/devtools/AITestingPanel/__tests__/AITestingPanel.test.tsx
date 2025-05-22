@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { AITestingPanel } from '../AITestingPanel';
 
 // Mock the context override utilities
@@ -14,6 +14,12 @@ jest.mock('../../../../lib/ai/contextOverride', () => ({
 describe('AITestingPanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Mock setTimeout to make tests run faster
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('displays custom input forms for world and character overrides', () => {
@@ -49,8 +55,6 @@ describe('AITestingPanel', () => {
   });
 
   test('executes narrative generation with custom context', async () => {
-    // Since we're using a mock implementation in the component, we don't need to mock anything here
-
     render(<AITestingPanel />);
     
     // Configure test inputs
@@ -58,11 +62,18 @@ describe('AITestingPanel', () => {
     fireEvent.change(screen.getByLabelText(/character name/i), { target: { value: 'Test Character' } });
     
     // Execute generation
-    fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    });
+    
+    // Fast-forward timers to simulate the delay
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
     
     // Verify the generation completed
     await waitFor(() => {
-      expect(screen.getByText(/generated narrative for/i)).toBeInTheDocument();
+      expect(screen.getByText(/in the.*realm of.*stands at a crossroads/i)).toBeInTheDocument();
     });
   });
 
@@ -70,13 +81,20 @@ describe('AITestingPanel', () => {
     render(<AITestingPanel />);
     
     // Execute generation
-    fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    });
+    
+    // Fast-forward timers to simulate the delay
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
     
     // Verify results are displayed
     await waitFor(() => {
-      expect(screen.getByText(/generated narrative for/i)).toBeInTheDocument();
-      expect(screen.getByText(/continue exploring the area/i)).toBeInTheDocument();
-      expect(screen.getByText(/rest and recover your strength/i)).toBeInTheDocument();
+      expect(screen.getByText(/in the.*realm of.*stands at a crossroads/i)).toBeInTheDocument();
+      // Note: The choices are now dynamic, so we'll check for the choices section instead
+      expect(screen.getByText(/choices:/i)).toBeInTheDocument();
     });
   });
 
@@ -84,11 +102,22 @@ describe('AITestingPanel', () => {
     render(<AITestingPanel />);
     
     // Start generation
-    fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    act(() => {
+      fireEvent.click(screen.getByRole('button', { name: /generate narrative/i }));
+    });
     
-    // With the mock implementation, verify that the process completes
+    // Verify loading state appears immediately
+    expect(screen.getByText(/generating\.\.\./i)).toBeInTheDocument();
+    expect(screen.getByText(/generating narrative\.\.\./i)).toBeInTheDocument();
+    
+    // Fast-forward timers to complete generation
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    
+    // Verify results appear after generation
     await waitFor(() => {
-      expect(screen.getByText(/generated narrative for/i)).toBeInTheDocument();
+      expect(screen.getByText(/in the.*realm of.*stands at a crossroads/i)).toBeInTheDocument();
     });
   });
 });
