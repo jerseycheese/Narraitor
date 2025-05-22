@@ -112,7 +112,7 @@ export const DevToolsPanel = () => {
           <StateSection defaultCollapsed={true} />
           
           {/* AI Testing Section */}
-          <CollapsibleSection title="AI Testing" defaultCollapsed={true}>
+          <CollapsibleSection title="AI Testing" initialCollapsed={true}>
             <AITestingPanel />
           </CollapsibleSection>
         </div>
