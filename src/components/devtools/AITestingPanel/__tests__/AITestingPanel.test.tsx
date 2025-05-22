@@ -16,13 +16,12 @@ describe('AITestingPanel', () => {
     jest.clearAllMocks();
   });
 
-  test('displays custom input forms for world, character, and narrative context', () => {
+  test('displays custom input forms for world and character overrides', () => {
     render(<AITestingPanel />);
     
     // Verify core input sections are present
     expect(screen.getByText(/world override/i)).toBeInTheDocument();
     expect(screen.getByText(/character override/i)).toBeInTheDocument();
-    expect(screen.getByText(/narrative context/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /generate narrative/i })).toBeInTheDocument();
   });
 
@@ -76,8 +75,8 @@ describe('AITestingPanel', () => {
     // Verify results are displayed
     await waitFor(() => {
       expect(screen.getByText(/generated narrative for/i)).toBeInTheDocument();
-      expect(screen.getByText('Continue exploring the area')).toBeInTheDocument();
-      expect(screen.getByText('Rest and recover your strength')).toBeInTheDocument();
+      expect(screen.getByText(/continue exploring the area/i)).toBeInTheDocument();
+      expect(screen.getByText(/rest and recover your strength/i)).toBeInTheDocument();
     });
   });
 

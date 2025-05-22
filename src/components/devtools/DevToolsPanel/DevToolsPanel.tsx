@@ -106,14 +106,7 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          style={{
-            padding: '16px',
-            overflow: 'auto',
-            height: 'calc(50vh - 48px)',
-            maxHeight: 'calc(50vh - 48px)',
-            backgroundColor: '#f9fafb',
-            fontSize: '12px'
-          }}
+          className="devtools-panel p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)]"
         >
           <EnvironmentInfo />
           <StateSection defaultCollapsed={true} />
