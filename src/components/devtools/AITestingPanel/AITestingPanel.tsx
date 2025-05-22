@@ -157,7 +157,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="bg-white p-2 rounded border border-gray-200">
+      <div className="devtools-panel bg-white p-2 rounded border border-gray-200">
         <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2">World Override</h4>
         <div className="space-y-1">
           <div>
@@ -168,7 +168,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full !text-xs !px-2 !py-1 !border !border-gray-300 !rounded !bg-white"
+              className="devtools-panel w-full"
             />
           </div>
           <div>
@@ -179,14 +179,14 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
               value={testConfig.worldOverride?.theme || ''}
               onChange={handleWorldThemeChange}
               placeholder="Enter world theme"
-              className="devtools-panel w-full !text-xs !px-2 !py-1 !border !border-gray-300 !rounded !bg-white"
+              className="devtools-panel w-full"
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="bg-white p-2 rounded border border-gray-200">
+      <div className="devtools-panel bg-white p-2 rounded border border-gray-200">
         <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2">Character Override</h4>
         <div>
           <label htmlFor="character-name" className="devtools-panel block !text-xs text-gray-600 !my-0 mb-0.5">Character Name:</label>
@@ -196,7 +196,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="devtools-panel w-full !text-xs !px-2 !py-1 !border !border-gray-300 !rounded !bg-white"
+            className="devtools-panel w-full"
           />
         </div>
       </div>
@@ -206,10 +206,10 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
         <button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
-          className={`devtools-panel w-full !text-xs !px-3 !py-2 !rounded !border-0 text-white transition-colors ${
+          className={`devtools-panel w-full transition-colors ${
             isGenerating 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-500 hover:bg-blue-600 cursor-pointer'
+              ? '!bg-slate-500 cursor-not-allowed' 
+              : '!bg-blue-600 hover:!bg-blue-500 cursor-pointer'
           }`}
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
@@ -218,29 +218,29 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="bg-yellow-50 p-2 rounded border border-yellow-200">
-          <p className="devtools-panel !text-xs text-yellow-800 !my-0">Generating narrative...</p>
+        <div className="bg-yellow-900 bg-opacity-30 p-2 rounded border border-yellow-600">
+          <p className="devtools-panel !text-xs text-yellow-200 !my-0">Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 p-2 rounded border border-red-200">
-          <p className="devtools-panel !text-xs text-red-800 !my-0">Error: {error}</p>
+        <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-600">
+          <p className="devtools-panel !text-xs text-red-200 !my-0">Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="bg-green-50 p-2 rounded border border-green-200">
-          <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-green-800">Generated Results</h4>
+        <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-600">
+          <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-green-200">Generated Results</h4>
           <div className="mb-2">
-            <p className="devtools-panel !text-xs text-green-700 !my-0">{result.text}</p>
+            <p className="devtools-panel !text-xs text-green-100 !my-0">{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div>
-              <h5 className="devtools-panel !text-xs !font-medium !my-0 !mb-1 text-green-800">Choices:</h5>
-              <ul className="text-xs text-green-700 my-0 p-0 list-none space-y-1">
+              <h5 className="devtools-panel !text-xs !font-medium !my-0 !mb-1 text-green-200">Choices:</h5>
+              <ul className="text-xs text-green-100 my-0 p-0 list-none space-y-1">
                 {result.choices.map((choice, index) => (
-                  <li key={index} className="pl-2 border-l-2 border-green-300 text-xs">• {choice}</li>
+                  <li key={index} className="pl-2 border-l-2 border-green-400 text-xs">• {choice}</li>
                 ))}
               </ul>
             </div>

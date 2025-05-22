@@ -79,16 +79,16 @@ export const DevToolsPanel = () => {
   return (
     <div 
       data-testid="devtools-panel-container"
-      className={`fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 z-[9999] overflow-hidden ${
+      className={`fixed bottom-0 left-0 right-0 bg-slate-800 border-t-2 border-slate-600 z-[9999] overflow-hidden ${
         isOpen ? 'max-h-[50vh]' : 'h-12'
       } min-h-[3rem] shadow-lg`}
     >
       {/* Header with toggle button */}
       <div 
         data-testid="devtools-panel-header"
-        className="flex justify-between items-center px-4 py-2 border-b border-gray-300 flex-shrink-0 bg-white h-12"
+        className="flex justify-between items-center px-4 py-2 border-b border-slate-600 flex-shrink-0 bg-slate-700 h-12"
       >
-        <div className="text-sm font-medium">
+        <div className="text-sm font-medium text-slate-200">
           Narraitor DevTools
           {/* Only render this on client-side to avoid hydration mismatch */}
           {isClient && isTestPage && ' (Test Page Mode)'}
@@ -96,7 +96,7 @@ export const DevToolsPanel = () => {
         <button
           data-testid="devtools-panel-toggle"
           onClick={toggleDevTools}
-          className="px-2 py-1 text-xs rounded focus:outline-none focus:ring-2 btn btn-primary"
+          className="px-2 py-1 text-xs rounded focus:outline-none focus:ring-2 bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
         >
           {isOpen ? 'Hide DevTools' : 'Show DevTools'}
         </button>
@@ -106,7 +106,7 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="devtools-panel p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)]"
+          className="devtools-panel p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-slate-800 text-slate-200"
         >
           <EnvironmentInfo />
           <StateSection defaultCollapsed={true} />
