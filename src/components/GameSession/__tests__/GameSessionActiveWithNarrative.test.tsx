@@ -1,9 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import GameSessionActiveWithNarrative from '../GameSessionActiveWithNarrative';
-import { NarrativeController } from '@/components/Narrative/NarrativeController';
-import { narrativeStore } from '@/state/narrativeStore';
-import { Decision } from '@/types/narrative.types';
 
 // Mock the NarrativeController with simpler implementation
 jest.mock('@/components/Narrative/NarrativeController', () => ({
