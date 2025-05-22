@@ -28,69 +28,56 @@ const meta: Meta<typeof JsonViewer> = {
 export default meta;
 type Story = StoryObj<typeof JsonViewer>;
 
-export const Default: Story = {
+export const GameStateData: Story = {
   args: {
     data: {
-      name: 'Example Object',
-      number: 42,
-      boolean: true,
-      null: null,
-      nested: {
-        property: 'value',
-        array: [1, 2, 3]
-      }
-    }
-  }
-};
-
-export const SimpleData: Story = {
-  args: {
-    data: {
-      id: 'simple-1',
-      value: 'Simple Value'
-    }
-  }
-};
-
-export const ComplexNestedData: Story = {
-  args: {
-    data: {
-      id: 'complex-1',
-      user: {
-        name: 'John Doe',
-        age: 30,
-        address: {
-          street: '123 Main St',
-          city: 'Exampleville',
-          zipCode: '12345'
-        }
+      worldId: 'fantasy-realm-1',
+      characterId: 'hero-001',
+      currentLocation: 'Dragon\'s Lair',
+      inventory: {
+        items: [
+          { id: 'sword-001', name: 'Enchanted Blade', quantity: 1 },
+          { id: 'potion-health', name: 'Health Potion', quantity: 3 }
+        ],
+        capacity: 20
       },
-      items: [
-        { id: 1, name: 'Item 1' },
-        { id: 2, name: 'Item 2' },
-        { id: 3, name: 'Item 3' }
-      ],
-      metadata: {
-        created: '2025-01-01T00:00:00Z',
-        modified: '2025-05-15T14:30:00Z',
-        tags: ['example', 'test', 'demo']
+      stats: {
+        health: 85,
+        mana: 42,
+        experience: 1250
+      },
+      questLog: ['Slay the Dragon', 'Find the Ancient Artifact']
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Displays game state data as it would appear in DevTools for debugging narrative progression.'
       }
     }
   }
 };
 
-export const ArrayData: Story = {
+export const NarrativeContext: Story = {
   args: {
-    data: [
-      { id: 1, name: 'Item 1' },
-      { id: 2, name: 'Item 2' },
-      { id: 3, name: 'Item 3' }
-    ]
-  }
-};
-
-export const EmptyData: Story = {
-  args: {
-    data: {}
+    data: {
+      recentSegments: ['segment-1', 'segment-2', 'segment-3'],
+      activeCharacters: ['hero-001', 'wizard-002'],
+      currentLocation: 'Mystic Forest',
+      activeQuests: ['quest-dragon', 'quest-artifact'],
+      mood: 'tense',
+      choices: [
+        'Attack the dragon directly',
+        'Use stealth to sneak past',
+        'Cast a protection spell'
+      ]
+    }
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows narrative context data used by the AI for generating story content.'
+      }
+    }
   }
 };

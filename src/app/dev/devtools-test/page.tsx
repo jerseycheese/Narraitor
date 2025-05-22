@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DevToolsProvider } from '@/components/devtools/DevToolsContext';
-import { DevToolsPanel } from '@/components/devtools/DevToolsPanel';
+import { useDevTools } from '@/components/devtools/DevToolsContext';
 import { create } from 'zustand';
 
 // Create a test store specifically for the test harness
@@ -89,10 +88,20 @@ export default function DevToolsTestPage() {
   const [renderCount, setRenderCount] = useState(0);
   const [newItem, setNewItem] = useState('');
   
+  // Use the existing DevTools context from root layout
+  const { isOpen, toggleDevTools } = useDevTools();
+  
   // Increment render count on each render
   useEffect(() => {
     setRenderCount(prev => prev + 1);
   }, []);
+  
+  // Open DevTools on mount for this test page
+  useEffect(() => {
+    if (!isOpen) {
+      toggleDevTools();
+    }
+  }, [isOpen, toggleDevTools]);
   
   const handleAddItem = () => {
     if (newItem.trim()) {
@@ -102,8 +111,7 @@ export default function DevToolsTestPage() {
   };
   
   return (
-    <DevToolsProvider initialIsOpen={true}>
-      <div className="min-h-screen p-6" style={{ paddingBottom: '60vh' }}> {/* Extra padding at bottom to ensure visibility */}
+    <div className="min-h-screen p-6" style={{ paddingBottom: '60vh' }}> {/* Extra padding at bottom to ensure visibility */}
         <h1 className="text-2xl font-bold mb-4">DevTools Test Harness</h1>
         
         <div className="mb-6 p-4 border rounded bg-gray-50">
@@ -194,11 +202,5 @@ export default function DevToolsTestPage() {
         {/* Add placeholder to ensure space for DevTools panel */}
         <div className="h-[60vh] bg-transparent"></div>
       </div>
-      
-      {/* DevToolsPanel */}
-      <div className="fixed bottom-0 left-0 right-0 bg-transparent">
-        <DevToolsPanel />
-      </div>
-    </DevToolsProvider>
   );
 }

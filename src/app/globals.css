@@ -1,207 +1,85 @@
 /* Import Tailwind CSS v4 with layers */
-@layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/preflight.css" layer(base);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import "tailwindcss/theme.css";
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/utilities.css";
 
-/* Global styles */
+/* Only keep essential CSS variables for consistency */
 :root {
-  /* Core color variables */
-  --color-background: #ffffff;
-  --color-foreground: #171717;
-  --color-primary: #2563eb;
-  --color-secondary: #4f46e5;
-  --color-accent: #f97316;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  
-  /* Typography variables */
-  --font-sans: Arial, Helvetica, sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
-  --font-mono: 'Courier New', monospace;
-  
-  /* Spacing variables */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  
-  /* Design element variables */
-  --radius-sm: 0.125rem;
-  --radius-md: 0.25rem;
-  --radius-lg: 0.5rem;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Core color variables (map to Tailwind colors) */
+  --color-primary: theme(colors.blue.600);
+  --color-secondary: theme(colors.indigo.600);
+  --color-accent: theme(colors.orange.500);
 }
 
-/* Base styles */
-body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans);
-  margin: 0;
-  padding: 0;
-  line-height: 1.5;
+/* DevTools specific dark theme styling */
+.devtools-panel {
+  font-size: 12px;
+  background-color: theme(colors.slate.800);
+  color: theme(colors.slate.200);
 }
 
-* {
-  box-sizing: border-box;
+.devtools-panel h1,
+.devtools-panel h2, 
+.devtools-panel h3,
+.devtools-panel h4,
+.devtools-panel h5,
+.devtools-panel h6 {
+  @apply text-xs font-medium my-2 text-slate-200;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin-top: var(--space-6);
-  margin-bottom: var(--space-4);
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--color-foreground);
+.devtools-panel p {
+  @apply text-xs my-2 text-slate-300;
 }
 
-h1 { font-size: 2.25rem; }
-h2 { font-size: 1.875rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.125rem; }
-h6 { font-size: 1rem; }
-
-p {
-  margin-top: var(--space-4);
-  margin-bottom: var(--space-4);
-  color: var(--color-foreground);
+.devtools-panel button {
+  @apply text-xs px-2 py-1 rounded border cursor-pointer bg-slate-600 text-slate-200 border-slate-500 hover:bg-slate-500;
 }
 
-a {
-  color: var(--color-primary);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
+.devtools-panel input,
+.devtools-panel select,
+.devtools-panel textarea {
+  @apply text-xs px-2 py-1 border border-slate-500 rounded bg-slate-700 text-slate-200 placeholder-slate-400;
 }
 
-a:hover {
-  text-decoration-thickness: 2px;
+/* DevTools card styling */
+.devtools-panel .card,
+.devtools-panel [class*="bg-white"] {
+  @apply bg-slate-700 border-slate-600;
 }
 
-code, pre {
-  font-family: var(--font-mono);
-  background-color: var(--color-border);
-  border-radius: var(--radius-sm);
+/* Override specific background colors for DevTools */
+.devtools-panel .bg-white {
+  @apply !bg-slate-700 !border-slate-600;
 }
 
-code {
-  padding: 0.125rem 0.25rem;
+.devtools-panel .text-gray-600 {
+  @apply !text-slate-400;
 }
 
-pre {
-  padding: var(--space-4);
-  overflow-x: auto;
+.devtools-panel .border-gray-200,
+.devtools-panel .border-gray-300 {
+  @apply !border-slate-600;
 }
 
-hr {
-  border: 0;
-  border-top: 1px solid var(--color-border);
-  margin: var(--space-8) 0;
-}
-
-input:not([type="range"]), select, textarea, button {
-  font-family: inherit;
-  font-size: 1rem;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-/* Range inputs have custom styling */
-input[type="range"] {
-  font-family: inherit;
-  font-size: 1rem;
-  padding: 0;
-  border: none;
-  background-color: transparent;
-  color: var(--color-foreground);
-}
-
-button {
-  cursor: pointer;
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: var(--space-2) var(--space-4);
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: var(--space-4) 0;
-}
-
-th, td {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
-  text-align: left;
-  color: var(--color-foreground);
-}
-
-th {
-  background-color: var(--color-border);
-  font-weight: 600;
-}
-
-/* Custom component classes */
+/* Component-specific classes using Tailwind */
 .card {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-md);
-}
-
-.form-group {
-  margin-bottom: var(--space-4);
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-weight: 500;
-  color: var(--color-foreground);
+  @apply bg-white border border-gray-200 rounded-lg p-4 shadow-md;
 }
 
 .btn {
-  display: inline-block;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  @apply inline-block px-4 py-2 rounded font-medium text-center cursor-pointer transition-colors;
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
+  @apply bg-blue-600 text-white border-0 hover:bg-blue-700;
 }
 
 .btn-secondary {
-  background-color: var(--color-secondary);
-  color: white;
-  border: none;
+  @apply bg-indigo-600 text-white border-0 hover:bg-indigo-700;
 }
 
 .btn-accent {
-  background-color: var(--color-accent);
-  color: white;
-  border: none;
+  @apply bg-orange-500 text-white border-0 hover:bg-orange-600;
 }
 
 /* Utility classes */
@@ -210,18 +88,9 @@ th {
 }
 
 .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
 }
 
 .focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  @apply outline-2 outline-blue-600 outline-offset-2;
 }

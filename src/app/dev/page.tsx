@@ -13,6 +13,9 @@ export default function DevPage() {
         <Link href="/dev/devtools-test" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           DevTools Test Harness
         </Link>
+        <Link href="/dev/ai-testing" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          AI Testing Panel Test Harness
+        </Link>
         <Link href="/dev/world-card" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           World Card Test Harness
         </Link>
