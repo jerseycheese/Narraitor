@@ -96,7 +96,7 @@ describe('NarrativeGenerator - Player Choices', () => {
       });
     });
 
-    it('should handle errors and rethrow them', async () => {
+    it('should handle errors and return fallback choices', async () => {
       // Mock ChoiceGenerator to throw an error
       mockGenerateChoices.mockRejectedValueOnce(new Error('Choice generation failed'));
       
@@ -114,12 +114,21 @@ describe('NarrativeGenerator - Player Choices', () => {
         }]
       };
       
-      // The generatePlayerChoices method should rethrow the error
-      await expect(narrativeGenerator.generatePlayerChoices(
+      // The generatePlayerChoices method should return fallback choices instead of throwing
+      const result = await narrativeGenerator.generatePlayerChoices(
         'world-1',
         mockNarrativeContext,
         ['character-1']
-      )).rejects.toThrow('Failed to generate player choices');
+      );
+      
+      // Should return fallback choices
+      expect(result).toBeDefined();
+      expect(result.prompt).toBe("What will you do next?");
+      expect(result.options).toHaveLength(3);
+      expect(result.options[0].text).toBe("Investigate further");
+      expect(result.options[1].text).toBe("Talk to nearby characters");
+      expect(result.options[2].text).toBe("Move to a new location");
+      expect(result.id).toMatch(/^decision-fallback-\d+$/);
     });
   });
 });
