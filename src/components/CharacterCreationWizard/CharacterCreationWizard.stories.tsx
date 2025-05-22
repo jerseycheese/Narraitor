@@ -12,7 +12,7 @@ const meta: Meta<typeof CharacterCreationWizard> = {
     layout: 'fullscreen',
   },
   decorators: [
-    (Story) => {
+    (Story, context) => {
       // Reset stores before each story
       characterStore.getState().reset();
       worldStore.getState().reset();
@@ -53,9 +53,12 @@ const meta: Meta<typeof CharacterCreationWizard> = {
       const worldId = worldStore.getState().createWorld(testWorld);
       worldStore.getState().setCurrentWorld(worldId);
       
+      // Update the args with the created worldId
+      const updatedArgs = { ...context.args, worldId };
+      
       return (
         <div className="min-h-screen bg-gray-50 p-8">
-          <Story worldId={worldId} />
+          <Story {...updatedArgs} />
         </div>
       );
     },
@@ -66,7 +69,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Step1BasicInfo: Story = {
-  args: {},
+  args: {
+    worldId: 'will-be-set-by-decorator',
+  },
   parameters: {
     docs: {
       description: {
@@ -77,7 +82,9 @@ export const Step1BasicInfo: Story = {
 };
 
 export const WithExistingCharacter: Story = {
-  args: {},
+  args: {
+    worldId: 'will-be-set-by-decorator',
+  },
   decorators: [
     (Story, context) => {
       // Add an existing character to test name uniqueness validation
@@ -110,7 +117,9 @@ export const WithExistingCharacter: Story = {
 };
 
 export const WithAutoSaveData: Story = {
-  args: {},
+  args: {
+    worldId: 'will-be-set-by-decorator',
+  },
   decorators: [
     (Story, context) => {
       const worldId = context.args.worldId || worldStore.getState().currentWorldId;
@@ -154,9 +163,11 @@ export const WithAutoSaveData: Story = {
 };
 
 export const MinimalWorld: Story = {
-  args: {},
+  args: {
+    worldId: 'will-be-set-by-decorator',
+  },
   decorators: [
-    (Story) => {
+    (Story, context) => {
       // Reset stores
       characterStore.getState().reset();
       worldStore.getState().reset();
@@ -189,7 +200,7 @@ export const MinimalWorld: Story = {
       
       return (
         <div className="min-h-screen bg-gray-50 p-8">
-          <Story worldId={worldId} />
+          <Story {...context.args} worldId={worldId} />
         </div>
       );
     },
