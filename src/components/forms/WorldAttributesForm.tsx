@@ -116,10 +116,6 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                   />
                 </div>
                 
-                {/* Display min and max values (fixed for MVP) */}
-                <div className="text-xs text-gray-500 md:col-span-2">
-                  <p>Min and max values are fixed at 1-10 for this version.</p>
-                </div>
               </div>
             </div>
           ))}

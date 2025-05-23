@@ -1,12 +1,5 @@
-/**
- * PostCSS Configuration for Storybook
- * This ensures Tailwind CSS works properly in Storybook
- */
-const storybookPostcssConfig = {
+export default {
   plugins: {
     '@tailwindcss/postcss': {},
-    'autoprefixer': {},
   },
 };
-
-module.exports = storybookPostcssConfig;

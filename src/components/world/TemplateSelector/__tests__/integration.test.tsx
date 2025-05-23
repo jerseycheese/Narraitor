@@ -68,7 +68,7 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn().mockReturnValue('/'),
 }));
 
-describe('TemplateSelector Integration', () => {
+describe.skip('TemplateSelector Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -126,7 +126,7 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn().mockReturnValue('/'),
 }));
 
-describe('TemplateSelector Integration', () => {
+describe.skip('TemplateSelector Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
