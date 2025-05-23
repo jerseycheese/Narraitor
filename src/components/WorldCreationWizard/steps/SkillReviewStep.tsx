@@ -13,15 +13,20 @@ import {
 import {
   SKILL_DIFFICULTIES
 } from '@/lib/constants/skillDifficultyLevels';
+import { 
+  wizardStyles,
+  WizardFormSection,
+  WizardFormGroup,
+  WizardTextField,
+  WizardTextArea,
+  WizardSelect
+} from '@/components/shared/wizard';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
   suggestions: SkillSuggestion[];
   errors: Record<string, string>;
   onUpdate: (updates: Partial<World>) => void;
-  onNext: () => void;
-  onBack: () => void;
-  onCancel: () => void;
 }
 
 export default function SkillReviewStep({
@@ -29,9 +34,6 @@ export default function SkillReviewStep({
   suggestions,
   errors,
   onUpdate,
-  onNext,
-  onBack,
-  onCancel,
 }: SkillReviewStepProps) {
   // Initialize state based on existing selections - always accept all by default
   const [localSuggestions, setLocalSuggestions] = useState(() => {
@@ -130,154 +132,120 @@ export default function SkillReviewStep({
     onUpdate({ ...worldData, skills: acceptedSkills });
   };
 
-  const validateAndNext = () => {
-    // Check if more than 12 skills are selected
-    if (localSuggestions.filter(s => s.accepted).length > 12) {
-      // Don't proceed if validation fails
-      return;
-    }
-    
-    // Update the world data with accepted skills
-    const acceptedSkills: WorldSkill[] = localSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
-        minValue: SKILL_MIN_VALUE, // Fixed value
-        maxValue: SKILL_MAX_VALUE, // Fixed value
-        linkedAttributeId: s.linkedAttributeName ?
-          worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id :
-          undefined,
-      }));
-    
-    onUpdate({ ...worldData, skills: acceptedSkills });
-    
-    onNext();
-  };
 
   const acceptedCount = localSuggestions.filter(s => s.accepted).length;
 
   return (
     <div data-testid="skill-review-step">
-      <h2 className="text-xl font-bold mb-4">Review Skills</h2>
-      <p className="mb-4">
-        Based on your description, we&apos;ve suggested these skills. You can accept, modify, or reject each one. Select up to 12 skills for your world.
-      </p>
+      <WizardFormSection
+        title="Review Skills"
+        description="Based on your description, we've suggested these skills. You can accept, modify, or reject each one. Select up to 12 skills for your world."
+      >
 
       <div className="space-y-4">
         {localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
-            className="border p-4 rounded" 
+            className={wizardStyles.card.base} 
             data-testid={`skill-card-${index}`}
           >
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  data-testid={`skill-toggle-${index}`}
-                  onClick={() => handleToggleSkill(index)}
-                  className={`px-3 py-1 rounded-full ${
-                    suggestion.accepted 
-                      ? 'bg-green-100 text-green-700 border border-green-300' 
-                      : 'bg-gray-100 text-gray-500 border border-gray-300'
-                  } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                >
-                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
-                </button>
                 <span className="font-medium">
                   {suggestion.name}
                 </span>
-                <span className={`px-2 py-1 rounded text-xs text-white uppercase font-medium ${
-                  suggestion.difficulty === 'easy' ? 'bg-green-500' :
-                  suggestion.difficulty === 'medium' ? 'bg-yellow-500' : 
-                  'bg-red-500'
+                <span className={`${wizardStyles.badge.base} ${
+                  suggestion.difficulty === 'easy' ? wizardStyles.badge.success :
+                  suggestion.difficulty === 'medium' ? wizardStyles.badge.warning : 
+                  wizardStyles.badge.danger
                 }`}>
                   {suggestion.difficulty}
                 </span>
               </div>
               
-              {/* Add a details toggle button */}
-              <button 
-                type="button" 
-                className="text-sm text-blue-600 hover:underline focus:outline-none ml-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const newSuggestions = [...localSuggestions];
-                  newSuggestions[index] = {
-                    ...newSuggestions[index],
-                    showDetails: !newSuggestions[index].showDetails
-                  };
-                  setLocalSuggestions(newSuggestions);
-                }}
-              >
-                {suggestion.showDetails ? 'Hide details' : 'Show details'}
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Add a details toggle button */}
+                <button 
+                  type="button" 
+                  className="text-sm text-blue-600 hover:underline focus:outline-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newSuggestions = [...localSuggestions];
+                    newSuggestions[index] = {
+                      ...newSuggestions[index],
+                      showDetails: !newSuggestions[index].showDetails
+                    };
+                    setLocalSuggestions(newSuggestions);
+                  }}
+                >
+                  {suggestion.showDetails ? 'Hide details' : 'Show details'}
+                </button>
+                <button
+                  type="button"
+                  data-testid={`skill-toggle-${index}`}
+                  onClick={() => handleToggleSkill(index)}
+                  className={`${wizardStyles.toggle.button} ${
+                    suggestion.accepted 
+                      ? wizardStyles.toggle.active 
+                      : wizardStyles.toggle.inactive
+                  }`}
+                >
+                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
+                </button>
+              </div>
             </div>
             
             {suggestion.showDetails && (
               <div 
                 key={`skill-expanded-${index}`}
                 className="mt-4 pl-7">
-                <div className="mb-3">
-                  <label className="block mb-1">Name</label>
-                  <input
-                    type="text"
-                    data-testid={`skill-name-input-${index}`}
+                <WizardFormGroup label="Name">
+                  <WizardTextField
                     value={suggestion.name}
-                    onChange={(e) => handleModifySkill(index, 'name', e.target.value)}
-                    className="w-full p-2 border rounded"
+                    onChange={(value) => handleModifySkill(index, 'name', value)}
+                    testId={`skill-name-input-${index}`}
                   />
-                </div>
+                </WizardFormGroup>
                 
-                <div className="mb-3">
-                  <label className="block mb-1">Description</label>
-                  <textarea
-                    data-testid={`skill-description-textarea-${index}`}
+                <WizardFormGroup label="Description">
+                  <WizardTextArea
                     value={suggestion.description}
-                    onChange={(e) => handleModifySkill(index, 'description', e.target.value)}
+                    onChange={(value) => handleModifySkill(index, 'description', value)}
                     rows={2}
-                    className="w-full p-2 border rounded"
+                    testId={`skill-description-textarea-${index}`}
                   />
-                </div>
+                </WizardFormGroup>
                 
-                <div className="flex gap-4 mb-3">
+                <div className="flex gap-4">
                   <div className="flex-1">
-                    <label className="block mb-1">Learning Curve</label>
-                    <select
-                      data-testid={`skill-difficulty-select-${index}`}
-                      value={suggestion.difficulty}
-                      onChange={(e) => handleModifySkill(index, 'difficulty', e.target.value)}
-                      className="w-full p-2 border rounded"
-                    >
-                      {SKILL_DIFFICULTIES.map(difficulty => (
-                        <option key={difficulty.value} value={difficulty.value}>
-                          {difficulty.label}
-                        </option>
-                      ))}
-                    </select>
+                    <WizardFormGroup label="Learning Curve">
+                      <WizardSelect
+                        value={suggestion.difficulty}
+                        onChange={(value) => handleModifySkill(index, 'difficulty', value)}
+                        options={SKILL_DIFFICULTIES.map(difficulty => ({
+                          value: difficulty.value,
+                          label: difficulty.label
+                        }))}
+                        testId={`skill-difficulty-select-${index}`}
+                      />
+                    </WizardFormGroup>
                   </div>
                   
                   <div className="flex-1">
-                    <label className="block mb-1">Linked Attribute</label>
-                    <select
-                      data-testid={`skill-attribute-select-${index}`}
-                      value={suggestion.linkedAttributeName || ''}
-                      onChange={(e) => handleModifySkill(index, 'linkedAttributeName', e.target.value)}
-                      className="w-full p-2 border rounded"
-                    >
-                      <option value="">None</option>
-                      {worldData.attributes?.map((attr) => (
-                        <option key={attr.id} value={attr.name}>
-                          {attr.name}
-                        </option>
-                      ))}
-                    </select>
+                    <WizardFormGroup label="Linked Attribute">
+                      <WizardSelect
+                        value={suggestion.linkedAttributeName || ''}
+                        onChange={(value) => handleModifySkill(index, 'linkedAttributeName', value)}
+                        options={[
+                          { value: '', label: 'None' },
+                          ...(worldData.attributes?.map((attr) => ({
+                            value: attr.name,
+                            label: attr.name
+                          })) || [])
+                        ]}
+                        testId={`skill-attribute-select-${index}`}
+                      />
+                    </WizardFormGroup>
                   </div>
                 </div>
                 
@@ -325,37 +293,12 @@ export default function SkillReviewStep({
       <div className="mt-4" data-testid="skill-count-summary">
         Selected skills: {acceptedCount} / 12
       </div>
+      </WizardFormSection>
 
       {errors.skills && (
-        <div className="text-red-500">{errors.skills}</div>
+        <div className={wizardStyles.form.error}>{errors.skills}</div>
       )}
 
-      <div className="flex justify-between mt-6">
-        <button
-          type="button"
-          data-testid="step-back-button"
-          onClick={onBack}
-          className="px-4 py-2 border rounded"
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          data-testid="step-cancel-button"
-          onClick={onCancel}
-          className="px-4 py-2 border rounded"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          data-testid="step-next-button"
-          onClick={validateAndNext}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 }

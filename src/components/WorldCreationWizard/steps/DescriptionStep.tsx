@@ -4,18 +4,22 @@ import React from 'react';
 import { World } from '@/types/world.types';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import { AttributeSuggestion, SkillSuggestion } from '../WorldCreationWizard';
+import { 
+  wizardStyles,
+  WizardFormGroup,
+  WizardTextArea,
+  WizardFormSection
+} from '@/components/shared/wizard';
 
 interface DescriptionStepProps {
   worldData: Partial<World>;
   errors: Record<string, string>;
   isProcessing: boolean;
   onUpdate: (updates: Partial<World>) => void;
-  onNext: () => void;
-  onBack: () => void;
-  onCancel: () => void;
   setAISuggestions: (suggestions: { attributes: AttributeSuggestion[]; skills: SkillSuggestion[] }) => void;
   setProcessing: (processing: boolean) => void;
   setError: (field: string, message: string) => void;
+  onComplete: () => void;
 }
 
 export default function DescriptionStep({
@@ -23,64 +27,38 @@ export default function DescriptionStep({
   errors,
   isProcessing,
   onUpdate,
-  onNext,
-  onBack,
-  onCancel,
   setAISuggestions,
   setProcessing,
   setError,
+  onComplete,
 }: DescriptionStepProps) {
   const MAX_DESCRIPTION_LENGTH = 3000;
   const MIN_DESCRIPTION_LENGTH = 50;
 
-  const validateAndNext = async () => {
-    const description = worldData.description || '';
-    
-    // Validation
-    if (description.length < MIN_DESCRIPTION_LENGTH) {
-      setError('description', 'Please provide a more detailed description (at least 50 characters)');
-      return;
-    }
-    
-    if (description.length > MAX_DESCRIPTION_LENGTH) {
-      setError('description', 'Description must be less than 3000 characters');
+  const handleGenerateSuggestions = async () => {
+    if (!worldData.description || worldData.description.length < MIN_DESCRIPTION_LENGTH) {
+      setError('description', `Please provide at least ${MIN_DESCRIPTION_LENGTH} characters to generate suggestions.`);
       return;
     }
 
-    // Clear any previous errors
-    setError('description', '');
-
-    // Start AI processing
     setProcessing(true);
-    console.log('Starting AI analysis...');
-    console.log('API key exists:', !!process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-
+    setError('description', '');
+    
     try {
-      // Call AI analyzer
-      const suggestions = await analyzeWorldDescription(description);
-      console.log('AI suggestions received:', suggestions);
+      const suggestions = await analyzeWorldDescription(worldData.description);
       setAISuggestions(suggestions);
-      onNext();
+      onComplete(); // Move to next step after generating suggestions
     } catch (error) {
-      // Handle AI failure with fallback
-      console.error('AI analysis error:', error);
-      setError('ai', 'AI suggestions unavailable. Providing default options.');
-      
-      // Provide default suggestions
-      const defaultSuggestions = getDefaultSuggestions();
-      setAISuggestions(defaultSuggestions);
-      onNext(); // Still proceed to the next step even if AI fails
+      console.error('Error generating suggestions:', error);
+      setError('ai', 'Failed to generate suggestions. You can continue manually or try again.');
+      // Fallback to default suggestions
+      setAISuggestions(getDefaultSuggestions());
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const description = e.target.value;
-    if (description.length <= MAX_DESCRIPTION_LENGTH) {
-      onUpdate({ ...worldData, description });
-    }
-  };
+  // Removed handleDescriptionChange as it's now handled inline
 
   const getDefaultSuggestions = (): { attributes: AttributeSuggestion[]; skills: SkillSuggestion[] } => ({
     attributes: [
@@ -111,37 +89,29 @@ export default function DescriptionStep({
 
   return (
     <div data-testid="description-step">
-      <h2 className="text-xl font-bold mb-4">Describe Your World</h2>
-      <p className="mb-4">
-        Provide a detailed description of your world. Include information about the setting, tone, 
-        major themes, and any unique aspects. This will help us suggest appropriate attributes and skills.
-      </p>
-
-      <div className="mb-4 relative">
-        <label htmlFor="worldFullDescription" className="block mb-1">
-          Full Description <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="worldFullDescription"
-          data-testid="world-full-description"
-          value={worldData.description || ''}
-          onChange={handleDescriptionChange}
-          placeholder="Describe your world in detail..."
-          rows={12}
-          className="w-full p-2 border rounded min-h-[200px]"
-          aria-invalid={!!errors.description}
-          aria-describedby={errors.description ? 'description-error' : undefined}
-          disabled={isProcessing}
-        />
-        <div className="text-right text-sm mt-1" data-testid="description-char-count">
-          {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
-        </div>
-        {errors.description && (
-          <span id="description-error" data-testid="description-error" className="text-red-500">
-            {errors.description}
-          </span>
-        )}
-      </div>
+      <WizardFormSection
+        title="Describe Your World"
+        description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects. This will help us suggest appropriate attributes and skills."
+      >
+        <WizardFormGroup label="Full Description" error={errors.description} required>
+          <WizardTextArea
+            value={worldData.description || ''}
+            onChange={(value) => {
+              if (value.length <= MAX_DESCRIPTION_LENGTH) {
+                onUpdate({ ...worldData, description: value });
+              }
+            }}
+            placeholder="Describe your world in detail..."
+            rows={12}
+            error={errors.description}
+            disabled={isProcessing}
+            testId="world-full-description"
+          />
+          <div className="text-right text-sm mt-1" data-testid="description-char-count">
+            {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
+          </div>
+        </WizardFormGroup>
+      </WizardFormSection>
 
       {errors.ai && (
         <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded" data-testid="ai-warning">
@@ -160,35 +130,22 @@ export default function DescriptionStep({
         </div>
       )}
 
-      <div className="flex justify-between mt-6">
+      <div className="mt-6 flex justify-end">
         <button
           type="button"
-          data-testid="step-back-button"
-          onClick={onBack}
-          className="px-4 py-2 border rounded"
-          disabled={isProcessing}
+          onClick={handleGenerateSuggestions}
+          disabled={isProcessing || descriptionLength < MIN_DESCRIPTION_LENGTH}
+          className={`${wizardStyles.navigation.primaryButton} ${
+            isProcessing || descriptionLength < MIN_DESCRIPTION_LENGTH 
+              ? 'opacity-50 cursor-not-allowed' 
+              : ''
+          }`}
+          data-testid="generate-suggestions-button"
         >
-          Back
-        </button>
-        <button
-          type="button"
-          data-testid="step-cancel-button"
-          onClick={onCancel}
-          className="px-4 py-2 border rounded"
-          disabled={isProcessing}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          data-testid="step-next-button"
-          onClick={validateAndNext}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          disabled={isProcessing}
-        >
-          {isProcessing ? 'Analyzing...' : 'Next'}
+          {isProcessing ? 'Generating...' : 'Generate AI Suggestions'}
         </button>
       </div>
+
     </div>
   );
 }
