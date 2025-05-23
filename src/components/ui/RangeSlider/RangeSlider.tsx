@@ -67,6 +67,16 @@ export interface RangeSliderProps {
    * Test ID for the component
    */
   testId?: string;
+  
+  /**
+   * Whether the slider is at a constrained max (visual indicator)
+   */
+  isConstrained?: boolean;
+  
+  /**
+   * The effective maximum value (for constraints), while max remains the visual max
+   */
+  effectiveMax?: number;
 }
 
 /**
@@ -83,8 +93,10 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   labelText = "Default Value",
   levelDescriptions = [],
   showLevelDescription = false,
-  valueFormatter,
+  valueFormatter, // eslint-disable-line @typescript-eslint/no-unused-vars
   testId = "range-slider",
+  isConstrained = false,
+  effectiveMax,
 }) => {
   const [value, setValue] = useState(initialValue);
   
@@ -93,28 +105,86 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     setValue(initialValue);
   }, [initialValue]);
 
+  // Determine if we should use visual scale mapping
+  const useVisualScale = min === 8 && max === 18;
+
+  // Map visual scale to actual value range
+  const scaleToValue = (scaleValue: number): number => {
+    if (useVisualScale) {
+      // Map 1-10 scale to 8-18 values (adding 7)
+      return scaleValue + 7;
+    }
+    return scaleValue;
+  };
+
+  // Map actual value to visual scale
+  const valueToScale = (actualValue: number): number => {
+    if (useVisualScale) {
+      // Map 8-18 values to 1-10 scale (subtracting 7)
+      return actualValue - 7;
+    }
+    return actualValue;
+  };
+
   // Handle slider changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newValue = parseInt(e.target.value);
+    const sliderValue = parseInt(e.target.value);
+    if (isNaN(sliderValue)) return;
     
-    // Clamp value to min/max range
-    if (isNaN(newValue)) newValue = min;
-    if (newValue < min) newValue = min;
-    if (newValue > max) newValue = max;
-
-    setValue(newValue);
-    onChange(newValue);
+    // Convert from scale to actual value
+    const actualValue = scaleToValue(sliderValue);
+    
+    // Ensure value is within bounds - use effectiveMax if provided
+    const maxBound = effectiveMax !== undefined ? effectiveMax : max;
+    const clampedValue = Math.max(min, Math.min(maxBound, actualValue));
+    
+    setValue(clampedValue);
+    onChange(clampedValue);
   };
 
   // Find the level description for the current value
   const currentLevelDescription = levelDescriptions.find(level => level.value === value);
-  
-  // Format value display text
-  const formattedValue = valueFormatter 
-    ? valueFormatter(value)
-    : currentLevelDescription
-      ? `${value} - ${currentLevelDescription.label}`
-      : `${value}`;
+
+  // Get the visual range for the slider - always use original max for consistency
+  const getVisualRange = () => {
+    if (useVisualScale) {
+      return { min: 1, max: 10 };
+    }
+    // Always use the original max, not effectiveMax, for visual consistency
+    return { min, max };
+  };
+
+  const visualRange = getVisualRange();
+
+  // Generate notches - one for each value in visual range
+  const generateScaleNotches = () => {
+    const notches = [];
+    const count = visualRange.max - visualRange.min + 1;
+    
+    for (let i = 0; i < count; i++) {
+      notches.push(
+        <div
+          key={`notch-${i}`}
+          className="w-0.5 h-2 bg-gray-400"
+        />
+      );
+    }
+    return notches;
+  };
+
+  // Generate labels - show visual scale
+  const generateScaleLabels = () => {
+    const labels = [];
+    
+    for (let i = visualRange.min; i <= visualRange.max; i++) {
+      labels.push(
+        <div key={`label-${i}`} className="text-xs text-gray-500">
+          {i}
+        </div>
+      );
+    }
+    return labels;
+  };
 
   return (
     <div className="py-2" data-testid={testId}>
@@ -130,43 +200,44 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       )}
       
       <div className="relative">
-        <div className="text-center mb-2">
-          <span 
-            className="inline-block px-4 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium" 
-            data-testid={`${testId}-value`}
-          >
-            {formattedValue}
-          </span>
-        </div>
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          className="w-full m-0 appearance-none bg-transparent cursor-pointer h-6 flex items-center [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-gray-200 [&::-webkit-slider-runnable-track]:rounded-full [&::-moz-range-track]:h-1 [&::-moz-range-track]:bg-gray-200 [&::-moz-range-track]:rounded-full [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:mt-0"
-          data-testid={`${testId}-slider`}
-        />
-        
-        {/* Min/Max labels */}
-        <div className="flex justify-between mt-1 text-xs text-gray-500">
-          {levelDescriptions.length > 0 && (
-            <>
-              <span data-testid={`${testId}-min-label`}>
-                {min} - {levelDescriptions[0]?.label || min}
-              </span>
-              <span data-testid={`${testId}-max-label`}>
-                {max} - {levelDescriptions[levelDescriptions.length - 1]?.label || max}
-              </span>
-            </>
-          )}
-          {levelDescriptions.length === 0 && (
-            <>
-              <span>{min}</span>
-              <span>{max}</span>
-            </>
-          )}
+        {/* Slider container with scale */}
+        <div className="space-y-1">
+          {/* Scale notches */}
+          <div className="flex justify-between items-center h-2">
+            {generateScaleNotches()}
+          </div>
+          
+          {/* Slider input */}
+          <div>
+            <input
+              type="range"
+              min={visualRange.min}
+              max={visualRange.max}
+              step={1}
+              value={valueToScale(value)}
+              onChange={handleChange}
+              disabled={disabled}
+              className={`w-full m-0 appearance-none bg-transparent cursor-pointer h-6 flex items-center 
+                [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-full
+                [&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-full
+                ${isConstrained && effectiveMax !== undefined && value === effectiveMax 
+                  ? '[&::-webkit-slider-runnable-track]:bg-orange-300 [&::-moz-range-track]:bg-orange-300' 
+                  : '[&::-webkit-slider-runnable-track]:bg-gray-200 [&::-moz-range-track]:bg-gray-200'
+                }
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:mt-0
+                ${isConstrained && effectiveMax !== undefined && value === effectiveMax
+                  ? '[&::-webkit-slider-thumb]:bg-orange-500 [&::-moz-range-thumb]:bg-orange-500'
+                  : '[&::-webkit-slider-thumb]:bg-blue-500 [&::-moz-range-thumb]:bg-blue-500'
+                }`}
+              data-testid={`${testId}-slider`}
+            />
+          </div>
+          
+          {/* Scale labels */}
+          <div className="flex justify-between items-start">
+            {generateScaleLabels()}
+          </div>
         </div>
         
         {/* Level description */}
