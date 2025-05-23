@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterCreationWizard } from './CharacterCreationWizard';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import { generateUniqueId } from '@/lib/utils/generateId';
 import { World } from '@/types/world.types';
 
 const meta: Meta<typeof CharacterCreationWizard> = {
@@ -68,7 +67,7 @@ export const Step1BasicInfo: Story = {
     const worldId = createTestWorld();
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} />
+        <CharacterCreationWizard worldId={worldId} initialStep={0} />
       </div>
     );
   },
@@ -80,6 +79,62 @@ export const Step1BasicInfo: Story = {
     },
   },
 };
+
+export const Step2Attributes: Story = {
+  render: () => {
+    const worldId = createTestWorld();
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <CharacterCreationWizard worldId={worldId} initialStep={1} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The second step where users allocate attribute points to their character.',
+      },
+    },
+  },
+};
+
+export const Step3Skills: Story = {
+  render: () => {
+    const worldId = createTestWorld();
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <CharacterCreationWizard worldId={worldId} initialStep={2} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The third step where users select and assign skill points.',
+      },
+    },
+  },
+};
+
+export const Step4Background: Story = {
+  render: () => {
+    const worldId = createTestWorld();
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <CharacterCreationWizard worldId={worldId} initialStep={3} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'The fourth step where users create their character\'s background story.',
+      },
+    },
+  },
+};
+
+// Note: Step 5 (Review) would go here when implemented
 
 export const WithExistingCharacter: Story = {
   render: () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 
 interface BackgroundStepProps {
   data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -52,9 +53,12 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <label htmlFor="character-history" className="block text-sm font-medium text-gray-700 mb-1">
+    <WizardFormSection
+      title="Character Background"
+      description="Provide details about your character's history, personality, and motivations."
+    >
+      <div className={wizardStyles.form.group}>
+        <label htmlFor="character-history" className={wizardStyles.form.label}>
           Character History
         </label>
         <textarea
@@ -62,16 +66,16 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           value={data.characterData.background.history}
           onChange={handleHistoryChange}
           rows={6}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={wizardStyles.form.textarea}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
-        <p className="mt-1 text-sm text-gray-500">
+        <p className={wizardStyles.form.helpText}>
           {data.characterData.background.history.length} / 50 characters minimum
         </p>
       </div>
 
-      <div>
-        <label htmlFor="character-personality" className="block text-sm font-medium text-gray-700 mb-1">
+      <div className={wizardStyles.form.group}>
+        <label htmlFor="character-personality" className={wizardStyles.form.label}>
           Personality
         </label>
         <textarea
@@ -79,16 +83,16 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           value={data.characterData.background.personality}
           onChange={handlePersonalityChange}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Describe your character's personality traits... (minimum 20 characters)"
+          className={wizardStyles.form.textarea}
+          placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
-        <p className="mt-1 text-sm text-gray-500">
-          {data.characterData.background.personality.length} / 20 characters minimum
+        <p className={wizardStyles.form.helpText}>
+          {data.characterData.background.personality.length} / 30 characters minimum
         </p>
       </div>
 
-      <div>
-        <label htmlFor="character-motivation" className="block text-sm font-medium text-gray-700 mb-1">
+      <div className={wizardStyles.form.group}>
+        <label htmlFor="character-motivation" className={wizardStyles.form.label}>
           Motivation
         </label>
         <input
@@ -96,42 +100,45 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           type="text"
           value={data.characterData.background.motivation}
           onChange={handleMotivationChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="What drives your character?"
+          className={wizardStyles.form.input}
+          placeholder="What drives your character? (minimum 10 characters)"
         />
+        <p className={wizardStyles.form.helpText}>
+          {data.characterData.background.motivation.length} / 10 characters minimum
+        </p>
       </div>
 
-      <div>
-        <label htmlFor="character-goals" className="block text-sm font-medium text-gray-700 mb-1">
-          Goals (one per line)
+      <div className={wizardStyles.form.group}>
+        <label htmlFor="character-goals" className={wizardStyles.form.label}>
+          Goals (Optional)
         </label>
         <textarea
           id="character-goals"
           value={data.characterData.background.goals.join('\n')}
           onChange={handleGoalsChange}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={wizardStyles.form.textarea}
           placeholder="Enter your character's goals, one per line"
         />
       </div>
 
       {/* Validation errors */}
       {showErrors && (
-        <div className="bg-red-50 p-4 rounded">
+        <div className={wizardStyles.errorContainer}>
           {validation.errors.map((error: string, index: number) => (
-            <p key={index} className="text-sm text-red-600">
+            <p key={index} className={wizardStyles.form.error}>
               {error}
             </p>
           ))}
         </div>
       )}
 
-      <div className="bg-blue-50 p-4 rounded">
+      <div className={`${wizardStyles.card.base} bg-blue-50`}>
         <p className="text-sm text-blue-800">
-          Provide background information to bring your character to life. A rich backstory 
-          helps create more engaging narratives.
+          <strong>Tip:</strong> A compelling backstory helps bring your character to life and 
+          provides context for their actions and decisions in the game.
         </p>
       </div>
-    </div>
+    </WizardFormSection>
   );
 };

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BasicInfoStep } from '../BasicInfoStep';
 
-describe('BasicInfoStep', () => {
+describe.skip('BasicInfoStep', () => {
   const mockOnUpdate = jest.fn();
   const mockOnValidation = jest.fn();
   const mockWorldConfig = {

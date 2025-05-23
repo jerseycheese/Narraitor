@@ -1,5 +1,6 @@
 import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
+import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 
 interface BasicInfoStepProps {
   data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -28,7 +29,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   const showErrors = validation?.touched && !validation?.valid;
 
   return (
-    <div className="space-y-6">
+    <WizardFormSection
+      title="Basic Information"
+      description="Create your character by providing their name and basic details."
+    >
       <div className="flex items-start gap-6">
         {/* Portrait placeholder */}
         <div className="flex-shrink-0">
@@ -37,8 +41,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
         {/* Form fields */}
         <div className="flex-1 space-y-4">
-          <div>
-            <label htmlFor="character-name" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className={wizardStyles.form.group}>
+            <label htmlFor="character-name" className={wizardStyles.form.label}>
               Character Name
             </label>
             <input
@@ -48,18 +52,18 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               onChange={handleNameChange}
               onBlur={handleBlur}
               maxLength={50}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={wizardStyles.form.input}
               placeholder="Enter character name"
             />
             {showErrors && validation.errors.map((error: string, index: number) => (
-              <p key={index} className="mt-1 text-sm text-red-600">
+              <p key={index} className={wizardStyles.form.error}>
                 {error}
               </p>
             ))}
           </div>
 
-          <div>
-            <label htmlFor="character-description" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className={wizardStyles.form.group}>
+            <label htmlFor="character-description" className={wizardStyles.form.label}>
               Description
             </label>
             <textarea
@@ -68,7 +72,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               onChange={handleDescriptionChange}
               onBlur={handleBlur}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={wizardStyles.form.textarea}
               placeholder="Describe your character"
             />
           </div>
@@ -76,11 +80,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       </div>
 
       <div className="bg-blue-50 p-4 rounded">
-        <p className="text-sm text-blue-800">
+        <p className={wizardStyles.form.helpText}>
           Choose a unique name for your character. The name should be between 3 and 50 characters 
           and must be unique within this world.
         </p>
       </div>
-    </div>
+    </WizardFormSection>
   );
 };

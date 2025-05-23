@@ -4,6 +4,12 @@ import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
+import { 
+  WizardContainer, 
+  WizardProgress, 
+  WizardNavigation, 
+  WizardStep
+} from '@/components/shared/wizard';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -12,6 +18,7 @@ import { validateCharacterName, validateAttributes, validateSkills, validateBack
 
 interface CharacterCreationWizardProps {
   worldId: EntityID;
+  initialStep?: number;
 }
 
 interface CharacterCreationState {
@@ -63,9 +70,14 @@ interface CharacterCreationState {
   };
 }
 
-const stepTitles = ['Basic Information', 'Attributes', 'Skills', 'Background'];
+const steps = [
+  { id: 'basic-info', label: 'Basic Info' },
+  { id: 'attributes', label: 'Attributes' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'background', label: 'Background' }
+];
 
-export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId }) => {
+export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId, initialStep = 0 }) => {
   const router = useRouter();
   const { worlds } = worldStore();
   const { createCharacter } = characterStore();
@@ -86,7 +98,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     
     // Initialize with world attributes and skills
     return {
-      currentStep: 0,
+      currentStep: initialStep,
       worldId,
       characterData: {
         name: '',
@@ -95,6 +107,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         attributes: world?.attributes.map(attr => ({
           attributeId: attr.id,
           name: attr.name,
+          description: attr.description,
           value: attr.minValue,
           minValue: attr.minValue,
           maxValue: attr.maxValue,
@@ -102,6 +115,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         skills: world?.skills.map(skill => ({
           skillId: skill.id,
           name: skill.name,
+          description: skill.description,
           level: skill.minValue,
           linkedAttributeId: skill.linkedAttributeId,
           isSelected: false,
@@ -218,9 +232,34 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         };
       }
 
+      // Revalidate current step after updates
+      let validation: { valid: boolean; errors: string[] } = { valid: true, errors: [] };
+      switch (prev.currentStep) {
+        case 0:
+          validation = validateCharacterName(newState.characterData.name, worldId);
+          break;
+        case 1:
+          validation = validateAttributes(newState.characterData.attributes, newState.pointPools.attributes.total);
+          break;
+        case 2:
+          validation = validateSkills(newState.characterData.skills);
+          break;
+        case 3:
+          validation = validateBackground(newState.characterData.background);
+          break;
+      }
+      
+      newState.validation = {
+        ...prev.validation,
+        [prev.currentStep]: { 
+          ...validation, 
+          touched: prev.validation[prev.currentStep]?.touched || false 
+        },
+      };
+
       return newState;
     });
-  }, []);
+  }, [worldId]);
 
   const handleValidation = useCallback((valid: boolean, errors: string[]) => {
     setState(prev => ({
@@ -325,89 +364,33 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     }
   };
 
-  const isLastStep = state.currentStep === stepTitles.length - 1;
   const currentValidation = state.validation[state.currentStep];
   const hasErrors = currentValidation?.touched && !currentValidation?.valid;
+  const error = hasErrors ? currentValidation.errors.join(', ') : undefined;
 
   return (
-    <div className="max-w-4xl mx-auto p-6" onBlur={handleFieldBlur}>
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          {stepTitles.map((_, index) => (
-            <div
-              key={index}
-              className={`flex items-center ${index < stepTitles.length - 1 ? 'flex-1' : ''}`}
-            >
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                  index < state.currentStep
-                    ? 'bg-green-600 text-white'
-                    : index === state.currentStep
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-300 text-gray-600'
-                }`}
-              >
-                {index + 1}
-              </div>
-              {index < stepTitles.length - 1 && (
-                <div
-                  className={`flex-1 h-1 mx-2 ${
-                    index < state.currentStep ? 'bg-green-600' : 'bg-gray-300'
-                  }`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        <h2 className="text-2xl font-bold text-center">
-          {stepTitles[state.currentStep]}
-        </h2>
-      </div>
-
-      {/* Step content */}
-      <div className="mb-8">
-        {renderStep()}
-      </div>
-
-      {/* Navigation buttons */}
-      <div className="flex justify-between">
-        <button
-          onClick={handleCancel}
-          className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100"
-        >
-          Cancel
-        </button>
+    <WizardContainer title={`Create Character in ${world.name}`}>
+      <div onBlur={handleFieldBlur}>
+        <WizardProgress 
+          steps={steps} 
+          currentStep={state.currentStep} 
+        />
         
-        <div className="flex gap-4">
-          {state.currentStep > 0 && (
-            <button
-              onClick={handleBack}
-              className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100"
-            >
-              Back
-            </button>
-          )}
-          
-          {isLastStep ? (
-            <button
-              onClick={handleCreate}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
-              disabled={hasErrors}
-            >
-              Create Character
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
-              disabled={hasErrors}
-            >
-              Next
-            </button>
-          )}
-        </div>
+        <WizardStep error={error}>
+          {renderStep()}
+        </WizardStep>
+        
+        <WizardNavigation
+          onCancel={handleCancel}
+          onBack={state.currentStep > 0 ? handleBack : undefined}
+          onNext={state.currentStep < steps.length - 1 ? handleNext : undefined}
+          onComplete={state.currentStep === steps.length - 1 ? handleCreate : undefined}
+          currentStep={state.currentStep}
+          totalSteps={steps.length}
+          completeLabel="Create Character"
+          disabled={hasErrors}
+        />
       </div>
-    </div>
+    </WizardContainer>
   );
 };
