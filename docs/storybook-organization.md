@@ -50,7 +50,7 @@ Within each domain, components are organized by type:
 - `Forms/` - Form components (WorldAttributesForm, SkillRangeEditor)
 - `Controls/` - Interactive controls (RangeSlider, SkillDifficulty, PointPoolManager)
 - `Modals/` - Modal and dialog components (DeleteConfirmationDialog)
-- `Feedback/` - Feedback components (ErrorMessage)
+- `Feedback/` - Feedback components (SectionError from ErrorDisplay)
 
 **DevTools Domain:**
 - `Panels/` - Main panels (DevToolsPanel, AITestingPanel)
