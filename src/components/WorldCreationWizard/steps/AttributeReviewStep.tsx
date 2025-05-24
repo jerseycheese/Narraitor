@@ -47,7 +47,7 @@ export default function AttributeReviewStep({
     // This should only run on initial mount or when suggestions change from parent
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
-      setLocalSuggestions(suggestions.map(suggestion => {
+      const newSuggestions = suggestions.map(suggestion => {
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
         // Always default to true (all attributes selected by default)
         const accepted = true;
@@ -58,7 +58,28 @@ export default function AttributeReviewStep({
           showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
-      }));
+      });
+      
+      setLocalSuggestions(newSuggestions);
+      
+      // Automatically save the initially selected attributes to parent state
+      const acceptedAttributes = newSuggestions
+        .filter(s => s.accepted)
+        .map(s => ({
+          id: generateUniqueId('attr'),
+          worldId: '',
+          name: s.name,
+          description: s.description,
+          baseValue: s.baseValue,
+          minValue: s.minValue,
+          maxValue: s.maxValue,
+          category: s.category,
+        }));
+      
+      // Only update if we don't already have attributes or if the count is different
+      if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
+        onUpdate({ ...worldData, attributes: acceptedAttributes });
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions]); // Only depend on suggestions, not worldData.attributes
