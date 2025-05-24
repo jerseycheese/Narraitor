@@ -83,6 +83,15 @@ The system uses different templates for different narrative needs:
 2. **Scene Template**: Creates standard narrative scenes
 3. **Transition Template**: Handles transitions between different narrative states
 
+### Narrative Perspective
+
+The narrative system consistently uses **second-person perspective** ("you") to create an immersive experience:
+
+1. **Player as Character**: The AI understands that the player IS the named character
+2. **Perspective Rules**: All narration uses "you" instead of the character name
+3. **Character Names in Dialogue**: Character names only appear when NPCs address the player
+4. **Immersive Storytelling**: Creates a direct, personal connection to the narrative
+
 ### Deduplication and Error Prevention
 
 The system includes several safeguards:

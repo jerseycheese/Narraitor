@@ -16,6 +16,7 @@ This user flow documents the process of starting and playing through a narrative
 - At least one world has been created
 - At least one character has been created
 - No other active game session is in progress
+- A character must be selected before starting a session
 
 ## User Flow Diagram
 
