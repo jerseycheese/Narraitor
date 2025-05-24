@@ -91,7 +91,7 @@ export const WithDevToolsContent: Story = {
     children: (
       <div className="font-mono text-sm">
         <div className="p-2 bg-slate-700 rounded mb-2">
-          <span className="text-gray-400">currentWorldId:</span> <span className="text-green-400">"world-123"</span>
+          <span className="text-gray-400">currentWorldId:</span> <span className="text-green-400">&quot;world-123&quot;</span>
         </div>
         <div className="p-2 bg-slate-700 rounded mb-2">
           <span className="text-gray-400">loading:</span> <span className="text-blue-400">false</span>
