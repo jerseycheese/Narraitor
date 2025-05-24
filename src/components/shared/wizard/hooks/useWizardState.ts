@@ -59,7 +59,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (debug) console.log(`[useWizardState] Restored state from ${persistKey}:`, parsed);
+          // State restored from persistence
           return parsed;
         } catch (e) {
           if (debug) console.error(`[useWizardState] Failed to parse saved state:`, e);
@@ -80,7 +80,7 @@ export function useWizardState<T>(config: WizardConfig<T>) {
   useEffect(() => {
     if (persistKey && typeof window !== 'undefined') {
       localStorage.setItem(persistKey, JSON.stringify(state));
-      if (debug) console.log(`[useWizardState] Persisted state to ${persistKey}`);
+      // State persisted
     }
   }, [state, persistKey, debug]);
 

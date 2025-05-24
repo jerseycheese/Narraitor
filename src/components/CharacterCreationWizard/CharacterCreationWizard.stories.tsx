@@ -56,8 +56,7 @@ const createTestWorld = () => {
   const worldId = worldStore.getState().createWorld(testWorld);
   worldStore.getState().setCurrentWorld(worldId);
   
-  console.log('[createTestWorld] Created world with ID:', worldId);
-  console.log('[createTestWorld] World store state:', worldStore.getState().worlds);
+  // World created successfully
   
   return worldId;
 };

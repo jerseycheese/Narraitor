@@ -62,8 +62,8 @@ const mockWorldConfig = {
 export const Empty: Story = {
   args: {
     data: defaultData,
-    onUpdate: (updates: unknown) => console.log('Update:', updates),
-    onValidation: (valid: boolean, errors: string[]) => console.log('Validation:', { valid, errors }),
+    onUpdate: () => {},
+    onValidation: () => {},
     worldConfig: mockWorldConfig,
   },
 };
@@ -78,8 +78,8 @@ export const WithData: Story = {
         description: 'A ranger from the North, skilled in sword and bow',
       },
     },
-    onUpdate: (updates: unknown) => console.log('Update:', updates),
-    onValidation: (valid: boolean, errors: string[]) => console.log('Validation:', { valid, errors }),
+    onUpdate: () => {},
+    onValidation: () => {},
     worldConfig: mockWorldConfig,
   },
 };
@@ -100,8 +100,8 @@ export const WithValidationError: Story = {
         },
       },
     },
-    onUpdate: (updates: unknown) => console.log('Update:', updates),
-    onValidation: (valid: boolean, errors: string[]) => console.log('Validation:', { valid, errors }),
+    onUpdate: () => {},
+    onValidation: () => {},
     worldConfig: mockWorldConfig,
   },
 };
@@ -116,8 +116,8 @@ export const WithLongName: Story = {
         description: 'Father to a murdered son, husband to a murdered wife',
       },
     },
-    onUpdate: (updates: unknown) => console.log('Update:', updates),
-    onValidation: (valid: boolean, errors: string[]) => console.log('Validation:', { valid, errors }),
+    onUpdate: () => {},
+    onValidation: () => {},
     worldConfig: mockWorldConfig,
   },
   parameters: {

@@ -86,13 +86,13 @@ export function useWizardAI<TInput, TOutput>(
 
     try {
       if (debug) {
-        console.log('[useWizardAI] Starting analysis with input:', input);
+        // Starting AI analysis
       }
 
       const suggestions = await analyzeFunction(input);
       
       if (debug) {
-        console.log('[useWizardAI] Analysis complete, suggestions:', suggestions);
+        // Analysis complete
       }
 
       setState({

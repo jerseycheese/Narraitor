@@ -85,9 +85,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   
   // Debug logging for Storybook
   if (typeof window !== 'undefined' && window.location.href.includes('storybook')) {
-    console.log('[CharacterCreationWizard] worldId:', worldId);
-    console.log('[CharacterCreationWizard] worlds:', worlds);
-    console.log('[CharacterCreationWizard] world found:', world);
+    // World validation is handled below
   }
   
   const { data, setData, handleFieldBlur, clearAutoSave } = useCharacterCreationAutoSave(worldId);
