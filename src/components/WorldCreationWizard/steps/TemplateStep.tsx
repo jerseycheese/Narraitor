@@ -55,10 +55,14 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
+    console.log('handleCreateOwnWorld called');
     // Clear any selected template
     onUpdate({ selectedTemplateId: null });
+    console.log('selectedTemplateId set to null');
     // Proceed to next step without applying a template
+    console.log('calling onComplete');
     onComplete();
+    console.log('onComplete called');
   };
   
   return (

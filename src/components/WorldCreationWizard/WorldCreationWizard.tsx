@@ -69,11 +69,17 @@ export default function WorldCreationWizard({
   };
 
   const handleNext = () => {
+    console.log('handleNext called, currentStep:', wizardState.currentStep);
+    console.log('canProceedToNext:', canProceedToNext());
+    console.log('wizardState:', wizardState);
     if (canProceedToNext() && wizardState.currentStep < WIZARD_STEPS.length - 1) {
+      console.log('Moving to next step');
       setWizardState((prev) => ({
         ...prev,
         currentStep: prev.currentStep + 1,
       }));
+    } else {
+      console.log('Cannot proceed to next step');
     }
   };
 
