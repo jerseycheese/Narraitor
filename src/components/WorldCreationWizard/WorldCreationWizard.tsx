@@ -71,7 +71,7 @@ export default function WorldCreationWizard({
     }
   };
 
-  const handleNext = (createOwnWorld?: boolean) => {
+  const handleNext = async (createOwnWorld?: boolean) => {
     console.log('handleNext called, currentStep:', wizardState.currentStep);
     console.log('createOwnWorld param:', createOwnWorld);
     console.log('canProceedToNext:', canProceedToNext());
@@ -86,6 +86,13 @@ export default function WorldCreationWizard({
     
     if (canProceed && wizardState.currentStep < WIZARD_STEPS.length - 1) {
       console.log('Moving to next step');
+      
+      // Special handling for step 2 (Description step) when creating own world
+      if (wizardState.currentStep === 2 && wizardState.createOwnWorld && !wizardState.aiSuggestions) {
+        console.log('Auto-generating AI suggestions for own world');
+        await generateAISuggestions();
+      }
+      
       setWizardState((prev) => ({
         ...prev,
         currentStep: prev.currentStep + 1,
@@ -95,6 +102,42 @@ export default function WorldCreationWizard({
       console.log('Cannot proceed to next step');
     }
   };
+
+  const generateAISuggestions = async () => {
+    if (!wizardState.worldData.description) return;
+    
+    try {
+      setWizardState(prev => ({ ...prev, isProcessing: true }));
+      const { analyzeWorldDescription } = await import('@/lib/ai/worldAnalyzer');
+      const suggestions = await analyzeWorldDescription(wizardState.worldData.description);
+      setWizardState(prev => ({ 
+        ...prev, 
+        aiSuggestions: suggestions,
+        isProcessing: false 
+      }));
+    } catch (error) {
+      console.error('Error generating suggestions:', error);
+      // Use default suggestions as fallback
+      setWizardState(prev => ({ 
+        ...prev, 
+        aiSuggestions: getDefaultSuggestions(),
+        isProcessing: false 
+      }));
+    }
+  };
+
+  const getDefaultSuggestions = () => ({
+    attributes: [
+      { name: 'Strength', description: 'Physical power and endurance', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical', accepted: true },
+      { name: 'Intelligence', description: 'Mental acuity and reasoning', minValue: 1, maxValue: 10, baseValue: 7, category: 'Mental', accepted: true },
+      { name: 'Agility', description: 'Speed and dexterity', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: true },
+    ],
+    skills: [
+      { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium' as const, category: 'Combat', linkedAttributeName: 'Strength', accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },
+      { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard' as const, category: 'Physical', linkedAttributeName: 'Agility', accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },
+      { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy' as const, category: 'Mental', linkedAttributeName: 'Intelligence', accepted: true, baseValue: 5, minValue: 1, maxValue: 10 },
+    ],
+  });
 
   const handleBack = () => {
     if (wizardState.currentStep > 0) {
