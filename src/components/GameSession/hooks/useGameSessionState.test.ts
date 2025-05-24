@@ -23,8 +23,27 @@ const mockWorldStoreState = {
   }
 };
 
+const mockCharacterStoreState = {
+  currentCharacterId: 'test-character-id',
+  characters: {
+    'test-character-id': {
+      id: 'test-character-id',
+      name: 'Test Character',
+      worldId: 'test-world',
+      level: 1,
+      attributes: [],
+      skills: [],
+      background: { description: '', personality: '', motivation: '' },
+      isPlayer: true,
+      status: { hp: 100, mp: 50, stamina: 100 },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  }
+};
+
 const mockSessionStoreState = {
-  status: 'active',
+  status: 'active' as const,
   error: null,
   currentSceneId: 'scene-001',
   playerChoices: [
@@ -55,9 +74,16 @@ jest.mock('@/state/sessionStore', () => ({
   }
 }));
 
+jest.mock('@/state/characterStore', () => ({
+  characterStore: {
+    getState: jest.fn(() => mockCharacterStoreState)
+  }
+}));
+
 // Import the mocked stores
 import { sessionStore } from '@/state/sessionStore';
 import { worldStore } from '@/state/worldStore';
+import { characterStore } from '@/state/characterStore';
 
 describe('useGameSessionState', () => {
   beforeEach(() => {
@@ -65,6 +91,7 @@ describe('useGameSessionState', () => {
     // Reset mock return values
     (worldStore.getState as jest.Mock).mockReturnValue(mockWorldStoreState);
     (sessionStore.getState as jest.Mock).mockReturnValue(mockSessionStoreState);
+    (characterStore.getState as jest.Mock).mockReturnValue(mockCharacterStoreState);
   });
 
   test('initializes with session store state', () => {
@@ -83,7 +110,8 @@ describe('useGameSessionState', () => {
       isClient: true,
       _stores: {
         worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState
+        sessionStore: mockSessionStoreState,
+        characterStore: mockCharacterStoreState
       }
     }));
 
@@ -110,7 +138,8 @@ describe('useGameSessionState', () => {
       isClient: true,
       _stores: {
         worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState
+        sessionStore: mockSessionStoreState,
+        characterStore: mockCharacterStoreState
       }
     }));
 
@@ -132,7 +161,8 @@ describe('useGameSessionState', () => {
       router,
       _stores: {
         worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState
+        sessionStore: mockSessionStoreState,
+        characterStore: mockCharacterStoreState
       }
     }));
 
@@ -153,7 +183,8 @@ describe('useGameSessionState', () => {
       onSessionStart,
       _stores: {
         worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState
+        sessionStore: mockSessionStoreState,
+        characterStore: mockCharacterStoreState
       }
     }));
 
@@ -170,7 +201,7 @@ describe('useGameSessionState', () => {
     });
 
     expect(result.current.error).toBeNull();
-    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledWith('test-world', onSessionStart);
+    expect(mockSessionStoreState.initializeSession).toHaveBeenCalledWith('test-world', 'test-character-id', onSessionStart);
   });
 
   test('detects world existence', () => {
@@ -187,6 +218,31 @@ describe('useGameSessionState', () => {
     }));
 
     expect(notExistsResult.current.worldExists).toBe(false);
+  });
+
+  test('handles retry when no character is selected', () => {
+    const onSessionStart = jest.fn();
+    const mockStoresWithoutCharacter = {
+      worldStore: mockWorldStoreState,
+      sessionStore: mockSessionStoreState,
+      characterStore: { ...mockCharacterStoreState, currentCharacterId: null }
+    };
+    
+    const { result } = renderHook(() => useGameSessionState({
+      worldId: 'test-world',
+      isClient: true,
+      onSessionStart,
+      _stores: mockStoresWithoutCharacter
+    }));
+
+    // Handle retry
+    act(() => {
+      result.current.handleRetry();
+    });
+
+    expect(result.current.error).toBeTruthy();
+    expect(result.current.error?.message).toBe('Please select a character before starting the game');
+    expect(mockSessionStoreState.initializeSession).not.toHaveBeenCalled();
   });
 
   test('uses initial state when provided', () => {

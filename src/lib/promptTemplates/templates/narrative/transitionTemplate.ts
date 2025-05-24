@@ -24,6 +24,9 @@ Generate a smooth transition that:
 4. Keeps the ${tone} tone consistent
 5. Is concise (1-2 sentences)
 
+IMPORTANT: Write in SECOND PERSON perspective (using "you").
+Example: "You make your way through..." NOT "The character travels..." or using character names.
+
 Response Format:
 {
   "content": "The transition text goes here...",

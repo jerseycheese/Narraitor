@@ -9,6 +9,7 @@ import PlayerChoices from './PlayerChoices';
 import SessionControls from './SessionControls';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
+import { characterStore } from '@/state/characterStore';
 import { PlayerChoiceSelector } from '@/components/Narrative';
 
 interface GameSessionActiveWithNarrativeProps {
@@ -48,6 +49,14 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const [isGenerating, setIsGenerating] = React.useState(true);
   const [initialized, setInitialized] = React.useState(false);
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
+  
+  // Get character ID from session store
+  const characterId = sessionStore(state => state.characterId);
+  
+  // Get character details
+  const character = characterStore(state => 
+    state.characters[characterId || '']
+  );
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
@@ -206,6 +215,9 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
         <div className="mb-2">
           <h1 className="text-2xl font-bold">{world.name}</h1>
           <p className="text-gray-600">{world.theme}</p>
+          {character && (
+            <p className="text-green-600 font-medium">Playing as: {character.name}</p>
+          )}
           <p className="text-blue-600" aria-live="polite">Status: {status}</p>
         </div>
       )}
@@ -227,6 +239,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             key={`generator-${controllerKey}`}
             worldId={worldId}
             sessionId={sessionId}
+            characterId={characterId || undefined}
             triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
             choiceId={selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}

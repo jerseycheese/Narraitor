@@ -8,6 +8,7 @@ import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.
 interface NarrativeControllerProps {
   worldId: string;
   sessionId: string;
+  characterId?: string;
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
   triggerGeneration?: boolean;
@@ -19,6 +20,7 @@ interface NarrativeControllerProps {
 export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   worldId,
   sessionId,
+  characterId,
   onNarrativeGenerated,
   onChoicesGenerated,
   triggerGeneration = true,
@@ -303,7 +305,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setError(null);
     
     try {
-      const result = await narrativeGenerator.generateInitialScene(worldId, []);
+      const result = await narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []);
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
@@ -376,7 +378,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
-        characterIds: [],
+        characterIds: characterId ? [characterId] : [],
         narrativeContext: {
           recentSegments,
           currentSituation: `Player selected choice: ${triggeringChoiceId}`

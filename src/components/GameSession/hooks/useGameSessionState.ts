@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
+import { characterStore } from '@/state/characterStore';
 import { GameSessionState } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
 
@@ -16,6 +17,7 @@ interface UseGameSessionStateOptions {
   _stores?: {
     worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
     sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
+    characterStore?: Partial<ReturnType<typeof characterStore.getState>> | (() => Partial<ReturnType<typeof characterStore.getState>>);
   };
 }
 
@@ -54,6 +56,10 @@ export const useGameSessionState = ({
     ? (typeof _stores.sessionStore === 'function' ? _stores.sessionStore() : _stores.sessionStore)
     : sessionStore.getState();
   
+  const characterStoreState = _stores?.characterStore
+    ? (typeof _stores.characterStore === 'function' ? _stores.characterStore() : _stores.characterStore)
+    : characterStore.getState();
+  
   // Check if world exists - only on client-side
   const worldExists = useMemo(() => {
     if (!isClient) return true; // Default for SSR
@@ -63,12 +69,20 @@ export const useGameSessionState = ({
   // Get the world for the active session
   const world = worldStoreState.worlds?.[worldId];
   
+  // Get the current character ID from the character store
+  const currentCharacterId = characterStoreState.currentCharacterId;
+  
   // Handle retry
   const handleRetry = () => {
     setError(null);
     setSessionState(prev => ({ ...prev, error: null }));
     if (sessionStoreState.initializeSession) {
-      sessionStoreState.initializeSession(worldId, onSessionStart);
+      if (!currentCharacterId) {
+        logger.warn('No character selected for session');
+        setError(new Error('Please select a character before starting the game'));
+        return;
+      }
+      sessionStoreState.initializeSession(worldId, currentCharacterId, onSessionStart);
     }
   };
 
@@ -83,7 +97,13 @@ export const useGameSessionState = ({
   const startSession = () => {
     logger.debug('Manual session start requested');
     if (sessionStoreState.initializeSession) {
-      sessionStoreState.initializeSession(worldId, onSessionStart);
+      if (!currentCharacterId) {
+        logger.warn('No character selected for session');
+        setError(new Error('Please select a character before starting the game'));
+        setSessionState(prev => ({ ...prev, error: 'Please select a character before starting the game' }));
+        return;
+      }
+      sessionStoreState.initializeSession(worldId, currentCharacterId, onSessionStart);
     }
   };
   

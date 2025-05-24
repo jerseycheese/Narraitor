@@ -123,7 +123,9 @@ export default function GameSessionTestHarness() {
             logger.info('Starting new session');
             const store = sessionStore.getState();
             if (store.initializeSession) {
-              store.initializeSession(mockWorld.id, handleSessionStart);
+              // Use a mock character ID for testing
+              const mockCharacterId = 'test-character-123';
+              store.initializeSession(mockWorld.id, mockCharacterId, handleSessionStart);
             } else {
               logger.error('initializeSession method not found');
             }

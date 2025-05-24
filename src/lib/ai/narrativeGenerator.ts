@@ -1,6 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { worldStore } from '@/state/worldStore';
+import { characterStore } from '@/state/characterStore';
 import {
   Decision,
   NarrativeContext,
@@ -39,13 +40,20 @@ export class NarrativeGenerator {
       const world = this.getWorld(worldId);
       const template = this.getTemplate('initialScene');
       
+      // Get character details
+      const { characters } = characterStore.getState();
+      const playerCharacterId = characterIds[0]; // First character is the player
+      const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+      
       const context = {
         worldName: world.name,
         worldDescription: world.description,
         genre: world.theme,
         tone: 'default',
         attributes: world.attributes,
-        characterIds
+        characterIds,
+        playerCharacterName: playerCharacter?.name,
+        playerCharacterBackground: playerCharacter?.background
       };
 
       const prompt = template(context);
@@ -96,6 +104,11 @@ export class NarrativeGenerator {
   }
 
   private buildContext(world: World, request: NarrativeGenerationRequest) {
+    // Get character details
+    const { characters } = characterStore.getState();
+    const playerCharacterId = request.characterIds?.[0]; // First character is the player
+    const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+    
     return {
       worldName: world.name,
       worldDescription: world.description,
@@ -103,6 +116,8 @@ export class NarrativeGenerator {
       tone: 'default',
       attributes: world.attributes,
       characterIds: request.characterIds,
+      playerCharacterName: playerCharacter?.name,
+      playerCharacterBackground: playerCharacter?.background,
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
       generationParameters: request.generationParameters
