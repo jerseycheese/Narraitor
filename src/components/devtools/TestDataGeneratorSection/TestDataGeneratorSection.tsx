@@ -14,54 +14,80 @@ export const TestDataGeneratorSection: React.FC = () => {
     console.log(`Test world "${testWorld.name}" created with ID: ${worldId}`);
   };
   
-  const handleGenerateCharacter = () => {
+  const handleGenerateCharacter = async () => {
     const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
     if (!currentWorld) {
       alert('Please select a world first');
       return;
     }
     
-    // Navigate to character creation with test data
+    // Generate test data
     const testData = generateTestCharacter(currentWorld);
-    sessionStorage.setItem(
-      `character-creation-${currentWorld.id}-test`, 
-      JSON.stringify(testData)
-    );
-    router.push('/characters/create?testMode=true');
+    
+    // Store the complete wizard state
+    const wizardState = {
+      currentStep: 0,
+      worldId: currentWorld.id,
+      characterData: testData,
+      validation: {},
+      pointPools: {
+        attributes: {
+          total: currentWorld.settings.attributePointPool,
+          spent: testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
+          remaining: currentWorld.settings.attributePointPool - testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
+        },
+        skills: {
+          total: currentWorld.settings.skillPointPool,
+          spent: testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
+          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
+        },
+      },
+    };
+    
+    // Store it in sessionStorage
+    const storageKey = `character-creation-${currentWorld.id}`;
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(wizardState));
+      console.log(`[TestDataGenerator] Stored test character data with key: ${storageKey}`, wizardState);
+      
+      // Verify it was stored
+      const stored = sessionStorage.getItem(storageKey);
+      if (!stored) {
+        throw new Error('Failed to store data in sessionStorage');
+      }
+      
+      // Force a small delay to ensure storage is committed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use window.location for a hard navigation to ensure fresh page load
+      window.location.href = '/characters/create';
+    } catch (error) {
+      console.error('[TestDataGenerator] Error storing test data:', error);
+      alert('Failed to store test data. Check console for details.');
+    }
   };
   
-  const handleFillCharacterForm = () => {
+  const handleDebugStorage = () => {
     const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
     if (!currentWorld) {
       alert('Please select a world first');
       return;
     }
     
-    // Generate test data and store it
-    const testData = generateTestCharacter(currentWorld);
-    sessionStorage.setItem(
-      `character-creation-${currentWorld.id}`, 
-      JSON.stringify({
-        currentStep: 0,
-        worldId: currentWorld.id,
-        characterData: testData,
-        validation: {},
-        pointPools: {
-          attributes: {
-            total: currentWorld.settings.attributePointPool,
-            spent: testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
-            remaining: currentWorld.settings.attributePointPool - testData.attributes.reduce((sum, attr) => sum + attr.value, 0),
-          },
-          skills: {
-            total: currentWorld.settings.skillPointPool,
-            spent: testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
-            remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
-          },
-        },
-      })
-    );
+    const storageKey = `character-creation-${currentWorld.id}`;
+    const storedData = sessionStorage.getItem(storageKey);
     
-    // Navigate to character creation
+    if (storedData) {
+      console.log('[TestDataGenerator] Current stored data:', JSON.parse(storedData));
+      alert(`Data found in sessionStorage for key: ${storageKey}. Check console for details.`);
+    } else {
+      console.log('[TestDataGenerator] No data found in sessionStorage for key:', storageKey);
+      alert(`No data found in sessionStorage for key: ${storageKey}`);
+    }
+  };
+  
+  const handleNavigateEmpty = () => {
+    // Just navigate without any data
     router.push('/characters/create');
   };
   
@@ -81,16 +107,27 @@ export const TestDataGeneratorSection: React.FC = () => {
           onClick={handleGenerateCharacter}
           className="w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm transition-colors"
           disabled={!currentWorldId}
+          title="Creates test character data and navigates to character creation form"
         >
-          Generate Test Character Data
+          Generate & Fill Character Form
         </button>
         
         <button
-          onClick={handleFillCharacterForm}
+          onClick={handleNavigateEmpty}
+          className="w-full px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm transition-colors"
+          disabled={!currentWorldId}
+          title="Navigate to empty character creation form"
+        >
+          Go to Empty Form
+        </button>
+        
+        <button
+          onClick={handleDebugStorage}
           className="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm transition-colors"
           disabled={!currentWorldId}
+          title="Check if test data exists in sessionStorage"
         >
-          Fill Character Creation Form
+          Debug: Check Storage
         </button>
       </div>
       
@@ -98,6 +135,15 @@ export const TestDataGeneratorSection: React.FC = () => {
         Test data generators create randomized content for development testing.
         {!currentWorldId && ' Select a world to enable character generation.'}
       </p>
+      
+      <div className="text-xs text-gray-500 bg-gray-800 p-2 rounded">
+        <strong>Troubleshooting:</strong>
+        <ul className="list-disc list-inside mt-1 space-y-1">
+          <li>If form isn't pre-filled, try the debug page at <code>/dev/test-character-form</code></li>
+          <li>Check browser console for <code>[TestDataGenerator]</code> and <code>[CharacterCreationWizard]</code> logs</li>
+          <li>Clear cache and hard refresh if needed (Cmd+Shift+R)</li>
+        </ul>
+      </div>
     </div>
   );
 };

@@ -34,6 +34,9 @@ export default function DevPage() {
         <Link href="/dev/character-creation" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           Character Creation Wizard Test Harness
         </Link>
+        <Link href="/dev/test-character-form" className="block p-4 bg-green-100 hover:bg-green-200 rounded">
+          Character Form Debug (Test Data Pre-fill)
+        </Link>
       </div>
     </div>
   );
