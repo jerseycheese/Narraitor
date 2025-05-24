@@ -3,14 +3,10 @@ import WorldEditor from './WorldEditor';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import { fn } from '@storybook/test';
 
 // Mock the Next.js router
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: mockPush,
-  }),
-}));
+const mockPush = fn();
 
 // Mock world data
 const mockWorld: World = {
@@ -64,23 +60,7 @@ const mockWorld: World = {
   },
 };
 
-// Mock the worldStore
-jest.mock('@/state/worldStore', () => ({
-  worldStore: {
-    getState: () => ({
-      worlds: {
-        'world-123': mockWorld,
-        'world-456': {
-          ...mockWorld,
-          id: 'world-456',
-          name: 'Sci-Fi Universe',
-          theme: 'Space Opera',
-        },
-      },
-      updateWorld: jest.fn(),
-    }),
-  },
-}));
+// We'll mock the worldStore in the decorators instead
 
 const meta: Meta<typeof WorldEditor> = {
   title: 'Narraitor/World/Edit/WorldEditor',
@@ -92,7 +72,39 @@ const meta: Meta<typeof WorldEditor> = {
         component: 'Complete world editor with forms for all world aspects and save/cancel functionality',
       },
     },
+    nextjs: {
+      navigation: {
+        push: mockPush,
+      },
+    },
   },
+  decorators: [
+    (Story) => {
+      // Mock the worldStore for all stories
+      const originalGetState = worldStore.getState;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (worldStore as any).getState = () => ({
+        worlds: {
+          'world-123': mockWorld,
+          'world-456': {
+            ...mockWorld,
+            id: 'world-456',
+            name: 'Sci-Fi Universe',
+            theme: 'Space Opera',
+          },
+        },
+        updateWorld: fn(),
+      });
+      
+      const result = <Story />;
+      
+      // Restore original
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (worldStore as any).getState = originalGetState;
+      
+      return result;
+    },
+  ],
   tags: ['autodocs'],
 };
 
@@ -125,22 +137,22 @@ export const NonExistentWorld: Story = {
         currentWorldId: null,
         error: null,
         loading: false,
-        createWorld: jest.fn(),
-        updateWorld: jest.fn(),
-        deleteWorld: jest.fn(),
-        setCurrentWorld: jest.fn(),
-        fetchWorlds: jest.fn(),
-        addAttribute: jest.fn(),
-        updateAttribute: jest.fn(),
-        removeAttribute: jest.fn(),
-        addSkill: jest.fn(),
-        updateSkill: jest.fn(),
-        removeSkill: jest.fn(),
-        updateSettings: jest.fn(),
-        reset: jest.fn(),
-        setError: jest.fn(),
-        clearError: jest.fn(),
-        setLoading: jest.fn(),
+        createWorld: fn(),
+        updateWorld: fn(),
+        deleteWorld: fn(),
+        setCurrentWorld: fn(),
+        fetchWorlds: fn(),
+        addAttribute: fn(),
+        updateAttribute: fn(),
+        removeAttribute: fn(),
+        addSkill: fn(),
+        updateSkill: fn(),
+        removeSkill: fn(),
+        updateSettings: fn(),
+        reset: fn(),
+        setError: fn(),
+        clearError: fn(),
+        setLoading: fn(),
       });
       
       const result = <Story />;
