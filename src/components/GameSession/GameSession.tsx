@@ -10,7 +10,7 @@ import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
 import GameSessionActiveWithNarrative from './GameSessionActiveWithNarrative';
-import ErrorMessage from '@/lib/components/ErrorMessage';
+import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 
 interface GameSessionProps {
   worldId: string;
@@ -180,9 +180,13 @@ const GameSession: React.FC<GameSessionProps> = ({
   if (!worldExists) {
     return (
       <div data-testid="game-session-error-container">
-        <ErrorMessage 
-          error={new Error('World not found')}
+        <SectionError 
+          title="World Not Found"
+          message="The world you're trying to access doesn't exist or has been deleted."
+          severity="error"
+          showRetry
           onRetry={handleRetry}
+          showDismiss
           onDismiss={handleDismissError}
         />
       </div>
