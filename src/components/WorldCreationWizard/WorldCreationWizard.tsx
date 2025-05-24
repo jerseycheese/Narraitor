@@ -47,6 +47,7 @@ export default function WorldCreationWizard({
     },
     aiSuggestions: initialData?.aiSuggestions,
     selectedTemplateId: initialData?.selectedTemplateId || null,
+    createOwnWorld: initialData?.createOwnWorld || false,
     errors: {},
     isProcessing: false,
   });
@@ -54,7 +55,7 @@ export default function WorldCreationWizard({
   const canProceedToNext = (): boolean => {
     switch (wizardState.currentStep) {
       case 0:
-        return wizardState.selectedTemplateId !== null;
+        return wizardState.selectedTemplateId !== null || wizardState.createOwnWorld === true;
       case 1:
         return !!(wizardState.worldData.name && wizardState.worldData.theme);
       case 2:

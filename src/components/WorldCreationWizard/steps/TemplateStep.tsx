@@ -7,7 +7,7 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: { selectedTemplateId: string | null }) => void;
+  onUpdate: (updates: { selectedTemplateId?: string | null; createOwnWorld?: boolean }) => void;
   errors: Record<string, string>;
   onComplete: () => void;
   onCancel?: () => void;
@@ -24,7 +24,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   
   // Handler for template selection
   const handleSelectTemplate = (templateId: string) => {
-    onUpdate({ selectedTemplateId: templateId });
+    onUpdate({ selectedTemplateId: templateId, createOwnWorld: false });
   };
   
   // Handler for proceeding with template
@@ -56,9 +56,9 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
     console.log('handleCreateOwnWorld called');
-    // Clear any selected template
-    onUpdate({ selectedTemplateId: null });
-    console.log('selectedTemplateId set to null');
+    // Clear any selected template and set createOwnWorld flag
+    onUpdate({ selectedTemplateId: null, createOwnWorld: true });
+    console.log('selectedTemplateId set to null, createOwnWorld set to true');
     // Proceed to next step without applying a template
     console.log('calling onComplete');
     onComplete();
