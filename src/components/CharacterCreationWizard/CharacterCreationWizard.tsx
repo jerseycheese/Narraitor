@@ -91,18 +91,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const [state, setState] = useState<CharacterCreationState>(() => {
     console.log('[CharacterCreationWizard] Initializing state. Auto-save data:', data);
     
-    // First check sessionStorage directly as a fallback
-    const storageKey = `character-creation-${worldId}`;
-    const directData = sessionStorage.getItem(storageKey);
-    if (directData) {
-      try {
-        const parsed = JSON.parse(directData);
-        console.log('[CharacterCreationWizard] Found data directly in sessionStorage:', parsed);
-        return parsed;
-      } catch (e) {
-        console.error('[CharacterCreationWizard] Error parsing direct sessionStorage data:', e);
-      }
-    }
+    // Don't access sessionStorage during initial render to avoid hydration issues
+    // The auto-save hook will handle this
     
     if (data) {
       console.log('[CharacterCreationWizard] Using auto-saved data');
@@ -343,11 +333,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
     });
 
+    // Set as current character
+    const { setCurrentCharacter } = characterStore();
+    setCurrentCharacter(characterId);
     // Clear auto-save
     clearAutoSave();
 
-    // Navigate to character detail
-    router.push(`/characters/${characterId}`);
+    // Navigate to game session with the world
+    router.push(`/world/${worldId}/play`);
   }, [state, worldId, createCharacter, clearAutoSave, router, validateStep]);
 
   if (!world) {

@@ -32,9 +32,10 @@ export interface SessionStore {
   playerChoices: PlayerChoice[];
   error: string | null;
   worldId: EntityID | null;
+  characterId: EntityID | null;
   
   // Actions
-  initializeSession: (worldId: EntityID, onComplete?: () => void) => Promise<void>;
+  initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
   endSession: () => void;
   setStatus: (status: GameSessionState['status']) => void;
   setError: (error: string | null) => void;
@@ -45,4 +46,5 @@ export interface SessionStore {
   pauseSession: () => void;
   resumeSession: () => void;
   setSessionId: (id: string) => void;
+  setCharacterId: (characterId: EntityID) => void;
 }

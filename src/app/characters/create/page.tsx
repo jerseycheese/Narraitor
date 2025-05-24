@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
@@ -8,6 +8,14 @@ import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 export default function CharacterCreatePage() {
   const router = useRouter();
   const { currentWorldId } = worldStore();
+  
+  // Clear any existing auto-save data when starting a new character
+  useEffect(() => {
+    if (currentWorldId) {
+      const saveKey = `character-creation-${currentWorldId}`;
+      sessionStorage.removeItem(saveKey);
+    }
+  }, [currentWorldId]);
 
   if (!currentWorldId) {
     return (
@@ -44,7 +52,11 @@ export default function CharacterCreatePage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Create New Character</h1>
         <div className="bg-white rounded-lg shadow p-8">
-          <CharacterCreationWizard worldId={currentWorldId} />
+          <CharacterCreationWizard 
+            key={`new-character-${currentWorldId}`} 
+            worldId={currentWorldId} 
+            initialStep={0} 
+          />
         </div>
       </div>
     </div>

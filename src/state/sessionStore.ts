@@ -17,6 +17,7 @@ const initialState = {
   playerChoices: [],
   error: null,
   worldId: null,
+  characterId: null,
 };
 
 /**
@@ -26,11 +27,11 @@ export const sessionStore = create<SessionStore>((set, get) => ({
   ...initialState,
 
   // Initialize a new game session
-  initializeSession: async (worldId, onComplete) => {
-    logger.debug('Initializing session for worldId:', worldId);
+  initializeSession: async (worldId, characterId, onComplete) => {
+    logger.debug('Initializing session for worldId:', worldId, 'characterId:', characterId);
     set(state => {
       logger.debug('Setting loading state from:', state);
-      return { status: 'loading', worldId, error: null };
+      return { status: 'loading', worldId, characterId, error: null };
     });
     
     try {
@@ -127,5 +128,11 @@ export const sessionStore = create<SessionStore>((set, get) => ({
   setSessionId: (id) => {
     logger.debug('Setting session ID:', id);
     set({ id });
+  },
+  
+  // Set character ID
+  setCharacterId: (characterId: string) => {
+    logger.debug('Setting character ID:', characterId);
+    set({ characterId });
   },
 }));

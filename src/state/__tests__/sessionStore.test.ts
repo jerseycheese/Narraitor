@@ -14,6 +14,7 @@ describe('sessionStore', () => {
       playerChoices: [],
       error: null,
       worldId: null,
+      characterId: null,
     });
     
     const state = sessionStore.getState();
@@ -23,21 +24,24 @@ describe('sessionStore', () => {
       playerChoices: [],
       error: null,
       worldId: null,
+      characterId: null,
     });
   });
 
   it('initializes a session with the given worldId', async () => {
     // Arrange
     const worldId = 'test-world-id';
+    const characterId = 'test-character-id';
     const onComplete = jest.fn();
     
     // Act
-    await sessionStore.getState().initializeSession(worldId, onComplete);
+    await sessionStore.getState().initializeSession(worldId, characterId, onComplete);
     
     // Assert - after initialization
     const state = sessionStore.getState();
     expect(state.status).toBe('active');
     expect(state.worldId).toBe(worldId);
+    expect(state.characterId).toBe(characterId);
     expect(state.currentSceneId).toBe('initial-scene');
     expect(state.playerChoices).toHaveLength(0); // Empty initially - populated by AI choice generator
     expect(onComplete).toHaveBeenCalled();
@@ -46,7 +50,8 @@ describe('sessionStore', () => {
   it('allows ending a session', async () => {
     // Arrange - initialize a session first
     const worldId = 'test-world-id';
-    await sessionStore.getState().initializeSession(worldId);
+    const characterId = 'test-character-id';
+    await sessionStore.getState().initializeSession(worldId, characterId);
     
     // Act - end the session
     sessionStore.getState().endSession();
@@ -55,6 +60,7 @@ describe('sessionStore', () => {
     const state = sessionStore.getState();
     expect(state.status).toBe('initializing');
     expect(state.worldId).toBe(null);
+    expect(state.characterId).toBe(null);
     expect(state.currentSceneId).toBe(null);
     expect(state.playerChoices).toHaveLength(0);
   });
@@ -105,7 +111,7 @@ describe('sessionStore', () => {
 
   it('allows selecting a player choice', async () => {
     // Arrange - initialize a session and set up player choices
-    await sessionStore.getState().initializeSession('test-world-id');
+    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     const testChoices = [
       { id: 'choice-1', text: 'Option 1', isSelected: false },
@@ -132,7 +138,7 @@ describe('sessionStore', () => {
 
   it('allows clearing player choices', async () => {
     // Arrange - initialize a session first to get default choices
-    await sessionStore.getState().initializeSession('test-world-id');
+    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     // Act - clear the choices
     sessionStore.getState().clearPlayerChoices();
@@ -155,7 +161,7 @@ describe('sessionStore', () => {
 
   it('allows pausing and resuming a session', async () => {
     // Arrange - initialize a session first
-    await sessionStore.getState().initializeSession('test-world-id');
+    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     // Act - pause the session
     sessionStore.getState().pauseSession();
