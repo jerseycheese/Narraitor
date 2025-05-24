@@ -251,19 +251,6 @@ export default function WorldCreationWizard({
           <DescriptionStep
             {...stepProps}
             isProcessing={wizardState.isProcessing}
-            setAISuggestions={(suggestions) => 
-              setWizardState(prev => ({ ...prev, aiSuggestions: suggestions }))
-            }
-            setProcessing={(isProcessing) => 
-              setWizardState(prev => ({ ...prev, isProcessing }))
-            }
-            setError={(field, error) => 
-              setWizardState(prev => ({ 
-                ...prev, 
-                errors: { ...prev.errors, [field]: error } 
-              }))
-            }
-            onComplete={handleNext}
           />
         );
       case 3:

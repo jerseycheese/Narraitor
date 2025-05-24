@@ -28,7 +28,7 @@ export default function AttributeReviewStep({
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
         return {
           ...suggestion,
-          accepted: !!existingAttr,
+          accepted: true, // Always default to true
           showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
           baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
         };
@@ -49,8 +49,8 @@ export default function AttributeReviewStep({
     if (suggestions.length > 0) {
       setLocalSuggestions(suggestions.map(suggestion => {
         const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
-        // If attribute exists in worldData, use its acceptance state, otherwise default to true
-        const accepted = existingAttr ? true : (suggestion.accepted ?? true);
+        // Always default to true (all attributes selected by default)
+        const accepted = true;
         // For the first attribute, show details by default to give user a clue
         return {
           ...suggestion,
