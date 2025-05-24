@@ -73,22 +73,47 @@ export const AllVariants: Story = {
             severity="error"
             showRetry
             showDismiss
-            {...args}
+            onRetry={args.onRetry}
+            onDismiss={args.onDismiss}
           />
           <SectionError
             title="Limited Features"
             message="Some features are unavailable in offline mode."
             severity="warning"
             showDismiss
-            {...args}
+            onDismiss={args.onDismiss}
           />
           <SectionError
             title="Tip"
             message="You can use AI suggestions to help create your world."
             severity="info"
             showDismiss
-            {...args}
+            onDismiss={args.onDismiss}
           />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Page & Toast Examples</h3>
+        <div className="space-y-4">
+          <div className="border rounded-lg">
+            <PageError
+              title="World Not Found"
+              message="The world you're looking for doesn't exist or has been deleted."
+              severity="error"
+              showRetry
+              onRetry={args.onRetry}
+            />
+          </div>
+          <div className="relative h-32 border rounded-lg">
+            <ToastError
+              title="Save Failed"
+              message="Unable to save your changes."
+              severity="error"
+              showDismiss
+              onDismiss={args.onDismiss}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -136,49 +161,6 @@ export const FormValidation: Story = {
   ),
 };
 
-// Page error example
-export const PageErrors: Story = {
-  render: (args) => (
-    <div className="grid grid-cols-1 gap-8">
-      <div className="border rounded-lg">
-        <PageError
-          title="World Not Found"
-          message="The world you're looking for doesn't exist or has been deleted."
-          severity="error"
-          showRetry
-          {...args}
-        />
-      </div>
-      <div className="border rounded-lg">
-        <PageError
-          title="Connection Lost"
-          message="Your internet connection appears to be offline."
-          severity="warning"
-          showRetry
-          showDismiss
-          {...args}
-        />
-      </div>
-    </div>
-  ),
-};
-
-// Toast notifications
-export const ToastNotifications: Story = {
-  render: (args) => (
-    <div className="relative h-96">
-      <p className="text-gray-600 mb-4">Toast notifications appear in the bottom-right corner:</p>
-      <ToastError
-        title="Save Failed"
-        message="Unable to save your changes. Please try again."
-        severity="error"
-        showDismiss
-        {...args}
-      />
-    </div>
-  ),
-};
-
 // Interactive playground
 export const Playground: Story = {
   args: {
@@ -189,45 +171,4 @@ export const Playground: Story = {
     showRetry: true,
     showDismiss: true,
   },
-};
-
-// Real-world examples
-export const RealWorldExamples: Story = {
-  render: (args) => (
-    <div className="space-y-8">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">AI Service Error</h3>
-        <SectionError
-          title="AI Service Unavailable"
-          message="The AI suggestion service is temporarily unavailable. You can still create your world manually."
-          severity="warning"
-          showRetry
-          {...args}
-        />
-      </div>
-      
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Loading Error</h3>
-        <SectionError
-          title="Failed to Load Worlds"
-          message="There was an error loading your worlds. Please refresh the page or try again later."
-          severity="error"
-          showRetry
-          showDismiss
-          {...args}
-        />
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Save Success with Warning</h3>
-        <SectionError
-          title="World Saved with Warnings"
-          message="Your world was saved, but some attributes may need adjustment for game balance."
-          severity="warning"
-          showDismiss
-          {...args}
-        />
-      </div>
-    </div>
-  ),
 };
