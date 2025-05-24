@@ -15,6 +15,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
 
+// TODO: Enable these tests after updating them to match the new shared wizard implementation
 describe.skip('CharacterCreationWizard', () => {
   const mockPush = jest.fn();
   const mockWorld = {

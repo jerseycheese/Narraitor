@@ -4,12 +4,12 @@ const nextConfig: NextConfig = {
   // App Router is enabled by default in Next.js 13+
   // No specific configuration needed for basic App Router usage
   
-  // Disable ESLint and TypeScript checks during build for now due to refactoring in progress
+  // ESLint and TypeScript checks are enabled
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
   // Optional: You can add experimental features if needed

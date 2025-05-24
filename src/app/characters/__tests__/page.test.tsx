@@ -14,6 +14,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/characterStore');
 jest.mock('@/state/worldStore');
 
+// TODO: Update these tests to match the current implementation
 describe.skip('CharactersPage', () => {
   const mockPush = jest.fn();
   const mockCharacters = {
@@ -141,7 +142,7 @@ describe.skip('CharactersPage', () => {
     render(<CharactersPage />);
     
     expect(screen.getByText(/no characters yet/i)).toBeInTheDocument();
-    expect(screen.getByText(/create your first character/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/create your first character/i)).toHaveLength(2);
   });
 
   it('shows message when no world is selected', () => {

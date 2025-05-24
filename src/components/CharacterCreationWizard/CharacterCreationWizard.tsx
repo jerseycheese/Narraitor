@@ -31,6 +31,7 @@ interface CharacterCreationState {
     attributes: Array<{
       attributeId: EntityID;
       name: string;
+      description?: string;
       value: number;
       minValue: number;
       maxValue: number;
@@ -83,10 +84,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { createCharacter } = characterStore();
   const world = worlds[worldId];
   
-  // Debug logging for Storybook
-  if (typeof window !== 'undefined' && window.location.href.includes('storybook')) {
-    // World validation is handled below
-  }
   
   const { data, setData, handleFieldBlur, clearAutoSave } = useCharacterCreationAutoSave(worldId);
   
@@ -129,8 +126,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       pointPools: {
         attributes: {
           total: world?.settings.attributePointPool || 0,
-          spent: world?.attributes.length * (world?.attributes[0]?.minValue || 1) || 0,
-          remaining: (world?.settings.attributePointPool || 0) - (world?.attributes.length * (world?.attributes[0]?.minValue || 1) || 0),
+          spent: world?.attributes?.reduce((sum, attr) => sum + (attr.minValue || 0), 0) || 0,
+          remaining: (world?.settings.attributePointPool || 0) - (world?.attributes?.reduce((sum, attr) => sum + (attr.minValue || 0), 0) || 0),
         },
         skills: {
           total: world?.settings.skillPointPool || 0,
@@ -307,7 +304,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           level: skill.level,
         })),
       background: {
-        description: state.characterData.description,
+        history: state.characterData.background.history,
         personality: state.characterData.background.personality,
         motivation: state.characterData.background.motivation,
       },
