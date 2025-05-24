@@ -5,7 +5,7 @@ import {
 } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof SkillDifficulty> = {
-  title: 'Narraitor/UI/SkillDifficulty',
+  title: 'Narraitor/UI/Controls/SkillDifficulty',
   component: SkillDifficulty,
   parameters: {
     layout: 'centered',

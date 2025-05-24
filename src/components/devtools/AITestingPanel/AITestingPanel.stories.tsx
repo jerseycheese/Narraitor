@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { AITestingPanel } from './AITestingPanel';
 
 const meta: Meta<typeof AITestingPanel> = {
-  title: 'DevTools/AITestingPanel',
+  title: 'Narraitor/DevTools/Panels/AITestingPanel',
   component: AITestingPanel,
   parameters: {
     layout: 'padded',

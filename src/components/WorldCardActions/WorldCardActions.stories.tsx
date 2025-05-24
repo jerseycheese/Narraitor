@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import WorldCardActions from './WorldCardActions';
 
 const meta = {
-  title: 'Narraitor/World/WorldCardActions',
+  title: 'Narraitor/World/Display/WorldCardActions',
   component: WorldCardActions,
   parameters: {
     layout: 'centered',

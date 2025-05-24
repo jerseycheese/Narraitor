@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import TemplateSelector from './TemplateSelector';
 
 const meta: Meta<typeof TemplateSelector> = {
-  title: 'Narraitor/World/TemplateSelector',
+  title: 'Narraitor/World/Creation/TemplateSelector',
   component: TemplateSelector,
   parameters: {
     layout: 'centered',

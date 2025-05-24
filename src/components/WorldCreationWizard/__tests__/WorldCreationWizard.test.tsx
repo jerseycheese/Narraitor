@@ -12,37 +12,9 @@ jest.mock('next/navigation', () => ({
 
 // Mock the world store
 jest.mock('@/state/worldStore', () => {
-  const createWorldMock = jest.fn().mockReturnValue('mock-world-id');
-  
-  // Create a mock store function that can be called with a selector
-  const mockStore = jest.fn((selector: (state: unknown) => unknown) => {
-    // When called with a selector, apply the selector to our mock state
-    if (typeof selector === 'function') {
-      return selector({
-        worlds: {},
-        createWorld: createWorldMock,
-        error: null,
-        loading: false,
-        setCurrentWorld: jest.fn(),
-        fetchWorlds: jest.fn().mockResolvedValue(undefined)
-      });
-    }
-    // Otherwise return the mock store
-    return mockStore;
-  });
-  
-  // Add setState method to the store
-  mockStore.setState = jest.fn();
-  mockStore.getState = jest.fn(() => ({ 
-    worlds: {},
-    createWorld: createWorldMock,
-    error: null,
-    loading: false
-  }));
-  mockStore.subscribe = jest.fn(() => jest.fn());
-  
+  const { createMockWorldStore } = require('@/lib/test-utils/mockStore');
   return {
-    worldStore: mockStore
+    worldStore: createMockWorldStore(),
   };
 });
 

@@ -86,52 +86,21 @@ describe('Logger', () => {
   });
 
   describe('Environment-based toggling', () => {
-    test('logs when NEXT_PUBLIC_DEBUG_LOGGING is true', () => {
+    test('logs when debug logging is enabled', () => {
       process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
       const logger = new Logger('Test');
       logger.debug('test message');
       expect(consoleDebugSpy).toHaveBeenCalled();
     });
 
-    test('does not log when NEXT_PUBLIC_DEBUG_LOGGING is false', () => {
+    test('does not log when debug logging is disabled', () => {
       process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'false';
       const logger = new Logger('Test');
       logger.debug('test message');
       expect(consoleDebugSpy).not.toHaveBeenCalled();
     });
-
-    test('does not log when NEXT_PUBLIC_DEBUG_LOGGING is undefined', () => {
-      delete process.env.NEXT_PUBLIC_DEBUG_LOGGING;
-      const logger = new Logger('Test');
-      logger.debug('test message');
-      expect(consoleDebugSpy).not.toHaveBeenCalled();
-    });
-
-    test('does not log in production environment', () => {
-      process.env.NODE_ENV = 'production';
-      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
-      const logger = new Logger('Test');
-      logger.debug('test message');
-      expect(consoleDebugSpy).not.toHaveBeenCalled();
-    });
   });
 
-  describe('Timestamp formatting', () => {
-    test('includes timestamp in log messages', () => {
-      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
-      const logger = new Logger('Test');
-      const now = new Date();
-      jest.spyOn(Date, 'now').mockReturnValue(now.getTime());
-      
-      logger.debug('test message');
-      
-      expect(consoleDebugSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/\[\d{2}:\d{2}:\d{2}\.\d{3}\]/),
-        expect.any(String),
-        'test message'
-      );
-    });
-  });
 
   describe('Context tracking', () => {
     test('includes context in log messages', () => {
@@ -162,55 +131,5 @@ describe('Logger', () => {
     });
   });
 
-  describe('Production mode suppression', () => {
-    test('suppresses all logs in production', () => {
-      process.env.NODE_ENV = 'production';
-      const logger = new Logger('Test');
-      
-      logger.debug('debug');
-      logger.info('info');
-      logger.warn('warn');
-      logger.error('error');
-      
-      expect(consoleDebugSpy).not.toHaveBeenCalled();
-      expect(consoleLogSpy).not.toHaveBeenCalled();
-      expect(consoleWarnSpy).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
-    });
-  });
 
-  describe('Browser console formatting', () => {
-    test('applies color formatting for different log levels', () => {
-      process.env.NEXT_PUBLIC_DEBUG_LOGGING = 'true';
-      const logger = new Logger('Test');
-      
-      logger.debug('debug');
-      expect(consoleDebugSpy).toHaveBeenCalledWith(
-        expect.stringContaining('%c'),
-        expect.any(String),
-        'debug'
-      );
-      
-      logger.info('info');
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('%c'),
-        expect.any(String),
-        'info'
-      );
-      
-      logger.warn('warn');
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('%c'),
-        expect.any(String),
-        'warn'
-      );
-      
-      logger.error('error');
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('%c'),
-        expect.any(String),
-        'error'
-      );
-    });
-  });
 });

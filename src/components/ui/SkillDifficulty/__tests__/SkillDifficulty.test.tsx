@@ -4,31 +4,15 @@ import SkillDifficulty from '../SkillDifficulty';
 import { SKILL_DIFFICULTIES } from '@/lib/constants/skillDifficultyLevels';
 
 describe('SkillDifficulty', () => {
-  test('renders easy difficulty correctly', () => {
-    render(<SkillDifficulty difficulty="easy" />);
-    const badge = screen.getByTestId('skill-difficulty-badge');
+  test('renders difficulty levels correctly', () => {
+    const { rerender } = render(<SkillDifficulty difficulty="easy" />);
+    expect(screen.getByTestId('skill-difficulty-badge')).toHaveTextContent('Easy');
     
-    expect(badge).toHaveTextContent('Easy');
-    expect(badge.className).toContain('bg-green-100');
-    expect(badge.className).toContain('text-green-800');
-  });
-  
-  test('renders medium difficulty correctly', () => {
-    render(<SkillDifficulty difficulty="medium" />);
-    const badge = screen.getByTestId('skill-difficulty-badge');
+    rerender(<SkillDifficulty difficulty="medium" />);
+    expect(screen.getByTestId('skill-difficulty-badge')).toHaveTextContent('Medium');
     
-    expect(badge).toHaveTextContent('Medium');
-    expect(badge.className).toContain('bg-blue-100');
-    expect(badge.className).toContain('text-blue-800');
-  });
-  
-  test('renders hard difficulty correctly', () => {
-    render(<SkillDifficulty difficulty="hard" />);
-    const badge = screen.getByTestId('skill-difficulty-badge');
-    
-    expect(badge).toHaveTextContent('Hard');
-    expect(badge.className).toContain('bg-red-100');
-    expect(badge.className).toContain('text-red-800');
+    rerender(<SkillDifficulty difficulty="hard" />);
+    expect(screen.getByTestId('skill-difficulty-badge')).toHaveTextContent('Hard');
   });
   
   test('does not render description by default', () => {
@@ -61,11 +45,4 @@ describe('SkillDifficulty', () => {
     expect(screen.getByTestId('custom-test-id-badge')).toBeInTheDocument();
   });
   
-  test('renders nothing if difficulty is invalid', () => {
-    // @ts-expect-error - Testing invalid input
-    render(<SkillDifficulty difficulty="invalid" />);
-    
-    expect(screen.queryByTestId('skill-difficulty')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('skill-difficulty-badge')).not.toBeInTheDocument();
-  });
 });

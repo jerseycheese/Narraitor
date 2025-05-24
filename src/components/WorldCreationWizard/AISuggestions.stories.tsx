@@ -4,7 +4,7 @@ import { AttributeSuggestion, SkillSuggestion } from './WizardState';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof AISuggestions> = {
-  title: 'Narraitor/World/AISuggestions',
+  title: 'Narraitor/World/Creation/AISuggestions',
   component: AISuggestions,
   parameters: {
     layout: 'padded',

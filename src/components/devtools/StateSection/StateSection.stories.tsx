@@ -63,7 +63,7 @@ const MockStateSection = () => {
 };
 
 const meta = {
-  title: 'Narraitor/DevTools/StateSection',
+  title: 'Narraitor/DevTools/Components/StateSection',
   component: MockStateSection,
   parameters: {
     layout: 'centered',

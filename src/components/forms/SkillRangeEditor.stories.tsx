@@ -4,7 +4,7 @@ import { WorldSkill } from '@/types/world.types';
 import { MIN_SKILL_VALUE as SKILL_MIN_VALUE, MAX_SKILL_VALUE as SKILL_MAX_VALUE } from '@/lib/constants/skillLevelDescriptions';
 
 const meta: Meta<typeof SkillRangeEditor> = {
-  title: 'Narraitor/Forms/SkillRangeEditor',
+  title: 'Narraitor/UI/Forms/SkillRangeEditor',
   component: SkillRangeEditor,
   parameters: {
     layout: 'centered',

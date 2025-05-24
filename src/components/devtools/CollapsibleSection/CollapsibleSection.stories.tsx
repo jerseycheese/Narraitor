@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CollapsibleSection } from './CollapsibleSection';
 
 const meta: Meta<typeof CollapsibleSection> = {
-  title: 'Narraitor/DevTools/CollapsibleSection',
+  title: 'Narraitor/DevTools/Components/CollapsibleSection',
   component: CollapsibleSection,
   parameters: {
     layout: 'centered',

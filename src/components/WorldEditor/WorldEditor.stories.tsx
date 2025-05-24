@@ -83,7 +83,7 @@ jest.mock('@/state/worldStore', () => ({
 }));
 
 const meta: Meta<typeof WorldEditor> = {
-  title: 'Narraitor/World/Editor/WorldEditor',
+  title: 'Narraitor/World/Edit/WorldEditor',
   component: WorldEditor,
   parameters: {
     layout: 'fullscreen',

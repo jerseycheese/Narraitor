@@ -3,7 +3,7 @@ import GameSessionActive from './GameSessionActive';
 import { World } from '@/types/world.types';
 
 const meta: Meta<typeof GameSessionActive> = {
-  title: 'Narraitor/Game/GameSessionActive',
+  title: 'Narraitor/Game/Session/GameSessionActive',
   component: GameSessionActive,
   parameters: {
     layout: 'padded',

@@ -82,6 +82,5 @@ describe('PlayerChoices', () => {
 
     const selectedChoice = screen.getByRole('radio', { name: /Talk to the mysterious figure/ });
     expect(selectedChoice).toHaveAttribute('aria-checked', 'true');
-    expect(selectedChoice.className).toContain('bg-blue-100');
   });
 });

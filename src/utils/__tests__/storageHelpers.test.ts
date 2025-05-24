@@ -190,7 +190,7 @@ describe('storageHelpers', () => {
     });
 
     test('should handle partial clearing on error', async () => {
-      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
       
       // Mock first deletion success, second failure
       let callCount = 0;

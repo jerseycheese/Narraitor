@@ -57,7 +57,7 @@ const mockWorlds: World[] = [
 ];
 
 const meta: Meta<typeof WorldListScreen> = {
-  title: 'Narraitor/World/WorldListScreen',
+  title: 'Narraitor/World/Display/WorldListScreen',
   component: WorldListScreen,
   parameters: {
     layout: 'padded',

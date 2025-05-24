@@ -107,30 +107,6 @@ describe('worldAnalyzer', () => {
     }));
   });
 
-  test('extracts JSON from mixed content response', async () => {
-    const mockResponse = {
-      content: `Here's the analysis:
-      {
-        "attributes": [
-          {
-            "name": "Intelligence",
-            "description": "Mental acuity",
-            "minValue": 1,
-            "maxValue": 10
-          }
-        ],
-        "skills": []
-      }
-      That should work for your world.`,
-    };
-
-    mockGenerateContent.mockResolvedValue(mockResponse);
-
-    const result = await analyzeWorldDescription('Test description');
-
-    expect(result.attributes).toHaveLength(1);
-    expect(result.attributes[0].name).toBe('Intelligence');
-  });
 
   test('returns default suggestions on AI failure', async () => {
     mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));

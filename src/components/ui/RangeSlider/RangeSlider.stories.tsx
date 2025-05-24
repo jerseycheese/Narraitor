@@ -2,7 +2,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import RangeSlider, { LevelDescription } from './RangeSlider';
 
 const meta: Meta<typeof RangeSlider> = {
-  title: 'Narraitor/UI/RangeSlider',
+  title: 'Narraitor/UI/Controls/RangeSlider',
   component: RangeSlider,
   parameters: {
     layout: 'centered',

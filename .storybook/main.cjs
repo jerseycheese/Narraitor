@@ -1,9 +1,9 @@
 /**
  * Storybook Configuration for Narraitor
  */
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+const config = {
   stories: [
     // Include all stories from the project
     '../src/**/*.stories.@(js|jsx|ts|tsx)'
@@ -26,3 +26,5 @@ module.exports = {
     return config;
   }
 };
+
+export default config;

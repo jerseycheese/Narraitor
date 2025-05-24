@@ -52,7 +52,7 @@ const mockSkills: WorldSkill[] = [
 ];
 
 const meta: Meta<typeof WorldSkillsForm> = {
-  title: 'Narraitor/Forms/WorldSkillsForm',
+  title: 'Narraitor/UI/Forms/WorldSkillsForm',
   component: WorldSkillsForm,
   parameters: {
     layout: 'padded',

@@ -5,7 +5,7 @@ import AttributeRangeEditor from './AttributeRangeEditor';
 import { WorldAttribute } from '@/types/world.types';
 
 const meta: Meta<typeof AttributeRangeEditor> = {
-  title: 'Narraitor/Forms/AttributeRangeEditor',
+  title: 'Narraitor/UI/Forms/AttributeRangeEditor',
   component: AttributeRangeEditor,
   parameters: {
     layout: 'centered',

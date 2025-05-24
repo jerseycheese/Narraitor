@@ -3,7 +3,7 @@ import PlayerChoiceSelector from './PlayerChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 
 const meta: Meta<typeof PlayerChoiceSelector> = {
-  title: 'Narraitor/Narrative/PlayerChoiceSelector',
+  title: 'Narraitor/Narrative/Input/PlayerChoiceSelector',
   component: PlayerChoiceSelector,
   parameters: {
     layout: 'centered',

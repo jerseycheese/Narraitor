@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import ErrorMessage from '../lib/components/ErrorMessage';
+import ErrorMessage from './ErrorMessage';
 
 const meta: Meta<typeof ErrorMessage> = {
-  title: 'Narraitor/Components/ErrorMessage',
+  title: 'Narraitor/UI/Feedback/ErrorMessage',
   component: ErrorMessage,
   parameters: {
     layout: 'centered',

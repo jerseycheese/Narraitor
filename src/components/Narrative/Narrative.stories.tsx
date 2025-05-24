@@ -5,7 +5,7 @@ import { NarrativeSegment } from '@/types/narrative.types';
 // NarrativeController and NarrativeDisplay are imported in docstrings but not directly used in this file
 
 const meta = {
-  title: 'Narraitor/Narrative',
+  title: 'Narraitor/Narrative/Display/Narrative',
   parameters: {
     layout: 'fullscreen',
     docs: {
