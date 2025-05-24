@@ -104,8 +104,8 @@ export default function CharactersPage() {
             <div className="mt-6 text-sm text-gray-500">
               <p>Each character starts with:</p>
               <ul className="mt-2 space-y-1">
-                <li>• Custom attributes based on {currentWorld.name}'s rules</li>
-                <li>• Unique skills from your world's skill system</li>
+                <li>• Custom attributes based on {currentWorld.name}&apos;s rules</li>
+                <li>• Unique skills from your world&apos;s skill system</li>
                 <li>• A rich backstory and personality</li>
               </ul>
             </div>
