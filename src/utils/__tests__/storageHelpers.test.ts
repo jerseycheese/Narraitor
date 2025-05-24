@@ -21,14 +21,14 @@ describe('storageHelpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Define types for the global object
-    (global as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
-    (global as { DOMException?: typeof MockDOMException }).DOMException = MockDOMException;
+    (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
+    (global as unknown as { DOMException?: typeof MockDOMException }).DOMException = MockDOMException;
   });
 
   afterEach(() => {
     // Use properly typed global object
-    delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
-    delete (global as { DOMException?: typeof MockDOMException }).DOMException;
+    delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+    delete (global as unknown as { DOMException?: typeof MockDOMException }).DOMException;
   });
 
   describe('isStorageAvailable', () => {
@@ -58,7 +58,7 @@ describe('storageHelpers', () => {
 
     test('should detect when IndexedDB is unavailable', async () => {
       // Use properly typed global object
-      delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+      delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
       const result = await isStorageAvailable();
       
@@ -226,7 +226,7 @@ describe('storageHelpers', () => {
 
     test('should handle missing IndexedDB gracefully', async () => {
       // Use properly typed global object
-      delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+      delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
       // Should not throw, just return
       await expect(clearAllStoredData()).resolves.toBeUndefined();
