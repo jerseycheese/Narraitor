@@ -81,7 +81,7 @@ const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
 };
 
 const meta: Meta<typeof WorldCard> = {
-  title: 'Narraitor/World/WorldCard',
+  title: 'Narraitor/World/Display/WorldCard',
   component: WorldCard,
   render: (args) => <WorldCardWrapper {...args} />,
   parameters: {

@@ -1,29 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldCard from '../WorldCard';
-import { World } from '../../../types/world.types';
-
-// No need to mock dependencies anymore
-// We'll pass them directly to the component
-
-const mockWorld: World = {
-  id: '1',
-  name: 'Test World',
-  description: 'This is a test world.', // Ensure description is always a string
-  theme: 'Fantasy',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 10,
-    maxSkills: 10,
-    attributePointPool: 100,
-    skillPointPool: 100,
-  },
-  createdAt: '2023-01-01T10:00:00Z',
-  updatedAt: '2023-01-01T10:00:00Z',
-};
+import { createMockWorld } from '@/lib/test-utils/testDataFactory';
 
 describe('WorldCard', () => {
+  const mockWorld = createMockWorld({
+    name: 'Fantasy Realm',
+    description: 'A magical world of adventure',
+    theme: 'High Fantasy',
+  });
+
   // Test case for displaying world data (updated to address all acceptance criteria)
   test('displays all required world information', () => {
     render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
@@ -62,11 +48,10 @@ describe('WorldCard', () => {
   
   // Test case for edge cases in data display
   test('handles missing or incomplete data gracefully', () => {
-    const incompleteWorld: World = {
-      ...mockWorld,
+    const incompleteWorld = createMockWorld({
       description: '',
       theme: '',
-    };
+    });
     
     render(<WorldCard world={incompleteWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
     

@@ -11,40 +11,35 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock the world store
-jest.mock('@/state/worldStore', () => {
-  const createWorldMock = jest.fn().mockReturnValue('mock-world-id');
-  
-  // Create a mock store function that can be called with a selector
-  const mockStore = jest.fn((selector: (state: unknown) => unknown) => {
-    // When called with a selector, apply the selector to our mock state
-    if (typeof selector === 'function') {
-      return selector({
-        worlds: {},
-        createWorld: createWorldMock,
-        error: null,
-        loading: false,
-        setCurrentWorld: jest.fn(),
-        fetchWorlds: jest.fn().mockResolvedValue(undefined)
-      });
-    }
-    // Otherwise return the mock store
-    return mockStore;
-  });
-  
-  // Add setState method to the store
-  mockStore.setState = jest.fn();
-  mockStore.getState = jest.fn(() => ({ 
-    worlds: {},
-    createWorld: createWorldMock,
-    error: null,
-    loading: false
-  }));
-  mockStore.subscribe = jest.fn(() => jest.fn());
-  
-  return {
-    worldStore: mockStore
-  };
-});
+jest.mock('@/state/worldStore', () => ({
+  worldStore: {
+    getState: jest.fn(() => ({
+      worlds: {},
+      currentWorldId: null,
+      error: null,
+      loading: false,
+      createWorld: jest.fn().mockReturnValue('mock-world-id'),
+      updateWorld: jest.fn(),
+      deleteWorld: jest.fn(),
+      setCurrentWorld: jest.fn(),
+      fetchWorlds: jest.fn(),
+      addAttribute: jest.fn(),
+      updateAttribute: jest.fn(),
+      removeAttribute: jest.fn(),
+      addSkill: jest.fn(),
+      updateSkill: jest.fn(),
+      removeSkill: jest.fn(),
+      updateSettings: jest.fn(),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+    })),
+    setState: jest.fn(),
+    subscribe: jest.fn(),
+    destroy: jest.fn(),
+  },
+}));
 
 // Mock the template loader
 jest.mock('@/lib/templates/templateLoader', () => ({

@@ -57,7 +57,7 @@ export default function SkillReviewStep({
     // This should only run on initial mount or when suggestions change from parent
     // Not on every worldData update to prevent overriding user toggles
     if (suggestions.length > 0) {
-      setLocalSuggestions(suggestions.map((suggestion, index) => {
+      const newSuggestions = suggestions.map((suggestion, index) => {
         // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
@@ -68,7 +68,32 @@ export default function SkillReviewStep({
           accepted,
           showDetails: index === 0 // Show details for the first one
         };
-      }));
+      });
+      
+      setLocalSuggestions(newSuggestions);
+      
+      // Automatically save the initially selected skills to parent state
+      const acceptedSkills = newSuggestions
+        .filter(s => s.accepted)
+        .map(s => ({
+          id: generateUniqueId('skill'),
+          worldId: '',
+          name: s.name,
+          description: s.description,
+          difficulty: s.difficulty,
+          category: s.category,
+          baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
+          minValue: SKILL_MIN_VALUE, // Fixed value
+          maxValue: SKILL_MAX_VALUE, // Fixed value
+          linkedAttributeId: s.linkedAttributeName ? 
+            worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+            undefined,
+        }));
+      
+      // Only update if we don't already have skills or if the count is different
+      if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
+        onUpdate({ ...worldData, skills: acceptedSkills });
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [suggestions]); // Only depend on suggestions, not worldData.skills
@@ -143,7 +168,13 @@ export default function SkillReviewStep({
       >
 
       <div className="space-y-4">
-        {localSuggestions.map((suggestion, index) => (
+        {localSuggestions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-lg mb-2">No skill suggestions available</p>
+            <p className="text-sm">You can add skills to your world later in the world editor.</p>
+          </div>
+        ) : (
+          localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
             className={wizardStyles.card.base} 
@@ -287,7 +318,8 @@ export default function SkillReviewStep({
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className="mt-4" data-testid="skill-count-summary">

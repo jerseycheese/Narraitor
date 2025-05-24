@@ -8,12 +8,16 @@ interface FinalizeStepProps {
   worldData: Partial<World>;
   errors: Record<string, string>;
   onComplete: () => void;
+  onBack?: () => void;
+  onCancel?: () => void;
 }
 
 export default function FinalizeStep({
   worldData,
   errors,
   onComplete,
+  onBack,
+  onCancel,
 }: FinalizeStepProps) {
   // Logger function that can be easily disabled for production
   const log = (message: string, data?: unknown) => {
@@ -112,7 +116,27 @@ export default function FinalizeStep({
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 flex justify-between">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onCancel || (() => window.history.back())}
+            className={wizardStyles.navigation.cancelButton}
+          >
+            Cancel
+          </button>
+          
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className={wizardStyles.navigation.secondaryButton}
+            >
+              Back
+            </button>
+          )}
+        </div>
+        
         <button
           type="button"
           data-testid="step-complete-button"

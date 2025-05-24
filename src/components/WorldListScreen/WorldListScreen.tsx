@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { worldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
+import { LoadingPulse } from '../ui/LoadingState';
+import { SectionError } from '../ui/ErrorDisplay';
 import { World } from '../../types/world.types';
 
 interface WorldListScreenProps {
@@ -26,11 +28,14 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     try {
       const state = worldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
-      setLoading(false);
+      setLoading(state.loading);
+      setError(state.error);
       
       const unsubscribe = worldStore.subscribe(() => {
         const newState = worldStore.getState();
         setWorlds(Object.values(newState.worlds || {}));
+        setLoading(newState.loading);
+        setError(newState.error);
       });
       
       return () => unsubscribe();
@@ -80,20 +85,20 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   if (loading) {
     return (
-      <section className="p-8 text-center" data-testid="world-list-screen-loading-indicator">
-        <div className="animate-pulse">
-          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Loading Worlds</h2>
-          <p className="text-gray-500">Please wait while we load your worlds...</p>
-        </div>
+      <section className="p-8" data-testid="world-list-screen-loading-indicator">
+        <LoadingPulse message="Loading your worlds..." skeletonLines={3} />
       </section>
     );
   }
 
   if (error) {
     return (
-      <section className="p-6 border border-red-300 rounded-lg bg-red-50" data-testid="world-list-screen-error-message">
-        <h2 className="text-xl font-semibold text-red-700 mb-2">Error Loading Worlds</h2>
-        <p className="text-red-600">Error: {error}</p>
+      <section className="p-6" data-testid="world-list-screen-error-message">
+        <SectionError
+          title="Error Loading Worlds"
+          message={error}
+          severity="error"
+        />
       </section>
     );
   }

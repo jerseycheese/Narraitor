@@ -1,9 +1,10 @@
 /**
  * Storybook Configuration for Narraitor
  */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path');
 
-module.exports = {
+const config = {
   stories: [
     // Include all stories from the project
     '../src/**/*.stories.@(js|jsx|ts|tsx)'
@@ -26,3 +27,5 @@ module.exports = {
     return config;
   }
 };
+
+module.exports = config;

@@ -8,6 +8,17 @@ import {
 } from '../type-guards';
 
 describe('Type Guards', () => {
+  test('all type guards should return false for falsy values', () => {
+    const falsyValues = [null, undefined, false, 0, '', NaN];
+    
+    falsyValues.forEach(value => {
+      expect(isWorld(value)).toBe(false);
+      expect(isCharacter(value)).toBe(false);
+      expect(isInventoryItem(value)).toBe(false);
+      expect(isNarrativeSegment(value)).toBe(false);
+      expect(isJournalEntry(value)).toBe(false);
+    });
+  });
   test('isWorld should correctly identify World objects', () => {
     const validWorld = {
       id: 'world-1',
@@ -33,8 +44,6 @@ describe('Type Guards', () => {
 
     expect(isWorld(validWorld)).toBe(true);
     expect(isWorld(invalidWorld)).toBe(false);
-    expect(isWorld(null)).toBe(false);
-    expect(isWorld(undefined)).toBe(false);
   });
 
   test('isCharacter should correctly identify Character objects', () => {

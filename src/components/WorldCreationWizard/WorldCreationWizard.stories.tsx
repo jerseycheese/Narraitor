@@ -3,7 +3,7 @@ import WorldCreationWizard from './WorldCreationWizard';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof WorldCreationWizard> = {
-  title: 'Narraitor/World/WorldCreationWizard',
+  title: 'Narraitor/World/Creation/WorldCreationWizard',
   component: WorldCreationWizard,
   parameters: {
     layout: 'fullscreen',

@@ -27,7 +27,7 @@ const mockAttributes: WorldAttribute[] = [
 ];
 
 const meta: Meta<typeof WorldAttributesForm> = {
-  title: 'Narraitor/Forms/WorldAttributesForm',
+  title: 'Narraitor/UI/Forms/WorldAttributesForm',
   component: WorldAttributesForm,
   parameters: {
     layout: 'padded',
@@ -60,14 +60,7 @@ export const Empty: Story = {
   },
 };
 
-export const SingleAttribute: Story = {
-  args: {
-    attributes: [mockAttributes[0]],
-    worldId: 'world-123',
-  },
-};
-
-export const ManyAttributes: Story = {
+export const CompleteExample: Story = {
   args: {
     attributes: [
       ...mockAttributes,
@@ -90,63 +83,6 @@ export const ManyAttributes: Story = {
         minValue: 1,
         maxValue: 10,
         category: 'Mental',
-      },
-    ],
-    worldId: 'world-123',
-  },
-};
-
-export const WithoutCategories: Story = {
-  args: {
-    attributes: mockAttributes.map(attr => ({
-      ...attr,
-      category: undefined,
-    })),
-    worldId: 'world-123',
-  },
-};
-
-export const WithDifferentDefaultValues: Story = {
-  args: {
-    attributes: [
-      {
-        id: 'attr-1',
-        worldId: 'world-123',
-        name: 'Strength',
-        description: 'Physical power and muscle',
-        baseValue: 8,
-        minValue: 1,
-        maxValue: 10,
-        category: 'Physical',
-      },
-      {
-        id: 'attr-2',
-        worldId: 'world-123',
-        name: 'Intelligence',
-        description: 'Mental acuity and reasoning',
-        baseValue: 9,
-        minValue: 1,
-        maxValue: 10,
-        category: 'Mental',
-      },
-      {
-        id: 'attr-3',
-        worldId: 'world-123',
-        name: 'Charisma',
-        description: 'Social appeal and leadership',
-        baseValue: 2,
-        minValue: 1,
-        maxValue: 10,
-        category: 'Social',
-      },
-      {
-        id: 'attr-4',
-        worldId: 'world-123',
-        name: 'Luck',
-        description: 'Random chance and fortune',
-        baseValue: 5,
-        minValue: 1,
-        maxValue: 10,
       },
     ],
     worldId: 'world-123',

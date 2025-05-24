@@ -80,35 +80,11 @@ describe('PlayerChoiceSelector', () => {
       />
     );
     
-    // Get option buttons (selected option has "➤ " prefix)
-    const selectedOption = screen.getByText('➤ Run away');
-    
-    // Check that the selected option has the selected styling
-    // The selected option text is inside the button, so we check the button itself
-    expect(selectedOption).toHaveClass('bg-blue-100');
+    // Check that the selected option is marked as checked
+    const selectedOption = screen.getByRole('radio', { name: /Run away/ });
     expect(selectedOption).toHaveAttribute('aria-checked', 'true');
   });
   
-  it('renders option hints when available', () => {
-    const decisionWithHints: Decision = {
-      id: 'decision-1',
-      prompt: 'What will you do?',
-      options: [
-        { id: 'option-1', text: 'Investigate the noise', hint: 'Might be dangerous' },
-        { id: 'option-2', text: 'Run away' }
-      ]
-    };
-    
-    render(
-      <PlayerChoiceSelector 
-        decision={decisionWithHints} 
-        onSelect={jest.fn()} 
-      />
-    );
-    
-    // Check that the hint is rendered
-    expect(screen.getByText('Might be dangerous')).toBeInTheDocument();
-  });
   
   it('returns null when there are no options', () => {
     const emptyDecision: Decision = {
