@@ -4,16 +4,32 @@ import React, { useState, useEffect } from 'react';
 import { worldStore } from '@/state/worldStore';
 import { generateTestCharacter } from '@/components/devtools/TestDataGeneratorSection/generators/characterGenerator';
 
+interface DebugInfo {
+  currentWorldId: string | null;
+  worldName: string;
+  sessionStorageKeys: string[];
+  characterCreationKeys: string[];
+  storedData: Record<string, unknown>;
+  lastGenerated?: string;
+  cleared?: boolean;
+}
+
 export default function TestCharacterFormPage() {
   const { worlds, currentWorldId } = worldStore();
-  const [debugInfo, setDebugInfo] = useState<any>({});
+  const [debugInfo, setDebugInfo] = useState<DebugInfo>({
+    currentWorldId: null,
+    worldName: 'None',
+    sessionStorageKeys: [],
+    characterCreationKeys: [],
+    storedData: {}
+  });
   
   useEffect(() => {
     // Check all sessionStorage keys
     const allKeys = Object.keys(sessionStorage);
     const characterKeys = allKeys.filter(key => key.startsWith('character-creation-'));
     
-    const info: any = {
+    const info: DebugInfo = {
       currentWorldId,
       worldName: currentWorldId ? worlds[currentWorldId]?.name : 'None',
       sessionStorageKeys: allKeys,
@@ -26,7 +42,7 @@ export default function TestCharacterFormPage() {
       try {
         const data = sessionStorage.getItem(key);
         info.storedData[key] = data ? JSON.parse(data) : null;
-      } catch (e) {
+      } catch {
         info.storedData[key] = 'Error parsing data';
       }
     });
@@ -124,10 +140,10 @@ export default function TestCharacterFormPage() {
       <div className="mt-6 bg-yellow-50 p-4 rounded-lg">
         <h3 className="font-semibold mb-2">Instructions</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          <li>Make sure you have a world selected (check "Current State" above)</li>
-          <li>Click "Generate & Store Test Data"</li>
+          <li>Make sure you have a world selected (check &quot;Current State&quot; above)</li>
+          <li>Click &quot;Generate & Store Test Data&quot;</li>
           <li>Check the debug info to confirm data is stored</li>
-          <li>Click "Go to Character Creation"</li>
+          <li>Click &quot;Go to Character Creation&quot;</li>
           <li>The form should be pre-filled with the test data</li>
         </ol>
         <p className="mt-2 text-sm text-gray-600">

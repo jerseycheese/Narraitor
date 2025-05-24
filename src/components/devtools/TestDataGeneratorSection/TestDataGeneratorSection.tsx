@@ -139,7 +139,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       <div className="text-xs text-gray-500 bg-gray-800 p-2 rounded">
         <strong>Troubleshooting:</strong>
         <ul className="list-disc list-inside mt-1 space-y-1">
-          <li>If form isn't pre-filled, try the debug page at <code>/dev/test-character-form</code></li>
+          <li>If form isn&apos;t pre-filled, try the debug page at <code>/dev/test-character-form</code></li>
           <li>Check browser console for <code>[TestDataGenerator]</code> and <code>[CharacterCreationWizard]</code> logs</li>
           <li>Clear cache and hard refresh if needed (Cmd+Shift+R)</li>
         </ul>
