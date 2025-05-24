@@ -16,8 +16,8 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
     .toUpperCase()
     .slice(0, 2);
     
-  // Generate consistent color based on name
-  const colorIndex = name.charCodeAt(0) % 5;
+  // Generate consistent color based on name, fallback to first gradient if name is empty
+  const colorIndex = name ? name.charCodeAt(0) % 5 : 0;
   const gradients = [
     'from-blue-500 to-purple-600',
     'from-green-500 to-teal-600',
@@ -26,12 +26,18 @@ export const CharacterPortraitPlaceholder: React.FC<CharacterPortraitPlaceholder
     'from-indigo-500 to-blue-600'
   ];
   
+  // Use gray background with border when name is empty
+  const isEmpty = !name.trim();
+  const backgroundClass = isEmpty 
+    ? 'bg-gray-100 border-2 border-gray-300 border-dashed text-gray-500' 
+    : `bg-gradient-to-br ${gradients[colorIndex]} text-white`;
+  
   return (
     <div 
       className={`
-        bg-gradient-to-br ${gradients[colorIndex]}
+        ${backgroundClass}
         rounded-full flex items-center justify-center 
-        text-white font-bold text-2xl w-24 h-24
+        font-bold text-2xl w-24 h-24
         ${className}
       `}
       data-testid="character-portrait-placeholder"

@@ -143,24 +143,6 @@ export const WesternWorld: Story = {
   },
 };
 
-// Story with recently updated world
-export const RecentlyUpdated: Story = {
-  args: {
-    world: {
-      ...mockWorld,
-      updatedAt: new Date().toISOString(),
-    },
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
-    onDelete: (id: string) => console.log(`Delete world: ${id}`),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A WorldCard showing a world that was recently updated'
-      }
-    }
-  },
-};
 
 // Story with empty description
 export const MinimalContent: Story = {

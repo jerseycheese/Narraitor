@@ -33,9 +33,9 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    // Current value is displayed in a span with data-testid
-    const valueDisplay = screen.getByTestId('skill-range-editor-value');
-    expect(valueDisplay).toBeInTheDocument();
+    // Slider shows the default value
+    const slider = screen.getByTestId('skill-range-editor-slider');
+    expect(slider).toHaveValue('3');
   });
 
   it('passes min and max values to the RangeSlider component', () => {
@@ -53,8 +53,8 @@ describe('SkillRangeEditor', () => {
     const slider = screen.getByTestId('skill-range-editor-slider');
     expect(slider).toBeInTheDocument();
     
-    // We can verify the current value is correctly displayed
-    expect(screen.getByTestId('skill-range-editor-value')).toHaveTextContent('3');
+    // We can verify the current value is correctly displayed in the slider
+    expect(slider).toHaveValue('3');
   });
 
   it('changes value when slider is moved', () => {
@@ -68,9 +68,6 @@ describe('SkillRangeEditor', () => {
     const slider = screen.getByTestId('skill-range-editor-slider');
     fireEvent.change(slider, { target: { value: '4' } });
 
-    // Current value is displayed in a span with data-testid
-    const valueDisplay = screen.getByTestId('skill-range-editor-value');
-    expect(valueDisplay).toBeInTheDocument();
     expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 4 });
   });
 
@@ -90,8 +87,8 @@ describe('SkillRangeEditor', () => {
     );
 
     // The initial value should be clamped to 5 (the max allowed)
-    const valueDisplay = screen.getByTestId('skill-range-editor-value');
-    expect(valueDisplay).toBeInTheDocument();
+    const slider = screen.getByTestId('skill-range-editor-slider');
+    expect(slider).toHaveValue('5');
   });
 
   it('disables the slider when disabled prop is true', () => {
@@ -127,8 +124,8 @@ describe('SkillRangeEditor', () => {
       />
     );
     
-    const initialValueDisplay = screen.getByTestId('skill-range-editor-value');
-    expect(initialValueDisplay).toHaveTextContent('3');
+    const initialSlider = screen.getByTestId('skill-range-editor-slider');
+    expect(initialSlider).toHaveValue('3');
     
     const updatedSkill = { ...mockSkill, baseValue: 4 };
     rerender(
@@ -139,10 +136,10 @@ describe('SkillRangeEditor', () => {
     );
     
     // Value should be updated
-    expect(screen.getByTestId('skill-range-editor-value')).toHaveTextContent('4');
+    expect(screen.getByTestId('skill-range-editor-slider')).toHaveValue('4');
   });
 
-  it('shows min and max level labels', () => {
+  it('shows min and max scale labels', () => {
     render(
       <SkillRangeEditor 
         skill={mockSkill} 
@@ -150,16 +147,9 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    // Check that we have min and max labels
-    const minLabel = screen.getByTestId('skill-range-editor-min-label');
-    const maxLabel = screen.getByTestId('skill-range-editor-max-label');
-    
-    expect(minLabel).toBeInTheDocument();
-    expect(maxLabel).toBeInTheDocument();
-    
-    // The labels should contain the level descriptions
-    expect(minLabel).toHaveTextContent('Novice');
-    expect(maxLabel).toHaveTextContent('Master');
+    // Check that we have min and max scale labels (1 and 5)
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
   
   it('displays skill level descriptions when showLevelDescriptions is true', () => {

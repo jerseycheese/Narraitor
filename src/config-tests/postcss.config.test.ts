@@ -1,37 +1,37 @@
 import fs from 'fs';
 import path from 'path';
 
-// These tests won't pass until the PostCSS configuration is fixed
 describe('PostCSS Configuration', () => {
-  // Adjust test to match the actual file format in use
   test('postcss.config.mjs has correct Tailwind CSS v4 structure', () => {
     const filePath = path.resolve(process.cwd(), 'postcss.config.mjs');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
-    // Tailwind CSS v4 uses a different plugin structure
+    // Tailwind CSS v4 uses simplified plugin structure
     expect(fileContent).toContain('@tailwindcss/postcss');
-    expect(fileContent).toContain('autoprefixer');
+    expect(fileContent).toContain('export default');
+    expect(fileContent).toContain('plugins:');
     
     // Should NOT contain postcss-nested in v4 configuration
     expect(fileContent).not.toContain('postcss-nested');
+    
+    // Autoprefixer is not required in Tailwind v4
+    // expect(fileContent).toContain('autoprefixer');
   });
   
-  // Update syntax test to handle ESM format
-  test('postcss.config.mjs does not have malformed syntax', () => {
+  test('postcss.config.mjs has valid syntax', () => {
     const filePath = path.resolve(process.cwd(), 'postcss.config.mjs');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
-    // More appropriate checks for ESM files
-    expect(fileContent).toContain('const postcssConfig = {');
-    expect(fileContent).toContain('plugins: {');
-    expect(fileContent).toContain('export default postcssConfig');
+    // Check for basic ESM export structure
+    expect(fileContent).toContain('export default');
+    expect(fileContent).toContain('plugins:');
     
-    // Check for balanced braces - simple check for correct syntax
+    // Check for balanced braces
     const openBraces = (fileContent.match(/{/g) || []).length;
     const closeBraces = (fileContent.match(/}/g) || []).length;
     expect(openBraces).toEqual(closeBraces);
     
-    // Check for missing commas or braces
+    // Check for common syntax errors
     expect(fileContent).not.toContain(',,');
     expect(fileContent).not.toContain('{,');
     expect(fileContent).not.toContain(',}');

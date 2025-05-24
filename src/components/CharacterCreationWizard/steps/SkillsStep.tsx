@@ -91,8 +91,8 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
       <div className={`${wizardStyles.card.base} bg-blue-50`}>
         <p className="text-sm text-blue-800">
-          <strong>Tip:</strong> Select skills that complement your attribute choices. 
-          You'll be able to improve these skills through gameplay and experience.
+          Select skills that complement your attribute choices. 
+          You&apos;ll be able to improve these skills through gameplay and experience.
         </p>
       </div>
     </WizardFormSection>

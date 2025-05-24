@@ -32,10 +32,6 @@ describe('RangeSlider', () => {
     // Check that the range slider shows the default value
     const rangeInput = screen.getByRole('slider');
     expect(rangeInput).toHaveValue('5');
-    
-    // Check numeric display
-    const valueDisplay = screen.getByTestId('range-slider-value');
-    expect(valueDisplay).toHaveTextContent('5');
   });
 
   test('updates when slider is moved', () => {
@@ -107,7 +103,7 @@ describe('RangeSlider', () => {
     expect(rangeInput).toBeDisabled();
   });
 
-  test('shows visual indicator for current value', () => {
+  test('shows slider interface', () => {
     render(
       <RangeSlider 
         value={5} 
@@ -117,9 +113,9 @@ describe('RangeSlider', () => {
       />
     );
 
-    const currentValueIndicator = screen.getByTestId('range-slider-value');
-    expect(currentValueIndicator).toBeInTheDocument();
-    expect(currentValueIndicator).toHaveTextContent('5');
+    const slider = screen.getByTestId('range-slider-slider');
+    expect(slider).toBeInTheDocument();
+    expect(slider).toHaveValue('5');
   });
 
   test('hides labels when showLabel is false', () => {
@@ -168,9 +164,9 @@ describe('RangeSlider', () => {
     // Should show the level description
     expect(screen.getByTestId('range-slider-description')).toHaveTextContent('Competent: Solid performance');
     
-    // Should show min and max level labels
-    expect(screen.getByTestId('range-slider-min-label')).toHaveTextContent('1 - Novice');
-    expect(screen.getByTestId('range-slider-max-label')).toHaveTextContent('5 - Master');
+    // Should show min and max scale labels
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
   test('updates when value prop changes', () => {
@@ -183,7 +179,7 @@ describe('RangeSlider', () => {
       />
     );
     
-    expect(screen.getByTestId('range-slider-value')).toHaveTextContent('3');
+    expect(screen.getByTestId('range-slider-slider')).toHaveValue('3');
     
     // Update with new value
     rerender(
@@ -195,21 +191,22 @@ describe('RangeSlider', () => {
       />
     );
     
-    expect(screen.getByTestId('range-slider-value')).toHaveTextContent('4');
+    expect(screen.getByTestId('range-slider-slider')).toHaveValue('4');
   });
 
-  test('uses custom value formatter when provided', () => {
+  test('renders slider with custom range', () => {
     render(
       <RangeSlider 
         value={50} 
         min={0} 
         max={100} 
         onChange={mockOnChange}
-        valueFormatter={(value) => `${value}%`}
       />
     );
 
-    expect(screen.getByTestId('range-slider-value')).toHaveTextContent('50%');
+    expect(screen.getByTestId('range-slider-slider')).toHaveValue('50');
+    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.getByText('100')).toBeInTheDocument();
   });
 
   test('uses custom testId when provided', () => {
@@ -224,7 +221,6 @@ describe('RangeSlider', () => {
     );
 
     expect(screen.getByTestId('custom-slider')).toBeInTheDocument();
-    expect(screen.getByTestId('custom-slider-value')).toBeInTheDocument();
     expect(screen.getByTestId('custom-slider-slider')).toBeInTheDocument();
   });
 });

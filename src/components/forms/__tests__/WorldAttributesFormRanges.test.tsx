@@ -55,10 +55,10 @@ describe('WorldAttributesForm - Range Selection', () => {
       />
     );
 
-    // Check if the current values are displayed
-    const valueDisplays = screen.getAllByTestId('attribute-range-editor-value');
-    expect(valueDisplays[0]).toHaveTextContent('5');
-    expect(valueDisplays[1]).toHaveTextContent('7');
+    // Check if the current values are set on the sliders
+    const sliders = screen.getAllByTestId('attribute-range-editor-slider');
+    expect(sliders[0]).toHaveValue('5');
+    expect(sliders[1]).toHaveValue('7');
   });
 
   test('updates attribute base value when range is changed', () => {

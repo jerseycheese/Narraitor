@@ -92,7 +92,7 @@ export const Step2Attributes: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The second step where users allocate attribute points to their character.',
+        story: 'The second step where users allocate attribute points with dynamic constraints.',
       },
     },
   },
@@ -110,7 +110,7 @@ export const Step3Skills: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The third step where users select and assign skill points.',
+        story: 'The third step where users select starting skills (all at level 1).',
       },
     },
   },
@@ -134,131 +134,3 @@ export const Step4Background: Story = {
   },
 };
 
-// Note: Step 5 (Review) would go here when implemented
-
-export const WithExistingCharacter: Story = {
-  render: () => {
-    const worldId = createTestWorld();
-    
-    // Add an existing character to test name uniqueness validation
-    characterStore.getState().createCharacter({
-      name: 'Existing Hero',
-      worldId: worldId,
-      level: 1,
-      attributes: [],
-      skills: [],
-      background: {
-        description: '',
-        personality: '',
-        motivation: '',
-      },
-      isPlayer: true,
-      status: { hp: 100, mp: 50, stamina: 100 },
-    });
-    
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows validation when trying to create a character with a name that already exists in the world.',
-      },
-    },
-  },
-};
-
-export const WithAutoSaveData: Story = {
-  render: () => {
-    const worldId = createTestWorld();
-    
-    // Pre-populate sessionStorage with saved data
-    const savedData = {
-      currentStep: 0,
-      worldId: worldId,
-      characterData: {
-        name: 'Auto-saved Hero',
-        description: 'This data was restored from auto-save',
-        portraitPlaceholder: '',
-        attributes: [],
-        skills: [],
-        background: {
-          history: '',
-          personality: '',
-          goals: [],
-          motivation: '',
-        },
-      },
-      validation: {},
-      pointPools: {
-        attributes: { total: 27, spent: 0, remaining: 27 },
-        skills: { total: 20, spent: 0, remaining: 20 },
-      },
-    };
-    
-    sessionStorage.setItem(`character-creation-${worldId}`, JSON.stringify(savedData));
-    
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates auto-save functionality by pre-loading saved data from sessionStorage.',
-      },
-    },
-  },
-};
-
-export const MinimalWorld: Story = {
-  render: () => {
-    // Reset stores
-    characterStore.getState().reset();
-    worldStore.getState().reset();
-    
-    // Create a minimal world with fewer attributes and skills
-    const minimalWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
-      name: 'Minimal Test World',
-      description: 'A simple world with minimal configuration',
-      theme: 'modern',
-      attributes: [
-        { id: 'attr-1', name: 'Body', description: 'Physical capability', worldId: '', baseValue: 5, minValue: 1, maxValue: 10 },
-        { id: 'attr-2', name: 'Mind', description: 'Mental capability', worldId: '', baseValue: 5, minValue: 1, maxValue: 10 },
-        { id: 'attr-3', name: 'Social', description: 'Social capability', worldId: '', baseValue: 5, minValue: 1, maxValue: 10 },
-      ],
-      skills: [
-        { id: 'skill-1', name: 'Fighting', description: 'Combat ability', worldId: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 5 },
-        { id: 'skill-2', name: 'Investigation', description: 'Finding clues', worldId: '', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 5 },
-        { id: 'skill-3', name: 'Persuasion', description: 'Convincing others', worldId: '', difficulty: 'easy', baseValue: 1, minValue: 1, maxValue: 5 },
-      ],
-      settings: {
-        maxAttributes: 3,
-        maxSkills: 6,
-        attributePointPool: 15,
-        skillPointPool: 10,
-      },
-    };
-    
-    const worldId = worldStore.getState().createWorld(minimalWorld);
-    worldStore.getState().setCurrentWorld(worldId);
-    
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A simplified world configuration with only 3 attributes and 3 skills for easier testing.',
-      },
-    },
-  },
-};

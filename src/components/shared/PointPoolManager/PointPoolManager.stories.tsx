@@ -112,10 +112,38 @@ export const AttributePoints: Story = {
 export const SkillPoints: Story = {
   render: () => {
     const initialAllocations: PointAllocation[] = [
-      { id: 'combat', name: 'Combat', value: 0, minValue: 0, maxValue: 5 },
-      { id: 'stealth', name: 'Stealth', value: 0, minValue: 0, maxValue: 5 },
-      { id: 'magic', name: 'Magic', value: 0, minValue: 0, maxValue: 5 },
-      { id: 'social', name: 'Social', value: 0, minValue: 0, maxValue: 5 },
+      { 
+        id: 'combat', 
+        name: 'Combat', 
+        value: 0, 
+        minValue: 0, 
+        maxValue: 5,
+        description: 'Proficiency with weapons and fighting techniques. Affects damage and accuracy in battle.'
+      },
+      { 
+        id: 'stealth', 
+        name: 'Stealth', 
+        value: 0, 
+        minValue: 0, 
+        maxValue: 5,
+        description: 'Ability to move unseen and avoid detection. Useful for infiltration and surprise attacks.'
+      },
+      { 
+        id: 'magic', 
+        name: 'Magic', 
+        value: 0, 
+        minValue: 0, 
+        maxValue: 5,
+        description: 'Knowledge of arcane arts and spellcasting. Determines available spells and magical power.'
+      },
+      { 
+        id: 'social', 
+        name: 'Social', 
+        value: 0, 
+        minValue: 0, 
+        maxValue: 5,
+        description: 'Charisma and interpersonal skills. Affects persuasion, negotiation, and leadership abilities.'
+      },
     ];
 
     const poolConfig: PointPoolConfig = {
@@ -131,70 +159,3 @@ export const SkillPoints: Story = {
   },
 };
 
-export const OverAllocated: Story = {
-  render: () => {
-    const initialAllocations: PointAllocation[] = [
-      { id: 'health', name: 'Health', value: 30, minValue: 10, maxValue: 40 },
-      { id: 'stamina', name: 'Stamina', value: 35, minValue: 10, maxValue: 40 },
-      { id: 'mana', name: 'Mana', value: 40, minValue: 10, maxValue: 40 },
-    ];
-
-    const poolConfig: PointPoolConfig = {
-      total: 100,
-      label: 'Resource Points',
-    };
-
-    return <InteractivePointPoolManager 
-      allocations={initialAllocations} 
-      poolConfig={poolConfig}
-      onChange={() => {}} 
-    />;
-  },
-};
-
-export const Disabled: Story = {
-  render: () => {
-    const initialAllocations: PointAllocation[] = [
-      { id: 'str', name: 'Strength', value: 12, minValue: 8, maxValue: 18 },
-      { id: 'int', name: 'Intelligence', value: 14, minValue: 8, maxValue: 18 },
-      { id: 'dex', name: 'Dexterity', value: 10, minValue: 8, maxValue: 18 },
-    ];
-
-    const poolConfig: PointPoolConfig = {
-      total: 40,
-      label: 'Locked Points',
-    };
-
-    return (
-      <InteractivePointPoolManager 
-        allocations={initialAllocations} 
-        poolConfig={poolConfig} 
-        onChange={() => {}}
-        disabled={true}
-      />
-    );
-  },
-};
-
-export const WithoutLabels: Story = {
-  render: () => {
-    const initialAllocations: PointAllocation[] = [
-      { id: 'a', name: 'Attribute A', value: 3, minValue: 1, maxValue: 10 },
-      { id: 'b', name: 'Attribute B', value: 5, minValue: 1, maxValue: 10 },
-      { id: 'c', name: 'Attribute C', value: 7, minValue: 1, maxValue: 10 },
-    ];
-
-    const poolConfig: PointPoolConfig = {
-      total: 20,
-    };
-
-    return (
-      <InteractivePointPoolManager 
-        allocations={initialAllocations} 
-        poolConfig={poolConfig}
-        onChange={() => {}}
-        showLabels={false}
-      />
-    );
-  },
-};

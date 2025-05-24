@@ -135,7 +135,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       <div className={`${wizardStyles.card.base} bg-blue-50`}>
         <p className="text-sm text-blue-800">
-          <strong>Tip:</strong> A compelling backstory helps bring your character to life and 
+          A compelling backstory helps bring your character to life and 
           provides context for their actions and decisions in the game.
         </p>
       </div>
