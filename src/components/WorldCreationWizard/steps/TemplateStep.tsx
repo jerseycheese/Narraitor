@@ -10,6 +10,7 @@ interface TemplateStepProps {
   onUpdate: (updates: { selectedTemplateId: string | null }) => void;
   errors: Record<string, string>;
   onComplete: () => void;
+  onCancel?: () => void;
 }
 
 const TemplateStep: React.FC<TemplateStepProps> = ({
@@ -17,6 +18,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   onUpdate,
   errors,
   onComplete,
+  onCancel,
 }) => {
   const [isApplying, setIsApplying] = useState(false);
   
@@ -79,27 +81,37 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         </div>
       )}
       
-      <div className="mt-6 flex justify-end gap-2">
+      <div className="mt-6 flex justify-between">
         <button
           type="button"
-          onClick={handleCreateOwnWorld}
-          className={wizardStyles.navigation.secondaryButton}
-          data-testid="create-own-button"
+          onClick={onCancel || (() => window.history.back())}
+          className={wizardStyles.navigation.cancelButton}
         >
-          Create My Own World
+          Cancel
         </button>
         
-        <button
-          type="button"
-          onClick={handleApplyTemplate}
-          disabled={!selectedTemplateId || isApplying}
-          className={`${wizardStyles.navigation.primaryButton} ${
-            (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
-          }`}
-          data-testid="next-button"
-        >
-          {isApplying ? 'Applying Template...' : 'Use Selected Template'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleCreateOwnWorld}
+            className={wizardStyles.navigation.secondaryButton}
+            data-testid="create-own-button"
+          >
+            Create My Own World
+          </button>
+          
+          <button
+            type="button"
+            onClick={handleApplyTemplate}
+            disabled={!selectedTemplateId || isApplying}
+            className={`${wizardStyles.navigation.primaryButton} ${
+              (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
+            }`}
+            data-testid="next-button"
+          >
+            {isApplying ? 'Applying Template...' : 'Use Selected Template'}
+          </button>
+        </div>
       </div>
     </div>
   );

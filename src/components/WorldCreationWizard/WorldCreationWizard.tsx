@@ -178,6 +178,7 @@ export default function WorldCreationWizard({
             selectedTemplateId={wizardState.selectedTemplateId}
             onUpdate={updateWizardState}
             onComplete={handleNext}
+            onCancel={handleCancel}
             errors={wizardState.errors}
           />
         );
@@ -250,17 +251,20 @@ export default function WorldCreationWizard({
           </div>
         </WizardStep>
         
-        <WizardNavigation
-          onCancel={handleCancel}
-          onBack={wizardState.currentStep > 0 ? handleBack : undefined}
-          onNext={wizardState.currentStep < WIZARD_STEPS.length - 1 ? handleNext : undefined}
-          onComplete={wizardState.currentStep === WIZARD_STEPS.length - 1 ? handleComplete : undefined}
-          currentStep={wizardState.currentStep}
-          totalSteps={WIZARD_STEPS.length}
-          completeLabel="Create World"
-          disabled={!canProceedToNext()}
-          isLoading={wizardState.isProcessing}
-        />
+        {/* Hide main navigation on template step since it has its own navigation */}
+        {wizardState.currentStep > 0 && (
+          <WizardNavigation
+            onCancel={handleCancel}
+            onBack={wizardState.currentStep > 0 ? handleBack : undefined}
+            onNext={wizardState.currentStep < WIZARD_STEPS.length - 1 ? handleNext : undefined}
+            onComplete={wizardState.currentStep === WIZARD_STEPS.length - 1 ? handleComplete : undefined}
+            currentStep={wizardState.currentStep}
+            totalSteps={WIZARD_STEPS.length}
+            completeLabel="Create World"
+            disabled={!canProceedToNext()}
+            isLoading={wizardState.isProcessing}
+          />
+        )}
       </div>
     </WizardContainer>
   );
