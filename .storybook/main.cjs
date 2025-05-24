@@ -1,7 +1,7 @@
 /**
  * Storybook Configuration for Narraitor
  */
-import path from 'path';
+const path = require('path');
 
 const config = {
   stories: [
@@ -27,4 +27,4 @@ const config = {
   }
 };
 
-export default config;
+module.exports = config;
