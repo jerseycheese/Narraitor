@@ -45,16 +45,6 @@ export const Default: Story = {
   },
 };
 
-export const EmptyWorld: Story = {
-  args: {
-    world: {
-      ...mockWorld,
-      name: '',
-      description: '',
-      theme: '',
-    },
-  },
-};
 
 export const LongDescription: Story = {
   args: {
