@@ -11,36 +11,34 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock the world store
-const mockWorldStore = {
-  getState: jest.fn(() => ({
-    worlds: {},
-    currentWorldId: null,
-    error: null,
-    loading: false,
-    createWorld: jest.fn().mockReturnValue('mock-world-id'),
-    updateWorld: jest.fn(),
-    deleteWorld: jest.fn(),
-    setCurrentWorld: jest.fn(),
-    fetchWorlds: jest.fn(),
-    addAttribute: jest.fn(),
-    updateAttribute: jest.fn(),
-    removeAttribute: jest.fn(),
-    addSkill: jest.fn(),
-    updateSkill: jest.fn(),
-    removeSkill: jest.fn(),
-    updateSettings: jest.fn(),
-    reset: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setLoading: jest.fn(),
-  })),
-  setState: jest.fn(),
-  subscribe: jest.fn(),
-  destroy: jest.fn(),
-};
-
 jest.mock('@/state/worldStore', () => ({
-  worldStore: mockWorldStore,
+  worldStore: {
+    getState: jest.fn(() => ({
+      worlds: {},
+      currentWorldId: null,
+      error: null,
+      loading: false,
+      createWorld: jest.fn().mockReturnValue('mock-world-id'),
+      updateWorld: jest.fn(),
+      deleteWorld: jest.fn(),
+      setCurrentWorld: jest.fn(),
+      fetchWorlds: jest.fn(),
+      addAttribute: jest.fn(),
+      updateAttribute: jest.fn(),
+      removeAttribute: jest.fn(),
+      addSkill: jest.fn(),
+      updateSkill: jest.fn(),
+      removeSkill: jest.fn(),
+      updateSettings: jest.fn(),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+    })),
+    setState: jest.fn(),
+    subscribe: jest.fn(),
+    destroy: jest.fn(),
+  },
 }));
 
 // Mock the template loader
