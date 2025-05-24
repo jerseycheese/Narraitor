@@ -26,11 +26,14 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     try {
       const state = worldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
-      setLoading(false);
+      setLoading(state.loading);
+      setError(state.error);
       
       const unsubscribe = worldStore.subscribe(() => {
         const newState = worldStore.getState();
         setWorlds(Object.values(newState.worlds || {}));
+        setLoading(newState.loading);
+        setError(newState.error);
       });
       
       return () => unsubscribe();
