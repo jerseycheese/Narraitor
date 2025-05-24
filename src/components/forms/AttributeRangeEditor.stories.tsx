@@ -45,25 +45,6 @@ export const Default: Story = {
   },
 };
 
-export const WithHighValue: Story = {
-  args: {
-    attribute: {
-      ...defaultAttribute,
-      baseValue: 9,
-    },
-    showLabels: true,
-  },
-};
-
-export const WithLowValue: Story = {
-  args: {
-    attribute: {
-      ...defaultAttribute,
-      baseValue: 2,
-    },
-    showLabels: true,
-  },
-};
 
 export const Disabled: Story = {
   args: {
@@ -73,7 +54,7 @@ export const Disabled: Story = {
   },
 };
 
-export const InContextExample: Story = {
+export const InteractiveExample: Story = {
   render: () => {
     const attributes: WorldAttribute[] = [
       {

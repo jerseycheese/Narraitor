@@ -95,54 +95,8 @@ export const Default: Story = {
   },
 };
 
-export const SingleWorld: Story = {
-  args: {
-    worlds: [mockWorlds[0]],
-  },
-};
-
 export const EmptyList: Story = {
   args: {
     worlds: [],
-  },
-};
-
-export const ManyWorlds: Story = {
-  args: {
-    worlds: [
-      ...mockWorlds,
-      {
-        id: '4',
-        name: 'Post-Apocalyptic Wasteland',
-        description: 'A harsh world after the fall of civilization',
-        theme: 'Post-Apocalyptic',
-        attributes: [],
-        skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100,
-        },
-        createdAt: '2023-02-01T10:00:00Z',
-        updatedAt: '2023-02-01T10:00:00Z',
-      },
-      {
-        id: '5',
-        name: 'Medieval Kingdom',
-        description: 'Knights, castles, and political intrigue',
-        theme: 'Medieval',
-        attributes: [],
-        skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100,
-        },
-        createdAt: '2023-02-02T10:00:00Z',
-        updatedAt: '2023-02-02T10:00:00Z',
-      },
-    ],
   },
 };

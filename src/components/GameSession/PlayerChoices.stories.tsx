@@ -45,19 +45,6 @@ export const DisabledChoices: Story = {
   },
 };
 
-export const EmptyChoices: Story = {
-  args: {
-    choices: [],
-  },
-};
-
-export const SingleChoice: Story = {
-  args: {
-    choices: [
-      { id: 'choice-1', text: 'Continue your journey' },
-    ],
-  },
-};
 
 export const LongTextChoices: Story = {
   args: {

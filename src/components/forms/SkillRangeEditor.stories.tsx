@@ -42,19 +42,9 @@ export const Default: Story = {
   args: {
     skill: defaultSkill,
     showLabels: true,
-    disabled: false,
-  },
-  name: 'Basic Skill Range Editor',
-};
-
-export const WithLevelDescriptions: Story = {
-  args: {
-    skill: defaultSkill,
-    showLabels: true,
     showLevelDescriptions: true,
     disabled: false,
   },
-  name: 'With Additional Level Descriptions',
 };
 
 export const SkillLevels: Story = {
@@ -97,5 +87,4 @@ export const Disabled: Story = {
     showLabels: true,
     disabled: true,
   },
-  name: 'Disabled State',
 };
