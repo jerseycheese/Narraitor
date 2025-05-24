@@ -242,6 +242,8 @@ export default function WorldCreationWizard({
           <FinalizeStep
             {...stepProps}
             onComplete={handleComplete}
+            onBack={handleBack}
+            onCancel={handleCancel}
           />
         );
       default:
@@ -270,8 +272,8 @@ export default function WorldCreationWizard({
           </div>
         </WizardStep>
         
-        {/* Hide main navigation on template step since it has its own navigation */}
-        {wizardState.currentStep > 0 && (
+        {/* Hide main navigation on template step (0) and finalize step (5) since they have their own navigation */}
+        {wizardState.currentStep > 0 && wizardState.currentStep < WIZARD_STEPS.length - 1 && (
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizardState.currentStep > 0 ? handleBack : undefined}
