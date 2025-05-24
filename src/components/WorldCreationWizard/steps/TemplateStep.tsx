@@ -9,7 +9,7 @@ interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
   onUpdate: (updates: { selectedTemplateId?: string | null; createOwnWorld?: boolean }) => void;
   errors: Record<string, string>;
-  onComplete: () => void;
+  onComplete: (createOwnWorld?: boolean) => void;
   onCancel?: () => void;
 }
 
@@ -42,7 +42,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Using setTimeout to ensure state updates complete before navigation
       // This fixes the test issue by ensuring the callback is executed
       setTimeout(() => {
-        onComplete();
+        onComplete(false);
         setIsApplying(false);
       }, 0);
       
@@ -59,9 +59,9 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     // Clear any selected template and set createOwnWorld flag
     onUpdate({ selectedTemplateId: null, createOwnWorld: true });
     console.log('selectedTemplateId set to null, createOwnWorld set to true');
-    // Proceed to next step without applying a template
-    console.log('calling onComplete');
-    onComplete();
+    // Proceed to next step without applying a template, passing createOwnWorld flag
+    console.log('calling onComplete with createOwnWorld=true');
+    onComplete(true);
     console.log('onComplete called');
   };
   

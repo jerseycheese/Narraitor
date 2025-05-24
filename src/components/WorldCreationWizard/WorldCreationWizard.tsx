@@ -69,15 +69,25 @@ export default function WorldCreationWizard({
     }
   };
 
-  const handleNext = () => {
+  const handleNext = (createOwnWorld?: boolean) => {
     console.log('handleNext called, currentStep:', wizardState.currentStep);
+    console.log('createOwnWorld param:', createOwnWorld);
     console.log('canProceedToNext:', canProceedToNext());
     console.log('wizardState:', wizardState);
-    if (canProceedToNext() && wizardState.currentStep < WIZARD_STEPS.length - 1) {
+    
+    // For step 0, check if we can proceed (either template selected or createOwnWorld is true)
+    const canProceed = wizardState.currentStep === 0 
+      ? (wizardState.selectedTemplateId !== null || createOwnWorld === true)
+      : canProceedToNext();
+    
+    console.log('canProceed (with createOwnWorld check):', canProceed);
+    
+    if (canProceed && wizardState.currentStep < WIZARD_STEPS.length - 1) {
       console.log('Moving to next step');
       setWizardState((prev) => ({
         ...prev,
         currentStep: prev.currentStep + 1,
+        createOwnWorld: createOwnWorld || prev.createOwnWorld,
       }));
     } else {
       console.log('Cannot proceed to next step');
