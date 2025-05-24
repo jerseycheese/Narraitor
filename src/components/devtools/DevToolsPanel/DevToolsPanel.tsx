@@ -5,6 +5,7 @@ import { useDevTools } from '../DevToolsContext';
 import { StateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
+import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -116,6 +117,11 @@ export const DevToolsPanel = () => {
           {/* AI Testing Section */}
           <CollapsibleSection title="AI Testing" initialCollapsed={true}>
             <AITestingPanel />
+          </CollapsibleSection>
+          
+          {/* Test Data Generators Section */}
+          <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
+            <TestDataGeneratorSection />
           </CollapsibleSection>
         </div>
       )}

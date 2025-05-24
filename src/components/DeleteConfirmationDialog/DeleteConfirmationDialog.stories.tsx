@@ -29,38 +29,5 @@ export const Default: Story = {
   },
 };
 
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    onClose: () => console.log('Dialog closed'),
-    onConfirm: () => console.log('Confirmed deletion'),
-    title: 'Delete World',
-    description: 'Are you sure you want to delete this world? This action cannot be undone.',
-    itemName: 'Fantasy Adventure World',
-  },
-};
 
-export const DeletingState: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => console.log('Dialog closed'),
-    onConfirm: () => console.log('Confirmed deletion'),
-    title: 'Delete World',
-    description: 'Are you sure you want to delete this world? This action cannot be undone.',
-    itemName: 'Fantasy Adventure World',
-    isDeleting: true,
-  },
-};
 
-export const CustomButtonText: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => console.log('Dialog closed'),
-    onConfirm: () => console.log('Confirmed deletion'),
-    title: 'Remove Item',
-    description: 'Are you sure you want to remove this item?',
-    itemName: 'Test Item',
-    confirmButtonText: 'Remove',
-    cancelButtonText: 'Keep',
-  },
-};

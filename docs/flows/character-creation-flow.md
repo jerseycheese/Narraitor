@@ -3,7 +3,7 @@ title: Character Creation User Flow
 aliases: [Character Setup Flow, Character Generation Flow]
 tags: [narraitor, user-flow, documentation, character-system]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-05-24
 ---
 
 # Character Creation User Flow
@@ -68,74 +68,81 @@ flowchart TD
 **Data Changes**: Current world is set in application state
 
 ### 3. Enter Basic Information
-**User Action**: Enters character name, concept, and appearance
-**System Response**: Enables the "Next" button when all required fields are filled
-**UI Component**: `/src/components/character/creation/BasicInformationStep.tsx`
+**User Action**: Enters character name and description
+**System Response**: 
+- Updates portrait placeholder with initials dynamically
+- Shows validation errors in real-time
+- Enables the "Next" button when all required fields are valid
+**UI Component**: `/src/components/CharacterCreationWizard/steps/BasicInfoStep.tsx`
 **Validation**: 
-- Character name must be 2-30 characters
-- Character concept must be 5-100 characters
-- Appearance is optional but limited to 500 characters if provided
+- Character name must be 3-50 characters
+- Name must be unique within the world
+- Description must be at least 50 characters
 **Data Changes**: Temporary wizard state is updated with basic information
 
 ### 4. Allocate Character Attributes
 **User Action**: 
-- Distributes attribute points based on world-defined attributes
-- Adjusts values within allowed ranges
-- Clicks "Next" when finished
+- Distributes attribute points using RangeSlider components
+- Uses PointPoolManager to track remaining points
+- Clicks "Next" when all points are allocated
 **System Response**: 
-- Displays attribute sliders or input fields
-- Shows remaining points to allocate
-- Validates total point allocation
-**UI Component**: `/src/components/character/creation/AttributesStep.tsx`
+- Displays attribute sliders with visual notches
+- Shows real-time point pool updates
+- Dynamically constrains sliders to prevent negative pool
+- Disables "Next" until all points allocated
+**UI Component**: `/src/components/CharacterCreationWizard/steps/AttributesStep.tsx`
 **Validation**: 
-- Each attribute must be within world-defined min/max values
-- Total attribute points must not exceed the allowed maximum
-- All attribute points must be allocated
+- Each attribute must be within world-defined min/max values (typically 8-18)
+- Cannot make changes that would result in negative point pool
+- Must allocate exactly all available points (no remaining)
 **Data Changes**: Temporary wizard state updated with attribute values
 
 ### 5. Select Character Skills
 **User Action**: 
-- Selects skills from world-defined skill options
-- Assigns points to chosen skills
-- Clicks "Next" when finished
+- Toggles skills on/off using toggle buttons
+- Selects up to the world's maximum allowed skills
+- Clicks "Next" when exact number selected
 **System Response**: 
-- Displays skill selection interface
-- Groups skills by related attributes
-- Shows remaining skill points
-**UI Component**: `/src/components/character/creation/SkillsStep.tsx`
+- Displays skills with toggle buttons on the right
+- Shows selection limit (e.g., "Select up to 5 skills")
+- Prevents selecting more than allowed
+- All selected skills start at level 1
+- Disables "Next" until exact number selected
+**UI Component**: `/src/components/CharacterCreationWizard/steps/SkillsStep.tsx`
 **Validation**: 
-- Selected skills must be defined in the world
-- Skill values must be within world-defined min/max values
-- Total skill points must not exceed the allowed maximum
-- Maximum of 8 skills can be selected (MVP constraint)
+- Must select exact number of skills specified by world
+- Cannot exceed maximum skill limit
+- All skills automatically set to level 1 (novice)
 **Data Changes**: Temporary wizard state updated with skill selections
 
 ### 6. Enter Character Background
 **User Action**: 
-- Enters character background information
-- Provides personal history and personality traits
-- Clicks "Next" when finished
+- Enters character history (backstory)
+- Provides personality description
+- Clicks "Create Character" when finished
 **System Response**: 
-- Displays text entry fields for background details
-- Offers optional prompts to guide creation
-**UI Component**: `/src/components/character/creation/BackgroundStep.tsx`
+- Displays large text areas for each field
+- Shows character count validation in real-time
+- Shows helpful tip about compelling backstories
+**UI Component**: `/src/components/CharacterCreationWizard/steps/BackgroundStep.tsx`
 **Validation**: 
-- Background text limited to 1000 characters
-- Certain restricted terms may be flagged (profanity, etc.)
+- History must be at least 100 characters
+- Personality must be at least 50 characters
+- Maximum 1000 characters per field
 **Data Changes**: Temporary wizard state updated with background information
 
 ### 7. Confirm and Create Character
-**User Action**: Reviews character summary and clicks "Create Character" button
+**User Action**: Clicks "Create Character" button on the Background step
 **System Response**: 
-- Shows loading indicator
-- Creates character in the database
-- Redirects to the Character Dashboard upon success
-**UI Component**: `/src/components/character/creation/SummaryStep.tsx`
+- Shows loading state on button
+- Creates character in characterStore
+- Attempts redirect to `/characters/[id]` (currently 404)
+**UI Component**: Background step handles creation directly (no separate summary step in MVP)
 **Validation**: Final validation of complete character configuration
 **Data Changes**: 
-- New Character record created in IndexedDB
-- Character state updated with new character
-- Current character set to new character
+- New Character record created via characterStore
+- Character persisted to IndexedDB
+- Navigation attempted to character detail page
 
 ## Error Paths
 
@@ -181,14 +188,14 @@ flowchart TD
 - Character data persists between sessions
 - Character reflects the world's attribute and skill definitions
 
-## Related Components
-- **CharacterCreationWizard**: `/src/components/character/creation/CharacterCreationWizard.tsx` - Main wizard container
-- **BasicInformationStep**: `/src/components/character/creation/BasicInformationStep.tsx` - Step 1 of wizard
-- **AttributesStep**: `/src/components/character/creation/AttributesStep.tsx` - Step 2 of wizard
-- **SkillsStep**: `/src/components/character/creation/SkillsStep.tsx` - Step 3 of wizard
-- **BackgroundStep**: `/src/components/character/creation/BackgroundStep.tsx` - Step 4 of wizard
-- **SummaryStep**: `/src/components/character/creation/SummaryStep.tsx` - Final confirmation step
-- **CharacterDashboard**: `/src/components/character/CharacterDashboard.tsx` - Landing page after creation
+## Related Components (Implementation Status: ✅ Complete)
+- **CharacterCreationWizard**: `/src/components/CharacterCreationWizard/CharacterCreationWizard.tsx` - Main wizard container ✅
+- **BasicInfoStep**: `/src/components/CharacterCreationWizard/steps/BasicInfoStep.tsx` - Step 1: Name & description ✅
+- **AttributesStep**: `/src/components/CharacterCreationWizard/steps/AttributesStep.tsx` - Step 2: Point allocation with PointPoolManager ✅
+- **SkillsStep**: `/src/components/CharacterCreationWizard/steps/SkillsStep.tsx` - Step 3: Skill selection (all at level 1) ✅
+- **BackgroundStep**: `/src/components/CharacterCreationWizard/steps/BackgroundStep.tsx` - Step 4: History & personality ✅
+- **CharacterPortraitPlaceholder**: `/src/components/CharacterCreationWizard/components/CharacterPortraitPlaceholder.tsx` - Dynamic portrait ✅
+- **Shared Wizard System**: `/src/components/shared/wizard/` - Reusable wizard components ✅
 
 ## Domain Interactions
 - **World Domain → Character Domain**: World provides attribute and skill definitions
@@ -204,13 +211,16 @@ flowchart TD
 6. **Edge Case: Maximum Skills**: User attempts to exceed the maximum number of skills (8)
 7. **Edge Case: Point Allocation**: User tries to allocate more points than allowed
 
-## Implementation Notes
-- The wizard should maintain state internally until final submission
-- Attribute and skill UI should reflect world-defined types and ranges
-- Provide clear feedback on point allocation remaining
-- Use optimistic UI updates with rollback on errors
-- Validate character against world constraints at each step
-- Consider mobile-friendly controls for point allocation
+## Implementation Notes (✅ IMPLEMENTED)
+- ✅ The wizard maintains state internally using shared wizard hooks
+- ✅ Attribute UI uses RangeSlider with dynamic constraints based on point pool
+- ✅ Real-time feedback on point allocation with PointPoolManager
+- ✅ Validation occurs at each step with real-time feedback
+- ✅ Character validates against world constraints (name uniqueness, skill limits)
+- ✅ Mobile-friendly sliders and toggle buttons for touch interfaces
+- ✅ Shared wizard component system ensures visual consistency with WorldCreationWizard
+- ✅ Auto-save functionality via sessionStorage persistence
+- ⚠️ Character detail page (`/characters/[id]`) not yet implemented (causes 404 after creation)
 
 ## Related Documents
 - [Character System Requirements](/users/jackhaas/projects/narraitor/docs/requirements/core/character-system.md)

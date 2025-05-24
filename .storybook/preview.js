@@ -19,7 +19,7 @@ const styleOverrides = `
   }
 `;
 
-export default {
+const preview = {
   parameters: {
     actions: { argTypesRegex: "^on[A-Z].*" },
     controls: {
@@ -34,6 +34,24 @@ export default {
         { name: 'light', value: '#ffffff' },
       ],
     },
+    nextjs: {
+      appDirectory: true,
+      navigation: {
+        pathname: '/',
+        query: {},
+        push: (...args) => {
+          console.log('[Storybook] router.push called with:', args);
+          return Promise.resolve(true);
+        },
+        replace: (...args) => {
+          console.log('[Storybook] router.replace called with:', args);
+          return Promise.resolve(true);
+        },
+        back: () => {
+          console.log('[Storybook] router.back called');
+        },
+      },
+    },
   },
   // Add style tag to force colors
   decorators: [
@@ -45,3 +63,5 @@ export default {
     ),
   ],
 };
+
+export default preview;

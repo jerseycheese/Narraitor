@@ -1,9 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { 
+  WizardContainer, 
+  WizardProgress, 
+  WizardNavigation, 
+  WizardStep 
+} from '@/components/shared/wizard';
 import TemplateStep from './steps/TemplateStep';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
@@ -29,7 +35,6 @@ export default function WorldCreationWizard({
 }: WorldCreationWizardProps) {
   const router = useRouter();
   const createWorld = worldStore((state) => state.createWorld);
-  const [mounted, setMounted] = useState(false);
   const [wizardState, setWizardState] = useState<WizardState>({
     currentStep: initialStep,
     worldData: initialData?.worldData || {
@@ -45,50 +50,38 @@ export default function WorldCreationWizard({
     errors: {},
     isProcessing: false,
   });
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  
-  // Expose wizardState for testing
-  useEffect(() => {
-    if (mounted && (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')) {
-      const testWindow = window as Window & {
-        __testWizardState?: {
-          getState: () => WizardState;
-          setState: (newState: Partial<WizardState>) => void;
-        };
-      };
-      
-      testWindow.__testWizardState = {
-        getState: () => wizardState,
-        setState: (newState: Partial<WizardState>) => {
-          setWizardState(prev => ({ ...prev, ...newState }));
-        }
-      };
-      
-      return () => {
-        delete testWindow.__testWizardState;
-      };
+
+  const canProceedToNext = (): boolean => {
+    switch (wizardState.currentStep) {
+      case 0:
+        return wizardState.selectedTemplateId !== null;
+      case 1:
+        return !!(wizardState.worldData.name && wizardState.worldData.theme);
+      case 2:
+        return !!wizardState.worldData.description;
+      case 3:
+        return (wizardState.worldData.attributes?.length || 0) > 0;
+      case 4:
+        return (wizardState.worldData.skills?.length || 0) > 0;
+      default:
+        return true;
     }
-  }, [wizardState, mounted]);
+  };
 
   const handleNext = () => {
-    if (wizardState.currentStep < WIZARD_STEPS.length - 1) {
-      setWizardState(prev => ({
+    if (canProceedToNext() && wizardState.currentStep < WIZARD_STEPS.length - 1) {
+      setWizardState((prev) => ({
         ...prev,
         currentStep: prev.currentStep + 1,
-        errors: {},
       }));
     }
   };
 
   const handleBack = () => {
     if (wizardState.currentStep > 0) {
-      setWizardState(prev => ({
+      setWizardState((prev) => ({
         ...prev,
         currentStep: prev.currentStep - 1,
-        errors: {},
       }));
     }
   };
@@ -175,9 +168,6 @@ export default function WorldCreationWizard({
     worldData: wizardState.worldData,
     errors: wizardState.errors,
     onUpdate: updateWorldData,
-    onNext: handleNext,
-    onBack: handleBack,
-    onCancel: handleCancel,
   };
 
   const renderCurrentStep = () => {
@@ -187,9 +177,7 @@ export default function WorldCreationWizard({
           <TemplateStep
             selectedTemplateId={wizardState.selectedTemplateId}
             onUpdate={updateWizardState}
-            onNext={handleNext}
-            onBack={handleBack}
-            onCancel={handleCancel}
+            onComplete={handleNext}
             errors={wizardState.errors}
           />
         );
@@ -212,6 +200,7 @@ export default function WorldCreationWizard({
                 errors: { ...prev.errors, [field]: error } 
               }))
             }
+            onComplete={handleNext}
           />
         );
       case 3:
@@ -240,41 +229,39 @@ export default function WorldCreationWizard({
     }
   };
 
+  const steps = WIZARD_STEPS.map(step => ({
+    id: step.id,
+    label: step.label
+  }));
+
+  const currentError = wizardState.errors.submit;
+
   return (
-    <div className="min-h-screen p-4" data-testid="wizard-container">
-      <div className="max-w-3xl mx-auto bg-white rounded shadow">
-        <div className="p-4 border-b" data-testid="wizard-header">
-          <h1 className="text-2xl font-bold">Create New World</h1>
-          <div className="text-sm text-gray-500" data-testid="wizard-progress">
-            <span>Step {wizardState.currentStep + 1} of {WIZARD_STEPS.length}</span>
+    <WizardContainer title="Create New World">
+      <div data-testid="wizard-container">
+        <WizardProgress 
+          steps={steps} 
+          currentStep={wizardState.currentStep}
+        />
+        
+        <WizardStep error={currentError}>
+          <div data-testid="wizard-content">
+            {renderCurrentStep()}
           </div>
-        </div>
-
-        <div className="flex p-4 border-b">
-          {WIZARD_STEPS.map((step, index) => (
-            <div
-              key={step.id}
-              data-testid={`wizard-step-${step.id}`}
-              className="flex-1 flex items-center gap-2"
-            >
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center" data-testid={`wizard-step-number-${index}`}>
-                {index + 1}
-              </div>
-              <span className="text-sm">{step.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="p-4" data-testid="wizard-content">
-          {renderCurrentStep()}
-        </div>
-
-        {wizardState.errors.submit && (
-          <div className="p-4 m-4 bg-red-100 text-red-600 rounded" data-testid="wizard-error-submit">
-            {wizardState.errors.submit}
-          </div>
-        )}
+        </WizardStep>
+        
+        <WizardNavigation
+          onCancel={handleCancel}
+          onBack={wizardState.currentStep > 0 ? handleBack : undefined}
+          onNext={wizardState.currentStep < WIZARD_STEPS.length - 1 ? handleNext : undefined}
+          onComplete={wizardState.currentStep === WIZARD_STEPS.length - 1 ? handleComplete : undefined}
+          currentStep={wizardState.currentStep}
+          totalSteps={WIZARD_STEPS.length}
+          completeLabel="Create World"
+          disabled={!canProceedToNext()}
+          isLoading={wizardState.isProcessing}
+        />
       </div>
-    </div>
+    </WizardContainer>
   );
 }

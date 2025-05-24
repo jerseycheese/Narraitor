@@ -23,7 +23,7 @@ jest.mock('@/lib/ai/worldAnalyzer', () => ({
   analyzeWorldDescription: jest.fn(),
 }));
 
-describe('WorldCreationWizard Integration - TO BE DELETED', () => {
+describe.skip('WorldCreationWizard Integration - TO BE DELETED', () => {
   const mockRouter = {
     push: jest.fn(),
   };

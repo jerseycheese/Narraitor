@@ -11,6 +11,7 @@ export interface AISuggestionBase {
 }
 
 export interface AttributeSuggestion extends AISuggestionBase {
+  baseValue: number;
   minValue: number;
   maxValue: number;
 }

@@ -1,21 +1,115 @@
-/* Import Tailwind CSS v4 with layers */
-@import "tailwindcss/theme.css";
-@import "tailwindcss/preflight.css";
-@import "tailwindcss/utilities.css";
+@import "tailwindcss";
 
-/* Only keep essential CSS variables for consistency */
-:root {
-  /* Core color variables (map to Tailwind colors) */
-  --color-primary: theme(colors.blue.600);
-  --color-secondary: theme(colors.indigo.600);
-  --color-accent: theme(colors.orange.500);
+/* Base layer for HTML element styles */
+@layer base {
+  /* Form element defaults */
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 0.375rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px var(--color-blue-500);
+    border-color: var(--color-blue-500);
+  }
+  
+  /* Form spacing */
+  label + input,
+  label + textarea,
+  label + select {
+    margin-top: 0.5rem;
+  }
+  
+  form > div + div {
+    margin-top: 1rem;
+  }
 }
 
-/* DevTools specific dark theme styling */
+/* Space utilities - explicit rules for Tailwind v4 */
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Alternative more specific selector */
+.space-y-2 > :not(:first-child) {
+  margin-top: 0.5rem;
+}
+
+.space-y-4 > :not(:first-child) {
+  margin-top: 1rem;
+}
+
+.space-y-6 > :not(:first-child) {
+  margin-top: 1.5rem;
+}
+
+/* Component layer for reusable classes */
+@layer components {
+  .card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--rounded-lg);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--rounded);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition-property: background-color, border-color, color;
+    transition-duration: 150ms;
+  }
+  
+  .btn-primary {
+    background-color: var(--color-blue-600);
+    color: var(--color-white);
+    border: 0;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-blue-700);
+  }
+}
+
+/* DevTools specific styling - not in a layer */
 .devtools-panel {
   font-size: 12px;
-  background-color: theme(colors.slate.800);
-  color: theme(colors.slate.200);
+  background-color: var(--color-slate-800);
+  color: var(--color-slate-200);
 }
 
 .devtools-panel h1,
@@ -24,73 +118,28 @@
 .devtools-panel h4,
 .devtools-panel h5,
 .devtools-panel h6 {
-  @apply text-xs font-medium my-2 text-slate-200;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+  color: var(--color-slate-200);
 }
 
 .devtools-panel p {
-  @apply text-xs my-2 text-slate-300;
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+  color: var(--color-slate-300);
 }
 
 .devtools-panel button {
-  @apply text-xs px-2 py-1 rounded border cursor-pointer bg-slate-600 text-slate-200 border-slate-500 hover:bg-slate-500;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--rounded);
+  border: 1px solid var(--color-slate-500);
+  cursor: pointer;
+  background-color: var(--color-slate-600);
+  color: var(--color-slate-200);
 }
 
-.devtools-panel input,
-.devtools-panel select,
-.devtools-panel textarea {
-  @apply text-xs px-2 py-1 border border-slate-500 rounded bg-slate-700 text-slate-200 placeholder-slate-400;
-}
-
-/* DevTools card styling */
-.devtools-panel .card,
-.devtools-panel [class*="bg-white"] {
-  @apply bg-slate-700 border-slate-600;
-}
-
-/* Override specific background colors for DevTools */
-.devtools-panel .bg-white {
-  @apply !bg-slate-700 !border-slate-600;
-}
-
-.devtools-panel .text-gray-600 {
-  @apply !text-slate-400;
-}
-
-.devtools-panel .border-gray-200,
-.devtools-panel .border-gray-300 {
-  @apply !border-slate-600;
-}
-
-/* Component-specific classes using Tailwind */
-.card {
-  @apply bg-white border border-gray-200 rounded-lg p-4 shadow-md;
-}
-
-.btn {
-  @apply inline-block px-4 py-2 rounded font-medium text-center cursor-pointer transition-colors;
-}
-
-.btn-primary {
-  @apply bg-blue-600 text-white border-0 hover:bg-blue-700;
-}
-
-.btn-secondary {
-  @apply bg-indigo-600 text-white border-0 hover:bg-indigo-700;
-}
-
-.btn-accent {
-  @apply bg-orange-500 text-white border-0 hover:bg-orange-600;
-}
-
-/* Utility classes */
-.text-balanced {
-  text-wrap: balance;
-}
-
-.visually-hidden {
-  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
-}
-
-.focus-visible {
-  @apply outline-2 outline-blue-600 outline-offset-2;
+.devtools-panel button:hover {
+  background-color: var(--color-slate-500);
 }

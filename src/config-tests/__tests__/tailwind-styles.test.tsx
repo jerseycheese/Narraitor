@@ -7,41 +7,23 @@ describe('Tailwind CSS Configuration Integration', () => {
     const configPath = path.resolve(process.cwd(), 'postcss.config.mjs');
     expect(fs.existsSync(configPath)).toBe(true);
     
-    // Read and check content
+    // Read and check content for Tailwind v4 format
     const fileContent = fs.readFileSync(configPath, 'utf8');
-    expect(fileContent).toContain('const postcssConfig = {');
-    expect(fileContent).toContain('plugins: {');
+    expect(fileContent).toContain('export default');
+    expect(fileContent).toContain('plugins:');
     expect(fileContent).toContain('@tailwindcss/postcss');
-    expect(fileContent).toContain('autoprefixer');
-    expect(fileContent).toContain('export default postcssConfig');
     
     // Should NOT contain postcss-nested in v4 configuration
     expect(fileContent).not.toContain('postcss-nested');
   });
   
-  // Test Tailwind Configuration
-  test('tailwind.config.ts file exists and has correct structure', () => {
-    const configPath = path.resolve(process.cwd(), 'tailwind.config.ts');
-    expect(fs.existsSync(configPath)).toBe(true);
-    
-    // Read and check content
-    const fileContent = fs.readFileSync(configPath, 'utf8');
-    expect(fileContent).toContain('import type { Config } from \'tailwindcss\'');
-    expect(fileContent).toContain('const config: Config = {');
-    expect(fileContent).toContain('content: [');
-    expect(fileContent).toContain('./src/app/');
-    expect(fileContent).toContain('./src/components/');
-    expect(fileContent).toContain('theme: {');
-    expect(fileContent).toContain('export default config');
-  });
-  
   // Test for globals.css to have Tailwind directives
-  test('globals.css has required Tailwind directives', () => {
+  test('globals.css has required Tailwind v4 directives', () => {
     const globalsPath = path.resolve(process.cwd(), 'src/app/globals.css');
     expect(fs.existsSync(globalsPath)).toBe(true);
     
     const fileContent = fs.readFileSync(globalsPath, 'utf8');
-    expect(fileContent).toContain('@import "tailwindcss/preflight.css"');
-    expect(fileContent).toContain('@import "tailwindcss/utilities.css"');
+    // Tailwind v4 uses single import
+    expect(fileContent).toContain('@import "tailwindcss"');
   });
 });

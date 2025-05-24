@@ -31,6 +31,9 @@ export default function DevPage() {
         <Link href="/dev/choice-generator" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
           Player Choice Generator Test Harness
         </Link>
+        <Link href="/dev/character-creation" className="block p-4 bg-blue-100 hover:bg-blue-200 rounded">
+          Character Creation Wizard Test Harness
+        </Link>
       </div>
     </div>
   );

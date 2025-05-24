@@ -1,45 +1,28 @@
 /**
- * Tests for the Tailwind CSS configuration file
+ * Tests for Tailwind CSS v4 configuration via PostCSS
  * @jest-environment node
  */
 
 import fs from 'fs';
 import path from 'path';
 
-describe('Tailwind Configuration', () => {
-  const configPath = path.resolve(process.cwd(), 'tailwind.config.ts');
+describe('Tailwind v4 Configuration', () => {
+  const postcssConfigPath = path.resolve(process.cwd(), 'postcss.config.mjs');
+  const globalsPath = path.resolve(process.cwd(), 'src/app/globals.css');
   
-  test('tailwind.config.ts file exists', () => {
-    expect(fs.existsSync(configPath)).toBe(true);
+  test('PostCSS config includes Tailwind v4 plugin', () => {
+    expect(fs.existsSync(postcssConfigPath)).toBe(true);
+    const fileContent = fs.readFileSync(postcssConfigPath, 'utf8');
+    
+    // Check for Tailwind v4 PostCSS plugin
+    expect(fileContent).toContain('@tailwindcss/postcss');
   });
   
-  test('tailwind.config.ts is properly structured', () => {
-    const fileContent = fs.readFileSync(configPath, 'utf8');
+  test('globals.css includes Tailwind v4 import', () => {
+    expect(fs.existsSync(globalsPath)).toBe(true);
+    const fileContent = fs.readFileSync(globalsPath, 'utf8');
     
-    // Check for expected content
-    expect(fileContent).toContain('import type { Config } from \'tailwindcss\'');
-    expect(fileContent).toContain('const config: Config = {');
-    expect(fileContent).toContain('content: [');
-    expect(fileContent).toContain('./src/app/');
-    expect(fileContent).toContain('./src/components/');
-    expect(fileContent).toContain('theme: {');
-    expect(fileContent).toContain('export default config');
-  });
-  
-  test('tailwind.config.ts includes all required content paths', () => {
-    const fileContent = fs.readFileSync(configPath, 'utf8');
-    
-    // Check that the content array includes all required paths
-    expect(fileContent).toMatch(/\.\/src\/app\/.*?\.{js,ts,jsx,tsx}/);
-    expect(fileContent).toMatch(/\.\/src\/components\/.*?\.{js,ts,jsx,tsx}/);
-    expect(fileContent).toMatch(/\.\/src\/lib\/.*?\.{js,ts,jsx,tsx}/);
-  });
-  
-  test('tailwind.config.ts includes appropriate Tailwind v4 configuration', () => {
-    const fileContent = fs.readFileSync(configPath, 'utf8');
-    
-    // Check for Tailwind v4 specific configuration
-    expect(fileContent).toContain('future:');
-    expect(fileContent).toContain('hoverOnlyWhenSupported');
+    // Check for Tailwind v4 import syntax
+    expect(fileContent).toContain('@import "tailwindcss"');
   });
 });

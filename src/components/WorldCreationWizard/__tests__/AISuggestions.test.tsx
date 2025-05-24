@@ -15,6 +15,7 @@ describe('AISuggestions', () => {
       description: 'Physical power',
       minValue: 1,
       maxValue: 10,
+      baseValue: 5,
       category: 'Physical',
       accepted: false
     },
@@ -23,6 +24,7 @@ describe('AISuggestions', () => {
       description: 'Mental acuity',
       minValue: 1,
       maxValue: 10,
+      baseValue: 5,
       category: 'Mental',
       accepted: false
     }
@@ -35,6 +37,9 @@ describe('AISuggestions', () => {
       difficulty: 'medium',
       category: 'Physical',
       linkedAttributeName: 'Strength',
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
       accepted: false
     },
     {
@@ -43,6 +48,9 @@ describe('AISuggestions', () => {
       difficulty: 'easy',
       category: 'Mental',
       linkedAttributeName: 'Intelligence',
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
       accepted: false
     }
   ];
