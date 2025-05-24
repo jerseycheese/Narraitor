@@ -89,8 +89,27 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   
   // Initialize state from auto-save or defaults
   const [state, setState] = useState<CharacterCreationState>(() => {
-    if (data) return data;
+    console.log('[CharacterCreationWizard] Initializing state. Auto-save data:', data);
     
+    // First check sessionStorage directly as a fallback
+    const storageKey = `character-creation-${worldId}`;
+    const directData = sessionStorage.getItem(storageKey);
+    if (directData) {
+      try {
+        const parsed = JSON.parse(directData);
+        console.log('[CharacterCreationWizard] Found data directly in sessionStorage:', parsed);
+        return parsed;
+      } catch (e) {
+        console.error('[CharacterCreationWizard] Error parsing direct sessionStorage data:', e);
+      }
+    }
+    
+    if (data) {
+      console.log('[CharacterCreationWizard] Using auto-saved data');
+      return data;
+    }
+    
+    console.log('[CharacterCreationWizard] No auto-save data, initializing defaults');
     // Initialize with world attributes and skills
     return {
       currentStep: initialStep,
@@ -142,6 +161,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   useEffect(() => {
     setData(state);
   }, [state, setData]);
+
+  // Check if data was loaded after initial render
+  useEffect(() => {
+    if (data && state.characterData.name === '') {
+      console.log('[CharacterCreationWizard] Late-loaded auto-save data detected, updating state:', data);
+      setState(data);
+    }
+  }, [data, state.characterData.name]);
 
   const validateStep = useCallback((step: number): { valid: boolean; errors: string[] } => {
     switch (step) {
