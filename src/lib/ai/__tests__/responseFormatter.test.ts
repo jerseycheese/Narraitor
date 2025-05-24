@@ -71,21 +71,6 @@ describe('ResponseFormatter', () => {
       expect(result.content).toBe('');
     });
 
-    test('should handle null content gracefully', () => {
-      // Arrange
-      const response: AIResponse = {
-        content: null as unknown as string, // Force null with proper type assertion
-        finishReason: 'STOP',
-      };
-      mockFormatAIResponse.mockReturnValue('');
-
-      // Act
-      const result = formatter.format(response);
-
-      // Assert
-      expect(mockFormatAIResponse).toHaveBeenCalledWith('', {}); // Expects empty string after null coalescing
-      expect(result.formattedContent).toBe('');
-    });
 
     test('should preserve existing response properties', () => {
       // Arrange

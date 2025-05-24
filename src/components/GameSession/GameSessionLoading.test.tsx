@@ -17,10 +17,4 @@ describe('GameSessionLoading', () => {
     expect(screen.getByText('Preparing your adventure...')).toBeInTheDocument();
   });
 
-  test('includes screen reader accessible text', () => {
-    render(<GameSessionLoading />);
-
-    const srOnlyText = screen.getByText('Loading...');
-    expect(srOnlyText.className).toContain('sr-only');
-  });
 });

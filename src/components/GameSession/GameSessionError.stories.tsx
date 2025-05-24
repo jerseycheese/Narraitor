@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import GameSessionError from './GameSessionError';
 
 const meta: Meta<typeof GameSessionError> = {
-  title: 'Narraitor/Game/GameSessionError',
+  title: 'Narraitor/Game/Session/GameSessionError',
   component: GameSessionError,
   parameters: {
     layout: 'centered',

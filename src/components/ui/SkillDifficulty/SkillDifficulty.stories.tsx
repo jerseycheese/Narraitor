@@ -5,7 +5,7 @@ import {
 } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof SkillDifficulty> = {
-  title: 'Narraitor/UI/SkillDifficulty',
+  title: 'Narraitor/UI/Controls/SkillDifficulty',
   component: SkillDifficulty,
   parameters: {
     layout: 'centered',
@@ -62,19 +62,6 @@ export const AllDifficulties: Story = {
   ),
 };
 
-export const CompactRow: Story = {
-  render: () => (
-    <div className="flex space-x-4">
-      {SKILL_DIFFICULTIES.map((difficulty) => (
-        <SkillDifficulty
-          key={difficulty.value}
-          difficulty={difficulty.value}
-          showDescription={false}
-        />
-      ))}
-    </div>
-  ),
-};
 
 export const InContext: Story = {
   render: () => (

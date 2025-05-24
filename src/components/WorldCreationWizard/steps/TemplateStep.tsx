@@ -7,9 +7,10 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: { selectedTemplateId: string | null }) => void;
+  onUpdate: (updates: { selectedTemplateId?: string | null; createOwnWorld?: boolean }) => void;
   errors: Record<string, string>;
-  onComplete: () => void;
+  onComplete: (createOwnWorld?: boolean) => void;
+  onCancel?: () => void;
 }
 
 const TemplateStep: React.FC<TemplateStepProps> = ({
@@ -17,12 +18,13 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   onUpdate,
   errors,
   onComplete,
+  onCancel,
 }) => {
   const [isApplying, setIsApplying] = useState(false);
   
   // Handler for template selection
   const handleSelectTemplate = (templateId: string) => {
-    onUpdate({ selectedTemplateId: templateId });
+    onUpdate({ selectedTemplateId: templateId, createOwnWorld: false });
   };
   
   // Handler for proceeding with template
@@ -40,7 +42,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Using setTimeout to ensure state updates complete before navigation
       // This fixes the test issue by ensuring the callback is executed
       setTimeout(() => {
-        onComplete();
+        onComplete(false);
         setIsApplying(false);
       }, 0);
       
@@ -53,10 +55,14 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
-    // Clear any selected template
-    onUpdate({ selectedTemplateId: null });
-    // Proceed to next step without applying a template
-    onComplete();
+    console.log('handleCreateOwnWorld called');
+    // Clear any selected template and set createOwnWorld flag
+    onUpdate({ selectedTemplateId: null, createOwnWorld: true });
+    console.log('selectedTemplateId set to null, createOwnWorld set to true');
+    // Proceed to next step without applying a template, passing createOwnWorld flag
+    console.log('calling onComplete with createOwnWorld=true');
+    onComplete(true);
+    console.log('onComplete called');
   };
   
   return (
@@ -79,27 +85,37 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         </div>
       )}
       
-      <div className="mt-6 flex justify-end gap-2">
+      <div className="mt-6 flex justify-between">
         <button
           type="button"
-          onClick={handleCreateOwnWorld}
-          className={wizardStyles.navigation.secondaryButton}
-          data-testid="create-own-button"
+          onClick={onCancel || (() => window.history.back())}
+          className={wizardStyles.navigation.cancelButton}
         >
-          Create My Own World
+          Cancel
         </button>
         
-        <button
-          type="button"
-          onClick={handleApplyTemplate}
-          disabled={!selectedTemplateId || isApplying}
-          className={`${wizardStyles.navigation.primaryButton} ${
-            (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
-          }`}
-          data-testid="next-button"
-        >
-          {isApplying ? 'Applying Template...' : 'Use Selected Template'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleCreateOwnWorld}
+            className={wizardStyles.navigation.secondaryButton}
+            data-testid="create-own-button"
+          >
+            Create My Own World
+          </button>
+          
+          <button
+            type="button"
+            onClick={handleApplyTemplate}
+            disabled={!selectedTemplateId || isApplying}
+            className={`${wizardStyles.navigation.primaryButton} ${
+              (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
+            }`}
+            data-testid="next-button"
+          >
+            {isApplying ? 'Applying Template...' : 'Use Selected Template'}
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import PlayerChoices from './PlayerChoices';
 
 const meta: Meta<typeof PlayerChoices> = {
-  title: 'Narraitor/Game/PlayerChoices',
+  title: 'Narraitor/Game/Session/PlayerChoices',
   component: PlayerChoices,
   parameters: {
     layout: 'padded',
@@ -45,19 +45,6 @@ export const DisabledChoices: Story = {
   },
 };
 
-export const EmptyChoices: Story = {
-  args: {
-    choices: [],
-  },
-};
-
-export const SingleChoice: Story = {
-  args: {
-    choices: [
-      { id: 'choice-1', text: 'Continue your journey' },
-    ],
-  },
-};
 
 export const LongTextChoices: Story = {
   args: {

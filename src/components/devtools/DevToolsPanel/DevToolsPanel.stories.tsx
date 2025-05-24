@@ -28,7 +28,7 @@ const DevToolsWrapper = ({ children, initialIsOpen = false }: DevToolsWrapperPro
 };
 
 const meta: Meta<typeof DevToolsPanel> = {
-  title: 'Narraitor/DevTools/DevToolsPanel',
+  title: 'Narraitor/DevTools/Panels/DevToolsPanel',
   component: DevToolsPanel,
   parameters: {
     layout: 'fullscreen',

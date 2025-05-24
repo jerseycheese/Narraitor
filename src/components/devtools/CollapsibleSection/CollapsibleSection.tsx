@@ -48,14 +48,13 @@ export const CollapsibleSection = ({
   return (
     <div 
       data-testid="collapsible-section" 
-      className={`border rounded mb-2 card ${className}`}
+      className={`border rounded mb-2 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 ${className}`}
       {...rest}
     >
-      <div className="border-b p-2 flex justify-between items-center" 
-        style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)' }}>
+      <div className="border-b p-2 flex justify-between items-center bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600">
         <h3 
           data-testid="collapsible-section-title"
-          className="font-medium text-sm text-slate-200"
+          className="font-medium text-sm text-gray-700 dark:text-slate-100"
         >
           {title}
         </h3>
@@ -63,7 +62,7 @@ export const CollapsibleSection = ({
           data-testid="collapsible-section-toggle"
           onClick={toggleExpanded}
           aria-expanded={isExpanded}
-          className="focus-visible text-base font-bold ml-2 bg-slate-600 text-slate-200 px-2 py-1 rounded border border-slate-500 cursor-pointer hover:bg-slate-500 transition-colors"
+          className="focus-visible text-base font-bold ml-2 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 px-2 py-1 rounded border border-gray-300 dark:border-slate-500 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-500 transition-colors"
         >
           {isExpanded ? '−' : '+'}
         </button>

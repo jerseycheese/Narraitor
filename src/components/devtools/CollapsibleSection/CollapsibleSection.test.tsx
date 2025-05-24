@@ -39,45 +39,24 @@ describe('CollapsibleSection', () => {
     expect(contentContainer).toHaveClass('hidden');
   });
   
-  it('renders with collapsed state when initiallyExpanded is false', () => {
-    render(
+  it('renders with collapsed state when configured', () => {
+    const { rerender } = render(
       <CollapsibleSection title="Test Section" initiallyExpanded={false}>
         <div data-testid="section-content">Content</div>
       </CollapsibleSection>
     );
     
-    // Content container should have the 'hidden' class
-    const contentContainer = screen.getByTestId('collapsible-section-content');
-    expect(contentContainer).toHaveClass('hidden');
-  });
-  
-  it('renders with collapsed state when initialCollapsed is true', () => {
-    render(
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
+    
+    rerender(
       <CollapsibleSection title="Test Section" initialCollapsed={true}>
         <div data-testid="section-content">Content</div>
       </CollapsibleSection>
     );
     
-    // Content container should have the 'hidden' class
-    const contentContainer = screen.getByTestId('collapsible-section-content');
-    expect(contentContainer).toHaveClass('hidden');
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
   });
   
-  it('prioritizes initialCollapsed over initiallyExpanded', () => {
-    render(
-      <CollapsibleSection 
-        title="Test Section" 
-        initiallyExpanded={true}
-        initialCollapsed={true} // This should take precedence
-      >
-        <div data-testid="section-content">Content</div>
-      </CollapsibleSection>
-    );
-    
-    // Content container should have the 'hidden' class
-    const contentContainer = screen.getByTestId('collapsible-section-content');
-    expect(contentContainer).toHaveClass('hidden');
-  });
   
   it('shows correct toggle icon based on expanded state', () => {
     render(

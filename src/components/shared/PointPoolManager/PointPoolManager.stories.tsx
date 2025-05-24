@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PointPoolManager, PointAllocation, PointPoolConfig, PointPoolManagerProps } from './PointPoolManager';
 
 const meta: Meta<typeof PointPoolManager> = {
-  title: 'Shared/PointPoolManager',
+  title: 'Narraitor/UI/Controls/PointPoolManager',
   component: PointPoolManager,
   parameters: {
     layout: 'centered',

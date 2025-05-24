@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { BasicInfoStep } from './BasicInfoStep';
 
 const meta: Meta<typeof BasicInfoStep> = {
-  title: 'Narraitor/Character/BasicInfoStep',
+  title: 'Narraitor/Character/Creation/BasicInfoStep',
   component: BasicInfoStep,
   parameters: {
     layout: 'centered',

@@ -3,12 +3,12 @@ import { render, screen } from '@testing-library/react';
 import GameSession from './GameSession';
 import { World } from '@/types/world.types';
 
-// Mock the ErrorMessage component
-jest.mock('@/lib/components/ErrorMessage', () => {
-  return function MockErrorMessage({ error }: { error: Error }) {
-    return <div data-testid="error-message">{error.message}</div>;
-  };
-});
+// Mock the ErrorDisplay component
+jest.mock('@/components/ui/ErrorDisplay/ErrorDisplay', () => ({
+  SectionError: function MockSectionError({ title, message }: { title: string; message: string }) {
+    return <div data-testid="section-error">{title}: {message}</div>;
+  }
+}));
 
 // Mock the child components
 jest.mock('./GameSessionLoading', () => {

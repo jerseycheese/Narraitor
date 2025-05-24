@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { AITestingPanel } from './AITestingPanel';
 
 const meta: Meta<typeof AITestingPanel> = {
-  title: 'DevTools/AITestingPanel',
+  title: 'Narraitor/DevTools/Panels/AITestingPanel',
   component: AITestingPanel,
   parameters: {
     layout: 'padded',
@@ -61,21 +61,6 @@ export const Default: Story = {
   }
 };
 
-/**
- * Panel with custom CSS class
- */
-export const WithCustomClass: Story = {
-  args: {
-    className: 'border border-blue-500'
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates how custom CSS classes can be applied to the panel.'
-      }
-    }
-  }
-};
 
 /**
  * Interactive example showing the complete workflow

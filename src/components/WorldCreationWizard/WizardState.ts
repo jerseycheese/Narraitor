@@ -12,6 +12,7 @@ export interface WizardState {
   errors: Record<string, string>;
   isProcessing: boolean;
   selectedTemplateId?: string | null;
+  createOwnWorld?: boolean;
 }
 
 export interface AttributeSuggestion {
