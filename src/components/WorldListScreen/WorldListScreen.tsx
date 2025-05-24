@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { worldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
+import { LoadingPulse } from '../ui/LoadingState';
 import { World } from '../../types/world.types';
 
 interface WorldListScreenProps {
@@ -83,11 +84,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   if (loading) {
     return (
-      <section className="p-8 text-center" data-testid="world-list-screen-loading-indicator">
-        <div className="animate-pulse">
-          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Loading Worlds</h2>
-          <p className="text-gray-500">Please wait while we load your worlds...</p>
-        </div>
+      <section className="p-8" data-testid="world-list-screen-loading-indicator">
+        <LoadingPulse message="Loading your worlds..." skeletonLines={3} />
       </section>
     );
   }
