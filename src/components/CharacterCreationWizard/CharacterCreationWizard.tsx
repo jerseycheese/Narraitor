@@ -304,7 +304,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           level: skill.level,
         })),
       background: {
-        history: state.characterData.background.history,
+        description: state.characterData.background.history, // Store uses 'description' for history
         personality: state.characterData.background.personality,
         motivation: state.characterData.background.motivation,
       },
