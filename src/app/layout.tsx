@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { DevToolsProvider, DevToolsPanel } from "@/components/devtools";
 import { DevMockState } from "@/components/devtools/DevMockState";
+import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: "Narraitor",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <DevToolsProvider>
           {/* Add DevMockState to initialize development data */}
           <DevMockState />
+          <Navigation />
           <div className="min-h-screen pb-12 md:pb-14">
             {children}
           </div>
