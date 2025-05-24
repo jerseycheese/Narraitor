@@ -5,6 +5,7 @@ import { worldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { LoadingPulse } from '../ui/LoadingState';
+import { SectionError } from '../ui/ErrorDisplay';
 import { World } from '../../types/world.types';
 
 interface WorldListScreenProps {
@@ -92,9 +93,12 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   if (error) {
     return (
-      <section className="p-6 border border-red-300 rounded-lg bg-red-50" data-testid="world-list-screen-error-message">
-        <h2 className="text-xl font-semibold text-red-700 mb-2">Error Loading Worlds</h2>
-        <p className="text-red-600">Error: {error}</p>
+      <section className="p-6" data-testid="world-list-screen-error-message">
+        <SectionError
+          title="Error Loading Worlds"
+          message={error}
+          severity="error"
+        />
       </section>
     );
   }
