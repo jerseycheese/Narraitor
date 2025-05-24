@@ -33,10 +33,10 @@ Look for these API calls in the Network tab:
    - Request payload should include:
      ```json
      {
-       "characterId": "char_xxx",
+       "characterIds": ["char_xxx"],
        "worldId": "world_xxx",
-       "character": {
-         "name": "Character Name",
+       "playerCharacterName": "Character Name",
+       "playerCharacterBackground": {
          "attributes": {...},
          "skills": {...}
        }
