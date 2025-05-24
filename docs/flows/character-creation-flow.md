@@ -33,7 +33,7 @@ flowchart TD
     K --> L[System validates background]
     L --> M[User confirms character creation]
     M --> N[System creates character]
-    N --> O[System redirects to Character Dashboard]
+    N --> O[System redirects to Game Session]
     
     F --> F1[Validation Error]
     F1 --> E
@@ -136,7 +136,7 @@ flowchart TD
 **System Response**: 
 - Shows loading state on button
 - Creates character in characterStore
-- Attempts redirect to `/characters/[id]` (currently 404)
+- Redirects to `/world/[worldId]/play` for immediate gameplay
 **UI Component**: Background step handles creation directly (no separate summary step in MVP)
 **Validation**: Final validation of complete character configuration
 **Data Changes**: 
@@ -220,7 +220,7 @@ flowchart TD
 - ✅ Mobile-friendly sliders and toggle buttons for touch interfaces
 - ✅ Shared wizard component system ensures visual consistency with WorldCreationWizard
 - ✅ Auto-save functionality via sessionStorage persistence
-- ⚠️ Character detail page (`/characters/[id]`) not yet implemented (causes 404 after creation)
+- ✅ Character creation now flows directly to game session (`/world/[worldId]/play`)
 
 ## Related Documents
 - [Character System Requirements](/users/jackhaas/projects/narraitor/docs/requirements/core/character-system.md)
