@@ -86,7 +86,7 @@ describe('ErrorDisplay', () => {
         />
       );
       
-      const container = screen.getByRole('alert').parentElement;
+      const container = screen.getByRole('alert');
       expect(container).toHaveClass('flex', 'flex-col', 'items-center', 'justify-center');
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Page Error');
     });

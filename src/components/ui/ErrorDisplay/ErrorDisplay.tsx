@@ -77,7 +77,11 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
 
   if (variant === 'page') {
     return (
-      <div className={cn('flex flex-col items-center justify-center min-h-[400px] p-8', className)}>
+      <div 
+        className={cn('flex flex-col items-center justify-center min-h-[400px] p-8', className)}
+        role="alert"
+        aria-live="polite"
+      >
         {title && (
           <h1 className={cn('text-2xl font-bold mb-4', styles.title)}>
             {title}
