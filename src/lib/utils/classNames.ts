@@ -25,7 +25,7 @@ export function clsx(...inputs: ClassValue[]): string {
       
       if (typeof input === 'object') {
         return Object.entries(input)
-          .filter(([_, value]) => value)
+          .filter(([, value]) => value)
           .map(([key]) => key)
           .join(' ');
       }
@@ -36,4 +36,4 @@ export function clsx(...inputs: ClassValue[]): string {
     .join(' ');
 }
 
-type ClassValue = string | number | null | undefined | ClassValue[] | { [key: string]: any };
+type ClassValue = string | number | null | undefined | ClassValue[] | { [key: string]: unknown };
