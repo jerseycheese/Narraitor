@@ -143,7 +143,13 @@ export default function SkillReviewStep({
       >
 
       <div className="space-y-4">
-        {localSuggestions.map((suggestion, index) => (
+        {localSuggestions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-lg mb-2">No skill suggestions available</p>
+            <p className="text-sm">You can add skills to your world later in the world editor.</p>
+          </div>
+        ) : (
+          localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
             className={wizardStyles.card.base} 
@@ -287,7 +293,8 @@ export default function SkillReviewStep({
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className="mt-4" data-testid="skill-count-summary">

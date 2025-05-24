@@ -61,9 +61,11 @@ export default function WorldCreationWizard({
       case 2:
         return !!wizardState.worldData.description;
       case 3:
-        return (wizardState.worldData.attributes?.length || 0) > 0;
+        // Attributes are optional when creating own world
+        return wizardState.createOwnWorld === true || (wizardState.worldData.attributes?.length || 0) > 0;
       case 4:
-        return (wizardState.worldData.skills?.length || 0) > 0;
+        // Skills are optional when creating own world
+        return wizardState.createOwnWorld === true || (wizardState.worldData.skills?.length || 0) > 0;
       default:
         return true;
     }

@@ -125,7 +125,13 @@ export default function AttributeReviewStep({
       >
 
       <div className="space-y-4">
-        {localSuggestions.map((suggestion, index) => (
+        {localSuggestions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p className="text-lg mb-2">No attribute suggestions available</p>
+            <p className="text-sm">You can add attributes to your world later in the world editor.</p>
+          </div>
+        ) : (
+          localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
             className="border p-4 rounded" 
@@ -219,7 +225,8 @@ export default function AttributeReviewStep({
               </div>
             )}
           </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className="mt-4" data-testid="attribute-count-summary">
