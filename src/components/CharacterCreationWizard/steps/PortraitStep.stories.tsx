@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import { PortraitStep } from './PortraitStep';
 
 const meta: Meta<typeof PortraitStep> = {
-  title: 'Narraitor/Character/Creation/PortraitStep',
+  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 5 Portrait',
   component: PortraitStep,
   parameters: {
     layout: 'centered',
@@ -82,96 +82,6 @@ export const WithGeneratedPortrait: Story = {
   },
 };
 
-// Different character - warrior type
-export const WarriorCharacter: Story = {
-  args: {
-    data: {
-      ...mockData,
-      characterData: {
-        ...mockData.characterData,
-        name: 'Thorin Ironshield',
-        attributes: [
-          { attributeId: 'strength', value: 18 },
-          { attributeId: 'constitution', value: 16 },
-          { attributeId: 'intelligence', value: 10 },
-        ],
-        skills: [
-          { skillId: 'swordplay', level: 15, isSelected: true },
-          { skillId: 'armor', level: 12, isSelected: true },
-        ],
-        background: {
-          history: 'A battle-hardened warrior from the mountain clans',
-          personality: 'Brave, loyal, and steadfast in battle',
-          goals: ['Protect the innocent', 'Honor his clan'],
-        },
-      },
-    },
-    onUpdate: action('onUpdate'),
-    worldConfig: {
-      theme: 'Dark Fantasy',
-      name: 'Iron Realm',
-    },
-  },
-};
-
-// Sci-fi themed character
-export const SciFiCharacter: Story = {
-  args: {
-    data: {
-      ...mockData,
-      characterData: {
-        ...mockData.characterData,
-        name: 'Zara Voidwalker',
-        attributes: [
-          { attributeId: 'intelligence', value: 16 },
-          { attributeId: 'dexterity', value: 14 },
-          { attributeId: 'technology', value: 18 },
-        ],
-        skills: [
-          { skillId: 'hacking', level: 12, isSelected: true },
-          { skillId: 'piloting', level: 10, isSelected: true },
-        ],
-        background: {
-          history: 'A skilled starship pilot and cyber-hacker from the outer colonies',
-          personality: 'Quick-witted, rebellious, and technologically savvy',
-          goals: ['Fight against corporate oppression', 'Explore unknown space'],
-        },
-      },
-    },
-    onUpdate: action('onUpdate'),
-    worldConfig: {
-      theme: 'Cyberpunk',
-      name: 'Neo Tokyo 2177',
-    },
-  },
-};
-
-// Minimal character data
-export const MinimalData: Story = {
-  args: {
-    data: {
-      characterData: {
-        name: 'Test Character',
-        portrait: {
-          type: 'placeholder' as const,
-          url: null,
-        },
-        attributes: [],
-        skills: [],
-        background: {
-          history: '',
-          personality: '',
-          goals: [],
-        },
-      },
-      worldId: 'world-1',
-    },
-    onUpdate: action('onUpdate'),
-    worldConfig: {
-      theme: 'Generic Fantasy',
-    },
-  },
-};
 
 // Known figure - real person
 export const KnownRealPerson: Story = {
@@ -241,16 +151,3 @@ export const WithPhysicalDescription: Story = {
   },
 };
 
-// Error state
-export const WithError: Story = {
-  args: {
-    data: mockData,
-    onUpdate: action('onUpdate'),
-    worldConfig: mockWorldConfig,
-  },
-  render: (args) => {
-    // This would show how the component looks with an error
-    // In real usage, errors come from failed API calls
-    return <PortraitStep {...args} />;
-  },
-};
