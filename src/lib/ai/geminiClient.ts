@@ -10,7 +10,7 @@ import { getGenerationConfig, getSafetySettings } from './config';
  * Using the new @google/genai SDK
  */
 export class GeminiClient implements AIClient {
-  private config: AIServiceConfig;
+  protected config: AIServiceConfig;
   private genAI: GoogleGenAI;
   
   constructor(config: AIServiceConfig) {

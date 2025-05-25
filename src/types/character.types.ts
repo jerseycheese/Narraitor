@@ -4,6 +4,25 @@ import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
 import { Inventory } from './inventory.types';
 
 /**
+ * Character portrait data
+ */
+export interface CharacterPortrait {
+  type: 'ai-generated' | 'placeholder';
+  url: string | null;
+  generatedAt?: string;
+  prompt?: string;
+}
+
+/**
+ * Portrait generation status tracking
+ */
+export interface PortraitGenerationStatus {
+  isGenerating: boolean;
+  error: string | null;
+  lastAttemptAt?: string;
+}
+
+/**
  * Represents a character in the game
  */
 export interface Character extends NamedEntity, TimestampedEntity {
@@ -13,6 +32,7 @@ export interface Character extends NamedEntity, TimestampedEntity {
   background: CharacterBackground;
   inventory: Inventory;
   status: CharacterStatus;
+  portrait?: CharacterPortrait;
 }
 
 /**
@@ -39,9 +59,12 @@ export interface CharacterSkill {
 export interface CharacterBackground {
   history: string;
   personality: string;
+  physicalDescription?: string; // Physical appearance description
   goals: string[];
   fears: string[];
   relationships: CharacterRelationship[];
+  isKnownFigure?: boolean; // Whether this is a real or fictional known figure
+  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
 }
 
 /**

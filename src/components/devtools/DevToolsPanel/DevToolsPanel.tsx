@@ -6,34 +6,33 @@ import { StateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
+import { PortraitDebugSection } from '../PortraitDebugSection';
 
 /**
  * Environment info component for the DevTools panel
  */
 const EnvironmentInfo = () => {
-  const [info, setInfo] = useState({
-    nodeEnv: '',
-    isClient: false,
-    isDev: false,
-    location: 'N/A'
-  });
+  const [mounted, setMounted] = useState(false);
+  const [location, setLocation] = useState('N/A');
   
   useEffect(() => {
-    setInfo({
-      nodeEnv: process.env.NODE_ENV || 'unknown',
-      isClient: true,
-      isDev: process.env.NODE_ENV === 'development',
-      location: typeof window !== 'undefined' ? window.location.pathname : 'N/A'
-    });
+    setMounted(true);
+    if (typeof window !== 'undefined') {
+      setLocation(window.location.pathname);
+    }
   }, []);
+  
+  // Static values that don't change between server and client
+  const nodeEnv = process.env.NODE_ENV || 'unknown';
+  const isDev = process.env.NODE_ENV === 'development';
   
   return (
     <div className="devtools-panel mb-4 text-xs bg-slate-700 p-2 rounded border border-slate-600">
       <h3 className="devtools-panel font-bold mb-1 text-slate-200">Environment Info:</h3>
-      <div className="devtools-panel text-slate-300">NODE_ENV: {info.nodeEnv}</div>
-      <div className="devtools-panel text-slate-300">Is Client: {String(info.isClient)}</div>
-      <div className="devtools-panel text-slate-300">Is Development: {String(info.isDev)}</div>
-      <div className="devtools-panel text-slate-300">Window Location: {info.location}</div>
+      <div className="devtools-panel text-slate-300">NODE_ENV: {nodeEnv}</div>
+      <div className="devtools-panel text-slate-300">Is Client: {String(mounted)}</div>
+      <div className="devtools-panel text-slate-300">Is Development: {String(isDev)}</div>
+      <div className="devtools-panel text-slate-300">Window Location: {location}</div>
     </div>
   );
 };
@@ -61,21 +60,26 @@ const EnvironmentInfo = () => {
  */
 export const DevToolsPanel = () => {
   const { isOpen, toggleDevTools } = useDevTools();
-  const [isClient, setIsClient] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [isTestPage, setIsTestPage] = useState(false);
   
-  // Set client-side flags after mount
+  // Set mounted flag and check if we're on the test page after mount
   useEffect(() => {
-    setIsClient(true);
+    setMounted(true);
     
     // Check if we're on the test page
     if (typeof window !== 'undefined') {
       setIsTestPage(window.location.pathname.includes('/dev/devtools-test'));
     }
-  }, [isOpen]);
+  }, []);
 
-  // Only render in development environment
-  if (isClient && process.env.NODE_ENV !== 'development' && !isTestPage) {
+  // Don't render anything on the server to avoid hydration issues
+  if (!mounted) {
+    return null;
+  }
+
+  // Only render in development environment or on test page
+  if (process.env.NODE_ENV !== 'development' && !isTestPage) {
     return null;
   }
 
@@ -93,8 +97,7 @@ export const DevToolsPanel = () => {
       >
         <div className="text-sm font-medium text-slate-200">
           Narraitor DevTools
-          {/* Only render this on client-side to avoid hydration mismatch */}
-          {isClient && isTestPage && ' (Test Page Mode)'}
+          {isTestPage && ' (Test Page Mode)'}
         </div>
         <button
           data-testid="devtools-panel-toggle"
@@ -123,6 +126,9 @@ export const DevToolsPanel = () => {
           <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
             <TestDataGeneratorSection />
           </CollapsibleSection>
+          
+          {/* Portrait Generation Debug Section */}
+          <PortraitDebugSection />
         </div>
       )}
     </div>

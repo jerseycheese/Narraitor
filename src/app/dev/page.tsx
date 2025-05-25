@@ -37,6 +37,9 @@ export default function DevPage() {
         <Link href="/dev/test-character-form" className="block p-4 bg-green-100 hover:bg-green-200 rounded">
           Character Form Debug (Test Data Pre-fill)
         </Link>
+        <Link href="/dev/portrait-prompt-test" className="block p-4 bg-purple-100 hover:bg-purple-200 rounded">
+          Portrait Prompt Testing & Logic Visualization
+        </Link>
       </div>
     </div>
   );
