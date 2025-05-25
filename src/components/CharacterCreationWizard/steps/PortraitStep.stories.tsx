@@ -11,6 +11,13 @@ const meta: Meta<typeof PortraitStep> = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  decorators: [
+    (Story) => (
+      <div style={{ width: '600px', padding: '2rem', backgroundColor: 'white' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;
@@ -163,5 +170,87 @@ export const MinimalData: Story = {
     worldConfig: {
       theme: 'Generic Fantasy',
     },
+  },
+};
+
+// Known figure - real person
+export const KnownRealPerson: Story = {
+  args: {
+    data: {
+      ...mockData,
+      characterData: {
+        ...mockData.characterData,
+        name: 'Albert Einstein',
+        background: {
+          history: 'Revolutionary physicist who developed the theory of relativity',
+          personality: 'Curious, thoughtful, and deeply philosophical',
+          goals: ['Understand the universe', 'Promote peace'],
+          isKnownFigure: true,
+          knownFigureType: 'historical',
+        },
+      },
+    },
+    onUpdate: action('onUpdate'),
+    worldConfig: {
+      theme: 'Historical',
+      name: '20th Century',
+    },
+  },
+};
+
+// Known figure - fictional character
+export const KnownFictionalCharacter: Story = {
+  args: {
+    data: {
+      ...mockData,
+      characterData: {
+        ...mockData.characterData,
+        name: 'Sherlock Holmes',
+        background: {
+          history: 'The worlds greatest consulting detective from 221B Baker Street',
+          personality: 'Brilliant, observant, and occasionally arrogant',
+          goals: ['Solve impossible cases', 'Defeat Moriarty'],
+          isKnownFigure: true,
+          knownFigureType: 'fictional',
+        },
+      },
+    },
+    onUpdate: action('onUpdate'),
+    worldConfig: {
+      theme: 'Victorian Mystery',
+      name: 'Victorian London',
+    },
+  },
+};
+
+// With physical description preset
+export const WithPhysicalDescription: Story = {
+  args: {
+    data: {
+      ...mockData,
+      characterData: {
+        ...mockData.characterData,
+        background: {
+          ...mockData.characterData.background,
+          physicalDescription: 'Tall and slender with flowing silver hair, piercing violet eyes, and intricate tattoos of ancient runes covering her arms',
+        },
+      },
+    },
+    onUpdate: action('onUpdate'),
+    worldConfig: mockWorldConfig,
+  },
+};
+
+// Error state
+export const WithError: Story = {
+  args: {
+    data: mockData,
+    onUpdate: action('onUpdate'),
+    worldConfig: mockWorldConfig,
+  },
+  render: (args) => {
+    // This would show how the component looks with an error
+    // In real usage, errors come from failed API calls
+    return <PortraitStep {...args} />;
   },
 };
