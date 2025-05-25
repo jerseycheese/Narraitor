@@ -169,7 +169,15 @@ describe('Character Creation Wizard with Portrait Integration', () => {
     ],
     skills: [
       { id: 'magic', name: 'Magic', category: 'arcane', difficultyLevels: {} }
-    ]
+    ],
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 20,
+      skillPointPool: 20
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   beforeEach(() => {

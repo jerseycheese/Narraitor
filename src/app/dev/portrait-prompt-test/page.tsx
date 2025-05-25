@@ -66,7 +66,16 @@ export default function PortraitPromptTestPage() {
       
       // Get detection info from the portrait generator's detection results
       // This will be more accurate than parsing the prompt
-      const storedDetection = typeof window !== 'undefined' ? (window as any).lastDetectionResult : null;
+      interface DetectionResult {
+        isKnownFigure: boolean;
+        figureType?: string;
+        actorName?: string;
+        figureName?: string;
+      }
+      
+      const storedDetection = typeof window !== 'undefined' 
+        ? (window as Window & { lastDetectionResult?: DetectionResult }).lastDetectionResult 
+        : null;
       if (storedDetection) {
         setDetectedInfo({
           isKnownFigure: storedDetection.isKnownFigure,

@@ -102,8 +102,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the image part in the response
-    const parts = data.candidates[0].content.parts;
-    const imagePart = parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) => 
+    type ContentPart = { text?: string; inlineData?: { mimeType?: string; data?: string } };
+    const parts = data.candidates[0].content.parts as ContentPart[];
+    const imagePart = parts.find((part) => 
       part.inlineData && 
       part.inlineData.mimeType && 
       part.inlineData.mimeType.startsWith('image/')
@@ -112,9 +113,9 @@ export async function POST(request: NextRequest) {
     if (!imagePart) {
       console.error('No image part found in response:', {
         partsCount: parts.length,
-        partTypes: parts.map((p: any) => {
-          if (p.text) return 'text';
-          if (p.inlineData) return `inlineData(${p.inlineData.mimeType || 'no-mime'})`;
+        partTypes: parts.map((p) => {
+          if ('text' in p) return 'text';
+          if ('inlineData' in p && p.inlineData) return `inlineData(${p.inlineData.mimeType || 'no-mime'})`;
           return 'unknown';
         }),
         parts: parts
@@ -129,9 +130,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return the image data
-    const mimeType = imagePart.inlineData.mimeType;
-    const base64Data = imagePart.inlineData.data;
+    // Return the image data (we already checked that inlineData exists above)
+    const mimeType = imagePart.inlineData!.mimeType;
+    const base64Data = imagePart.inlineData!.data;
     
     return NextResponse.json({
       image: `data:${mimeType};base64,${base64Data}`,
