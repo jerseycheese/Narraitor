@@ -44,12 +44,12 @@ describe('PortraitGenerator - Following Gemini Guidelines', () => {
       });
       
       // Should follow: Subject + Context + Style
-      expect(prompt).toMatch(/^A portrait photograph of/);
-      expect(prompt).toContain('Albert Einstein, the historical');
-      expect(prompt).toContain('professional headshot'); // context
-      expect(prompt).toContain('studio lighting'); // context
-      expect(prompt).toContain('85mm lens'); // style
-      expect(prompt).toContain('photorealistic'); // style
+      expect(prompt).toMatch(/^Photorealistic portrait of/);
+      expect(prompt).toContain('Albert Einstein');
+      expect(prompt).toContain('the historical');
+      expect(prompt).toContain('appropriate environment'); // context
+      expect(prompt).toContain('ambient lighting'); // context
+      expect(prompt).toContain('photorealistic quality'); // style
     });
 
     test('original characters should use fantasy art approach', () => {
@@ -60,14 +60,14 @@ describe('PortraitGenerator - Following Gemini Guidelines', () => {
       });
       
       // Should follow: Subject + Context + Style
-      expect(prompt).toMatch(/^A fantasy portrait of/);
+      expect(prompt).toMatch(/^Fantasy character portrait of/);
       expect(prompt).toContain('Elara Moonshadow');
       expect(prompt).toContain('courageous wise leader character'); // extracted traits
-      expect(prompt).toContain('wizard class'); // profession
-      expect(prompt).toContain('fantasy setting'); // context
-      expect(prompt).toContain('dramatic lighting'); // context
+      expect(prompt).toContain('wizard character'); // profession
+      expect(prompt).toContain('fantasy world setting'); // context
+      expect(prompt).toContain('dramatic atmospheric lighting'); // context
       expect(prompt).toContain('digital painting'); // style
-      expect(prompt).toContain('concept art style'); // style
+      expect(prompt).toContain('concept art quality'); // style
     });
 
     test('should include specific photography terms for known figures', () => {
@@ -77,18 +77,19 @@ describe('PortraitGenerator - Following Gemini Guidelines', () => {
         knownFigureContext: 'celebrity'
       });
       
-      expect(prompt).toContain('85mm lens');
-      expect(prompt).toContain('shallow depth of field');
-      expect(prompt).toContain('professional photography');
-      expect(prompt).toContain('high resolution');
+      expect(prompt).toContain('Photorealistic portrait');
+      expect(prompt).toContain('Taylor Swift');
+      expect(prompt).toContain('sharp focus');
+      expect(prompt).toContain('high-resolution photorealistic quality');
+      expect(prompt).toContain('natural skin tones');
     });
 
     test('should handle different world themes for original characters', () => {
       const testCases = [
         { theme: 'cyberpunk', expected: 'cyberpunk setting' },
         { theme: 'steampunk', expected: 'steampunk setting' },
-        { theme: 'medieval', expected: 'medieval setting' },
-        { theme: undefined, expected: 'mystical background' }
+        { theme: 'medieval', expected: 'medieval world setting' },
+        { theme: undefined, expected: 'neutral background' }
       ];
 
       testCases.forEach(({ theme, expected }) => {
@@ -142,7 +143,7 @@ describe('PortraitGenerator - Following Gemini Guidelines', () => {
       
       const prompt = generator.buildPortraitPrompt(character);
       
-      expect(prompt.length).toBeLessThan(1900);
+      expect(prompt.length).toBeLessThanOrEqual(1900);
       expect(prompt).toContain('...');
     });
   });

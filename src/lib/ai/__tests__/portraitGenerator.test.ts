@@ -22,11 +22,13 @@ describe('PortraitGenerator', () => {
     (mockAIClient.generateContent as jest.Mock).mockImplementation((prompt: string) => {
       if (prompt.includes('Nathan Fielder')) {
         return Promise.resolve({
-          content: '{"isKnownFigure": true, "figureType": "comedian", "actorName": null}'
+          content: '{"isKnownFigure": true, "figureType": "comedian", "actorName": null}',
+          finishReason: 'stop'
         });
       }
       return Promise.resolve({
-        content: '{"isKnownFigure": false, "figureType": null, "actorName": null}'
+        content: '{"isKnownFigure": false, "figureType": null, "actorName": null}',
+        finishReason: 'stop'
       });
     });
     
@@ -44,6 +46,7 @@ describe('PortraitGenerator', () => {
       background: {
         history: 'A skilled mage from the northern kingdoms',
         personality: 'Wise and mysterious',
+        physicalDescription: 'Tall elf with long silver hair and piercing blue eyes',
         goals: ['Master ancient magic'],
         fears: ['Losing control of power'],
         relationships: []
@@ -72,6 +75,12 @@ describe('PortraitGenerator', () => {
     });
 
     it('should build descriptive prompt from character attributes', async () => {
+      // Mock should specifically return false for Elara
+      (mockAIClient.generateContent as jest.Mock).mockResolvedValueOnce({
+        content: '{"isKnownFigure": false, "figureType": null, "actorName": null}',
+        finishReason: 'stop'
+      });
+      
       (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
         image: 'data:image/png;base64,abc123',
         prompt: ''
@@ -80,9 +89,18 @@ describe('PortraitGenerator', () => {
       await generator.generatePortrait(mockCharacter);
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
+      
+      // Check that detection was called with Elara's name
+      expect(mockAIClient.generateContent).toHaveBeenCalledWith(
+        expect.stringContaining('Elara Moonshadow')
+      );
+      
+      // The prompt should be for an unknown character (not a comedian)
       expect(callArgs).toContain('Elara Moonshadow');
-      expect(callArgs).toContain('mage');
-      expect(callArgs).toContain('wise and mysterious');
+      expect(callArgs).toContain('Character portrait'); // Not "Photorealistic portrait"
+      expect(callArgs).toContain('Tall elf with long silver hair'); // Should include physical description
+      expect(callArgs).not.toContain('comedian');
+      expect(callArgs).not.toContain('comedy club');
     });
 
     it('should handle generation failures gracefully', async () => {
@@ -113,17 +131,27 @@ describe('PortraitGenerator', () => {
       const prompt = generator.buildPortraitPrompt(mockCharacter);
 
       expect(prompt).toContain('Elara Moonshadow');
-      expect(prompt).toContain('wise and mysterious');
-      expect(prompt).toContain('mage');
+      expect(prompt).toContain('expressing wise mysterious character');
       expect(prompt).toContain('portrait');
     });
 
     it('should detect and handle comedians/TV personalities as known figures', async () => {
+      const comedianCharacter = {
+        ...mockCharacter,
+        name: 'Nathan Fielder',
+        background: {
+          ...mockCharacter.background,
+          history: 'Known for his comedy and awkward situations'
+        }
+      };
+      
       // Generate portrait (which includes detection)
       (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
         image: 'data:image/png;base64,abc123',
-        prompt: 'Professional portrait photograph of Nathan Fielder'
+        prompt: 'Photorealistic portrait of Nathan Fielder'
       });
+      
+      await generator.generatePortrait(comedianCharacter);
       
       // Check that detection was called
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
@@ -132,8 +160,8 @@ describe('PortraitGenerator', () => {
       
       // Check the generated prompt is for a real person, not fantasy
       const imagePrompt = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
-      expect(imagePrompt).toContain('Professional portrait photograph');
-      expect(imagePrompt).toContain('Nathan Fielder');
+      expect(imagePrompt).toContain('Photorealistic portrait of Nathan Fielder');
+      expect(imagePrompt).toContain('comedian');
       expect(imagePrompt).not.toContain('Fantasy character');
       expect(imagePrompt).not.toContain('digital painting');
     });

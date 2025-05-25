@@ -23,12 +23,12 @@ export async function POST(request: NextRequest) {
     }
     
     // Debug logging
-    if (process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('Portrait API Request:', {
-        prompt: prompt.substring(0, 200) + '...',
-        promptLength: prompt.length
-      });
-    }
+    console.log('Portrait API Request:', {
+      prompt: prompt.substring(0, 200) + '...',
+      promptLength: prompt.length,
+      apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'NOT_SET',
+      endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`
+    });
 
     // Call Google's Gemini API from the server
     const response = await fetch(
@@ -53,12 +53,18 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API Error:', errorText);
+      console.error('Gemini API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        errorText: errorText
+      });
       
       return NextResponse.json(
         { 
           error: `Gemini API failed: ${response.status} ${response.statusText}`,
-          details: errorText
+          details: errorText,
+          apiEndpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`
         },
         { status: response.status }
       );

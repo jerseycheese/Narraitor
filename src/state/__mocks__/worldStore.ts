@@ -244,7 +244,7 @@ const mockSetLoading = jest.fn((loading: boolean) => {
 const mockFetchWorlds = jest.fn(() => Promise.resolve());
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockWorldStore = jest.fn((selector: (state: WorldStore) => any) => {
+const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
   console.log('[__mocks__/worldStore.ts] worldStore mock called with selector type:', typeof selector);
   
   const state: WorldStore = {
@@ -266,6 +266,12 @@ const mockWorldStore = jest.fn((selector: (state: WorldStore) => any) => {
     clearError: mockClearError,
     setLoading: mockSetLoading,
   };
+  
+  // If no selector is provided, return the entire state (like useStore() with no selector)
+  if (!selector || typeof selector !== 'function') {
+    console.log('[__mocks__/worldStore.ts] No selector provided, returning full state');
+    return state;
+  }
   
   const result = selector(state);
   console.log('[__mocks__/worldStore.ts] Selector returned:', result);

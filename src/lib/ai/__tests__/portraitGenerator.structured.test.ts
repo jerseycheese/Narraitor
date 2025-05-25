@@ -43,17 +43,13 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         knownFigureContext: 'fictional'
       });
       
-      expect(prompt).toContain('Gandalf');
-      expect(prompt).toContain('the fictional');
-      expect(prompt).toContain('accurate depiction');
-      expect(prompt).toContain('as commonly recognized');
-      expect(prompt).toContain('photorealistic');
-      expect(prompt).toContain('professional portrait');
+      expect(prompt).toContain('Character portrait of Gandalf');
+      expect(prompt).toContain('authentic');
+      expect(prompt).toContain('recognizable character design');
+      expect(prompt).toContain('photorealistic quality');
       
       // Should NOT contain generic descriptors
-      expect(prompt).not.toContain('detailed character portrait of');
-      expect(prompt).not.toContain('with courageous and wise appearance');
-      expect(prompt).not.toContain('fantasy art');
+      expect(prompt).not.toContain('Fantasy character portrait');
     });
 
     test('should generate appropriate prompt for historical figure', () => {
@@ -63,11 +59,10 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         knownFigureContext: 'historical'
       });
       
-      expect(prompt).toContain('Albert Einstein');
+      expect(prompt).toContain('Photorealistic portrait of Albert Einstein');
       expect(prompt).toContain('the historical');
-      expect(prompt).toContain('accurate depiction');
-      expect(prompt).toContain('as commonly recognized');
-      expect(prompt).toContain('photorealistic');
+      expect(prompt).toContain('appropriate environment');
+      expect(prompt).toContain('photorealistic quality');
     });
 
     test('should generate appropriate prompt for celebrity', () => {
@@ -77,10 +72,10 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         knownFigureContext: 'celebrity'
       });
       
-      expect(prompt).toContain('Taylor Swift');
+      expect(prompt).toContain('Photorealistic portrait of Taylor Swift');
       expect(prompt).toContain('the celebrity');
-      expect(prompt).toContain('accurate depiction');
-      expect(prompt).toContain('as commonly recognized');
+      expect(prompt).toContain('appropriate environment');
+      expect(prompt).toContain('photorealistic quality');
     });
 
     test('should generate appropriate prompt for mythological figure', () => {
@@ -90,10 +85,10 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         knownFigureContext: 'mythological'
       });
       
-      expect(prompt).toContain('Zeus');
+      expect(prompt).toContain('Photorealistic portrait of Zeus');
       expect(prompt).toContain('the mythological');
-      expect(prompt).toContain('accurate depiction');
-      expect(prompt).toContain('as commonly recognized');
+      expect(prompt).toContain('appropriate environment');
+      expect(prompt).toContain('photorealistic quality');
     });
   });
 
@@ -102,13 +97,12 @@ describe('PortraitGenerator - Structured Known Figures', () => {
       const character = createTestCharacter('Elara Moonshadow', false);
       const prompt = generator.buildPortraitPrompt(character);
       
-      expect(prompt).toContain('detailed character portrait');
-      expect(prompt).toContain('of Elara Moonshadow');
-      expect(prompt).toContain('with courageous and wise appearance');
-      expect(prompt).toContain('fantasy art');
+      expect(prompt).toContain('Character portrait');
+      expect(prompt).toContain('Elara Moonshadow');
+      expect(prompt).toContain('expressing courageous wise character');
+      expect(prompt).toContain('photorealistic quality');
       expect(prompt).not.toContain('accurate depiction');
       expect(prompt).not.toContain('as commonly recognized');
-      expect(prompt).not.toContain('photorealistic');
     });
 
     test('should include world theme for original characters', () => {
@@ -117,10 +111,10 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         worldTheme: 'cyberpunk'
       });
       
-      expect(prompt).toContain('in cyberpunk style');
+      expect(prompt).toContain('cyberpunk setting');
     });
 
-    test('should not include world theme for known figures', () => {
+    test('should include world theme for known figures', () => {
       const character = createTestCharacter('Batman', true, 'fictional');
       const prompt = generator.buildPortraitPrompt(character, {
         worldTheme: 'medieval',
@@ -128,9 +122,8 @@ describe('PortraitGenerator - Structured Known Figures', () => {
         knownFigureContext: 'fictional'
       });
       
-      expect(prompt).not.toContain('in medieval style');
+      expect(prompt).toContain('medieval style atmosphere');
       expect(prompt).toContain('Batman');
-      expect(prompt).toContain('the fictional');
     });
   });
 

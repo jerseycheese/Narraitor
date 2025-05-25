@@ -359,8 +359,22 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
     });
 
+    console.log('[CharacterCreationWizard] Created character:', characterId);
+    
     // Set as current character
     characterStore.getState().setCurrentCharacter(characterId);
+    
+    // Verify the character was set as current
+    const currentCharacterId = characterStore.getState().currentCharacterId;
+    console.log('[CharacterCreationWizard] Current character after setting:', currentCharacterId);
+    
+    if (currentCharacterId !== characterId) {
+      console.error('[CharacterCreationWizard] Failed to set current character!', {
+        expectedId: characterId,
+        actualId: currentCharacterId,
+        charactersInStore: Object.keys(characterStore.getState().characters)
+      });
+    }
 
     // Clear auto-save
     clearAutoSave();

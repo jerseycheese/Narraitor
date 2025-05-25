@@ -21,7 +21,23 @@ export class PortraitGenerationClient extends GeminiClient implements AIClient {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          errorData = await response.json();
+        } else {
+          // If response is not JSON (like HTML error page), read as text
+          const errorText = await response.text();
+          console.error('Non-JSON API Error Response:', {
+            status: response.status,
+            statusText: response.statusText,
+            contentType,
+            text: errorText.substring(0, 500) + '...'
+          });
+          throw new Error(`Image generation failed: ${response.status} ${response.statusText} - Server returned HTML instead of JSON`);
+        }
+        
         console.error('API Error Response:', errorData);
         throw new Error(`Image generation failed: ${response.status} - ${errorData.error || 'Unknown error'}`);
       }
