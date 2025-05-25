@@ -76,7 +76,8 @@ describe('PortraitGenerator - Known Characters', () => {
     test('should detect Sloth from The Goonies played by John Matuszak', async () => {
       // Mock the AI response for detection
       mockAIClient.generateContent.mockResolvedValueOnce({
-        content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "John Matuszak", "figureName": "The Goonies"}'
+        content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "John Matuszak", "figureName": "The Goonies"}',
+        finishReason: 'stop'
       });
       
       // Mock the image generation
@@ -101,7 +102,8 @@ describe('PortraitGenerator - Known Characters', () => {
 
     test('should detect Bob Wiley played by Bill Murray', async () => {
       mockAIClient.generateContent.mockResolvedValueOnce({
-        content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "Bill Murray", "figureName": "What About Bob?"}'
+        content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "Bill Murray", "figureName": "What About Bob?"}',
+        finishReason: 'stop'
       });
       
       if (mockAIClient.generateImage) {

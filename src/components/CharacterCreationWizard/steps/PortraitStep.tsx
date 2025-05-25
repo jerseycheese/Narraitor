@@ -195,7 +195,6 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             <LoadingState 
               variant="spinner" 
               size="md" 
-              message="Generating portrait..." 
               centered={false}
             />
           </div>
