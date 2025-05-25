@@ -50,6 +50,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const [isGenerating, setIsGenerating] = React.useState(true);
   const [initialized, setInitialized] = React.useState(false);
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
+  const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   
   // Get character ID from session store
   const characterId = sessionStore(state => state.characterId);
@@ -168,6 +169,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const handleChoiceSelected = (choiceId: string) => {
     // Player choice was selected
     setIsGenerating(true);
+    setLocalSelectedChoiceId(choiceId);
     
     // If we have a current decision, update its selected option
     if (currentDecision) {
@@ -252,7 +254,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             sessionId={sessionId}
             characterId={characterId || undefined}
             triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
-            choiceId={selectedChoiceId}
+            choiceId={localSelectedChoiceId || selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
             onChoicesGenerated={handleChoicesGenerated}
             generateChoices={true}
@@ -298,10 +300,8 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
                 // Try to get latest decision from narrative store
                 const latestDecision = narrativeStore.getState().getLatestDecision(sessionId);
                 if (latestDecision) {
-                  console.log("Found latest decision in store:", latestDecision);
                   setCurrentDecision(latestDecision);
                 } else {
-                  console.log("No decision found in store, creating fallback choices");
                   
                   // Create fallback choices manually
                   const fallbackId = `decision-fallback-${Date.now()}`;
@@ -331,8 +331,6 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
                     isSelected: false
                   }));
                   sessionStore.getState().setPlayerChoices(playerChoices);
-                  
-                  console.log("Created and set fallback decision:", fallbackDecision);
                 }
               }}
             >
