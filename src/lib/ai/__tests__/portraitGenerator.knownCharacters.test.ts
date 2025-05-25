@@ -80,10 +80,12 @@ describe('PortraitGenerator - Known Characters', () => {
       });
       
       // Mock the image generation
-      mockAIClient.generateImage.mockResolvedValueOnce({
-        image: 'https://example.com/sloth.jpg',
-        prompt: 'Cinematic portrait of Sloth character. John Matuszak as Sloth, authentic character portrayal'
-      });
+      if (mockAIClient.generateImage) {
+        mockAIClient.generateImage.mockResolvedValueOnce({
+          image: 'https://example.com/sloth.jpg',
+          prompt: 'Cinematic portrait of Sloth character. John Matuszak as Sloth, authentic character portrayal'
+        });
+      }
 
       const character = createTestCharacter('Sloth');
       character.background.physicalDescription = 'Large deformed man with misshapen face, one eye higher than the other, wearing torn clothes';
@@ -102,10 +104,12 @@ describe('PortraitGenerator - Known Characters', () => {
         content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "Bill Murray", "figureName": "What About Bob?"}'
       });
       
-      mockAIClient.generateImage.mockResolvedValueOnce({
-        image: 'https://example.com/bob.jpg',
-        prompt: 'Cinematic portrait of Bob Wiley character. Bill Murray as Bob Wiley, authentic character portrayal'
-      });
+      if (mockAIClient.generateImage) {
+        mockAIClient.generateImage.mockResolvedValueOnce({
+          image: 'https://example.com/bob.jpg',
+          prompt: 'Cinematic portrait of Bob Wiley character. Bill Murray as Bob Wiley, authentic character portrayal'
+        });
+      }
 
       const character = createTestCharacter('Bob Wiley');
       const result = await generator.generatePortrait(character, { worldTheme: 'comedy' });
