@@ -362,7 +362,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     console.log('[CharacterCreationWizard] Created character:', characterId);
     
     // Set as current character
-    characterStore.getState().setCurrentCharacter(characterId);
+    const { setCurrentCharacter } = characterStore();
+    setCurrentCharacter(characterId);
     
     // Verify the character was set as current
     const currentCharacterId = characterStore.getState().currentCharacterId;
@@ -375,7 +376,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         charactersInStore: Object.keys(characterStore.getState().characters)
       });
     }
-
     // Clear auto-save
     clearAutoSave();
 
