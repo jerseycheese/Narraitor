@@ -37,6 +37,13 @@ interface PortraitStepProps {
 export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Local state for prompt-affecting fields
+  const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
+    data.characterData.background?.physicalDescription || ''
+  );
+  const [portraitStyle, setPortraitStyle] = useState<'photorealistic' | 'fantasy' | 'anime'>('photorealistic');
+  const [environmentHint, setEnvironmentHint] = useState('');
 
   const portrait: CharacterPortraitType = data.characterData.portrait || {
     type: 'placeholder',
@@ -51,7 +58,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       const aiClient = createAIClient();
       const generator = new PortraitGenerator(aiClient);
       
-      // Create a character object for the generator
+      // Create a character object for the generator with local overrides
       const characterForGeneration: Character = {
         id: 'temp',
         name: data.characterData.name,
@@ -70,9 +77,9 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             isActive: true
           })),
         background: {
-          history: data.characterData.background.history,
+          history: data.characterData.background.history + (environmentHint ? ` ${environmentHint}` : ''),
           personality: data.characterData.background.personality,
-          physicalDescription: data.characterData.background.physicalDescription,
+          physicalDescription: localPhysicalDescription || data.characterData.background.physicalDescription,
           goals: data.characterData.background.goals,
           fears: [],
           relationships: []
@@ -83,10 +90,18 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         updatedAt: new Date().toISOString()
       };
 
+      // Determine world theme based on style selection
+      let effectiveTheme = worldConfig.theme;
+      if (portraitStyle === 'fantasy') {
+        effectiveTheme = 'fantasy';
+      } else if (portraitStyle === 'anime') {
+        effectiveTheme = 'anime';
+      }
+
       const generatedPortrait = await generator.generatePortrait(
         characterForGeneration,
         { 
-          worldTheme: worldConfig.theme
+          worldTheme: effectiveTheme
         }
       );
 
@@ -100,6 +115,16 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     }
   };
 
+  const handleRemovePortrait = () => {
+    onUpdate({
+      portrait: {
+        type: 'placeholder',
+        url: null
+      }
+    });
+    setError(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -111,6 +136,58 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           }
         </p>
       </div>
+
+      {/* Portrait customization fields */}
+      {portrait.type === 'placeholder' && (
+        <div className="space-y-4 max-w-md mx-auto">
+          <div>
+            <label htmlFor="physical-desc" className="block text-sm font-medium text-gray-700 mb-1">
+              Physical Description (for portrait)
+            </label>
+            <textarea
+              id="physical-desc"
+              value={localPhysicalDescription}
+              onChange={(e) => setLocalPhysicalDescription(e.target.value)}
+              placeholder="e.g., Long silver hair, green eyes, wearing a blue robe..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              rows={2}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Describe appearance details you want in the portrait
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="portrait-style" className="block text-sm font-medium text-gray-700 mb-1">
+              Portrait Style
+            </label>
+            <select
+              id="portrait-style"
+              value={portraitStyle}
+              onChange={(e) => setPortraitStyle(e.target.value as 'photorealistic' | 'fantasy' | 'anime')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            >
+              <option value="photorealistic">Photorealistic</option>
+              <option value="fantasy">Fantasy Art</option>
+              <option value="anime">Anime Style</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-1">
+              Environment/Setting (optional)
+            </label>
+            <input
+              id="environment"
+              type="text"
+              value={environmentHint}
+              onChange={(e) => setEnvironmentHint(e.target.value)}
+              placeholder="e.g., In a forest, throne room, starship bridge..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col items-center space-y-4">
         {isGenerating ? (
@@ -145,14 +222,23 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         {portrait.type === 'ai-generated' && portrait.url && (
           <div className="text-center space-y-2">
             <p className="text-sm text-green-600">✓ Portrait generated successfully</p>
-            <button
-              type="button"
-              onClick={handleGeneratePortrait}
-              disabled={isGenerating}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Regenerate Portrait
-            </button>
+            <div className="flex gap-2 justify-center">
+              <button
+                type="button"
+                onClick={handleGeneratePortrait}
+                disabled={isGenerating}
+                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Regenerate Portrait
+              </button>
+              <button
+                type="button"
+                onClick={handleRemovePortrait}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Remove Portrait
+              </button>
+            </div>
           </div>
         )}
 
