@@ -100,17 +100,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   
   // Initialize state from auto-save or defaults
   const [state, setState] = useState<CharacterCreationState>(() => {
-    console.log('[CharacterCreationWizard] Initializing state. Auto-save data:', data);
-    
     // Don't access sessionStorage during initial render to avoid hydration issues
     // The auto-save hook will handle this
     
     if (data) {
-      console.log('[CharacterCreationWizard] Using auto-saved data');
       return data;
     }
     
-    console.log('[CharacterCreationWizard] No auto-save data, initializing defaults');
     // Initialize with world attributes and skills
     return {
       currentStep: initialStep,
@@ -170,7 +166,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // Check if data was loaded after initial render
   useEffect(() => {
     if (data && state.characterData.name === '') {
-      console.log('[CharacterCreationWizard] Late-loaded auto-save data detected, updating state:', data);
       setState(data);
     }
   }, [data, state.characterData.name]);
@@ -359,15 +354,12 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
     });
 
-    console.log('[CharacterCreationWizard] Created character:', characterId);
-    
     // Set as current character
     const { setCurrentCharacter } = characterStore();
     setCurrentCharacter(characterId);
     
     // Verify the character was set as current
     const currentCharacterId = characterStore.getState().currentCharacterId;
-    console.log('[CharacterCreationWizard] Current character after setting:', currentCharacterId);
     
     if (currentCharacterId !== characterId) {
       console.error('[CharacterCreationWizard] Failed to set current character!', {

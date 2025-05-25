@@ -72,13 +72,6 @@ export const useGameSessionState = ({
   // Get the current character ID from the character store
   const currentCharacterId = characterStoreState.currentCharacterId;
   
-  // Debug logging
-  console.log('[useGameSessionState] Current character detected:', {
-    currentCharacterId,
-    allCharacters: Object.keys(characterStoreState.characters || {}),
-    worldId
-  });
-  
   // Handle retry
   const handleRetry = () => {
     setError(null);

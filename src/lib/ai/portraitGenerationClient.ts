@@ -43,7 +43,6 @@ export class PortraitGenerationClient extends GeminiClient implements AIClient {
       }
 
       const data = await response.json();
-      console.log('✅ Portrait generated successfully');
       
       return {
         image: data.image,

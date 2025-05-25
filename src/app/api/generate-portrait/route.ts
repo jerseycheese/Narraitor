@@ -22,14 +22,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Debug logging
-    console.log('Portrait API Request:', {
-      prompt: prompt.substring(0, 200) + '...',
-      promptLength: prompt.length,
-      apiKey: apiKey ? `${apiKey.substring(0, 10)}...` : 'NOT_SET',
-      endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`
-    });
-
     // Call Google's Gemini API from the server
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
@@ -71,21 +63,6 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    
-    // Debug logging
-    if (process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-      console.log('Gemini API Response Structure:', {
-        hasCandidates: !!data.candidates,
-        candidatesLength: data.candidates?.length,
-        firstCandidate: data.candidates?.[0] ? {
-          hasContent: !!data.candidates[0].content,
-          partsLength: data.candidates[0].content?.parts?.length,
-          partTypes: data.candidates[0].content?.parts?.map((p: { text?: string; inlineData?: { mimeType?: string; data?: string } }) => 
-            p.text ? 'text' : p.inlineData ? 'image' : 'unknown'
-          )
-        } : null
-      });
-    }
     
     // Look for image in the response
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
