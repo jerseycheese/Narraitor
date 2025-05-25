@@ -194,7 +194,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           <div className="w-32 h-32 flex items-center justify-center">
             <LoadingState 
               variant="spinner" 
-              size="lg" 
+              size="md" 
               message="Generating portrait..." 
               centered={false}
             />
