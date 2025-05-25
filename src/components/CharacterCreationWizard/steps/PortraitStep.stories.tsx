@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import { PortraitStep } from './PortraitStep';
 
 const meta: Meta<typeof PortraitStep> = {
-  title: 'Components/CharacterCreationWizard/PortraitStep',
+  title: 'Narraitor/Character/Creation/PortraitStep',
   component: PortraitStep,
   parameters: {
     layout: 'centered',
