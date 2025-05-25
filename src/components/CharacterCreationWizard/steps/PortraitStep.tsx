@@ -7,6 +7,7 @@ import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
 import { createAIClient } from '../../../lib/ai/clientFactory';
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
+import { LoadingState } from '../../ui/LoadingState';
 
 interface CharacterFormData {
   name: string;
@@ -112,13 +113,23 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       </div>
 
       <div className="flex flex-col items-center space-y-4">
-        <CharacterPortrait
-          portrait={portrait}
-          characterName={data.characterData.name}
-          size="large"
-          isGenerating={isGenerating}
-          error={error}
-        />
+        {isGenerating ? (
+          <div className="w-32 h-32 flex items-center justify-center">
+            <LoadingState 
+              variant="spinner" 
+              size="lg" 
+              message="Generating portrait..." 
+              centered={false}
+            />
+          </div>
+        ) : (
+          <CharacterPortrait
+            portrait={portrait}
+            characterName={data.characterData.name}
+            size="xlarge"
+            error={error}
+          />
+        )}
 
         {portrait.type === 'placeholder' && (
           <button
@@ -127,20 +138,20 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             disabled={isGenerating}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isGenerating ? 'Generating...' : 'Generate Portrait'}
+            Generate Portrait
           </button>
         )}
 
         {portrait.type === 'ai-generated' && portrait.url && (
-          <div className="text-center">
-            <p className="text-sm text-green-600 mb-2">✓ Portrait generated successfully</p>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-green-600">✓ Portrait generated successfully</p>
             <button
               type="button"
               onClick={handleGeneratePortrait}
               disabled={isGenerating}
-              className="text-sm text-blue-600 hover:underline"
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Regenerate
+              Regenerate Portrait
             </button>
           </div>
         )}

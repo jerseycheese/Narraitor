@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils/classNames';
 interface CharacterPortraitProps {
   portrait: CharacterPortraitType;
   characterName: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
   isGenerating?: boolean;
   error?: string | null;
   onClick?: () => void;
@@ -17,7 +17,8 @@ interface CharacterPortraitProps {
 const sizeClasses = {
   small: 'w-8 h-8 text-xs',
   medium: 'w-16 h-16 text-lg',
-  large: 'w-24 h-24 text-2xl'
+  large: 'w-24 h-24 text-2xl',
+  xlarge: 'w-32 h-32 text-3xl'
 };
 
 export function CharacterPortrait({
@@ -51,7 +52,13 @@ export function CharacterPortrait({
     return (
       <div className={containerClasses} data-testid="character-portrait">
         <div className="absolute inset-0 flex items-center justify-center bg-gray-300">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" role="status">
+          <div className={cn(
+            "animate-spin rounded-full border-b-2 border-gray-900",
+            size === 'small' && "h-3 w-3",
+            size === 'medium' && "h-6 w-6",
+            size === 'large' && "h-8 w-8",
+            size === 'xlarge' && "h-10 w-10"
+          )} role="status">
             <span className="sr-only">Generating portrait...</span>
           </div>
         </div>
