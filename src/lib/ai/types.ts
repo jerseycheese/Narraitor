@@ -81,8 +81,17 @@ export interface AIPromptProcessorOptions {
 }
 
 /**
+ * Response from AI image generation
+ */
+export interface AIImageResponse {
+  image: string; // Base64 encoded image data
+  prompt: string;
+}
+
+/**
  * Interface for AI clients (both real and mock)
  */
 export interface AIClient {
   generateContent(prompt: string): Promise<AIResponse>;
+  generateImage?(prompt: string): Promise<AIImageResponse>;
 }

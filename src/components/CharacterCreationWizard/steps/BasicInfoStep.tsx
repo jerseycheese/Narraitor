@@ -21,6 +21,16 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     onUpdate({ description: e.target.value });
   };
 
+  const handlePhysicalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onUpdate({ 
+      background: {
+        ...data.characterData.background,
+        physicalDescription: e.target.value
+      }
+    });
+  };
+
+
   const handleBlur = () => {
     // Validation will be triggered by parent component
   };
@@ -71,11 +81,30 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               value={data.characterData.description}
               onChange={handleDescriptionChange}
               onBlur={handleBlur}
-              rows={4}
+              rows={3}
               className={wizardStyles.form.textarea}
-              placeholder="Describe your character"
+              placeholder="Describe your character's role and background"
             />
           </div>
+
+          <div className={wizardStyles.form.group}>
+            <label htmlFor="physical-description" className={wizardStyles.form.label}>
+              Physical Description
+            </label>
+            <textarea
+              id="physical-description"
+              value={data.characterData.background?.physicalDescription || ''}
+              onChange={handlePhysicalDescriptionChange}
+              onBlur={handleBlur}
+              rows={3}
+              className={wizardStyles.form.textarea}
+              placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              This will be used to generate your character&apos;s portrait
+            </p>
+          </div>
+
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
 import { PlayerChoiceSelector } from '@/components/Narrative';
+import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface GameSessionActiveWithNarrativeProps {
   worldId: string;
@@ -212,13 +213,23 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   return (
     <div data-testid="game-session-active" className="p-4" role="region" aria-label="Game session">
       {world && (
-        <div className="mb-2">
+        <div className="mb-4">
           <h1 className="text-2xl font-bold">{world.name}</h1>
-          <p className="text-gray-600">{world.theme}</p>
+          <p className="text-gray-600 mb-3">{world.theme}</p>
           {character && (
-            <p className="text-green-600 font-medium">Playing as: {character.name}</p>
+            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+              <CharacterPortrait
+                portrait={character.portrait || { type: 'placeholder', url: null }}
+                characterName={character.name}
+                size="small"
+              />
+              <div>
+                <p className="text-green-700 font-medium">Playing as: {character.name}</p>
+                <p className="text-green-600 text-sm">Level {character.level}</p>
+              </div>
+            </div>
           )}
-          <p className="text-blue-600" aria-live="polite">Status: {status}</p>
+          <p className="text-blue-600 mt-2" aria-live="polite">Status: {status}</p>
         </div>
       )}
       

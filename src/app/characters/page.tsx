@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
+import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 export default function CharactersPage() {
   const router = useRouter();
@@ -120,14 +121,22 @@ export default function CharactersPage() {
                 }`}
                 onClick={() => handleSelectCharacter(character.id)}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-semibold">{character.name}</h3>
-                  <span className="text-sm text-gray-500">Level {character.level}</span>
+                <div className="flex items-start gap-4 mb-4">
+                  <CharacterPortrait
+                    portrait={character.portrait || { type: 'placeholder', url: null }}
+                    characterName={character.name}
+                    size="medium"
+                  />
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-xl font-semibold">{character.name}</h3>
+                      <span className="text-sm text-gray-500">Level {character.level}</span>
+                    </div>
+                    <p className="text-gray-600 line-clamp-2">
+                      {character.background.personality || 'No description provided'}
+                    </p>
+                  </div>
                 </div>
-                
-                <p className="text-gray-600 mb-4 line-clamp-2">
-                  {character.background.description || 'No description provided'}
-                </p>
                 
                 <div className="flex gap-2">
                   <button

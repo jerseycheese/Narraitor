@@ -7,12 +7,20 @@ jest.mock('@/state/characterStore');
 describe('Character Creation Validation', () => {
   describe('validateCharacterName', () => {
     beforeEach(() => {
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      const mockStore = {
         characters: {
           'char-1': { id: 'char-1', name: 'Existing Hero', worldId: 'world-1' },
           'char-2': { id: 'char-2', name: 'Another Hero', worldId: 'world-2' },
         },
-      });
+        getState: jest.fn(() => ({
+          characters: {
+            'char-1': { id: 'char-1', name: 'Existing Hero', worldId: 'world-1' },
+            'char-2': { id: 'char-2', name: 'Another Hero', worldId: 'world-2' },
+          },
+        })),
+      };
+      (characterStore as unknown as jest.Mock).mockReturnValue(mockStore);
+      (characterStore as unknown as { getState: typeof mockStore.getState }).getState = mockStore.getState;
     });
 
     it('returns error when name is empty', () => {

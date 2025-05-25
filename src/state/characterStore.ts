@@ -44,6 +44,12 @@ interface Character {
   background: CharacterBackground;
   isPlayer: boolean;
   status: CharacterStatus;
+  portrait?: {
+    type: 'ai-generated' | 'placeholder';
+    url: string | null;
+    generatedAt?: string;
+    prompt?: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

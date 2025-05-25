@@ -14,6 +14,7 @@ import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
 import { BackgroundStep } from './steps/BackgroundStep';
+import { PortraitStep } from './steps/PortraitStep';
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from './utils/validation';
 
 interface CharacterCreationWizardProps {
@@ -28,6 +29,12 @@ interface CharacterCreationState {
     name: string;
     description: string;
     portraitPlaceholder: string;
+    portrait?: {
+      type: 'ai-generated' | 'placeholder';
+      url: string | null;
+      generatedAt?: string;
+      prompt?: string;
+    };
     attributes: Array<{
       attributeId: EntityID;
       name: string;
@@ -46,8 +53,11 @@ interface CharacterCreationState {
     background: {
       history: string;
       personality: string;
+      physicalDescription?: string;
       goals: string[];
       motivation: string;
+      isKnownFigure?: boolean;
+      knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
     };
   };
   validation: {
@@ -75,7 +85,8 @@ const steps = [
   { id: 'basic-info', label: 'Basic Info' },
   { id: 'attributes', label: 'Attributes' },
   { id: 'skills', label: 'Skills' },
-  { id: 'background', label: 'Background' }
+  { id: 'background', label: 'Background' },
+  { id: 'portrait', label: 'Portrait' }
 ];
 
 export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId, initialStep = 0 }) => {
@@ -89,17 +100,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   
   // Initialize state from auto-save or defaults
   const [state, setState] = useState<CharacterCreationState>(() => {
-    console.log('[CharacterCreationWizard] Initializing state. Auto-save data:', data);
-    
     // Don't access sessionStorage during initial render to avoid hydration issues
     // The auto-save hook will handle this
     
     if (data) {
-      console.log('[CharacterCreationWizard] Using auto-saved data');
       return data;
     }
     
-    console.log('[CharacterCreationWizard] No auto-save data, initializing defaults');
     // Initialize with world attributes and skills
     return {
       currentStep: initialStep,
@@ -108,6 +115,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         name: '',
         description: '',
         portraitPlaceholder: '',
+        portrait: {
+          type: 'placeholder',
+          url: null
+        },
         attributes: world?.attributes.map(attr => ({
           attributeId: attr.id,
           name: attr.name,
@@ -155,7 +166,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   // Check if data was loaded after initial render
   useEffect(() => {
     if (data && state.characterData.name === '') {
-      console.log('[CharacterCreationWizard] Late-loaded auto-save data detected, updating state:', data);
       setState(data);
     }
   }, [data, state.characterData.name]);
@@ -170,6 +180,9 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         return validateSkills(state.characterData.skills);
       case 3:
         return validateBackground(state.characterData.background);
+      case 4:
+        // Portrait is optional, always valid
+        return { valid: true, errors: [] };
       default:
         return { valid: true, errors: [] };
     }
@@ -259,6 +272,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         case 3:
           validation = validateBackground(newState.characterData.background);
           break;
+        case 4:
+          // Portrait is optional
+          validation = { valid: true, errors: [] };
+          break;
       }
       
       newState.validation = {
@@ -285,7 +302,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   const handleCreate = useCallback(() => {
     // Validate all steps
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const validation = validateStep(i);
       if (!validation.valid) {
         setState(prev => ({
@@ -325,6 +342,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         personality: state.characterData.background.personality,
         motivation: state.characterData.background.motivation,
       },
+      portrait: state.characterData.portrait || {
+        type: 'placeholder',
+        url: null
+      },
       isPlayer: true,
       status: {
         hp: 100,
@@ -336,6 +357,17 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     // Set as current character
     const { setCurrentCharacter } = characterStore();
     setCurrentCharacter(characterId);
+    
+    // Verify the character was set as current
+    const currentCharacterId = characterStore.getState().currentCharacterId;
+    
+    if (currentCharacterId !== characterId) {
+      console.error('[CharacterCreationWizard] Failed to set current character!', {
+        expectedId: characterId,
+        actualId: currentCharacterId,
+        charactersInStore: Object.keys(characterStore.getState().characters)
+      });
+    }
     // Clear auto-save
     clearAutoSave();
 
@@ -374,6 +406,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         return <SkillsStep {...props} />;
       case 3:
         return <BackgroundStep {...props} />;
+      case 4:
+        return <PortraitStep {...props} />;
       default:
         return null;
     }
