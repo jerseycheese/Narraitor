@@ -11,6 +11,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 - **GameSession** (`GameSession.tsx`): The main container component that orchestrates state and child components
 - **GameSessionActive** (`GameSessionActive.tsx`): Handles the active game session rendering
 - **GameSessionActiveWithNarrative** (`GameSessionActiveWithNarrative.tsx`): Enhanced active session with AI-driven narrative and choice generation
+  - Manages `localSelectedChoiceId` state to track player choice selection and trigger narrative progression
 - **GameSessionError** (`GameSessionError.tsx`): Error state component
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
 - **PlayerChoices** (`PlayerChoices.tsx`): Renders and handles player choices
