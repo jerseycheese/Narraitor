@@ -19,6 +19,7 @@ interface WorldListScreenProps {
 
 const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions }) => {
   const [worlds, setWorlds] = useState<World[]>([]);
+  const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -28,12 +29,14 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     try {
       const state = worldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
+      setCurrentWorldId(state.currentWorldId);
       setLoading(state.loading);
       setError(state.error);
       
       const unsubscribe = worldStore.subscribe(() => {
         const newState = worldStore.getState();
         setWorlds(Object.values(newState.worlds || {}));
+        setCurrentWorldId(newState.currentWorldId);
         setLoading(newState.loading);
         setError(newState.error);
       });
@@ -107,6 +110,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     <main>
       <WorldList 
         worlds={worlds} 
+        currentWorldId={currentWorldId}
         onSelectWorld={handleSelectWorld} 
         onDeleteWorld={handleDeleteClick}
         _router={_router}

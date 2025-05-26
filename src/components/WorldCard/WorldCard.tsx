@@ -6,6 +6,7 @@ import { worldStore } from '../../state/worldStore';
 
 interface WorldCardProps {
   world: World;
+  isActive?: boolean;
   onSelect: (worldId: string) => void;
   onDelete: (worldId: string) => void;
   _storeActions?: {
@@ -18,6 +19,7 @@ interface WorldCardProps {
 
 const WorldCard: React.FC<WorldCardProps> = ({ 
   world, 
+  isActive = false,
   onSelect, 
   onDelete,
   _storeActions,
@@ -62,16 +64,27 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <article
       data-testid="world-card"
       onClick={handleCardClick}
-      className="border border-gray-300 p-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white relative"
+      className={`border p-4 rounded-lg cursor-pointer transition-all duration-200 relative ${
+        isActive 
+          ? 'border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-400' 
+          : 'border-gray-300 bg-white hover:border-blue-500 hover:shadow-lg'
+      }`}
     >
-      {world.theme && (
-        <p 
-          data-testid="world-card-theme" 
-          className="absolute top-4 right-4 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
-        >
-          {world.theme.charAt(0).toUpperCase() + world.theme.slice(1)}
-        </p>
-      )}
+      <div className="absolute top-4 right-4 flex items-center gap-2">
+        {isActive && (
+          <span className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-full">
+            Active
+          </span>
+        )}
+        {world.theme && (
+          <p 
+            data-testid="world-card-theme" 
+            className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
+          >
+            {world.theme.charAt(0).toUpperCase() + world.theme.slice(1)}
+          </p>
+        )}
+      </div>
       <header>
         <h2 
           data-testid="world-card-name" 

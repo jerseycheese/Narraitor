@@ -4,6 +4,7 @@ import WorldCard from '../WorldCard/WorldCard';
 
 interface WorldListProps {
   worlds: World[];
+  currentWorldId?: string | null;
   onSelectWorld: (worldId: string) => void;
   onDeleteWorld: (worldId: string) => void;
   _router?: {
@@ -14,7 +15,7 @@ interface WorldListProps {
   };
 }
 
-const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
+const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
   if (worlds.length === 0) {
     return (
       <section data-testid="world-list-empty-message" className="p-12 text-center bg-gray-50 rounded-lg">
@@ -48,6 +49,7 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWo
           <li key={world.id}>
             <WorldCard
               world={world}
+              isActive={world.id === currentWorldId}
               onSelect={onSelectWorld}
               onDelete={onDeleteWorld}
               _router={_router}
