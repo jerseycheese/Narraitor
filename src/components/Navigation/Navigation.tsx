@@ -84,7 +84,7 @@ export function Navigation() {
             )}
             {!currentWorld && Object.keys(worlds).length === 0 && (
               <Link 
-                href="/worlds/create" 
+                href="/world/create" 
                 className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
               >
                 Create Your First World
