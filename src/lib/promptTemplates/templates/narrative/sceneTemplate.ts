@@ -19,13 +19,15 @@ World: ${worldName}
 Tone: ${tone}
 Previous Scene: ${recentContent}
 ${narrativeContext?.currentLocation ? `Current Location: ${narrativeContext.currentLocation}` : ''}
+${narrativeContext?.currentSituation ? `\nIMPORTANT - ${narrativeContext.currentSituation}` : ''}
 
 Generate a ${segmentType} that:
-1. Continues naturally from the previous content
-2. Maintains the ${tone} tone
-3. Advances the story meaningfully
-4. Engages the reader with vivid descriptions
-5. Is approximately 1-2 paragraphs long
+1. DIRECTLY RESPONDS to the player's action/choice shown above
+2. Continues naturally from the previous content
+3. Maintains the ${tone} tone
+4. Advances the story based on what the player chose to do
+5. Engages the reader with vivid descriptions
+6. Is approximately 1-2 paragraphs long
 
 CRITICAL INSTRUCTIONS:
 1. Write in SECOND PERSON perspective (using "you")
