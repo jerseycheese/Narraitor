@@ -11,22 +11,33 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
-  const recentContent = narrativeContext?.recentSegments?.[0]?.content || '';
+  const recentSegments = narrativeContext?.recentSegments || [];
+  const recentContent = recentSegments.map((seg, i) => 
+    `[Scene ${recentSegments.length - i}]: ${seg.content}`
+  ).join('\n\n');
 
   return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
 Tone: ${tone}
-Previous Scene: ${recentContent}
-${narrativeContext?.currentLocation ? `Current Location: ${narrativeContext.currentLocation}` : ''}
-${narrativeContext?.currentSituation ? `\nIMPORTANT - ${narrativeContext.currentSituation}` : ''}
+
+STORY SO FAR:
+${recentContent}
+
+${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+
+CRITICAL CONTINUITY RULES:
+- The player is EXACTLY where the last scene ended
+- Time has NOT reset or jumped backward
+- Pick up IMMEDIATELY from where the story left off
+- The player's action happens RIGHT NOW in the current moment
 
 Generate a ${segmentType} that:
-1. DIRECTLY RESPONDS to the player's action/choice shown above
-2. Continues naturally from the previous content
-3. Maintains the ${tone} tone
-4. Advances the story based on what the player chose to do
-5. Engages the reader with vivid descriptions
+1. Shows the IMMEDIATE RESULT of the player's action
+2. Maintains perfect continuity with the previous scene
+3. Does NOT repeat or revisit events that already happened
+4. Advances the story forward in time (never backward)
+5. Maintains the ${tone} tone
 6. Is approximately 1-2 paragraphs long
 
 CRITICAL INSTRUCTIONS:
