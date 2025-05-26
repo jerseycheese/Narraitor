@@ -154,17 +154,14 @@ export const useGameSessionState = ({
       
       // Only update if there's a meaningful change to avoid unnecessary re-renders
       const shouldUpdate = 
-        !pausedRef.current && 
-        (storeState.status !== sessionState.status ||
-         storeState.error !== sessionState.error ||
-         storeState.currentSceneId !== sessionState.currentSceneId ||
-         JSON.stringify(storeState.playerChoices) !== JSON.stringify(sessionState.playerChoices));
+        storeState.status !== sessionState.status ||
+        storeState.error !== sessionState.error ||
+        storeState.currentSceneId !== sessionState.currentSceneId ||
+        JSON.stringify(storeState.playerChoices) !== JSON.stringify(sessionState.playerChoices);
       
       if (shouldUpdate) {
-        // Only update if we're not in a paused state that we control locally
         setSessionState(prev => {
-          // If we have a local paused state, maintain it
-          const effectiveStatus = pausedRef.current ? 'paused' : storeState.status;
+          const effectiveStatus = storeState.status;
           
           // Store previous status for focus management
           prevStatusRef.current = prev.status!;
