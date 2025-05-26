@@ -288,6 +288,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateInitialNarrative = async () => {
+    console.log('🎬 INITIAL NARRATIVE: Checking if we need to generate initial scene');
+    
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
@@ -295,7 +297,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
     );
     
+    console.log('🎬 INITIAL NARRATIVE: Existing segments:', existingSegments.length, 'Has initial scene:', hasInitialScene);
+    
     if (hasInitialScene) {
+      console.log('🎬 INITIAL NARRATIVE: Already has initial scene, skipping generation');
       setInitialGenerationCompleted(true);
       setIsLoading(false);
       return;
@@ -305,10 +310,24 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setError(null);
     
     try {
+      console.log('🎬 INITIAL NARRATIVE: Generating initial scene...');
       const result = await narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []);
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
+        console.log('🎬 INITIAL NARRATIVE: Component unmounted, skipping');
+        return;
+      }
+      
+      // Double-check we still don't have an initial scene (in case another instance created one)
+      const currentSegments = getSessionSegments(sessionId);
+      const nowHasInitialScene = currentSegments.some(segment => 
+        segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
+      );
+      
+      if (nowHasInitialScene) {
+        console.log('🎬 INITIAL NARRATIVE: Another instance already created initial scene, skipping');
+        setIsLoading(false);
         return;
       }
       
