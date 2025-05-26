@@ -40,10 +40,10 @@ const WorldCard: React.FC<WorldCardProps> = ({
     setShowDeleteDialog(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     setIsDeleting(true);
     try {
-      await onDelete(world.id);
+      onDelete(world.id);
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
