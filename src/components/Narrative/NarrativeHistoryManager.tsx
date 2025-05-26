@@ -125,9 +125,9 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         continue;
       }
       
-      // For segment deduplication, create a key based on content and type
-      // Trim and normalize the content to reduce minor variations
-      const normalizedContent = segment.content.trim().replace(/\s+/g, ' ').slice(0, 100);
+      // For segment deduplication, only dedupe if content is EXACTLY the same
+      // Don't use partial content matching as it removes valid segments
+      const normalizedContent = segment.content.trim().replace(/\s+/g, ' ');
       const key = `${segment.type}-${normalizedContent}`;
       
       if (!contentMap.has(key)) {
