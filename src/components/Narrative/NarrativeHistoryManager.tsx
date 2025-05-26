@@ -83,6 +83,13 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     // only keep the most recent one
     const initialSceneLocations = ['Starting Location', 'Frontier Town', 'Town Square', 'Village Center'];
     
+    console.log('🔍 DEDUP: Checking segments for initial scenes:', segments.map(s => ({
+      id: s.id,
+      type: s.type,
+      location: s.metadata?.location,
+      isInitialScene: s.type === 'scene' && s.metadata?.location && initialSceneLocations.includes(s.metadata.location)
+    })));
+    
     const initialScenes = segments.filter(
       segment => segment.type === 'scene' && 
                  segment.metadata?.location && 
@@ -92,6 +99,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     let processedSegments = [...segments];
     
     if (initialScenes.length > 1) {
+      console.log('🔍 DEDUP: Found multiple initial scenes:', initialScenes.length);
       // Sort by timestamp (newest first)
       initialScenes.sort((a, b) => 
         new Date(b.timestamp || b.createdAt).getTime() - new Date(a.timestamp || a.createdAt).getTime()
@@ -119,9 +127,17 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       new Date(a.timestamp || a.createdAt).getTime() - new Date(b.timestamp || b.createdAt).getTime()
     );
     
+    console.log('🔍 DEDUP: Processing segments:', processedSegments.map(s => ({
+      id: s.id,
+      type: s.type,
+      contentStart: s.content.substring(0, 50) + '...',
+      timestamp: s.timestamp || s.createdAt
+    })));
+    
     for (const segment of processedSegments) {
       // Skip if this exact ID has already been included
       if (idMap.has(segment.id)) {
+        console.log('🔍 DEDUP: Skipping duplicate ID:', segment.id);
         continue;
       }
       
@@ -134,6 +150,8 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         uniqueSegments.push(segment);
         contentMap.set(key, true);
         idMap.set(segment.id, true);
+      } else {
+        console.log('🔍 DEDUP: Removing duplicate content for segment:', segment.id);
       }
     }
     
