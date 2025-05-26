@@ -76,7 +76,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <article
       data-testid="world-card"
       onClick={handleCardClick}
-      className="border border-gray-300 p-4 m-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white"
+      className="border border-gray-300 p-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white"
     >
       <header>
         <h2 
