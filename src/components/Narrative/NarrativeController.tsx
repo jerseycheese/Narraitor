@@ -397,17 +397,31 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Use recent segments for context (last 3-5 segments)
       const recentSegments = segments.slice(-5);
       
+      // Get the actual choice text from the narrative store
+      const decisions = narrativeStore.getState().getSessionDecisions(sessionId);
+      let choiceText = triggeringChoiceId;
+      
+      // Find the decision that contains this choice
+      for (const decision of decisions) {
+        const selectedOption = decision.options.find(opt => opt.id === triggeringChoiceId);
+        if (selectedOption) {
+          choiceText = selectedOption.text;
+          console.log('🎯 Found choice text:', choiceText);
+          break;
+        }
+      }
+      
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
         characterIds: characterId ? [characterId] : [],
         narrativeContext: {
           recentSegments,
-          currentSituation: `Player selected choice: ${triggeringChoiceId}`
+          currentSituation: `Player chose: "${choiceText}"`
         },
         generationParameters: {
           segmentType: 'scene',
-          includedTopics: [triggeringChoiceId]
+          includedTopics: [choiceText]
         }
       });
       
