@@ -42,7 +42,7 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, onSelectWorld, onDeleteWo
 
   return (
     <section data-testid="world-list-container" className="mt-6">
-      <h2 className="text-2xl font-bold mb-4 pl-4 text-gray-800">Your Worlds</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Your Worlds</h2>
       <ul className="space-y-4">
         {worlds.map((world) => (
           <li key={world.id}>
