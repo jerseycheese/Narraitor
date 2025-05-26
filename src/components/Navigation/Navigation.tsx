@@ -38,7 +38,7 @@ export function Navigation() {
               <Link 
                 href="/worlds" 
                 className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors ${
-                  pathname.startsWith('/world') ? 'bg-gray-800' : ''
+                  pathname === '/worlds' || pathname.startsWith('/world/') ? 'bg-gray-800' : ''
                 }`}
               >
                 Worlds
