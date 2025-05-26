@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { World } from '../../types/world.types';
 import WorldCardActions from '../WorldCardActions/WorldCardActions';
-import DeleteConfirmationDialog from '../DeleteConfirmationDialog';
 import { worldStore } from '../../state/worldStore';
 
 interface WorldCardProps {
@@ -29,25 +28,12 @@ const WorldCard: React.FC<WorldCardProps> = ({
   const router = _router ? null : useRouter();
   const actualRouter = _router || router;
 
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
   const handleCardClick = () => {
     onSelect(world.id);
   };
 
   const handleDeleteClick = () => {
-    setShowDeleteDialog(true);
-  };
-
-  const handleConfirmDelete = () => {
-    setIsDeleting(true);
-    try {
-      onDelete(world.id);
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteDialog(false);
-    }
+    onDelete(world.id);
   };
 
   const handlePlayClick = () => {
@@ -117,16 +103,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
           onDelete={handleDeleteClick} 
         />
       </footer>
-      
-      <DeleteConfirmationDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={handleConfirmDelete}
-        title="Delete World"
-        description="Are you sure you want to delete this world? This action cannot be undone."
-        itemName={world.name}
-        isDeleting={isDeleting}
-      />
     </article>
   );
 };
