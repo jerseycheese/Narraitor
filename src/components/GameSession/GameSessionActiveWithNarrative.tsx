@@ -98,24 +98,11 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
           setCurrentDecision(latestDecision);
         }
         
-        if (hasInitialScene) {
-          // If we already have an initial scene, just use it - no need to generate again
-          // Found existing initial scene, use it without generating a new one
+        if (hasInitialScene || existingSegments.length > 0) {
+          // If we have any segments at all, use them
+          // Don't clear existing narrative history
           setInitialized(true);
           setIsGenerating(false);
-        }
-        else if (existingSegments.length > 0) {
-          // We have segments but no initial scene - unusual state - clean up and regenerate
-          // Found segments but no initial scene - unusual state - clean up
-          narrativeStore.getState().clearSessionSegments(sessionId);
-          
-          // Wait a short time to ensure the store update has completed
-          setTimeout(() => {
-            if (isMounted) {
-              // Set initialized flag to generate fresh narrative
-              setInitialized(true);
-            }
-          }, 500);
         }
         else {
           // No segments at all - normal case for new session
