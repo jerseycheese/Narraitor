@@ -51,6 +51,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const [initialized, setInitialized] = React.useState(false);
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
+  const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   
   // Get character ID from session store
   const characterId = sessionStore(state => state.characterId);
@@ -129,6 +130,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const handleNarrativeGenerated = (_: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
+    setShouldTriggerGeneration(false); // Reset trigger
     // Start generating choices
     setIsGeneratingChoices(true);
     
@@ -157,6 +159,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
     // Player choice was selected
     setIsGenerating(true);
     setLocalSelectedChoiceId(choiceId);
+    setShouldTriggerGeneration(true); // Trigger narrative generation
     
     // If we have a current decision, update its selected option
     if (currentDecision) {
@@ -240,7 +243,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             worldId={worldId}
             sessionId={sessionId}
             characterId={characterId || undefined}
-            triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
+            triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
             choiceId={localSelectedChoiceId || selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
             onChoicesGenerated={handleChoicesGenerated}
