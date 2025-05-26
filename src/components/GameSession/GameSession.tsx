@@ -9,7 +9,7 @@ import { narrativeStore } from '@/state/narrativeStore';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
-import GameSessionActiveWithNarrative from './GameSessionActiveWithNarrative';
+import ActiveGameSession from './ActiveGameSession';
 import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 
 interface GameSessionProps {
@@ -227,7 +227,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
     // Use the new narrative integration component
     return (
-      <GameSessionActiveWithNarrative
+      <ActiveGameSession
         worldId={worldId}
         sessionId={stableSessionId}
         world={world}

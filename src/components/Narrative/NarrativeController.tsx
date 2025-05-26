@@ -364,7 +364,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
+    console.log('🎯 GENERATING NEXT SEGMENT for choice:', triggeringChoiceId);
+    
     if (segments.length === 0) {
+      console.log('❌ No segments found, skipping generation');
       return;
     }
     

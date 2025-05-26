@@ -13,7 +13,7 @@ import { characterStore } from '@/state/characterStore';
 import { PlayerChoiceSelector } from '@/components/Narrative';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
-interface GameSessionActiveWithNarrativeProps {
+interface ActiveGameSessionProps {
   worldId: string;
   sessionId: string;
   world?: World;
@@ -33,7 +33,7 @@ interface GameSessionActiveWithNarrativeProps {
   selectedChoiceId?: string;
 }
 
-const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativeProps> = ({
+const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   worldId,
   sessionId,
   world,
@@ -342,4 +342,4 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   );
 };
 
-export default GameSessionActiveWithNarrative;
+export default ActiveGameSession;

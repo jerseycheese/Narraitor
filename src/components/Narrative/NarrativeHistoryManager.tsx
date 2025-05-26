@@ -37,6 +37,17 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       const uniqueSegments = removeDuplicateSegments(existingSegments);
       
       // Log deduplication info for debugging
+      console.log('📚 NARRATIVE HISTORY:', {
+        sessionId,
+        existingSegmentsCount: existingSegments.length,
+        uniqueSegmentsCount: uniqueSegments.length,
+        segments: uniqueSegments.map(s => ({ 
+          id: s.id, 
+          type: s.type, 
+          content: s.content.substring(0, 50) + '...' 
+        }))
+      });
+      
       if (uniqueSegments.length !== existingSegments.length) {
         console.debug(
           `NarrativeHistoryManager: Deduplicated segments for session ${sessionId} ` +
