@@ -28,6 +28,10 @@ export default function CharactersPage() {
     router.push(`/characters/${characterId}`);
   };
 
+  const handleEditCharacter = (characterId: string) => {
+    router.push(`/characters/${characterId}/edit`);
+  };
+
   const handleDeleteCharacter = (characterId: string) => {
     if (confirm('Are you sure you want to delete this character?')) {
       deleteCharacter(characterId);
@@ -144,9 +148,18 @@ export default function CharactersPage() {
                       e.stopPropagation();
                       handleViewCharacter(character.id);
                     }}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                   >
                     View
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditCharacter(character.id);
+                    }}
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Edit
                   </button>
                   <button
                     onClick={(e) => {
