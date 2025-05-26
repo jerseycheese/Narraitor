@@ -6,7 +6,6 @@ import { NarrativeController } from '@/components/Narrative/NarrativeController'
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import PlayerChoices from './PlayerChoices';
-import SessionControls from './SessionControls';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
@@ -19,8 +18,6 @@ interface ActiveGameSessionProps {
   world?: World;
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
-  onPause?: () => void;
-  onResume?: () => void;
   onEnd?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
@@ -39,8 +36,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   world,
   status = 'active',
   onChoiceSelected,
-  onPause,
-  onResume,
   onEnd,
   /* existingSegments - not currently used */
   choices,
@@ -330,13 +325,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
       )}
 
-      {onPause && onResume && onEnd && (
-        <SessionControls
-          status={status}
-          onPause={onPause}
-          onResume={onResume}
-          onEnd={onEnd}
-        />
+      {onEnd && (
+        <div className="mt-6 flex justify-end">
+          <button
+            data-testid="game-session-end"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            onClick={onEnd}
+          >
+            End Session
+          </button>
+        </div>
       )}
     </div>
   );

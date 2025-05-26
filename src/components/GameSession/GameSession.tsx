@@ -60,7 +60,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     handleDismissError,
     startSession,
     handleSelectChoice,
-    handlePauseToggle,
     handleEndSession,
   } = useGameSessionState({
     worldId,
@@ -233,8 +232,6 @@ const GameSession: React.FC<GameSessionProps> = ({
         world={world}
         status={sessionState.status}
         onChoiceSelected={handleSelectChoice}
-        onPause={handlePauseToggle}
-        onResume={handlePauseToggle}
         onEnd={handleEndSession}
         choices={sessionState.playerChoices || []}
         triggerGeneration={sessionState.status === 'active'}

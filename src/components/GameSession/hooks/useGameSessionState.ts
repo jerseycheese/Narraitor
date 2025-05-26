@@ -133,29 +133,6 @@ export const useGameSessionState = ({
     }
   };
 
-  // Use a ref to track paused state properly across renders
-  const pausedRef = useRef(false);
-  
-  // Handle pause/resume toggle
-  const handlePauseToggle = () => {
-    // Toggle the paused state
-    pausedRef.current = !pausedRef.current;
-    
-    // Update local state immediately
-    setSessionState(prev => ({ 
-      ...prev, 
-      status: pausedRef.current ? 'paused' : 'active' 
-    }));
-    
-    // Update the store based on the action
-    if (pausedRef.current) {
-      logger.debug('Pausing session');
-      sessionStoreState.pauseSession?.();
-    } else {
-      logger.debug('Resuming session');
-      sessionStoreState.resumeSession?.();
-    }
-  };
 
   // Handle end session
   const handleEndSession = () => {
@@ -220,12 +197,10 @@ export const useGameSessionState = ({
     worldExists,
     world,
     prevStatusRef,
-    pausedRef,
     handleRetry,
     handleDismissError,
     startSession,
     handleSelectChoice,
-    handlePauseToggle,
     handleEndSession,
     setError,
     setSessionState,
