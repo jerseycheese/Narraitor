@@ -37,17 +37,6 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       const uniqueSegments = removeDuplicateSegments(existingSegments);
       
       // Log deduplication info for debugging
-      console.log('📚 NARRATIVE HISTORY:', {
-        sessionId,
-        existingSegmentsCount: existingSegments.length,
-        uniqueSegmentsCount: uniqueSegments.length,
-        segments: uniqueSegments.map(s => ({ 
-          id: s.id, 
-          type: s.type, 
-          content: s.content.substring(0, 50) + '...' 
-        }))
-      });
-      
       if (uniqueSegments.length !== existingSegments.length) {
         console.debug(
           `NarrativeHistoryManager: Deduplicated segments for session ${sessionId} ` +
@@ -78,44 +67,10 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       return [];
     }
     
-    // First, handle initial scenes
-    // If we have more than one segment with type "scene" and location that indicates an initial scene,
-    // only keep the most recent one
-    const initialSceneLocations = ['Starting Location', 'Frontier Town', 'Town Square', 'Village Center'];
-    
-    console.log('🔍 DEDUP: Checking segments for initial scenes:', segments.map(s => ({
-      id: s.id,
-      type: s.type,
-      location: s.metadata?.location,
-      isInitialScene: s.type === 'scene' && s.metadata?.location && initialSceneLocations.includes(s.metadata.location)
-    })));
-    
-    const initialScenes = segments.filter(
-      segment => segment.type === 'scene' && 
-                 segment.metadata?.location && 
-                 initialSceneLocations.includes(segment.metadata.location)
-    );
-    
-    let processedSegments = [...segments];
-    
-    if (initialScenes.length > 1) {
-      console.log('🔍 DEDUP: Found multiple initial scenes:', initialScenes.length);
-      // Sort by timestamp (newest first)
-      initialScenes.sort((a, b) => 
-        new Date(b.timestamp || b.createdAt).getTime() - new Date(a.timestamp || a.createdAt).getTime()
-      );
-      
-      // Keep only the newest initial scene
-      const newestInitialScene = initialScenes[0];
-      
-      // Filter out all but the newest initial scene
-      processedSegments = segments.filter(segment => 
-        segment.id === newestInitialScene.id || 
-        !(segment.type === 'scene' && 
-          segment.metadata?.location && 
-          initialSceneLocations.includes(segment.metadata.location))
-      );
-    }
+    // Skip the overly aggressive initial scene deduplication
+    // The problem is that all segments are getting the same location metadata
+    // Instead, just do simple content-based deduplication
+    const processedSegments = [...segments];
     
     // Second, handle general deduplication by content
     const uniqueSegments: NarrativeSegment[] = [];
@@ -127,17 +82,9 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       new Date(a.timestamp || a.createdAt).getTime() - new Date(b.timestamp || b.createdAt).getTime()
     );
     
-    console.log('🔍 DEDUP: Processing segments:', processedSegments.map(s => ({
-      id: s.id,
-      type: s.type,
-      contentStart: s.content.substring(0, 50) + '...',
-      timestamp: s.timestamp || s.createdAt
-    })));
-    
     for (const segment of processedSegments) {
       // Skip if this exact ID has already been included
       if (idMap.has(segment.id)) {
-        console.log('🔍 DEDUP: Skipping duplicate ID:', segment.id);
         continue;
       }
       
@@ -150,8 +97,6 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         uniqueSegments.push(segment);
         contentMap.set(key, true);
         idMap.set(segment.id, true);
-      } else {
-        console.log('🔍 DEDUP: Removing duplicate content for segment:', segment.id);
       }
     }
     
