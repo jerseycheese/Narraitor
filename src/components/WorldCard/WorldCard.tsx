@@ -62,12 +62,20 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <article
       data-testid="world-card"
       onClick={handleCardClick}
-      className="border border-gray-300 p-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white"
+      className="border border-gray-300 p-4 rounded-lg cursor-pointer hover:border-blue-500 hover:shadow-lg transition-all duration-200 bg-white relative"
     >
+      {world.theme && (
+        <p 
+          data-testid="world-card-theme" 
+          className="absolute top-4 right-4 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
+        >
+          {world.theme.charAt(0).toUpperCase() + world.theme.slice(1)}
+        </p>
+      )}
       <header>
         <h2 
           data-testid="world-card-name" 
-          className="text-2xl font-bold mb-3 text-blue-800"
+          className="text-2xl font-bold mb-3 text-blue-800 pr-32"
         >
           {world.name}
         </h2>
@@ -79,14 +87,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
         >
           {world.description}
         </p>
-        {world.theme && (
-          <p 
-            data-testid="world-card-theme" 
-            className="inline-block px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full"
-          >
-            Theme: {world.theme}
-          </p>
-        )}
       </div>
       <footer className="mt-4 pt-3 border-t border-gray-200">
         <div className="flex justify-between text-sm text-gray-600 mb-3">
