@@ -22,7 +22,7 @@ interface Character {
 }
 
 const meta = {
-  title: 'Components/GameSession/CharacterSummary',
+  title: 'Narraitor/GameSession/CharacterSummary',
   component: CharacterSummary,
   parameters: {
     layout: 'centered',
@@ -53,7 +53,7 @@ const baseCharacter: Character = {
   updatedAt: new Date().toISOString(),
   portrait: {
     type: 'ai-generated',
-    url: 'https://via.placeholder.com/150'
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iI2RkZCIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9Ijc1IiB5PSI3NSIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxOHB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE1MHgxNTA8L3RleHQ+PC9zdmc+'
   }
 };
 
@@ -68,15 +68,6 @@ export const WithoutPortrait: Story = {
     character: {
       ...baseCharacter,
       portrait: undefined,
-    },
-  },
-};
-
-export const PlaceholderPortrait: Story = {
-  args: {
-    character: {
-      ...baseCharacter,
-      portrait: { type: 'placeholder', url: null },
     },
   },
 };
@@ -101,28 +92,6 @@ export const LongDescription: Story = {
         personality: 'Noble and courageous, with an unwavering sense of justice',
         motivation: 'Right the wrongs of the world and bring justice to all'
       },
-    },
-  },
-};
-
-export const HighLevel: Story = {
-  args: {
-    character: {
-      ...baseCharacter,
-      name: 'Thorin Ironforge',
-      description: 'A legendary dwarven champion',
-      level: 20,
-    },
-  },
-};
-
-export const MobileView: Story = {
-  args: {
-    character: baseCharacter,
-  },
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1',
     },
   },
 };

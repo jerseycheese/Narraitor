@@ -2,6 +2,11 @@
 
 /* Base layer for HTML element styles */
 @layer base {
+  /* Button defaults */
+  button {
+    cursor: pointer;
+  }
+  
   /* Form element defaults */
   label {
     display: block;
