@@ -120,6 +120,15 @@ NEXT_PUBLIC_GEMINI_API_KEY=your-api-key
 
 The AI service integrates with the template system to generate contextual narratives based on world and character data. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
 
+### Portrait Generation
+
+Narraitor includes an AI-powered portrait generation system for creating character images. For comprehensive documentation, see:
+
+- [Portrait Generation Documentation](docs/features/portrait-generation/) - Complete guide to the portrait system
+- [API Reference](docs/features/portrait-generation/api.md) - Endpoint documentation and OpenAPI spec
+- [Integration Guide](docs/features/portrait-generation/integration-guide.md) - How to use portraits in your components
+- [Troubleshooting](docs/features/portrait-generation/troubleshooting.md) - Common issues and solutions
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
