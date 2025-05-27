@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import SessionControls from './SessionControls';
 
 const meta: Meta<typeof SessionControls> = {
-  title: 'Narraitor/Game/Session/SessionControls',
+  title: 'Narraitor/GameSession/SessionControls',
   component: SessionControls,
   parameters: {
     layout: 'padded',

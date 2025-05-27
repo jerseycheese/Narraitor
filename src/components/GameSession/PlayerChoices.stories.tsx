@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import PlayerChoices from './PlayerChoices';
 
 const meta: Meta<typeof PlayerChoices> = {
-  title: 'Narraitor/Game/Session/PlayerChoices',
+  title: 'Narraitor/GameSession/PlayerChoices',
   component: PlayerChoices,
   parameters: {
     layout: 'padded',
