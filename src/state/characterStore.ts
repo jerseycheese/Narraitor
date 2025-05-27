@@ -26,6 +26,7 @@ interface CharacterBackground {
   description: string;
   personality: string;
   motivation: string;
+  physicalDescription?: string;
 }
 
 interface CharacterStatus {

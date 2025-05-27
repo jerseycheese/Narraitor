@@ -46,7 +46,8 @@ describe('generateCharacter - Specific Character Type', () => {
         background: {
           description: 'A wizard of Middle Earth, member of the Istari',
           personality: 'Wise, patient, and caring but can be stern when needed',
-          motivation: 'To guide the peoples of Middle Earth against the forces of darkness'
+          motivation: 'To guide the peoples of Middle Earth against the forces of darkness',
+          physicalDescription: 'Tall elderly man with long grey beard, wearing grey robes and pointed hat, carrying a staff'
         },
         attributes: [
           { id: 'attr-1', value: 6 },
@@ -65,6 +66,9 @@ describe('generateCharacter - Specific Character Type', () => {
 
     // Verify the character has the correct name
     expect(result.name).toBe(characterName);
+    
+    // Verify the character has physical description
+    expect(result.background.physicalDescription).toBe('Tall elderly man with long grey beard, wearing grey robes and pointed hat, carrying a staff');
 
     // Verify the character is marked as a known figure
     expect(result.isKnownFigure).toBe(true);

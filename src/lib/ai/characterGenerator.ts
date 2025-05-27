@@ -43,6 +43,7 @@ export interface GeneratedCharacterData {
     description: string;
     personality: string;
     motivation: string;
+    physicalDescription?: string;
   };
   attributes: Array<{
     id: string;
@@ -131,7 +132,8 @@ Respond with ONLY valid JSON in this format:
   "background": {
     "description": "Their history and background story...",
     "personality": "Their personality traits...",
-    "motivation": "What drives them..."
+    "motivation": "What drives them...",
+    "physicalDescription": "Their physical appearance, including distinctive features, clothing style, height, build, etc..."
   },
   "attributes": [
     ${world.attributes.map(a => `{"id": "${a.id}", "value": <number between ${a.minValue} and ${a.maxValue}>}`).join(',\n    ')}
