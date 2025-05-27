@@ -1,3 +1,14 @@
+/**
+ * Journal System - POST-MVP
+ * Status: Implementation complete but not included in MVP
+ * Reason: Deprioritized to focus on core narrative experience
+ * Date: May 2025
+ * 
+ * Note: This store is fully functional and tested but will not be 
+ * exposed in the UI until post-MVP. Automatic journal entry creation
+ * is suspended until post-MVP implementation.
+ */
+
 import { create } from 'zustand';
 import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';

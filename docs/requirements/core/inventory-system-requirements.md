@@ -3,8 +3,18 @@ title: Inventory System Requirements
 aliases: [Item Management Requirements]
 tags: [narraitor, requirements, inventory-system]
 created: 2025-04-29
-updated: 2025-05-03
+updated: 2025-05-26
 ---
+
+> **⚠️ POST-MVP SYSTEM**
+> 
+> **Status**: Implementation complete but deprioritized to post-MVP
+> 
+> **Reason**: To focus on core narrative experience for the MVP release
+> 
+> **Date**: May 2025
+> 
+> This system is fully functional and tested but will not be exposed in the UI until post-MVP phase.
 
 # Inventory System Requirements
 

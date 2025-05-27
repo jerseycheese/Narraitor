@@ -3,6 +3,8 @@ import { useRouter } from 'next/navigation';
 import { World } from '../../types/world.types';
 import WorldCardActions from '../WorldCardActions/WorldCardActions';
 import { worldStore } from '../../state/worldStore';
+import { sessionStore } from '../../state/sessionStore';
+import { characterStore } from '../../state/characterStore';
 
 interface WorldCardProps {
   world: World;
@@ -42,8 +44,34 @@ const WorldCard: React.FC<WorldCardProps> = ({
     try {
       const storeActions = _storeActions || worldStore.getState();
       storeActions.setCurrentWorld(world.id);
+      
+      // Check for saved session
+      const characterState = characterStore.getState();
+      const worldCharacters = Object.values(characterState.characters)
+        .filter(char => char.worldId === world.id);
+      
+      let hasSession = false;
+      if (worldCharacters.length > 0) {
+        // Check if there's a saved session for any character in this world
+        const savedSession = sessionStore.getState().getSavedSession(
+          world.id, 
+          worldCharacters[0].id
+        );
+        
+        if (savedSession) {
+          hasSession = true;
+          console.log('[WorldCard] Found saved session:', savedSession.id);
+        }
+      } else {
+        console.log('[WorldCard] No characters exist for this world yet');
+      }
+      
       if (actualRouter) {
-        actualRouter.push(`/world/${world.id}/play`);
+        // Add query parameter to auto-resume if there's a saved session
+        const url = hasSession 
+          ? `/world/${world.id}/play?autoResume=true`
+          : `/world/${world.id}/play`;
+        actualRouter.push(url);
       }
     } catch (exception) {
       console.error('Error in handlePlayClick:', exception);

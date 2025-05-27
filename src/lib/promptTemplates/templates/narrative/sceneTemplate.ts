@@ -1,4 +1,5 @@
 // import { PromptTemplate } from '../../types';
+import { NarrativeSegment } from '../../../../types/narrative.types';
 
 export const sceneTemplate = (context: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   const {
@@ -12,7 +13,7 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
 
   const segmentType = generationParameters?.segmentType || 'scene';
   const recentSegments = narrativeContext?.recentSegments || [];
-  const recentContent = recentSegments.map((seg: any, i: number) => 
+  const recentContent = recentSegments.map((seg: NarrativeSegment, i: number) => 
     `[Scene ${recentSegments.length - i}]: ${seg.content}`
   ).join('\n\n');
 

@@ -22,6 +22,17 @@ export interface GameSessionState {
 }
 
 /**
+ * Saved session info
+ */
+export interface SavedSessionInfo {
+  id: string;
+  worldId: string;
+  characterId: string;
+  lastPlayed: string;
+  narrativeCount: number;
+}
+
+/**
  * Session store interface
  */
 export interface SessionStore {
@@ -33,6 +44,7 @@ export interface SessionStore {
   error: string | null;
   worldId: EntityID | null;
   characterId: EntityID | null;
+  savedSessions: Record<string, SavedSessionInfo>;
   
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
@@ -47,4 +59,8 @@ export interface SessionStore {
   resumeSession: () => void;
   setSessionId: (id: string) => void;
   setCharacterId: (characterId: EntityID) => void;
+  getSavedSession: (worldId: string, characterId: string) => SavedSessionInfo | undefined;
+  resumeSavedSession: (sessionId: string) => boolean;
+  deleteSavedSession: (sessionId: string) => void;
+  updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
 }

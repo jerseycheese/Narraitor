@@ -17,10 +17,10 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     return (
       <div className="p-8">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent dark:border-blue-400 dark:border-r-transparent">
             <span className="sr-only">Loading...</span>
           </div>
-          <p className="mt-2 text-muted-foreground">Generating narrative...</p>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">Generating narrative...</p>
         </div>
       </div>
     );

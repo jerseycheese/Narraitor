@@ -293,14 +293,16 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
+    const hasAnySegments = existingSegments.length > 0;
     const hasInitialScene = existingSegments.some(segment => 
       segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
     );
     
-    console.log('🎬 INITIAL NARRATIVE: Existing segments:', existingSegments.length, 'Has initial scene:', hasInitialScene);
+    console.log('🎬 INITIAL NARRATIVE: Existing segments:', existingSegments.length, 'Has any segments:', hasAnySegments, 'Has initial scene:', hasInitialScene);
     
-    if (hasInitialScene) {
-      console.log('🎬 INITIAL NARRATIVE: Already has initial scene, skipping generation');
+    // If we have ANY segments, this is a resumed session - don't generate initial narrative
+    if (hasAnySegments) {
+      console.log('🎬 INITIAL NARRATIVE: Session has existing segments (resumed session), skipping generation');
       setInitialGenerationCompleted(true);
       setIsLoading(false);
       return;
@@ -319,14 +321,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         return;
       }
       
-      // Double-check we still don't have an initial scene (in case another instance created one)
+      // Double-check we still don't have any segments (in case another instance created one)
       const currentSegments = getSessionSegments(sessionId);
-      const nowHasInitialScene = currentSegments.some(segment => 
-        segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
-      );
+      const nowHasSegments = currentSegments.length > 0;
       
-      if (nowHasInitialScene) {
-        console.log('🎬 INITIAL NARRATIVE: Another instance already created initial scene, skipping');
+      if (nowHasSegments) {
+        console.log('🎬 INITIAL NARRATIVE: Another instance already created segments, skipping');
         setIsLoading(false);
         return;
       }

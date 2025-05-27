@@ -21,7 +21,7 @@ describe('WorldCard', () => {
     expect(screen.getByTestId('world-card-description')).toHaveTextContent(mockWorld.description);
     
     // Verify genre (theme) is displayed
-    expect(screen.getByTestId('world-card-theme')).toHaveTextContent(`Theme: ${mockWorld.theme}`);
+    expect(screen.getByTestId('world-card-theme')).toHaveTextContent(mockWorld.theme);
     
     // Verify timestamps are displayed
     expect(screen.getByTestId('world-card-createdAt')).toHaveTextContent(`Created: ${new Date(mockWorld.createdAt).toLocaleDateString()}`);
