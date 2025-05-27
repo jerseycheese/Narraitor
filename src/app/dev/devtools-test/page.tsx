@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useDevTools } from '@/components/devtools/DevToolsContext';
 import { create } from 'zustand';
 
@@ -112,7 +113,13 @@ export default function DevToolsTestPage() {
   
   return (
     <div className="min-h-screen p-6" style={{ paddingBottom: '60vh' }}> {/* Extra padding at bottom to ensure visibility */}
-        <h1 className="text-2xl font-bold mb-4">DevTools Test Harness</h1>
+        <Link 
+          href="/dev" 
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          ← Back to Dev Harnesses
+        </Link>
+        <h1 className="text-2xl font-bold mb-4 mt-4">DevTools Test Harness</h1>
         
         <div className="mb-6 p-4 border rounded bg-gray-50">
           <h2 className="text-xl font-bold mb-2">State Manipulation</h2>

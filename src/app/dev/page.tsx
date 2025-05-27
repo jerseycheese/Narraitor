@@ -46,6 +46,9 @@ export default function DevPage() {
         <Link href="/dev/world-generation" className="block p-4 bg-orange-100 hover:bg-orange-200 rounded">
           World Generation Test Harness
         </Link>
+        <Link href="/dev/attribute-editor" className="block p-4 bg-yellow-100 hover:bg-yellow-200 rounded">
+          Attribute Editor Test Harness
+        </Link>
       </div>
     </div>
   );

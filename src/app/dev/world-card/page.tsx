@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { World } from '@/types/world.types';
 import { worldStore } from '@/state/worldStore';
@@ -60,7 +61,13 @@ export default function WorldCardTestHarness() {
   
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">WorldCard Test Harness</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-4 mt-4">WorldCard Test Harness</h1>
       
       <div className="flex gap-6">
         <div className="w-2/3">

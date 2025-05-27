@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { MockNarrativeController } from './MockNarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
 import { narrativeStore } from '@/state/narrativeStore';
@@ -222,7 +223,13 @@ export default function NarrativeSystemHarness() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Narrative System Test Harness</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-4 mt-4">Narrative System Test Harness</h1>
       
       {/* Control Panel */}
       <div className="mb-6 p-4 bg-gray-100 rounded">

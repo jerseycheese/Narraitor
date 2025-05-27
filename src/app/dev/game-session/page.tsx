@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { worldStore } from '@/state/worldStore';
@@ -135,7 +136,13 @@ export default function GameSessionTestHarness() {
   
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Game Session Test Harness</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-4 mt-4">Game Session Test Harness</h1>
       
       <div className="mb-4">
         <button 

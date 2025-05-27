@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai';
 import { Character } from '@/types/character.types';
@@ -167,7 +168,13 @@ export default function PortraitPromptTestPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Portrait Prompt Testing</h1>
+        <Link 
+          href="/dev" 
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          ← Back to Dev Harnesses
+        </Link>
+        <h1 className="text-3xl font-bold mb-6 mt-4">Portrait Prompt Testing</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Controls */}

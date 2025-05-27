@@ -97,7 +97,13 @@ export default function TestCharacterFormPage() {
   
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Character Form Test & Debug</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-4 mt-4">Character Form Test & Debug</h1>
       
       <div className="mb-6 space-y-4">
         <div className="bg-blue-50 p-4 rounded-lg">

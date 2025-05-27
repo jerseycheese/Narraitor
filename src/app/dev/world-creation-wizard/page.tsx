@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
 
@@ -40,7 +41,13 @@ export default function WorldCreationWizardTestHarness() {
 
   return (
     <main className="p-8">
-      <h1 className="text-4xl font-bold mb-8">
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-4xl font-bold mb-8 mt-4">
         World Creation Wizard Test Harness
       </h1>
 

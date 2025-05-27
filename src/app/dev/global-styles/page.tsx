@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { GlobalStylesDemo } from '@/components/design-system/GlobalStylesDemo';
 
 /**
@@ -9,7 +10,13 @@ import { GlobalStylesDemo } from '@/components/design-system/GlobalStylesDemo';
 export default function GlobalStylesPage() {
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">Global Styles Demo</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-6 mt-4">Global Styles Demo</h1>
       <p className="mb-6">
         This page demonstrates the global styles implemented for the Narraitor application.
         You can view this page in both light and dark mode by toggling your system preferences.
