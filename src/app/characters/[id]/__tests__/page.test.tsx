@@ -74,11 +74,6 @@ describe('CharacterViewPage', () => {
     // Should display background information
     expect(screen.getByText('A brave warrior')).toBeInTheDocument();
     expect(screen.getByText('Bold and honorable')).toBeInTheDocument();
-    
-    // Should display status information
-    expect(screen.getByText('100')).toBeInTheDocument();
-    expect(screen.getByText('50')).toBeInTheDocument();
-    expect(screen.getByText('80')).toBeInTheDocument();
   });
 
   test('shows character not found message for invalid character ID', () => {

@@ -8,7 +8,6 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { CharacterAttributeDisplay } from '@/components/characters/CharacterAttributeDisplay';
 import { CharacterSkillDisplay } from '@/components/characters/CharacterSkillDisplay';
 import { CharacterBackgroundDisplay } from '@/components/characters/CharacterBackgroundDisplay';
-import { CharacterStatusDisplay } from '@/components/characters/CharacterStatusDisplay';
 
 export default function CharacterViewPage() {
   const params = useParams();
@@ -82,12 +81,6 @@ export default function CharacterViewPage() {
 
           {/* Character Details Sections */}
           <div className="border-t pt-8 space-y-8">
-            {/* Character Status */}
-            <section>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Status</h2>
-              <CharacterStatusDisplay status={character.status} />
-            </section>
-
             {/* Character Attributes */}
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Attributes</h2>
