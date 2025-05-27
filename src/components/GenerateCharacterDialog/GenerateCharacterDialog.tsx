@@ -78,8 +78,8 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
                   disabled={isGenerating}
                 />
                 <div>
-                  <div className="font-medium">Specific Character</div>
-                  <div className="text-sm text-gray-600">Enter a name to create a particular character</div>
+                  <div className="font-medium">Specific Known Figure</div>
+                  <div className="text-sm text-gray-600">Generate a specific character from {worldName} lore</div>
                 </div>
               </label>
             </div>
@@ -100,7 +100,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
                 disabled={isGenerating}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Enter the name of the character you want to create
+                Enter the name of a known character from {worldName} lore
               </p>
             </div>
           )}
