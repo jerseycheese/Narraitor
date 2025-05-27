@@ -1,4 +1,4 @@
-import { describe, it, expect, jest, beforeEach } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import { PortraitGenerator } from '../portraitGenerator';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { render, screen } from '@testing-library/react';
