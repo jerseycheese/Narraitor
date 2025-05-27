@@ -117,7 +117,7 @@ describe('ActiveGameSession', () => {
     expect(screen.getByTestId('mock-narrative-controller')).toBeInTheDocument();
     
     // Check for session controls
-    expect(screen.getByText('⏸️ Pause')).toBeInTheDocument();
+    expect(screen.getByText('Start New Session')).toBeInTheDocument();
     expect(screen.getByText('End Session')).toBeInTheDocument();
   });
 

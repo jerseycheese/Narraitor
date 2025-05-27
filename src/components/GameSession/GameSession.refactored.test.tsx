@@ -35,12 +35,15 @@ jest.mock('./hooks/useGameSessionState', () => ({
     sessionState: { status: 'initializing' },
     error: null,
     worldExists: true,
+    world: undefined,
+    worldCharacters: [],
+    savedSession: null,
     handleRetry: jest.fn(),
     handleDismissError: jest.fn(),
     startSession: jest.fn(),
     handleSelectChoice: jest.fn(),
     handleResumeSession: jest.fn(),
-      handleNewSession: jest.fn(),
+    handleNewSession: jest.fn(),
     handleEndSession: jest.fn(),
     prevStatusRef: { current: 'initializing' },
   }))
@@ -89,6 +92,8 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -103,7 +108,7 @@ describe('GameSession (Refactored)', () => {
 
     render(<GameSession worldId="test-world-id" />);
 
-    expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
+    expect(screen.getByTestId('game-session-no-characters')).toBeInTheDocument();
   });
 
   test('renders loading state', () => {
@@ -112,6 +117,8 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -135,6 +142,8 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -158,6 +167,8 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: true,
       world: mockWorld,
+      worldCharacters: [{ id: 'char-1', name: 'Test Character', worldId: 'test-world-id' }],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -181,6 +192,8 @@ describe('GameSession (Refactored)', () => {
       error: null,
       worldExists: false,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),

@@ -36,12 +36,15 @@ jest.mock('./hooks/useGameSessionState', () => ({
     sessionState: { status: 'initializing' },
     error: null,
     worldExists: true,
+    world: undefined,
+    worldCharacters: [],
+    savedSession: null,
     handleRetry: jest.fn(),
     handleDismissError: jest.fn(),
     startSession: jest.fn(),
     handleSelectChoice: jest.fn(),
     handleResumeSession: jest.fn(),
-      handleNewSession: jest.fn(),
+    handleNewSession: jest.fn(),
     handleEndSession: jest.fn(),
     prevStatusRef: { current: 'initializing' },
   }))
@@ -73,6 +76,8 @@ describe('GameSession', () => {
       error: null,
       worldExists: false,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -96,6 +101,8 @@ describe('GameSession', () => {
       error: null,
       worldExists: true,
       world: undefined,
+      worldCharacters: [],
+      savedSession: null,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),
       startSession: jest.fn(),
@@ -141,7 +148,7 @@ describe('GameSession', () => {
       />
     );
     
-    expect(screen.getByTestId('game-session-initializing')).toBeInTheDocument();
-    expect(screen.getByText('Session Not Started')).toBeInTheDocument();
+    expect(screen.getByTestId('game-session-no-characters')).toBeInTheDocument();
+    expect(screen.getByText('No Characters Found')).toBeInTheDocument();
   });
 });
