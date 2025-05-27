@@ -6,6 +6,9 @@ const logger = new Logger('CharacterGenerator');
 
 /**
  * Calculate similarity between two strings using Levenshtein distance
+ * @param str1 - First string to compare
+ * @param str2 - Second string to compare
+ * @returns Similarity score between 0 and 1, where 1 is identical
  */
 function calculateNameSimilarity(str1: string, str2: string): number {
   const len1 = str1.length;
@@ -34,7 +37,7 @@ function calculateNameSimilarity(str1: string, str2: string): number {
   return (maxLen - matrix[len2][len1]) / maxLen;
 }
 
-interface GeneratedCharacterData {
+export interface GeneratedCharacterData {
   name: string;
   background: {
     description: string;
@@ -54,6 +57,18 @@ interface GeneratedCharacterData {
   characterType?: 'protagonist' | 'antagonist' | 'supporting' | 'original';
 }
 
+/**
+ * Generate a character for a given world using AI
+ * @param world - The world configuration containing attributes, skills, and theme
+ * @param existingCharacterNames - List of character names that already exist (to avoid duplicates)
+ * @param suggestedName - Optional name to use for the character
+ * @param generationType - Type of character to generate:
+ *   - 'known': Generate a canonical character from the source material
+ *   - 'original': Generate a completely new character that fits the world
+ *   - 'specific': Generate a character with the suggested name
+ * @returns Generated character data including name, background, attributes, and skills
+ * @throws Error if generation fails or duplicate names are detected
+ */
 export async function generateCharacter(
   world: World,
   existingCharacterNames: string[],
