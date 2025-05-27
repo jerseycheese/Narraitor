@@ -2,6 +2,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { PortraitStep } from './PortraitStep';
+import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof PortraitStep> = {
   title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 5 Portrait',
@@ -11,8 +12,23 @@ const meta: Meta<typeof PortraitStep> = {
   },
   decorators: [
     (Story) => (
-      <div className="w-full max-w-2xl p-6 bg-white rounded-lg shadow">
-        <Story />
+      <div className="w-full max-w-2xl">
+        <WizardContainer title="Create Character in Storybook Test World">
+          <WizardProgress 
+            steps={[
+              { id: 'basic-info', label: 'Basic Info' },
+              { id: 'attributes', label: 'Attributes' },
+              { id: 'skills', label: 'Skills' },
+              { id: 'background', label: 'Background' },
+              { id: 'portrait', label: 'Portrait' }
+            ]} 
+            currentStep={4} 
+            className="mb-6"
+          />
+          <div className="p-6 bg-white rounded-lg shadow">
+            <Story />
+          </div>
+        </WizardContainer>
       </div>
     ),
   ],
@@ -74,21 +90,3 @@ export const WithGeneratedPortrait: Story = {
     worldConfig: mockWorldConfig,
   },
 };
-
-export const WithPhysicalDescription: Story = {
-  args: {
-    data: {
-      ...defaultData,
-      characterData: {
-        ...defaultData.characterData,
-        background: {
-          ...defaultData.characterData.background,
-          physicalDescription: 'Tall with silver hair and violet eyes',
-        },
-      },
-    },
-    onUpdate: () => {},
-    worldConfig: mockWorldConfig,
-  },
-};
-

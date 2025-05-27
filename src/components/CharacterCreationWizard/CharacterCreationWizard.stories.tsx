@@ -56,12 +56,10 @@ const createTestWorld = () => {
   const worldId = worldStore.getState().createWorld(testWorld);
   worldStore.getState().setCurrentWorld(worldId);
   
-  // World created successfully
-  
   return worldId;
 };
 
-export const Step1BasicInfo: Story = {
+export const FullWizard: Story = {
   render: () => {
     const worldId = createTestWorld();
     return (
@@ -73,63 +71,8 @@ export const Step1BasicInfo: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The first step of character creation where users enter basic information like name and description.',
+        story: 'The complete character creation wizard flow, starting from the beginning.',
       },
     },
   },
 };
-
-export const Step2Attributes: Story = {
-  render: () => {
-    const worldId = createTestWorld();
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} initialStep={1} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'The second step where users allocate attribute points with dynamic constraints.',
-      },
-    },
-  },
-};
-
-export const Step3Skills: Story = {
-  render: () => {
-    const worldId = createTestWorld();
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} initialStep={2} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'The third step where users select starting skills (all at level 1).',
-      },
-    },
-  },
-};
-
-export const Step4Background: Story = {
-  render: () => {
-    const worldId = createTestWorld();
-    return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <CharacterCreationWizard worldId={worldId} initialStep={3} />
-      </div>
-    );
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'The fourth step where users create their character\'s background story.',
-      },
-    },
-  },
-};
-

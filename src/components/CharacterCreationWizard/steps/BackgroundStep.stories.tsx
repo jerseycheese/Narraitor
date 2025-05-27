@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BasicInfoStep } from './BasicInfoStep';
+import { BackgroundStep } from './BackgroundStep';
 import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
-const meta: Meta<typeof BasicInfoStep> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 1 BasicInfo',
-  component: BasicInfoStep,
+const meta: Meta<typeof BackgroundStep> = {
+  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 4 Background',
+  component: BackgroundStep,
   parameters: {
     layout: 'centered',
   },
@@ -20,7 +20,7 @@ const meta: Meta<typeof BasicInfoStep> = {
               { id: 'background', label: 'Background' },
               { id: 'portrait', label: 'Portrait' }
             ]} 
-            currentStep={0} 
+            currentStep={3} 
             className="mb-6"
           />
           <div className="p-6 bg-white rounded-lg shadow">
@@ -36,12 +36,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const defaultData = {
-  currentStep: 0,
+  currentStep: 3,
   worldId: 'world-1',
   characterData: {
-    name: '',
-    description: '',
-    portraitPlaceholder: '',
+    name: 'Elara Moonshadow',
+    description: 'A skilled mage from the northern kingdoms',
     attributes: [],
     skills: [],
     background: {
@@ -53,8 +52,8 @@ const defaultData = {
   },
   validation: {},
   pointPools: {
-    attributes: { total: 20, spent: 0, remaining: 20 },
-    skills: { total: 15, spent: 0, remaining: 15 },
+    attributes: { total: 48, spent: 48, remaining: 0 },
+    skills: { total: 15, spent: 15, remaining: 0 },
   },
 };
 
@@ -68,7 +67,7 @@ const mockWorldConfig = {
   settings: {
     maxAttributes: 6,
     maxSkills: 12,
-    attributePointPool: 20,
+    attributePointPool: 48,
     skillPointPool: 15,
   },
   createdAt: '2023-01-01',
@@ -90,8 +89,16 @@ export const WithData: Story = {
       ...defaultData,
       characterData: {
         ...defaultData.characterData,
-        name: 'Aragorn Strider',
-        description: 'A ranger from the North, skilled in sword and bow',
+        background: {
+          history: 'Born in the mystical forests of Eldoria, Elara showed an early affinity for magic. She spent her youth studying under the archmage Theron, mastering the arcane arts. When her village was threatened by dark forces, she set out on a journey to find ancient artifacts that could protect her people.',
+          personality: 'Wise beyond her years, yet curious and sometimes impulsive. She values knowledge and often gets lost in her studies. Despite her serious demeanor, she has a warm heart and fierce loyalty to her friends.',
+          motivation: 'To protect the innocent and uncover the lost secrets of the ancient mages',
+          goals: [
+            'Master the forbidden spells of the ancients',
+            'Find the Crystal of Eternal Light',
+            'Establish a new school of magic',
+          ],
+        },
       },
     },
     onUpdate: () => {},
@@ -100,18 +107,27 @@ export const WithData: Story = {
   },
 };
 
-export const WithValidationError: Story = {
+export const WithValidationErrors: Story = {
   args: {
     data: {
       ...defaultData,
       characterData: {
         ...defaultData.characterData,
-        name: 'AB', // Too short
+        background: {
+          history: 'Too short',
+          personality: 'Brief',
+          motivation: 'Why',
+          goals: [],
+        },
       },
       validation: {
-        0: {
+        3: {
           valid: false,
-          errors: ['Name must be at least 3 characters'],
+          errors: [
+            'History must be at least 50 characters',
+            'Personality must be at least 30 characters',
+            'Motivation must be at least 10 characters',
+          ],
           touched: true,
         },
       },
