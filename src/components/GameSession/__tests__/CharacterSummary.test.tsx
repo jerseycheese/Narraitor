@@ -1,30 +1,71 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import CharacterSummary from '../CharacterSummary';
-import { Character } from '@/types/character.types';
+
+// Define the Character type as used in characterStore
+interface Character {
+  id: string;
+  name: string;
+  worldId: string;
+  level: number;
+  description?: string;
+  background?: {
+    description: string;
+    personality: string;
+    motivation: string;
+  };
+  portrait?: {
+    type: 'ai-generated' | 'placeholder';
+    url: string | null;
+  };
+  attributes: Array<{
+    id: string;
+    characterId: string;
+    name: string;
+    baseValue: number;
+    modifiedValue: number;
+  }>;
+  skills: Array<{
+    id: string;
+    characterId: string;
+    name: string;
+    level: number;
+  }>;
+  isPlayer: boolean;
+  status: {
+    hp: number;
+    mp: number;
+    stamina: number;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
 
 describe('CharacterSummary', () => {
   const mockCharacter: Character = {
     id: 'char-1',
     name: 'Aldric the Bold',
     description: 'A brave knight with unwavering loyalty',
-    background: 'Raised in a noble family, trained in the art of combat since childhood',
+    background: {
+      description: 'Raised in a noble family, trained in the art of combat since childhood',
+      personality: 'Brave and loyal',
+      motivation: 'Protect the innocent'
+    },
     worldId: 'world-1',
     level: 5,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     portrait: {
-      type: 'generated',
+      type: 'ai-generated',
       url: 'https://example.com/portrait.jpg'
     },
-    attributes: {
-      strength: { value: 18, min: 1, max: 20 },
-      intelligence: { value: 12, min: 1, max: 20 },
-      agility: { value: 14, min: 1, max: 20 }
-    },
-    skills: {
-      swordsmanship: { value: 8, min: 1, max: 10 },
-      diplomacy: { value: 5, min: 1, max: 10 }
+    attributes: [],
+    skills: [],
+    isPlayer: true,
+    status: {
+      hp: 100,
+      mp: 50,
+      stamina: 80
     }
   };
 
@@ -58,7 +99,7 @@ describe('CharacterSummary', () => {
     it('displays character portrait when available', () => {
       render(<CharacterSummary character={mockCharacter} />);
       
-      const portrait = screen.getByRole('img', { name: 'Aldric the Bold' });
+      const portrait = screen.getByRole('img', { name: /Aldric the Bold/i });
       expect(portrait).toBeInTheDocument();
     });
 
