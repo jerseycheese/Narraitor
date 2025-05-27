@@ -5,12 +5,11 @@ import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
-import PlayerChoices from './PlayerChoices';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
-import { PlayerChoiceSelector } from '@/components/Narrative';
-import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
+import CharacterSummary from './CharacterSummary';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -203,20 +202,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         <div className="mb-4">
           <h1 className="text-2xl font-bold">{world.name}</h1>
           <p className="text-gray-600 mb-3">{world.theme}</p>
-          {character && (
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-              <CharacterPortrait
-                portrait={character.portrait || { type: 'placeholder', url: null }}
-                characterName={character.name}
-                size="small"
-              />
-              <div>
-                <p className="text-green-700 font-medium">Playing as: {character.name}</p>
-                <p className="text-green-600 text-sm">Level {character.level}</p>
-              </div>
-            </div>
-          )}
           <p className="text-blue-600 mt-2" aria-live="polite">Status: {status}</p>
+        </div>
+      )}
+      
+      {/* Character Summary Panel */}
+      {character && (
+        <div className="mb-6">
+          <CharacterSummary character={character} />
         </div>
       )}
       
@@ -250,7 +243,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Show AI-generated choices, loading state, or fallback */}
       {currentDecision ? (
         <div className="player-choices-container">
-          <PlayerChoiceSelector
+          <ChoiceSelector
             decision={currentDecision}
             onSelect={handleChoiceSelected}
             isDisabled={status !== 'active' || isGenerating}
@@ -269,9 +262,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
       ) : choices && choices.length > 0 ? (
         <div className="player-choices-container">
-          <PlayerChoices
+          <ChoiceSelector
             choices={choices}
-            onChoiceSelected={handleChoiceSelected}
+            onSelect={handleChoiceSelected}
             isDisabled={status !== 'active' || isGenerating}
           />
         </div>

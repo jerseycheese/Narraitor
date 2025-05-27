@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { World } from '@/types/world.types';
-import PlayerChoices from './PlayerChoices';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import SessionControls from './SessionControls';
 
 interface GameSessionActiveProps {
@@ -52,9 +52,9 @@ const GameSessionActive: React.FC<GameSessionActiveProps> = ({
       </div>
 
       {narrative.choices && narrative.choices.length > 0 && (
-        <PlayerChoices
+        <ChoiceSelector
           choices={narrative.choices}
-          onChoiceSelected={onChoiceSelected}
+          onSelect={onChoiceSelected}
           isDisabled={status !== 'active'}
         />
       )}

@@ -5,6 +5,7 @@ import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
+import { characterStore } from '@/state/characterStore';
 import Logger from '@/lib/utils/logger';
 
 // Mock world
@@ -25,6 +26,34 @@ const mockWorld: World = {
   updatedAt: '2023-01-01T10:00:00Z',
 };
 
+// Mock character
+const mockCharacter = {
+  id: 'test-character-123',
+  name: 'Test Hero',
+  description: 'A brave adventurer ready for testing',
+  worldId: 'world-1',
+  level: 5,
+  background: {
+    description: 'Born in a test harness, raised to debug',
+    personality: 'Deterministic and reliable',
+    motivation: 'To pass all tests'
+  },
+  portrait: {
+    type: 'placeholder' as const,
+    url: null
+  },
+  attributes: [],
+  skills: [],
+  isPlayer: true,
+  status: {
+    hp: 100,
+    mp: 50,
+    stamina: 80
+  },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
+
 type SessionStateDisplay = {
   status?: string;
   currentSceneId?: string | null;
@@ -40,7 +69,7 @@ export default function GameSessionTestHarness() {
   const [currentState, setCurrentState] = useState<SessionStateDisplay>({});
   const logger = React.useMemo(() => new Logger('GameSessionTestHarness'), []);
   
-  // Create mock world for testing
+  // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
     const worlds = worldStore.getState().worlds || {};
     
@@ -52,7 +81,16 @@ export default function GameSessionTestHarness() {
       }
     });
     
-    logger.info('Test world created/recreated');
+    // Add test character to the store
+    const characters = characterStore.getState().characters || {};
+    characterStore.setState({
+      characters: {
+        ...characters,
+        [mockCharacter.id]: mockCharacter
+      }
+    });
+    
+    logger.info('Test world and character created/recreated');
   }, [logger]);
   
   // Set isClient to true once component mounts to avoid hydration mismatch
@@ -113,7 +151,7 @@ export default function GameSessionTestHarness() {
           className="px-4 py-2 bg-green-500 text-white rounded mb-4"
           onClick={createTestWorld}
         >
-          Recreate Test World
+          Recreate Test World & Character
         </button>
         
         <button 
@@ -123,9 +161,8 @@ export default function GameSessionTestHarness() {
             logger.info('Starting new session');
             const store = sessionStore.getState();
             if (store.initializeSession) {
-              // Use a mock character ID for testing
-              const mockCharacterId = 'test-character-123';
-              store.initializeSession(mockWorld.id, mockCharacterId, handleSessionStart);
+              // Use the test character ID
+              store.initializeSession(mockWorld.id, mockCharacter.id, handleSessionStart);
             } else {
               logger.error('initializeSession method not found');
             }

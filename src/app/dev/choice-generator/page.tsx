@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { PlayerChoiceSelector } from '@/components/Narrative';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { worldStore } from '@/state/worldStore';
@@ -288,7 +288,7 @@ export default function ChoiceGeneratorTestPage() {
           <div className="mb-4">
             <h3 className="font-semibold mb-2">Player Choice UI:</h3>
             <div className="bg-white p-4 rounded border">
-              <PlayerChoiceSelector
+              <ChoiceSelector
                 decision={decision}
                 onSelect={handleChoiceSelected}
               />

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import PlayerChoices from '@/components/GameSession/PlayerChoices';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
 import GameSessionError from '@/components/GameSession/GameSessionError';
@@ -76,12 +76,12 @@ export default function GameSessionComponentsTestPage() {
       <h1 className="text-2xl font-bold mb-6">GameSession Components Test Page</h1>
       
       <div className="space-y-8">
-        {/* PlayerChoices Component */}
+        {/* ChoiceSelector Component */}
         <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">PlayerChoices Component</h2>
-          <PlayerChoices
+          <h2 className="text-xl font-semibold mb-4">ChoiceSelector Component</h2>
+          <ChoiceSelector
             choices={mockChoices}
-            onChoiceSelected={handleChoiceSelected}
+            onSelect={handleChoiceSelected}
           />
           <p className="mt-2 text-sm text-gray-600">
             Selected: {selectedChoiceId || 'None'}
@@ -144,10 +144,10 @@ export default function GameSessionComponentsTestPage() {
 
         {/* Disabled State Demo */}
         <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">Disabled PlayerChoices</h2>
-          <PlayerChoices
+          <h2 className="text-xl font-semibold mb-4">Disabled ChoiceSelector</h2>
+          <ChoiceSelector
             choices={mockChoices}
-            onChoiceSelected={handleChoiceSelected}
+            onSelect={handleChoiceSelected}
             isDisabled={true}
           />
         </section>

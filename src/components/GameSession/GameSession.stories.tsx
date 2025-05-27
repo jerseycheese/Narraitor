@@ -100,7 +100,7 @@ const sampleChoices = [
 ];
 
 const meta: Meta<typeof MockGameSession> = {
-  title: 'Narraitor/Game/Session/GameSession',
+  title: 'Narraitor/GameSession/GameSession',
   component: MockGameSession,
   parameters: {
     layout: 'fullscreen',
