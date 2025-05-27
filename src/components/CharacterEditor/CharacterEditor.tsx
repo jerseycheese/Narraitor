@@ -3,10 +3,16 @@ import { useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
-import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai/clientFactory';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { PageError } from '@/components/ui/ErrorDisplay';
+import { PortraitSection } from './components/PortraitSection';
+import { BasicInfoForm } from './components/BasicInfoForm';
+import { BackgroundForm } from './components/BackgroundForm';
+import { AttributesForm } from './components/AttributesForm';
+import { SkillsForm } from './components/SkillsForm';
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof characterStore.getState>['characters'][string];
@@ -147,247 +153,59 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   };
   
   if (loading) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-lg text-gray-600">Loading character data...</div>
-      </div>
-    );
+    return <LoadingState message="Loading character data..." />;
   }
   
   if (error || !character || !world) {
     return (
-      <div className="p-4">
-        <div className="text-red-600">{error || 'Character not found'}</div>
-        <button 
-          onClick={() => router.push('/characters')}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
-        >
-          Return to Characters
-        </button>
-      </div>
+      <PageError
+        title="Character Not Found"
+        message={error || 'The requested character could not be found or loaded.'}
+        showRetry={true}
+        onRetry={() => router.push('/characters')}
+      />
     );
   }
   
   return (
     <div className="space-y-8 p-4">
       {/* Portrait Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Character Portrait</h2>
-        <div className="flex items-start gap-6">
-          <div className="flex-shrink-0">
-            <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
-              characterName={character.name}
-              size="large"
-            />
-          </div>
-          <div className="flex-1">
-            <p className="text-gray-600 mb-4">
-              {character.portrait?.type === 'ai-generated' 
-                ? 'AI-generated portrait based on character details.'
-                : 'No portrait has been generated yet.'}
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleGeneratePortrait}
-                disabled={generatingPortrait}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
-              >
-                {generatingPortrait ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {character.portrait?.type === 'ai-generated' ? 'Regenerate Portrait' : 'Generate Portrait'}
-                  </>
-                )}
-              </button>
-              {character.portrait?.type === 'ai-generated' && (
-                <button
-                  onClick={() => setCharacter({ ...character, portrait: undefined })}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Remove Portrait
-                </button>
-              )}
-            </div>
-            {character.portrait?.generatedAt && (
-              <p className="text-sm text-gray-500 mt-2">
-                Generated: {new Date(character.portrait.generatedAt).toLocaleDateString()}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      <PortraitSection
+        portrait={character.portrait}
+        characterName={character.name}
+        generatingPortrait={generatingPortrait}
+        onGeneratePortrait={handleGeneratePortrait}
+        onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
+      />
       
       {/* Basic Info Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Basic Information</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Character Name
-            </label>
-            <input
-              type="text"
-              value={character.name}
-              onChange={(e) => setCharacter({ ...character, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Level
-            </label>
-            <select
-              value={character.level}
-              onChange={(e) => setCharacter({ ...character, level: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(level => (
-                <option key={level} value={level}>Level {level}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Character Type
-            </label>
-            <select
-              value={character.isPlayer ? 'player' : 'npc'}
-              onChange={(e) => setCharacter({ ...character, isPlayer: e.target.value === 'player' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="player">Player Character</option>
-              <option value="npc">Non-Player Character (NPC)</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <BasicInfoForm
+        name={character.name}
+        level={character.level}
+        isPlayer={character.isPlayer}
+        onNameChange={(name) => setCharacter({ ...character, name })}
+        onLevelChange={(level) => setCharacter({ ...character, level })}
+        onPlayerTypeChange={(isPlayer) => setCharacter({ ...character, isPlayer })}
+      />
       
       {/* Background Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Background</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              value={character.background?.description || ''}
-              onChange={(e) => setCharacter({ 
-                ...character, 
-                background: { ...character.background, description: e.target.value }
-              })}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Describe your character's history and background..."
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Personality
-            </label>
-            <textarea
-              value={character.background?.personality || ''}
-              onChange={(e) => setCharacter({ 
-                ...character, 
-                background: { ...character.background, personality: e.target.value }
-              })}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Describe your character's personality traits..."
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Motivation
-            </label>
-            <textarea
-              value={character.background?.motivation || ''}
-              onChange={(e) => setCharacter({ 
-                ...character, 
-                background: { ...character.background, motivation: e.target.value }
-              })}
-              rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="What drives your character?"
-            />
-          </div>
-        </div>
-      </div>
+      <BackgroundForm
+        background={character.background}
+        onBackgroundChange={(background) => setCharacter({ ...character, background })}
+      />
       
       {/* Attributes Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Attributes</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {character.attributes.map((attr) => (
-            <div key={attr.id}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {attr.name}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={world.attributes.find((wa) => wa.id === attr.id)?.minValue || 1}
-                  max={world.attributes.find((wa) => wa.id === attr.id)?.maxValue || 10}
-                  value={attr.modifiedValue}
-                  onChange={(e) => {
-                    const newAttributes = character.attributes.map(a =>
-                      a.id === attr.id ? { ...a, modifiedValue: parseInt(e.target.value) } : a
-                    );
-                    setCharacter({ ...character, attributes: newAttributes });
-                  }}
-                  className="flex-1"
-                />
-                <span className="w-12 text-center font-medium">{attr.modifiedValue}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <AttributesForm
+        attributes={character.attributes}
+        world={world}
+        onAttributesChange={(attributes) => setCharacter({ ...character, attributes })}
+      />
       
       {/* Skills Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Skills</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {character.skills.map((skill) => (
-            <div key={skill.id}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {skill.name}
-              </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={skill.level}
-                  onChange={(e) => {
-                    const newSkills = character.skills.map(s =>
-                      s.id === skill.id ? { ...s, level: parseInt(e.target.value) } : s
-                    );
-                    setCharacter({ ...character, skills: newSkills });
-                  }}
-                  className="flex-1"
-                />
-                <span className="w-12 text-center font-medium">{skill.level}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <SkillsForm
+        skills={character.skills}
+        onSkillsChange={(skills) => setCharacter({ ...character, skills })}
+      />
       
       {/* Action Buttons */}
       <div className="flex justify-between pt-4 border-t">
