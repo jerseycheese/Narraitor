@@ -1,17 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 export default function CharacterViewPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters } = characterStore();
+  const { characters, setCurrentCharacter, deleteCharacter } = characterStore();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const character = characters[characterId];
+
+  const handleDelete = () => {
+    deleteCharacter(characterId);
+    router.push('/characters');
+  };
 
   if (!character) {
     return (
@@ -20,7 +27,7 @@ export default function CharacterViewPage() {
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Character Not Found</h1>
             <p className="text-gray-600 mb-6">
-              The character you're looking for doesn't exist or has been deleted.
+              The character you&apos;re looking for doesn&apos;t exist or has been deleted.
             </p>
             <button
               onClick={() => router.push('/characters')}
@@ -86,19 +93,41 @@ export default function CharacterViewPage() {
           <div className="mt-8 flex gap-4">
             <button
               onClick={() => router.push(`/characters/${characterId}/edit`)}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
             >
               Edit Character
             </button>
             <button
-              onClick={() => router.push(`/world/${character.worldId}/play`)}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              onClick={() => {
+                // Set this character as the current character before playing
+                setCurrentCharacter(characterId);
+                router.push(`/world/${character.worldId}/play`);
+              }}
+              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
             >
               Play with Character
+            </button>
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
+            >
+              Delete Character
             </button>
           </div>
         </div>
       </div>
+      
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        title="Delete Character"
+        description={`Are you sure you want to delete "${character.name}"? This action cannot be undone.`}
+        itemName={character.name}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 }
