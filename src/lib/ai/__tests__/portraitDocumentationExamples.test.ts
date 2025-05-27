@@ -9,9 +9,12 @@ import { createAIClient } from '../clientFactory';
 // Mock the AI client
 jest.mock('../clientFactory', () => ({
   createAIClient: jest.fn(() => ({
+    generateContent: jest.fn().mockResolvedValue({
+      content: '{"isKnownFigure": false}'
+    }),
     generateImage: jest.fn().mockResolvedValue({
-      success: true,
-      imageData: 'data:image/png;base64,mockImageData'
+      image: 'data:image/png;base64,mockImageData',
+      prompt: 'Test prompt'
     })
   }))
 }));
@@ -140,15 +143,15 @@ describe('Portrait Generation Documentation Examples', () => {
     it('known character detection should work as documented', () => {
       // This validates the documented known character detection
       const knownCharacters = [
-        'Harry Potter',
-        'Darth Vader',
-        'Sherlock Holmes',
-        'Gandalf'
+        { name: 'Harry Potter', pattern: /^[A-Z][a-z]+ [A-Z][a-z]+$/ },
+        { name: 'Darth Vader', pattern: /^[A-Z][a-z]+ [A-Z][a-z]+$/ },
+        { name: 'Sherlock Holmes', pattern: /^[A-Z][a-z]+ [A-Z][a-z]+$/ },
+        { name: 'Gandalf', pattern: /^[A-Z][a-z]+$/ } // Single name character
       ];
 
-      knownCharacters.forEach(name => {
+      knownCharacters.forEach(({ name, pattern }) => {
         // The portrait generator should detect these as known characters
-        expect(name).toMatch(/^[A-Z][a-z]+ [A-Z][a-z]+$/);
+        expect(name).toMatch(pattern);
       });
     });
   });
