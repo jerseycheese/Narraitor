@@ -2,9 +2,11 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterPortrait } from './CharacterPortrait';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { SectionError } from '@/components/ui/ErrorDisplay';
 
 const meta: Meta<typeof CharacterPortrait> = {
-  title: 'Components/CharacterPortrait',
+  title: 'Narraitor/Character/CharacterPortrait',
   component: CharacterPortrait,
   parameters: {
     layout: 'centered',
@@ -28,115 +30,75 @@ const meta: Meta<typeof CharacterPortrait> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Default placeholder portrait
+const mockPortraitImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICA8ZGVmcz4KICAgICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmdHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzdjM2FlZCIvPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyNTYzZWIiLz4KICAgICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImZhY2VHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIiByPSI2MCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwLjMiLz4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwLjEiLz4KICAgICAgICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICAgICAgPC9kZWZzPgogICAgICAgIAogICAgICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICAgICAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI4MCIgcj0iMzUiIGZpbGw9InVybCgjZmFjZUdyYWQpIi8+CiAgICAgICAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjE2MCIgcng9IjQ1IiByeT0iMzAiIGZpbGw9InVybCgjZmFjZUdyYWQpIi8+CiAgICAgICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iNTAiIHI9IjgiIGZpbGw9IiMwNmI2ZDQiIG9wYWNpdHk9IjAuNiIvPgogICAgICAgIDx0ZXh0IHg9IjEwMCIgeT0iMTk1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC44Ij5FTTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIxMDAiIHk9IjE4NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjYiPkFJIEdlbmVyYXRlZDwvdGV4dD4KICAgICAgPC9zdmc+';
+
+// AI-generated portrait - Primary use case
+export const AIGenerated: Story = {
+  args: {
+    portrait: {
+      type: 'ai-generated',
+      url: mockPortraitImage,
+      generatedAt: '2024-01-15T10:30:00Z',
+      prompt: 'A brave warrior with noble bearing and kind eyes',
+    },
+    characterName: 'Sir Galahad',
+    size: 'medium',
+  },
+};
+
+// Placeholder state - Before generation
 export const Placeholder: Story = {
   args: {
     portrait: {
       type: 'placeholder',
       url: null,
     },
-    characterName: 'Elara Moonshadow',
+    characterName: 'Test Character',
     size: 'medium',
   },
 };
 
-// AI-generated portrait - Mage
-export const AIGenerated: Story = {
-  args: {
-    portrait: {
-      type: 'ai-generated',
-      url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgICAgICA8ZGVmcz4KICAgICAgICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYmdHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzdjM2FlZCIvPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyNTYzZWIiLz4KICAgICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICAgICAgICA8cmFkaWFsR3JhZGllbnQgaWQ9ImZhY2VHcmFkIiBjeD0iNTAlIiBjeT0iNDAlIiByPSI2MCUiPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwLjMiLz4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwLjEiLz4KICAgICAgICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgICAgICAgPC9kZWZzPgogICAgICAgIAogICAgICAgIDxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI2JnR3JhZCkiLz4KICAgICAgICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSI4MCIgcj0iMzUiIGZpbGw9InVybCgjZmFjZUdyYWQpIi8+CiAgICAgICAgPGVsbGlwc2UgY3g9IjEwMCIgY3k9IjE2MCIgcng9IjQ1IiByeT0iMzAiIGZpbGw9InVybCgjZmFjZUdyYWQpIi8+CiAgICAgICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iNTAiIHI9IjgiIGZpbGw9IiMwNmI2ZDQiIG9wYWNpdHk9IjAuNiIvPgogICAgICAgIDx0ZXh0IHg9IjEwMCIgeT0iMTk1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC44Ij5FTTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIxMDAiIHk9IjE4NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBvcGFjaXR5PSIwLjYiPkFJIEdlbmVyYXRlZDwvdGV4dD4KICAgICAgPC9zdmc+',
-      generatedAt: new Date().toISOString(),
-      prompt: 'A mystical elven mage with silver hair and glowing eyes',
-    },
-    characterName: 'Elara Moonshadow',
-    size: 'medium',
-  },
+// Loading state - Using shared LoadingState component
+export const Generating: Story = {
+  decorators: [
+    () => (
+      <div className="p-8 bg-gray-50 rounded-lg">
+        <h3 className="text-lg font-semibold mb-4">Generating Character Portrait</h3>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <LoadingState message="Generating character portrait..." />
+        </div>
+      </div>
+    )
+  ]
 };
 
-// Loading state
-export const Loading: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Elara Moonshadow',
-    size: 'medium',
-    isGenerating: true,
-  },
-};
 
-// Error state
+// Error state - Component's built-in error display
 export const Error: Story = {
   args: {
     portrait: {
       type: 'placeholder',
       url: null,
     },
-    characterName: 'Elara Moonshadow',
+    characterName: 'Failed Character',
     size: 'medium',
     error: 'Failed to generate portrait',
   },
 };
 
-// Size variations
-export const SmallSize: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Thorin',
-    size: 'small',
-  },
-};
-
-export const LargeSize: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Gandalf the Grey',
-    size: 'large',
-  },
-};
-
-// Clickable portrait
-export const Clickable: Story = {
-  args: {
-    portrait: {
-      type: 'ai-generated',
-      url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZmY2NjY2Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2ZmOTkzMyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSI0MCIgcj0iMTUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjgiLz4KICA8ZWxsaXBzZSBjeD0iNTAiIGN5PSI3NSIgcng9IjIwIiByeT0iMTUiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIwLjgiLz4KICA8dGV4dCB4PSI1MCIgeT0iOTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI4IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Q2xpY2sgTWU8L3RleHQ+Cjwvc3ZnPgo=',
-      generatedAt: new Date().toISOString(),
-    },
-    characterName: 'Ragnar Firebrand',
-    size: 'medium',
-    onClick: () => alert('Portrait clicked!'),
-  },
-};
-
-// Short name initials
-export const ShortName: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Bob',
-    size: 'medium',
-  },
-};
-
-// Long name with multiple words
-export const LongName: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Sir Reginald Archibald Pemberton III',
-    size: 'medium',
-  },
+// Error state - Using shared ErrorDisplay component
+export const ErrorWithRetry: Story = {
+  decorators: [
+    () => (
+      <div className="p-8 bg-gray-50 rounded-lg">
+        <h3 className="text-lg font-semibold mb-4">Portrait Generation Error</h3>
+        <SectionError
+          title="Portrait Generation Failed"
+          message="We encountered an error while generating the character portrait. Please try again."
+          showRetry={true}
+          onRetry={() => alert('Retrying portrait generation...')}
+        />
+      </div>
+    )
+  ]
 };
