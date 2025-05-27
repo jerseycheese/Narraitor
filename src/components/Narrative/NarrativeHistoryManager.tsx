@@ -67,36 +67,10 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       return [];
     }
     
-    // First, handle initial scenes
-    // If we have more than one segment with type "scene" and location that indicates an initial scene,
-    // only keep the most recent one
-    const initialSceneLocations = ['Starting Location', 'Frontier Town', 'Town Square', 'Village Center'];
-    
-    const initialScenes = segments.filter(
-      segment => segment.type === 'scene' && 
-                 segment.metadata?.location && 
-                 initialSceneLocations.includes(segment.metadata.location)
-    );
-    
-    let processedSegments = [...segments];
-    
-    if (initialScenes.length > 1) {
-      // Sort by timestamp (newest first)
-      initialScenes.sort((a, b) => 
-        new Date(b.timestamp || b.createdAt).getTime() - new Date(a.timestamp || a.createdAt).getTime()
-      );
-      
-      // Keep only the newest initial scene
-      const newestInitialScene = initialScenes[0];
-      
-      // Filter out all but the newest initial scene
-      processedSegments = segments.filter(segment => 
-        segment.id === newestInitialScene.id || 
-        !(segment.type === 'scene' && 
-          segment.metadata?.location && 
-          initialSceneLocations.includes(segment.metadata.location))
-      );
-    }
+    // Skip the overly aggressive initial scene deduplication
+    // The problem is that all segments are getting the same location metadata
+    // Instead, just do simple content-based deduplication
+    const processedSegments = [...segments];
     
     // Second, handle general deduplication by content
     const uniqueSegments: NarrativeSegment[] = [];
@@ -114,9 +88,9 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         continue;
       }
       
-      // For segment deduplication, create a key based on content and type
-      // Trim and normalize the content to reduce minor variations
-      const normalizedContent = segment.content.trim().replace(/\s+/g, ' ').slice(0, 100);
+      // For segment deduplication, only dedupe if content is EXACTLY the same
+      // Don't use partial content matching as it removes valid segments
+      const normalizedContent = segment.content.trim().replace(/\s+/g, ' ');
       const key = `${segment.type}-${normalizedContent}`;
       
       if (!contentMap.has(key)) {
@@ -141,7 +115,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     const stabilizeTimer = setTimeout(() => {
       setStabilized(true);
       setIsLoading(false);
-    }, 1000);  // Wait for 1 second to ensure all segments are loaded and deduplicated
+    }, 100);  // Reduced from 1000ms to 100ms for faster response
     
     // Cleanup timer on unmount or when segments change again
     return () => {

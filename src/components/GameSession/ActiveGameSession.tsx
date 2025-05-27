@@ -6,21 +6,18 @@ import { NarrativeController } from '@/components/Narrative/NarrativeController'
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import PlayerChoices from './PlayerChoices';
-import SessionControls from './SessionControls';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
 import { PlayerChoiceSelector } from '@/components/Narrative';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
-interface GameSessionActiveWithNarrativeProps {
+interface ActiveGameSessionProps {
   worldId: string;
   sessionId: string;
   world?: World;
   status?: 'active' | 'paused' | 'ended';
   onChoiceSelected: (choiceId: string) => void;
-  onPause?: () => void;
-  onResume?: () => void;
   onEnd?: () => void;
   // Narrative specific props
   existingSegments?: NarrativeSegment[];
@@ -33,14 +30,12 @@ interface GameSessionActiveWithNarrativeProps {
   selectedChoiceId?: string;
 }
 
-const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativeProps> = ({
+const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   worldId,
   sessionId,
   world,
   status = 'active',
   onChoiceSelected,
-  onPause,
-  onResume,
   onEnd,
   /* existingSegments - not currently used */
   choices,
@@ -51,6 +46,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const [initialized, setInitialized] = React.useState(false);
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
+  const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   
   // Get character ID from session store
   const characterId = sessionStore(state => state.characterId);
@@ -98,24 +94,11 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
           setCurrentDecision(latestDecision);
         }
         
-        if (hasInitialScene) {
-          // If we already have an initial scene, just use it - no need to generate again
-          // Found existing initial scene, use it without generating a new one
+        if (hasInitialScene || existingSegments.length > 0) {
+          // If we have any segments at all, use them
+          // Don't clear existing narrative history
           setInitialized(true);
           setIsGenerating(false);
-        }
-        else if (existingSegments.length > 0) {
-          // We have segments but no initial scene - unusual state - clean up and regenerate
-          // Found segments but no initial scene - unusual state - clean up
-          narrativeStore.getState().clearSessionSegments(sessionId);
-          
-          // Wait a short time to ensure the store update has completed
-          setTimeout(() => {
-            if (isMounted) {
-              // Set initialized flag to generate fresh narrative
-              setInitialized(true);
-            }
-          }, 500);
         }
         else {
           // No segments at all - normal case for new session
@@ -142,6 +125,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
   const handleNarrativeGenerated = (_: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
+    setShouldTriggerGeneration(false); // Reset trigger
     // Start generating choices
     setIsGeneratingChoices(true);
     
@@ -170,6 +154,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
     // Player choice was selected
     setIsGenerating(true);
     setLocalSelectedChoiceId(choiceId);
+    setShouldTriggerGeneration(true); // Trigger narrative generation
     
     // If we have a current decision, update its selected option
     if (currentDecision) {
@@ -253,7 +238,7 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
             worldId={worldId}
             sessionId={sessionId}
             characterId={characterId || undefined}
-            triggerGeneration={triggerGeneration || !initialized} // Force generation if not initialized
+            triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
             choiceId={localSelectedChoiceId || selectedChoiceId}
             onNarrativeGenerated={handleNarrativeGenerated}
             onChoicesGenerated={handleChoicesGenerated}
@@ -340,16 +325,33 @@ const GameSessionActiveWithNarrative: React.FC<GameSessionActiveWithNarrativePro
         </div>
       )}
 
-      {onPause && onResume && onEnd && (
-        <SessionControls
-          status={status}
-          onPause={onPause}
-          onResume={onResume}
-          onEnd={onEnd}
-        />
+      {onEnd && (
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            data-testid="game-session-new"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
+            onClick={() => {
+              // Save current session and clear narrative
+              sessionStore.getState().endSession();
+              narrativeStore.getState().clearSessionSegments(sessionId);
+              
+              // Reload the page to start fresh
+              window.location.reload();
+            }}
+          >
+            Start New Session
+          </button>
+          <button
+            data-testid="game-session-end"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+            onClick={onEnd}
+          >
+            End Session
+          </button>
+        </div>
       )}
     </div>
   );
 };
 
-export default GameSessionActiveWithNarrative;
+export default ActiveGameSession;

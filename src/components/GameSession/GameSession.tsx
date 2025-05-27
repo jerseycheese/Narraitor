@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
 import { sessionStore } from '@/state/sessionStore';
 import { worldStore } from '@/state/worldStore';
@@ -9,7 +9,8 @@ import { narrativeStore } from '@/state/narrativeStore';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
-import GameSessionActiveWithNarrative from './GameSessionActiveWithNarrative';
+import ActiveGameSession from './ActiveGameSession';
+import GameSessionResume from './GameSessionResume';
 import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 
 interface GameSessionProps {
@@ -39,10 +40,15 @@ const GameSession: React.FC<GameSessionProps> = ({
   _router,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
   
   // Use provided router or real router
   const actualRouter = _router || router;
+  
+  // Check for auto-resume parameter
+  const autoResume = searchParams?.get('autoResume') === 'true';
+  const [hasAutoResumed, setHasAutoResumed] = useState(false);
   
   // Set isClient to true once component mounts
   useEffect(() => {
@@ -55,13 +61,16 @@ const GameSession: React.FC<GameSessionProps> = ({
     error,
     worldExists,
     world,
+    worldCharacters,
     prevStatusRef,
     handleRetry,
     handleDismissError,
     startSession,
     handleSelectChoice,
-    handlePauseToggle,
     handleEndSession,
+    savedSession,
+    handleResumeSession,
+    handleNewSession,
   } = useGameSessionState({
     worldId,
     isClient,
@@ -79,6 +88,12 @@ const GameSession: React.FC<GameSessionProps> = ({
       return sessionState.id;
     }
     
+    // Check if we're resuming a saved session
+    if (savedSession) {
+      console.log(`[GameSession] Using saved session ID: ${savedSession.id}`);
+      return savedSession.id;
+    }
+    
     // Create a new stable ID if one doesn't exist
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
     console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
@@ -92,7 +107,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     }
     
     return sessionId;
-  }, [worldId, sessionState.id]);
+  }, [worldId, sessionState.id, savedSession]);
   
   // Focus management for state transitions
   useEffect(() => {
@@ -158,18 +173,37 @@ const GameSession: React.FC<GameSessionProps> = ({
     };
   }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
   
-  // Clean up on unmount
+  // Clean up on unmount - save session when navigating away
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
     
     return () => {
+      // Save the session when component unmounts (navigating away)
+      const currentState = sessionStore.getState();
+      if (currentState.status === 'active' && currentState.id) {
+        console.log('[GameSession] Saving session on unmount:', currentState.id);
+        // Don't reset the session, just save it
+        sessionStore.getState().endSession();
+        
+        // Update the narrative count after saving
+        const narrativeCount = narrativeStore.getState().getSessionSegments(currentState.id).length;
+        sessionStore.getState().updateSavedSessionNarrativeCount(currentState.id, narrativeCount);
+      }
+      
       // Only call onSessionEnd if the session is actually ending (status is 'ended')
-      const currentStatus = sessionStore.getState().status;
-      if (onSessionEnd && currentStatus === 'ended') {
+      if (onSessionEnd && currentState.status === 'ended') {
         onSessionEnd();
       }
     };
   }, [isClient, onSessionEnd]);
+  
+  // Handle auto-resume - MUST be before any conditional returns
+  useEffect(() => {
+    if (autoResume && savedSession && !hasAutoResumed && isClient && sessionState.status === 'initializing') {
+      setHasAutoResumed(true);
+      handleResumeSession();
+    }
+  }, [autoResume, savedSession, hasAutoResumed, isClient, sessionState.status, handleResumeSession]);
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
@@ -194,6 +228,42 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'initializing') {
+    // Check if there's a saved session to resume
+    if (savedSession && !sessionState.id) {
+      // Show loading if auto-resuming
+      if (autoResume && (hasAutoResumed || !isClient)) {
+        return <GameSessionLoading />;
+      }
+      
+      return (
+        <GameSessionResume
+          savedSession={savedSession}
+          onResume={handleResumeSession}
+          onNewGame={handleNewSession}
+        />
+      );
+    }
+    
+    // Check if there are any characters for this world
+    if (worldCharacters.length === 0) {
+      return (
+        <div data-testid="game-session-no-characters" className="p-4">
+          <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 text-center">
+            <h2 className="text-xl font-bold mb-2">No Characters Found</h2>
+            <p className="text-gray-600 mb-4">
+              You need to create a character before you can start playing in this world.
+            </p>
+            <button 
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
+            >
+              Create Character
+            </button>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div data-testid="game-session-initializing" className="p-4">
         <div className="text-center">
@@ -227,14 +297,12 @@ const GameSession: React.FC<GameSessionProps> = ({
   if (sessionState.status === 'active' || sessionState.status === 'paused') {
     // Use the new narrative integration component
     return (
-      <GameSessionActiveWithNarrative
+      <ActiveGameSession
         worldId={worldId}
         sessionId={stableSessionId}
         world={world}
         status={sessionState.status}
         onChoiceSelected={handleSelectChoice}
-        onPause={handlePauseToggle}
-        onResume={handlePauseToggle}
         onEnd={handleEndSession}
         choices={sessionState.playerChoices || []}
         triggerGeneration={sessionState.status === 'active'}

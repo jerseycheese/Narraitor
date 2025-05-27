@@ -1,3 +1,14 @@
+/**
+ * Inventory System - POST-MVP
+ * Status: Implementation complete but not included in MVP
+ * Reason: Deprioritized to focus on core narrative experience
+ * Date: May 2025
+ * 
+ * Note: This store is fully functional and tested but will not be 
+ * exposed in the UI until post-MVP. The narrative engine may still
+ * reference inventory data for context.
+ */
+
 import { create } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';

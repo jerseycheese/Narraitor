@@ -1,7 +1,9 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { createIndexedDBStorage } from './persistence';
 
 /**
  * Narrative store interface with state and actions
@@ -49,8 +51,10 @@ const initialState = {
   loading: false,
 };
 
-// Narrative Store implementation
-export const narrativeStore = create<NarrativeStore>()((set, get) => ({
+// Narrative Store implementation with persistence
+export const narrativeStore = create<NarrativeStore>()(
+  persist(
+    (set, get) => ({
   ...initialState,
 
   // Add segment
@@ -274,4 +278,10 @@ export const narrativeStore = create<NarrativeStore>()((set, get) => ({
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
-}));
+}),
+{
+  name: 'narraitor-narrative-store',
+  storage: createIndexedDBStorage(),
+  version: 1,
+}
+));

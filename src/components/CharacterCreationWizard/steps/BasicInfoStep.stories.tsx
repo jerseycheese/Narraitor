@@ -1,16 +1,32 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BasicInfoStep } from './BasicInfoStep';
+import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof BasicInfoStep> = {
-  title: 'Narraitor/Character/Creation/BasicInfoStep',
+  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 1 BasicInfo',
   component: BasicInfoStep,
   parameters: {
     layout: 'centered',
   },
   decorators: [
     (Story) => (
-      <div className="w-full max-w-2xl p-6 bg-white rounded-lg shadow">
-        <Story />
+      <div className="w-full max-w-2xl">
+        <WizardContainer title="Create Character in Storybook Test World">
+          <WizardProgress 
+            steps={[
+              { id: 'basic-info', label: 'Basic Info' },
+              { id: 'attributes', label: 'Attributes' },
+              { id: 'skills', label: 'Skills' },
+              { id: 'background', label: 'Background' },
+              { id: 'portrait', label: 'Portrait' }
+            ]} 
+            currentStep={0} 
+            className="mb-6"
+          />
+          <div className="p-6 bg-white rounded-lg shadow">
+            <Story />
+          </div>
+        </WizardContainer>
       </div>
     ),
   ],
@@ -103,28 +119,5 @@ export const WithValidationError: Story = {
     onUpdate: () => {},
     onValidation: () => {},
     worldConfig: mockWorldConfig,
-  },
-};
-
-export const WithLongName: Story = {
-  args: {
-    data: {
-      ...defaultData,
-      characterData: {
-        ...defaultData.characterData,
-        name: 'Maximilianus Meridius Decimus Commander of the Armies',
-        description: 'Father to a murdered son, husband to a murdered wife',
-      },
-    },
-    onUpdate: () => {},
-    onValidation: () => {},
-    worldConfig: mockWorldConfig,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows how the portrait placeholder handles long names by using initials.',
-      },
-    },
   },
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GameSessionActiveWithNarrative from '../GameSessionActiveWithNarrative';
+import ActiveGameSession from '../ActiveGameSession';
 
 // Mock the NarrativeController with simpler implementation
 jest.mock('@/components/Narrative/NarrativeController', () => ({
@@ -35,7 +35,35 @@ jest.mock('@/lib/utils/generateId', () => ({
   generateUniqueId: jest.fn().mockImplementation((prefix) => `${prefix}-12345`)
 }));
 
-describe('GameSessionActiveWithNarrative', () => {
+// Mock sessionStore
+jest.mock('@/state/sessionStore', () => ({
+  sessionStore: jest.fn(() => ({
+    id: 'test-session',
+    worldId: 'test-world',
+    characterId: 'test-character',
+    status: 'active'
+  }))
+}));
+
+// Mock characterStore
+jest.mock('@/state/characterStore', () => ({
+  characterStore: jest.fn((selector) => {
+    const state = {
+      characters: {
+        'test-character': {
+          id: 'test-character',
+          name: 'Test Character',
+          worldId: 'test-world',
+          portrait: { type: 'placeholder', url: null }
+        }
+      },
+      currentCharacterId: 'test-character'
+    };
+    return selector ? selector(state) : state;
+  })
+}));
+
+describe('ActiveGameSession', () => {
   const mockProps = {
     worldId: 'test-world',
     sessionId: 'test-session',
@@ -43,7 +71,24 @@ describe('GameSessionActiveWithNarrative', () => {
       id: 'test-world',
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy'
+      theme: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        difficulty: 'medium',
+        startingLevel: 1,
+        additionalInstructions: '',
+        playerCharacterGuidelines: '',
+        storyTone: 'balanced',
+        enableNarrativeContext: true,
+        maxPointPool: 100,
+        maxAttributes: 6,
+        maxSkills: 10,
+        attributePointPool: 27,
+        skillPointPool: 50
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     onChoiceSelected: jest.fn(),
     onPause: jest.fn(),
@@ -61,7 +106,7 @@ describe('GameSessionActiveWithNarrative', () => {
   });
 
   it('renders correctly with all required props', () => {
-    render(<GameSessionActiveWithNarrative {...mockProps} />);
+    render(<ActiveGameSession {...mockProps} />);
     
     // Check that world info is displayed
     expect(screen.getByText('Test World')).toBeInTheDocument();
@@ -72,12 +117,12 @@ describe('GameSessionActiveWithNarrative', () => {
     expect(screen.getByTestId('mock-narrative-controller')).toBeInTheDocument();
     
     // Check for session controls
-    expect(screen.getByText('⏸️ Pause')).toBeInTheDocument();
+    expect(screen.getByText('Start New Session')).toBeInTheDocument();
     expect(screen.getByText('End Session')).toBeInTheDocument();
   });
 
   it('renders without crashing', () => {
-    const { container } = render(<GameSessionActiveWithNarrative {...mockProps} />);
+    const { container } = render(<ActiveGameSession {...mockProps} />);
     expect(container).toBeInTheDocument();
   });
 });

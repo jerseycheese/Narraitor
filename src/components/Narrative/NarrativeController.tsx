@@ -288,14 +288,21 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateInitialNarrative = async () => {
+    console.log('🎬 INITIAL NARRATIVE: Checking if we need to generate initial scene');
+    
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
+    const hasAnySegments = existingSegments.length > 0;
     const hasInitialScene = existingSegments.some(segment => 
       segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
     );
     
-    if (hasInitialScene) {
+    console.log('🎬 INITIAL NARRATIVE: Existing segments:', existingSegments.length, 'Has any segments:', hasAnySegments, 'Has initial scene:', hasInitialScene);
+    
+    // If we have ANY segments, this is a resumed session - don't generate initial narrative
+    if (hasAnySegments) {
+      console.log('🎬 INITIAL NARRATIVE: Session has existing segments (resumed session), skipping generation');
       setInitialGenerationCompleted(true);
       setIsLoading(false);
       return;
@@ -305,10 +312,22 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setError(null);
     
     try {
+      console.log('🎬 INITIAL NARRATIVE: Generating initial scene...');
       const result = await narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []);
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
+        console.log('🎬 INITIAL NARRATIVE: Component unmounted, skipping');
+        return;
+      }
+      
+      // Double-check we still don't have any segments (in case another instance created one)
+      const currentSegments = getSessionSegments(sessionId);
+      const nowHasSegments = currentSegments.length > 0;
+      
+      if (nowHasSegments) {
+        console.log('🎬 INITIAL NARRATIVE: Another instance already created segments, skipping');
+        setIsLoading(false);
         return;
       }
       
@@ -364,7 +383,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
+    console.log('🎯 GENERATING NEXT SEGMENT for choice:', triggeringChoiceId);
+    
     if (segments.length === 0) {
+      console.log('❌ No segments found, skipping generation');
       return;
     }
     
@@ -375,17 +397,31 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Use recent segments for context (last 3-5 segments)
       const recentSegments = segments.slice(-5);
       
+      // Get the actual choice text from the narrative store
+      const decisions = narrativeStore.getState().getSessionDecisions(sessionId);
+      let choiceText = triggeringChoiceId;
+      
+      // Find the decision that contains this choice
+      for (const decision of decisions) {
+        const selectedOption = decision.options.find(opt => opt.id === triggeringChoiceId);
+        if (selectedOption) {
+          choiceText = selectedOption.text;
+          console.log('🎯 Found choice text:', choiceText);
+          break;
+        }
+      }
+      
       const result = await narrativeGenerator.generateSegment({
         worldId,
         sessionId,
         characterIds: characterId ? [characterId] : [],
         narrativeContext: {
           recentSegments,
-          currentSituation: `Player selected choice: ${triggeringChoiceId}`
+          currentSituation: `Player chose: "${choiceText}"`
         },
         generationParameters: {
           segmentType: 'scene',
-          includedTopics: [triggeringChoiceId]
+          includedTopics: [choiceText]
         }
       });
       

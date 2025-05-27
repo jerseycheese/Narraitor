@@ -10,3 +10,4 @@ export { ResponseFormatter } from './responseFormatter';
 export { PortraitGenerator } from './portraitGenerator';
 export { createAIClient } from './clientFactory';
 export { PortraitGenerationClient } from './portraitGenerationClient';
+export { generateCharacter } from './characterGenerator';

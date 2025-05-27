@@ -40,6 +40,12 @@ export default function DevPage() {
         <Link href="/dev/portrait-prompt-test" className="block p-4 bg-purple-100 hover:bg-purple-200 rounded">
           Portrait Prompt Testing & Logic Visualization
         </Link>
+        <Link href="/dev/character-generation" className="block p-4 bg-orange-100 hover:bg-orange-200 rounded">
+          Character Generation Test Harness
+        </Link>
+        <Link href="/dev/world-generation" className="block p-4 bg-orange-100 hover:bg-orange-200 rounded">
+          World Generation Test Harness
+        </Link>
       </div>
     </div>
   );
