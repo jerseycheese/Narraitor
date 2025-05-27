@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
 interface WorldAttributesFormProps {
   attributes: WorldAttribute[];
@@ -18,6 +19,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
 }) => {
   const [editingAttribute, setEditingAttribute] = useState<EntityID | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [attributeToDelete, setAttributeToDelete] = useState<WorldAttribute | null>(null);
   // Handle creating a new attribute
   const handleCreateAttribute = (newAttribute: WorldAttribute) => {
     onChange([...attributes, { ...newAttribute, worldId }]);
@@ -40,6 +43,26 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     const updatedAttributes = attributes.filter(attr => attr.id !== attributeId);
     onChange(updatedAttributes);
     setEditingAttribute(null);
+  };
+  
+  // Handle delete button click
+  const handleDeleteClick = (attribute: WorldAttribute) => {
+    setAttributeToDelete(attribute);
+    setShowDeleteDialog(true);
+  };
+  
+  // Get skills linked to an attribute
+  const getLinkedSkills = (attributeId: EntityID) => {
+    return skills.filter(skill => skill.linkedAttributeId === attributeId);
+  };
+  
+  // Handle delete confirmation
+  const handleDeleteConfirm = () => {
+    if (attributeToDelete) {
+      handleDeleteAttribute(attributeToDelete.id);
+    }
+    setShowDeleteDialog(false);
+    setAttributeToDelete(null);
   };
   
   
@@ -71,11 +94,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                     Edit
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm(`Are you sure you want to delete "${attribute.name}"?`)) {
-                        handleDeleteAttribute(attribute.id);
-                      }
-                    }}
+                    onClick={() => handleDeleteClick(attribute)}
                     className="text-red-600 hover:text-red-800 text-sm"
                   >
                     Delete
@@ -134,6 +153,30 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
           </div>
         </div>
       )}
+      
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        onClose={() => {
+          setShowDeleteDialog(false);
+          setAttributeToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Attribute"
+        description={(() => {
+          if (!attributeToDelete) return "Are you sure you want to delete this attribute? This action cannot be undone.";
+          
+          const linkedSkills = getLinkedSkills(attributeToDelete.id);
+          if (linkedSkills.length === 0) {
+            return "Are you sure you want to delete this attribute? This action cannot be undone.";
+          }
+          
+          return `WARNING: This attribute is linked to ${linkedSkills.length} skill${linkedSkills.length > 1 ? 's' : ''}: ${linkedSkills.map(s => s.name).join(', ')}. Deleting this attribute will affect these skills. This action cannot be undone.`;
+        })()}
+        itemName={attributeToDelete?.name || 'this attribute'}
+        confirmButtonText="Delete Attribute"
+        cancelButtonText="Cancel"
+      />
     </section>
   );
 };
