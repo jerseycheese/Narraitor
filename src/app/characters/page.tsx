@@ -11,9 +11,102 @@ import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai/clientFactory';
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 
+// Helper function to transform generated data to character attributes
+function transformGeneratedAttributes(generatedData: any, currentWorld: any) {
+  return generatedData.attributes.map((attr: any) => {
+    const worldAttr = currentWorld.attributes.find((wa: any) => wa.id === attr.id);
+    return {
+      id: generateUniqueId('attr'),
+      characterId: '', // Will be set by store
+      name: worldAttr?.name || 'Unknown',
+      baseValue: attr.value,
+      modifiedValue: attr.value,
+      category: worldAttr?.category
+    };
+  });
+}
+
+// Helper function to transform generated data to character skills
+function transformGeneratedSkills(generatedData: any, currentWorld: any) {
+  return generatedData.skills.map((skill: any) => {
+    const worldSkill = currentWorld.skills.find((ws: any) => ws.id === skill.id);
+    return {
+      id: generateUniqueId('skill'),
+      characterId: '', // Will be set by store
+      name: worldSkill?.name || 'Unknown',
+      level: skill.level,
+      category: worldSkill?.category
+    };
+  });
+}
+
+// Helper function to generate portrait for character
+async function generateCharacterPortrait(
+  characterId: string,
+  generatedData: any,
+  currentWorld: any,
+  currentWorldId: string,
+  updateCharacter: (id: string, updates: any) => void
+) {
+  try {
+    const aiClient = createAIClient();
+    const portraitGenerator = new PortraitGenerator(aiClient);
+    
+    // Create a Character-like object for portrait generation
+    const characterForPortrait = {
+      id: characterId,
+      name: generatedData.name,
+      description: generatedData.background.description,
+      worldId: currentWorldId,
+      background: {
+        history: generatedData.background.description,
+        personality: generatedData.background.personality,
+        physicalDescription: generatedData.background.motivation, // Using motivation as physical description
+        goals: [],
+        fears: [],
+        relationships: []
+      },
+      attributes: generatedData.attributes.map((attr: any) => ({
+        attributeId: attr.id,
+        value: attr.value
+      })),
+      skills: generatedData.skills.map((skill: any) => ({
+        skillId: skill.id,
+        level: skill.level,
+        experience: 0,
+        isActive: true
+      })),
+      inventory: {
+        characterId: characterId,
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+        location: currentWorld.name
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
+      worldTheme: currentWorld.theme
+    });
+    
+    // Update character with generated portrait
+    updateCharacter(characterId, { portrait });
+  } catch (portraitError) {
+    console.error('Failed to generate portrait:', portraitError);
+    // Continue without portrait - character already has placeholder
+  }
+}
+
 export default function CharactersPage() {
   const router = useRouter();
-  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter } = characterStore();
+  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = characterStore();
   const { worlds, currentWorldId } = worldStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
@@ -57,32 +150,13 @@ export default function CharactersPage() {
         generationType
       );
       
-      // Create the character with placeholder portrait first
+      // Create the character with transformed attributes and skills
       const characterId = createCharacter({
         name: generatedData.name,
         worldId: currentWorldId,
         level: generatedData.level,
-        attributes: generatedData.attributes.map(attr => {
-          const worldAttr = currentWorld.attributes.find(wa => wa.id === attr.id);
-          return {
-            id: generateUniqueId('attr'),
-            characterId: '', // Will be set by store
-            name: worldAttr?.name || 'Unknown',
-            baseValue: attr.value,
-            modifiedValue: attr.value,
-            category: worldAttr?.category
-          };
-        }),
-        skills: generatedData.skills.map(skill => {
-          const worldSkill = currentWorld.skills.find(ws => ws.id === skill.id);
-          return {
-            id: generateUniqueId('skill'),
-            characterId: '', // Will be set by store
-            name: worldSkill?.name || 'Unknown',
-            level: skill.level,
-            category: worldSkill?.category
-          };
-        }),
+        attributes: transformGeneratedAttributes(generatedData, currentWorld),
+        skills: transformGeneratedSkills(generatedData, currentWorld),
         background: generatedData.background,
         isPlayer: true,
         status: {
@@ -101,60 +175,13 @@ export default function CharactersPage() {
       
       // Generate portrait for the character
       setGeneratingStatus('Generating portrait...');
-      try {
-        const aiClient = createAIClient();
-        const portraitGenerator = new PortraitGenerator(aiClient);
-        
-        // Create a Character-like object for portrait generation
-        const characterForPortrait = {
-          id: characterId,
-          name: generatedData.name,
-          description: generatedData.background.description,
-          worldId: currentWorldId,
-          background: {
-            history: generatedData.background.description,
-            personality: generatedData.background.personality,
-            physicalDescription: generatedData.background.motivation, // Using motivation as physical description
-            goals: [],
-            fears: [],
-            relationships: []
-          },
-          attributes: generatedData.attributes.map(attr => ({
-            attributeId: attr.id,
-            value: attr.value
-          })),
-          skills: generatedData.skills.map(skill => ({
-            skillId: skill.id,
-            level: skill.level,
-            experience: 0,
-            isActive: true
-          })),
-          inventory: {
-            characterId: characterId,
-            items: [],
-            capacity: 100,
-            categories: []
-          },
-          status: {
-            health: 100,
-            maxHealth: 100,
-            conditions: [],
-            location: currentWorld.name
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        
-        const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-          worldTheme: currentWorld.theme
-        });
-        
-        // Update character with generated portrait
-        characterStore.getState().updateCharacter(characterId, { portrait });
-      } catch (portraitError) {
-        console.error('Failed to generate portrait:', portraitError);
-        // Continue without portrait - character already has placeholder
-      }
+      await generateCharacterPortrait(
+        characterId,
+        generatedData,
+        currentWorld,
+        currentWorldId,
+        updateCharacter
+      );
       
       // Reset dialog state
       setShowGenerateDialog(false);

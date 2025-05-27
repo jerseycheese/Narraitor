@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { worldStore } from '@/state/worldStore';
@@ -9,12 +9,34 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 
 export default function WorldsPage() {
   const router = useRouter();
+  const modalRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldReference, setWorldReference] = useState('');
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Handle focus when modal opens/closes
+  useEffect(() => {
+    if (showPrompt && modalRef.current) {
+      // Focus the modal when it opens
+      modalRef.current.focus();
+      
+      // Trap focus within the modal
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && !isGenerating) {
+          setShowPrompt(false);
+          setWorldReference('');
+          setWorldName('');
+          setError(null);
+        }
+      };
+      
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [showPrompt, isGenerating]);
 
   const handleCreateWorld = () => {
     router.push('/world/create');
@@ -103,10 +125,20 @@ export default function WorldsPage() {
 
         {/* World Generation Prompt */}
         {showPrompt && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h2 className="text-xl font-bold mb-4">Generate World</h2>
-              <div className="space-y-4">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="generate-world-title"
+            aria-describedby="generate-world-description"
+          >
+            <div 
+              className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+              tabIndex={-1}
+              ref={modalRef}
+            >
+              <h2 id="generate-world-title" className="text-xl font-bold mb-4">Generate World</h2>
+              <div id="generate-world-description" className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     World Name (optional)
