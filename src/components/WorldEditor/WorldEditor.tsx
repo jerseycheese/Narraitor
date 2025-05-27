@@ -102,6 +102,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       
       <WorldAttributesForm 
         attributes={world.attributes} 
+        skills={world.skills}
         worldId={worldId} 
         onChange={(attributes) => handleWorldChange({ attributes })} 
       />

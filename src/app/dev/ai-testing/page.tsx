@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { AITestingPanel } from '../../../components/devtools/AITestingPanel';
 
 /**
@@ -13,7 +14,13 @@ export default function AITestingPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
+        <Link 
+          href="/dev" 
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          ← Back to Dev Harnesses
+        </Link>
+        <div className="mb-8 mt-4">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             AI Testing Panel Test Harness
           </h1>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
@@ -177,7 +178,13 @@ export default function ChoiceGeneratorTestPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Choice Generator Test Harness</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-4 mt-4">Choice Generator Test Harness</h1>
       
       <div className="mb-8 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">World Settings</h2>

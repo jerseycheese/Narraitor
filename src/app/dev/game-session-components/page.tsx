@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
@@ -73,7 +74,13 @@ export default function GameSessionComponentsTestPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">GameSession Components Test Page</h1>
+      <Link 
+        href="/dev" 
+        className="text-blue-600 hover:text-blue-800 underline"
+      >
+        ← Back to Dev Harnesses
+      </Link>
+      <h1 className="text-2xl font-bold mb-6 mt-4">GameSession Components Test Page</h1>
       
       <div className="space-y-8">
         {/* ChoiceSelector Component */}
