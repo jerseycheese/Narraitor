@@ -1,20 +1,5 @@
-import { describe, it, expect, jest } from '@jest/globals';
-import { PortraitGenerator } from '../portraitGenerator';
+import { describe, it, expect } from '@jest/globals';
 import { Character } from '@/types/character.types';
-import { createAIClient } from '../clientFactory';
-
-// Mock the AI client
-jest.mock('../clientFactory', () => ({
-  createAIClient: jest.fn(() => ({
-    generateContent: jest.fn().mockResolvedValue({
-      content: '{"isKnownFigure": false}'
-    }),
-    generateImage: jest.fn().mockResolvedValue({
-      image: 'data:image/png;base64,mockImageData',
-      prompt: 'Test prompt'
-    })
-  }))
-}));
 
 describe('Portrait Generation Documentation Examples', () => {
   describe('Integration Guide Examples', () => {
