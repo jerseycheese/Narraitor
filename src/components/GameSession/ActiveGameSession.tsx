@@ -5,11 +5,10 @@ import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
-import PlayerChoices from './PlayerChoices';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
-import { PlayerChoiceSelector } from '@/components/Narrative';
+import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import CharacterSummary from './CharacterSummary';
 
 interface ActiveGameSessionProps {
@@ -244,7 +243,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Show AI-generated choices, loading state, or fallback */}
       {currentDecision ? (
         <div className="player-choices-container">
-          <PlayerChoiceSelector
+          <ChoiceSelector
             decision={currentDecision}
             onSelect={handleChoiceSelected}
             isDisabled={status !== 'active' || isGenerating}
@@ -263,9 +262,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
       ) : choices && choices.length > 0 ? (
         <div className="player-choices-container">
-          <PlayerChoices
+          <ChoiceSelector
             choices={choices}
-            onChoiceSelected={handleChoiceSelected}
+            onSelect={handleChoiceSelected}
             isDisabled={status !== 'active' || isGenerating}
           />
         </div>

@@ -12,6 +12,8 @@ interface PlayerChoiceSelectorProps {
 
 /**
  * PlayerChoiceSelector component for displaying decision options to the player
+ * @deprecated Use ChoiceSelector from shared components instead
+ * This component is maintained for backwards compatibility only
  */
 const PlayerChoiceSelector: React.FC<PlayerChoiceSelectorProps> = ({
   decision,

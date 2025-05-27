@@ -14,6 +14,10 @@ interface PlayerChoicesProps {
   isDisabled?: boolean;
 }
 
+/**
+ * @deprecated Use ChoiceSelector from shared components instead
+ * This component is maintained for backwards compatibility only
+ */
 const PlayerChoices: React.FC<PlayerChoicesProps> = ({
   choices,
   onChoiceSelected,
