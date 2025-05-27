@@ -5,16 +5,27 @@ import { useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { generateCharacter } from '@/lib/ai/characterGenerator';
+import { generateCharacter, GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai/clientFactory';
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
+import { World } from '@/types/world.types';
+
+// Type for character portrait update
+type CharacterPortraitUpdate = {
+  portrait: {
+    type: 'ai-generated' | 'placeholder';
+    url: string | null;
+    generatedAt?: string;
+    prompt?: string;
+  };
+};
 
 // Helper function to transform generated data to character attributes
-function transformGeneratedAttributes(generatedData: any, currentWorld: any) {
-  return generatedData.attributes.map((attr: any) => {
-    const worldAttr = currentWorld.attributes.find((wa: any) => wa.id === attr.id);
+function transformGeneratedAttributes(generatedData: GeneratedCharacterData, currentWorld: World) {
+  return generatedData.attributes.map((attr) => {
+    const worldAttr = currentWorld.attributes.find((wa) => wa.id === attr.id);
     return {
       id: generateUniqueId('attr'),
       characterId: '', // Will be set by store
@@ -27,9 +38,9 @@ function transformGeneratedAttributes(generatedData: any, currentWorld: any) {
 }
 
 // Helper function to transform generated data to character skills
-function transformGeneratedSkills(generatedData: any, currentWorld: any) {
-  return generatedData.skills.map((skill: any) => {
-    const worldSkill = currentWorld.skills.find((ws: any) => ws.id === skill.id);
+function transformGeneratedSkills(generatedData: GeneratedCharacterData, currentWorld: World) {
+  return generatedData.skills.map((skill) => {
+    const worldSkill = currentWorld.skills.find((ws) => ws.id === skill.id);
     return {
       id: generateUniqueId('skill'),
       characterId: '', // Will be set by store
@@ -43,10 +54,10 @@ function transformGeneratedSkills(generatedData: any, currentWorld: any) {
 // Helper function to generate portrait for character
 async function generateCharacterPortrait(
   characterId: string,
-  generatedData: any,
-  currentWorld: any,
+  generatedData: GeneratedCharacterData,
+  currentWorld: World,
   currentWorldId: string,
-  updateCharacter: (id: string, updates: any) => void
+  updateCharacter: (id: string, updates: CharacterPortraitUpdate) => void
 ) {
   try {
     const aiClient = createAIClient();
@@ -66,11 +77,11 @@ async function generateCharacterPortrait(
         fears: [],
         relationships: []
       },
-      attributes: generatedData.attributes.map((attr: any) => ({
+      attributes: generatedData.attributes.map((attr) => ({
         attributeId: attr.id,
         value: attr.value
       })),
-      skills: generatedData.skills.map((skill: any) => ({
+      skills: generatedData.skills.map((skill) => ({
         skillId: skill.id,
         level: skill.level,
         experience: 0,
