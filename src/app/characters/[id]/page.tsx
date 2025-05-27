@@ -5,6 +5,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { CharacterAttributeDisplay } from '@/components/characters/CharacterAttributeDisplay';
+import { CharacterSkillDisplay } from '@/components/characters/CharacterSkillDisplay';
+import { CharacterBackgroundDisplay } from '@/components/characters/CharacterBackgroundDisplay';
+import { CharacterStatusDisplay } from '@/components/characters/CharacterStatusDisplay';
 
 export default function CharacterViewPage() {
   const params = useParams();
@@ -76,17 +80,37 @@ export default function CharacterViewPage() {
             </div>
           </div>
 
-          {/* Placeholder content */}
-          <div className="border-t pt-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-              <h2 className="text-xl font-semibold text-blue-800 mb-2">
-                Character Sheet Coming Soon
-              </h2>
-              <p className="text-blue-700">
-                This page will display full character details including attributes, skills, 
-                background, inventory, and more.
-              </p>
-            </div>
+          {/* Character Details Sections */}
+          <div className="border-t pt-8 space-y-8">
+            {/* Character Status */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Status</h2>
+              <CharacterStatusDisplay status={character.status} />
+            </section>
+
+            {/* Character Attributes */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Attributes</h2>
+              <CharacterAttributeDisplay 
+                attributes={character.attributes} 
+                showCategories={true} 
+              />
+            </section>
+
+            {/* Character Skills */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Skills</h2>
+              <CharacterSkillDisplay 
+                skills={character.skills} 
+                showCategories={true} 
+              />
+            </section>
+
+            {/* Character Background */}
+            <section>
+              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Background</h2>
+              <CharacterBackgroundDisplay background={character.background} />
+            </section>
           </div>
 
           {/* Action buttons */}

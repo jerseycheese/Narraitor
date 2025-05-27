@@ -23,10 +23,10 @@ describe('CharacterStatusDisplay', () => {
   test('shows status labels for each stat', () => {
     render(<CharacterStatusDisplay status={mockStatus} />);
     
-    // Should show proper labels
-    expect(screen.getByText(/health|hp/i)).toBeInTheDocument();
-    expect(screen.getByText(/mana|mp/i)).toBeInTheDocument();
-    expect(screen.getByText(/stamina/i)).toBeInTheDocument();
+    // Should show proper labels - checking for specific labels
+    expect(screen.getByText('Health')).toBeInTheDocument();
+    expect(screen.getByText('Mana')).toBeInTheDocument();
+    expect(screen.getByText('Stamina')).toBeInTheDocument();
   });
 
   test('handles zero or negative values correctly', () => {
