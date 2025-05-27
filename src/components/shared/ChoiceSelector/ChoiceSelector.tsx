@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Decision, DecisionOption } from '@/types/narrative.types';
+import { Decision } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {

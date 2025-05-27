@@ -52,22 +52,13 @@ export const SimpleChoices: Story = {
   },
 };
 
-export const SimpleChoicesWithSelection: Story = {
-  args: {
-    choices: [
-      ...simpleChoices.slice(0, 2),
-      { ...simpleChoices[2], isSelected: true },
-    ],
-  },
-};
-
-export const DecisionMode: Story = {
+export const DecisionWithHints: Story = {
   args: {
     decision: decisionWithHints,
   },
 };
 
-export const DecisionWithSelection: Story = {
+export const WithSelection: Story = {
   args: {
     decision: {
       ...decisionWithHints,
@@ -76,29 +67,9 @@ export const DecisionWithSelection: Story = {
   },
 };
 
-export const CustomPrompt: Story = {
-  args: {
-    choices: simpleChoices,
-    prompt: 'Choose your next action:',
-  },
-};
-
 export const Disabled: Story = {
   args: {
     choices: simpleChoices,
     isDisabled: true,
-  },
-};
-
-export const NoHints: Story = {
-  args: {
-    decision: decisionWithHints,
-    showHints: false,
-  },
-};
-
-export const EmptyState: Story = {
-  args: {
-    choices: [],
   },
 };
