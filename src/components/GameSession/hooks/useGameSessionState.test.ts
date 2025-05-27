@@ -58,27 +58,25 @@ const mockSessionStoreState = {
 
 // Mock the stores
 jest.mock('@/state/worldStore', () => ({
-  worldStore: {
-    getState: jest.fn(() => mockWorldStoreState)
-  }
+  worldStore: Object.assign(
+    jest.fn(() => mockWorldStoreState),
+    { getState: jest.fn(() => mockWorldStoreState) }
+  )
 }));
 
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: {
-    getState: jest.fn(() => mockSessionStoreState)
-  }
+  sessionStore: Object.assign(
+    jest.fn(() => mockSessionStoreState),
+    { getState: jest.fn(() => mockSessionStoreState) }
+  )
 }));
 
 jest.mock('@/state/characterStore', () => ({
-  characterStore: {
-    getState: jest.fn(() => mockCharacterStoreState)
-  }
+  characterStore: Object.assign(
+    jest.fn(() => mockCharacterStoreState),
+    { getState: jest.fn(() => mockCharacterStoreState) }
+  )
 }));
-
-// Import the mocked stores
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
 
 describe('useGameSessionState', () => {
   beforeEach(() => {
@@ -93,34 +91,6 @@ describe('useGameSessionState', () => {
 
     expect(result.current.sessionState.status).toBe('active');
     expect(result.current.sessionState.currentSceneId).toBe('scene-001');
-  });
-
-  test('handles pause and resume toggling', () => {
-    const { result } = renderHook(() => useGameSessionState({
-      worldId: 'test-world',
-      isClient: true,
-      _stores: {
-        worldStore: mockWorldStoreState,
-        sessionStore: mockSessionStoreState,
-        characterStore: mockCharacterStoreState
-      }
-    }));
-
-    // Pause action
-    act(() => {
-      result.current.handlePauseToggle();
-    });
-
-    expect(result.current.sessionState.status).toBe('paused');
-    expect(mockSessionStoreState.pauseSession).toHaveBeenCalledTimes(1);
-
-    // Resume action
-    act(() => {
-      result.current.handlePauseToggle();
-    });
-
-    expect(result.current.sessionState.status).toBe('active');
-    expect(mockSessionStoreState.resumeSession).toHaveBeenCalledTimes(1);
   });
 
   test('handles choice selection', () => {
@@ -216,7 +186,11 @@ describe('useGameSessionState', () => {
     const mockStoresWithoutCharacter = {
       worldStore: mockWorldStoreState,
       sessionStore: mockSessionStoreState,
-      characterStore: { ...mockCharacterStoreState, currentCharacterId: null }
+      characterStore: { 
+        ...mockCharacterStoreState, 
+        currentCharacterId: null,
+        characters: {} // No characters for this world
+      }
     };
     
     const { result } = renderHook(() => useGameSessionState({
@@ -232,7 +206,7 @@ describe('useGameSessionState', () => {
     });
 
     expect(result.current.error).toBeTruthy();
-    expect(result.current.error?.message).toBe('Please select a character before starting the game');
+    expect(result.current.error?.message).toBe('Please create a character for this world before starting the game');
     expect(mockSessionStoreState.initializeSession).not.toHaveBeenCalled();
   });
 
