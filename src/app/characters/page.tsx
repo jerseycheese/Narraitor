@@ -1,15 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { generateCharacter } from '@/lib/ai/characterGenerator';
+import { generateUniqueId } from '@/lib/utils/generateId';
+import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { createAIClient } from '@/lib/ai/clientFactory';
 
 export default function CharactersPage() {
   const router = useRouter();
-  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter } = characterStore();
+  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter } = characterStore();
   const { worlds, currentWorldId } = worldStore();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatingStatus, setGeneratingStatus] = useState<string>('');
+  const [generateError, setGenerateError] = useState<string | null>(null);
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
+  const [characterName, setCharacterName] = useState('');
+  const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
   
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
   const worldCharacters = Object.values(characters).filter(
@@ -18,6 +28,148 @@ export default function CharactersPage() {
 
   const handleCreateCharacter = () => {
     router.push('/characters/create');
+  };
+  
+  const handleGenerateCharacter = async () => {
+    if (!currentWorld || !currentWorldId) return;
+    
+    // Validate specific character name
+    if (generationType === 'specific' && !characterName.trim()) {
+      setGenerateError('Please enter a character name');
+      return;
+    }
+    
+    setIsGenerating(true);
+    setGenerateError(null);
+    setGeneratingStatus('Creating character...');
+    
+    try {
+      // Get existing character names to avoid duplicates
+      const existingNames = worldCharacters.map(char => char.name);
+      
+      // Generate character data based on type
+      const nameToUse = generationType === 'specific' ? characterName : undefined;
+      const generatedData = await generateCharacter(
+        currentWorld, 
+        existingNames, 
+        nameToUse,
+        generationType
+      );
+      
+      // Create the character with placeholder portrait first
+      const characterId = createCharacter({
+        name: generatedData.name,
+        worldId: currentWorldId,
+        level: generatedData.level,
+        attributes: generatedData.attributes.map(attr => {
+          const worldAttr = currentWorld.attributes.find(wa => wa.id === attr.id);
+          return {
+            id: generateUniqueId('attr'),
+            characterId: '', // Will be set by store
+            name: worldAttr?.name || 'Unknown',
+            baseValue: attr.value,
+            modifiedValue: attr.value,
+            category: worldAttr?.category
+          };
+        }),
+        skills: generatedData.skills.map(skill => {
+          const worldSkill = currentWorld.skills.find(ws => ws.id === skill.id);
+          return {
+            id: generateUniqueId('skill'),
+            characterId: '', // Will be set by store
+            name: worldSkill?.name || 'Unknown',
+            level: skill.level,
+            category: worldSkill?.category
+          };
+        }),
+        background: generatedData.background,
+        isPlayer: true,
+        status: {
+          hp: 100,
+          mp: 50,
+          stamina: 100,
+        },
+        portrait: {
+          type: 'placeholder',
+          url: null
+        }
+      });
+      
+      // Select the new character
+      setCurrentCharacter(characterId);
+      
+      // Generate portrait for the character
+      setGeneratingStatus('Generating portrait...');
+      try {
+        const aiClient = createAIClient();
+        const portraitGenerator = new PortraitGenerator(aiClient);
+        
+        // Create a Character-like object for portrait generation
+        const characterForPortrait = {
+          id: characterId,
+          name: generatedData.name,
+          description: generatedData.background.description,
+          worldId: currentWorldId,
+          background: {
+            history: generatedData.background.description,
+            personality: generatedData.background.personality,
+            physicalDescription: generatedData.background.motivation, // Using motivation as physical description
+            goals: [],
+            fears: [],
+            relationships: []
+          },
+          attributes: generatedData.attributes.map(attr => ({
+            attributeId: attr.id,
+            value: attr.value
+          })),
+          skills: generatedData.skills.map(skill => ({
+            skillId: skill.id,
+            level: skill.level,
+            experience: 0,
+            isActive: true
+          })),
+          inventory: {
+            characterId: characterId,
+            items: [],
+            capacity: 100,
+            categories: []
+          },
+          status: {
+            health: 100,
+            maxHealth: 100,
+            conditions: [],
+            location: currentWorld.name
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
+          worldTheme: currentWorld.theme
+        });
+        
+        // Update character with generated portrait
+        characterStore.getState().updateCharacter(characterId, { portrait });
+      } catch (portraitError) {
+        console.error('Failed to generate portrait:', portraitError);
+        // Continue without portrait - character already has placeholder
+      }
+      
+      // Reset dialog state
+      setShowGenerateDialog(false);
+      setCharacterName('');
+      setGenerationType('known');
+      setGenerateError(null);
+      
+      // Navigate to view the character
+      router.push(`/characters/${characterId}`);
+    } catch (error) {
+      console.error('Failed to generate character:', error);
+      setGenerateError(error instanceof Error ? error.message : 'Failed to generate character');
+    } finally {
+      setIsGenerating(false);
+      setGeneratingStatus('');
+    }
   };
 
   const handleSelectCharacter = (characterId: string) => {
@@ -76,13 +228,58 @@ export default function CharactersPage() {
             <h1 className="text-3xl font-bold">Characters</h1>
             <p className="text-gray-600 mt-2">World: {currentWorld.name}</p>
           </div>
-          <button
-            onClick={handleCreateCharacter}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Create Character
-          </button>
+          <div className="flex gap-2">
+            {currentCharacterId && currentWorldId && (
+              <button
+                onClick={() => {
+                  const character = characters[currentCharacterId];
+                  if (character) {
+                    router.push(`/world/${character.worldId}/play`);
+                  }
+                }}
+                className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Start Playing
+              </button>
+            )}
+            <button
+              onClick={() => setShowGenerateDialog(true)}
+              disabled={isGenerating}
+              className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+            >
+              {isGenerating ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  {generatingStatus || 'Generating...'}
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Generate Character
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleCreateCharacter}
+              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+            >
+              Create Character
+            </button>
+          </div>
         </div>
+
+        {generateError && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            <p className="font-medium">Generation Failed</p>
+            <p className="text-sm mt-1">{generateError}</p>
+          </div>
+        )}
 
         {worldCharacters.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
@@ -100,12 +297,33 @@ export default function CharactersPage() {
                 Create characters to explore your world and start their adventures!
               </p>
             </div>
-            <button
-              onClick={handleCreateCharacter}
-              className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg"
-            >
-              Create Your First Character
-            </button>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleGenerateCharacter}
+                disabled={isGenerating}
+                className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {generatingStatus || 'Generating...'}
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    Generate Character
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleCreateCharacter}
+                className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg cursor-pointer"
+              >
+                Create Your First Character
+              </button>
+            </div>
             <div className="mt-6 text-sm text-gray-500">
               <p>Each character starts with:</p>
               <ul className="mt-2 space-y-1">
@@ -173,6 +391,117 @@ export default function CharactersPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        
+        {/* Character Generation Dialog */}
+        {showGenerateDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h2 className="text-xl font-bold mb-4">Generate Character</h2>
+              <div className="space-y-4">
+                {/* Generation Type Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    What type of character would you like to create?
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="radio"
+                        value="known"
+                        checked={generationType === 'known'}
+                        onChange={(e) => setGenerationType(e.target.value as 'known' | 'original' | 'specific')}
+                        className="mr-3"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <div className="font-medium">Known Figure</div>
+                        <div className="text-sm text-gray-600">Generate a major character from {currentWorld?.name}</div>
+                      </div>
+                    </label>
+                    <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="radio"
+                        value="original"
+                        checked={generationType === 'original'}
+                        onChange={(e) => setGenerationType(e.target.value as 'known' | 'original' | 'specific')}
+                        className="mr-3"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <div className="font-medium">Original Character</div>
+                        <div className="text-sm text-gray-600">Create a unique character that fits the world</div>
+                      </div>
+                    </label>
+                    <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="radio"
+                        value="specific"
+                        checked={generationType === 'specific'}
+                        onChange={(e) => setGenerationType(e.target.value as 'known' | 'original' | 'specific')}
+                        className="mr-3"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <div className="font-medium">Specific Character</div>
+                        <div className="text-sm text-gray-600">Enter a name to create a particular character</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                
+                {/* Name Input (only shown for specific type) */}
+                {generationType === 'specific' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Character Name
+                    </label>
+                    <input
+                      type="text"
+                      value={characterName}
+                      onChange={(e) => setCharacterName(e.target.value)}
+                      placeholder="e.g., Aragorn, Princess Leia, Sherlock Holmes..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      disabled={isGenerating}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Enter the name of the character you want to create
+                    </p>
+                  </div>
+                )}
+              </div>
+              {generateError && (
+                <p className="text-red-600 text-sm mt-4">{generateError}</p>
+              )}
+              {isGenerating && (
+                <p className="text-purple-600 text-sm mt-4 flex items-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
+                  {generatingStatus}
+                </p>
+              )}
+              <div className="flex justify-end gap-2 mt-6">
+                <button
+                  onClick={() => {
+                    setShowGenerateDialog(false);
+                    setCharacterName('');
+                    setGenerationType('known');
+                    setGenerateError(null);
+                  }}
+                  disabled={isGenerating}
+                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleGenerateCharacter}
+                  disabled={isGenerating || (generationType === 'specific' && !characterName.trim())}
+                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? 'Generating...' : 'Generate'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
