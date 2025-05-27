@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface Portrait {
@@ -11,8 +11,9 @@ interface PortraitSectionProps {
   portrait?: Portrait;
   characterName: string;
   generatingPortrait: boolean;
-  onGeneratePortrait: () => void;
+  onGeneratePortrait: (customDescription?: string) => void;
   onRemovePortrait: () => void;
+  currentPhysicalDescription?: string;
 }
 
 export const PortraitSection: React.FC<PortraitSectionProps> = ({
@@ -20,8 +21,16 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
   characterName,
   generatingPortrait,
   onGeneratePortrait,
-  onRemovePortrait
+  onRemovePortrait,
+  currentPhysicalDescription
 }) => {
+  const [showCustomDescription, setShowCustomDescription] = useState(false);
+  const [customDescription, setCustomDescription] = useState(currentPhysicalDescription || '');
+
+  const handleGeneratePortrait = () => {
+    onGeneratePortrait(showCustomDescription ? customDescription : undefined);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Character Portrait</h2>
@@ -39,9 +48,39 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
               ? 'AI-generated portrait based on character details.'
               : 'No portrait has been generated yet.'}
           </p>
+          
+          {/* Custom description toggle */}
+          <div className="mb-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showCustomDescription}
+                onChange={(e) => setShowCustomDescription(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <span>Customize physical description for portrait generation</span>
+            </label>
+          </div>
+          
+          {/* Custom description textarea */}
+          {showCustomDescription && (
+            <div className="mb-4">
+              <textarea
+                value={customDescription}
+                onChange={(e) => setCustomDescription(e.target.value)}
+                placeholder="Describe specific visual details for the portrait (clothing, pose, expression, etc.)"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                This will override the character&apos;s physical description for this portrait generation only
+              </p>
+            </div>
+          )}
+          
           <div className="flex gap-2">
             <button
-              onClick={onGeneratePortrait}
+              onClick={handleGeneratePortrait}
               disabled={generatingPortrait}
               className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >

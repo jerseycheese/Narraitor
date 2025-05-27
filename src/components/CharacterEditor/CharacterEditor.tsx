@@ -90,7 +90,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   };
   
   // Handle portrait generation
-  const handleGeneratePortrait = async () => {
+  const handleGeneratePortrait = async (customDescription?: string) => {
     if (!character || !world) return;
     
     setGeneratingPortrait(true);
@@ -107,7 +107,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         background: {
           history: character.background.description,
           personality: character.background.personality,
-          physicalDescription: character.background.motivation,
+          physicalDescription: customDescription || character.background.physicalDescription || '',
           goals: [],
           fears: [],
           relationships: []
@@ -176,6 +176,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         generatingPortrait={generatingPortrait}
         onGeneratePortrait={handleGeneratePortrait}
         onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
+        currentPhysicalDescription={character.background.physicalDescription}
       />
       
       {/* Basic Info Section */}

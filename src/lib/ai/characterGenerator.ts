@@ -43,6 +43,7 @@ export interface GeneratedCharacterData {
     description: string;
     personality: string;
     motivation: string;
+    physicalDescription?: string;
   };
   attributes: Array<{
     id: string;
@@ -87,7 +88,7 @@ World Skills: ${world.skills.map(s => s.name).join(', ')}
 
 Create a character that:
 ${generationType === 'specific' && suggestedName ? 
-  `1. Is named "${suggestedName}"` :
+  `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from the actual ${world.name} source material` :
   generationType === 'known' ?
   `1. MUST be a REAL, EXISTING character from the actual ${world.name} source material (NOT made up)` :
   `1. Should be an original character that fits the ${world.name} world theme`
@@ -100,12 +101,13 @@ ${generationType === 'specific' && suggestedName ?
 7. Has varied skill levels (some high, some medium, some low)
 8. Fits naturally into the world's setting
 
-${generationType === 'known' ? `
+${(generationType === 'known' || (generationType === 'specific' && suggestedName)) ? `
 CRITICAL: You MUST create a REAL character that ACTUALLY EXISTS in the ${world.name} source material.
 - Research the actual characters from ${world.name}
 - Do NOT invent, create, or make up character names
 - Only use characters that genuinely appear in the original work
 - If you're not certain a character exists, choose one you're absolutely sure about
+${generationType === 'specific' ? `- The character MUST be named "${suggestedName}" and must be a known figure from the source material` : ''}
 
 Priority order for known character generation:
 1. Main protagonist(s) from ${world.name}
@@ -130,7 +132,8 @@ Respond with ONLY valid JSON in this format:
   "background": {
     "description": "Their history and background story...",
     "personality": "Their personality traits...",
-    "motivation": "What drives them..."
+    "motivation": "What drives them...",
+    "physicalDescription": "Their physical appearance, including distinctive features, clothing style, height, build, etc..."
   },
   "attributes": [
     ${world.attributes.map(a => `{"id": "${a.id}", "value": <number between ${a.minValue} and ${a.maxValue}>}`).join(',\n    ')}
@@ -189,6 +192,12 @@ Respond with ONLY valid JSON in this format:
     characterData.skills.forEach(skill => {
       skill.level = Math.max(0, Math.min(10, skill.level));
     });
+    
+    // Mark as known figure if it's a 'known' or 'specific' type
+    if (generationType === 'known' || generationType === 'specific') {
+      characterData.isKnownFigure = true;
+      characterData.characterType = 'protagonist'; // Default, can be adjusted based on the actual character
+    }
     
     return characterData;
   } catch (error) {

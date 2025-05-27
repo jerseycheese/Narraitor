@@ -72,7 +72,7 @@ async function generateCharacterPortrait(
       background: {
         history: generatedData.background.description,
         personality: generatedData.background.personality,
-        physicalDescription: generatedData.background.motivation, // Using motivation as physical description
+        physicalDescription: generatedData.background.physicalDescription || '',
         goals: [],
         fears: [],
         relationships: []
