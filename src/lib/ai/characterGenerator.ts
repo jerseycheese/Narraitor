@@ -193,6 +193,15 @@ Respond with ONLY valid JSON in this format:
     return characterData;
   } catch (error) {
     logger.error('Failed to generate character:', error);
+    
+    // Re-throw specific errors with their original message
+    if (error instanceof Error && error.message.includes('already exists in this world')) {
+      throw error;
+    }
+    if (error instanceof Error && error.message.includes('Generated character has no name')) {
+      throw error;
+    }
+    
     throw new Error('Failed to generate character. Please try again.');
   }
 }

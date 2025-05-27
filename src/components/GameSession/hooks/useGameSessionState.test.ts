@@ -58,26 +58,15 @@ const mockSessionStoreState = {
 
 // Mock the stores
 jest.mock('@/state/worldStore', () => ({
-  worldStore: {
-    getState: jest.fn(() => mockWorldStoreState)
-  }
+  worldStore: jest.fn(() => mockWorldStoreState)
 }));
 
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: {
-    getState: jest.fn(() => mockSessionStoreState),
-    pauseSession: jest.fn(),
-    resumeSession: jest.fn(),
-    endSession: jest.fn(),
-    selectChoice: jest.fn(),
-    initializeSession: jest.fn(),
-  }
+  sessionStore: jest.fn(() => mockSessionStoreState)
 }));
 
 jest.mock('@/state/characterStore', () => ({
-  characterStore: {
-    getState: jest.fn(() => mockCharacterStoreState)
-  }
+  characterStore: jest.fn(() => mockCharacterStoreState)
 }));
 
 // Import the mocked stores

@@ -178,6 +178,32 @@ describe('Character Generator - Cleanup Tests', () => {
   describe('Duplicate Name Detection', () => {
     it('should throw error for exact duplicate names', async () => {
       const existingNames = ['Test Hero', 'Another Character'];
+      
+      // Mock response that returns a duplicate name
+      const mockResponseWithDuplicate = {
+        content: JSON.stringify({
+          name: 'Test Hero', // This matches existing name
+          level: 3,
+          background: {
+            description: 'A duplicate character',
+            personality: 'Test personality',
+            motivation: 'Test motivation'
+          },
+          attributes: [
+            { id: 'strength', value: 8 },
+            { id: 'intelligence', value: 6 }
+          ],
+          skills: [
+            { id: 'swordsmanship', level: 7 },
+            { id: 'magic', level: 4 }
+          ]
+        })
+      };
+
+      const mockClient = {
+        generateContent: jest.fn().mockResolvedValue(mockResponseWithDuplicate)
+      };
+      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
 
       await expect(
         generateCharacter(mockWorld, existingNames, undefined, 'original')
@@ -186,6 +212,32 @@ describe('Character Generator - Cleanup Tests', () => {
 
     it('should be case-insensitive for duplicate detection', async () => {
       const existingNames = ['test hero', 'Another Character'];
+      
+      // Mock response that returns a name with different case
+      const mockResponseWithCaseDuplicate = {
+        content: JSON.stringify({
+          name: 'Test Hero', // Different case but same name
+          level: 3,
+          background: {
+            description: 'A duplicate character',
+            personality: 'Test personality',
+            motivation: 'Test motivation'
+          },
+          attributes: [
+            { id: 'strength', value: 8 },
+            { id: 'intelligence', value: 6 }
+          ],
+          skills: [
+            { id: 'swordsmanship', level: 7 },
+            { id: 'magic', level: 4 }
+          ]
+        })
+      };
+
+      const mockClient = {
+        generateContent: jest.fn().mockResolvedValue(mockResponseWithCaseDuplicate)
+      };
+      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
 
       await expect(
         generateCharacter(mockWorld, existingNames, undefined, 'original')
