@@ -12,6 +12,7 @@ import {
 import { World } from '@/types/world.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt, extractFactsFromNarrative } from './loreContextHelper';
+import { extractStructuredLore } from './structuredLoreExtractor';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -34,9 +35,21 @@ export class NarrativeGenerator {
 
       const response = await this.geminiClient.generateContent(enhancedPrompt);
       
-      // Extract facts from generated narrative
+      // Extract structured lore from generated narrative
       if (response.content) {
-        extractFactsFromNarrative(response.content, request.worldId, request.sessionId);
+        try {
+          const existingLoreContext = getLoreContextForPrompt(request.worldId);
+          const structuredLore = await extractStructuredLore(response.content, existingLoreContext);
+          
+          // Import lore store dynamically to avoid circular dependency
+          const { useLoreStore } = await import('@/state/loreStore');
+          const { addStructuredLore } = useLoreStore.getState();
+          addStructuredLore(structuredLore, request.worldId, request.sessionId);
+        } catch (error) {
+          console.warn('Failed to extract structured lore, falling back to regex:', error);
+          // Fallback to old method
+          extractFactsFromNarrative(response.content, request.worldId, request.sessionId);
+        }
       }
       
       return this.formatResponse(response, request.generationParameters?.segmentType || 'scene');
@@ -74,9 +87,21 @@ export class NarrativeGenerator {
       
       const response = await this.geminiClient.generateContent(enhancedPrompt);
       
-      // Extract facts from initial scene
+      // Extract structured lore from initial scene
       if (response.content) {
-        extractFactsFromNarrative(response.content, worldId);
+        try {
+          const existingLoreContext = getLoreContextForPrompt(worldId);
+          const structuredLore = await extractStructuredLore(response.content, existingLoreContext);
+          
+          // Import lore store dynamically to avoid circular dependency
+          const { useLoreStore } = await import('@/state/loreStore');
+          const { addStructuredLore } = useLoreStore.getState();
+          addStructuredLore(structuredLore, worldId);
+        } catch (error) {
+          console.warn('Failed to extract structured lore from initial scene, falling back to regex:', error);
+          // Fallback to old method
+          extractFactsFromNarrative(response.content, worldId);
+        }
       }
       
       return this.formatResponse(response, 'scene');

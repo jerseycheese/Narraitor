@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
+import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
 import { useWorldStore } from '@/state/useWorldStore';
 import type { EntityID } from '@/types';
 
 export default function LoreViewerTestPage() {
-  const { addFact, clearFacts, extractFactsFromText, getFacts } = useLoreStore();
+  const { addFact, clearFacts, extractFactsFromText, getFacts, addStructuredLore } = useLoreStore();
   const { worlds, createWorld } = useWorldStore();
   const [showSessionOnly, setShowSessionOnly] = useState(false);
   const [extractionResult, setExtractionResult] = useState<string>('');
@@ -84,8 +85,38 @@ export default function LoreViewerTestPage() {
     const afterCount = getFacts({ worldId }).length;
     const extracted = afterCount - beforeCount;
     
-    setExtractionResult(`Extracted ${extracted} new facts from the narrative. Look for new entries in Characters and Locations categories.`);
+    setExtractionResult(`Extracted ${extracted} new facts from the narrative (regex). Look for new entries in Characters and Locations categories.`);
     setTimeout(() => setExtractionResult(''), 5000);
+  };
+
+  const testStructuredExtraction = async () => {
+    const beforeCount = getFacts({ worldId }).length;
+    
+    const sampleNarrative = customNarrative || `
+      You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares.
+      A mysterious woman named Lady Seraphina approaches you with an urgent request.
+      She tells you about the Lost Temple of Aethon, hidden deep in the Whispering Woods.
+      The temple is said to contain the Crystal of Truth, a powerful artifact.
+      
+      Sir Gareth, the captain of the guard, warns you that the woods are dangerous.
+      Many adventurers have entered the Whispering Woods, but few have returned.
+      The local tavern, The Dragon's Rest, might have more information.
+    `;
+    
+    try {
+      setExtractionResult('Extracting structured lore with AI...');
+      const structuredLore = await extractStructuredLore(sampleNarrative);
+      addStructuredLore(structuredLore, worldId, sessionId);
+      
+      const afterCount = getFacts({ worldId }).length;
+      const extracted = afterCount - beforeCount;
+      
+      setExtractionResult(`AI extracted ${extracted} new structured facts! Check all categories for rich metadata.`);
+      setTimeout(() => setExtractionResult(''), 7000);
+    } catch (error) {
+      setExtractionResult(`Failed to extract structured lore: ${error}`);
+      setTimeout(() => setExtractionResult(''), 5000);
+    }
   };
 
   return (
@@ -105,7 +136,14 @@ export default function LoreViewerTestPage() {
             onClick={testNarrativeExtraction}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
-            Test Narrative Extraction
+            Test Regex Extraction (Legacy)
+          </button>
+          
+          <button
+            onClick={testStructuredExtraction}
+            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+          >
+            Test AI Structured Extraction
           </button>
           
           <button
@@ -156,17 +194,21 @@ export default function LoreViewerTestPage() {
         <h2 className="font-bold mb-2">Test Instructions:</h2>
         <ol className="list-decimal list-inside space-y-2">
           <li><strong>Add Sample Facts:</strong> Manually adds predefined facts to test display</li>
-          <li><strong>Test Narrative Extraction:</strong> Automatically extracts character names and locations from narrative text using regex patterns (e.g., &quot;Lady Seraphina&quot;, &quot;Lost Temple of Aethon&quot;)</li>
-          <li><strong>Custom Narrative:</strong> Enter your own text to test extraction patterns</li>
+          <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata (recommended)</li>
+          <li><strong>Test Regex Extraction:</strong> Legacy regex pattern matching for basic extraction</li>
+          <li><strong>Custom Narrative:</strong> Enter your own text to test extraction methods</li>
           <li><strong>Session Filtering:</strong> Toggle to show only facts from the current session</li>
           <li><strong>Clear All Facts:</strong> Remove all facts to start fresh</li>
         </ol>
         
-        <div className="mt-4 p-3 bg-blue-50 rounded">
-          <h3 className="font-semibold text-sm mb-1">Extraction Patterns:</h3>
+        <div className="mt-4 p-3 bg-purple-50 rounded">
+          <h3 className="font-semibold text-sm mb-1">AI Structured Extraction:</h3>
           <ul className="text-sm space-y-1">
-            <li>• Characters: Titles + Names (e.g., &quot;Sir Gareth&quot;, &quot;Lady Seraphina&quot;)</li>
-            <li>• Locations: Proper nouns with location words (e.g., &quot;Temple of&quot;, &quot;Woods&quot;, &quot;Tavern&quot;)</li>
+            <li>• Extracts characters with roles, descriptions, and importance</li>
+            <li>• Identifies locations with types and context</li>
+            <li>• Captures events with significance and relationships</li>
+            <li>• Recognizes rules and world mechanics</li>
+            <li>• Much more comprehensive than regex patterns</li>
           </ul>
         </div>
       </div>
