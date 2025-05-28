@@ -12,7 +12,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 
 /**
- * Simple lore store for tracking narrative facts
+ * Lore store for tracking narrative facts
  */
 export interface LoreStore {
   // State
@@ -26,12 +26,12 @@ export interface LoreStore {
   // AI Integration
   getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
   
-  // Simple fact extraction
+  // Fact extraction
   extractFactsFromText: (text: string, worldId: EntityID, sessionId?: EntityID) => void;
 }
 
 /**
- * Simple patterns for extracting facts from narrative text
+ * Patterns for extracting facts from narrative text
  */
 const extractBasicFacts = (text: string): Array<{
   key: string;
@@ -39,35 +39,44 @@ const extractBasicFacts = (text: string): Array<{
   category: LoreCategory;
 }> => {
   const facts: Array<{ key: string; value: string; category: LoreCategory }> = [];
+  const seenKeys = new Set<string>();
   
-  // Extract character names (capitalized words followed by titles or actions)
-  const characterPattern = /([A-Z][a-z]+ (?:[A-Z][a-z]+\s)?(?:the [A-Za-z]+|[A-Z][a-z]+))/g;
+  // Extract character names (pattern for titles + names)
+  const characterPattern = /\b((?:Sir|Lady|Lord|Captain|Master|Dr\.|Professor) [A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g;
   let match;
   while ((match = characterPattern.exec(text)) !== null) {
     const name = match[1].trim();
-    facts.push({
-      key: `character_${name.toLowerCase().replace(/\s+/g, '_')}`,
-      value: name,
-      category: 'characters'
-    });
+    const key = `character_${name.toLowerCase().replace(/\s+/g, '_')}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      facts.push({
+        key,
+        value: name,
+        category: 'characters'
+      });
+    }
   }
   
   // Extract location names (place indicators)
   const locationPattern = /(?:in|at|from|to) (?:the )?([A-Z][a-z]+(?: [A-Z][a-z]+)*)/g;
   while ((match = locationPattern.exec(text)) !== null) {
     const location = match[1].trim();
-    facts.push({
-      key: `location_${location.toLowerCase().replace(/\s+/g, '_')}`,
-      value: location,
-      category: 'locations'
-    });
+    const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      facts.push({
+        key,
+        value: location,
+        category: 'locations'
+      });
+    }
   }
   
   return facts;
 };
 
 /**
- * Simple lore store implementation
+ * Lore store implementation
  */
 export const useLoreStore = create<LoreStore>()(
   persist(

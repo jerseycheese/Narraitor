@@ -1,5 +1,5 @@
 /**
- * Simple Read-Only Lore Viewer Component
+ * Read-Only Lore Viewer Component
  * Displays established facts for player reference
  */
 

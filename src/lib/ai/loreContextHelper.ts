@@ -1,5 +1,5 @@
 /**
- * Simple helper to include lore context in AI prompts
+ * Helper to include lore context in AI prompts
  */
 
 import { useLoreStore } from '@/state/loreStore';

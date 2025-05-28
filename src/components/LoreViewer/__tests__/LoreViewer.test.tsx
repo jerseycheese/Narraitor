@@ -3,52 +3,59 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { LoreViewer } from '../LoreViewer';
 import type { LoreFact } from '../../../types';
 
 // Mock the lore store
-const mockUseLoreStore = {
-  facts: {} as Record<string, LoreFact>,
-  loading: false,
-  error: null as string | null,
-  getFactsByWorld: jest.fn(),
-  searchFacts: jest.fn(),
-  createFact: jest.fn(),
-  updateFact: jest.fn(),
-  deleteFact: jest.fn(),
-  setLoading: jest.fn()
-};
+const mockGetFacts = jest.fn();
 
 jest.mock('../../../state/loreStore', () => ({
-  useLoreStore: () => mockUseLoreStore
+  useLoreStore: () => ({
+    getFacts: mockGetFacts
+  })
 }));
 
-// Mock data
-const mockFacts: LoreFact[] = [
+// Sample facts for testing
+const sampleFacts: LoreFact[] = [
   {
     id: 'fact-1',
+    key: 'hero_name',
+    value: 'Lyra Starweaver',
     category: 'characters',
-    title: 'Hero Backstory',
-    content: 'The hero was raised by dragons in the northern mountains',
-    source: 'narrative',
-    tags: ['hero', 'dragons', 'backstory'],
-    isCanonical: true,
-    relatedFacts: [],
+    source: 'manual',
     worldId: 'world-1',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'
   },
   {
     id: 'fact-2',
+    key: 'tavern_location',
+    value: 'The Prancing Pony',
     category: 'locations',
-    title: 'Dragon Peak',
-    content: 'A mystical mountain where ancient dragons live',
+    source: 'narrative',
+    worldId: 'world-1',
+    sessionId: 'session-1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z'
+  },
+  {
+    id: 'fact-3',
+    key: 'quest_start',
+    value: 'Heroes met at the tavern',
+    category: 'events',
+    source: 'narrative',
+    worldId: 'world-1',
+    sessionId: 'session-1',
+    createdAt: '2023-01-01T00:00:00Z',
+    updatedAt: '2023-01-01T00:00:00Z'
+  },
+  {
+    id: 'fact-4',
+    key: 'magic_cost',
+    value: 'All magic requires sacrifice',
+    category: 'rules',
     source: 'manual',
-    tags: ['dragons', 'mountain', 'mystical'],
-    isCanonical: true,
-    relatedFacts: ['fact-1'],
     worldId: 'world-1',
     createdAt: '2023-01-01T00:00:00Z',
     updatedAt: '2023-01-01T00:00:00Z'
@@ -58,224 +65,101 @@ const mockFacts: LoreFact[] = [
 describe('LoreViewer Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseLoreStore.loading = false;
-    mockUseLoreStore.error = null;
-    mockUseLoreStore.getFactsByWorld.mockReturnValue(mockFacts);
-    mockUseLoreStore.searchFacts.mockReturnValue(mockFacts);
   });
 
-  describe('Basic Rendering', () => {
-    test('displays lore facts for a world', () => {
-      render(<LoreViewer worldId="world-1" />);
+  test('displays facts grouped by category', () => {
+    mockGetFacts.mockReturnValue(sampleFacts);
+    
+    render(<LoreViewer worldId="world-1" />);
 
-      expect(screen.getByText('Hero Backstory')).toBeInTheDocument();
-      expect(screen.getByText('Dragon Peak')).toBeInTheDocument();
-      expect(screen.getByText('The hero was raised by dragons in the northern mountains')).toBeInTheDocument();
-      expect(screen.getByText('A mystical mountain where ancient dragons live')).toBeInTheDocument();
-    });
+    // Check category headings are present
+    expect(screen.getByText('Characters')).toBeInTheDocument();
+    expect(screen.getByText('Locations')).toBeInTheDocument();
+    expect(screen.getByText('Events')).toBeInTheDocument();
+    expect(screen.getByText('World Rules')).toBeInTheDocument();
 
-    test('shows appropriate category badges', () => {
-      render(<LoreViewer worldId="world-1" />);
-
-      expect(screen.getByText('characters')).toBeInTheDocument();
-      expect(screen.getByText('locations')).toBeInTheDocument();
-    });
-
-    test('displays source information', () => {
-      render(<LoreViewer worldId="world-1" />);
-
-      expect(screen.getByText('narrative')).toBeInTheDocument();
-      expect(screen.getByText('manual')).toBeInTheDocument();
-    });
-
-    test('shows tags for each fact', () => {
-      render(<LoreViewer worldId="world-1" />);
-
-      expect(screen.getByText('hero')).toBeInTheDocument();
-      expect(screen.getAllByText('dragons')).toHaveLength(2); // Both facts have 'dragons' tag
-      expect(screen.getByText('mountain')).toBeInTheDocument();
-    });
+    // Check facts are displayed
+    expect(screen.getByText('hero_name:')).toBeInTheDocument();
+    expect(screen.getByText('Lyra Starweaver')).toBeInTheDocument();
+    expect(screen.getByText('tavern_location:')).toBeInTheDocument();
+    expect(screen.getByText('The Prancing Pony')).toBeInTheDocument();
   });
 
-  describe('Search and Filtering', () => {
-    test('filters facts by category when category is selected', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
+  test('shows empty state when no facts exist', () => {
+    mockGetFacts.mockReturnValue([]);
+    
+    render(<LoreViewer worldId="world-1" />);
 
-      const categoryFilter = screen.getByRole('combobox', { name: /category/i });
-      await user.selectOptions(categoryFilter, 'characters');
-
-      await waitFor(() => {
-        expect(mockUseLoreStore.searchFacts).toHaveBeenCalledWith({
-          category: 'characters',
-          worldId: 'world-1'
-        });
-      });
-    });
-
-    test('searches facts by text when search term is entered', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const searchInput = screen.getByRole('textbox', { name: /search/i });
-      await user.type(searchInput, 'dragon');
-
-      await waitFor(() => {
-        expect(mockUseLoreStore.searchFacts).toHaveBeenCalledWith({
-          searchTerm: 'dragon',
-          worldId: 'world-1'
-        });
-      });
-    });
-
-    test('filters by canonical status', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const canonicalFilter = screen.getByRole('checkbox', { name: /canonical only/i });
-      await user.click(canonicalFilter);
-
-      await waitFor(() => {
-        expect(mockUseLoreStore.searchFacts).toHaveBeenCalledWith({
-          isCanonical: true,
-          worldId: 'world-1'
-        });
-      });
-    });
+    expect(screen.getByText('No lore facts recorded yet.')).toBeInTheDocument();
+    expect(screen.getByText('Facts will appear here as the story unfolds.')).toBeInTheDocument();
   });
 
-  describe('Fact Management', () => {
-    test('opens create fact dialog when add button is clicked', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
+  test('filters facts by session when sessionId is provided', () => {
+    mockGetFacts.mockReturnValue([sampleFacts[1], sampleFacts[2]]); // Only session facts
+    
+    render(<LoreViewer worldId="world-1" sessionId="session-1" />);
 
-      const addButton = screen.getByRole('button', { name: /add fact/i });
-      await user.click(addButton);
-
-      expect(screen.getByText('Create New Fact')).toBeInTheDocument();
+    // Should call getFacts with session filter
+    expect(mockGetFacts).toHaveBeenCalledWith({
+      worldId: 'world-1',
+      sessionId: 'session-1'
     });
 
-    test('creates new fact when form is submitted', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const addButton = screen.getByRole('button', { name: /add fact/i });
-      await user.click(addButton);
-
-      // Fill out the form
-      await user.type(screen.getByRole('textbox', { name: /title/i }), 'New Fact');
-      await user.type(screen.getByRole('textbox', { name: /content/i }), 'Fact content');
-      await user.selectOptions(screen.getByRole('combobox', { name: /category/i }), 'events');
-
-      const saveButton = screen.getByRole('button', { name: /save/i });
-      await user.click(saveButton);
-
-      expect(mockUseLoreStore.createFact).toHaveBeenCalledWith({
-        title: 'New Fact',
-        content: 'Fact content',
-        category: 'events',
-        source: 'manual',
-        tags: [],
-        isCanonical: true,
-        relatedFacts: [],
-        worldId: 'world-1'
-      });
-    });
-
-    test('opens edit dialog when edit button is clicked', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const editButtons = screen.getAllByRole('button', { name: /edit/i });
-      await user.click(editButtons[0]);
-
-      expect(screen.getByDisplayValue('Hero Backstory')).toBeInTheDocument();
-    });
-
-    test('deletes fact when delete button is clicked', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-      await user.click(deleteButtons[0]);
-
-      // Confirm deletion
-      const confirmButton = screen.getByRole('button', { name: /confirm/i });
-      await user.click(confirmButton);
-
-      expect(mockUseLoreStore.deleteFact).toHaveBeenCalledWith('fact-1');
-    });
+    // Check that only session facts are displayed
+    expect(screen.getByText('tavern_location:')).toBeInTheDocument();
+    expect(screen.getByText('quest_start:')).toBeInTheDocument();
+    expect(screen.queryByText('hero_name:')).not.toBeInTheDocument();
   });
 
-  describe('Loading and Error States', () => {
-    test('shows loading state when loading is true', () => {
-      mockUseLoreStore.loading = true;
-      mockUseLoreStore.error = null;
-      
-      render(<LoreViewer worldId="world-1" />);
+  test('displays total fact count', () => {
+    mockGetFacts.mockReturnValue(sampleFacts);
+    
+    render(<LoreViewer worldId="world-1" />);
 
-      expect(screen.getByText(/loading/i)).toBeInTheDocument();
-    });
-
-    test('shows error message when error exists', () => {
-      mockUseLoreStore.loading = false;
-      mockUseLoreStore.error = 'Failed to load facts';
-      
-      render(<LoreViewer worldId="world-1" />);
-
-      expect(screen.getByText('Failed to load facts')).toBeInTheDocument();
-    });
-
-    test('shows empty state when no facts exist', () => {
-      mockUseLoreStore.getFactsByWorld.mockReturnValue([]);
-      mockUseLoreStore.searchFacts.mockReturnValue([]);
-      
-      render(<LoreViewer worldId="world-1" />);
-
-      expect(screen.getByText(/no lore facts/i)).toBeInTheDocument();
-    });
+    expect(screen.getByText('Total facts: 4')).toBeInTheDocument();
   });
 
-  describe('Accessibility', () => {
-    test('provides proper ARIA labels for interactive elements', () => {
-      render(<LoreViewer worldId="world-1" />);
+  test('applies custom className when provided', () => {
+    mockGetFacts.mockReturnValue(sampleFacts);
+    
+    const { container } = render(<LoreViewer worldId="world-1" className="custom-class" />);
 
-      expect(screen.getByRole('combobox', { name: /category/i })).toBeInTheDocument();
-      expect(screen.getByRole('textbox', { name: /search/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /add fact/i })).toBeInTheDocument();
-    });
-
-    test('supports keyboard navigation', async () => {
-      const user = userEvent.setup();
-      render(<LoreViewer worldId="world-1" />);
-
-      const searchInput = screen.getByRole('textbox', { name: /search/i });
-      await user.tab();
-      
-      expect(searchInput).toHaveFocus();
-    });
+    const rootDiv = container.firstChild;
+    expect(rootDiv).toHaveClass('custom-class');
   });
 
-  describe('Responsive Behavior', () => {
-    test('displays facts in grid layout on larger screens', () => {
-      render(<LoreViewer worldId="world-1" />);
+  test('only displays categories that have facts', () => {
+    // Only character and location facts
+    mockGetFacts.mockReturnValue([sampleFacts[0], sampleFacts[1]]);
+    
+    render(<LoreViewer worldId="world-1" />);
 
-      const factsList = screen.getByTestId('facts-list');
-      expect(factsList).toHaveClass('grid');
-    });
+    expect(screen.getByText('Characters')).toBeInTheDocument();
+    expect(screen.getByText('Locations')).toBeInTheDocument();
+    expect(screen.queryByText('Events')).not.toBeInTheDocument();
+    expect(screen.queryByText('World Rules')).not.toBeInTheDocument();
+  });
 
-    test('adapts layout for mobile screens', () => {
-      // Mock mobile viewport
-      Object.defineProperty(window, 'innerWidth', {
-        writable: true,
-        configurable: true,
-        value: 375,
-      });
+  test('applies correct category colors', () => {
+    mockGetFacts.mockReturnValue(sampleFacts);
+    
+    const { container } = render(<LoreViewer worldId="world-1" />);
 
-      render(<LoreViewer worldId="world-1" />);
+    // Check that category sections have the right color classes
+    const characterSection = container.querySelector('.bg-blue-50');
+    expect(characterSection).toBeInTheDocument();
+    expect(characterSection).toHaveClass('border-blue-200');
 
-      const factsList = screen.getByTestId('facts-list');
-      expect(factsList).toHaveClass('grid-cols-1');
-    });
+    const locationSection = container.querySelector('.bg-green-50');
+    expect(locationSection).toBeInTheDocument();
+    expect(locationSection).toHaveClass('border-green-200');
+
+    const eventSection = container.querySelector('.bg-purple-50');
+    expect(eventSection).toBeInTheDocument();
+    expect(eventSection).toHaveClass('border-purple-200');
+
+    const rulesSection = container.querySelector('.bg-orange-50');
+    expect(rulesSection).toBeInTheDocument();
+    expect(rulesSection).toHaveClass('border-orange-200');
   });
 });

@@ -1,5 +1,5 @@
 /**
- * Tests for simplified lore store
+ * Tests for lore store
  */
 
 import { renderHook, act } from '@testing-library/react';
