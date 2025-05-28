@@ -2,7 +2,7 @@
  * LoreViewer Component - Display and manage lore facts for a world
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLoreStore } from '../../state/loreStore';
 import type { LoreFact, LoreCategory, LoreSource, LoreSearchOptions } from '../../types';
 import { LoadingState } from '../ui/LoadingState';
@@ -26,7 +26,6 @@ const SOURCES: LoreSource[] = ['narrative', 'manual', 'ai_generated', 'imported'
 
 export const LoreViewer: React.FC<LoreViewerProps> = ({ worldId, className = '' }) => {
   const {
-    getFactsByWorld,
     searchFacts,
     createFact,
     updateFact,
@@ -160,11 +159,30 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({ worldId, className = '' 
   };
 
   if (loading) {
-    return <LoadingState message="Loading lore facts..." />;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingState 
+          variant="spinner" 
+          size="lg" 
+          message="Loading lore facts..." 
+        />
+      </div>
+    );
   }
 
   if (error) {
-    return <ErrorDisplay error={error} />;
+    return (
+      <div className="p-6">
+        <ErrorDisplay 
+          variant="section" 
+          severity="error"
+          title="Failed to Load Lore"
+          message={error} 
+          showRetry
+          onRetry={() => window.location.reload()}
+        />
+      </div>
+    );
   }
 
   return (
@@ -440,7 +458,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({ worldId, className = '' 
           <div className="bg-white rounded-lg p-6 w-full max-w-sm">
             <h3 className="text-lg font-semibold mb-4">Delete Fact</h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{factToDelete.title}"? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{factToDelete.title}&rdquo;? This action cannot be undone.
             </p>
             <div className="flex gap-2">
               <button
