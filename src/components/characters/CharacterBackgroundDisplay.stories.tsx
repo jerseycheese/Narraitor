@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterBackgroundDisplay } from './CharacterBackgroundDisplay';
 
 const meta: Meta<typeof CharacterBackgroundDisplay> = {
-  title: 'Narraitor/Characters/CharacterBackgroundDisplay',
+  title: 'Character/CharacterBackgroundDisplay',
   component: CharacterBackgroundDisplay,
   parameters: {
     layout: 'padded',
@@ -53,27 +53,5 @@ export const WithoutPhysicalDescription: Story = {
 export const DetailedCharacter: Story = {
   args: {
     background: detailedBackground
-  }
-};
-
-export const FantasyWarrior: Story = {
-  args: {
-    background: {
-      description: 'A dragonborn paladin sworn to an ancient order dedicated to protecting the innocent from supernatural threats.',
-      personality: 'Righteous and determined, with an unwavering moral compass. Can be rigid in thinking but learns to adapt through experience.',
-      motivation: 'To prove worthy of their draconic heritage while upholding the sacred oaths of their order.',
-      physicalDescription: 'Seven feet tall with bronze-scaled skin that gleams in sunlight. Golden eyes burn with inner fire, and ceremonial scars mark important victories.'
-    }
-  }
-};
-
-export const ModernSetting: Story = {
-  args: {
-    background: {
-      description: 'A former corporate lawyer who left the high-stress world of big business to become a private investigator after witnessing corruption firsthand.',
-      personality: 'Sharp, cynical, but retains a core of idealism. Excellent at reading people and situations. Sometimes struggles with trust.',
-      motivation: 'To use investigative skills to help ordinary people who can\'t afford justice through traditional channels.',
-      physicalDescription: 'Average height, impeccably dressed even when doing fieldwork. Wire-rimmed glasses and a habit of taking detailed notes. Carries themselves with quiet confidence.'
-    }
   }
 };

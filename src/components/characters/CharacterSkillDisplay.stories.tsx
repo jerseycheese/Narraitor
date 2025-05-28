@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterSkillDisplay } from './CharacterSkillDisplay';
 
 const meta: Meta<typeof CharacterSkillDisplay> = {
-  title: 'Narraitor/Characters/CharacterSkillDisplay',
+  title: 'Character/CharacterSkillDisplay',
   component: CharacterSkillDisplay,
   parameters: {
     layout: 'padded',
@@ -83,13 +83,6 @@ export const WithCategories: Story = {
   }
 };
 
-export const EmptySkills: Story = {
-  args: {
-    skills: [],
-    showCategories: false
-  }
-};
-
 export const VariedLevels: Story = {
   args: {
     skills: [
@@ -116,34 +109,5 @@ export const VariedLevels: Story = {
       }
     ],
     showCategories: false
-  }
-};
-
-export const SingleCategory: Story = {
-  args: {
-    skills: [
-      {
-        id: 'skill-1',
-        characterId: 'char-1',
-        name: 'Swordsmanship',
-        level: 3,
-        category: 'combat'
-      },
-      {
-        id: 'skill-2',
-        characterId: 'char-1',
-        name: 'Archery',
-        level: 4,
-        category: 'combat'
-      },
-      {
-        id: 'skill-3',
-        characterId: 'char-1',
-        name: 'Shield Mastery',
-        level: 2,
-        category: 'combat'
-      }
-    ],
-    showCategories: true
   }
 };

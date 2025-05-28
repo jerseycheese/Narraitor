@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterAttributeDisplay } from './CharacterAttributeDisplay';
 
 const meta: Meta<typeof CharacterAttributeDisplay> = {
-  title: 'Narraitor/Characters/CharacterAttributeDisplay',
+  title: 'Character/CharacterAttributeDisplay',
   component: CharacterAttributeDisplay,
   parameters: {
     layout: 'padded',
@@ -81,13 +81,6 @@ export const WithCategories: Story = {
   }
 };
 
-export const EmptyAttributes: Story = {
-  args: {
-    attributes: [],
-    showCategories: false
-  }
-};
-
 export const ModifiedValues: Story = {
   args: {
     attributes: [
@@ -109,29 +102,5 @@ export const ModifiedValues: Story = {
       }
     ],
     showCategories: false
-  }
-};
-
-export const SingleCategory: Story = {
-  args: {
-    attributes: [
-      {
-        id: 'attr-1',
-        characterId: 'char-1',
-        name: 'Strength',
-        baseValue: 8,
-        modifiedValue: 8,
-        category: 'physical'
-      },
-      {
-        id: 'attr-2',
-        characterId: 'char-1',
-        name: 'Agility',
-        baseValue: 9,
-        modifiedValue: 9,
-        category: 'physical'
-      }
-    ],
-    showCategories: true
   }
 };
