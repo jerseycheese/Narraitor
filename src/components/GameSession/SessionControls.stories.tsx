@@ -8,6 +8,10 @@ const meta: Meta<typeof SessionControls> = {
     layout: 'padded',
   },
   argTypes: {
+    status: {
+      control: 'select',
+      options: ['active', 'paused', 'ended'],
+    },
     onPause: { action: 'pause clicked' },
     onResume: { action: 'resume clicked' },
     onEnd: { action: 'end clicked' },
@@ -17,20 +21,8 @@ const meta: Meta<typeof SessionControls> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ActiveSession: Story = {
+export const Default: Story = {
   args: {
     status: 'active',
-  },
-};
-
-export const PausedSession: Story = {
-  args: {
-    status: 'paused',
-  },
-};
-
-export const EndedSession: Story = {
-  args: {
-    status: 'ended',
   },
 };

@@ -16,20 +16,8 @@ export const Default: Story = {
   args: {},
 };
 
-export const CustomMessage: Story = {
+export const WithCustomMessage: Story = {
   args: {
     loadingMessage: 'Preparing your adventure...',
-  },
-};
-
-export const InitializingMessage: Story = {
-  args: {
-    loadingMessage: 'Initializing game world...',
-  },
-};
-
-export const GeneratingMessage: Story = {
-  args: {
-    loadingMessage: 'Generating narrative...',
   },
 };
