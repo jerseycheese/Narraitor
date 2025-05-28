@@ -23,8 +23,8 @@ jest.mock('./GameSessionError', () => {
   };
 });
 
-jest.mock('./GameSessionActive', () => {
-  return function MockGameSessionActive() {
+jest.mock('./ActiveGameSession', () => {
+  return function MockActiveGameSession() {
     return <div data-testid="game-session-active">Active session</div>;
   };
 });

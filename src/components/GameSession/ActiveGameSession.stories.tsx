@@ -17,17 +17,27 @@ const meta: Meta<typeof ActiveGameSession> = {
         component: `
         # ActiveGameSession
         
-        The ActiveGameSession component manages the complete narrative gameplay experience,
-        integrating narrative generation, choice selection, and character display.
+        The ActiveGameSession component is the core narrative gameplay component that integrates
+        narrative generation, choice selection, and character display. It replaces the older
+        GameSessionActive component and provides full narrative engine integration.
         
-        ## Features
+        ## Key Features
         
-        - Automatic narrative generation on mount
-        - Player choice selection and response
-        - Character summary display
-        - Loading states for narrative and choices
-        - Error handling and fallback choices
+        - Real-time narrative generation via NarrativeController
+        - Player choice selection with AI-generated options
+        - Character integration and summary display
+        - Loading states for both narrative and choice generation
+        - Error handling with fallback options
         - Session status management (active, paused, ended)
+        
+        ## States Covered
+        
+        - **WithExistingSegments**: Pre-populated narrative with choices
+        - **LoadingNarrative**: Generating narrative content
+        - **LoadingChoices**: Generating player choices
+        - **ErrorState**: Narrative generation failure
+        - **WithCharacter/WithoutCharacter**: Character integration
+        - **PausedState/EndedState**: Session status variations
         `,
       },
     },
@@ -262,29 +272,6 @@ const mockDecision: Decision = {
     { id: 'choice-1', text: 'Enter the dungeon', hint: 'Face whatever dangers lie within' },
     { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth' },
     { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information' },
-  ],
-};
-
-/**
- * Default state showing initial narrative generation
- */
-export const Default: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-    triggerGeneration: true,
-  },
-  decorators: [
-    (Story) => {
-      // Set up minimal state for initial generation
-      return (
-        <div data-testid="active-game-session">
-          <Story />
-        </div>
-      );
-    },
   ],
 };
 
@@ -526,48 +513,6 @@ export const EndedState: Story = {
           <div className="bg-gray-100 border border-gray-300 rounded p-4 mb-4">
             <p className="text-gray-800 font-semibold">Session Ended</p>
             <p className="text-gray-600 text-sm">Thank you for playing!</p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
- * Interactive demo showing choice selection flow
- */
-export const InteractiveDemo: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-    existingSegments: mockSegments,
-    choices: mockDecision.options.map(opt => ({
-      id: opt.id,
-      text: opt.text,
-      isSelected: false,
-    })),
-  },
-  decorators: [
-    (Story) => {
-      // Set up full interactive state
-      // Set up character in store
-      characterStore.getState().characters['char-123'] = mockCharacter;
-      characterStore.getState().currentCharacterId = 'char-123';
-      
-      sessionStore.setState({
-        characterId: 'char-123',
-      });
-      
-      populateNarrativeStore(mockSegments, [mockDecision]);
-      
-      return (
-        <div>
-          <div className="bg-green-50 border border-green-200 rounded p-4 mb-4">
-            <p className="text-green-800 font-semibold">Interactive Demo</p>
-            <p className="text-green-600 text-sm">Click on choices to see the interaction flow.</p>
           </div>
           <Story />
         </div>

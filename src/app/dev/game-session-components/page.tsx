@@ -6,41 +6,17 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import SessionControls from '@/components/GameSession/SessionControls';
 import GameSessionLoading from '@/components/GameSession/GameSessionLoading';
 import GameSessionError from '@/components/GameSession/GameSessionError';
-import GameSessionActive from '@/components/GameSession/GameSessionActive';
-import { World } from '@/types/world.types';
 
 export default function GameSessionComponentsTestPage() {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const [sessionStatus, setSessionStatus] = useState<'active' | 'paused' | 'ended'>('active');
   const [showError, setShowError] = useState(false);
 
-  const mockWorld: World = {
-    id: 'test-world',
-    name: 'Test World',
-    description: 'A world for testing',
-    theme: 'Fantasy',
-    attributes: [],
-    skills: [],
-    settings: {
-      maxAttributes: 6,
-      maxSkills: 8,
-      attributePointPool: 27,
-      skillPointPool: 20,
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
   const mockChoices = [
     { id: 'choice-1', text: 'Talk to the mysterious figure', isSelected: selectedChoiceId === 'choice-1' },
     { id: 'choice-2', text: 'Order a drink from the bartender', isSelected: selectedChoiceId === 'choice-2' },
     { id: 'choice-3', text: 'Leave the tavern', isSelected: selectedChoiceId === 'choice-3' },
   ];
-
-  const mockNarrative = {
-    text: 'You are in a dimly lit tavern. The air is thick with smoke and the scent of ale. A mysterious figure sits in the corner, watching you.',
-    choices: mockChoices,
-  };
 
   const handleChoiceSelected = (choiceId: string) => {
     setSelectedChoiceId(choiceId);
@@ -134,20 +110,6 @@ export default function GameSessionComponentsTestPage() {
           )}
         </section>
 
-        {/* GameSessionActive Component */}
-        <section className="border rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">GameSessionActive Component</h2>
-          <GameSessionActive
-            narrative={mockNarrative}
-            onChoiceSelected={handleChoiceSelected}
-            world={mockWorld}
-            currentSceneId="test-scene-001"
-            status={sessionStatus}
-            onPause={handlePause}
-            onResume={handleResume}
-            onEnd={handleEnd}
-          />
-        </section>
 
         {/* Disabled State Demo */}
         <section className="border rounded p-4">
