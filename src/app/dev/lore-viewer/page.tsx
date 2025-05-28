@@ -200,7 +200,11 @@ export default function LoreViewerTestPage() {
           </button>
           
           <button
-            onClick={() => clearFacts(worldId)}
+            onClick={() => {
+              clearFacts(worldId);
+              setExtractionResult('All facts cleared from this world');
+              setTimeout(() => setExtractionResult(''), 3000);
+            }}
             className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
           >
             Clear All Facts
