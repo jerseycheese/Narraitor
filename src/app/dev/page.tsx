@@ -9,6 +9,7 @@ export default function DevPage() {
       { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
       { href: '/dev/choice-generator', label: 'Player Choice Generator', color: 'blue' },
       { href: '/dev/lore-viewer', label: 'Lore Viewer', color: 'indigo' },
+      { href: '/dev/fallback-narrative', label: 'Fallback Narrative System', color: 'orange' },
     ],
     'World Management': [
       { href: '/dev/world-creation-wizard', label: 'World Creation Wizard', color: 'green' },

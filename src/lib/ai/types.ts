@@ -94,4 +94,6 @@ export interface AIImageResponse {
 export interface AIClient {
   generateContent(prompt: string): Promise<AIResponse>;
   generateImage?(prompt: string): Promise<AIImageResponse>;
+  generateStructuredContent?(prompt: string, schema: any): Promise<any>;
+  isAvailable?(): Promise<boolean>;
 }

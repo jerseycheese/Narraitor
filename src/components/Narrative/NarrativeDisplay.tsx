@@ -1,17 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
+import { FallbackIndicator } from './FallbackIndicator';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
   isLoading?: boolean;
   error?: string;
+  isAIGenerated?: boolean;
+  fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
 }
 
 export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   segment,
   isLoading = false,
-  error
+  error,
+  isAIGenerated = true,
+  fallbackReason
 }) => {
   if (isLoading) {
     return (
@@ -193,18 +198,24 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const displayContent = parseContent(segment.content);
 
   return (
-    <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
-      <p className={styles.label}>{segment.type}</p>
-      <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
-        {displayContent}
-      </p>
-      {segment.metadata?.location && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
-            {segment.metadata.location}
-          </p>
-        </div>
-      )}
+    <div className="space-y-3">
+      <FallbackIndicator 
+        isVisible={!isAIGenerated} 
+        reason={fallbackReason}
+      />
+      <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
+        <p className={styles.label}>{segment.type}</p>
+        <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
+          {displayContent}
+        </p>
+        {segment.metadata?.location && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              {segment.metadata.location}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

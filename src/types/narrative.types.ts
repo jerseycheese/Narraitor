@@ -84,7 +84,13 @@ export interface NarrativeGenerationRequest {
  * Represents narrative context for generation
  */
 export interface NarrativeContext {
-  recentSegments: NarrativeSegment[];
+  worldId: EntityID;
+  currentSceneId: EntityID;
+  characterIds: EntityID[];
+  previousSegments: NarrativeSegment[];
+  currentTags: string[];
+  sessionId: EntityID;
+  recentSegments?: NarrativeSegment[];
   currentLocation?: string;
   currentSituation?: string;
   importantEntities?: Array<{
@@ -116,10 +122,22 @@ export interface NarrativeGenerationResult {
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
+    timestamp?: string;
+    isAIGenerated?: boolean;
+    fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
+    contentId?: string;
+    retryAttempts?: number;
   };
+  choices?: Array<{
+    text: string;
+    outcome?: string;
+    tags?: string[];
+  }>;
   tokenUsage?: {
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
   };
+  isAIGenerated?: boolean;
+  fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
 }
