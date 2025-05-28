@@ -11,7 +11,7 @@ import {
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { ChoiceGenerator } from './choiceGenerator';
-import { getLoreContextForPrompt, extractFactsFromNarrative } from './loreContextHelper';
+import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 
 export class NarrativeGenerator {
@@ -46,9 +46,8 @@ export class NarrativeGenerator {
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, request.worldId, request.sessionId);
         } catch (error) {
-          console.warn('Failed to extract structured lore, falling back to regex:', error);
-          // Fallback to old method
-          extractFactsFromNarrative(response.content, request.worldId, request.sessionId);
+          console.warn('Failed to extract structured lore:', error);
+          // No fallback - AI extraction or nothing
         }
       }
       
@@ -98,9 +97,8 @@ export class NarrativeGenerator {
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, worldId);
         } catch (error) {
-          console.warn('Failed to extract structured lore from initial scene, falling back to regex:', error);
-          // Fallback to old method
-          extractFactsFromNarrative(response.content, worldId);
+          console.warn('Failed to extract structured lore from initial scene:', error);
+          // No fallback - AI extraction or nothing
         }
       }
       

@@ -19,14 +19,3 @@ export function getLoreContextForPrompt(worldId: EntityID): string {
   return `\nEstablished World Facts:\n${context.facts.join('\n')}\n`;
 }
 
-/**
- * Extract facts from AI-generated narrative
- */
-export function extractFactsFromNarrative(
-  narrative: string, 
-  worldId: EntityID, 
-  sessionId?: EntityID
-): void {
-  const { extractFactsFromText } = useLoreStore.getState();
-  extractFactsFromText(narrative, worldId, sessionId);
-}

@@ -8,7 +8,7 @@ import { useWorldStore } from '@/state/useWorldStore';
 import type { EntityID } from '@/types';
 
 export default function LoreViewerTestPage() {
-  const { addFact, clearFacts, extractFactsFromText, getFacts, addStructuredLore } = useLoreStore();
+  const { addFact, clearFacts, getFacts, addStructuredLore } = useLoreStore();
   const { worlds, createWorld } = useWorldStore();
   const [showSessionOnly, setShowSessionOnly] = useState(false);
   const [extractionResult, setExtractionResult] = useState<string>('');
@@ -66,28 +66,6 @@ export default function LoreViewerTestPage() {
     addFact('combat_rule', 'Initiative is based on agility', 'rules', 'manual', worldId);
   };
 
-  const testNarrativeExtraction = () => {
-    const beforeCount = getFacts({ worldId }).length;
-    
-    const sampleNarrative = customNarrative || `
-      You enter the bustling marketplace of Goldenhaven, where merchants hawk their wares.
-      A mysterious woman named Lady Seraphina approaches you with an urgent request.
-      She tells you about the Lost Temple of Aethon, hidden deep in the Whispering Woods.
-      The temple is said to contain the Crystal of Truth, a powerful artifact.
-      
-      Sir Gareth, the captain of the guard, warns you that the woods are dangerous.
-      Many adventurers have entered the Whispering Woods, but few have returned.
-      The local tavern, The Dragon's Rest, might have more information.
-    `;
-    
-    extractFactsFromText(sampleNarrative, worldId, sessionId);
-    
-    const afterCount = getFacts({ worldId }).length;
-    const extracted = afterCount - beforeCount;
-    
-    setExtractionResult(`Extracted ${extracted} new facts from the narrative (regex). Look for new entries in Characters and Locations categories.`);
-    setTimeout(() => setExtractionResult(''), 5000);
-  };
 
   const testStructuredExtraction = async () => {
     const beforeCount = getFacts({ worldId }).length;
@@ -119,7 +97,7 @@ export default function LoreViewerTestPage() {
     }
   };
 
-  const testFallbackBehavior = async () => {
+  const testErrorHandling = async () => {
     const beforeCount = getFacts({ worldId }).length;
     
     const sampleNarrative = customNarrative || `
@@ -133,34 +111,19 @@ export default function LoreViewerTestPage() {
       The local tavern, The Dragon's Rest, might have more information.
     `;
     
-    setExtractionResult('Testing fallback chain: AI → Mock → Regex...');
+    setExtractionResult('Testing AI extraction with error handling...');
     
     try {
-      // Simulate the production fallback behavior
-      let extracted = 0;
-      let method = '';
+      const structuredLore = await extractStructuredLore(sampleNarrative);
+      addStructuredLore(structuredLore, worldId, sessionId);
+      const afterCount = getFacts({ worldId }).length;
+      const extracted = afterCount - beforeCount;
       
-      try {
-        // Try AI first (this will use mock in development)
-        const structuredLore = await extractStructuredLore(sampleNarrative);
-        addStructuredLore(structuredLore, worldId, sessionId);
-        const afterAI = getFacts({ worldId }).length;
-        extracted = afterAI - beforeCount;
-        method = 'AI/Mock Structured';
-      } catch (aiError) {
-        console.warn('AI extraction failed, falling back to regex:', aiError);
-        // Fallback to regex
-        extractFactsFromText(sampleNarrative, worldId, sessionId);
-        const afterRegex = getFacts({ worldId }).length;
-        extracted = afterRegex - beforeCount;
-        method = 'Regex Fallback';
-      }
-      
-      setExtractionResult(`Fallback chain completed! Used ${method} extraction, added ${extracted} facts.`);
+      setExtractionResult(`AI extraction successful! Added ${extracted} facts with robust error handling.`);
       setTimeout(() => setExtractionResult(''), 7000);
       
     } catch (error) {
-      setExtractionResult(`Complete fallback failure: ${error}`);
+      setExtractionResult(`AI extraction failed gracefully: ${error}`);
       setTimeout(() => setExtractionResult(''), 5000);
     }
   };
@@ -179,13 +142,6 @@ export default function LoreViewerTestPage() {
           </button>
           
           <button
-            onClick={testNarrativeExtraction}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-          >
-            Test Regex Extraction (Legacy)
-          </button>
-          
-          <button
             onClick={testStructuredExtraction}
             className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
           >
@@ -193,10 +149,10 @@ export default function LoreViewerTestPage() {
           </button>
           
           <button
-            onClick={testFallbackBehavior}
+            onClick={testErrorHandling}
             className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
           >
-            Test Fallback Chain
+            Test Error Handling
           </button>
           
           <button
@@ -251,10 +207,9 @@ export default function LoreViewerTestPage() {
         <h2 className="font-bold mb-2">Test Instructions:</h2>
         <ol className="list-decimal list-inside space-y-2">
           <li><strong>Add Sample Facts:</strong> Manually adds predefined facts to test display</li>
-          <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata (recommended)</li>
-          <li><strong>Test Regex Extraction:</strong> Legacy regex pattern matching for basic extraction (standalone test)</li>
-          <li><strong>Test Fallback Chain:</strong> Simulates production behavior - tries AI first, falls back to regex if needed</li>
-          <li><strong>Custom Narrative:</strong> Enter your own text to test extraction methods</li>
+          <li><strong>Test AI Structured Extraction:</strong> Uses AI to intelligently extract structured lore with rich metadata</li>
+          <li><strong>Test Error Handling:</strong> Demonstrates robust error handling when AI fails</li>
+          <li><strong>Custom Narrative:</strong> Enter your own text to test extraction (any genre/style supported)</li>
           <li><strong>Session Filtering:</strong> Toggle to show only facts from the current session</li>
           <li><strong>Clear All Facts:</strong> Remove all facts to start fresh</li>
         </ol>
@@ -271,13 +226,13 @@ export default function LoreViewerTestPage() {
         </div>
         
         <div className="mt-4 p-3 bg-orange-50 rounded">
-          <h3 className="font-semibold text-sm mb-1">Fallback Chain (Production Behavior):</h3>
+          <h3 className="font-semibold text-sm mb-1">Production Behavior:</h3>
           <ul className="text-sm space-y-1">
-            <li>• <strong>Primary:</strong> AI-powered structured extraction (best results)</li>
-            <li>• <strong>Secondary:</strong> Mock structured extraction (development/testing)</li>
-            <li>• <strong>Fallback:</strong> Regex pattern matching (always works, basic results)</li>
-            <li>• Ensures lore tracking works even if AI service is unavailable</li>
-            <li>• Graceful degradation maintains system reliability</li>
+            <li>• <strong>Primary:</strong> AI-powered structured extraction (production with API key)</li>
+            <li>• <strong>Development:</strong> Mock structured extraction (intelligent patterns without API)</li>
+            <li>• <strong>Error Handling:</strong> Graceful failure - no lore extraction rather than bad data</li>
+            <li>• Focuses on quality over quantity - better no data than wrong data</li>
+            <li>• Simple, reliable architecture without brittle regex patterns</li>
           </ul>
         </div>
       </div>

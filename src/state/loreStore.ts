@@ -27,113 +27,10 @@ export interface LoreStore {
   // AI Integration
   getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
   
-  // Structured extraction (new approach)
+  // Structured extraction
   addStructuredLore: (extraction: StructuredLoreExtraction, worldId: EntityID, sessionId?: EntityID) => void;
-  
-  // Legacy regex extraction (will be deprecated)
-  extractFactsFromText: (text: string, worldId: EntityID, sessionId?: EntityID) => void;
 }
 
-/**
- * Patterns for extracting facts from narrative text
- */
-const extractBasicFacts = (text: string, worldId: EntityID): Array<{
-  key: string;
-  value: string;
-  category: LoreCategory;
-}> => {
-  const facts: Array<{ key: string; value: string; category: LoreCategory }> = [];
-  const seenKeys = new Set<string>();
-  
-  // Extract character names (pattern for titles + names)
-  const characterPattern = /\b((?:Sir|Lady|Lord|Captain|Master|Dr\.|Professor|King|Queen|Prince|Princess) [A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g;
-  let match;
-  while ((match = characterPattern.exec(text)) !== null) {
-    const name = match[1].trim();
-    const key = `${worldId}:character_${name.toLowerCase().replace(/\s+/g, '_')}`;
-    if (!seenKeys.has(key)) {
-      seenKeys.add(key);
-      facts.push({
-        key,
-        value: name,
-        category: 'characters'
-      });
-    }
-  }
-  
-  // Extract locations - multiple patterns for better coverage
-  
-  // Pattern 1: Basic preposition pattern (from, to, in, at) - only capture the place name
-  const basicLocationPattern = /(?:in|at|from|to)\s+(?:the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*?)(?:\s|,|\.|\b)/g;
-  while ((match = basicLocationPattern.exec(text)) !== null) {
-    const location = match[1].trim();
-    // Skip if it's followed by common non-place words
-    if (!location.match(/\b(district|quarter|market|bridge|tower|citadel|castle|palace|temple|spire|dome|was|were|is|are|had|have|has|and|or|but|with|for|by|on|upon|under|over|through|across|along|around|before|after|during|while|until|since|because|although|though|if|when|where|why|how|what|who|which|that|this|these|those|stretched|stood|rose|lay)\b/i)) {
-      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        facts.push({
-          key,
-          value: location,
-          category: 'locations'
-        });
-      }
-    }
-  }
-  
-  // Pattern 2: "X of Y" constructs (e.g., "Citadel of Stars", "city of Aetheria")
-  const locationOfPattern = /\b(?:the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*?)\s+of\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*?)\b/g;
-  while ((match = locationOfPattern.exec(text)) !== null) {
-    const firstPart = match[1].trim();
-    const secondPart = match[2].trim();
-    
-    // For "city of X" patterns, extract just X
-    if (firstPart.toLowerCase().match(/^(city|town|village|kingdom|realm|land|country|province|region)$/)) {
-      const key = `${worldId}:location_${secondPart.toLowerCase().replace(/\s+/g, '_')}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        facts.push({
-          key,
-          value: secondPart,
-          category: 'locations'
-        });
-      }
-    } else {
-      // For other "X of Y" patterns, keep the full name
-      const location = `${firstPart} of ${secondPart}`;
-      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        facts.push({
-          key,
-          value: location,
-          category: 'locations'
-        });
-      }
-    }
-  }
-  
-  // Pattern 3: Named places with location types (e.g., "market district")
-  const namedPlacePattern = /\b([a-z]+\s+)?(district|quarter|market|bridge|tower|citadel|castle|palace|temple|spire|dome|plaza|square|avenue|street|road)\b/gi;
-  while ((match = namedPlacePattern.exec(text)) !== null) {
-    const fullMatch = match[0].trim();
-    // Only extract if it has a descriptive prefix
-    if (match[1] && match[1].trim()) {
-      const location = fullMatch.replace(/^(the\s+)?/i, '');
-      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
-      if (!seenKeys.has(key)) {
-        seenKeys.add(key);
-        facts.push({
-          key,
-          value: location,
-          category: 'locations'
-        });
-      }
-    }
-  }
-  
-  return facts;
-};
 
 /**
  * Lore store implementation
@@ -295,22 +192,6 @@ export const useLoreStore = create<LoreStore>()(
                 tags: rule.tags
               }
             );
-          }
-        });
-      },
-
-      extractFactsFromText: (text, worldId, sessionId) => {
-        const extractedFacts = extractBasicFacts(text, worldId);
-        const { addFact, getFacts } = get();
-        
-        // Get existing facts to avoid duplicates
-        const existingFacts = getFacts({ worldId });
-        const existingKeys = new Set(existingFacts.map(f => f.key));
-        
-        // Add only new facts
-        extractedFacts.forEach(({ key, value, category }) => {
-          if (!existingKeys.has(key)) {
-            addFact(key, value, category, 'narrative', worldId, sessionId);
           }
         });
       },

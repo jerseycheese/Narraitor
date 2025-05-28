@@ -106,52 +106,81 @@ describe('LoreStore', () => {
     });
   });
 
-  describe('Fact Extraction', () => {
-    test('should extract character names from text', () => {
+  describe('Structured Lore', () => {
+    test('should add structured lore from extraction', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      const narrative = 'Sir Marcus the Brave led the charge. Lady Elena watched from the tower.';
+      const extraction = {
+        characters: [
+          { name: 'Sir Gareth', role: 'Knight', importance: 'medium' as const }
+        ],
+        locations: [
+          { name: 'Aetheria', type: 'city', importance: 'high' as const }
+        ],
+        events: [
+          { description: 'Hero arrives in city', importance: 'medium' as const }
+        ],
+        rules: [
+          { rule: 'Magic requires focus', importance: 'medium' as const }
+        ]
+      };
 
       act(() => {
-        result.current.extractFactsFromText(narrative, 'test-world', 'session-1');
+        result.current.addStructuredLore(extraction, 'test-world', 'session-1');
       });
 
       const facts = result.current.getFacts({ worldId: 'test-world' });
-      expect(facts.length).toBeGreaterThan(0);
       
-      const characterFacts = facts.filter(f => f.category === 'characters');
-      expect(characterFacts.length).toBeGreaterThan(0);
+      expect(facts.length).toBe(4);
+      expect(facts.some(f => f.category === 'characters' && f.value === 'Sir Gareth')).toBe(true);
+      expect(facts.some(f => f.category === 'locations' && f.value === 'Aetheria')).toBe(true);
+      expect(facts.some(f => f.category === 'events')).toBe(true);
+      expect(facts.some(f => f.category === 'rules')).toBe(true);
     });
 
-    test('should extract location names from text', () => {
+    test('should use world-scoped keys', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      const narrative = 'They traveled from Riverdale to the Dark Forest.';
+      const extraction = {
+        characters: [
+          { name: 'Test Character', importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
 
       act(() => {
-        result.current.extractFactsFromText(narrative, 'test-world');
+        result.current.addStructuredLore(extraction, 'world-123', 'session-1');
       });
 
-      const facts = result.current.getFacts({ worldId: 'test-world' });
-      const locationFacts = facts.filter(f => f.category === 'locations');
+      const facts = result.current.getFacts({ worldId: 'world-123' });
+      const characterFact = facts.find(f => f.category === 'characters');
       
-      expect(locationFacts.length).toBeGreaterThan(0);
-      expect(locationFacts.some(f => f.value === 'Riverdale')).toBe(true);
+      expect(characterFact?.key).toMatch(/^world-123:character_/);
     });
 
-    test('should avoid duplicate facts', () => {
+    test('should avoid duplicate structured facts', () => {
       const { result } = renderHook(() => useLoreStore());
 
-      const narrative = 'Sir Marcus fought bravely. Sir Marcus won the battle.';
+      const extraction = {
+        characters: [
+          { name: 'Duplicate Character', importance: 'medium' as const }
+        ],
+        locations: [],
+        events: [],
+        rules: []
+      };
 
       act(() => {
-        result.current.extractFactsFromText(narrative, 'test-world');
+        result.current.addStructuredLore(extraction, 'test-world');
+        result.current.addStructuredLore(extraction, 'test-world'); // Same extraction twice
       });
 
       const facts = result.current.getFacts({ worldId: 'test-world' });
-      const marcusFacts = facts.filter(f => f.value.includes('Marcus'));
+      const characterFacts = facts.filter(f => f.category === 'characters' && f.value === 'Duplicate Character');
       
-      expect(marcusFacts).toHaveLength(1);
+      expect(characterFacts.length).toBe(1);
     });
   });
 });
