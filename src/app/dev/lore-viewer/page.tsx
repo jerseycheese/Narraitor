@@ -15,7 +15,13 @@ export default function LoreViewerTestPage() {
   const worldId = Object.keys(worlds)[0] || createWorld({
     name: 'Test World',
     description: 'Test world for lore viewer',
-    theme: 'fantasy'
+    theme: 'fantasy',
+    attributes: [],
+    skills: [],
+    settings: {
+      difficulty: 'normal',
+      playerCharacterLimit: 1
+    }
   });
   
   const sessionId = 'test-session-123' as EntityID;
@@ -103,10 +109,10 @@ export default function LoreViewerTestPage() {
       <div className="mt-6 p-4 bg-gray-100 rounded">
         <h2 className="font-bold mb-2">Test Instructions:</h2>
         <ol className="list-decimal list-inside space-y-1">
-          <li>Click "Add Sample Facts" to populate with test data</li>
-          <li>Click "Test Narrative Extraction" to test automatic fact extraction</li>
-          <li>Toggle "Show Session Facts Only" to test filtering</li>
-          <li>Click "Clear All Facts" to reset</li>
+          <li>Click &quot;Add Sample Facts&quot; to populate with test data</li>
+          <li>Click &quot;Test Narrative Extraction&quot; to test automatic fact extraction</li>
+          <li>Toggle &quot;Show Session Facts Only&quot; to test filtering</li>
+          <li>Click &quot;Clear All Facts&quot; to reset</li>
         </ol>
       </div>
     </div>
