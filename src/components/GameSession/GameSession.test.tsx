@@ -138,8 +138,8 @@ describe('GameSession', () => {
 
   test('renders error state', () => {
     mockedUseGameSessionState.mockReturnValue({
-      sessionState: { status: "ended", error: 'Test error' },
-      error: null,
+      sessionState: { status: "ended" },
+      error: 'Test error',
       worldExists: true,
       world: undefined,
       worldCharacters: [],
