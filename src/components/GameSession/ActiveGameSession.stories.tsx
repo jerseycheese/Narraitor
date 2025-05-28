@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ActiveGameSession from './ActiveGameSession';
 import { World } from '@/types/world.types';
-import { Character } from '@/types/character.types';
 import { NarrativeSegment, Decision } from '@/types/narrative.types';
 import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
@@ -51,13 +50,14 @@ const meta: Meta<typeof ActiveGameSession> = {
       });
       
       sessionStore.setState({
-        sessions: {},
-        currentSessionId: null,
-        activeGameId: null,
-        characterId: null,
+        id: null,
+        status: 'initializing',
+        currentSceneId: null,
         playerChoices: [],
         error: null,
-        loading: false,
+        worldId: null,
+        characterId: null,
+        savedSessions: {},
       });
       
       characterStore.setState({
@@ -74,6 +74,47 @@ const meta: Meta<typeof ActiveGameSession> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+// Helper function to populate narrative store
+const populateNarrativeStore = (
+  segments: NarrativeSegment[],
+  decisions: Decision[] = []
+) => {
+  const segmentMap: Record<string, NarrativeSegment> = {};
+  const sessionSegments: Record<string, string[]> = {};
+  const decisionMap: Record<string, Decision> = {};
+  const sessionDecisions: Record<string, string[]> = {};
+  
+  // Process segments
+  segments.forEach(seg => {
+    segmentMap[seg.id] = seg;
+    if (seg.sessionId) {
+      if (!sessionSegments[seg.sessionId]) {
+        sessionSegments[seg.sessionId] = [];
+      }
+      sessionSegments[seg.sessionId].push(seg.id);
+    }
+  });
+  
+  // Process decisions
+  decisions.forEach(dec => {
+    decisionMap[dec.id] = dec;
+    // Assume decisions belong to session-123 for this story
+    if (!sessionDecisions['session-123']) {
+      sessionDecisions['session-123'] = [];
+    }
+    sessionDecisions['session-123'].push(dec.id);
+  });
+  
+  narrativeStore.setState({
+    segments: segmentMap,
+    sessionSegments,
+    decisions: decisionMap,
+    sessionDecisions,
+    error: null,
+    loading: false,
+  });
+};
 
 // Mock data
 const mockWorld: World = {
@@ -127,25 +168,56 @@ const mockWorld: World = {
   updatedAt: new Date().toISOString(),
 };
 
-const mockCharacter: Character = {
+// Use a type-safe character mock that matches characterStore's internal structure
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockCharacter: any = {
   id: 'char-123',
   name: 'Aria Starweaver',
   worldId: 'world-123',
   level: 5,
-  experience: 2500,
-  attributes: {
-    'attr-1': 15,
-    'attr-2': 12,
-  },
-  skills: {
-    'skill-1': 7,
-  },
+  isPlayer: true,
+  attributes: [
+    {
+      id: 'char-attr-1',
+      characterId: 'char-123',
+      name: 'Strength',
+      baseValue: 15,
+      modifiedValue: 15,
+      category: 'Physical',
+    },
+    {
+      id: 'char-attr-2',
+      characterId: 'char-123',
+      name: 'Intelligence',
+      baseValue: 12,
+      modifiedValue: 12,
+      category: 'Mental',
+    },
+  ],
+  skills: [
+    {
+      id: 'char-skill-1',
+      characterId: 'char-123',
+      name: 'Swordsmanship',
+      level: 7,
+      category: 'Combat',
+    },
+  ],
   background: {
-    occupation: 'Adventurer',
-    origin: 'The Northern Kingdoms',
-    biography: 'A seasoned explorer seeking ancient artifacts.',
+    description: 'A seasoned explorer from the Northern Kingdoms.',
+    personality: 'Brave and curious, always seeking new adventures.',
+    motivation: 'To find ancient artifacts and uncover the world\'s mysteries',
+    physicalDescription: 'Tall and lean with weathered features',
   },
-  portraitUrl: '',
+  status: {
+    hp: 100,
+    mp: 50,
+    stamina: 75,
+  },
+  portrait: {
+    type: 'placeholder',
+    url: null,
+  },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -162,13 +234,14 @@ const mockSegments: NarrativeSegment[] = [
     updatedAt: new Date(Date.now() - 120000).toISOString(),
     metadata: {
       location: 'Dungeon Entrance',
-      mood: 'ominous',
+      mood: 'mysterious',
+      tags: ['entrance', 'dungeon', 'beginning'],
     },
   },
   {
     id: 'seg-2',
     content: 'The air is thick with anticipation as you consider your options. The path ahead is shrouded in darkness, but you can hear the faint echo of dripping water from within.',
-    type: 'description',
+    type: 'scene',
     sessionId: 'session-123',
     worldId: 'world-123',
     timestamp: new Date(Date.now() - 60000),
@@ -176,6 +249,7 @@ const mockSegments: NarrativeSegment[] = [
     updatedAt: new Date(Date.now() - 60000).toISOString(),
     metadata: {
       mood: 'tense',
+      tags: ['atmosphere', 'anticipation'],
     },
   },
 ];
@@ -232,14 +306,7 @@ export const WithExistingSegments: Story = {
   decorators: [
     (Story) => {
       // Pre-populate narrative store
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return <Story />;
     },
@@ -287,12 +354,7 @@ export const LoadingChoices: Story = {
   decorators: [
     (Story) => {
       // Pre-populate narrative but no decisions yet
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {},
-      });
+      populateNarrativeStore(mockSegments, []);
       
       return (
         <div>
@@ -318,6 +380,7 @@ export const ErrorState: Story = {
     (Story) => {
       // Set error state
       narrativeStore.setState({
+        ...narrativeStore.getState(),
         error: 'Failed to generate narrative: API request timeout',
       });
       
@@ -352,25 +415,15 @@ export const WithCharacter: Story = {
   decorators: [
     (Story) => {
       // Set up character in stores
-      characterStore.setState({
-        characters: {
-          'char-123': mockCharacter,
-        },
-        currentCharacterId: 'char-123',
-      });
+      // Set up character in store
+      characterStore.getState().characters['char-123'] = mockCharacter;
+      characterStore.getState().currentCharacterId = 'char-123';
       
       sessionStore.setState({
         characterId: 'char-123',
       });
       
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return <Story />;
     },
@@ -405,14 +458,7 @@ export const WithoutCharacter: Story = {
         characterId: null,
       });
       
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return (
         <div>
@@ -444,14 +490,7 @@ export const PausedState: Story = {
   },
   decorators: [
     (Story) => {
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return (
         <div>
@@ -479,14 +518,7 @@ export const EndedState: Story = {
   },
   decorators: [
     (Story) => {
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return (
         <div>
@@ -520,25 +552,15 @@ export const InteractiveDemo: Story = {
   decorators: [
     (Story) => {
       // Set up full interactive state
-      characterStore.setState({
-        characters: {
-          'char-123': mockCharacter,
-        },
-        currentCharacterId: 'char-123',
-      });
+      // Set up character in store
+      characterStore.getState().characters['char-123'] = mockCharacter;
+      characterStore.getState().currentCharacterId = 'char-123';
       
       sessionStore.setState({
         characterId: 'char-123',
       });
       
-      narrativeStore.setState({
-        segments: {
-          'session-123': mockSegments,
-        },
-        decisions: {
-          'session-123': [mockDecision],
-        },
-      });
+      populateNarrativeStore(mockSegments, [mockDecision]);
       
       return (
         <div>
