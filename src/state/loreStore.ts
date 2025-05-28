@@ -37,7 +37,7 @@ export interface LoreStore {
 /**
  * Patterns for extracting facts from narrative text
  */
-const extractBasicFacts = (text: string): Array<{
+const extractBasicFacts = (text: string, worldId: EntityID): Array<{
   key: string;
   value: string;
   category: LoreCategory;
@@ -50,7 +50,7 @@ const extractBasicFacts = (text: string): Array<{
   let match;
   while ((match = characterPattern.exec(text)) !== null) {
     const name = match[1].trim();
-    const key = `character_${name.toLowerCase().replace(/\s+/g, '_')}`;
+    const key = `${worldId}:character_${name.toLowerCase().replace(/\s+/g, '_')}`;
     if (!seenKeys.has(key)) {
       seenKeys.add(key);
       facts.push({
@@ -69,7 +69,7 @@ const extractBasicFacts = (text: string): Array<{
     const location = match[1].trim();
     // Skip if it's followed by common non-place words
     if (!location.match(/\b(district|quarter|market|bridge|tower|citadel|castle|palace|temple|spire|dome|was|were|is|are|had|have|has|and|or|but|with|for|by|on|upon|under|over|through|across|along|around|before|after|during|while|until|since|because|although|though|if|when|where|why|how|what|who|which|that|this|these|those|stretched|stood|rose|lay)\b/i)) {
-      const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
       if (!seenKeys.has(key)) {
         seenKeys.add(key);
         facts.push({
@@ -89,7 +89,7 @@ const extractBasicFacts = (text: string): Array<{
     
     // For "city of X" patterns, extract just X
     if (firstPart.toLowerCase().match(/^(city|town|village|kingdom|realm|land|country|province|region)$/)) {
-      const key = `location_${secondPart.toLowerCase().replace(/\s+/g, '_')}`;
+      const key = `${worldId}:location_${secondPart.toLowerCase().replace(/\s+/g, '_')}`;
       if (!seenKeys.has(key)) {
         seenKeys.add(key);
         facts.push({
@@ -101,7 +101,7 @@ const extractBasicFacts = (text: string): Array<{
     } else {
       // For other "X of Y" patterns, keep the full name
       const location = `${firstPart} of ${secondPart}`;
-      const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
       if (!seenKeys.has(key)) {
         seenKeys.add(key);
         facts.push({
@@ -120,7 +120,7 @@ const extractBasicFacts = (text: string): Array<{
     // Only extract if it has a descriptive prefix
     if (match[1] && match[1].trim()) {
       const location = fullMatch.replace(/^(the\s+)?/i, '');
-      const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+      const key = `${worldId}:location_${location.toLowerCase().replace(/\s+/g, '_')}`;
       if (!seenKeys.has(key)) {
         seenKeys.add(key);
         facts.push({
@@ -218,7 +218,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add characters
         extraction.characters.forEach(char => {
-          const key = `character_${char.name.toLowerCase().replace(/\s+/g, '_')}`;
+          const key = `${worldId}:character_${char.name.toLowerCase().replace(/\s+/g, '_')}`;
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -239,7 +239,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add locations
         extraction.locations.forEach(loc => {
-          const key = `location_${loc.name.toLowerCase().replace(/\s+/g, '_')}`;
+          const key = `${worldId}:location_${loc.name.toLowerCase().replace(/\s+/g, '_')}`;
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -260,7 +260,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add events
         extraction.events.forEach(event => {
-          const key = `event_${event.description.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
+          const key = `${worldId}:event_${event.description.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -280,7 +280,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add rules
         extraction.rules.forEach(rule => {
-          const key = `rule_${rule.rule.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
+          const key = `${worldId}:rule_${rule.rule.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -300,7 +300,7 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       extractFactsFromText: (text, worldId, sessionId) => {
-        const extractedFacts = extractBasicFacts(text);
+        const extractedFacts = extractBasicFacts(text, worldId);
         const { addFact, getFacts } = get();
         
         // Get existing facts to avoid duplicates

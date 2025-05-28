@@ -21,8 +21,8 @@ export type LoreSource = 'narrative' | 'manual';
 export interface LoreFact extends TimestampedEntity {
   id: EntityID;
   category: LoreCategory;
-  key: string;      // Key for the fact (e.g., "hero_name", "tavern_location")
-  value: string;    // The fact content
+  key: string;      // Descriptive key for human reference (e.g., "world-123:character_lady_seraphina")
+  value: string;    // The fact content (canonical name)
   source: LoreSource;
   sessionId?: EntityID; // Which game session this fact came from
   worldId: EntityID;
