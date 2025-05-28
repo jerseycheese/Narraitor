@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
 import { useWorldStore } from '@/state/useWorldStore';
@@ -12,21 +12,35 @@ export default function LoreViewerTestPage() {
   const [showSessionOnly, setShowSessionOnly] = useState(false);
   const [extractionResult, setExtractionResult] = useState<string>('');
   const [customNarrative, setCustomNarrative] = useState('');
+  const [worldId, setWorldId] = useState<EntityID | null>(null);
   
-  // Get or create test world
-  const worldId = Object.keys(worlds)[0] || createWorld({
-    name: 'Test World',
-    description: 'Test world for lore viewer',
-    theme: 'fantasy',
-    attributes: [],
-    skills: [],
-    settings: {
-      difficulty: 'normal',
-      playerCharacterLimit: 1
+  // Create test world on mount if needed
+  useEffect(() => {
+    const existingWorldId = Object.keys(worlds)[0];
+    if (existingWorldId) {
+      setWorldId(existingWorldId as EntityID);
+    } else {
+      const newWorldId = createWorld({
+        name: 'Test World',
+        description: 'Test world for lore viewer',
+        theme: 'fantasy',
+        attributes: [],
+        skills: [],
+        settings: {
+          difficulty: 'normal',
+          playerCharacterLimit: 1
+        }
+      });
+      setWorldId(newWorldId);
     }
-  });
+  }, [worlds, createWorld]);
   
   const sessionId = 'test-session-123' as EntityID;
+  
+  // Don't render until we have a world
+  if (!worldId) {
+    return <div className="p-8">Loading test world...</div>;
+  }
 
   const addSampleFacts = () => {
     // Characters
