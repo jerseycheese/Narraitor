@@ -36,9 +36,7 @@ export type {
   LoreFact,
   LoreCategory,
   LoreSource,
-  LoreConsistencyCheck,
   LoreSearchOptions,
-  LoreExtractionResult,
   LoreContext
 } from './lore.types';
 export type { 

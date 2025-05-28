@@ -11,6 +11,7 @@ import {
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { ChoiceGenerator } from './choiceGenerator';
+import { getLoreContextForPrompt, extractFactsFromNarrative } from './loreContextHelper';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -26,8 +27,17 @@ export class NarrativeGenerator {
       
       const context = this.buildContext(world, request);
       const prompt = template(context);
+      
+      // Add lore context to prompt
+      const loreContext = getLoreContextForPrompt(request.worldId);
+      const enhancedPrompt = prompt + loreContext;
 
-      const response = await this.geminiClient.generateContent(prompt);
+      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      
+      // Extract facts from generated narrative
+      if (response.content) {
+        extractFactsFromNarrative(response.content, request.worldId, request.sessionId);
+      }
       
       return this.formatResponse(response, request.generationParameters?.segmentType || 'scene');
     } catch {
@@ -57,7 +67,17 @@ export class NarrativeGenerator {
       };
 
       const prompt = template(context);
-      const response = await this.geminiClient.generateContent(prompt);
+      
+      // Add lore context to initial scene
+      const loreContext = getLoreContextForPrompt(worldId);
+      const enhancedPrompt = prompt + loreContext;
+      
+      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      
+      // Extract facts from initial scene
+      if (response.content) {
+        extractFactsFromNarrative(response.content, worldId);
+      }
       
       return this.formatResponse(response, 'scene');
     } catch {

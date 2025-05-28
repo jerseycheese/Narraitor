@@ -42,7 +42,7 @@ Closes #
 <!-- For UI changes, include before/after screenshots if applicable -->
 
 ## Testing Instructions
-<!-- Instructions for testing changes locally -->
+<!-- Instructions for testing changes locally, with three stage verification -->
 
 ## Checklist
 - [ ] Code follows the project's coding standards

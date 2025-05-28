@@ -1,70 +1,46 @@
 /**
- * Lore Management System Type Definitions
+ * Lore Management Type Definitions
+ * Issue #434: Basic lore consistency tracking
  */
 
 import type { EntityID, TimestampedEntity } from './common.types';
 
 /**
- * Categories for organizing lore facts
+ * Basic categories for organizing lore facts
  */
-export type LoreCategory = 'characters' | 'locations' | 'events' | 'rules' | 'items' | 'organizations';
+export type LoreCategory = 'characters' | 'locations' | 'events' | 'rules';
 
 /**
  * Source types for tracking where facts originated
  */
-export type LoreSource = 'narrative' | 'manual' | 'ai_generated' | 'imported';
+export type LoreSource = 'narrative' | 'manual';
 
 /**
- * Individual lore fact entry
+ * Simple lore fact entry
  */
 export interface LoreFact extends TimestampedEntity {
   id: EntityID;
   category: LoreCategory;
-  title: string;
-  content: string;
+  key: string;      // Simple key for the fact (e.g., "hero_name", "tavern_location")
+  value: string;    // The fact content
   source: LoreSource;
-  sourceReference?: string; // Reference to the narrative segment, user input, etc.
-  tags: string[];
-  isCanonical: boolean; // Whether this fact is confirmed/official
-  relatedFacts: EntityID[]; // Links to other related facts
-  worldId: EntityID; // Which world this fact belongs to
+  sessionId?: EntityID; // Which game session this fact came from
+  worldId: EntityID;
 }
 
 /**
- * Lore consistency validation result
- */
-export interface LoreConsistencyCheck {
-  isConsistent: boolean;
-  conflictingFacts: EntityID[];
-  suggestions: string[];
-}
-
-/**
- * Lore search/filter options
+ * Simple search options for finding facts
  */
 export interface LoreSearchOptions {
   category?: LoreCategory;
-  tags?: string[];
-  source?: LoreSource;
-  searchTerm?: string;
   worldId?: EntityID;
-  isCanonical?: boolean;
-}
-
-/**
- * Lore extraction result from narrative text
- */
-export interface LoreExtractionResult {
-  extractedFacts: Omit<LoreFact, 'id' | 'createdAt' | 'updatedAt'>[];
-  confidence: number; // 0-1 confidence score
-  sourceText: string;
+  sessionId?: EntityID;
 }
 
 /**
  * Lore context for AI prompt inclusion
  */
 export interface LoreContext {
-  relevantFacts: LoreFact[];
-  contextSummary: string;
+  facts: string[]; // Simple array of fact strings for prompt inclusion
   factCount: number;
 }
