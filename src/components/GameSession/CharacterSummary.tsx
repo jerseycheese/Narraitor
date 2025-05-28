@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 // Character type as used in characterStore
@@ -40,16 +41,22 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       <div className="flex gap-4">
         {/* Portrait Section */}
         <div className="flex-shrink-0">
-          <CharacterPortrait
-            portrait={character.portrait || { type: 'placeholder', url: null }}
-            characterName={character.name}
-            size="medium"
-          />
+          <Link href={`/characters/${character.id}`} className="block">
+            <CharacterPortrait
+              portrait={character.portrait || { type: 'placeholder', url: null }}
+              characterName={character.name}
+              size="medium"
+            />
+          </Link>
         </div>
 
         {/* Character Info Section */}
         <div className="flex-grow">
-          <h2 className="text-xl font-bold text-gray-900">{character.name}</h2>
+          <Link href={`/characters/${character.id}`} className="block">
+            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+              {character.name}
+            </h2>
+          </Link>
           
           <p className="text-sm text-gray-600 mt-1">Level {character.level}</p>
           
