@@ -28,7 +28,7 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
   if (showCategories) {
     // Group attributes by category
     const categorizedAttributes = attributes.reduce((acc, attr) => {
-      const category = attr.category || 'uncategorized';
+      const category = attr.category || 'general';
       if (!acc[category]) {
         acc[category] = [];
       }

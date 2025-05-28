@@ -53,6 +53,25 @@ describe('CharacterAttributeDisplay', () => {
     expect(screen.getByText(/no attributes/i)).toBeInTheDocument();
   });
 
+  test('handles attributes without categories as general', () => {
+    const attributesWithoutCategory = [
+      {
+        id: 'attr-1',
+        characterId: 'char-1',
+        name: 'Luck',
+        baseValue: 5,
+        modifiedValue: 5
+        // No category property
+      }
+    ];
+    
+    render(<CharacterAttributeDisplay attributes={attributesWithoutCategory} showCategories={true} />);
+    
+    // Should show as general category
+    expect(screen.getByText(/general attributes/i)).toBeInTheDocument();
+    expect(screen.getByText('Luck')).toBeInTheDocument();
+  });
+
   test('groups attributes by category when provided', () => {
     render(<CharacterAttributeDisplay attributes={mockAttributes} showCategories={true} />);
     

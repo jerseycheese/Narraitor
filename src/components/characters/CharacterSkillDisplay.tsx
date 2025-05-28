@@ -27,7 +27,7 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
   if (showCategories) {
     // Group skills by category
     const categorizedSkills = skills.reduce((acc, skill) => {
-      const category = skill.category || 'uncategorized';
+      const category = skill.category || 'general';
       if (!acc[category]) {
         acc[category] = [];
       }

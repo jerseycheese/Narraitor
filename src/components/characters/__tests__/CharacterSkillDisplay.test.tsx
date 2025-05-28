@@ -50,6 +50,24 @@ describe('CharacterSkillDisplay', () => {
     expect(screen.getByText(/no skills/i)).toBeInTheDocument();
   });
 
+  test('handles skills without categories as general', () => {
+    const skillsWithoutCategory = [
+      {
+        id: 'skill-1',
+        characterId: 'char-1',
+        name: 'Luck',
+        level: 3
+        // No category property
+      }
+    ];
+    
+    render(<CharacterSkillDisplay skills={skillsWithoutCategory} showCategories={true} />);
+    
+    // Should show as general category
+    expect(screen.getByText(/general skills/i)).toBeInTheDocument();
+    expect(screen.getByText('Luck')).toBeInTheDocument();
+  });
+
   test('groups skills by category when provided', () => {
     render(<CharacterSkillDisplay skills={mockSkills} showCategories={true} />);
     
