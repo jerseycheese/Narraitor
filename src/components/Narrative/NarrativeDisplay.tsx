@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
-import { FallbackIndicator } from './FallbackIndicator';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -197,12 +197,25 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const styles = getSegmentStyles(segment.type);
   const displayContent = parseContent(segment.content);
 
+  const getFallbackMessage = (reason?: string) => {
+    const messages = {
+      service_unavailable: 'AI service temporarily unavailable - using curated content',
+      timeout: 'AI response timed out - using curated content',
+      error: 'An error occurred - using curated content',
+      rate_limit: 'Rate limit reached - using curated content'
+    };
+    return messages[reason as keyof typeof messages] || 'Using curated content';
+  };
+
   return (
     <div className="space-y-3">
-      <FallbackIndicator 
-        isVisible={!isAIGenerated} 
-        reason={fallbackReason}
-      />
+      {!isAIGenerated && (
+        <ErrorDisplay
+          variant="inline"
+          severity="info"
+          message={getFallbackMessage(fallbackReason)}
+        />
+      )}
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
         <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
