@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LoreViewer } from '../LoreViewer';
 import type { LoreFact } from '../../../types';
@@ -12,7 +12,7 @@ import type { LoreFact } from '../../../types';
 const mockUseLoreStore = {
   facts: {} as Record<string, LoreFact>,
   loading: false,
-  error: null,
+  error: null as string | null,
   getFactsByWorld: jest.fn(),
   searchFacts: jest.fn(),
   createFact: jest.fn(),
@@ -58,6 +58,8 @@ const mockFacts: LoreFact[] = [
 describe('LoreViewer Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseLoreStore.loading = false;
+    mockUseLoreStore.error = null;
     mockUseLoreStore.getFactsByWorld.mockReturnValue(mockFacts);
     mockUseLoreStore.searchFacts.mockReturnValue(mockFacts);
   });
@@ -90,7 +92,7 @@ describe('LoreViewer Component', () => {
       render(<LoreViewer worldId="world-1" />);
 
       expect(screen.getByText('hero')).toBeInTheDocument();
-      expect(screen.getByText('dragons')).toBeInTheDocument();
+      expect(screen.getAllByText('dragons')).toHaveLength(2); // Both facts have 'dragons' tag
       expect(screen.getByText('mountain')).toBeInTheDocument();
     });
   });
@@ -208,13 +210,17 @@ describe('LoreViewer Component', () => {
   describe('Loading and Error States', () => {
     test('shows loading state when loading is true', () => {
       mockUseLoreStore.loading = true;
+      mockUseLoreStore.error = null;
+      
       render(<LoreViewer worldId="world-1" />);
 
       expect(screen.getByText(/loading/i)).toBeInTheDocument();
     });
 
     test('shows error message when error exists', () => {
+      mockUseLoreStore.loading = false;
       mockUseLoreStore.error = 'Failed to load facts';
+      
       render(<LoreViewer worldId="world-1" />);
 
       expect(screen.getByText('Failed to load facts')).toBeInTheDocument();
