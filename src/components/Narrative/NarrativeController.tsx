@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
@@ -36,7 +36,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   // Access store methods in a way that works with testing
   const addSegment = narrativeStore(state => state.addSegment);
   const getSessionSegments = narrativeStore(state => state.getSessionSegments);
-  const narrativeGenerator = new NarrativeGenerator(createDefaultGeminiClient());
+  const narrativeGenerator = useMemo(() => new NarrativeGenerator(createDefaultGeminiClient()), []);
 
   // Track if we've already generated a narrative for this session
   const [sessionKey, setSessionKey] = useState('');

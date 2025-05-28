@@ -18,6 +18,7 @@ interface GameSessionProps {
   onSessionStart?: () => void;
   onSessionEnd?: () => void;
   initialState?: Partial<GameSessionState>;
+  disableAutoResume?: boolean; // For testing/dev harnesses
   // Optional testing props
   _stores?: {
     worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
@@ -36,6 +37,7 @@ const GameSession: React.FC<GameSessionProps> = ({
   onSessionStart,
   onSessionEnd,
   initialState,
+  disableAutoResume = false,
   _stores,
   _router,
 }) => {
@@ -77,6 +79,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     onSessionStart,
     onSessionEnd,
     initialState,
+    disableAutoResume,
     router: actualRouter,
     _stores,
   });
@@ -199,11 +202,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Handle auto-resume - MUST be before any conditional returns
   useEffect(() => {
-    if (autoResume && savedSession && !hasAutoResumed && isClient && sessionState.status === 'initializing') {
+    if (autoResume && savedSession && !hasAutoResumed && isClient && sessionState.status === 'initializing' && !disableAutoResume) {
       setHasAutoResumed(true);
       handleResumeSession();
     }
-  }, [autoResume, savedSession, hasAutoResumed, isClient, sessionState.status, handleResumeSession]);
+  }, [autoResume, savedSession, hasAutoResumed, isClient, sessionState.status, handleResumeSession, disableAutoResume]);
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
