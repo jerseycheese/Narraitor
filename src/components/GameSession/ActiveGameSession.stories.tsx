@@ -30,14 +30,12 @@ const meta: Meta<typeof ActiveGameSession> = {
         - Error handling with fallback options
         - Session status management (active, paused, ended)
         
-        ## States Covered
+        ## Core Stories
         
-        - **WithExistingSegments**: Pre-populated narrative with choices
-        - **LoadingNarrative**: Generating narrative content
-        - **LoadingChoices**: Generating player choices
-        - **ErrorState**: Narrative generation failure
-        - **WithCharacter/WithoutCharacter**: Character integration
-        - **PausedState/EndedState**: Session status variations
+        - **WithExistingSegments**: Main story showing active gameplay with narrative and choices
+        - **LoadingNarrative**: Loading state during narrative generation
+        - **ErrorState**: Error handling when narrative generation fails
+        - **WithCharacter**: Complete integration with character system
         `,
       },
     },
@@ -329,32 +327,6 @@ export const LoadingNarrative: Story = {
 };
 
 /**
- * Loading state while generating choices
- */
-export const LoadingChoices: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-    existingSegments: mockSegments,
-  },
-  decorators: [
-    (Story) => {
-      // Pre-populate narrative but no decisions yet
-      populateNarrativeStore(mockSegments, []);
-      
-      return (
-        <div>
-          <p className="text-sm text-gray-600 mb-4">Generating choices...</p>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
  * Error state for narrative generation failure
  */
 export const ErrorState: Story = {
@@ -418,105 +390,3 @@ export const WithCharacter: Story = {
   ],
 };
 
-/**
- * Component without a selected character
- */
-export const WithoutCharacter: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-    existingSegments: mockSegments,
-    choices: mockDecision.options.map(opt => ({
-      id: opt.id,
-      text: opt.text,
-      isSelected: false,
-    })),
-  },
-  decorators: [
-    (Story) => {
-      // Ensure no character is selected
-      characterStore.setState({
-        characters: {},
-        currentCharacterId: null,
-      });
-      
-      sessionStore.setState({
-        characterId: null,
-      });
-      
-      populateNarrativeStore(mockSegments, [mockDecision]);
-      
-      return (
-        <div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mb-4">
-            <p className="text-yellow-800">No character selected for this session.</p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
- * Paused game session
- */
-export const PausedState: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'paused',
-    existingSegments: mockSegments,
-    choices: mockDecision.options.map(opt => ({
-      id: opt.id,
-      text: opt.text,
-      isSelected: false,
-    })),
-  },
-  decorators: [
-    (Story) => {
-      populateNarrativeStore(mockSegments, [mockDecision]);
-      
-      return (
-        <div>
-          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
-            <p className="text-blue-800 font-semibold">Session Paused</p>
-            <p className="text-blue-600 text-sm">Your progress has been saved.</p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
- * Ended game session
- */
-export const EndedState: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'ended',
-    existingSegments: mockSegments,
-  },
-  decorators: [
-    (Story) => {
-      populateNarrativeStore(mockSegments, [mockDecision]);
-      
-      return (
-        <div>
-          <div className="bg-gray-100 border border-gray-300 rounded p-4 mb-4">
-            <p className="text-gray-800 font-semibold">Session Ended</p>
-            <p className="text-gray-600 text-sm">Thank you for playing!</p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
