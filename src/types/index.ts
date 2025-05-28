@@ -32,6 +32,13 @@ export type {
   RelatedEntity, 
   JournalMetadata 
 } from './journal.types';
+export type {
+  LoreFact,
+  LoreCategory,
+  LoreSource,
+  LoreSearchOptions,
+  LoreContext
+} from './lore.types';
 export type { 
   GameSession, 
   SessionState, 

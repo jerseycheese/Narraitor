@@ -10,4 +10,5 @@ export { narrativeStore } from './narrativeStore';
 export { journalStore } from './journalStore';
 export { sessionStore } from './sessionStore';
 export { aiContextStore } from './aiContextStore';
+export { useLoreStore } from './loreStore';
 export { persistConfig } from './persistence';

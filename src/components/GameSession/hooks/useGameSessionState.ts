@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { worldStore } from '@/state/worldStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
@@ -13,6 +13,7 @@ interface UseGameSessionStateOptions {
   onSessionStart?: () => void;
   onSessionEnd?: () => void;
   initialState?: Partial<GameSessionState>;
+  disableAutoResume?: boolean;
   router?: { push: (url: string) => void };
   _stores?: {
     worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
@@ -27,6 +28,7 @@ export const useGameSessionState = ({
   onSessionStart,
   onSessionEnd,
   initialState,
+  disableAutoResume = false,
   router,
   _stores,
 }: UseGameSessionStateOptions) => {
@@ -82,56 +84,54 @@ export const useGameSessionState = ({
     char => char.worldId === worldId
   );
   
-  // Determine which character to use for this session (without side effects)
-  const getCharacterForSession = (): string | null => {
-    logger.debug('[getCharacterForSession] Current character ID:', currentCharacterId);
-    logger.debug('[getCharacterForSession] World ID:', worldId);
-    logger.debug('[getCharacterForSession] World characters:', worldCharacters.map(c => ({ id: c.id, name: c.name, worldId: c.worldId })));
+  // Memoize the character for this session to prevent re-calculation
+  const sessionCharacterId = useMemo(() => {
+    if (!isClient) return null;
     
     // If current character belongs to this world, use it
     if (currentCharacterId && actualCharacterState.characters?.[currentCharacterId]?.worldId === worldId) {
-      logger.debug('[getCharacterForSession] Current character belongs to this world, using it:', currentCharacterId);
       return currentCharacterId;
     }
     
     // Otherwise, use the first available character for this world
-    if (worldCharacters.length > 0) {
-      const firstWorldChar = worldCharacters[0];
-      logger.warn('[getCharacterForSession] Current character does not belong to this world, using first world character:', firstWorldChar.id);
+    const firstWorldChar = Object.values(actualCharacterState.characters || {}).find(
+      char => char.worldId === worldId
+    );
+    
+    if (firstWorldChar) {
       return firstWorldChar.id;
     }
     
-    logger.debug('[getCharacterForSession] No characters found for this world');
     return null;
-  };
+  }, [worldId, currentCharacterId, actualCharacterState.characters, isClient]);
   
-  // Effect to update current character if needed
+  // Effect to update current character if needed - only when worldId or currentCharacterId changes
   useEffect(() => {
     if (!isClient) return;
     
-    // If current character doesn't belong to this world, update it
+    // If current character doesn't belong to this world, update it once
     if (currentCharacterId && actualCharacterState.characters?.[currentCharacterId]?.worldId !== worldId) {
       const firstWorldChar = worldCharacters[0];
       if (firstWorldChar && actualCharacterState.setCurrentCharacter) {
+        logger.debug('[useGameSessionState] Updating character from', currentCharacterId, 'to', firstWorldChar.id);
         actualCharacterState.setCurrentCharacter(firstWorldChar.id);
       }
     }
-  }, [worldId, currentCharacterId, worldCharacters.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [worldId, currentCharacterId, isClient, actualCharacterState, logger, worldCharacters]); // Dependencies to prevent stale closures
   
   // Handle retry
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setError(null);
     setSessionState(prev => ({ ...prev, error: null }));
     if (actualSessionState.initializeSession) {
-      const characterId = getCharacterForSession();
-      if (!characterId) {
+      if (!sessionCharacterId) {
         logger.warn('No character available for this world');
         setError(new Error('Please create a character for this world before starting the game'));
         return;
       }
-      actualSessionState.initializeSession(worldId, characterId, onSessionStart);
+      actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
     }
-  };
+  }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);
 
   // Handle dismiss error
   const handleDismissError = () => {
@@ -141,19 +141,18 @@ export const useGameSessionState = ({
   };
   
   // Manual session initialization
-  const startSession = () => {
+  const startSession = useCallback(() => {
     logger.debug('Manual session start requested');
     if (actualSessionState.initializeSession) {
-      const characterId = getCharacterForSession();
-      if (!characterId) {
+      if (!sessionCharacterId) {
         logger.warn('No character available for this world');
         setError(new Error('Please create a character for this world before starting the game'));
         setSessionState(prev => ({ ...prev, error: 'Please create a character for this world before starting the game' }));
         return;
       }
-      actualSessionState.initializeSession(worldId, characterId, onSessionStart);
+      actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
     }
-  };
+  }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);
   
   // Handle selection of a choice
   const handleSelectChoice = (choiceId: string) => {
@@ -197,26 +196,25 @@ export const useGameSessionState = ({
     if (!isClient) return;
     
     // Only initialize if session is not already active
-    if (sessionState.status === 'initializing' && worldExists) {
-      const characterId = getCharacterForSession();
-      if (characterId) {
-        // Check if there's a saved session for this world/character combo
-        const savedSession = actualSessionState.getSavedSession?.(worldId, characterId);
-        
-        if (savedSession) {
-          logger.debug('[useGameSessionState] Found saved session:', savedSession.id);
-          // Resume the saved session
-          if (actualSessionState.resumeSavedSession) {
-            actualSessionState.resumeSavedSession(savedSession.id);
-          }
-        } else if (actualSessionState.initializeSession) {
-          logger.debug('[useGameSessionState] No saved session, creating new one with character:', characterId);
-          actualSessionState.initializeSession(worldId, characterId, onSessionStart);
+    if (sessionState.status === 'initializing' && worldExists && sessionCharacterId) {
+      // Check if there's a saved session for this world/character combo
+      const currentSavedSession = actualSessionState.getSavedSession?.(worldId, sessionCharacterId);
+      
+      if (currentSavedSession && !disableAutoResume) {
+        logger.debug('[useGameSessionState] Found saved session:', currentSavedSession.id);
+        // Resume the saved session
+        if (actualSessionState.resumeSavedSession) {
+          actualSessionState.resumeSavedSession(currentSavedSession.id);
         }
+      } else if (actualSessionState.initializeSession && !disableAutoResume) {
+        logger.debug('[useGameSessionState] No saved session, creating new one with character:', sessionCharacterId);
+        actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
+      } else if (disableAutoResume) {
+        logger.debug('[useGameSessionState] Auto-resume disabled, waiting for manual session start');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, worldExists, sessionState.status]); // Dependencies carefully selected to avoid infinite loops
+  }, [isClient, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
   
   // Poll for session state updates to avoid subscription issues
   useEffect(() => {
@@ -255,21 +253,21 @@ export const useGameSessionState = ({
     updateStateFromStore();
     
     // Then set up polling interval - use a longer interval to reduce console noise
-    const intervalId = setInterval(updateStateFromStore, 2000);
+    const intervalId = setInterval(updateStateFromStore, 5000);
     
     return () => {
       clearInterval(intervalId);
     };
   }, [isClient, sessionState.currentSceneId, sessionState.error, sessionState.playerChoices, sessionState.status]);
   
+  
   // Get saved session for current world/character
   const savedSession = useMemo(() => {
-    const characterId = getCharacterForSession();
-    if (characterId && actualSessionState.getSavedSession) {
-      return actualSessionState.getSavedSession(worldId, characterId);
+    if (sessionCharacterId && actualSessionState.getSavedSession && !disableAutoResume) {
+      return actualSessionState.getSavedSession(worldId, sessionCharacterId);
     }
     return undefined;
-  }, [worldId, actualCharacterState.currentCharacterId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [worldId, sessionCharacterId, actualSessionState, disableAutoResume]);
   
   // Handle resume saved session
   const handleResumeSession = () => {
@@ -280,13 +278,12 @@ export const useGameSessionState = ({
   };
   
   // Handle new session (when saved session exists)
-  const handleNewSession = () => {
-    const characterId = getCharacterForSession();
-    if (characterId && actualSessionState.initializeSession) {
-      logger.debug('Starting new session, character:', characterId);
-      actualSessionState.initializeSession(worldId, characterId, onSessionStart);
+  const handleNewSession = useCallback(() => {
+    if (sessionCharacterId && actualSessionState.initializeSession) {
+      logger.debug('Starting new session, character:', sessionCharacterId);
+      actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
     }
-  };
+  }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);
   
   return {
     sessionState,

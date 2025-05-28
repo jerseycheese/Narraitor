@@ -73,25 +73,28 @@ export default function GameSessionTestHarness() {
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
     const worlds = worldStore.getState().worlds || {};
-    
-    // Always recreate the test world
-    worldStore.setState({
-      worlds: {
-        ...worlds,
-        [mockWorld.id]: { ...mockWorld, updatedAt: new Date().toISOString() }
-      }
-    });
-    
-    // Add test character to the store
     const characters = characterStore.getState().characters || {};
-    characterStore.setState({
-      characters: {
-        ...characters,
-        [mockCharacter.id]: mockCharacter
-      }
-    });
     
-    logger.info('Test world and character created/recreated');
+    // Only create if they don't exist
+    if (!worlds[mockWorld.id]) {
+      worldStore.setState({
+        worlds: {
+          ...worlds,
+          [mockWorld.id]: mockWorld
+        }
+      });
+      logger.info('Test world created');
+    }
+    
+    if (!characters[mockCharacter.id]) {
+      characterStore.setState({
+        characters: {
+          ...characters,
+          [mockCharacter.id]: mockCharacter
+        }
+      });
+      logger.info('Test character created');
+    }
   }, [logger]);
   
   // Set isClient to true once component mounts to avoid hydration mismatch
@@ -158,7 +161,7 @@ export default function GameSessionTestHarness() {
           className="px-4 py-2 bg-green-500 text-white rounded mb-4"
           onClick={createTestWorld}
         >
-          Recreate Test World & Character
+          Ensure Test World & Character Exist
         </button>
         
         <button 
@@ -196,6 +199,7 @@ export default function GameSessionTestHarness() {
             worldId={mockWorld.id}
             onSessionStart={handleSessionStart}
             onSessionEnd={handleSessionEnd}
+            disableAutoResume={true}
           />
         ) : (
           <div>Component hidden</div>

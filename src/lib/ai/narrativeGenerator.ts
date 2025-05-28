@@ -10,13 +10,24 @@ import {
   NarrativeSegment
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
+import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
+import { getLoreContextForPrompt } from './loreContextHelper';
+import { extractStructuredLore } from './structuredLoreExtractor';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
   
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
+  }
+
+  /**
+   * Enhances a prompt with lore context for the given world
+   */
+  private enhancePromptWithLore(prompt: string, worldId: EntityID): string {
+    const loreContext = getLoreContextForPrompt(worldId);
+    return prompt + loreContext;
   }
 
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
@@ -26,8 +37,27 @@ export class NarrativeGenerator {
       
       const context = this.buildContext(world, request);
       const prompt = template(context);
+      
+      // Add lore context to prompt
+      const enhancedPrompt = this.enhancePromptWithLore(prompt, request.worldId);
 
-      const response = await this.geminiClient.generateContent(prompt);
+      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      
+      // Extract structured lore from generated narrative
+      if (response.content) {
+        try {
+          const existingLoreContext = getLoreContextForPrompt(request.worldId);
+          const structuredLore = await extractStructuredLore(response.content, existingLoreContext);
+          
+          // Import lore store dynamically to avoid circular dependency
+          const { useLoreStore } = await import('@/state/loreStore');
+          const { addStructuredLore } = useLoreStore.getState();
+          addStructuredLore(structuredLore, request.worldId, request.sessionId);
+        } catch (error) {
+          console.warn('Failed to extract structured lore:', error);
+          // No fallback - AI extraction or nothing
+        }
+      }
       
       return this.formatResponse(response, request.generationParameters?.segmentType || 'scene');
     } catch {
@@ -57,7 +87,27 @@ export class NarrativeGenerator {
       };
 
       const prompt = template(context);
-      const response = await this.geminiClient.generateContent(prompt);
+      
+      // Add lore context to initial scene
+      const enhancedPrompt = this.enhancePromptWithLore(prompt, worldId);
+      
+      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      
+      // Extract structured lore from initial scene
+      if (response.content) {
+        try {
+          const existingLoreContext = getLoreContextForPrompt(worldId);
+          const structuredLore = await extractStructuredLore(response.content, existingLoreContext);
+          
+          // Import lore store dynamically to avoid circular dependency
+          const { useLoreStore } = await import('@/state/loreStore');
+          const { addStructuredLore } = useLoreStore.getState();
+          addStructuredLore(structuredLore, worldId);
+        } catch (error) {
+          console.warn('Failed to extract structured lore from initial scene:', error);
+          // No fallback - AI extraction or nothing
+        }
+      }
       
       return this.formatResponse(response, 'scene');
     } catch {
