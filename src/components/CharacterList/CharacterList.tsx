@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface Character {
@@ -42,14 +43,20 @@ export const CharacterList: React.FC<CharacterListProps> = ({
           onClick={() => onSelectCharacter(character.id)}
         >
           <div className="flex items-start gap-4 mb-4">
-            <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
-              characterName={character.name}
-              size="medium"
-            />
+            <Link href={`/characters/${character.id}`} className="flex-shrink-0">
+              <CharacterPortrait
+                portrait={character.portrait || { type: 'placeholder', url: null }}
+                characterName={character.name}
+                size="medium"
+              />
+            </Link>
             <div className="flex-1">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-semibold">{character.name}</h3>
+                <Link href={`/characters/${character.id}`}>
+                  <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer">
+                    {character.name}
+                  </h3>
+                </Link>
                 <span className="text-sm text-gray-500">Level {character.level}</span>
               </div>
               {character.background?.description && (
