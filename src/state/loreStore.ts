@@ -42,7 +42,7 @@ const extractBasicFacts = (text: string): Array<{
   const seenKeys = new Set<string>();
   
   // Extract character names (pattern for titles + names)
-  const characterPattern = /\b((?:Sir|Lady|Lord|Captain|Master|Dr\.|Professor) [A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g;
+  const characterPattern = /\b((?:Sir|Lady|Lord|Captain|Master|Dr\.|Professor|King|Queen|Prince|Princess) [A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/g;
   let match;
   while ((match = characterPattern.exec(text)) !== null) {
     const name = match[1].trim();
@@ -57,9 +57,11 @@ const extractBasicFacts = (text: string): Array<{
     }
   }
   
-  // Extract location names (place indicators)
-  const locationPattern = /(?:in|at|from|to) (?:the )?([A-Z][a-z]+(?: [A-Z][a-z]+)*)/g;
-  while ((match = locationPattern.exec(text)) !== null) {
+  // Extract locations - multiple patterns for better coverage
+  
+  // Pattern 1: Basic preposition pattern (from, to, in, at)
+  const basicLocationPattern = /(?:in|at|from|to) (?:the )?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+  while ((match = basicLocationPattern.exec(text)) !== null) {
     const location = match[1].trim();
     const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
     if (!seenKeys.has(key)) {
@@ -67,6 +69,51 @@ const extractBasicFacts = (text: string): Array<{
       facts.push({
         key,
         value: location,
+        category: 'locations'
+      });
+    }
+  }
+  
+  // Pattern 2: "the X of Y" (e.g., "the Citadel of Stars", "the city of Aetheria")
+  const locationOfPattern = /\b(?:the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+of\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/g;
+  while ((match = locationOfPattern.exec(text)) !== null) {
+    const location = `${match[1]} of ${match[2]}`;
+    const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      facts.push({
+        key,
+        value: location,
+        category: 'locations'
+      });
+    }
+  }
+  
+  // Pattern 3: Named places (capitalized words with location context)
+  const namedPlacePattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:district|quarter|market|bridge|tower|citadel|castle|palace|temple|spire|dome)\b/gi;
+  while ((match = namedPlacePattern.exec(text)) !== null) {
+    const location = match[0].trim();
+    const key = `location_${location.toLowerCase().replace(/\s+/g, '_')}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      facts.push({
+        key,
+        value: location,
+        category: 'locations'
+      });
+    }
+  }
+  
+  // Pattern 4: Standalone proper nouns with location context
+  const contextualLocationPattern = /\b(?:city|town|village|kingdom|realm|land|country|province|region)\s+of\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b/gi;
+  while ((match = contextualLocationPattern.exec(text)) !== null) {
+    const place = match[1].trim();
+    const key = `location_${place.toLowerCase().replace(/\s+/g, '_')}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      facts.push({
+        key,
+        value: place,
         category: 'locations'
       });
     }
