@@ -312,16 +312,6 @@ I've implemented this feature and all automated tests are now passing:
 ## Request
 Help me plan manual testing steps to verify this implementation works as expected in real usage, given the current state of the codebase.
 
-## Preferred MCP Tools
-
-When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
-
-- **sequentialthinking**: For planning and structuring responses.
-- **mcp-obsidian**: For referencing project documentation and notes.
-- **memory**: For building and querying context.
-- **@modelcontextprotocol-server-github**: For GitHub interaction.
-- **brave-search**: For research and finding best practices.
-
 ## Scope Boundaries
 - Only test functionality within the defined scope
 - Focus on user experience and edge cases automated tests might miss
@@ -370,16 +360,6 @@ I've implemented this feature:
 Help me review, clean up, and document this implementation.
 
 [PASTE LIST OF CHANGED FILES]
-
-## Preferred MCP Tools
-
-When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
-
-- **sequentialthinking**: For planning and structuring responses.
-- **mcp-obsidian**: For referencing project documentation and notes.
-- **memory**: For building and querying context.
-- **@modelcontextprotocol-server-github**: For GitHub interaction.
-- **brave-search**: For research and finding best practices.
 
 ## Scope Boundaries
 - Focus only on the implemented code
