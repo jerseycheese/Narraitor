@@ -4,7 +4,7 @@
  */
 
 import { createDefaultGeminiClient } from './defaultGeminiClient';
-import type { StructuredLoreExtraction } from '@/types';
+import type { StructuredLoreExtraction } from '@/types/lore.types';
 
 /**
  * Extract structured lore from narrative text using AI
@@ -115,7 +115,7 @@ Respond with ONLY a JSON block in this exact format:
 /**
  * Validate and clean the extracted lore
  */
-function validateAndCleanExtraction(extraction: any): StructuredLoreExtraction {
+function validateAndCleanExtraction(extraction: unknown): StructuredLoreExtraction {
   const cleaned: StructuredLoreExtraction = {
     characters: [],
     locations: [],
@@ -124,66 +124,67 @@ function validateAndCleanExtraction(extraction: any): StructuredLoreExtraction {
     relationships: []
   };
 
-  // Validate characters
-  if (Array.isArray(extraction.characters)) {
-    cleaned.characters = extraction.characters
-      .filter((char: any) => char.name && typeof char.name === 'string')
-      .map((char: any) => ({
-        name: char.name.trim(),
+  // Type guard and validate characters
+  const extractionObj = extraction as Record<string, unknown>;
+  if (Array.isArray(extractionObj.characters)) {
+    cleaned.characters = (extractionObj.characters as Array<Record<string, unknown>>)
+      .filter((char) => char.name && typeof char.name === 'string')
+      .map((char) => ({
+        name: (char.name as string).trim(),
         description: typeof char.description === 'string' ? char.description.trim() : undefined,
         role: typeof char.role === 'string' ? char.role.trim() : undefined,
-        importance: ['low', 'medium', 'high'].includes(char.importance) ? char.importance : 'medium',
-        tags: Array.isArray(char.tags) ? char.tags.filter((t: any) => typeof t === 'string') : undefined
+        importance: ['low', 'medium', 'high'].includes(char.importance as string) ? char.importance as 'low' | 'medium' | 'high' : 'medium',
+        tags: Array.isArray(char.tags) ? (char.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }
 
   // Validate locations
-  if (Array.isArray(extraction.locations)) {
-    cleaned.locations = extraction.locations
-      .filter((loc: any) => loc.name && typeof loc.name === 'string')
-      .map((loc: any) => ({
-        name: loc.name.trim(),
+  if (Array.isArray(extractionObj.locations)) {
+    cleaned.locations = (extractionObj.locations as Array<Record<string, unknown>>)
+      .filter((loc) => loc.name && typeof loc.name === 'string')
+      .map((loc) => ({
+        name: (loc.name as string).trim(),
         type: typeof loc.type === 'string' ? loc.type.trim() : undefined,
         description: typeof loc.description === 'string' ? loc.description.trim() : undefined,
-        importance: ['low', 'medium', 'high'].includes(loc.importance) ? loc.importance : 'medium',
-        tags: Array.isArray(loc.tags) ? loc.tags.filter((t: any) => typeof t === 'string') : undefined
+        importance: ['low', 'medium', 'high'].includes(loc.importance as string) ? loc.importance as 'low' | 'medium' | 'high' : 'medium',
+        tags: Array.isArray(loc.tags) ? (loc.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }
 
   // Validate events
-  if (Array.isArray(extraction.events)) {
-    cleaned.events = extraction.events
-      .filter((event: any) => event.description && typeof event.description === 'string')
-      .map((event: any) => ({
-        description: event.description.trim(),
+  if (Array.isArray(extractionObj.events)) {
+    cleaned.events = (extractionObj.events as Array<Record<string, unknown>>)
+      .filter((event) => event.description && typeof event.description === 'string')
+      .map((event) => ({
+        description: (event.description as string).trim(),
         significance: typeof event.significance === 'string' ? event.significance.trim() : undefined,
-        importance: ['low', 'medium', 'high'].includes(event.importance) ? event.importance : 'medium',
+        importance: ['low', 'medium', 'high'].includes(event.importance as string) ? event.importance as 'low' | 'medium' | 'high' : 'medium',
         relatedEntities: Array.isArray(event.relatedEntities) ? 
-          event.relatedEntities.filter((e: any) => typeof e === 'string') : undefined
+          (event.relatedEntities as unknown[]).filter((e) => typeof e === 'string') as string[] : undefined
       }));
   }
 
   // Validate rules
-  if (Array.isArray(extraction.rules)) {
-    cleaned.rules = extraction.rules
-      .filter((rule: any) => rule.rule && typeof rule.rule === 'string')
-      .map((rule: any) => ({
-        rule: rule.rule.trim(),
+  if (Array.isArray(extractionObj.rules)) {
+    cleaned.rules = (extractionObj.rules as Array<Record<string, unknown>>)
+      .filter((rule) => rule.rule && typeof rule.rule === 'string')
+      .map((rule) => ({
+        rule: (rule.rule as string).trim(),
         context: typeof rule.context === 'string' ? rule.context.trim() : undefined,
-        importance: ['low', 'medium', 'high'].includes(rule.importance) ? rule.importance : 'medium',
-        tags: Array.isArray(rule.tags) ? rule.tags.filter((t: any) => typeof t === 'string') : undefined
+        importance: ['low', 'medium', 'high'].includes(rule.importance as string) ? rule.importance as 'low' | 'medium' | 'high' : 'medium',
+        tags: Array.isArray(rule.tags) ? (rule.tags as unknown[]).filter((t) => typeof t === 'string') as string[] : undefined
       }));
   }
 
   // Validate relationships
-  if (Array.isArray(extraction.relationships)) {
-    cleaned.relationships = extraction.relationships
-      .filter((rel: any) => rel.from && rel.to && rel.type && 
+  if (Array.isArray(extractionObj.relationships)) {
+    cleaned.relationships = (extractionObj.relationships as Array<Record<string, unknown>>)
+      .filter((rel) => rel.from && rel.to && rel.type && 
         typeof rel.from === 'string' && typeof rel.to === 'string' && typeof rel.type === 'string')
-      .map((rel: any) => ({
-        from: rel.from.trim(),
-        to: rel.to.trim(),
-        type: rel.type.trim(),
+      .map((rel) => ({
+        from: (rel.from as string).trim(),
+        to: (rel.to as string).trim(),
+        type: (rel.type as string).trim(),
         description: typeof rel.description === 'string' ? rel.description.trim() : undefined
       }));
   }
