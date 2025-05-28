@@ -10,7 +10,6 @@ jest.mock('@/lib/narrative/fallback/FallbackContentManager');
 jest.unmock('@/state/worldStore');
 jest.unmock('@/state/characterStore');
 import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
 
 describe('NarrativeGenerator - Fallback Integration', () => {
   let generator: NarrativeGenerator;
@@ -22,12 +21,14 @@ describe('NarrativeGenerator - Fallback Integration', () => {
     name: 'Test World',
     description: 'A fantasy world',
     theme: 'fantasy',
-    tone: 'adventurous',
     attributes: [],
     skills: [],
-    playerCount: { min: 1, max: 4 },
-    sessionLength: 'medium',
-    contentRating: 'teen',
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 30,
+      skillPointPool: 30
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };

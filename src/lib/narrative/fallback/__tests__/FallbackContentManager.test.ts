@@ -1,7 +1,6 @@
 import { FallbackContentManager } from '../FallbackContentManager';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
-import { FallbackContent } from '../types';
 
 describe('FallbackContentManager', () => {
   let manager: FallbackContentManager;
@@ -16,12 +15,14 @@ describe('FallbackContentManager', () => {
       name: 'Test World',
       description: 'A test world',
       theme: 'fantasy',
-      tone: 'lighthearted',
       attributes: [],
       skills: [],
-      playerCount: { min: 1, max: 4 },
-      sessionLength: 'medium',
-      contentRating: 'teen',
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 30,
+        skillPointPool: 30
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

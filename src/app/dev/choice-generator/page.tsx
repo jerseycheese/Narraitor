@@ -24,11 +24,19 @@ const createSampleNarrativeContext = (): NarrativeContext => {
     updatedAt: new Date().toISOString(),
   });
 
+  const segments = [
+    createSampleSegment('You find yourself in a dense forest. The trees tower above you, blocking out most of the sunlight.'),
+    createSampleSegment('A strange noise catches your attention from deeper in the woods. Something is moving through the undergrowth.'),
+  ];
+
   return {
-    recentSegments: [
-      createSampleSegment('You find yourself in a dense forest. The trees tower above you, blocking out most of the sunlight.'),
-      createSampleSegment('A strange noise catches your attention from deeper in the woods. Something is moving through the undergrowth.'),
-    ],
+    worldId: 'test-world',
+    currentSceneId: 'test-scene',
+    characterIds: ['test-char'],
+    previousSegments: segments,
+    currentTags: ['forest', 'mysterious'],
+    sessionId: 'test-session',
+    recentSegments: segments,
     currentLocation: 'Forest',
   };
 };
@@ -123,7 +131,7 @@ export default function ChoiceGeneratorTestPage() {
   // Update narrative context when segments change
   const handleSegmentContentChange = (index: number, content: string) => {
     setNarrativeContext(prev => {
-      const updatedSegments = [...prev.recentSegments];
+      const updatedSegments = [...(prev.recentSegments || [])];
       updatedSegments[index] = {
         ...updatedSegments[index],
         content,
@@ -152,19 +160,19 @@ export default function ChoiceGeneratorTestPage() {
 
     setNarrativeContext(prev => ({
       ...prev,
-      recentSegments: [...prev.recentSegments, newSegment],
+      recentSegments: [...(prev.recentSegments || []), newSegment],
     }));
   };
 
   // Remove a segment from the narrative context
   const removeSegment = (index: number) => {
-    if (narrativeContext.recentSegments.length <= 1) {
+    if ((narrativeContext.recentSegments?.length || 0) <= 1) {
       return; // Prevent removing all segments
     }
 
     setNarrativeContext(prev => ({
       ...prev,
-      recentSegments: prev.recentSegments.filter((_, i) => i !== index),
+      recentSegments: (prev.recentSegments || []).filter((_, i) => i !== index),
     }));
   };
 
@@ -243,14 +251,14 @@ export default function ChoiceGeneratorTestPage() {
           </button>
         </div>
 
-        {narrativeContext.recentSegments.map((segment, index) => (
+        {(narrativeContext.recentSegments || []).map((segment, index) => (
           <div key={segment.id} className="mb-4 p-4 border rounded bg-white">
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-semibold">Segment {index + 1}</h3>
               <button
                 onClick={() => removeSegment(index)}
                 className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                disabled={narrativeContext.recentSegments.length <= 1}
+                disabled={(narrativeContext.recentSegments?.length || 0) <= 1}
               >
                 Remove
               </button>

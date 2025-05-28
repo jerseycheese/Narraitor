@@ -188,6 +188,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
+        worldId,
+        currentSceneId: `scene-${Date.now()}`,
+        characterIds: [],
+        previousSegments: recentSegments,
+        currentTags: recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
+        sessionId: sessionId || 'temp-session',
         recentSegments,
         currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
       };
@@ -416,6 +422,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         sessionId,
         characterIds: characterId ? [characterId] : [],
         narrativeContext: {
+          worldId,
+          currentSceneId: `scene-${Date.now()}`,
+          characterIds: characterId ? [characterId] : [],
+          previousSegments: recentSegments,
+          currentTags: recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
+          sessionId: sessionId || 'temp-session',
           recentSegments,
           currentSituation: `Player chose: "${choiceText}"`
         },

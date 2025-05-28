@@ -21,12 +21,14 @@ export default function FallbackNarrativeTestPage() {
     name: 'Test World',
     description: 'A world for testing fallback content',
     theme: worldTheme,
-    tone: 'adventurous',
     attributes: [],
     skills: [],
-    playerCount: { min: 1, max: 4 },
-    sessionLength: 'medium',
-    contentRating: 'teen',
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 30,
+      skillPointPool: 30
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -49,7 +51,7 @@ export default function FallbackNarrativeTestPage() {
         worldId: mockWorld.id,
         sessionId: 'test-session',
         content: content.content,
-        type: content.type as any,
+        type: content.type as 'scene' | 'dialogue' | 'action' | 'transition',
         metadata: {
           tags: content.tags,
           characterIds: ['test-char']
@@ -72,7 +74,7 @@ export default function FallbackNarrativeTestPage() {
       worldId: mockWorld.id,
       sessionId: 'test-session',
       content: 'This is simulated AI-generated content. In a real scenario, this would come from the AI service and be much more detailed and contextual.',
-      type: segmentType as any,
+      type: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
         tags: contextTags,
         characterIds: ['test-char']
@@ -157,7 +159,7 @@ export default function FallbackNarrativeTestPage() {
                 <label className="block text-sm font-medium mb-1">Fallback Reason</label>
                 <select 
                   value={fallbackReason} 
-                  onChange={(e) => setFallbackReason(e.target.value as any)}
+                  onChange={(e) => setFallbackReason(e.target.value as 'service_unavailable' | 'timeout' | 'error' | 'rate_limit')}
                   className="w-full p-2 border rounded"
                 >
                   <option value="service_unavailable">Service Unavailable</option>

@@ -17,12 +17,14 @@ describe('Fallback System Integration', () => {
     name: 'Fantasy Kingdom',
     description: 'A magical realm',
     theme: 'fantasy',
-    tone: 'adventurous',
     attributes: [],
     skills: [],
-    playerCount: { min: 1, max: 4 },
-    sessionLength: 'medium',
-    contentRating: 'teen',
+    settings: {
+      maxAttributes: 10,
+      maxSkills: 10,
+      attributePointPool: 30,
+      skillPointPool: 30
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -254,7 +256,7 @@ describe('Fallback System Integration', () => {
     it('should generate fallback content quickly', async () => {
       // Create a generator with no retries for performance test
       const fastGenerator = new NarrativeGenerator(mockClient);
-      // @ts-ignore - accessing private property for test
+      // @ts-expect-error - accessing private property for test
       fastGenerator.maxRetries = 0;
       
       mockClient.generateContent.mockRejectedValue(new Error('Immediate failure'));

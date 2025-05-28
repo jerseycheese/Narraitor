@@ -6,8 +6,7 @@ import {
   Decision,
   NarrativeContext,
   NarrativeGenerationRequest,
-  NarrativeGenerationResult,
-  NarrativeSegment
+  NarrativeGenerationResult
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
@@ -162,8 +161,8 @@ export class NarrativeGenerator {
       worldId,
       sessionId: 'initial-session',
       characterIds,
-      context: fallbackContext,
-      generationParameters: { segmentType: 'initial' }
+      narrativeContext: fallbackContext,
+      generationParameters: { segmentType: 'scene' }
     };
     
     return this.generateFallbackContent(
@@ -185,7 +184,7 @@ export class NarrativeGenerator {
     error: Error | null,
     retryAttempts: number
   ): Promise<NarrativeGenerationResult> {
-    const context = request.context || this.buildMinimalContext(world, request);
+    const context = request.narrativeContext || this.buildMinimalContext(world, request);
     const fallbackContent = this.fallbackManager.getContent(segmentType, context, world);
     
     if (!fallbackContent) {
@@ -196,7 +195,7 @@ export class NarrativeGenerator {
     
     return {
       content: fallbackContent.content,
-      segmentType: segmentType as any,
+      segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
         characterIds: request.characterIds,
         tags: fallbackContent.tags,
@@ -259,21 +258,21 @@ export class NarrativeGenerator {
     return narrativeTemplateManager.getTemplate(type);
   }
 
-  private buildContext(world: World, request: NarrativeGenerationRequest): any {
+  private buildContext(world: World, request: NarrativeGenerationRequest): Record<string, unknown> {
     return {
       worldName: world.name,
       worldDescription: world.description,
       genre: world.theme,
-      tone: world.tone || 'default',
-      narrativeContext: request.narrativeContext || request.context,
+      tone: 'default',
+      narrativeContext: request.narrativeContext,
       generationParameters: request.generationParameters
     };
   }
 
-  private formatResponse(response: any, segmentType: string, isAIGenerated: boolean): NarrativeGenerationResult {
+  private formatResponse(response: { content: string }, segmentType: string, isAIGenerated: boolean): NarrativeGenerationResult {
     return {
       content: response.content,
-      segmentType: segmentType as any,
+      segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
         characterIds: [],
         tags: [],
@@ -284,7 +283,11 @@ export class NarrativeGenerator {
   }
 
   // Choices are now handled through the existing ChoiceGenerator
-  async generateChoices(context: NarrativeContext): Promise<Decision[]> {
-    return this.choiceGenerator.generateChoices(context);
+  async generateChoices(params: {
+    worldId: string;
+    narrativeContext: NarrativeContext;
+    characterIds: string[];
+  }): Promise<Decision> {
+    return this.choiceGenerator.generateChoices(params);
   }
 }

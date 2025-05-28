@@ -76,7 +76,9 @@ export class FallbackContentManager {
     // Maintain max history size
     if (this.recentlyUsedIds.size > this.maxHistorySize) {
       const firstId = this.recentlyUsedIds.values().next().value;
-      this.recentlyUsedIds.delete(firstId);
+      if (firstId !== undefined) {
+        this.recentlyUsedIds.delete(firstId);
+      }
     }
   }
 }

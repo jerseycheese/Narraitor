@@ -62,7 +62,12 @@ export class ServiceMonitor extends EventEmitter {
     this.stats.totalChecks++;
 
     try {
-      await this.client.isAvailable();
+      if (this.client.isAvailable) {
+        await this.client.isAvailable();
+      } else {
+        // If no isAvailable method, assume it's available
+        // This could be enhanced to do a test request
+      }
       
       const wasUnavailable = !this.status.isAvailable;
       
