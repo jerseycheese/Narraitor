@@ -21,6 +21,14 @@ export class NarrativeGenerator {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
   }
 
+  /**
+   * Enhances a prompt with lore context for the given world
+   */
+  private enhancePromptWithLore(prompt: string, worldId: EntityID): string {
+    const loreContext = getLoreContextForPrompt(worldId);
+    return prompt + loreContext;
+  }
+
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -30,8 +38,7 @@ export class NarrativeGenerator {
       const prompt = template(context);
       
       // Add lore context to prompt
-      const loreContext = getLoreContextForPrompt(request.worldId);
-      const enhancedPrompt = prompt + loreContext;
+      const enhancedPrompt = this.enhancePromptWithLore(prompt, request.worldId);
 
       const response = await this.geminiClient.generateContent(enhancedPrompt);
       
@@ -81,8 +88,7 @@ export class NarrativeGenerator {
       const prompt = template(context);
       
       // Add lore context to initial scene
-      const loreContext = getLoreContextForPrompt(worldId);
-      const enhancedPrompt = prompt + loreContext;
+      const enhancedPrompt = this.enhancePromptWithLore(prompt, worldId);
       
       const response = await this.geminiClient.generateContent(enhancedPrompt);
       
