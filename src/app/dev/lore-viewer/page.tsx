@@ -27,8 +27,10 @@ export default function LoreViewerTestPage() {
         attributes: [],
         skills: [],
         settings: {
-          difficulty: 'normal',
-          playerCharacterLimit: 1
+          maxAttributes: 10,
+          maxSkills: 15,
+          attributePointPool: 30,
+          skillPointPool: 50
         }
       });
       setWorldId(newWorldId);
