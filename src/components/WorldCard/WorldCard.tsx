@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { World } from '../../types/world.types';
 import WorldCardActions from '../WorldCardActions/WorldCardActions';
 import { worldStore } from '../../state/worldStore';
@@ -114,12 +115,18 @@ const WorldCard: React.FC<WorldCardProps> = ({
         )}
       </div>
       <header>
-        <h2 
-          data-testid="world-card-name" 
-          className="text-2xl font-bold mb-3 text-blue-800 pr-32"
+        <Link 
+          href={`/world/${world.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="inline-block"
         >
-          {world.name}
-        </h2>
+          <h2 
+            data-testid="world-card-name" 
+            className="text-2xl font-bold mb-3 text-blue-800 pr-32 hover:text-blue-600 transition-colors"
+          >
+            {world.name}
+          </h2>
+        </Link>
       </header>
       <div className="mb-4 space-y-3">
         <p 
