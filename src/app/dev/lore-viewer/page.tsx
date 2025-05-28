@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { LoreViewer } from '@/components/LoreViewer';
 import { useLoreStore } from '@/state/loreStore';
-import { useWorldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/useWorldStore';
 import type { EntityID } from '@/types';
 
 export default function LoreViewerTestPage() {
