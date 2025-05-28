@@ -376,8 +376,13 @@ export const WithCharacter: Story = {
     (Story) => {
       // Set up character in stores
       // Set up character in store
-      characterStore.getState().characters['char-123'] = mockCharacter;
-      characterStore.getState().currentCharacterId = 'char-123';
+      characterStore.setState({
+        characters: {
+          ...characterStore.getState().characters,
+          'char-123': mockCharacter,
+        },
+        currentCharacterId: 'char-123',
+      });
       
       sessionStore.setState({
         characterId: 'char-123',
