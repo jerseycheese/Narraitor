@@ -1,14 +1,12 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import Link from 'next/link';
-import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 
 export default function WorldViewPage() {
   const params = useParams();
-  const router = useRouter();
   const worldId = params.id as string;
   const world = worldStore((state) => state.worlds[worldId]);
 

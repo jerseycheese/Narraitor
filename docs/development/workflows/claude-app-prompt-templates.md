@@ -361,16 +361,6 @@ Help me review, clean up, and document this implementation.
 
 [PASTE LIST OF CHANGED FILES]
 
-## Preferred MCP Tools
-
-When using these prompt templates, the AI is encouraged to leverage the following MCP tools:
-
-- **sequentialthinking**: For planning and structuring responses.
-- **mcp-obsidian**: For referencing project documentation and notes.
-- **memory**: For building and querying context.
-- **@modelcontextprotocol-server-github**: For GitHub interaction.
-- **brave-search**: For research and finding best practices.
-
 ## Scope Boundaries
 - Focus only on the implemented code
 - Do not suggest refactoring or restructuring
