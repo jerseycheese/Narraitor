@@ -9,8 +9,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 ### Main Components
 
 - **GameSession** (`GameSession.tsx`): The main container component that orchestrates state and child components
-- **GameSessionActive** (`GameSessionActive.tsx`): Handles the active game session rendering
-- **GameSessionActiveWithNarrative** (`GameSessionActiveWithNarrative.tsx`): Enhanced active session with AI-driven narrative and choice generation
+- **ActiveGameSession** (`ActiveGameSession.tsx`): Handles the active game session with AI-driven narrative and choice generation
   - Manages `localSelectedChoiceId` state to track player choice selection and trigger narrative progression
 - **GameSessionError** (`GameSessionError.tsx`): Error state component
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
@@ -43,8 +42,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 ### State Components
 - **GameSessionLoading**: Shows loading spinner with customizable message
 - **GameSessionError**: Uses existing ErrorMessage component for consistency
-- **GameSessionActive**: Combines narrative, choices, and controls
-- **GameSessionActiveWithNarrative**: Enhanced active session component with integrated AI narrative generation and contextual choice systems
+- **ActiveGameSession**: Enhanced active session component with integrated AI narrative generation and contextual choice systems
 
 ### useGameSessionState Hook
 - Encapsulates all state management logic
@@ -82,7 +80,7 @@ A test harness is available at `/dev/game-session-components` for interactive te
 
 ## AI Choice Generation Features
 
-The `GameSessionActiveWithNarrative` component includes:
+The `ActiveGameSession` component includes:
 
 ### Core AI Features
 - **Automated Choice Generation**: AI-powered player choices based on narrative context

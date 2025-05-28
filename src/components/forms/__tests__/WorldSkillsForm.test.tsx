@@ -24,6 +24,9 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
       description: 'Physical prowess',
       linkedAttributeId: 'attr-1',
       difficulty: 'medium',
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
     },
   ];
 
