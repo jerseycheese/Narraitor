@@ -100,11 +100,9 @@ export const useLoreStore = create<LoreStore>()(
           `${fact.category}: ${fact.key} = ${fact.value}`
         );
 
-        const contextSummary = `Found ${factStrings.length} facts for world ${worldId}.`;
-
         return {
-          relevantFacts: factStrings,
-          contextSummary,
+          facts: factStrings,
+          factCount: factStrings.length,
         };
       },
 

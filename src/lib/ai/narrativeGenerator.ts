@@ -10,6 +10,7 @@ import {
   NarrativeSegment
 } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
+import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
