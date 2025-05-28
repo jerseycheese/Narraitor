@@ -49,6 +49,9 @@ export default function DevPage() {
         <Link href="/dev/attribute-editor" className="block p-4 bg-yellow-100 hover:bg-yellow-200 rounded">
           Attribute Editor Test Harness
         </Link>
+        <Link href="/dev/lore-viewer" className="block p-4 bg-indigo-100 hover:bg-indigo-200 rounded">
+          Lore Viewer Test Harness
+        </Link>
       </div>
     </div>
   );
