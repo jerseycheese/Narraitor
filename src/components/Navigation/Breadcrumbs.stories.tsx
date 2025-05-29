@@ -2,96 +2,79 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Breadcrumbs } from './Breadcrumbs';
 
 const meta: Meta<typeof Breadcrumbs> = {
-  title: 'Narraitor/Common/Breadcrumbs',
+  title: 'Narraitor/Navigation/Breadcrumbs',
   component: Breadcrumbs,
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Navigation breadcrumbs showing the current page hierarchy'
-      }
+        component: 'Enhanced breadcrumbs component with optional next-step guidance for navigation flow.',
+      },
     },
-    nextjs: {
-      appDirectory: true,
-      navigation: {
-        pathname: '/worlds'
-      }
-    }
   },
-  tags: ['autodocs'],
+  decorators: [
+    (Story) => (
+      <div className="bg-gray-50 border-b border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto">
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
   argTypes: {
-    separator: {
-      control: 'text',
-      description: 'Character or element to separate breadcrumb items'
+    showNextStep: {
+      control: 'boolean',
+      description: 'Show next step guidance in breadcrumbs',
     },
     maxItems: {
       control: 'number',
-      description: 'Maximum number of breadcrumb items to show (for mobile)'
-    }
-  }
+      description: 'Maximum number of breadcrumb items to show (for mobile)',
+    },
+    separator: {
+      control: 'text',
+      description: 'Custom separator between breadcrumb items',
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+    },
+  },
 };
 
 export default meta;
-type Story = StoryObj<typeof Breadcrumbs>;
+type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  parameters: {
-    nextjs: {
-      navigation: {
-        pathname: '/characters'
-      }
-    }
-  }
-};
-
-
-
-export const DeepNesting: Story = {
-  parameters: {
-    nextjs: {
-      navigation: {
-        pathname: '/characters/char-456'
-      }
-    },
-    docs: {
-      description: {
-        story: 'Breadcrumbs with deep nesting (character detail page)'
-      }
-    }
-  }
-};
-
-export const MobileTruncation: Story = {
+export const StandardBreadcrumbs: Story = {
+  name: 'Standard Breadcrumbs',
   args: {
-    maxItems: 2
+    showNextStep: false,
+  },
+};
+
+export const WithNextStepGuidance: Story = {
+  name: 'With Next Step Guidance',
+  args: {
+    showNextStep: true,
+  },
+};
+
+export const MobileView: Story = {
+  name: 'Mobile View (Max 2 Items)',
+  args: {
+    showNextStep: true,
+    maxItems: 2,
   },
   parameters: {
-    nextjs: {
-      navigation: {
-        pathname: '/characters/char-456'
-      }
+    viewport: {
+      defaultViewport: 'mobile1',
     },
-    docs: {
-      description: {
-        story: 'Breadcrumbs truncated for mobile display'
-      }
-    }
-  }
+  },
 };
 
-
-
-export const LoadingState: Story = {
-  parameters: {
-    nextjs: {
-      navigation: {
-        pathname: '/world/123'
-      }
-    },
-    docs: {
-      description: {
-        story: 'Breadcrumbs with loading entity name (simulated by empty store)'
-      }
-    }
-  }
+export const CustomSeparator: Story = {
+  name: 'Custom Separator',
+  args: {
+    showNextStep: true,
+    separator: '/',
+  },
 };
