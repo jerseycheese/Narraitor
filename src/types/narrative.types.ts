@@ -87,9 +87,11 @@ export interface NarrativeContext {
   worldId: EntityID;
   currentSceneId: EntityID;
   characterIds: EntityID[];
+  /** All narrative segments in the current session */
   previousSegments: NarrativeSegment[];
   currentTags: string[];
   sessionId: EntityID;
+  /** Most recent segments (typically last 3-5) for immediate context. Subset of previousSegments */
   recentSegments?: NarrativeSegment[];
   currentLocation?: string;
   currentSituation?: string;
