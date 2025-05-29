@@ -119,8 +119,8 @@ export function Navigation() {
       {/* Breadcrumbs */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <Breadcrumbs className="sm:hidden" maxItems={2} />
-          <Breadcrumbs className="hidden sm:flex" />
+          <Breadcrumbs className="sm:hidden" maxItems={2} showNextStep />
+          <Breadcrumbs className="hidden sm:flex" showNextStep />
         </div>
       </div>
     </>
