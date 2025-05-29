@@ -84,7 +84,15 @@ export interface NarrativeGenerationRequest {
  * Represents narrative context for generation
  */
 export interface NarrativeContext {
-  recentSegments: NarrativeSegment[];
+  worldId: EntityID;
+  currentSceneId: EntityID;
+  characterIds: EntityID[];
+  /** All narrative segments in the current session */
+  previousSegments: NarrativeSegment[];
+  currentTags: string[];
+  sessionId: EntityID;
+  /** Most recent segments (typically last 3-5) for immediate context. Subset of previousSegments */
+  recentSegments?: NarrativeSegment[];
   currentLocation?: string;
   currentSituation?: string;
   importantEntities?: Array<{
@@ -116,7 +124,13 @@ export interface NarrativeGenerationResult {
     location?: string;
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
+    timestamp?: string;
   };
+  choices?: Array<{
+    text: string;
+    outcome?: string;
+    tags?: string[];
+  }>;
   tokenUsage?: {
     promptTokens: number;
     completionTokens: number;

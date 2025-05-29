@@ -188,6 +188,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
+        worldId,
+        currentSceneId: `scene-${Date.now()}`,
+        characterIds: [],
+        previousSegments: recentSegments,
+        currentTags: recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
+        sessionId: sessionId || 'temp-session',
         recentSegments,
         currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
       };
@@ -201,7 +207,11 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         });
         
         decision = await Promise.race([
-          narrativeGenerator.generatePlayerChoices(worldId, narrativeContext, []),
+          narrativeGenerator.generatePlayerChoices(
+            worldId,
+            narrativeContext,
+            []
+          ),
           timeoutPromise
         ]);
         
@@ -244,7 +254,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       }
     } catch (error) {
       console.error('⚡ CHOICE GENERATION: Unhandled error in generatePlayerChoices:', error);
-      setError('Failed to generate player choices');
+      setError('Unable to generate choices. Please check your connection and try again.');
       
       // Even if we get an unhandled error, try to provide fallback choices
       
@@ -374,7 +384,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
-      setError('Failed to generate narrative');
+      setError('Unable to generate narrative. Please check your connection and try again.');
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
@@ -416,6 +426,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         sessionId,
         characterIds: characterId ? [characterId] : [],
         narrativeContext: {
+          worldId,
+          currentSceneId: `scene-${Date.now()}`,
+          characterIds: characterId ? [characterId] : [],
+          previousSegments: recentSegments,
+          currentTags: recentSegments[recentSegments.length - 1]?.metadata?.tags || [],
+          sessionId: sessionId || 'temp-session',
           recentSegments,
           currentSituation: `Player chose: "${choiceText}"`
         },
@@ -473,11 +489,31 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);
-      setError('Failed to generate narrative');
+      setError('Unable to generate narrative. Please check your connection and try again.');
     } finally {
       if (mountedRef.current) {
         setIsLoading(false);
       }
+    }
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    
+    // If we have no segments, retry initial generation
+    if (segments.length === 0) {
+      generateInitialNarrative();
+    } else if (choiceId && processedChoices.has(choiceId)) {
+      // If we were trying to generate from a choice, remove it from processed and retry
+      setProcessedChoices(prev => {
+        const updated = new Set(prev);
+        updated.delete(choiceId);
+        return updated;
+      });
+      generateNextSegment(choiceId);
+    } else {
+      // Otherwise just clear the error
+      setError(null);
     }
   };
 
@@ -487,6 +523,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         segments={segments}
         isLoading={isLoading || isGeneratingChoices}
         error={error || undefined}
+        onRetry={handleRetry}
       />
     </div>
   );
