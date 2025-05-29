@@ -28,6 +28,13 @@ export function QuickPlay() {
   const handleContinue = async () => {
     if (!mostRecentSession) return;
 
+    // Set the current world and character before resuming session
+    const { setCurrentWorld } = worldStore.getState();
+    const { setCurrentCharacter } = characterStore.getState();
+    
+    setCurrentWorld(mostRecentSession.worldId);
+    setCurrentCharacter(mostRecentSession.characterId);
+    
     const success = resumeSavedSession(mostRecentSession.id);
     if (success) {
       router.push('/play');

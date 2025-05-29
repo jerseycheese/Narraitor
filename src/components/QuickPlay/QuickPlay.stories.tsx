@@ -38,13 +38,3 @@ export const WithSavedSession: Story = {
     timeAgo: 3600000, // 1 hour ago
   })],
 };
-
-export const MultipleSessions: Story = {
-  name: 'Multiple Sessions (Shows Most Recent)',
-  decorators: [createMockStoreState({ 
-    hasSession: true,
-    narrativeCount: 25,
-    timeAgo: 1800000, // 30 minutes ago
-    hasMultipleSessions: true,
-  })],
-};

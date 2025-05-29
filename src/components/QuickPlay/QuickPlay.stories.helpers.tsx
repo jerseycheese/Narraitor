@@ -50,18 +50,30 @@ interface MockStoreOptions {
   hasSession: boolean;
   narrativeCount?: number;
   timeAgo?: number; // milliseconds ago
-  hasMultipleSessions?: boolean;
 }
 
 export const createMockStoreState = (options: MockStoreOptions) => {
   return (Story: React.ComponentType) => {
-    const { hasSession, narrativeCount = 12, timeAgo = 3600000, hasMultipleSessions = false } = options;
+    const { hasSession, narrativeCount = 12, timeAgo = 3600000 } = options;
     
     if (!hasSession) {
       // Empty state
-      worldStore.setState({ worlds: {}, currentWorldId: null });
-      characterStore.setState({ characters: {} });
-      sessionStore.setState({ savedSessions: {} });
+      worldStore.setState({ 
+        worlds: {}, 
+        currentWorldId: null,
+        setCurrentWorld: (id: string) => console.log('Set world:', id),
+      });
+      characterStore.setState({ 
+        characters: {},
+        setCurrentCharacter: (id: string) => console.log('Set character:', id),
+      });
+      sessionStore.setState({ 
+        savedSessions: {},
+        resumeSavedSession: (id: string) => {
+          console.log('Resume session:', id);
+          return true;
+        },
+      });
     } else {
       // Create session data
       const mockSavedSession = {
@@ -72,42 +84,22 @@ export const createMockStoreState = (options: MockStoreOptions) => {
         narrativeCount,
       };
 
-      const worlds = { [mockWorld.id]: mockWorld };
-      const characters = { [mockCharacter.id]: mockCharacter };
-      const sessions = { [mockSavedSession.id]: mockSavedSession };
-
-      // Add additional session if multiple requested
-      if (hasMultipleSessions) {
-        const olderWorld = {
-          ...mockWorld,
-          id: 'world-2',
-          name: 'Ancient Mysteries',
-          theme: 'mystery' as const,
-        };
-        
-        const olderCharacter = {
-          ...mockCharacter,
-          id: 'char-2',
-          worldId: 'world-2',
-          name: 'Detective Holmes',
-        };
-        
-        const olderSession = {
-          id: 'session-2',
-          worldId: 'world-2',
-          characterId: 'char-2',
-          lastPlayed: new Date(Date.now() - (timeAgo + 86400000)).toISOString(), // 1 day older
-          narrativeCount: 8,
-        };
-
-        worlds[olderWorld.id] = olderWorld;
-        characters[olderCharacter.id] = olderCharacter;
-        sessions[olderSession.id] = olderSession;
-      }
-
-      worldStore.setState({ worlds, currentWorldId: null });
-      characterStore.setState({ characters });
-      sessionStore.setState({ savedSessions: sessions });
+      worldStore.setState({ 
+        worlds: { [mockWorld.id]: mockWorld },
+        currentWorldId: null,
+        setCurrentWorld: (id: string) => console.log('Set world:', id),
+      });
+      characterStore.setState({ 
+        characters: { [mockCharacter.id]: mockCharacter },
+        setCurrentCharacter: (id: string) => console.log('Set character:', id),
+      });
+      sessionStore.setState({ 
+        savedSessions: { [mockSavedSession.id]: mockSavedSession },
+        resumeSavedSession: (id: string) => {
+          console.log('Resume session:', id);
+          return true;
+        },
+      });
     }
     
     return <Story />;
