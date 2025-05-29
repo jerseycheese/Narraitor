@@ -38,34 +38,36 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       role="region"
       aria-label="Character information"
     >
-      <div>
-        {/* Portrait Section */}
-        <Link href={`/characters/${character.id}`} className="float-right ml-4 mb-3">
-          <CharacterPortrait
-            portrait={character.portrait || { type: 'placeholder', url: null }}
-            characterName={character.name}
-            size="large"
-          />
-        </Link>
-
+      <div className="flex gap-4">
         {/* Character Info Section */}
-        <Link href={`/characters/${character.id}`} className="block">
-          <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors mb-1">
-            {character.name}
-          </h2>
-        </Link>
-        
-        <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
-        
-        {character.description && (
-          <p className="text-gray-700 mb-2">{character.description}</p>
-        )}
-        
-        {character.background?.description && (
-          <p className="text-sm text-gray-600 italic">{character.background.description}</p>
-        )}
-        
-        <div className="clear-both"></div>
+        <div className="flex-1">
+          <Link href={`/characters/${character.id}`} className="block">
+            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors mb-1">
+              {character.name}
+            </h2>
+          </Link>
+          
+          <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
+          
+          {character.description && (
+            <p className="text-gray-700 mb-2">{character.description}</p>
+          )}
+          
+          {character.background?.description && (
+            <p className="text-sm text-gray-600 italic">{character.background.description}</p>
+          )}
+        </div>
+
+        {/* Portrait Section */}
+        <div className="flex-shrink-0">
+          <Link href={`/characters/${character.id}`}>
+            <CharacterPortrait
+              portrait={character.portrait || { type: 'placeholder', url: null }}
+              characterName={character.name}
+              size="large"
+            />
+          </Link>
+        </div>
       </div>
     </div>
   );

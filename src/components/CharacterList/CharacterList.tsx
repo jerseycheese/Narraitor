@@ -43,25 +43,33 @@ export const CharacterList: React.FC<CharacterListProps> = ({
           onClick={() => onSelectCharacter(character.id)}
         >
           <div className="mb-4">
-            <Link href={`/characters/${character.id}`} className="float-right ml-4 mb-3">
-              <CharacterPortrait
-                portrait={character.portrait || { type: 'placeholder', url: null }}
-                characterName={character.name}
-                size="large"
-              />
-            </Link>
-            <Link href={`/characters/${character.id}`}>
-              <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1">
-                {character.name}
-              </h3>
-            </Link>
-            <span className="text-sm text-gray-500 block mb-2">Level {character.level}</span>
-            {character.background?.description && (
-              <p className="text-sm text-gray-600">
-                {character.background.description}
-              </p>
-            )}
-            <div className="clear-both"></div>
+            <div className="flex gap-3 mb-3">
+              {/* Character Info Section */}
+              <div className="flex-1">
+                <Link href={`/characters/${character.id}`}>
+                  <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1">
+                    {character.name}
+                  </h3>
+                </Link>
+                <span className="text-sm text-gray-500 block mb-2">Level {character.level}</span>
+                {character.background?.description && (
+                  <p className="text-sm text-gray-600">
+                    {character.background.description}
+                  </p>
+                )}
+              </div>
+
+              {/* Portrait Section */}
+              <div className="flex-shrink-0">
+                <Link href={`/characters/${character.id}`}>
+                  <CharacterPortrait
+                    portrait={character.portrait || { type: 'placeholder', url: null }}
+                    characterName={character.name}
+                    size="large"
+                  />
+                </Link>
+              </div>
+            </div>
           </div>
           
           <div className="space-y-2 mb-4">
