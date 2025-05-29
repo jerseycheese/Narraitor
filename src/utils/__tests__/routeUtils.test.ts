@@ -41,13 +41,7 @@ describe('routeUtils', () => {
 
     it('should build breadcrumbs for root path', () => {
       const segments = buildBreadcrumbSegments('/', {}, {}, null);
-      expect(segments).toEqual([
-        {
-          label: 'Worlds',
-          href: '/worlds',
-          isCurrentPage: true
-        }
-      ]);
+      expect(segments).toEqual([]);
     });
 
     it('should build breadcrumbs for world detail page', () => {

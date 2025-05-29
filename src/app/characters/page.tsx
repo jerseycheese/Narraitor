@@ -276,7 +276,7 @@ export default function CharactersPage() {
                     router.push(`/world/${character.worldId}/play`);
                   }
                 }}
-                className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer flex items-center gap-2"
+                className="px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium transition-colors flex items-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -288,7 +288,7 @@ export default function CharactersPage() {
             <button
               onClick={() => setShowGenerateDialog(true)}
               disabled={isGenerating}
-              className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center gap-2"
             >
               {isGenerating ? (
                 <>
@@ -306,7 +306,7 @@ export default function CharactersPage() {
             </button>
             <button
               onClick={handleCreateCharacter}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+              className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
             >
               Create Character
             </button>
@@ -330,10 +330,10 @@ export default function CharactersPage() {
               </div>
               <h2 className="text-2xl font-semibold mb-2">Ready to bring {currentWorld.name} to life?</h2>
               <p className="text-gray-600 mb-2">
-                Your world is set up and waiting for heroes, villains, and everyone in between.
+                Your world is set up and ready for characters to inhabit it.
               </p>
               <p className="text-gray-500 text-sm">
-                Create characters to explore your world and start their adventures!
+                Create characters to explore your world and shape their stories!
               </p>
             </div>
             <div className="flex gap-3 justify-center">
@@ -377,51 +377,48 @@ export default function CharactersPage() {
             {worldCharacters.map(character => (
               <div
                 key={character.id}
-                className={`bg-white rounded-lg shadow p-6 cursor-pointer transition-all ${
+                className={`bg-white rounded-lg shadow p-8 cursor-pointer transition-all ${
                   currentCharacterId === character.id ? 'ring-2 ring-blue-500' : ''
                 }`}
                 onClick={() => handleSelectCharacter(character.id)}
               >
-                <div className="flex items-start gap-4 mb-4">
+                <div className="mb-6">
                   <div 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleViewCharacter(character.id);
                     }}
-                    className="cursor-pointer"
+                    className="cursor-pointer float-right ml-4 mb-3"
                   >
                     <CharacterPortrait
                       portrait={character.portrait || { type: 'placeholder', url: null }}
                       characterName={character.name}
-                      size="medium"
+                      size="large"
                     />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewCharacter(character.id);
-                        }}
-                        className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer"
-                      >
-                        {character.name}
-                      </h3>
-                      <span className="text-sm text-gray-500">Level {character.level}</span>
-                    </div>
-                    <p className="text-gray-600 line-clamp-2">
-                      {character.background.personality || 'No description provided'}
-                    </p>
-                  </div>
+                  <h3 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewCharacter(character.id);
+                    }}
+                    className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1"
+                  >
+                    {character.name}
+                  </h3>
+                  <span className="text-sm text-gray-500 block mb-3">Level {character.level}</span>
+                  <p className="text-gray-600 leading-relaxed">
+                    {character.background.personality || 'No description provided'}
+                  </p>
+                  <div className="clear-both"></div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleViewCharacter(character.id);
                     }}
-                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
                   >
                     View
                   </button>
@@ -430,7 +427,7 @@ export default function CharactersPage() {
                       e.stopPropagation();
                       handleEditCharacter(character.id);
                     }}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
                   >
                     Edit
                   </button>
@@ -439,7 +436,7 @@ export default function CharactersPage() {
                       e.stopPropagation();
                       handleDeleteCharacter(character.id);
                     }}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
                   >
                     Delete
                   </button>

@@ -38,17 +38,17 @@ describe('QuickPlay', () => {
       });
     });
 
-    it('should show "Start New Adventure" button', () => {
+    it('should show "Start New Game" button', () => {
       render(<QuickPlay />);
       
-      expect(screen.getByRole('button', { name: /start new adventure/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
     });
 
-    it('should navigate to worlds page when "Start New Adventure" is clicked', () => {
+    it('should navigate to worlds page when "Start New Game" is clicked', () => {
       render(<QuickPlay />);
       
-      fireEvent.click(screen.getByRole('button', { name: /start new adventure/i }));
+      fireEvent.click(screen.getByRole('button', { name: /start new game/i }));
       
       expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
@@ -114,10 +114,10 @@ describe('QuickPlay', () => {
       expect(screen.getByText(/5 entries/i)).toBeInTheDocument();
     });
 
-    it('should also show "Start New Adventure" as secondary option', () => {
+    it('should also show "Start New Game" as secondary option', () => {
       render(<QuickPlay />);
       
-      expect(screen.getByRole('button', { name: /start new adventure/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
     });
 
     it('should resume session and navigate when "Continue Last Game" is clicked', async () => {
@@ -187,7 +187,7 @@ describe('QuickPlay', () => {
       render(<QuickPlay />);
       
       expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /start new adventure/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
     });
   });
 });

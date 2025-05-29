@@ -152,7 +152,7 @@ export default function WorldsPage() {
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Leave empty to let AI generate a name
+                    Leave empty for an auto-generated name
                   </p>
                 </div>
                 <div>

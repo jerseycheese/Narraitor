@@ -38,36 +38,34 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       role="region"
       aria-label="Character information"
     >
-      <div className="flex gap-4">
+      <div>
         {/* Portrait Section */}
-        <div className="flex-shrink-0">
-          <Link href={`/characters/${character.id}`} className="block">
-            <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
-              characterName={character.name}
-              size="medium"
-            />
-          </Link>
-        </div>
+        <Link href={`/characters/${character.id}`} className="float-right ml-4 mb-3">
+          <CharacterPortrait
+            portrait={character.portrait || { type: 'placeholder', url: null }}
+            characterName={character.name}
+            size="large"
+          />
+        </Link>
 
         {/* Character Info Section */}
-        <div className="flex-grow">
-          <Link href={`/characters/${character.id}`} className="block">
-            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-              {character.name}
-            </h2>
-          </Link>
-          
-          <p className="text-sm text-gray-600 mt-1">Level {character.level}</p>
-          
-          {character.description && (
-            <p className="text-gray-700 mt-2">{character.description}</p>
-          )}
-          
-          {character.background?.description && (
-            <p className="text-sm text-gray-600 mt-2 italic">{character.background.description}</p>
-          )}
-        </div>
+        <Link href={`/characters/${character.id}`} className="block">
+          <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors mb-1">
+            {character.name}
+          </h2>
+        </Link>
+        
+        <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
+        
+        {character.description && (
+          <p className="text-gray-700 mb-2">{character.description}</p>
+        )}
+        
+        {character.background?.description && (
+          <p className="text-sm text-gray-600 italic">{character.background.description}</p>
+        )}
+        
+        <div className="clear-both"></div>
       </div>
     </div>
   );

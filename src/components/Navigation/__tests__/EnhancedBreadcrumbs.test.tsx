@@ -20,6 +20,10 @@ jest.mock('@/utils/routeUtils', () => ({
   buildBreadcrumbSegments: jest.fn(),
 }));
 
+// Import the mocked function
+import { buildBreadcrumbSegments } from '@/utils/routeUtils';
+const mockedBuildBreadcrumbSegments = buildBreadcrumbSegments as jest.MockedFunction<typeof buildBreadcrumbSegments>;
+
 describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
   const mockPush = jest.fn();
   const mockRouter = { push: mockPush };
@@ -40,8 +44,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: true },
       ]);
@@ -74,8 +77,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: true },
@@ -111,8 +113,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
         { label: 'Characters', href: '/characters', isCurrentPage: true },
@@ -148,8 +149,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
         { label: 'Characters', href: '/characters', isCurrentPage: false },
@@ -182,8 +182,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
         { label: 'Test Character', href: '/characters/char-1', isCurrentPage: false },
@@ -211,8 +210,7 @@ describe.skip('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
-      buildBreadcrumbSegments.mockReturnValue([
+      mockedBuildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: true },

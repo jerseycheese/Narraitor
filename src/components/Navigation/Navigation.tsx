@@ -31,9 +31,9 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/" 
-                className="text-xl font-bold hover:text-gray-300 transition-colors"
+                className="text-xl hover:text-gray-300 transition-colors"
               >
-                Narraitor
+                <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
               </Link>
               
               <div className="hidden sm:flex items-center space-x-1 ml-8">
@@ -119,8 +119,8 @@ export function Navigation() {
       {/* Breadcrumbs */}
       <div className="bg-gray-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <Breadcrumbs className="sm:hidden" maxItems={2} showNextStep />
-          <Breadcrumbs className="hidden sm:flex" showNextStep />
+          <Breadcrumbs className="sm:hidden" maxItems={2} />
+          <Breadcrumbs className="hidden sm:flex" />
         </div>
       </div>
     </>

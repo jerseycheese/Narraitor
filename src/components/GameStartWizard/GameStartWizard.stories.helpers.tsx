@@ -96,7 +96,7 @@ interface WizardMockOptions {
 }
 
 export const createWizardMockState = (options: WizardMockOptions) => {
-  return (Story: React.ComponentType) => {
+  const WizardMockWrapper = (Story: React.ComponentType) => {
     const { hasWorlds, hasCharacters } = options;
     
     const worlds = hasWorlds ? mockWorlds : {};
@@ -111,12 +111,20 @@ export const createWizardMockState = (options: WizardMockOptions) => {
     });
     sessionStore.setState({ 
       savedSessions: {},
-      initializeSession: (worldId: string, characterId: string, callback?: () => void) => {
+      initializeSession: async (worldId: string, characterId: string, callback?: () => void) => {
         console.log('Initializing session:', { worldId, characterId });
-        setTimeout(() => callback?.(), 1000);
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            callback?.();
+            resolve();
+          }, 1000);
+        });
       }
     });
     
     return <Story />;
   };
+  
+  WizardMockWrapper.displayName = 'WizardMockWrapper';
+  return WizardMockWrapper;
 };

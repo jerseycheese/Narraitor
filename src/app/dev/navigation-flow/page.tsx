@@ -27,21 +27,17 @@ export default function NavigationFlowTestPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
+        <Link 
+          href="/dev" 
+          className="text-blue-600 hover:text-blue-800 underline inline-block mb-4"
+        >
+          ← Back to Dev Harnesses
+        </Link>
         <header className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Navigation Flow Test Harness</h1>
-              <p className="text-gray-600">
-                Test the enhanced navigation components and flow logic
-              </p>
-            </div>
-            <Link
-              href="/dev"
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
-            >
-              ← Back to Dev Tools
-            </Link>
-          </div>
+          <h1 className="text-3xl font-bold mb-2">Navigation Flow Test Harness</h1>
+          <p className="text-gray-600">
+            Test the enhanced navigation components and flow logic
+          </p>
         </header>
 
         {/* Test Navigation */}

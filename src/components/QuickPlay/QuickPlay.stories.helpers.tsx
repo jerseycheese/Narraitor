@@ -11,6 +11,12 @@ export const mockWorld = {
   theme: 'fantasy' as const,
   attributes: [],
   skills: [],
+  settings: {
+    maxAttributes: 10,
+    maxSkills: 10,
+    attributePointPool: 100,
+    skillPointPool: 100,
+  },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -19,13 +25,12 @@ export const mockCharacter = {
   id: 'char-1',
   worldId: 'world-1',
   name: 'Aria the Brave',
+  level: 3,
+  isPlayer: true,
   background: {
-    history: 'A courageous warrior',
+    description: 'A courageous warrior',
     personality: 'Bold and adventurous',
-    physicalDescription: 'Tall with flowing red hair',
-    goals: [],
-    fears: [],
-    relationships: [],
+    motivation: 'To protect the innocent and seek adventure',
   },
   attributes: [],
   skills: [],
@@ -36,10 +41,9 @@ export const mockCharacter = {
     categories: [],
   },
   status: {
-    health: 100,
-    maxHealth: 100,
-    conditions: [],
-    location: 'Starting Village',
+    hp: 100,
+    mp: 50,
+    stamina: 80,
   },
   portrait: { type: 'placeholder' as const, url: null },
   createdAt: new Date().toISOString(),
@@ -53,7 +57,7 @@ interface MockStoreOptions {
 }
 
 export const createMockStoreState = (options: MockStoreOptions) => {
-  return (Story: React.ComponentType) => {
+  const MockStateWrapper = (Story: React.ComponentType) => {
     const { hasSession, narrativeCount = 12, timeAgo = 3600000 } = options;
     
     if (!hasSession) {
@@ -104,4 +108,7 @@ export const createMockStoreState = (options: MockStoreOptions) => {
     
     return <Story />;
   };
+  
+  MockStateWrapper.displayName = 'MockStateWrapper';
+  return MockStateWrapper;
 };

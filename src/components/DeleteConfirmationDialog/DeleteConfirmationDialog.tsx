@@ -82,7 +82,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${
+            className={`px-4 py-3 font-medium rounded-md transition-colors ${
               isDeleting
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -95,7 +95,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
             type="button"
             onClick={handleConfirm}
             disabled={isDeleting}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${
+            className={`px-4 py-3 font-medium rounded-md transition-colors ${
               isDeleting
                 ? 'bg-red-300 text-red-100 cursor-not-allowed'
                 : 'bg-red-600 text-white hover:bg-red-700'

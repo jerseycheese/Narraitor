@@ -101,16 +101,21 @@ const GameSession: React.FC<GameSessionProps> = ({
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
     console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
     
+    return sessionId;
+  }, [worldId, sessionState.id, savedSession]);
+  
+  // Update session store and clear segments when session ID changes
+  useEffect(() => {
+    if (!stableSessionId) return;
+    
     // Clear any existing segments for this session ID to prevent duplicates
-    narrativeStore.getState().clearSessionSegments(sessionId);
+    narrativeStore.getState().clearSessionSegments(stableSessionId);
     
     // Update the session store
     if (sessionStore.getState().setSessionId) {
-      sessionStore.getState().setSessionId(sessionId);
+      sessionStore.getState().setSessionId(stableSessionId);
     }
-    
-    return sessionId;
-  }, [worldId, sessionState.id, savedSession]);
+  }, [stableSessionId]);
   
   // Focus management for state transitions
   useEffect(() => {
