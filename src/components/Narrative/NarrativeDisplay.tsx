@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
@@ -7,16 +6,14 @@ interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
   isLoading?: boolean;
   error?: string;
-  isAIGenerated?: boolean;
-  fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
+  onRetry?: () => void;
 }
 
 export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   segment,
   isLoading = false,
   error,
-  isAIGenerated = true,
-  fallbackReason
+  onRetry
 }) => {
   if (isLoading) {
     return (
@@ -33,10 +30,14 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (error) {
     return (
-      <div className="p-6 border border-red-300 rounded-lg bg-red-50">
-        <h3 className="text-lg font-semibold text-red-700 mb-2">Error Generating Narrative</h3>
-        <p className="text-red-600">{error}</p>
-      </div>
+      <ErrorDisplay
+        variant="section"
+        severity="error"
+        title="Unable to Generate Narrative"
+        message={error}
+        showRetry={!!onRetry}
+        onRetry={onRetry}
+      />
     );
   }
 
@@ -150,7 +151,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
               }
             }
           }
-        } catch (_) {
+        } catch {
           // If proper JSON parsing fails, try more lenient approaches
           console.warn('Strict JSON parsing failed, trying regex extraction');
           
@@ -186,7 +187,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         } else if (parsed && typeof parsed.text === 'string') {
           return parsed.text;
         }
-      } catch (_) {
+      } catch {
         // Ignore error, just return the content as-is
       }
     }
@@ -197,25 +198,8 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const styles = getSegmentStyles(segment.type);
   const displayContent = parseContent(segment.content);
 
-  const getFallbackMessage = (reason?: string) => {
-    const messages = {
-      service_unavailable: 'AI service temporarily unavailable - using curated content',
-      timeout: 'AI response timed out - using curated content',
-      error: 'An error occurred - using curated content',
-      rate_limit: 'Rate limit reached - using curated content'
-    };
-    return messages[reason as keyof typeof messages] || 'Using curated content';
-  };
-
   return (
     <div className="space-y-3">
-      {!isAIGenerated && (
-        <ErrorDisplay
-          variant="inline"
-          severity="info"
-          message={getFallbackMessage(fallbackReason)}
-        />
-      )}
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
         <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>

@@ -7,13 +7,15 @@ interface NarrativeHistoryProps {
   isLoading?: boolean;
   error?: string;
   className?: string;
+  onRetry?: () => void;
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   segments,
   isLoading = false,
   error,
-  className = ''
+  className = '',
+  onRetry
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prevSegmentCountRef = useRef(segments.length);
@@ -70,6 +72,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           segment={null}
           isLoading={false}
           error={error}
+          onRetry={onRetry}
         />
       );
     }

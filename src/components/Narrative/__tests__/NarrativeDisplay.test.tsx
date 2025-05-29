@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 
 describe('NarrativeDisplay', () => {
@@ -62,5 +63,28 @@ describe('NarrativeDisplay', () => {
     render(<NarrativeDisplay segment={null} error={errorMessage} />);
     
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
+  });
+
+  it('shows retry button when error occurs and onRetry is provided', async () => {
+    const user = userEvent.setup();
+    const errorMessage = 'Unable to generate narrative. Please check your connection and try again.';
+    const mockRetry = jest.fn();
+    
+    render(<NarrativeDisplay segment={null} error={errorMessage} onRetry={mockRetry} />);
+    
+    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    
+    await user.click(screen.getByText('Try Again'));
+    expect(mockRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show retry button when no onRetry handler is provided', () => {
+    const errorMessage = 'Unable to generate narrative. Please check your connection and try again.';
+    
+    render(<NarrativeDisplay segment={null} error={errorMessage} />);
+    
+    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    expect(screen.queryByText('Try Again')).not.toBeInTheDocument();
   });
 });

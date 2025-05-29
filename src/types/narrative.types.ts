@@ -123,10 +123,6 @@ export interface NarrativeGenerationResult {
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
     timestamp?: string;
-    isAIGenerated?: boolean;
-    fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
-    contentId?: string;
-    retryAttempts?: number;
   };
   choices?: Array<{
     text: string;
@@ -138,6 +134,4 @@ export interface NarrativeGenerationResult {
     completionTokens: number;
     totalTokens: number;
   };
-  isAIGenerated?: boolean;
-  fallbackReason?: 'service_unavailable' | 'timeout' | 'error' | 'rate_limit';
 }

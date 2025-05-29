@@ -161,36 +161,6 @@ export const FormValidation: Story = {
   ),
 };
 
-// Fallback content scenarios
-export const FallbackScenarios: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold mb-4">Fallback Content Messages</h3>
-      <div className="space-y-3 max-w-md">
-        <ErrorDisplay
-          variant="inline"
-          severity="info"
-          message="AI service temporarily unavailable - using curated content"
-        />
-        <ErrorDisplay
-          variant="inline"
-          severity="info"
-          message="AI response timed out - using curated content"
-        />
-        <ErrorDisplay
-          variant="inline"
-          severity="info"
-          message="Rate limit reached - using curated content"
-        />
-        <ErrorDisplay
-          variant="inline"
-          severity="info"
-          message="An error occurred - using curated content"
-        />
-      </div>
-    </div>
-  ),
-};
 
 // Interactive playground
 export const Playground: Story = {
