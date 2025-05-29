@@ -17,7 +17,7 @@ describe('useNavigationFlow', () => {
   });
 
   describe('getNextStep', () => {
-    it('should return world selection when no world is selected', () => {
+    it('should return world creation when no worlds exist', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
       (worldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: null,
@@ -26,25 +26,8 @@ describe('useNavigationFlow', () => {
       (characterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
-
-      const { result } = renderHook(() => useNavigationFlow());
-
-      expect(result.current.getNextStep()).toEqual({
-        label: 'Select a World',
-        href: '/worlds',
-        action: 'select-world',
-        isEnabled: true,
-      });
-    });
-
-    it('should return world creation when no worlds exist', () => {
-      (usePathname as jest.Mock).mockReturnValue('/worlds');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
-        currentWorldId: null,
-        worlds: {},
-      });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
-        characters: {},
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
       });
 
       const { result } = renderHook(() => useNavigationFlow());
@@ -53,6 +36,31 @@ describe('useNavigationFlow', () => {
         label: 'Create Your First World',
         href: '/world/create',
         action: 'create-world',
+        isEnabled: true,
+      });
+    });
+
+    it('should return world selection when worlds exist but none selected', () => {
+      (usePathname as jest.Mock).mockReturnValue('/worlds');
+      (worldStore as unknown as jest.Mock).mockReturnValue({
+        currentWorldId: null,
+        worlds: {
+          'world-1': { id: 'world-1', name: 'Test World' },
+        },
+      });
+      (characterStore as unknown as jest.Mock).mockReturnValue({
+        characters: {},
+      });
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
+      });
+
+      const { result } = renderHook(() => useNavigationFlow());
+
+      expect(result.current.getNextStep()).toEqual({
+        label: 'Select a World',
+        href: '/worlds',
+        action: 'select-world',
         isEnabled: true,
       });
     });
@@ -67,6 +75,9 @@ describe('useNavigationFlow', () => {
       });
       (characterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
+      });
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
       });
 
       const { result } = renderHook(() => useNavigationFlow());
@@ -92,6 +103,9 @@ describe('useNavigationFlow', () => {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
       });
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
+      });
 
       const { result } = renderHook(() => useNavigationFlow());
 
@@ -115,6 +129,9 @@ describe('useNavigationFlow', () => {
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
+      });
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
       });
 
       const { result } = renderHook(() => useNavigationFlow());
@@ -140,6 +157,9 @@ describe('useNavigationFlow', () => {
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
+      });
+      (sessionStore as unknown as jest.Mock).mockReturnValue({
+        savedSessions: {},
       });
 
       const { result } = renderHook(() => useNavigationFlow());

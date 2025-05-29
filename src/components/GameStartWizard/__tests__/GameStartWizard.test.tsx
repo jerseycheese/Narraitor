@@ -100,7 +100,7 @@ describe('GameStartWizard', () => {
     render(<GameStartWizard />);
     
     expect(screen.getByText(/step 1 of 3/i)).toBeInTheDocument();
-    expect(screen.getByText(/select world/i)).toBeInTheDocument();
+    expect(screen.getByText(/select world/i, { selector: 'span' })).toBeInTheDocument();
   });
 
   it('should progress to character selection when world is selected', () => {
@@ -111,7 +111,7 @@ describe('GameStartWizard', () => {
     expect(screen.queryByTestId('world-selection-step')).not.toBeInTheDocument();
     expect(screen.getByTestId('character-selection-step')).toBeInTheDocument();
     expect(screen.getByText(/step 2 of 3/i)).toBeInTheDocument();
-    expect(screen.getByText(/select character/i)).toBeInTheDocument();
+    expect(screen.getByText(/select character/i, { selector: 'span' })).toBeInTheDocument();
   });
 
   it('should pass selected world ID to character selection step', () => {
@@ -133,7 +133,7 @@ describe('GameStartWizard', () => {
     expect(screen.queryByTestId('character-selection-step')).not.toBeInTheDocument();
     expect(screen.getByTestId('game-ready-step')).toBeInTheDocument();
     expect(screen.getByText(/step 3 of 3/i)).toBeInTheDocument();
-    expect(screen.getByText(/ready to play/i)).toBeInTheDocument();
+    expect(screen.getByText(/ready to play/i, { selector: 'span' })).toBeInTheDocument();
   });
 
   it('should pass selected IDs to game ready step', () => {
