@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { useNavigationFlow } from '../useNavigationFlow';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';

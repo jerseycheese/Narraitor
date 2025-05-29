@@ -69,7 +69,7 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
               <div>
                 <h4 className="font-medium text-gray-900">{character.name}</h4>
                 <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {character.background}
+                  {character.background.personality || 'No description available'}
                 </p>
               </div>
               <span className="text-blue-600 ml-4">

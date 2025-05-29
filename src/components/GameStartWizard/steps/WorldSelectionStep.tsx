@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
-import { WorldCard } from '@/components/WorldCard/WorldCard';
+import WorldCard from '@/components/WorldCard/WorldCard';
 
 export interface WorldSelectionStepProps {
   onNext: (worldId: string) => void;
@@ -40,11 +40,12 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {worldList.map(world => (
-          <div key={world.id} className="cursor-pointer" onClick={() => onNext(world.id)}>
+          <div key={world.id} className="cursor-pointer">
             <WorldCard 
               world={world}
-              isSelected={false}
-              characterCount={0}
+              isActive={false}
+              onSelect={onNext}
+              onDelete={() => {/* No delete in wizard */}}
             />
           </div>
         ))}

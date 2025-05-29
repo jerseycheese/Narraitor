@@ -40,7 +40,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: true },
@@ -74,7 +74,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: false },
@@ -111,7 +111,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
@@ -148,7 +148,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
@@ -182,7 +182,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         },
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Test World', href: '/world/world-1', isCurrentPage: false },
@@ -211,7 +211,7 @@ describe('Enhanced Breadcrumbs with Next Step Guidance', () => {
         characters: {},
       });
       
-      const { buildBreadcrumbSegments } = require('@/utils/routeUtils');
+      const { buildBreadcrumbSegments } = jest.requireActual('@/utils/routeUtils');
       buildBreadcrumbSegments.mockReturnValue([
         { label: 'Home', href: '/', isCurrentPage: false },
         { label: 'Worlds', href: '/worlds', isCurrentPage: false },

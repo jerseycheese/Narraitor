@@ -41,7 +41,9 @@ export function GameReadyStep({
           <div className="pt-2 border-t">
             <span className="text-sm text-gray-600">Character:</span>
             <p className="font-medium text-gray-900">{character?.name}</p>
-            <p className="text-sm text-gray-600 line-clamp-2">{character?.background}</p>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {character?.background?.personality || 'No description available'}
+            </p>
           </div>
         </div>
       </div>
