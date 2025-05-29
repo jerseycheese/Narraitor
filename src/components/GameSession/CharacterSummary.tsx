@@ -39,34 +39,34 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       aria-label="Character information"
     >
       <div className="flex gap-4">
-        {/* Portrait Section */}
-        <div className="flex-shrink-0">
-          <Link href={`/characters/${character.id}`} className="block">
-            <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
-              characterName={character.name}
-              size="medium"
-            />
-          </Link>
-        </div>
-
         {/* Character Info Section */}
-        <div className="flex-grow">
+        <div className="flex-1">
           <Link href={`/characters/${character.id}`} className="block">
-            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors mb-1">
               {character.name}
             </h2>
           </Link>
           
-          <p className="text-sm text-gray-600 mt-1">Level {character.level}</p>
+          <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
           
           {character.description && (
-            <p className="text-gray-700 mt-2">{character.description}</p>
+            <p className="text-gray-700 mb-2">{character.description}</p>
           )}
           
           {character.background?.description && (
-            <p className="text-sm text-gray-600 mt-2 italic">{character.background.description}</p>
+            <p className="text-sm text-gray-600 italic">{character.background.description}</p>
           )}
+        </div>
+
+        {/* Portrait Section */}
+        <div className="flex-shrink-0">
+          <Link href={`/characters/${character.id}`}>
+            <CharacterPortrait
+              portrait={character.portrait || { type: 'placeholder', url: null }}
+              characterName={character.name}
+              size="large"
+            />
+          </Link>
         </div>
       </div>
     </div>

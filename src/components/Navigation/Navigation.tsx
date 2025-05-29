@@ -31,9 +31,9 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/" 
-                className="text-xl font-bold hover:text-gray-300 transition-colors"
+                className="text-xl hover:text-gray-300 transition-colors"
               >
-                Narraitor
+                <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
               </Link>
               
               <div className="hidden sm:flex items-center space-x-1 ml-8">

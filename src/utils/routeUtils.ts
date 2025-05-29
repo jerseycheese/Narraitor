@@ -112,12 +112,19 @@ export function buildBreadcrumbSegments(
 ): BreadcrumbSegment[] {
   const segments: BreadcrumbSegment[] = [];
   
-  // Always start with Worlds as home
+  // Only show breadcrumbs for non-root paths
   const isRootPath = pathname === '/' || pathname === '/worlds';
+  
+  // Don't show breadcrumbs on the root/home page
+  if (isRootPath) {
+    return [];
+  }
+  
+  // Start with Worlds for other pages
   segments.push({
     label: 'Worlds',
     href: '/worlds',
-    isCurrentPage: isRootPath
+    isCurrentPage: false
   });
   
   // Handle world routes

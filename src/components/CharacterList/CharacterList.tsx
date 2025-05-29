@@ -42,28 +42,33 @@ export const CharacterList: React.FC<CharacterListProps> = ({
           }`}
           onClick={() => onSelectCharacter(character.id)}
         >
-          <div className="flex items-start gap-4 mb-4">
-            <Link href={`/characters/${character.id}`} className="flex-shrink-0">
-              <CharacterPortrait
-                portrait={character.portrait || { type: 'placeholder', url: null }}
-                characterName={character.name}
-                size="medium"
-              />
-            </Link>
-            <div className="flex-1">
-              <div className="flex justify-between items-start mb-2">
+          <div className="mb-4">
+            <div className="flex gap-3 mb-3">
+              {/* Character Info Section */}
+              <div className="flex-1">
                 <Link href={`/characters/${character.id}`}>
-                  <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer">
+                  <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1">
                     {character.name}
                   </h3>
                 </Link>
-                <span className="text-sm text-gray-500">Level {character.level}</span>
+                <span className="text-sm text-gray-500 block mb-2">Level {character.level}</span>
+                {character.background?.description && (
+                  <p className="text-sm text-gray-600">
+                    {character.background.description}
+                  </p>
+                )}
               </div>
-              {character.background?.description && (
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {character.background.description}
-                </p>
-              )}
+
+              {/* Portrait Section */}
+              <div className="flex-shrink-0">
+                <Link href={`/characters/${character.id}`}>
+                  <CharacterPortrait
+                    portrait={character.portrait || { type: 'placeholder', url: null }}
+                    characterName={character.name}
+                    size="large"
+                  />
+                </Link>
+              </div>
             </div>
           </div>
           
@@ -84,13 +89,13 @@ export const CharacterList: React.FC<CharacterListProps> = ({
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEditCharacter(character.id);
               }}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
             >
               Edit
             </button>
@@ -99,7 +104,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                 e.stopPropagation();
                 onDeleteCharacter(character.id);
               }}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
             >
               Delete
             </button>

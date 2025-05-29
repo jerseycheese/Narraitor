@@ -5,24 +5,30 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
+import { sessionStore } from '@/state/sessionStore';
 import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
 import { cn } from '@/lib/utils/classNames';
+import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 
 export interface BreadcrumbsProps {
   className?: string;
   separator?: React.ReactNode;
   maxItems?: number;
+  showNextStep?: boolean;
 }
 
 export function Breadcrumbs({ 
   className,
   separator = '→',
-  maxItems
+  maxItems,
+  showNextStep = false
 }: BreadcrumbsProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { worlds, currentWorldId } = worldStore();
   const { characters } = characterStore();
+  const { initializeSession } = sessionStore();
+  const { getNextStep } = useNavigationFlow();
   
   // Build breadcrumb segments
   const segments = buildBreadcrumbSegments(
@@ -111,8 +117,76 @@ export function Breadcrumbs({
           </React.Fragment>
         );
       })}
+      
+      {/* Next Step Guidance */}
+      {showNextStep && renderNextStepGuidance()}
     </nav>
   );
+  
+  function renderNextStepGuidance() {
+    const nextStep = getNextStep();
+    if (!nextStep) return null;
+
+    if (nextStep.action === 'start-game' && nextStep.characterId) {
+      const character = characters[nextStep.characterId];
+      return (
+        <div className="ml-4 flex items-center">
+          <span className="text-gray-400 mr-2">{separator}</span>
+          <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
+          <button
+            onClick={() => {
+              if (currentWorldId && nextStep.characterId) {
+                initializeSession(currentWorldId, nextStep.characterId, () => {
+                  router.push('/play');
+                });
+              }
+            }}
+            className="text-sm px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+          >
+            Play as {character?.name}
+          </button>
+        </div>
+      );
+    }
+
+    if (nextStep.action === 'select-character' && Object.values(characters).filter(c => c.worldId === currentWorldId).length > 0) {
+      return (
+        <div className="ml-4 flex items-center">
+          <span className="text-gray-400 mr-2">{separator}</span>
+          <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
+          <button
+            onClick={() => {
+              const firstCharacter = Object.values(characters).find(c => c.worldId === currentWorldId);
+              if (currentWorldId && firstCharacter) {
+                initializeSession(currentWorldId, firstCharacter.id, () => {
+                  router.push('/play');
+                });
+              }
+            }}
+            className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          >
+            Quick Start
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="ml-4 flex items-center">
+        <span className="text-gray-400 mr-2">{separator}</span>
+        <span className="text-sm text-gray-600 mr-2">Next: {nextStep.label}</span>
+        <Link
+          href={nextStep.href}
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+        >
+          {nextStep.action === 'create-world' && 'Create Your First World'}
+          {nextStep.action === 'create-character' && 'Create Character'}
+          {nextStep.action === 'select-world' && 'Browse Worlds'}
+          {nextStep.action === 'select-character' && 'View Characters'}
+        </Link>
+      </div>
+    );
+  }
 }
 
 /**

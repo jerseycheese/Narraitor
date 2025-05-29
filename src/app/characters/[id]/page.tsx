@@ -34,7 +34,7 @@ export default function CharacterViewPage() {
             </p>
             <button
               onClick={() => router.push('/characters')}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
             >
               Back to Characters
             </button>
@@ -54,6 +54,32 @@ export default function CharacterViewPage() {
             className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
           >
             <span>←</span> Back to Characters
+          </button>
+        </div>
+
+        {/* Action buttons */}
+        <div className="mb-6 flex gap-3">
+          <button
+            onClick={() => router.push(`/characters/${characterId}/edit`)}
+            className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+          >
+            Edit Character
+          </button>
+          <button
+            onClick={() => {
+              // Set this character as the current character before playing
+              setCurrentCharacter(characterId);
+              router.push(`/world/${character.worldId}/play`);
+            }}
+            className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
+          >
+            Play with Character
+          </button>
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+          >
+            Delete Character
           </button>
         </div>
 
@@ -104,32 +130,6 @@ export default function CharacterViewPage() {
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Background</h2>
               <CharacterBackgroundDisplay background={character.background} />
             </section>
-          </div>
-
-          {/* Action buttons */}
-          <div className="mt-8 flex gap-4">
-            <button
-              onClick={() => router.push(`/characters/${characterId}/edit`)}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
-            >
-              Edit Character
-            </button>
-            <button
-              onClick={() => {
-                // Set this character as the current character before playing
-                setCurrentCharacter(characterId);
-                router.push(`/world/${character.worldId}/play`);
-              }}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
-            >
-              Play with Character
-            </button>
-            <button
-              onClick={() => setShowDeleteDialog(true)}
-              className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
-            >
-              Delete Character
-            </button>
           </div>
         </div>
       </div>

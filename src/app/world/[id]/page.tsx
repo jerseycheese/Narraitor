@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import Link from 'next/link';
 import { SectionError } from '@/components/ui/ErrorDisplay';
+import { DataField } from '@/components/shared/DataField';
 
 export default function WorldViewPage() {
   const params = useParams();
@@ -30,7 +31,13 @@ export default function WorldViewPage() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
+        <div className="mb-6">
+          <Link href="/worlds" className="text-blue-600 hover:text-blue-800 flex items-center gap-2">
+            <span>←</span> Back to Worlds
+          </Link>
+        </div>
+
+        <header className="mb-6">
           <h1 className="text-4xl font-bold mb-4">{world.name}</h1>
           {world.theme && (
             <span className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-full">
@@ -39,6 +46,27 @@ export default function WorldViewPage() {
           )}
         </header>
 
+        <div className="flex gap-3 mb-8">
+          <Link
+            href={`/world/${worldId}/edit`}
+            className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+          >
+            Edit World
+          </Link>
+          <Link
+            href={`/world/${worldId}/play`}
+            className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
+          >
+            Play in World
+          </Link>
+          <Link
+            href="/characters"
+            className="px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium transition-colors"
+          >
+            View Characters
+          </Link>
+        </div>
+
         <section className="bg-white rounded-lg p-6 shadow mb-6">
           <h2 className="text-2xl font-semibold mb-4">Description</h2>
           <p className="text-gray-700 leading-relaxed">{world.description}</p>
@@ -46,46 +74,29 @@ export default function WorldViewPage() {
 
         <section className="bg-white rounded-lg p-6 shadow mb-6">
           <h2 className="text-2xl font-semibold mb-4">World Details</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-gray-600">Created:</span>
-              <span className="ml-2">{new Date(world.createdAt).toLocaleDateString()}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Updated:</span>
-              <span className="ml-2">{new Date(world.updatedAt).toLocaleDateString()}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Attributes:</span>
-              <span className="ml-2">{world.attributes?.length || 0}</span>
-            </div>
-            <div>
-              <span className="font-medium text-gray-600">Skills:</span>
-              <span className="ml-2">{world.skills?.length || 0}</span>
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            <DataField 
+              label="Created" 
+              value={new Date(world.createdAt).toLocaleDateString()} 
+              variant="inline"
+            />
+            <DataField 
+              label="Updated" 
+              value={new Date(world.updatedAt).toLocaleDateString()} 
+              variant="inline"
+            />
+            <DataField 
+              label="Attributes" 
+              value={world.attributes?.length || 0} 
+              variant="inline"
+            />
+            <DataField 
+              label="Skills" 
+              value={world.skills?.length || 0} 
+              variant="inline"
+            />
           </div>
         </section>
-
-        <div className="flex gap-4">
-          <Link
-            href={`/world/${worldId}/edit`}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Edit World
-          </Link>
-          <Link
-            href={`/world/${worldId}/play`}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-          >
-            Play in World
-          </Link>
-          <Link
-            href="/characters"
-            className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-          >
-            View Characters
-          </Link>
-        </div>
       </div>
     </main>
   );

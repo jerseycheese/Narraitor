@@ -22,12 +22,23 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
 
+// Mock route utils
+jest.mock('@/utils/routeUtils', () => ({
+  buildBreadcrumbSegments: jest.fn(),
+}));
+
+import { buildBreadcrumbSegments } from '@/utils/routeUtils';
+const mockedBuildBreadcrumbSegments = buildBreadcrumbSegments as jest.MockedFunction<typeof buildBreadcrumbSegments>;
+
 describe('Breadcrumbs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockPush.mockClear();
     (usePathname as jest.Mock).mockReturnValue('/');
     (useParams as jest.Mock).mockReturnValue({});
+    
+    // Default mock for buildBreadcrumbSegments
+    mockedBuildBreadcrumbSegments.mockReturnValue([]);
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     (worldStore as jest.Mock).mockReturnValue({
       worlds: {},
@@ -39,13 +50,13 @@ describe('Breadcrumbs', () => {
   });
 
   describe('Basic breadcrumb generation', () => {
-    it('should render home breadcrumb on root path', () => {
+    it('should not render breadcrumbs on root path', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
       
       render(<Breadcrumbs />);
       
-      expect(screen.getByTestId('breadcrumb-home')).toBeInTheDocument();
-      expect(screen.getByText('Worlds')).toBeInTheDocument();
+      expect(screen.queryByTestId('breadcrumb-home')).not.toBeInTheDocument();
+      expect(screen.queryByText('Worlds')).not.toBeInTheDocument();
     });
 
     it('should render world breadcrumbs on world detail page', () => {
@@ -58,10 +69,14 @@ describe('Breadcrumbs', () => {
         currentWorldId: '123',
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      expect(screen.getByTestId('breadcrumb-home')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-world')).toBeInTheDocument();
+      expect(screen.getByText('Worlds')).toBeInTheDocument();
       expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
     });
 
@@ -74,11 +89,16 @@ describe('Breadcrumbs', () => {
         currentWorldId: '123',
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+        { label: 'Characters', href: '/characters', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      expect(screen.getByTestId('breadcrumb-home')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-world')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-characters')).toBeInTheDocument();
+      expect(screen.getByText('Worlds')).toBeInTheDocument();
+      expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
       expect(screen.getByText('Characters')).toBeInTheDocument();
     });
 
@@ -97,18 +117,24 @@ describe('Breadcrumbs', () => {
         },
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+        { label: 'Characters', href: '/characters', isCurrentPage: false },
+        { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      expect(screen.getByTestId('breadcrumb-home')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-world')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-characters')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-character')).toBeInTheDocument();
+      expect(screen.getByText('Worlds')).toBeInTheDocument();
+      expect(screen.getByText('Fantasy Realm')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
       expect(screen.getByText('Aragorn')).toBeInTheDocument();
     });
   });
 
   describe('Navigation behavior', () => {
-    it('should navigate to home when clicking Worlds breadcrumb', async () => {
+    it('should navigate to worlds when clicking Worlds breadcrumb', async () => {
       const user = userEvent.setup();
       // Set pathname to a page where Worlds breadcrumb is clickable
       (usePathname as jest.Mock).mockReturnValue('/world/123');
@@ -119,9 +145,14 @@ describe('Breadcrumbs', () => {
         currentWorldId: '123',
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      await user.click(screen.getByTestId('breadcrumb-home'));
+      await user.click(screen.getByText('Worlds'));
       expect(mockPush).toHaveBeenCalledWith('/worlds');
     });
 
@@ -135,19 +166,30 @@ describe('Breadcrumbs', () => {
         currentWorldId: '123',
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+        { label: 'Characters', href: '/characters', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      await user.click(screen.getByTestId('breadcrumb-world'));
+      await user.click(screen.getByText('Fantasy Realm'));
       expect(mockPush).toHaveBeenCalledWith('/world/123');
     });
 
     it('should not navigate when clicking current page breadcrumb', async () => {
       const user = userEvent.setup();
-      (usePathname as jest.Mock).mockReturnValue('/worlds');
+      (usePathname as jest.Mock).mockReturnValue('/world/123');
+      
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Test World', href: '/world/123', isCurrentPage: true },
+      ]);
       
       render(<Breadcrumbs />);
       
-      const currentBreadcrumb = screen.getByTestId('breadcrumb-home');
+      const currentBreadcrumb = screen.getByText('Test World');
       expect(currentBreadcrumb).toHaveAttribute('aria-current', 'page');
       
       await user.click(currentBreadcrumb);
@@ -168,14 +210,21 @@ describe('Breadcrumbs', () => {
         },
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+        { label: 'Characters', href: '/characters', isCurrentPage: false },
+        { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs maxItems={2} />);
       
       // Should show ellipsis and last 2 items
-      expect(screen.getByTestId('breadcrumb-ellipsis')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-characters')).toBeInTheDocument();
-      expect(screen.getByTestId('breadcrumb-character')).toBeInTheDocument();
-      expect(screen.queryByTestId('breadcrumb-home')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('breadcrumb-world')).not.toBeInTheDocument();
+      expect(screen.getByText('...')).toBeInTheDocument();
+      expect(screen.getByText('Characters')).toBeInTheDocument();
+      expect(screen.getByText('Aragorn')).toBeInTheDocument();
+      expect(screen.queryByText('Worlds')).not.toBeInTheDocument();
+      expect(screen.queryByText('Fantasy Realm')).not.toBeInTheDocument();
     });
   });
 
@@ -188,9 +237,14 @@ describe('Breadcrumbs', () => {
         currentWorldId: '123',
       });
       
+      mockedBuildBreadcrumbSegments.mockReturnValue([
+        { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+        { label: 'Loading...', href: '/world/123', isCurrentPage: true },
+      ]);
+      
       render(<Breadcrumbs />);
       
-      expect(screen.getByTestId('breadcrumb-world-loading')).toBeInTheDocument();
+      expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
 });

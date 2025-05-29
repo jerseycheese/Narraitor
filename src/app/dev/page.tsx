@@ -23,6 +23,11 @@ export default function DevPage() {
       { href: '/dev/character-generation', label: 'Character Generation (AI)', color: 'orange' },
       { href: '/dev/portrait-prompt-test', label: 'Portrait Testing', color: 'purple' },
     ],
+    'Navigation & UI': [
+      { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
+      { href: '/dev/global-styles', label: 'Global Styles', color: 'pink' },
+      { href: '/dev/template-selector', label: 'Template Selector', color: 'cyan' },
+    ],
     'Development Tools': [
       { href: '/dev/devtools-test', label: 'DevTools Panel', color: 'gray' },
       { href: '/dev/ai-testing', label: 'AI Testing Panel', color: 'gray' },
@@ -37,6 +42,9 @@ export default function DevPage() {
     yellow: 'bg-yellow-100 hover:bg-yellow-200',
     gray: 'bg-gray-100 hover:bg-gray-200',
     indigo: 'bg-indigo-100 hover:bg-indigo-200',
+    teal: 'bg-teal-100 hover:bg-teal-200',
+    pink: 'bg-pink-100 hover:bg-pink-200',
+    cyan: 'bg-cyan-100 hover:bg-cyan-200',
   };
 
   return (
