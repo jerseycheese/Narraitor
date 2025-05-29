@@ -8,7 +8,7 @@ const meta: Meta<typeof Breadcrumbs> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Enhanced breadcrumbs component with optional next-step guidance for navigation flow.',
+        component: 'Enhanced breadcrumbs component with optional next-step guidance. Best tested in the Navigation Flow test harness at /dev/navigation-flow.',
       },
     },
   },
@@ -21,60 +21,21 @@ const meta: Meta<typeof Breadcrumbs> = {
       </div>
     ),
   ],
-  argTypes: {
-    showNextStep: {
-      control: 'boolean',
-      description: 'Show next step guidance in breadcrumbs',
-    },
-    maxItems: {
-      control: 'number',
-      description: 'Maximum number of breadcrumb items to show (for mobile)',
-    },
-    separator: {
-      control: 'text',
-      description: 'Custom separator between breadcrumb items',
-    },
-    className: {
-      control: 'text',
-      description: 'Additional CSS classes',
-    },
-  },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const StandardBreadcrumbs: Story = {
-  name: 'Standard Breadcrumbs',
-  args: {
-    showNextStep: false,
-  },
-};
-
-export const WithNextStepGuidance: Story = {
-  name: 'With Next Step Guidance',
-  args: {
-    showNextStep: true,
-  },
-};
-
-export const MobileView: Story = {
-  name: 'Mobile View (Max 2 Items)',
-  args: {
-    showNextStep: true,
-    maxItems: 2,
-  },
+export const BasicExample: Story = {
+  name: 'Basic Example',
   parameters: {
-    viewport: {
-      defaultViewport: 'mobile1',
+    docs: {
+      description: {
+        story: 'For full testing of breadcrumbs with different navigation states, use the test harness at /dev/navigation-flow in the running application.',
+      },
     },
   },
-};
-
-export const CustomSeparator: Story = {
-  name: 'Custom Separator',
   args: {
     showNextStep: true,
-    separator: '/',
   },
 };
