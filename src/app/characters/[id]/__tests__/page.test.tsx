@@ -20,23 +20,30 @@ jest.mock('@/state/characterStore', () => ({
         level: 5,
         worldId: 'world-1',
         attributes: [
-          { id: 'attr-1', name: 'Strength', baseValue: 8, modifiedValue: 8 }
+          { id: 'attr-1', characterId: 'char-123', name: 'Strength', baseValue: 8, modifiedValue: 8, category: 'Physical' }
         ],
         skills: [
-          { id: 'skill-1', name: 'Swordsmanship', level: 3 }
+          { id: 'skill-1', characterId: 'char-123', name: 'Swordsmanship', level: 3, category: 'Combat' }
         ],
         background: {
-          description: 'A brave warrior',
+          history: 'A brave warrior with a noble past',
           personality: 'Bold and honorable',
-          motivation: 'To protect others'
+          goals: ['To protect others'],
+          fears: ['Failing those who depend on them'],
+          physicalDescription: 'Tall and strong'
         },
         status: {
           hp: 100,
           mp: 50,
           stamina: 80
         },
+        isPlayer: true,
+        portrait: {
+          type: 'placeholder',
+          url: null
+        },
         createdAt: '2023-01-01T00:00:00.000Z',
-        isPlayer: true
+        updatedAt: '2023-01-01T00:00:00.000Z'
       }
     },
     setCurrentCharacter: jest.fn(),
