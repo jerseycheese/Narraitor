@@ -1,21 +1,118 @@
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
-import { generateTestCharacter } from './generators/characterGenerator';
-import { generateTestWorld } from './generators/worldGenerator';
+import { characterStore } from '@/state/characterStore';
+import { generateTestWorld } from '@/lib/generators/worldGenerator';
+import { generateTestCharacter } from '@/lib/generators/characterGenerator';
+import { createAIClient } from '@/lib/ai';
+import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { generateCharacter } from '@/lib/ai/characterGenerator';
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { worlds, currentWorldId, createWorld } = worldStore();
+  const { createCharacter } = characterStore();
   
-  const handleGenerateWorld = () => {
-    const testWorld = generateTestWorld();
-    const worldId = createWorld(testWorld);
-    console.log(`Test world "${testWorld.name}" created with ID: ${worldId}`);
+  // Check if we're on the characters page and get the worldId from URL
+  const isOnCharactersPage = pathname === '/characters';
+  const worldIdFromUrl = isOnCharactersPage ? searchParams.get('worldId') : null;
+  const effectiveWorldId = worldIdFromUrl || currentWorldId;
+  
+  const handleGenerateWorld = async () => {
+    try {
+      // Use the test world generator which includes TV/movie themes
+      console.log(`[DevTools] Generating test world with TV/movie themes...`);
+      const testWorldData = await generateTestWorld();
+      
+      const worldId = createWorld(testWorldData);
+      console.log(`Test world "${testWorldData.name}" created with ID: ${worldId}`);
+      
+      // Set the newly created world as the active world
+      const { setCurrentWorld } = worldStore.getState();
+      setCurrentWorld(worldId);
+      console.log(`[DevTools] Set newly generated world as active: ${worldId}`);
+      
+      // Generate world image asynchronously
+      try {
+        const aiClient = createAIClient();
+        const imageGenerator = new WorldImageGenerator(aiClient);
+        
+        // Get the created world from store
+        const world = worldStore.getState().worlds[worldId];
+        if (world) {
+          const image = await imageGenerator.generateWorldImage(world);
+          
+          // Update the world with the generated image
+          worldStore.getState().updateWorld(worldId, { image });
+          console.log(`Generated image for test world "${testWorldData.name}"`);
+        }
+      } catch (error) {
+        console.error('Failed to generate world image for test world:', error);
+        // Don't block world creation if image generation fails
+      }
+      
+    } catch (error) {
+      console.error('[DevTools] Error generating test world:', error);
+      alert(`Error generating test world: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleGenerate5Worlds = async () => {
+    const createdWorlds = [];
+    
+    try {
+      for (let i = 0; i < 5; i++) {
+        console.log(`[DevTools] Generating test world ${i + 1}/5 with TV/movie themes...`);
+        
+        // Use the test world generator which includes TV/movie themes
+        const testWorldData = await generateTestWorld();
+        
+        const worldId = createWorld(testWorldData);
+        createdWorlds.push({ id: worldId, name: testWorldData.name });
+        console.log(`Created test world: ${testWorldData.name}`);
+        
+        // Set the first created world as active (for batch generation)
+        if (i === 0) {
+          const { setCurrentWorld } = worldStore.getState();
+          setCurrentWorld(worldId);
+          console.log(`[DevTools] Set first generated world as active: ${worldId}`);
+        }
+        
+        // Generate world image asynchronously for each world
+        try {
+          const aiClient = createAIClient();
+          const imageGenerator = new WorldImageGenerator(aiClient);
+          
+          // Get the created world from store
+          const world = worldStore.getState().worlds[worldId];
+          if (world) {
+            const image = await imageGenerator.generateWorldImage(world);
+            
+            // Update the world with the generated image
+            worldStore.getState().updateWorld(worldId, { image });
+            console.log(`Generated image for test world "${testWorldData.name}"`);
+          }
+        } catch (error) {
+          console.error(`Failed to generate world image for test world "${testWorldData.name}":`, error);
+          // Don't block world creation if image generation fails
+        }
+      }
+
+      const worldNames = createdWorlds.map(w => w.name).join(', ');
+      console.log(`[DevTools] Generated 5 test worlds with images:`, createdWorlds);
+      alert(`Successfully generated 5 test worlds with images: ${worldNames}`);
+      
+    } catch (error) {
+      console.error('[DevTools] Error generating test worlds:', error);
+      alert(`Error generating test worlds: ${error instanceof Error ? error.message : 'Unknown error'}\n\nGenerated ${createdWorlds.length} worlds before error.`);
+    }
   };
   
   const handleGenerateCharacter = async () => {
-    const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
+    const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
     if (!currentWorld) {
       alert('Please select a world first');
       return;
@@ -68,7 +165,7 @@ export const TestDataGeneratorSection: React.FC = () => {
   };
   
   const handleDebugStorage = () => {
-    const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
+    const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
     if (!currentWorld) {
       alert('Please select a world first');
       return;
@@ -90,6 +187,261 @@ export const TestDataGeneratorSection: React.FC = () => {
     // Just navigate without any data
     router.push('/characters/create');
   };
+
+  const handleGenerate5Characters = async () => {
+    const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+    if (!currentWorld) {
+      alert('Please select a world first');
+      return;
+    }
+
+    const createdCharacters = [];
+    const { characters } = characterStore.getState();
+    const existingCharacterNames = Object.values(characters)
+      .filter(char => char.worldId === currentWorld.id)
+      .map(char => char.name);
+
+    try {
+      for (let i = 0; i < 5; i++) {
+        console.log(`[DevTools] Generating character ${i + 1}/5 for world "${currentWorld.name}"...`);
+        
+        // Use the AI character generator (same as the regular generate button)
+        const aiCharacterData = await generateCharacter(
+          currentWorld,
+          [...existingCharacterNames, ...createdCharacters.map(c => c.name)], // Avoid duplicate names
+          undefined, // No suggested name
+          'original' // Generate original characters
+        );
+
+
+        // Convert AI-generated data to character store format
+        const characterData = {
+          name: aiCharacterData.name,
+          description: aiCharacterData.background.description,
+          worldId: currentWorld.id,
+          attributes: aiCharacterData.attributes.map(attr => ({
+            attributeId: attr.id,
+            value: attr.value
+          })),
+          skills: aiCharacterData.skills.map(skill => ({
+            skillId: skill.id,
+            level: skill.level,
+            experience: 0,
+            isActive: true
+          })),
+          background: {
+            history: aiCharacterData.background.description || '',
+            personality: aiCharacterData.background.personality || '',
+            physicalDescription: aiCharacterData.background.physicalDescription || '',
+            goals: aiCharacterData.background.motivation ? [aiCharacterData.background.motivation] : [],
+            fears: []
+          },
+          inventory: {
+            items: [],
+            capacity: 100,
+            categories: [],
+            characterId: '' // Will be set by createCharacter
+          },
+          status: {
+            health: 100,
+            maxHealth: 100,
+            conditions: []
+          }
+        };
+
+        const characterId = createCharacter(characterData);
+        createdCharacters.push({ id: characterId, name: characterData.name });
+        console.log(`[DevTools] Created AI character: ${characterData.name}`);
+        
+        // Generate portrait asynchronously
+        try {
+          const aiClient = createAIClient();
+          const portraitGenerator = new PortraitGenerator(aiClient);
+          
+          // Get the created character from store
+          const character = characterStore.getState().characters[characterId];
+          if (character) {
+            console.log(`[DevTools] Generating portrait for character "${characterData.name}"...`);
+            const portrait = await portraitGenerator.generatePortrait(character, {
+              worldTheme: currentWorld.theme
+            });
+            
+            // Update the character with the generated portrait
+            characterStore.getState().updateCharacter(characterId, { portrait });
+            console.log(`[DevTools] Generated portrait for character "${characterData.name}"`)
+          }
+        } catch (error) {
+          console.error(`[DevTools] Failed to generate portrait for character "${characterData.name}":`, error);
+          // Don't block character creation if portrait generation fails
+        }
+      }
+
+      const characterNames = createdCharacters.map(c => c.name).join(', ');
+      console.log(`[DevTools] Generated 5 AI characters with portraits for world "${currentWorld.name}":`, createdCharacters);
+      alert(`Successfully generated 5 AI characters with portraits: ${characterNames}`);
+      
+    } catch (error) {
+      console.error('[DevTools] Error generating AI characters:', error);
+      alert(`Error generating characters: ${error instanceof Error ? error.message : 'Unknown error'}\n\nGenerated ${createdCharacters.length} characters before error.`);
+    }
+  };
+
+  const handleDeleteAllWorlds = async () => {
+    const worldCount = Object.keys(worlds).length;
+    if (worldCount === 0) {
+      alert('No worlds to delete');
+      return;
+    }
+
+    const confirmed = confirm(`DELETE ALL WORLDS?\n\nThis will permanently delete all ${worldCount} worlds and their characters.\n\nThis action cannot be undone!`);
+    if (!confirmed) return;
+
+    try {
+      // Get fresh references to the store methods
+      const characterStoreState = characterStore.getState();
+      const worldStoreState = worldStore.getState();
+      
+      // Delete all characters first
+      const characterIds = Object.keys(characterStoreState.characters);
+      for (const characterId of characterIds) {
+        characterStoreState.deleteCharacter(characterId);
+        await new Promise(resolve => setTimeout(resolve, 1));
+      }
+
+      // Then delete all worlds
+      const worldIds = Object.keys(worldStoreState.worlds);
+      for (const worldId of worldIds) {
+        worldStoreState.deleteWorld(worldId);
+        await new Promise(resolve => setTimeout(resolve, 1));
+      }
+
+      // Clear current world selection
+      if (worldStoreState.currentWorldId) {
+        worldStoreState.setCurrentWorld('');
+      }
+
+      console.log(`[DevTools] Deleted all ${worldCount} worlds and their characters`);
+      alert(`Successfully deleted all ${worldCount} worlds and their characters`);
+    } catch (error) {
+      console.error('[DevTools] Error deleting all worlds:', error);
+      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleDeleteAllCharactersInWorld = async () => {
+    const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+    if (!currentWorld) {
+      alert('Please select a world first');
+      return;
+    }
+
+    const { characters } = characterStore.getState();
+    const worldCharacters = Object.values(characters).filter(char => char.worldId === currentWorld.id);
+    
+    if (worldCharacters.length === 0) {
+      alert(`No characters found in world "${currentWorld.name}"`);
+      return;
+    }
+
+    const confirmed = confirm(`DELETE ALL CHARACTERS IN "${currentWorld.name}"?\n\nThis will permanently delete ${worldCharacters.length} characters.\n\nThis action cannot be undone!`);
+    if (!confirmed) return;
+
+    try {
+      const { deleteCharacter } = characterStore.getState();
+      
+      for (const character of worldCharacters) {
+        deleteCharacter(character.id);
+        await new Promise(resolve => setTimeout(resolve, 1));
+      }
+
+      const characterNames = worldCharacters.map(c => c.name).join(', ');
+      console.log(`[DevTools] Deleted ${worldCharacters.length} characters from world "${currentWorld.name}":`, characterNames);
+      alert(`Successfully deleted ${worldCharacters.length} characters from "${currentWorld.name}"`);
+    } catch (error) {
+      console.error('[DevTools] Error deleting characters:', error);
+      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleNukeEverything = async () => {
+    const worldCount = Object.keys(worlds).length;
+    const { characters } = characterStore.getState();
+    const characterCount = Object.keys(characters).length;
+    const totalItems = worldCount + characterCount;
+
+    if (totalItems === 0) {
+      alert('Nothing to delete - database is already empty');
+      return;
+    }
+
+    const confirmed = confirm(`NUCLEAR OPTION - DELETE EVERYTHING?\n\nThis will permanently delete:\n• ${worldCount} worlds\n• ${characterCount} characters\n• All associated data\n\nTHIS CANNOT BE UNDONE!\n\nAre you absolutely sure?`);
+    if (!confirmed) return;
+
+    const doubleConfirmed = confirm(`FINAL WARNING\n\nYou are about to delete EVERYTHING.\n\nClick OK to proceed with total data destruction.`);
+    if (!doubleConfirmed) return;
+
+    try {
+      // Use the reset methods to completely clear both stores
+      const characterStoreState = characterStore.getState();
+      const worldStoreState = worldStore.getState();
+
+      // Reset character store first
+      characterStoreState.reset();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Reset world store
+      worldStoreState.reset();
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Also clear localStorage as a backup
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem('world-store');
+          localStorage.removeItem('character-store');
+          localStorage.removeItem('worlds'); // Legacy storage
+        } catch (e) {
+          console.warn('Failed to clear localStorage:', e);
+        }
+      }
+
+      console.log(`[DevTools] NUKED EVERYTHING: Reset both stores, deleted ${worldCount} worlds and ${characterCount} characters`);
+      alert(`NUCLEAR OPTION COMPLETE\n\nDeleted ${worldCount} worlds and ${characterCount} characters.\n\nDatabase is now empty.`);
+      
+      // Force a small delay before allowing any other operations
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+    } catch (error) {
+      console.error('[DevTools] Error during nuclear deletion:', error);
+      alert(`Error during deletion: ${error instanceof Error ? error.message : 'Unknown error'}\n\nSome data may not have been deleted. Check console for details.`);
+    }
+  };
+
+  const handleDebugPersistence = () => {
+    const worldStoreState = worldStore.getState();
+    const characterStoreState = characterStore.getState();
+    
+    console.log('[DevTools] Current Store States:');
+    console.log('World Store:', {
+      worldCount: Object.keys(worldStoreState.worlds).length,
+      currentWorldId: worldStoreState.currentWorldId,
+      worlds: worldStoreState.worlds
+    });
+    console.log('Character Store:', {
+      characterCount: Object.keys(characterStoreState.characters).length,
+      currentCharacterId: characterStoreState.currentCharacterId,
+      characters: characterStoreState.characters
+    });
+    
+    // Check localStorage
+    if (typeof window !== 'undefined') {
+      console.log('localStorage entries:');
+      console.log('world-store:', localStorage.getItem('world-store'));
+      console.log('character-store:', localStorage.getItem('character-store'));
+      console.log('worlds (legacy):', localStorage.getItem('worlds'));
+    }
+    
+    alert('Debug info logged to console. Check browser developer tools.');
+  };
   
   return (
     <div className="space-y-4">
@@ -100,22 +452,39 @@ export const TestDataGeneratorSection: React.FC = () => {
           onClick={handleGenerateWorld}
           className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm transition-colors"
         >
-          Generate Test World
+          Generate AI World
+        </button>
+        
+        <button
+          onClick={handleGenerate5Worlds}
+          className="w-full px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm transition-colors"
+          title="Creates 5 complete AI worlds with randomized themes, attributes, and skills"
+        >
+          Generate 5 AI Worlds
         </button>
         
         <button
           onClick={handleGenerateCharacter}
           className="w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm transition-colors"
-          disabled={!currentWorldId}
+          disabled={!effectiveWorldId}
           title="Creates test character data and navigates to character creation form"
         >
           Generate & Fill Character Form
         </button>
         
         <button
+          onClick={handleGenerate5Characters}
+          className="w-full px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm transition-colors"
+          disabled={!effectiveWorldId}
+          title="Creates 5 AI-generated characters directly in the selected world using the same AI as the Generate Character button"
+        >
+          Generate 5 AI Characters for World
+        </button>
+        
+        <button
           onClick={handleNavigateEmpty}
           className="w-full px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm transition-colors"
-          disabled={!currentWorldId}
+          disabled={!effectiveWorldId}
           title="Navigate to empty character creation form"
         >
           Go to Empty Form
@@ -124,7 +493,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         <button
           onClick={handleDebugStorage}
           className="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm transition-colors"
-          disabled={!currentWorldId}
+          disabled={!effectiveWorldId}
           title="Check if test data exists in sessionStorage"
         >
           Debug: Check Storage
@@ -132,9 +501,52 @@ export const TestDataGeneratorSection: React.FC = () => {
       </div>
       
       <p className="text-xs text-gray-400">
-        Test data generators create randomized content for development testing.
-        {!currentWorldId && ' Select a world to enable character generation.'}
+        AI generators create unique content for development testing.
+        {!effectiveWorldId && ' Select a world to enable character generation.'}
+        {worldIdFromUrl && <span className="block mt-1 text-blue-400">Using world from current page: {worlds[worldIdFromUrl]?.name}</span>}
       </p>
+
+      {/* Destructive Operations Section */}
+      <div className="border-t border-red-600 pt-4">
+        <h4 className="font-bold text-sm text-red-400 mb-2">Destructive Operations</h4>
+        <div className="space-y-2">
+          <button
+            onClick={handleDeleteAllCharactersInWorld}
+            className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm transition-colors"
+            disabled={!effectiveWorldId}
+            title={`Deletes all characters in ${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
+          >
+            Delete All Characters in {effectiveWorldId ? worlds[effectiveWorldId]?.name : 'World'}
+          </button>
+          
+          <button
+            onClick={handleDeleteAllWorlds}
+            className="w-full px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm transition-colors"
+            title="Deletes all worlds and their characters"
+          >
+            Delete All Worlds
+          </button>
+          
+          <button
+            onClick={handleNukeEverything}
+            className="w-full px-3 py-2 bg-red-800 text-white rounded hover:bg-red-900 text-sm transition-colors border-2 border-red-600"
+            title="NUCLEAR OPTION: Deletes absolutely everything"
+          >
+            NUKE EVERYTHING
+          </button>
+        </div>
+        <p className="text-xs text-red-300 mt-2">
+          WARNING: These operations are permanent and cannot be undone!
+        </p>
+        
+        <button
+          onClick={handleDebugPersistence}
+          className="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm transition-colors mt-2"
+          title="Debug current store state and persistence"
+        >
+          Debug Persistence State
+        </button>
+      </div>
       
       <div className="text-xs text-gray-500 bg-gray-800 p-2 rounded">
         <strong>Troubleshooting:</strong>

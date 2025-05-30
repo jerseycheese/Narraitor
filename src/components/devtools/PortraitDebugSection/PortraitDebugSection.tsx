@@ -198,7 +198,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   };
 
   return (
-    <CollapsibleSection title="Portrait Generation Debug" defaultExpanded={false}>
+    <CollapsibleSection title="Portrait Generation Debug" initialCollapsed={true}>
       <div className="space-y-4">
         {/* Character Selector */}
         {charactersArray.length > 0 && (
