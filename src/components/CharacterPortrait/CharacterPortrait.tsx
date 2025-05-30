@@ -30,10 +30,25 @@ export function CharacterPortrait({
   onClick
 }: CharacterPortraitProps) {
   const getInitials = (name: string): string => {
-    const words = name.trim().split(' ');
+    // Remove nicknames in quotes (single or double quotes, including spaces)
+    const nameWithoutNickname = name
+      .replace(/['"][^'"]+['"]/g, '') // Remove anything between quotes
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to single space
+      .trim();
+    
+    // Split by spaces and filter out empty strings
+    const words = nameWithoutNickname.split(' ').filter(word => word.length > 0);
+    
+    if (words.length === 0) {
+      // Fallback to original name if nothing left after removing nicknames
+      return name.substring(0, 2).toUpperCase();
+    }
+    
     if (words.length === 1) {
       return words[0].substring(0, 2).toUpperCase();
     }
+    
+    // Take first letter of first two words
     return words
       .slice(0, 2)
       .map(word => word[0])

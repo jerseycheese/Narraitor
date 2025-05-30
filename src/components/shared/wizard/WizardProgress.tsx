@@ -18,21 +18,39 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`${wizardStyles.progress.container} ${className}`}>
-      {steps.map((step, index) => (
-        <React.Fragment key={step.id}>
-          {index > 0 && (
-            <div
-              className={cn(
-                wizardStyles.progress.connector,
-                index <= currentStep ? wizardStyles.progress.connectorActive : ''
-              )}
-            />
-          )}
-          <div className={wizardStyles.progress.step}>
+    <div className={`relative mb-8 ${className}`}>
+      {/* Background connector line */}
+      <div 
+        className="absolute top-5 h-1 bg-gray-200" 
+        style={{ 
+          left: `${50 / steps.length}%`,
+          right: `${50 / steps.length}%`
+        }} 
+      />
+      
+      {/* Steps container */}
+      <div className="relative flex justify-between items-start">
+        {steps.map((step, index) => (
+          <div 
+            key={step.id} 
+            className="flex flex-col items-center flex-1"
+            style={{ maxWidth: `${100 / steps.length}%` }}
+          >
+            {/* Active connector overlay */}
+            {index > 0 && index <= currentStep && (
+              <div
+                className="absolute top-5 h-1 bg-blue-500"
+                style={{
+                  left: `${(100 / steps.length) * (index - 1) + (50 / steps.length)}%`,
+                  width: `${100 / steps.length}%`,
+                }}
+              />
+            )}
+            
             <div
               className={cn(
                 wizardStyles.progress.circle,
+                "relative z-10",
                 index === currentStep
                   ? wizardStyles.progress.circleActive
                   : index < currentStep
@@ -42,12 +60,12 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
             >
               {index + 1}
             </div>
-            <span className={wizardStyles.progress.label}>
+            <span className={cn(wizardStyles.progress.label, "text-center mt-2 px-1")}>
               {step.label}
             </span>
           </div>
-        </React.Fragment>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

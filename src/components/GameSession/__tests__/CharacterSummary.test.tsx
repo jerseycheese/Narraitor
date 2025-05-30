@@ -8,34 +8,16 @@ interface Character {
   name: string;
   worldId: string;
   level: number;
-  description?: string;
-  background?: {
-    description: string;
+  background: {
+    history: string;
     personality: string;
-    motivation: string;
+    goals: string[];
+    fears: string[];
+    physicalDescription?: string;
   };
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
-  };
-  attributes: Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    baseValue: number;
-    modifiedValue: number;
-  }>;
-  skills: Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    level: number;
-  }>;
-  isPlayer: boolean;
-  status: {
-    hp: number;
-    mp: number;
-    stamina: number;
   };
   createdAt: string;
   updatedAt: string;
@@ -45,11 +27,11 @@ describe('CharacterSummary', () => {
   const mockCharacter: Character = {
     id: 'char-1',
     name: 'Aldric the Bold',
-    description: 'A brave knight with unwavering loyalty',
     background: {
-      description: 'Raised in a noble family, trained in the art of combat since childhood',
-      personality: 'Brave and loyal',
-      motivation: 'Protect the innocent'
+      history: 'Raised in a noble family, trained in the art of combat since childhood',
+      personality: 'A brave knight with unwavering loyalty',
+      goals: ['Protect the innocent'],
+      fears: ['Failing in battle']
     },
     worldId: 'world-1',
     level: 5,
@@ -58,14 +40,6 @@ describe('CharacterSummary', () => {
     portrait: {
       type: 'ai-generated',
       url: 'https://example.com/portrait.jpg'
-    },
-    attributes: [],
-    skills: [],
-    isPlayer: true,
-    status: {
-      hp: 100,
-      mp: 50,
-      stamina: 80
     }
   };
 
@@ -129,13 +103,16 @@ describe('CharacterSummary', () => {
   });
 
   describe('Missing Data Handling', () => {
-    it('handles missing description gracefully', () => {
-      const characterWithoutDescription = {
+    it('handles missing personality gracefully', () => {
+      const characterWithoutPersonality = {
         ...mockCharacter,
-        description: undefined
+        background: {
+          ...mockCharacter.background,
+          personality: ''
+        }
       };
       
-      render(<CharacterSummary character={characterWithoutDescription} />);
+      render(<CharacterSummary character={characterWithoutPersonality} />);
       
       // Should still render name and other available info
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
@@ -145,14 +122,21 @@ describe('CharacterSummary', () => {
     it('handles missing background gracefully', () => {
       const characterWithoutBackground = {
         ...mockCharacter,
-        background: undefined
+        background: {
+          history: '',
+          personality: '',
+          goals: [],
+          fears: []
+        }
       };
       
       render(<CharacterSummary character={characterWithoutBackground} />);
       
-      // Should still render other information
+      // Should still render name and level but not background info
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
-      expect(screen.getByText('A brave knight with unwavering loyalty')).toBeInTheDocument();
+      expect(screen.getByText(/Level 5/)).toBeInTheDocument();
+      // Should not show empty background content
+      expect(screen.queryByText('A brave knight with unwavering loyalty')).not.toBeInTheDocument();
     });
   });
 

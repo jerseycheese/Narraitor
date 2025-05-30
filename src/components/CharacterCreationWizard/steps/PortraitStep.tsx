@@ -8,6 +8,7 @@ import { createAIClient } from '../../../lib/ai/clientFactory';
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
 import { LoadingState } from '../../ui/LoadingState';
+import { PortraitCustomizationSection } from '../../shared';
 
 interface CharacterFormData {
   name: string;
@@ -42,7 +43,6 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
   const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
     data.characterData.background?.physicalDescription || ''
   );
-  const [portraitStyle, setPortraitStyle] = useState<'photorealistic' | 'fantasy' | 'anime'>('photorealistic');
   const [environmentHint, setEnvironmentHint] = useState('');
 
   const portrait: CharacterPortraitType = data.characterData.portrait || {
@@ -90,13 +90,8 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         updatedAt: new Date().toISOString()
       };
 
-      // Determine world theme based on style selection
-      let effectiveTheme = worldConfig.theme;
-      if (portraitStyle === 'fantasy') {
-        effectiveTheme = 'fantasy';
-      } else if (portraitStyle === 'anime') {
-        effectiveTheme = 'anime';
-      }
+      // Always use photorealistic style for MVP
+      const effectiveTheme = worldConfig.theme;
 
       const generatedPortrait = await generator.generatePortrait(
         characterForGeneration,
@@ -139,54 +134,13 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
 
       {/* Portrait customization fields */}
       {portrait.type === 'placeholder' && (
-        <div className="space-y-4 max-w-md mx-auto">
-          <div>
-            <label htmlFor="physical-desc" className="block text-sm font-medium text-gray-700 mb-1">
-              Physical Description (for portrait)
-            </label>
-            <textarea
-              id="physical-desc"
-              value={localPhysicalDescription}
-              onChange={(e) => setLocalPhysicalDescription(e.target.value)}
-              placeholder="e.g., Long silver hair, green eyes, wearing a blue robe..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              rows={2}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Describe appearance details you want in the portrait
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="portrait-style" className="block text-sm font-medium text-gray-700 mb-1">
-              Portrait Style
-            </label>
-            <select
-              id="portrait-style"
-              value={portraitStyle}
-              onChange={(e) => setPortraitStyle(e.target.value as 'photorealistic' | 'fantasy' | 'anime')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-            >
-              <option value="photorealistic">Photorealistic</option>
-              <option value="fantasy">Fantasy Art</option>
-              <option value="anime">Anime Style</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="environment" className="block text-sm font-medium text-gray-700 mb-1">
-              Environment/Setting (optional)
-            </label>
-            <input
-              id="environment"
-              type="text"
-              value={environmentHint}
-              onChange={(e) => setEnvironmentHint(e.target.value)}
-              placeholder="e.g., In a forest, throne room, starship bridge..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-            />
-          </div>
-        </div>
+        <PortraitCustomizationSection
+          physicalDescription={localPhysicalDescription}
+          setPhysicalDescription={setLocalPhysicalDescription}
+          environmentHint={environmentHint}
+          setEnvironmentHint={setEnvironmentHint}
+          className="max-w-md mx-auto"
+        />
       )}
 
       <div className="flex flex-col items-center space-y-4">

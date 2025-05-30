@@ -178,6 +178,7 @@ export const SkillReviewStep: Story = {
   }
 };
 
+
 // Story showing the finalize step
 export const FinalizeStep: Story = {
   args: {
@@ -186,7 +187,7 @@ export const FinalizeStep: Story = {
       worldData: {
         name: 'Fantasy Kingdom',
         theme: 'fantasy',
-        description: 'A magical world filled with wizards and warriors',
+        description: 'A magical world filled with wizards and warriors, ancient forests, and towering castles',
         attributes: [
           { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
           { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },

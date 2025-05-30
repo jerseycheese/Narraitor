@@ -7,11 +7,12 @@ interface Character {
   name: string;
   worldId: string;
   level: number;
-  description?: string;
-  background?: {
-    description: string;
+  background: {
+    history: string;
     personality: string;
-    motivation: string;
+    goals: string[];
+    fears: string[];
+    physicalDescription?: string;
   };
   portrait?: {
     type: 'ai-generated' | 'placeholder';
@@ -41,11 +42,12 @@ type Story = StoryObj<typeof meta>;
 const baseCharacter: Character = {
   id: 'char-1',
   name: 'Elara Moonwhisper',
-  description: 'A mysterious elf with a deep connection to nature',
   background: {
-    description: 'Born under a full moon in the ancient forest of Eldoria, Elara was raised by druids who taught her the sacred ways of nature magic.',
+    history: 'Born under a full moon in the ancient forest of Eldoria, Elara was raised by druids who taught her the sacred ways of nature magic.',
     personality: 'Wise and mysterious, with a gentle spirit',
-    motivation: 'Protect the natural world from corruption'
+    goals: ['Protect the natural world from corruption'],
+    fears: ['Dark magic', 'Forest destruction'],
+    physicalDescription: 'Tall elf with silver hair and green eyes'
   },
   worldId: 'world-1',
   level: 3,
@@ -72,12 +74,55 @@ export const WithoutPortrait: Story = {
   },
 };
 
+export const WithPlaceholderPortrait: Story = {
+  args: {
+    character: {
+      ...baseCharacter,
+      portrait: {
+        type: 'placeholder',
+        url: null,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character with placeholder portrait - shows initials-based fallback'
+      }
+    }
+  }
+};
+
+export const WithNicknamePortrait: Story = {
+  args: {
+    character: {
+      ...baseCharacter,
+      name: 'Marcus "The Shield" Valorian',
+      portrait: {
+        type: 'placeholder',
+        url: null,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character with nickname in name - portrait initials should ignore the quoted nickname (MV)'
+      }
+    }
+  }
+};
+
 export const MinimalInfo: Story = {
   args: {
     character: {
       ...baseCharacter,
-      description: undefined,
-      background: undefined,
+      background: {
+        history: '',
+        personality: '',
+        goals: [],
+        fears: []
+      },
     },
   },
 };
@@ -86,11 +131,12 @@ export const LongDescription: Story = {
   args: {
     character: {
       ...baseCharacter,
-      description: 'A highly skilled warrior-mage who has mastered both the arcane arts and swordsmanship. Known throughout the lands for their incredible feats and legendary battles against the forces of darkness.',
       background: {
-        description: 'Born into a noble family but chose the path of adventure after witnessing injustice. Trained at the Academy of High Magic for ten years before setting out on a quest to right the wrongs of the world. Has traveled to every corner of the realm, learning from masters of various disciplines and gathering allies for the fight against evil.',
-        personality: 'Noble and courageous, with an unwavering sense of justice',
-        motivation: 'Right the wrongs of the world and bring justice to all'
+        history: 'Born into a noble family but chose the path of adventure after witnessing injustice. Trained at the Academy of High Magic for ten years before setting out on a quest to right the wrongs of the world. Has traveled to every corner of the realm, learning from masters of various disciplines and gathering allies for the fight against evil.',
+        personality: 'A highly skilled warrior-mage who has mastered both the arcane arts and swordsmanship. Noble and courageous, with an unwavering sense of justice',
+        goals: ['Right the wrongs of the world and bring justice to all'],
+        fears: ['Failing those who depend on them', 'Losing their magical abilities'],
+        physicalDescription: 'Tall and imposing with battle scars and magical aura'
       },
     },
   },

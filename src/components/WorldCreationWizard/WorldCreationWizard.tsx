@@ -17,6 +17,8 @@ import AttributeReviewStep from './steps/AttributeReviewStep';
 import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
 import { WizardState, WIZARD_STEPS } from './WizardState';
+import { createAIClient } from '@/lib/ai';
+import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 
 export type { AttributeSuggestion, SkillSuggestion } from './WizardState';
 
@@ -156,8 +158,9 @@ export default function WorldCreationWizard({
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     try {
+      // Create the world first
       const worldId = createWorld({
         name: wizardState.worldData.name!,
         description: wizardState.worldData.description!,
@@ -165,7 +168,52 @@ export default function WorldCreationWizard({
         attributes: wizardState.worldData.attributes || [],
         skills: wizardState.worldData.skills || [],
         settings: wizardState.worldData.settings!,
+        image: wizardState.worldData.image, // Include any image if already generated
       });
+      
+      // Set the newly created world as the active world
+      const { setCurrentWorld } = worldStore.getState();
+      setCurrentWorld(worldId);
+      console.log('[WorldCreationWizard] Set newly created world as active:', worldId);
+      
+      // Generate world image asynchronously after creation (only if no image was already generated)
+      console.log('[WorldCreationWizard] Checking if world image should be generated...');
+      console.log('[WorldCreationWizard] wizardState.worldData.image:', wizardState.worldData.image);
+      
+      if (!wizardState.worldData.image?.url) {
+        console.log('[WorldCreationWizard] No image found, generating world image...');
+        
+        const generateWorldImage = async () => {
+          try {
+            const aiClient = createAIClient();
+            const imageGenerator = new WorldImageGenerator(aiClient);
+            
+            // Get the created world from store
+            const world = worldStore.getState().worlds[worldId];
+            console.log('[WorldCreationWizard] Retrieved world for image generation:', world);
+            
+            if (world) {
+              console.log('[WorldCreationWizard] Starting world image generation...');
+              const image = await imageGenerator.generateWorldImage(world);
+              console.log('[WorldCreationWizard] Generated world image:', image);
+              
+              // Update the world with the generated image
+              worldStore.getState().updateWorld(worldId, { image });
+              console.log('[WorldCreationWizard] Updated world with generated image');
+            } else {
+              console.error('[WorldCreationWizard] World not found in store for image generation');
+            }
+          } catch (error) {
+            console.error('[WorldCreationWizard] Failed to generate world image:', error);
+            // Don't block world creation if image generation fails
+          }
+        };
+        
+        // Start image generation in the background
+        generateWorldImage();
+      } else {
+        console.log('[WorldCreationWizard] Image already exists, skipping generation');
+      }
       
       // Save to localStorage as temporary solution
       if (typeof window !== 'undefined') {
@@ -178,6 +226,7 @@ export default function WorldCreationWizard({
           createdAt: new Date().toISOString(),
           attributes: wizardState.worldData.attributes || [],
           skills: wizardState.worldData.skills || [],
+          image: wizardState.worldData.image,
         });
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
@@ -200,6 +249,7 @@ export default function WorldCreationWizard({
           createdAt: new Date().toISOString(),
           attributes: wizardState.worldData.attributes || [],
           skills: wizardState.worldData.skills || [],
+          image: wizardState.worldData.image,
         });
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
@@ -274,6 +324,7 @@ export default function WorldCreationWizard({
             onComplete={handleComplete}
             onBack={handleBack}
             onCancel={handleCancel}
+            onUpdateWorldData={updateWorldData}
           />
         );
       default:

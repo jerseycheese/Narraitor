@@ -8,6 +8,7 @@ import { createIndexedDBStorage } from './persistence';
 interface CharacterAttribute {
   id: EntityID;
   characterId: EntityID;
+  worldAttributeId?: EntityID; // Reference to world attribute for safer matching
   name: string;
   baseValue: number;
   modifiedValue: number;
@@ -17,15 +18,17 @@ interface CharacterAttribute {
 interface CharacterSkill {
   id: EntityID;
   characterId: EntityID;
+  worldSkillId?: EntityID; // Reference to world skill for safer matching
   name: string;
   level: number;
   category?: string;
 }
 
 interface CharacterBackground {
-  description: string;
+  history: string;
   personality: string;
-  motivation: string;
+  goals: string[];
+  fears: string[];
   physicalDescription?: string;
 }
 
@@ -112,6 +115,7 @@ export const characterStore = create<CharacterStore>()(
         const newCharacter: Character = {
           ...characterData,
           id: characterId,
+          level: characterData.level || 1, // Default to level 1 if not provided
           createdAt: now,
           updatedAt: now,
         };

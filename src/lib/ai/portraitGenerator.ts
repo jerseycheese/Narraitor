@@ -377,6 +377,8 @@ export class PortraitGenerator {
       style.push(`sharp focus throughout entire image`);
       style.push(`high-resolution photorealistic quality`);
       style.push(`natural skin tones and textures`);
+      style.push(`realistic imperfections, blemishes, wrinkles, and asymmetry`);
+      style.push(`authentic human diversity in features`);
       
     } else {
       // Unknown/original characters - context-based approach
@@ -420,12 +422,15 @@ export class PortraitGenerator {
           }
         }
         
-        // CONTEXT: Fantasy setting
+        // CONTEXT: Fantasy setting with realistic diversity
         context.push(`${options.worldTheme} world setting`);
         context.push(`dramatic atmospheric lighting`);
         context.push(`mystical environment`);
         context.push(`heroic pose`);
         context.push(`detailed costume and equipment`);
+        context.push(`weathered and lived-in appearance`);
+        context.push(`realistic body types and proportions`);
+        context.push(`diverse facial features and characteristics`);
       } else {
         // SUBJECT: Realistic character portrait
         subject.push(`Character portrait of ${character.name}`);
@@ -449,7 +454,7 @@ export class PortraitGenerator {
           }
         }
         
-        // CONTEXT: Neutral/realistic setting
+        // CONTEXT: Neutral/realistic setting with authentic diversity
         if (options.worldTheme) {
           context.push(`${options.worldTheme} setting`);
         } else {
@@ -457,6 +462,9 @@ export class PortraitGenerator {
         }
         context.push(`natural lighting`);
         context.push(`authentic appearance`);
+        context.push(`realistic human diversity: varying body types, ages, and features`);
+        context.push(`natural imperfections and asymmetry`);
+        context.push(`unidealized, genuine human appearance`);
       }
       
       // STYLE: Based on fantasy vs realistic

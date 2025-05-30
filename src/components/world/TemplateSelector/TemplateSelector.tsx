@@ -36,56 +36,20 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
     onSelect(templateId);
   };
   
-  // Render a template preview
-  const renderTemplatePreview = (template: WorldTemplate) => {
-    return (
-      <div 
-        className="border p-4 mt-2 bg-gray-50 rounded"
-        data-testid={`template-preview-${template.id}`}
-      >
-        <h4 className="font-bold mb-2">Template Details</h4>
-        
-        <div data-testid={`template-preview-attributes-${template.id}`}>
-          <h5 className="font-semibold mb-1">Attributes ({template.attributes.length})</h5>
-          <ul className="text-sm">
-            {template.attributes.map((attr) => (
-              <li key={attr.name} className="mb-1">
-                <span className="font-medium">{attr.name}</span>: {attr.description}
-              </li>
-            ))}
-          </ul>
-        </div>
-        
-        <div 
-          className="mt-3"
-          data-testid={`template-preview-skills-${template.id}`}
-        >
-          <h5 className="font-semibold mb-1">Skills ({template.skills.length})</h5>
-          <ul className="text-sm">
-            {template.skills.map((skill) => (
-              <li key={skill.name} className="mb-1">
-                <span className="font-medium">{skill.name}</span>: {skill.description}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    );
-  };
-  
+  const selectedTemplate = displayTemplates.find(t => t.id === selectedTemplateId);
+
   return (
     <div 
-      className="p-4"
+      className="space-y-6"
       data-testid="template-selector"
     >
-      <h2 className="text-xl font-bold mb-4">Choose a World Template</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {displayTemplates.map((template) => (
-          <div key={template.id}>
+      <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {displayTemplates.map((template) => (
             <div
-              className={`border rounded p-4 cursor-pointer transition-colors hover:border-blue-500
-                ${selectedTemplateId === template.id ? 'selected-template border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+              key={template.id}
+              className={`border rounded-lg p-4 cursor-pointer transition-all hover:border-blue-500 hover:shadow-md
+                ${selectedTemplateId === template.id ? 'selected-template border-blue-500 bg-blue-50 shadow-md' : 'border-gray-300'}`}
               onClick={() => handleSelectTemplate(template.id)}
               data-testid={`template-card-${template.id}`}
             >
@@ -97,23 +61,58 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               </h3>
               
               <p
-                className="text-gray-600 mb-2"
+                className="text-gray-600 mb-3 text-sm"
                 data-testid={`template-description-${template.id}`}
               >
                 {template.description}
               </p>
               
-              <div className="text-sm text-gray-500">
-                <p>Genre: {template.genre}</p>
+              <div className="text-sm text-gray-500 space-y-1">
+                <p className="font-medium">{template.genre}</p>
                 <p>{template.attributes.length} attributes · {template.skills.length} skills</p>
               </div>
             </div>
-            
-            {/* Show preview for selected template */}
-            {selectedTemplateId === template.id && renderTemplatePreview(template)}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* Show preview for selected template in a separate section */}
+      {selectedTemplate && (
+        <div 
+          className="border rounded-lg bg-gray-50 p-6"
+          data-testid={`template-preview-${selectedTemplate.id}`}
+        >
+          <h3 className="text-lg font-bold mb-4">Template Details: {selectedTemplate.name}</h3>
+          
+          <div className="space-y-4">
+            {/* Attributes Section */}
+            <div data-testid={`template-preview-attributes-${selectedTemplate.id}`}>
+              <h4 className="font-semibold mb-2 text-gray-700">Attributes ({selectedTemplate.attributes.length})</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {selectedTemplate.attributes.map((attr) => (
+                  <div key={attr.name} className="bg-white rounded p-2 border border-gray-200">
+                    <span className="font-medium text-sm text-gray-900">{attr.name}</span>
+                    <p className="text-xs text-gray-600 mt-0.5">{attr.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Skills Section */}
+            <div data-testid={`template-preview-skills-${selectedTemplate.id}`}>
+              <h4 className="font-semibold mb-2 text-gray-700">Skills ({selectedTemplate.skills.length})</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {selectedTemplate.skills.map((skill) => (
+                  <div key={skill.name} className="bg-white rounded p-2 border border-gray-200">
+                    <span className="font-medium text-sm text-gray-900">{skill.name}</span>
+                    <p className="text-xs text-gray-600 mt-0.5">{skill.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

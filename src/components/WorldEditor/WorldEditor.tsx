@@ -6,6 +6,7 @@ import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
+import WorldImageForm from '@/components/forms/WorldImageForm';
 
 interface WorldEditorProps {
   worldId: string;
@@ -98,6 +99,11 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       <WorldBasicInfoForm 
         world={world} 
         onChange={handleWorldChange} 
+      />
+      
+      <WorldImageForm
+        world={world}
+        onChange={handleWorldChange}
       />
       
       <WorldAttributesForm 

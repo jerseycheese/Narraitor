@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import Link from 'next/link';
+import Image from 'next/image';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { DataField } from '@/components/shared/DataField';
 
@@ -37,6 +38,19 @@ export default function WorldViewPage() {
           </Link>
         </div>
 
+        {/* Hero Image */}
+        {world.image?.url && (
+          <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+            <Image 
+              src={world.image.url} 
+              alt={`${world.name} world`}
+              width={800}
+              height={400}
+              className="w-full h-64 md:h-96 object-cover"
+            />
+          </div>
+        )}
+
         <header className="mb-6">
           <h1 className="text-4xl font-bold mb-4">{world.name}</h1>
           {world.theme && (
@@ -60,7 +74,7 @@ export default function WorldViewPage() {
             Play in World
           </Link>
           <Link
-            href="/characters"
+            href={`/characters?worldId=${worldId}`}
             className="px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium transition-colors"
           >
             View Characters

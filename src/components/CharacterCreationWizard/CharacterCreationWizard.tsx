@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 import { 
   WizardContainer, 
@@ -322,25 +323,37 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       name: state.characterData.name,
       worldId,
       level: 1,
-      attributes: state.characterData.attributes.map(attr => ({
-        id: attr.attributeId,
-        characterId: '', // Will be set by store
-        name: attr.name,
-        baseValue: attr.value,
-        modifiedValue: attr.value,
-      })),
+      attributes: state.characterData.attributes.map(attr => {
+        const worldAttr = world?.attributes.find(wa => wa.id === attr.attributeId);
+        return {
+          id: generateUniqueId('attr'),
+          characterId: '', // Will be set by store
+          worldAttributeId: attr.attributeId, // Store reference to world attribute ID
+          name: worldAttr?.name || 'Unknown',
+          baseValue: attr.value,
+          modifiedValue: attr.value,
+          category: worldAttr?.category
+        };
+      }),
       skills: state.characterData.skills
         .filter(skill => skill.isSelected)
-        .map(skill => ({
-          id: skill.skillId,
-          characterId: '', // Will be set by store
-          name: skill.name,
-          level: skill.level,
-        })),
+        .map(skill => {
+          const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
+          return {
+            id: generateUniqueId('skill'),
+            characterId: '', // Will be set by store
+            worldSkillId: skill.skillId, // Store reference to world skill ID
+            name: worldSkill?.name || 'Unknown',
+            level: skill.level,
+            category: worldSkill?.category
+          };
+        }),
       background: {
-        description: state.characterData.background.history, // Store uses 'description' for history
+        history: state.characterData.background.history,
         personality: state.characterData.background.personality,
-        motivation: state.characterData.background.motivation,
+        goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
+        fears: [],
+        physicalDescription: state.characterData.background.physicalDescription || '',
       },
       portrait: state.characterData.portrait || {
         type: 'placeholder',
@@ -355,8 +368,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     });
 
     // Set as current character
-    const { setCurrentCharacter } = characterStore();
-    setCurrentCharacter(characterId);
+    characterStore.getState().setCurrentCharacter(characterId);
     
     // Verify the character was set as current
     const currentCharacterId = characterStore.getState().currentCharacterId;
@@ -373,7 +385,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     // Navigate to game session with the world
     router.push(`/world/${worldId}/play`);
-  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep]);
+  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep, world?.attributes, world?.skills]);
 
   if (!world) {
     return (

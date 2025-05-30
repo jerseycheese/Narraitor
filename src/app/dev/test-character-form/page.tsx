@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
-import { generateTestCharacter } from '@/components/devtools/TestDataGeneratorSection/generators/characterGenerator';
+import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 
 interface DebugInfo {
   currentWorldId: string | null;
@@ -73,8 +73,8 @@ export default function TestCharacterFormPage() {
         },
         skills: {
           total: currentWorld.settings.skillPointPool,
-          spent: testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
-          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
+          spent: testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
+          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
         },
       },
     };

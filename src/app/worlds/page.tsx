@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { worldStore } from '@/state/worldStore';
 import { generateWorld } from '@/lib/ai/worldGenerator';
+import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { createAIClient } from '@/lib/ai/clientFactory';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
 export default function WorldsPage() {
@@ -60,20 +62,22 @@ export default function WorldsPage() {
       // Generate the world data
       const generatedData = await generateWorld(worldReference, existingNames, worldName);
 
-      // Create attributes with IDs
+      // Create attributes with IDs and worldId placeholder
       const attributes = generatedData.attributes.map(attr => ({
         ...attr,
-        id: generateUniqueId('attr')
+        id: generateUniqueId('attr'),
+        worldId: '' // Will be set by the store
       }));
 
-      // Create skills with IDs and associate with random attributes
+      // Create skills with IDs, worldId placeholder, and associate with random attributes
       const skills = generatedData.skills.map(skill => ({
         ...skill,
         id: generateUniqueId('skill'),
+        worldId: '', // Will be set by the store
         associatedAttributeId: attributes[Math.floor(Math.random() * attributes.length)].id
       }));
 
-      // Create the world
+      // Create the world initially without an image
       const worldId = worldStore.getState().createWorld({
         name: generatedData.name,
         theme: generatedData.theme,
@@ -83,14 +87,36 @@ export default function WorldsPage() {
         settings: generatedData.settings
       });
 
+      // Now generate the world image
+      setGeneratingStatus('Generating world image...');
+      
+      try {
+        const aiClient = createAIClient();
+        const imageGenerator = new WorldImageGenerator(aiClient);
+        
+        // Get the created world to generate image for it
+        const createdWorld = worldStore.getState().worlds[worldId];
+        const worldImage = await imageGenerator.generateWorldImage(createdWorld);
+        
+        // Update the world with the generated image
+        worldStore.getState().updateWorld(worldId, {
+          image: worldImage
+        });
+      } catch (imageError) {
+        console.error('Failed to generate world image:', imageError);
+        // Continue without image - world creation should still succeed
+      }
+
+      // Set as current world
+      worldStore.getState().setCurrentWorld(worldId);
+
       // Hide the prompt and reset state
       setShowPrompt(false);
       setWorldReference('');
       setWorldName('');
       setIsGenerating(false);
       
-      // Navigate to the new world
-      router.push(`/world/${worldId}/edit`);
+      // Stay on worlds page to see the new world
     } catch (err) {
       console.error('Failed to generate world:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate world');
@@ -101,26 +127,31 @@ export default function WorldsPage() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold">
-            My Worlds
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={handleCreateWorld}
-              data-testid="create-world-button"
-              className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
-            >
-              Create World
-            </button>
-            <button
-              onClick={() => setShowPrompt(true)}
-              disabled={isGenerating}
-              className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Generate World
-            </button>
+        <header className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-4xl font-bold">
+              My Worlds
+            </h1>
+            <div className="flex gap-2">
+              <button
+                onClick={handleCreateWorld}
+                data-testid="create-world-button"
+                className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+              >
+                Create World
+              </button>
+              <button
+                onClick={() => setShowPrompt(true)}
+                disabled={isGenerating}
+                className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Generate World
+              </button>
+            </div>
           </div>
+          <p className="text-gray-600">
+            Select a world to make it active, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
+          </p>
         </header>
 
         {/* World Generation Prompt */}

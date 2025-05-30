@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { characterStore } from '@/state/characterStore';
+import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { CharacterAttributeDisplay } from '@/components/characters/CharacterAttributeDisplay';
@@ -14,16 +15,19 @@ export default function CharacterViewPage() {
   const router = useRouter();
   const characterId = params.id as string;
   const { characters, setCurrentCharacter, deleteCharacter } = characterStore();
+  const { worlds } = worldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const character = characters[characterId];
+  const world = character ? worlds[character.worldId] : null;
 
   const handleDelete = () => {
     deleteCharacter(characterId);
     router.push('/characters');
   };
 
-  if (!character) {
+
+  if (!character || !world) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
@@ -43,6 +47,50 @@ export default function CharacterViewPage() {
       </div>
     );
   }
+
+  // Helper function to properly display character attributes
+  const repairCharacterAttributes = () => {
+    // Character attributes from store already have the correct structure
+    return character.attributes.map((charAttr) => {
+      // Find matching world attribute by ID first (safer), then fallback to name
+      const worldAttr = charAttr.worldAttributeId 
+        ? world.attributes.find(wa => wa.id === charAttr.worldAttributeId)
+        : world.attributes.find(wa => wa.name === charAttr.name);
+      return {
+        id: charAttr.id,
+        characterId: character.id,
+        name: charAttr.name,
+        baseValue: charAttr.baseValue,
+        modifiedValue: charAttr.modifiedValue,
+        category: charAttr.category || worldAttr?.category || 'General'
+      };
+    });
+  };
+
+  // Enrich character attributes with world attribute data
+  const enrichedAttributes = repairCharacterAttributes();
+
+  // Helper function to properly display character skills
+  const repairCharacterSkills = () => {
+    // Character skills from store already have the correct structure
+    return character.skills.map((charSkill) => {
+      // Find matching world skill by ID first (safer), then fallback to name
+      const worldSkill = charSkill.worldSkillId 
+        ? world.skills.find(ws => ws.id === charSkill.worldSkillId)
+        : world.skills.find(ws => ws.name === charSkill.name);
+      return {
+        id: charSkill.id,
+        characterId: character.id,
+        name: charSkill.name,
+        level: charSkill.level,
+        category: charSkill.category || worldSkill?.category || 'General',
+        difficulty: worldSkill?.difficulty || 'medium' as const
+      };
+    });
+  };
+
+  // Enrich character skills with world skill data
+  const enrichedSkills = repairCharacterSkills();
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -94,12 +142,17 @@ export default function CharacterViewPage() {
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{character.name}</h1>
               <p className="text-gray-600 mb-4">Level {character.level}</p>
+              {character.background.personality && (
+                <p className="text-gray-700 mb-4 italic">
+                  {character.background.personality}
+                </p>
+              )}
               <div className="space-y-2">
                 <p className="text-sm text-gray-500">
                   <strong>Created:</strong> {new Date(character.createdAt).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-500">
-                  <strong>World:</strong> {character.worldId}
+                  <strong>World:</strong> {world.name}
                 </p>
               </div>
             </div>
@@ -111,7 +164,7 @@ export default function CharacterViewPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Attributes</h2>
               <CharacterAttributeDisplay 
-                attributes={character.attributes} 
+                attributes={enrichedAttributes} 
                 showCategories={true} 
               />
             </section>
@@ -120,7 +173,7 @@ export default function CharacterViewPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-4 text-gray-800">Skills</h2>
               <CharacterSkillDisplay 
-                skills={character.skills} 
+                skills={enrichedSkills} 
                 showCategories={true} 
               />
             </section>

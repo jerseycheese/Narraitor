@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
@@ -29,10 +30,11 @@ function transformGeneratedAttributes(generatedData: GeneratedCharacterData, cur
     return {
       id: generateUniqueId('attr'),
       characterId: '', // Will be set by store
+      worldAttributeId: attr.id, // Store reference to world attribute ID
       name: worldAttr?.name || 'Unknown',
-      baseValue: attr.value,
-      modifiedValue: attr.value,
-      category: worldAttr?.category
+      baseValue: attr.value, // Use the AI-generated value
+      modifiedValue: attr.value, // Use the AI-generated value
+      category: worldAttr?.category || 'General'
     };
   });
 }
@@ -44,6 +46,7 @@ function transformGeneratedSkills(generatedData: GeneratedCharacterData, current
     return {
       id: generateUniqueId('skill'),
       characterId: '', // Will be set by store
+      worldSkillId: skill.id, // Store reference to world skill ID
       name: worldSkill?.name || 'Unknown',
       level: skill.level,
       category: worldSkill?.category
@@ -117,6 +120,7 @@ async function generateCharacterPortrait(
 
 export default function CharactersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = characterStore();
   const { worlds, currentWorldId } = worldStore();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -126,9 +130,13 @@ export default function CharactersPage() {
   const [characterName, setCharacterName] = useState('');
   const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
   
-  const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
+  // Use worldId from URL if provided, otherwise use the current world
+  const worldIdFromUrl = searchParams.get('worldId');
+  const effectiveWorldId = worldIdFromUrl || currentWorldId;
+  
+  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
   const worldCharacters = Object.values(characters).filter(
-    char => char.worldId === currentWorldId
+    char => char.worldId === effectiveWorldId
   );
 
   const handleCreateCharacter = () => {
@@ -136,7 +144,7 @@ export default function CharactersPage() {
   };
   
   const handleGenerateCharacter = async () => {
-    if (!currentWorld || !currentWorldId) return;
+    if (!currentWorld || !effectiveWorldId) return;
     
     // Validate specific character name
     if (generationType === 'specific' && !characterName.trim()) {
@@ -154,6 +162,7 @@ export default function CharactersPage() {
       
       // Generate character data based on type
       const nameToUse = generationType === 'specific' ? characterName : undefined;
+      
       const generatedData = await generateCharacter(
         currentWorld, 
         existingNames, 
@@ -164,11 +173,17 @@ export default function CharactersPage() {
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({
         name: generatedData.name,
-        worldId: currentWorldId,
+        worldId: effectiveWorldId,
         level: generatedData.level,
         attributes: transformGeneratedAttributes(generatedData, currentWorld),
         skills: transformGeneratedSkills(generatedData, currentWorld),
-        background: generatedData.background,
+        background: {
+          history: generatedData.background.description,
+          personality: generatedData.background.personality,
+          goals: generatedData.background.motivation ? [generatedData.background.motivation] : [],
+          fears: generatedData.background.fears || [], // AI-generated fears
+          physicalDescription: generatedData.background.physicalDescription || ''
+        },
         isPlayer: true,
         status: {
           hp: 100,
@@ -190,7 +205,7 @@ export default function CharactersPage() {
         characterId,
         generatedData,
         currentWorld,
-        currentWorldId,
+        effectiveWorldId,
         updateCharacter
       );
       
@@ -229,7 +244,7 @@ export default function CharactersPage() {
     }
   };
 
-  if (!currentWorldId || !currentWorld) {
+  if (!effectiveWorldId || !currentWorld) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
@@ -242,8 +257,16 @@ export default function CharactersPage() {
             </div>
             <h2 className="text-xl font-semibold mb-2">Choose Your World</h2>
             <p className="text-gray-600 mb-6">
-              Characters belong to specific worlds. Select or create a world first to begin creating characters for that setting.
+              Characters belong to specific worlds. To create characters, you need to select an active world first.
             </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 text-sm">
+              <h3 className="font-medium text-blue-900 mb-2">How to get started:</h3>
+              <ol className="list-decimal list-inside space-y-1 text-blue-800">
+                <li>Go to the Worlds page</li>
+                <li>Click &quot;Make Active&quot; on any world you want to play in</li>
+                <li>Return here to create characters for that world</li>
+              </ol>
+            </div>
             <button
               onClick={() => router.push('/worlds')}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-md hover:shadow-lg"
@@ -262,13 +285,25 @@ export default function CharactersPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Show back link if viewing from a specific world */}
+        {worldIdFromUrl && (
+          <div className="mb-6">
+            <Link
+              href={`/world/${worldIdFromUrl}`}
+              className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+            >
+              <span>←</span> Back to {currentWorld.name}
+            </Link>
+          </div>
+        )}
+        
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Characters</h1>
             <p className="text-gray-600 mt-2">World: {currentWorld.name}</p>
           </div>
           <div className="flex gap-2">
-            {currentCharacterId && currentWorldId && (
+            {currentCharacterId && effectiveWorldId && (
               <button
                 onClick={() => {
                   const character = characters[currentCharacterId];
@@ -377,69 +412,107 @@ export default function CharactersPage() {
             {worldCharacters.map(character => (
               <div
                 key={character.id}
-                className={`bg-white rounded-lg shadow p-8 cursor-pointer transition-all ${
-                  currentCharacterId === character.id ? 'ring-2 ring-blue-500' : ''
+                className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full ${
+                  currentCharacterId === character.id 
+                    ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
+                    : 'border-gray-300 bg-white hover:shadow-lg'
                 }`}
                 onClick={() => handleSelectCharacter(character.id)}
               >
-                <div className="mb-6">
-                  <div 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewCharacter(character.id);
-                    }}
-                    className="cursor-pointer float-right ml-4 mb-3"
-                  >
-                    <CharacterPortrait
-                      portrait={character.portrait || { type: 'placeholder', url: null }}
-                      characterName={character.name}
-                      size="large"
-                    />
+                {/* Active Character Header */}
+                {currentCharacterId === character.id && (
+                  <div className="bg-green-600 text-white px-4 py-2 flex items-center justify-center">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-medium text-sm">Currently Active Character</span>
+                    </div>
                   </div>
-                  <h3 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewCharacter(character.id);
-                    }}
-                    className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1"
-                  >
-                    {character.name}
-                  </h3>
-                  <span className="text-sm text-gray-500 block mb-3">Level {character.level}</span>
-                  <p className="text-gray-600 leading-relaxed">
-                    {character.background.personality || 'No description provided'}
-                  </p>
-                  <div className="clear-both"></div>
-                </div>
-                
-                <div className="flex gap-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewCharacter(character.id);
-                    }}
-                    className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditCharacter(character.id);
-                    }}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteCharacter(character.id);
-                    }}
-                    className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
-                  >
-                    Delete
-                  </button>
+                )}
+
+                <div className="p-8 flex-grow flex flex-col">
+                  <div className="flex-grow mb-6">
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewCharacter(character.id);
+                      }}
+                      className="cursor-pointer float-right ml-4 mb-3"
+                    >
+                      <CharacterPortrait
+                        portrait={character.portrait || { type: 'placeholder', url: null }}
+                        characterName={character.name}
+                        size="large"
+                      />
+                    </div>
+                    <h3 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewCharacter(character.id);
+                      }}
+                      className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1"
+                    >
+                      {character.name}
+                    </h3>
+                    <span className="text-sm text-gray-500 block mb-3">Level {character.level || 1}</span>
+                    <p className="text-gray-600 leading-relaxed">
+                      {character.background.personality || 'No description provided'}
+                    </p>
+                    <div className="clear-both"></div>
+                  </div>
+                  
+                  {/* Footer with buttons - always at bottom */}
+                  <footer className="mt-auto pt-6 border-t border-gray-200">
+                    {/* Make Active button for inactive characters */}
+                    {currentCharacterId !== character.id && (
+                      <div className="mb-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectCharacter(character.id);
+                          }}
+                          className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 hover:text-green-900 rounded-md transition-colors border border-green-300 hover:border-green-400 font-medium flex items-center justify-center gap-2"
+                          title="Set as active character"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Make Active
+                        </button>
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-3">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewCharacter(character.id);
+                        }}
+                        className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditCharacter(character.id);
+                        }}
+                        className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCharacter(character.id);
+                        }}
+                        className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </footer>
                 </div>
               </div>
             ))}

@@ -102,3 +102,102 @@ export const ErrorWithRetry: Story = {
     )
   ]
 };
+
+// Nickname handling - Single quoted nickname
+export const WithSingleQuotedNickname: Story = {
+  args: {
+    portrait: {
+      type: 'placeholder',
+      url: null,
+    },
+    characterName: "John 'The Beast' Smith",
+    size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows proper initials generation (JS) when character name contains a single-quoted nickname'
+      }
+    }
+  }
+};
+
+// Nickname handling - Double quoted nickname
+export const WithDoubleQuotedNickname: Story = {
+  args: {
+    portrait: {
+      type: 'placeholder',
+      url: null,
+    },
+    characterName: 'Maria "Lightning" Rodriguez',
+    size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows proper initials generation (MR) when character name contains a double-quoted nickname'
+      }
+    }
+  }
+};
+
+// Complex name with multiple nicknames
+export const WithMultipleNicknames: Story = {
+  args: {
+    portrait: {
+      type: 'placeholder',
+      url: null,
+    },
+    characterName: 'Sir Alexander "The Great" \'Dragon Slayer\' Blackwood',
+    size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows proper initials generation (SB) when character name contains multiple quoted nicknames'
+      }
+    }
+  }
+};
+
+// All sizes comparison
+export const SizeComparison: Story = {
+  decorators: [
+    () => (
+      <div className="flex items-end gap-4 p-4">
+        <div className="text-center">
+          <CharacterPortrait
+            portrait={{ type: 'placeholder', url: null }}
+            characterName="Small Hero"
+            size="small"
+          />
+          <p className="text-xs mt-2">Small</p>
+        </div>
+        <div className="text-center">
+          <CharacterPortrait
+            portrait={{ type: 'placeholder', url: null }}
+            characterName="Medium Hero"
+            size="medium"
+          />
+          <p className="text-xs mt-2">Medium</p>
+        </div>
+        <div className="text-center">
+          <CharacterPortrait
+            portrait={{ type: 'placeholder', url: null }}
+            characterName="Large Hero"
+            size="large"
+          />
+          <p className="text-xs mt-2">Large</p>
+        </div>
+        <div className="text-center">
+          <CharacterPortrait
+            portrait={{ type: 'placeholder', url: null }}
+            characterName="XLarge Hero"
+            size="xlarge"
+          />
+          <p className="text-xs mt-2">XLarge</p>
+        </div>
+      </div>
+    )
+  ]
+};

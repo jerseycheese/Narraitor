@@ -8,11 +8,12 @@ interface Character {
   name: string;
   worldId: string;
   level: number;
-  description?: string;
-  background?: {
-    description: string;
+  background: {
+    history: string;
     personality: string;
-    motivation: string;
+    goals: string[];
+    fears: string[];
+    physicalDescription?: string;
   };
   portrait?: {
     type: 'ai-generated' | 'placeholder';
@@ -49,12 +50,12 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           
           <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
           
-          {character.description && (
-            <p className="text-gray-700 mb-2">{character.description}</p>
+          {character.background?.personality && (
+            <p className="text-gray-700 mb-2">{character.background.personality}</p>
           )}
           
-          {character.background?.description && (
-            <p className="text-sm text-gray-600 italic">{character.background.description}</p>
+          {character.background?.history && (
+            <p className="text-sm text-gray-600 italic">{character.background.history}</p>
           )}
         </div>
 

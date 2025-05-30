@@ -44,8 +44,8 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
               {category} Attributes
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {attrs.map(attr => (
-                <AttributeItem key={attr.id} attribute={attr} />
+              {attrs.map((attr, index) => (
+                <AttributeItem key={attr.id || `attr-${category}-${index}`} attribute={attr} />
               ))}
             </div>
           </div>
@@ -56,8 +56,8 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {attributes.map(attr => (
-        <AttributeItem key={attr.id} attribute={attr} />
+      {attributes.map((attr, index) => (
+        <AttributeItem key={attr.id || `attr-${index}`} attribute={attr} />
       ))}
     </div>
   );

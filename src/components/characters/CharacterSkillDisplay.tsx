@@ -43,8 +43,8 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
               {category} Skills
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {skillList.map(skill => (
-                <SkillItem key={skill.id} skill={skill} />
+              {skillList.map((skill, index) => (
+                <SkillItem key={skill.id || `skill-${category}-${index}`} skill={skill} />
               ))}
             </div>
           </div>
@@ -55,8 +55,8 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {skills.map(skill => (
-        <SkillItem key={skill.id} skill={skill} />
+      {skills.map((skill, index) => (
+        <SkillItem key={skill.id || `skill-${index}`} skill={skill} />
       ))}
     </div>
   );

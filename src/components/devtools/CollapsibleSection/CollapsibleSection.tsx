@@ -16,8 +16,6 @@ interface CollapsibleSectionProps {
   initialCollapsed?: boolean;
   /** Optional additional class names */
   className?: string;
-  /** Any additional props */
-  [key: string]: unknown;
 }
 
 /**
@@ -31,8 +29,7 @@ export const CollapsibleSection = ({
   children,
   initiallyExpanded = true,
   initialCollapsed,
-  className = '',
-  ...rest
+  className = ''
 }: CollapsibleSectionProps) => {
   // If initialCollapsed is provided, it takes precedence over initiallyExpanded
   const startExpanded = initialCollapsed !== undefined 
@@ -49,18 +46,24 @@ export const CollapsibleSection = ({
     <div 
       data-testid="collapsible-section" 
       className={`border rounded mb-2 border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 ${className}`}
-      {...rest}
     >
-      <div className="border-b p-2 flex justify-between items-center bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600">
+      <div 
+        className="border-b p-2 flex justify-between items-center bg-gray-50 dark:bg-slate-700 border-gray-200 dark:border-slate-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors"
+        onClick={toggleExpanded}
+        data-testid="collapsible-section-header"
+      >
         <h3 
           data-testid="collapsible-section-title"
-          className="font-medium text-sm text-gray-700 dark:text-slate-100"
+          className="font-medium text-sm text-gray-700 dark:text-slate-100 select-none"
         >
           {title}
         </h3>
         <button
           data-testid="collapsible-section-toggle"
-          onClick={toggleExpanded}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent double toggle when clicking button
+            toggleExpanded();
+          }}
           aria-expanded={isExpanded}
           className="focus-visible text-base font-bold ml-2 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 px-2 py-1 rounded border border-gray-300 dark:border-slate-500 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-500 transition-colors"
         >

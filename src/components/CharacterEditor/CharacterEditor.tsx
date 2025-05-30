@@ -102,14 +102,14 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       const characterForPortrait = {
         id: characterId,
         name: character.name,
-        description: character.background?.description || '',
+        description: character.background?.history || '',
         worldId: character.worldId,
         background: {
-          history: character.background.description,
+          history: character.background.history,
           personality: character.background.personality,
           physicalDescription: customDescription || character.background.physicalDescription || '',
-          goals: [],
-          fears: [],
+          goals: character.background.goals || [],
+          fears: character.background.fears || [],
           relationships: []
         },
         attributes: character.attributes.map(attr => ({
@@ -176,7 +176,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         generatingPortrait={generatingPortrait}
         onGeneratePortrait={handleGeneratePortrait}
         onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
-        currentPhysicalDescription={character.background.physicalDescription}
       />
       
       {/* Basic Info Section */}
@@ -197,15 +196,42 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Attributes Section */}
       <AttributesForm
-        attributes={character.attributes}
+        attributes={character.attributes.map(attr => ({
+          attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+          value: attr.baseValue
+        }))}
         world={world}
-        onAttributesChange={(attributes) => setCharacter({ ...character, attributes })}
+        onAttributesChange={(formAttributes) => {
+          const updatedAttributes = character.attributes.map(attr => {
+            const formAttr = formAttributes.find(fa => {
+              const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
+              return worldAttr?.name === attr.name;
+            });
+            return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
+          });
+          setCharacter({ ...character, attributes: updatedAttributes });
+        }}
       />
       
       {/* Skills Section */}
       <SkillsForm
-        skills={character.skills}
-        onSkillsChange={(skills) => setCharacter({ ...character, skills })}
+        skills={character.skills.map(skill => ({
+          skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+          level: skill.level,
+          experience: 0,
+          isActive: true
+        }))}
+        world={world}
+        onSkillsChange={(formSkills) => {
+          const updatedSkills = character.skills.map(skill => {
+            const formSkill = formSkills.find(fs => {
+              const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
+              return worldSkill?.name === skill.name;
+            });
+            return formSkill ? { ...skill, level: formSkill.level } : skill;
+          });
+          setCharacter({ ...character, skills: updatedSkills });
+        }}
       />
       
       {/* Action Buttons */}

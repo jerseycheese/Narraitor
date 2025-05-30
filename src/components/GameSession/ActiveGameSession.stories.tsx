@@ -224,8 +224,10 @@ const mockCharacter: any = {
     stamina: 75,
   },
   portrait: {
-    type: 'placeholder',
-    url: null,
+    type: 'ai-generated',
+    url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2NjZmZiIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTMzZmYiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSJ1cmwoI2dyYWQpIi8+CiAgPGNpcmNsZSBjeD0iNjQiIGN5PSI1MCIgcj0iMjAiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuOCIvPgogIDxlbGxpcHNlIGN4PSI2NCIgY3k9IjkwIiByeD0iMjUiIHJ5PSIyMCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44Ii8+Cjwvc3ZnPg==',
+    generatedAt: new Date().toISOString(),
+    prompt: 'A brave warrior with noble bearing',
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
