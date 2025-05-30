@@ -23,9 +23,10 @@ interface CharacterSkill {
 }
 
 interface CharacterBackground {
-  description: string;
+  history: string;
   personality: string;
-  motivation: string;
+  goals: string[];
+  fears: string[];
   physicalDescription?: string;
 }
 
@@ -112,6 +113,7 @@ export const characterStore = create<CharacterStore>()(
         const newCharacter: Character = {
           ...characterData,
           id: characterId,
+          level: characterData.level || 1, // Default to level 1 if not provided
           createdAt: now,
           updatedAt: now,
         };

@@ -37,6 +37,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
       title="Select Starting Skills"
       description="Choose skills that define your character's initial abilities and expertise. You can select between 1 and 8 skills. All selected skills start at level 1."
     >
+      {/* Helpful tip */}
+      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
+        <p className="text-sm text-blue-800">
+          Select skills that complement your attribute choices. 
+          You&apos;ll be able to improve these skills through gameplay and experience.
+        </p>
+      </div>
+
       {/* Skill selection info */}
       <div className={`${wizardStyles.card.base} bg-gray-50 mb-6`}>
         <h3 className={wizardStyles.subheading}>Skill Selection</h3>
@@ -88,13 +96,6 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
           ))}
         </div>
       )}
-
-      <div className={`${wizardStyles.card.base} bg-blue-50`}>
-        <p className="text-sm text-blue-800">
-          Select skills that complement your attribute choices. 
-          You&apos;ll be able to improve these skills through gameplay and experience.
-        </p>
-      </div>
     </WizardFormSection>
   );
 };

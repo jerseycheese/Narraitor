@@ -323,24 +323,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       worldId,
       level: 1,
       attributes: state.characterData.attributes.map(attr => ({
-        id: attr.attributeId,
-        characterId: '', // Will be set by store
-        name: attr.name,
-        baseValue: attr.value,
-        modifiedValue: attr.value,
+        attributeId: attr.attributeId,
+        value: attr.value,
       })),
       skills: state.characterData.skills
         .filter(skill => skill.isSelected)
         .map(skill => ({
-          id: skill.skillId,
-          characterId: '', // Will be set by store
-          name: skill.name,
+          skillId: skill.skillId,
           level: skill.level,
+          experience: 0,
+          isActive: true,
         })),
       background: {
-        description: state.characterData.background.history, // Store uses 'description' for history
+        history: state.characterData.background.history,
         personality: state.characterData.background.personality,
-        motivation: state.characterData.background.motivation,
+        goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
+        fears: [],
+        physicalDescription: state.characterData.background.physicalDescription || '',
       },
       portrait: state.characterData.portrait || {
         type: 'placeholder',
@@ -355,8 +354,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     });
 
     // Set as current character
-    const { setCurrentCharacter } = characterStore();
-    setCurrentCharacter(characterId);
+    characterStore.getState().setCurrentCharacter(characterId);
     
     // Verify the character was set as current
     const currentCharacterId = characterStore.getState().currentCharacterId;

@@ -4,6 +4,16 @@ import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 /**
+ * World image data
+ */
+export interface WorldImage {
+  type: 'ai-generated' | 'placeholder';
+  url: string | null;
+  generatedAt?: string;
+  prompt?: string;
+}
+
+/**
  * Represents a game world configuration
  */
 export interface World extends NamedEntity, TimestampedEntity {
@@ -11,6 +21,7 @@ export interface World extends NamedEntity, TimestampedEntity {
   attributes: WorldAttribute[];
   skills: WorldSkill[];
   settings: WorldSettings;
+  image?: WorldImage;
 }
 
 /**

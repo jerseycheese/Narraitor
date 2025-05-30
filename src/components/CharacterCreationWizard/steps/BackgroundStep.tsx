@@ -57,6 +57,14 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
       title="Character Background"
       description="Provide details about your character's history, personality, and motivations."
     >
+      {/* Helpful tip */}
+      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
+        <p className="text-sm text-blue-800">
+          A compelling backstory helps bring your character to life and 
+          provides context for their actions and decisions in the game.
+        </p>
+      </div>
+
       <div className={wizardStyles.form.group}>
         <label htmlFor="character-history" className={wizardStyles.form.label}>
           Character History
@@ -132,13 +140,6 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           ))}
         </div>
       )}
-
-      <div className={`${wizardStyles.card.base} bg-blue-50`}>
-        <p className="text-sm text-blue-800">
-          A compelling backstory helps bring your character to life and 
-          provides context for their actions and decisions in the game.
-        </p>
-      </div>
     </WizardFormSection>
   );
 };

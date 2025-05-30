@@ -71,7 +71,51 @@ export const FullWizard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'The complete character creation wizard flow, starting from the beginning.',
+        story: 'The complete character creation wizard flow, starting from the beginning. Includes portrait generation in step 5.',
+      },
+    },
+  },
+};
+
+export const StartAtPortraitStep: Story = {
+  render: () => {
+    const worldId = createTestWorld();
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <CharacterCreationWizard worldId={worldId} initialStep={4} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character creation starting at the Portrait generation step. Shows AI portrait generation with the new integrated system.',
+      },
+    },
+  },
+};
+
+export const WithGeneratedCharacter: Story = {
+  render: () => {
+    const worldId = createTestWorld();
+    
+    // Simulate character data that would be present at the portrait step
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+          <p className="text-blue-800 text-sm">
+            <strong>Story Context:</strong> This demonstrates the wizard after character generation 
+            has occurred, where the character now has AI-generated data including portrait integration.
+          </p>
+        </div>
+        <CharacterCreationWizard worldId={worldId} initialStep={4} />
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character creation with AI-generated character data, demonstrating the new portrait generation workflow and integration with character data.',
       },
     },
   },

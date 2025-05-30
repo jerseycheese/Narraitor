@@ -102,14 +102,14 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       const characterForPortrait = {
         id: characterId,
         name: character.name,
-        description: character.background?.description || '',
+        description: character.background?.history || '',
         worldId: character.worldId,
         background: {
-          history: character.background.description,
+          history: character.background.history,
           personality: character.background.personality,
           physicalDescription: customDescription || character.background.physicalDescription || '',
-          goals: [],
-          fears: [],
+          goals: character.background.goals || [],
+          fears: character.background.fears || [],
           relationships: []
         },
         attributes: character.attributes.map(attr => ({
@@ -176,7 +176,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         generatingPortrait={generatingPortrait}
         onGeneratePortrait={handleGeneratePortrait}
         onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
-        currentPhysicalDescription={character.background.physicalDescription}
       />
       
       {/* Basic Info Section */}
@@ -205,6 +204,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       {/* Skills Section */}
       <SkillsForm
         skills={character.skills}
+        world={world}
         onSkillsChange={(skills) => setCharacter({ ...character, skills })}
       />
       

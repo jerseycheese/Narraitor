@@ -72,6 +72,45 @@ export const WithoutPortrait: Story = {
   },
 };
 
+export const WithPlaceholderPortrait: Story = {
+  args: {
+    character: {
+      ...baseCharacter,
+      portrait: {
+        type: 'placeholder',
+        url: null,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character with placeholder portrait - shows initials-based fallback'
+      }
+    }
+  }
+};
+
+export const WithNicknamePortrait: Story = {
+  args: {
+    character: {
+      ...baseCharacter,
+      name: 'Marcus "The Shield" Valorian',
+      portrait: {
+        type: 'placeholder',
+        url: null,
+      },
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Character with nickname in name - portrait initials should ignore the quoted nickname (MV)'
+      }
+    }
+  }
+};
+
 export const MinimalInfo: Story = {
   args: {
     character: {

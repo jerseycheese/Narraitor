@@ -78,7 +78,7 @@ export const wizardStyles = {
   },
   
   // Utility styles
-  divider: "border-t border-gray-200 my-6",
+  divider: "border-t border-gray-200 pt-6",
   subheading: "text-lg font-semibold mb-4",
   errorContainer: "p-4 bg-red-50 border border-red-200 rounded-lg",
 };

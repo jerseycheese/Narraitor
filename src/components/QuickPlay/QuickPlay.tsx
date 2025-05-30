@@ -43,7 +43,7 @@ export function QuickPlay() {
     }
   };
 
-  const handleNewAdventure = () => {
+  const handleNewGame = () => {
     router.push('/worlds');
   };
 
@@ -51,7 +51,7 @@ export function QuickPlay() {
     return (
       <div className="text-center">
         <button
-          onClick={handleNewAdventure}
+          onClick={handleNewGame}
           className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-colors"
         >
           Start New Game
@@ -110,11 +110,11 @@ export function QuickPlay() {
         </button>
       </div>
 
-      {/* Start New Adventure - Secondary Option */}
+      {/* Start New Game - Secondary Option */}
       <div className="text-center">
         <p className="text-sm text-gray-600 mb-2">Or</p>
         <button
-          onClick={handleNewAdventure}
+          onClick={handleNewGame}
           className="px-6 py-2 border border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-md transition-colors"
         >
           Start New Game

@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
+    "@google/generative-ai": "^0.24.1",
     "@octokit/rest": "^21.1.1",
     "build": "^0.1.4",
     "csv-parse": "^5.6.0",

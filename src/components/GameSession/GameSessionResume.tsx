@@ -25,7 +25,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
   return (
     <div data-testid="game-session-resume" className="p-4">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Continue Your Adventure?</h2>
+        <h2 className="text-xl font-bold mb-4">Continue Your Story?</h2>
         
         <div className="bg-gray-50 rounded p-4 mb-6">
           <p className="text-sm text-gray-600 mb-1">Last played: {formattedDate}</p>
