@@ -104,7 +104,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
   return (
     <article
       data-testid="world-card"
-      className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full ${
+      onClick={() => onSelect?.(world.id)}
+      className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full cursor-pointer ${
         isActive 
           ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
           : 'border-gray-300 bg-white hover:shadow-lg'
@@ -223,6 +224,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
             </button>
             <button
               onClick={handlePlayClick}
+              data-testid="world-card-actions-play-button"
               className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium transition-colors flex items-center justify-center gap-2"
               title="Start playing in this world"
             >
@@ -237,6 +239,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
           <div className="flex gap-2">
             <button
               onClick={handleEditClick}
+              data-testid="world-card-actions-edit-button"
               className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors text-sm"
             >
               Edit World
