@@ -138,7 +138,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       stamina: 75,
     },
     portrait: {
-      type: 'placeholder',
+      type: 'placeholder' as const,
       url: null,
     },
   };
@@ -163,7 +163,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       stamina: 60,
     },
     portrait: {
-      type: 'placeholder',
+      type: 'placeholder' as const,
       url: null,
     },
   };
@@ -188,7 +188,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       stamina: 85,
     },
     portrait: {
-      type: 'placeholder',
+      type: 'placeholder' as const,
       url: null,
     },
   };

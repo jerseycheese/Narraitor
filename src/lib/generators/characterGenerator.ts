@@ -199,13 +199,13 @@ CRITICAL INSTRUCTIONS:
 - Skill levels: 1-3=beginner, 4-6=competent, 7-8=expert, 9-10=master
 - Return ONLY valid JSON with numbers, no placeholder text`;
 
-    logger.log('CharacterGenerator', 'Generated prompt:', prompt);
+    logger.debug('CharacterGenerator', 'Generated prompt:', prompt);
     
     const client = createAIClient();
     const response = await client.generateContent(prompt);
     
     // Log the raw response for debugging
-    logger.log('CharacterGenerator', 'Raw AI response:', response.content);
+    logger.debug('CharacterGenerator', 'Raw AI response:', response.content);
     
     // Extract JSON from response
     const jsonMatch = response.content.match(/\{[\s\S]*\}/);
@@ -218,7 +218,7 @@ CRITICAL INSTRUCTIONS:
     let jsonString = jsonMatch[0];
     
     // Log the raw JSON before cleaning for debugging
-    logger.log('CharacterGenerator', 'Raw JSON before cleaning:', jsonString.substring(0, 200) + '...');
+    logger.debug('CharacterGenerator', 'Raw JSON before cleaning:', jsonString.substring(0, 200) + '...');
     
     // Remove any comments that might have been included
     jsonString = jsonString.replace(/\/\/.*$/gm, ''); // Remove single-line comments
@@ -229,13 +229,13 @@ CRITICAL INSTRUCTIONS:
       const minVal = parseInt(min, 10);
       const maxVal = parseInt(max, 10);
       const randomValue = Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
-      logger.log('CharacterGenerator', `Replacing placeholder ${match} with ${randomValue}`);
+      logger.debug('CharacterGenerator', `Replacing placeholder ${match} with ${randomValue}`);
       return String(randomValue);
     });
     
     // Fallback for any remaining number placeholders
     jsonString = jsonString.replace(/<number>/g, (match) => {
-      logger.log('CharacterGenerator', `Found unhandled placeholder ${match}, using fallback value 5`);
+      logger.debug('CharacterGenerator', `Found unhandled placeholder ${match}, using fallback value 5`);
       return '5';
     });
     
@@ -257,20 +257,20 @@ CRITICAL INSTRUCTIONS:
       return `"${escapedKey}":`;
     });
     
-    logger.log('CharacterGenerator', 'Cleaned JSON string:', jsonString.substring(0, 500) + '...');
+    logger.debug('CharacterGenerator', 'Cleaned JSON string:', jsonString.substring(0, 500) + '...');
     
     let characterData: GeneratedCharacterData;
     try {
       characterData = JSON.parse(jsonString) as GeneratedCharacterData;
-      logger.log('CharacterGenerator', 'Parsed character data:', JSON.stringify(characterData, null, 2));
-      logger.log('CharacterGenerator', 'Generated attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
+      logger.debug('CharacterGenerator', 'Parsed character data:', JSON.stringify(characterData, null, 2));
+      logger.debug('CharacterGenerator', 'Generated attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
       
       // Check if all attributes are the same value (likely all 5s) and fix it
       const attributeValues = characterData.attributes.map(a => a.value);
       const allSameValue = attributeValues.every(val => val === attributeValues[0]);
       
       if (allSameValue && attributeValues[0] === 5) {
-        logger.log('CharacterGenerator', 'Detected all attributes are 5, applying varied distribution');
+        logger.debug('CharacterGenerator', 'Detected all attributes are 5, applying varied distribution');
         
         // Create a varied distribution for the character
         characterData.attributes = characterData.attributes.map((attr, index) => {
@@ -297,11 +297,11 @@ CRITICAL INSTRUCTIONS:
           // Ensure value is within bounds
           value = Math.max(worldAttr.minValue, Math.min(worldAttr.maxValue, value));
           
-          logger.log('CharacterGenerator', `Fixed attribute ${attr.id}: ${attr.value} -> ${value}`);
+          logger.debug('CharacterGenerator', `Fixed attribute ${attr.id}: ${attr.value} -> ${value}`);
           return { ...attr, value };
         });
         
-        logger.log('CharacterGenerator', 'Fixed attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
+        logger.debug('CharacterGenerator', 'Fixed attribute values:', characterData.attributes.map(a => `${a.id}: ${a.value}`));
       }
     } catch (parseError) {
       logger.error('CharacterGenerator', 'JSON parse error:', parseError);
@@ -337,7 +337,7 @@ CRITICAL INSTRUCTIONS:
     logger.error('CharacterGenerator', 'AI generation failed:', error);
     
     // If AI generation fails, fall back to template generation
-    logger.log('CharacterGenerator', 'Falling back to template generation due to AI error');
+    logger.debug('CharacterGenerator', 'Falling back to template generation due to AI error');
     try {
       return generateFromTemplate({ 
         method: 'template', 
@@ -384,7 +384,8 @@ export function generateTestCharacter(world: World): {
       return {
         skillId: skill.id,
         level: generated?.level || Math.floor(Math.random() * 5) + 1,
-        isSelected: !!generated // Only selected if in generated skills
+        experience: 0,
+        isActive: !!generated // Only active if in generated skills
       };
     }),
     background: {

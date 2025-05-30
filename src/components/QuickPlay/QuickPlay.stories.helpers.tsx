@@ -28,9 +28,10 @@ export const mockCharacter = {
   level: 3,
   isPlayer: true,
   background: {
-    description: 'A courageous warrior',
+    history: 'A courageous warrior with noble intentions',
     personality: 'Bold and adventurous',
-    motivation: 'To protect the innocent and seek adventure',
+    goals: ['To protect the innocent and seek adventure'],
+    fears: ['Failing those who depend on her'],
   },
   attributes: [],
   skills: [],
