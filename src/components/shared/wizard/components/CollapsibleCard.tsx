@@ -23,7 +23,10 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
       className={`${wizardStyles.card.base} ${className}`}
       data-testid={testId}
     >
-      <div className="flex justify-between items-center">
+      <div 
+        className="flex justify-between items-center cursor-pointer select-none hover:bg-gray-50 -m-2 p-2 rounded transition-colors"
+        onClick={onToggleExpand}
+      >
         {header}
         
         <button 
