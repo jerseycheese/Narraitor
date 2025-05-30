@@ -62,16 +62,18 @@ export default function WorldsPage() {
       // Generate the world data
       const generatedData = await generateWorld(worldReference, existingNames, worldName);
 
-      // Create attributes with IDs
+      // Create attributes with IDs and worldId placeholder
       const attributes = generatedData.attributes.map(attr => ({
         ...attr,
-        id: generateUniqueId('attr')
+        id: generateUniqueId('attr'),
+        worldId: '' // Will be set by the store
       }));
 
-      // Create skills with IDs and associate with random attributes
+      // Create skills with IDs, worldId placeholder, and associate with random attributes
       const skills = generatedData.skills.map(skill => ({
         ...skill,
         id: generateUniqueId('skill'),
+        worldId: '', // Will be set by the store
         associatedAttributeId: attributes[Math.floor(Math.random() * attributes.length)].id
       }));
 

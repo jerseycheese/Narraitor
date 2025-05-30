@@ -76,7 +76,13 @@ export default function CharacterGenerationTestPage() {
           level: skill.level
         };
       }),
-      background: generatedCharacter.background,
+      background: {
+        history: generatedCharacter.background.description,
+        personality: generatedCharacter.background.personality,
+        goals: generatedCharacter.background.motivation ? [generatedCharacter.background.motivation] : [],
+        fears: generatedCharacter.background.fears || [],
+        physicalDescription: generatedCharacter.background.physicalDescription
+      },
       isPlayer: true,
       status: {
         hp: 100,

@@ -73,8 +73,8 @@ export default function TestCharacterFormPage() {
         },
         skills: {
           total: currentWorld.settings.skillPointPool,
-          spent: testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
-          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
+          spent: testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
+          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
         },
       },
     };

@@ -267,7 +267,7 @@ export default function CharactersPage() {
               <h3 className="font-medium text-blue-900 mb-2">How to get started:</h3>
               <ol className="list-decimal list-inside space-y-1 text-blue-800">
                 <li>Go to the Worlds page</li>
-                <li>Click "Make Active" on any world you want to play in</li>
+                <li>Click &quot;Make Active&quot; on any world you want to play in</li>
                 <li>Return here to create characters for that world</li>
               </ol>
             </div>

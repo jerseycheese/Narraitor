@@ -49,11 +49,13 @@ export default function WorldGenerationTestPage() {
       description: generatedWorld.description,
       attributes: generatedWorld.attributes.map((attr) => ({
         ...attr,
-        id: `attr-${Date.now()}-${Math.random()}`
+        id: `attr-${Date.now()}-${Math.random()}`,
+        worldId: '' // Will be set by the store
       })),
       skills: generatedWorld.skills.map((skill) => ({
         ...skill,
-        id: `skill-${Date.now()}-${Math.random()}`
+        id: `skill-${Date.now()}-${Math.random()}`,
+        worldId: '' // Will be set by the store
       })),
       settings: generatedWorld.settings
     });

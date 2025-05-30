@@ -1,15 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldCardActions from './WorldCardActions';
 
-// Mock router for Storybook
+// Mock wrapper for Storybook
 const MockWorldCardActions = (props: Parameters<typeof WorldCardActions>[0]) => {
-  const mockRouter = {
-    push: (url: string) => {
-      console.log(`[Storybook] Would navigate to: ${url}`);
-      return Promise.resolve();
-    }
-  };
-  
   return (
     <div className="max-w-xs">
       <WorldCardActions {...props} />

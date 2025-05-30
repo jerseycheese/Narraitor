@@ -138,9 +138,9 @@ export default function CharacterViewPage() {
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{character.name}</h1>
               <p className="text-gray-600 mb-4">Level {character.level}</p>
-              {character.description && (
+              {character.background.personality && (
                 <p className="text-gray-700 mb-4 italic">
-                  {character.description}
+                  {character.background.personality}
                 </p>
               )}
               <div className="space-y-2">

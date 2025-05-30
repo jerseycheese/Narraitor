@@ -121,9 +121,11 @@ export const NewCharacter: Story = {
           level: 5
         })),
         background: {
-          description: 'A brave adventurer',
+          history: 'A brave adventurer who started their journey in a small village',
           personality: 'Courageous and kind',
-          motivation: 'Seeking glory and treasure'
+          goals: ['Seeking glory and treasure', 'Protecting the innocent'],
+          fears: ['Losing loved ones', 'Failing their quest'],
+          physicalDescription: 'Tall and athletic with distinctive scars'
         },
         isPlayer: true,
         status: {
@@ -167,9 +169,11 @@ export const WithPortrait: Story = {
           level: 7
         })),
         background: {
-          description: 'A legendary warrior from the northern kingdoms',
+          history: 'A legendary warrior from the northern kingdoms',
           personality: 'Stoic and honorable, with a hidden sense of humor',
-          motivation: 'Protecting the innocent and upholding justice'
+          goals: ['Protecting the innocent and upholding justice'],
+          fears: ['Dishonor', 'Failing in duty'],
+          physicalDescription: 'Battle-scarred warrior with piercing eyes'
         },
         isPlayer: true,
         status: {

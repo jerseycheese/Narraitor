@@ -208,7 +208,7 @@ export const NoWorlds: Story = {
 export const WithWorlds: Story = {
   decorators: [
     (Story) => {
-      const { worldId1, worldId2, worldId3 } = setupWorlds();
+      const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
       return <Story />;
     },
@@ -225,7 +225,7 @@ export const WithWorlds: Story = {
 export const WithActiveWorld: Story = {
   decorators: [
     (Story) => {
-      const { worldId1, worldId2, worldId3 } = setupWorlds();
+      const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
       worldStore.getState().setCurrentWorld(worldId1);
       return <Story />;
@@ -243,7 +243,7 @@ export const WithActiveWorld: Story = {
 export const WorldSwitcherOpen: Story = {
   decorators: [
     (Story) => {
-      const { worldId1, worldId2, worldId3 } = setupWorlds();
+      const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
       worldStore.getState().setCurrentWorld(worldId1);
       

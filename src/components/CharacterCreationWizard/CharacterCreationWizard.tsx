@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 import { 
   WizardContainer, 
@@ -322,18 +323,29 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       name: state.characterData.name,
       worldId,
       level: 1,
-      attributes: state.characterData.attributes.map(attr => ({
-        attributeId: attr.attributeId,
-        value: attr.value,
-      })),
+      attributes: state.characterData.attributes.map(attr => {
+        const worldAttr = world?.attributes.find(wa => wa.id === attr.attributeId);
+        return {
+          id: generateUniqueId('attr'),
+          characterId: '', // Will be set by store
+          name: worldAttr?.name || 'Unknown',
+          baseValue: attr.value,
+          modifiedValue: attr.value,
+          category: worldAttr?.category
+        };
+      }),
       skills: state.characterData.skills
         .filter(skill => skill.isSelected)
-        .map(skill => ({
-          skillId: skill.skillId,
-          level: skill.level,
-          experience: 0,
-          isActive: true,
-        })),
+        .map(skill => {
+          const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
+          return {
+            id: generateUniqueId('skill'),
+            characterId: '', // Will be set by store
+            name: worldSkill?.name || 'Unknown',
+            level: skill.level,
+            category: worldSkill?.category
+          };
+        }),
       background: {
         history: state.characterData.background.history,
         personality: state.characterData.background.personality,

@@ -31,13 +31,14 @@ const mockWorld: World = {
 const mockCharacter = {
   id: 'test-character-123',
   name: 'Test Hero',
-  description: 'A brave adventurer ready for testing',
   worldId: 'world-1',
   level: 5,
   background: {
-    description: 'Born in a test harness, raised to debug',
+    history: 'Born in a test harness, raised to debug',
     personality: 'Deterministic and reliable',
-    motivation: 'To pass all tests'
+    goals: ['To pass all tests'],
+    fears: ['Null pointer exceptions', 'Infinite loops'],
+    physicalDescription: 'A well-structured test character'
   },
   portrait: {
     type: 'placeholder' as const,
