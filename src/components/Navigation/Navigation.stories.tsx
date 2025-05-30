@@ -3,7 +3,7 @@ import { Navigation } from './Navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { World } from '@/types/world.types';
-import { Character } from '@/types/character.types';
+// Use character interface from store for consistency
 
 const meta: Meta<typeof Navigation> = {
   title: 'Narraitor/Navigation/Navigation',
@@ -118,7 +118,7 @@ const setupWorlds = () => {
 };
 
 const setupCharacters = (worldId1: string, worldId2: string) => {
-  const character1: Omit<Character, 'id' | 'createdAt' | 'updatedAt'> = {
+  const character1 = {
     name: 'Aria Starweaver',
     worldId: worldId1,
     level: 5,
@@ -126,9 +126,10 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     attributes: [],
     skills: [],
     background: {
-      description: 'A brave warrior',
+      history: 'A brave warrior',
       personality: 'Noble and just',
-      motivation: 'Protect the innocent',
+      goals: ['Protect the innocent'],
+      fears: ['Failing in duty'],
       physicalDescription: 'Tall and strong',
     },
     status: {
@@ -142,7 +143,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     },
   };
   
-  const character2: Omit<Character, 'id' | 'createdAt' | 'updatedAt'> = {
+  const character2 = {
     name: 'Zara Chen',
     worldId: worldId1,
     level: 3,
@@ -150,10 +151,11 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     attributes: [],
     skills: [],
     background: {
-      description: 'A skilled mage',
+      history: 'A skilled mage with ancient knowledge',
       personality: 'Wise and mysterious',
-      motivation: 'Seek ancient knowledge',
-      physicalDescription: 'Small and quick',
+      goals: ['Seek ancient knowledge'],
+      fears: ['Losing magical powers'],
+      physicalDescription: 'Small and quick'
     },
     status: {
       hp: 80,
@@ -166,7 +168,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     },
   };
   
-  const character3: Omit<Character, 'id' | 'createdAt' | 'updatedAt'> = {
+  const character3 = {
     name: 'Jack Harrison',
     worldId: worldId2,
     level: 1,
@@ -174,10 +176,11 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     attributes: [],
     skills: [],
     background: {
-      description: 'A cyber-enhanced detective',
+      history: 'A cyber-enhanced detective investigating corruption',
       personality: 'Cynical but determined',
-      motivation: 'Uncover corporate conspiracy',
-      physicalDescription: 'Scarred face, cybernetic eyes',
+      goals: ['Uncover corporate conspiracy'],
+      fears: ['Corporate retaliation'],
+      physicalDescription: 'Scarred face, cybernetic eyes'
     },
     status: {
       hp: 90,

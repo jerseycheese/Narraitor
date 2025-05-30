@@ -196,16 +196,42 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Attributes Section */}
       <AttributesForm
-        attributes={character.attributes}
+        attributes={character.attributes.map(attr => ({
+          attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+          value: attr.baseValue
+        }))}
         world={world}
-        onAttributesChange={(attributes) => setCharacter({ ...character, attributes })}
+        onAttributesChange={(formAttributes) => {
+          const updatedAttributes = character.attributes.map(attr => {
+            const formAttr = formAttributes.find(fa => {
+              const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
+              return worldAttr?.name === attr.name;
+            });
+            return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
+          });
+          setCharacter({ ...character, attributes: updatedAttributes });
+        }}
       />
       
       {/* Skills Section */}
       <SkillsForm
-        skills={character.skills}
+        skills={character.skills.map(skill => ({
+          skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+          level: skill.level,
+          experience: 0,
+          isActive: true
+        }))}
         world={world}
-        onSkillsChange={(skills) => setCharacter({ ...character, skills })}
+        onSkillsChange={(formSkills) => {
+          const updatedSkills = character.skills.map(skill => {
+            const formSkill = formSkills.find(fs => {
+              const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
+              return worldSkill?.name === skill.name;
+            });
+            return formSkill ? { ...skill, level: formSkill.level } : skill;
+          });
+          setCharacter({ ...character, skills: updatedSkills });
+        }}
       />
       
       {/* Action Buttons */}

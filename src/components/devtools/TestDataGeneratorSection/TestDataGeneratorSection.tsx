@@ -4,6 +4,7 @@ import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { generateTestWorld } from '@/lib/generators/worldGenerator';
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
@@ -27,7 +28,22 @@ export const TestDataGeneratorSection: React.FC = () => {
       console.log(`[DevTools] Generating test world with TV/movie themes...`);
       const testWorldData = await generateTestWorld();
       
-      const worldId = createWorld(testWorldData);
+      // Transform the generated data to match the store's expected format
+      const worldDataForStore = {
+        ...testWorldData,
+        attributes: testWorldData.attributes.map(attr => ({
+          ...attr,
+          id: generateUniqueId('attr'),
+          worldId: '' // Will be set by store
+        })),
+        skills: testWorldData.skills.map(skill => ({
+          ...skill,
+          id: generateUniqueId('skill'),
+          worldId: '' // Will be set by store
+        }))
+      };
+      
+      const worldId = createWorld(worldDataForStore);
       console.log(`Test world "${testWorldData.name}" created with ID: ${worldId}`);
       
       // Set the newly created world as the active world
@@ -70,7 +86,22 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Use the test world generator which includes TV/movie themes
         const testWorldData = await generateTestWorld();
         
-        const worldId = createWorld(testWorldData);
+        // Transform the generated data to match the store's expected format
+        const worldDataForStore = {
+          ...testWorldData,
+          attributes: testWorldData.attributes.map(attr => ({
+            ...attr,
+            id: generateUniqueId('attr'),
+            worldId: '' // Will be set by store
+          })),
+          skills: testWorldData.skills.map(skill => ({
+            ...skill,
+            id: generateUniqueId('skill'),
+            worldId: '' // Will be set by store
+          }))
+        };
+        
+        const worldId = createWorld(worldDataForStore);
         createdWorlds.push({ id: worldId, name: testWorldData.name });
         console.log(`Created test world: ${testWorldData.name}`);
         
@@ -135,8 +166,8 @@ export const TestDataGeneratorSection: React.FC = () => {
         },
         skills: {
           total: currentWorld.settings.skillPointPool,
-          spent: testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
-          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isSelected).reduce((sum, skill) => sum + skill.level, 0),
+          spent: testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
+          remaining: currentWorld.settings.skillPointPool - testData.skills.filter(s => s.isActive).reduce((sum, skill) => sum + skill.level, 0),
         },
       },
     };
@@ -217,18 +248,30 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Convert AI-generated data to character store format
         const characterData = {
           name: aiCharacterData.name,
-          description: aiCharacterData.background.description,
           worldId: currentWorld.id,
-          attributes: aiCharacterData.attributes.map(attr => ({
-            attributeId: attr.id,
-            value: attr.value
-          })),
-          skills: aiCharacterData.skills.map(skill => ({
-            skillId: skill.id,
-            level: skill.level,
-            experience: 0,
-            isActive: true
-          })),
+          level: aiCharacterData.level || 1,
+          isPlayer: true,
+          attributes: aiCharacterData.attributes.map(attr => {
+            const worldAttr = currentWorld.attributes.find(wa => wa.id === attr.id);
+            return {
+              id: generateUniqueId('attr'),
+              characterId: '', // Will be set by store
+              name: worldAttr?.name || 'Unknown',
+              baseValue: attr.value,
+              modifiedValue: attr.value,
+              category: worldAttr?.category
+            };
+          }),
+          skills: aiCharacterData.skills.map(skill => {
+            const worldSkill = currentWorld.skills.find(ws => ws.id === skill.id);
+            return {
+              id: generateUniqueId('skill'),
+              characterId: '', // Will be set by store
+              name: worldSkill?.name || 'Unknown',
+              level: skill.level,
+              category: worldSkill?.category
+            };
+          }),
           background: {
             history: aiCharacterData.background.description || '',
             personality: aiCharacterData.background.personality || '',
@@ -236,16 +279,10 @@ export const TestDataGeneratorSection: React.FC = () => {
             goals: aiCharacterData.background.motivation ? [aiCharacterData.background.motivation] : [],
             fears: []
           },
-          inventory: {
-            items: [],
-            capacity: 100,
-            categories: [],
-            characterId: '' // Will be set by createCharacter
-          },
           status: {
-            health: 100,
-            maxHealth: 100,
-            conditions: []
+            hp: 100,
+            mp: 50,
+            stamina: 100
           }
         };
 
@@ -258,11 +295,52 @@ export const TestDataGeneratorSection: React.FC = () => {
           const aiClient = createAIClient();
           const portraitGenerator = new PortraitGenerator(aiClient);
           
-          // Get the created character from store
-          const character = characterStore.getState().characters[characterId];
-          if (character) {
+          // Get the created character from store and transform it for PortraitGenerator
+          const storeCharacter = characterStore.getState().characters[characterId];
+          if (storeCharacter) {
             console.log(`[DevTools] Generating portrait for character "${characterData.name}"...`);
-            const portrait = await portraitGenerator.generatePortrait(character, {
+            
+            // Create a character object compatible with PortraitGenerator
+            const characterForPortrait = {
+              id: storeCharacter.id,
+              name: storeCharacter.name,
+              description: storeCharacter.background.history,
+              worldId: storeCharacter.worldId,
+              background: {
+                history: storeCharacter.background.history,
+                personality: storeCharacter.background.personality,
+                physicalDescription: storeCharacter.background.physicalDescription || '',
+                goals: storeCharacter.background.goals,
+                fears: storeCharacter.background.fears,
+                relationships: []
+              },
+              attributes: storeCharacter.attributes.map(attr => ({
+                attributeId: currentWorld.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+                value: attr.baseValue
+              })),
+              skills: storeCharacter.skills.map(skill => ({
+                skillId: currentWorld.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+                level: skill.level,
+                experience: 0,
+                isActive: true
+              })),
+              inventory: {
+                characterId: storeCharacter.id,
+                items: [],
+                capacity: 100,
+                categories: []
+              },
+              status: {
+                health: storeCharacter.status.hp,
+                maxHealth: storeCharacter.status.hp,
+                conditions: [],
+                location: currentWorld.name
+              },
+              createdAt: storeCharacter.createdAt,
+              updatedAt: storeCharacter.updatedAt
+            };
+            
+            const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
               worldTheme: currentWorld.theme
             });
             
