@@ -287,18 +287,23 @@ describe('Character Generator - Cleanup Tests', () => {
   });
 
   describe('Error Handling', () => {
-    it('should throw error when AI response is invalid JSON', async () => {
+    it('should fall back to template generation when AI response is invalid JSON', async () => {
       const mockClient = {
         generateContent: jest.fn().mockResolvedValue({ content: 'Invalid JSON response' })
       };
       mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
 
-      await expect(
-        generateCharacter(mockWorld, [], undefined, 'original')
-      ).rejects.toThrow('Failed to generate character');
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
+      
+      // Should successfully return a template-generated character
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('background');
+      expect(result).toHaveProperty('attributes');
+      expect(result).toHaveProperty('skills');
+      expect(result.characterType).toBe('original');
     });
 
-    it('should throw error when generated character has no name', async () => {
+    it('should fall back to template generation when generated character has no name', async () => {
       const mockResponseWithoutName = {
         content: JSON.stringify({
           level: 3,
@@ -317,20 +322,28 @@ describe('Character Generator - Cleanup Tests', () => {
       };
       mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
 
-      await expect(
-        generateCharacter(mockWorld, [], undefined, 'original')
-      ).rejects.toThrow('Generated character has no name');
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
+      
+      // Should successfully return a template-generated character with a valid name
+      expect(result.name).toBeTruthy();
+      expect(typeof result.name).toBe('string');
+      expect(result.name.length).toBeGreaterThan(0);
     });
 
-    it('should handle AI client errors gracefully', async () => {
+    it('should fall back to template generation when AI client errors occur', async () => {
       const mockClient = {
         generateContent: jest.fn().mockRejectedValue(new Error('AI service unavailable'))
       };
       mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
 
-      await expect(
-        generateCharacter(mockWorld, [], undefined, 'original')
-      ).rejects.toThrow('Failed to generate character');
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
+      
+      // Should successfully return a template-generated character
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('background');
+      expect(result).toHaveProperty('attributes');
+      expect(result).toHaveProperty('skills');
+      expect(result.characterType).toBe('original');
     });
   });
 });

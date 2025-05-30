@@ -154,7 +154,7 @@ ${generationType === 'specific' && suggestedName ?
   `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from the actual ${world.name} source material` :
   generationType === 'known' ?
   `1. MUST be a REAL, EXISTING character from the actual ${world.name} source material (NOT made up)` :
-  `1. Should be an original character that fits the ${world.name} world theme`
+  `1. Should be an original character that fits the ${world.name} world theme and has never appeared in the source material`
 }
 2. Is NOT one of the existing characters listed above (check names carefully)
 3. Has an interesting background story that fits the world
@@ -314,6 +314,30 @@ CRITICAL INSTRUCTIONS:
       characterData.name = suggestedName;
     }
     
+    // Validate and clamp all attribute values to world bounds
+    characterData.attributes = characterData.attributes.map(attr => {
+      const worldAttr = world.attributes.find(wa => wa.id === attr.id);
+      if (!worldAttr) return attr;
+      
+      // Clamp value to valid range
+      const clampedValue = Math.max(worldAttr.minValue, Math.min(worldAttr.maxValue, attr.value));
+      if (clampedValue !== attr.value) {
+        logger.debug('CharacterGenerator', `Clamped attribute ${attr.id}: ${attr.value} -> ${clampedValue} (range: ${worldAttr.minValue}-${worldAttr.maxValue})`);
+      }
+      
+      return { ...attr, value: clampedValue };
+    });
+    
+    // Validate and clamp all skill levels to 0-10 range
+    characterData.skills = characterData.skills.map(skill => {
+      const clampedLevel = Math.max(0, Math.min(10, skill.level));
+      if (clampedLevel !== skill.level) {
+        logger.debug('CharacterGenerator', `Clamped skill ${skill.id}: ${skill.level} -> ${clampedLevel} (range: 0-10)`);
+      }
+      
+      return { ...skill, level: clampedLevel };
+    });
+    
     // Validate the generated character
     if (!characterData.name) {
       throw new Error('Generated character has no name');
@@ -327,13 +351,28 @@ CRITICAL INSTRUCTIONS:
       throw new Error('Generated character has no skills');
     }
     
-    // Check for duplicate names
-    if (existingNames.includes(characterData.name)) {
+    // Check for duplicate names (case-insensitive)
+    const normalizedExistingNames = existingNames.map(name => name.toLowerCase());
+    if (normalizedExistingNames.includes(characterData.name.toLowerCase())) {
       throw new Error(`Character name "${characterData.name}" already exists in this world`);
+    }
+    
+    // Set character metadata based on generation type
+    if (generationType === 'known' || generationType === 'specific') {
+      characterData.isKnownFigure = true;
+      characterData.characterType = 'protagonist'; // Default for known characters
+    } else if (generationType === 'original') {
+      characterData.isKnownFigure = false;
+      characterData.characterType = 'original';
     }
     
     return characterData;
   } catch (error) {
+    // Don't fall back for certain types of validation errors
+    if (error instanceof Error && error.message.includes('already exists in this world')) {
+      throw error; // Re-throw duplicate name errors immediately
+    }
+    
     logger.error('CharacterGenerator', 'AI generation failed:', error);
     
     // If AI generation fails, fall back to template generation

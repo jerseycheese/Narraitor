@@ -209,36 +209,45 @@ describe('CharacterCreationWizard - Navigation to Game Session', () => {
           level: 1,
           attributes: expect.arrayContaining([
             expect.objectContaining({
-              id: 'attr-1',
               name: 'Strength',
               baseValue: 12,
+              modifiedValue: 12,
+              characterId: '',
             }),
             expect.objectContaining({
-              id: 'attr-2',
-              name: 'Intelligence',
+              name: 'Intelligence', 
               baseValue: 8,
+              modifiedValue: 8,
+              characterId: '',
             }),
           ]),
           skills: expect.arrayContaining([
             expect.objectContaining({
-              id: 'skill-1',
               name: 'Swordsmanship',
               level: 5,
+              characterId: '',
             }),
             expect.objectContaining({
-              id: 'skill-2',
               name: 'Magic',
               level: 3,
+              characterId: '',
             }),
           ]),
           background: expect.objectContaining({
-            description: 'Born in a small village, this character always dreamed of adventure and glory in distant lands.',
+            history: 'Born in a small village, this character always dreamed of adventure and glory in distant lands.',
             personality: 'Brave, curious, and always ready to help those in need.',
-            motivation: 'To make the world a better place',
+            goals: expect.arrayContaining(['To make the world a better place']),
+            fears: expect.any(Array),
           }),
           portrait: expect.objectContaining({
             type: 'placeholder',
             url: null,
+          }),
+          isPlayer: true,
+          status: expect.objectContaining({
+            hp: expect.any(Number),
+            mp: expect.any(Number),
+            stamina: expect.any(Number),
           }),
         })
       );

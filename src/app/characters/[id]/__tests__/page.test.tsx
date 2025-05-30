@@ -51,6 +51,34 @@ jest.mock('@/state/characterStore', () => ({
   }))
 }));
 
+// Mock world store
+jest.mock('@/state/worldStore', () => ({
+  worldStore: jest.fn(() => ({
+    worlds: {
+      'world-1': {
+        id: 'world-1',
+        name: 'Test World',
+        description: 'A test world',
+        theme: 'fantasy',
+        attributes: [
+          { id: 'attr-1', worldId: 'world-1', name: 'Strength', description: 'Physical power', baseValue: 10, minValue: 1, maxValue: 20, category: 'Physical' }
+        ],
+        skills: [
+          { id: 'skill-1', worldId: 'world-1', name: 'Swordsmanship', description: 'Skill with blades', difficulty: 'medium', baseValue: 5, minValue: 1, maxValue: 10, category: 'Combat' }
+        ],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 20,
+          skillPointPool: 20
+        },
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      }
+    }
+  }))
+}));
+
 const mockPush = jest.fn();
 
 beforeEach(() => {
@@ -79,8 +107,8 @@ describe('CharacterViewPage', () => {
     expect(screen.getByText('3')).toBeInTheDocument();
     
     // Should display background information
-    expect(screen.getByText('A brave warrior')).toBeInTheDocument();
-    expect(screen.getByText('Bold and honorable')).toBeInTheDocument();
+    expect(screen.getByText('A brave warrior with a noble past')).toBeInTheDocument();
+    expect(screen.getAllByText('Bold and honorable')).toHaveLength(2); // Appears in summary and detailed background
   });
 
   test('shows character not found message for invalid character ID', () => {

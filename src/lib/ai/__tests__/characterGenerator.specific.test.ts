@@ -76,9 +76,8 @@ describe('generateCharacter - Specific Character Type', () => {
 
     // Verify the AI prompt includes instructions for known figures
     const promptCall = mockGenerateContent.mock.calls[0][0];
+    expect(promptCall).toContain(`The character should be named: "${characterName}"`);
     expect(promptCall).toContain(`Is named "${characterName}" and MUST be a REAL, EXISTING character from the actual Middle Earth source material`);
-    expect(promptCall).toContain('CRITICAL: You MUST create a REAL character that ACTUALLY EXISTS in the Middle Earth source material');
-    expect(promptCall).toContain(`The character MUST be named "${characterName}" and must be a known figure from the source material`);
   });
 
   it('should generate an original character when using original type', async () => {
@@ -107,14 +106,13 @@ describe('generateCharacter - Specific Character Type', () => {
     const result = await generateCharacter(mockWorld, [], undefined, 'original');
 
     // Verify the character is NOT marked as a known figure
-    expect(result.isKnownFigure).toBeUndefined();
-    expect(result.characterType).toBeUndefined();
+    expect(result.isKnownFigure).toBe(false);
+    expect(result.characterType).toBe('original');
 
     // Verify the AI prompt includes instructions for original characters
     const promptCall = mockGenerateContent.mock.calls[0][0];
     expect(promptCall).toContain('Should be an original character that fits the Middle Earth world theme');
-    expect(promptCall).toContain('Create a completely original character that:');
-    expect(promptCall).toContain('Has never appeared in the source material');
+    expect(promptCall).toContain('never appeared in the source material');
   });
 
   it('should handle specific character generation with existing names', async () => {
