@@ -53,7 +53,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
       setCustomPrompt(currentPrompt);
       setShowCustomPrompt(true);
     }
-  }, [currentPrompt]);
+  }, [currentPrompt, customPrompt]);
 
   const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
 

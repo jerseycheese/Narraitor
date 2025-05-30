@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { WorldImage as WorldImageType } from '@/types/world.types';
 
 interface WorldImageProps {
@@ -53,9 +54,11 @@ export const WorldImage: React.FC<WorldImageProps> = ({
 
   return (
     <div className={`${sizeClasses[size]} ${aspectRatio} rounded-lg overflow-hidden border-2 border-gray-200 ${className}`}>
-      <img
+      <Image
         src={image.url}
         alt={`${worldName} world image`}
+        width={400}
+        height={300}
         className="w-full h-full object-cover"
         onError={(e) => {
           const target = e.target as HTMLImageElement;

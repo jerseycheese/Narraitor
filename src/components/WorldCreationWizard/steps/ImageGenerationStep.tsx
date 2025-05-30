@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { World, WorldImage } from '@/types/world.types';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { createAIClient } from '@/lib/ai';
@@ -29,14 +30,7 @@ export default function ImageGenerationStep({
   const [error, setError] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<WorldImage | null>(worldData.image || null);
 
-  useEffect(() => {
-    // Auto-generate image when component mounts if we don't have one
-    if (!generatedImage && !skipGeneration && !isGenerating) {
-      generateImage();
-    }
-  }, []);
-
-  const generateImage = async () => {
+  const generateImage = useCallback(async () => {
     setIsGenerating(true);
     setError(null);
 
@@ -54,7 +48,14 @@ export default function ImageGenerationStep({
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [worldData, onUpdate]);
+
+  useEffect(() => {
+    // Auto-generate image when component mounts if we don't have one
+    if (!generatedImage && !skipGeneration && !isGenerating) {
+      generateImage();
+    }
+  }, [generatedImage, skipGeneration, isGenerating, generateImage]);
 
   const handleSkip = () => {
     // Set a placeholder image
@@ -93,9 +94,11 @@ export default function ImageGenerationStep({
                 <LoadingState message="Generating world image..." />
               </div>
             ) : generatedImage?.url ? (
-              <img 
+              <Image 
                 src={generatedImage.url} 
                 alt={`${worldData.name} world`}
+                width={600}
+                height={337}
                 className="w-full h-full object-cover"
               />
             ) : (

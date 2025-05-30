@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import Link from 'next/link';
+import Image from 'next/image';
 import { SectionError } from '@/components/ui/ErrorDisplay';
 import { DataField } from '@/components/shared/DataField';
 
@@ -40,9 +41,11 @@ export default function WorldViewPage() {
         {/* Hero Image */}
         {world.image?.url && (
           <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-            <img 
+            <Image 
               src={world.image.url} 
               alt={`${world.name} world`}
+              width={800}
+              height={400}
               className="w-full h-64 md:h-96 object-cover"
             />
           </div>

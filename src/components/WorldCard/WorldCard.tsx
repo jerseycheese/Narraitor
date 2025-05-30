@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { World } from '../../types/world.types';
 import { worldStore } from '../../state/worldStore';
 import { sessionStore } from '../../state/sessionStore';
@@ -112,9 +113,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
       {/* World Image */}
       {world.image?.url && (
         <div className="h-48 overflow-hidden bg-gray-100">
-          <img 
+          <Image 
             src={world.image.url} 
             alt={`${world.name} world`}
+            width={400}
+            height={192}
             className="w-full h-full object-cover"
           />
         </div>

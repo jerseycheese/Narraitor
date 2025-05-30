@@ -383,7 +383,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     // Navigate to game session with the world
     router.push(`/world/${worldId}/play`);
-  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep]);
+  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep, world?.attributes, world?.skills]);
 
   if (!world) {
     return (
