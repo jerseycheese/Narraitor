@@ -52,8 +52,10 @@ export default function CharacterViewPage() {
   const repairCharacterAttributes = () => {
     // Character attributes from store already have the correct structure
     return character.attributes.map((charAttr) => {
-      // Find matching world attribute by name (since store uses name, not ID reference)
-      const worldAttr = world.attributes.find(wa => wa.name === charAttr.name);
+      // Find matching world attribute by ID first (safer), then fallback to name
+      const worldAttr = charAttr.worldAttributeId 
+        ? world.attributes.find(wa => wa.id === charAttr.worldAttributeId)
+        : world.attributes.find(wa => wa.name === charAttr.name);
       return {
         id: charAttr.id,
         characterId: character.id,
@@ -72,8 +74,10 @@ export default function CharacterViewPage() {
   const repairCharacterSkills = () => {
     // Character skills from store already have the correct structure
     return character.skills.map((charSkill) => {
-      // Find matching world skill by name (since store uses name, not ID reference)
-      const worldSkill = world.skills.find(ws => ws.name === charSkill.name);
+      // Find matching world skill by ID first (safer), then fallback to name
+      const worldSkill = charSkill.worldSkillId 
+        ? world.skills.find(ws => ws.id === charSkill.worldSkillId)
+        : world.skills.find(ws => ws.name === charSkill.name);
       return {
         id: charSkill.id,
         characterId: character.id,

@@ -30,6 +30,7 @@ function transformGeneratedAttributes(generatedData: GeneratedCharacterData, cur
     return {
       id: generateUniqueId('attr'),
       characterId: '', // Will be set by store
+      worldAttributeId: attr.id, // Store reference to world attribute ID
       name: worldAttr?.name || 'Unknown',
       baseValue: attr.value, // Use the AI-generated value
       modifiedValue: attr.value, // Use the AI-generated value
@@ -45,6 +46,7 @@ function transformGeneratedSkills(generatedData: GeneratedCharacterData, current
     return {
       id: generateUniqueId('skill'),
       characterId: '', // Will be set by store
+      worldSkillId: skill.id, // Store reference to world skill ID
       name: worldSkill?.name || 'Unknown',
       level: skill.level,
       category: worldSkill?.category
@@ -160,9 +162,6 @@ export default function CharactersPage() {
       
       // Generate character data based on type
       const nameToUse = generationType === 'specific' ? characterName : undefined;
-      console.log('=== CHARACTER GENERATION DEBUG ===');
-      console.log('World attributes:', currentWorld.attributes.map(a => `${a.name} (${a.minValue}-${a.maxValue})`));
-      console.log('Calling generateCharacter...');
       
       const generatedData = await generateCharacter(
         currentWorld, 
@@ -170,9 +169,6 @@ export default function CharactersPage() {
         nameToUse,
         generationType
       );
-      
-      console.log('Generated character data:', generatedData);
-      console.log('Generated attributes:', generatedData.attributes.map(a => `${a.id}: ${a.value}`));
       
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({

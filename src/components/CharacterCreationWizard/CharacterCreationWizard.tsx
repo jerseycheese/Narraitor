@@ -328,6 +328,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         return {
           id: generateUniqueId('attr'),
           characterId: '', // Will be set by store
+          worldAttributeId: attr.attributeId, // Store reference to world attribute ID
           name: worldAttr?.name || 'Unknown',
           baseValue: attr.value,
           modifiedValue: attr.value,
@@ -341,6 +342,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           return {
             id: generateUniqueId('skill'),
             characterId: '', // Will be set by store
+            worldSkillId: skill.skillId, // Store reference to world skill ID
             name: worldSkill?.name || 'Unknown',
             level: skill.level,
             category: worldSkill?.category

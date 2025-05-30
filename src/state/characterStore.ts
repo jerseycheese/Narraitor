@@ -8,6 +8,7 @@ import { createIndexedDBStorage } from './persistence';
 interface CharacterAttribute {
   id: EntityID;
   characterId: EntityID;
+  worldAttributeId?: EntityID; // Reference to world attribute for safer matching
   name: string;
   baseValue: number;
   modifiedValue: number;
@@ -17,6 +18,7 @@ interface CharacterAttribute {
 interface CharacterSkill {
   id: EntityID;
   characterId: EntityID;
+  worldSkillId?: EntityID; // Reference to world skill for safer matching
   name: string;
   level: number;
   category?: string;
