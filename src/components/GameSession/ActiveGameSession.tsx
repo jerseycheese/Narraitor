@@ -9,6 +9,7 @@ import { narrativeStore } from '@/state/narrativeStore';
 import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import CharacterSummary from './CharacterSummary';
 
 interface ActiveGameSessionProps {
@@ -162,6 +163,56 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     onChoiceSelected(choiceId);
   };
+
+  const handleCustomSubmit = (customText: string) => {
+    // Handle custom player input
+    const customChoiceId = generateUniqueId('custom');
+    
+    // Create a custom decision option and add it to the current decision
+    if (currentDecision) {
+      const customOption = {
+        id: customChoiceId,
+        text: customText,
+        isCustomInput: true,
+        customText: customText
+      };
+      
+      // Update the current decision with the custom option
+      const updatedDecision = {
+        ...currentDecision,
+        options: [...currentDecision.options, customOption],
+        selectedOptionId: customChoiceId
+      };
+      
+      setCurrentDecision(updatedDecision);
+      
+      // Check if decision exists in store before updating
+      const storeState = narrativeStore.getState();
+      const existingDecision = storeState.decisions[currentDecision.id];
+      
+      if (existingDecision) {
+        // Update the decision in the narrative store with the custom option
+        narrativeStore.getState().updateDecision(currentDecision.id, {
+          options: updatedDecision.options,
+          selectedOptionId: customChoiceId
+        });
+      } else {
+        // Decision doesn't exist in store yet, add it
+        narrativeStore.getState().addDecision(sessionId, {
+          prompt: updatedDecision.prompt,
+          options: updatedDecision.options,
+          selectedOptionId: customChoiceId
+        });
+      }
+    }
+    
+    // Trigger narrative generation with the custom choice
+    setIsGenerating(true);
+    setLocalSelectedChoiceId(customChoiceId);
+    setShouldTriggerGeneration(true);
+    
+    onChoiceSelected(customChoiceId);
+  };
   
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
@@ -246,6 +297,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <ChoiceSelector
             decision={currentDecision}
             onSelect={handleChoiceSelected}
+            onCustomSubmit={handleCustomSubmit}
+            enableCustomInput={true}
             isDisabled={status !== 'active' || isGenerating}
           />
         </div>
@@ -265,6 +318,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <ChoiceSelector
             choices={choices}
             onSelect={handleChoiceSelected}
+            onCustomSubmit={handleCustomSubmit}
+            enableCustomInput={true}
             isDisabled={status !== 'active' || isGenerating}
           />
         </div>

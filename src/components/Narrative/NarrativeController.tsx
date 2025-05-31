@@ -298,21 +298,15 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateInitialNarrative = async () => {
-    console.log('🎬 INITIAL NARRATIVE: Checking if we need to generate initial scene');
     
     // CHECK FIRST: Don't generate an initial scene if one already exists
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
     const hasAnySegments = existingSegments.length > 0;
-    const hasInitialScene = existingSegments.some(segment => 
-      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
-    );
     
-    console.log('🎬 INITIAL NARRATIVE: Existing segments:', existingSegments.length, 'Has any segments:', hasAnySegments, 'Has initial scene:', hasInitialScene);
     
     // If we have ANY segments, this is a resumed session - don't generate initial narrative
     if (hasAnySegments) {
-      console.log('🎬 INITIAL NARRATIVE: Session has existing segments (resumed session), skipping generation');
       setInitialGenerationCompleted(true);
       setIsLoading(false);
       return;
@@ -322,12 +316,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     setError(null);
     
     try {
-      console.log('🎬 INITIAL NARRATIVE: Generating initial scene...');
       const result = await narrativeGenerator.generateInitialScene(worldId, characterId ? [characterId] : []);
       
       // Skip if component unmounted during async operation
       if (!mountedRef.current) {
-        console.log('🎬 INITIAL NARRATIVE: Component unmounted, skipping');
         return;
       }
       
@@ -336,7 +328,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       const nowHasSegments = currentSegments.length > 0;
       
       if (nowHasSegments) {
-        console.log('🎬 INITIAL NARRATIVE: Another instance already created segments, skipping');
         setIsLoading(false);
         return;
       }
@@ -374,11 +365,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Generate choices if enabled - always generate for initial narrative
       if (generateChoices) {
-        console.log('Initial narrative generated, now generating choices');
         
         // Start generating AI choices immediately without showing fallback choices first
         setTimeout(() => {
-          console.log('⏱️ TIMEOUT: Now running delayed generatePlayerChoices for initial narrative');
           generatePlayerChoices();
         }, 500); // Reduced timeout since we're not showing immediate choices
       }
@@ -393,10 +382,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
-    console.log('🎯 GENERATING NEXT SEGMENT for choice:', triggeringChoiceId);
     
     if (segments.length === 0) {
-      console.log('❌ No segments found, skipping generation');
       return;
     }
     
@@ -412,11 +399,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       let choiceText = triggeringChoiceId;
       
       // Find the decision that contains this choice
+      let isCustomInput = false;
       for (const decision of decisions) {
         const selectedOption = decision.options.find(opt => opt.id === triggeringChoiceId);
         if (selectedOption) {
           choiceText = selectedOption.text;
-          console.log('🎯 Found choice text:', choiceText);
+          isCustomInput = selectedOption.isCustomInput || false;
           break;
         }
       }
@@ -477,15 +465,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
       
-      // Generate choices if enabled - always generate after a new segment
+      // Generate choices if enabled
       if (generateChoices) {
-        console.log('New narrative segment generated, now generating choices');
-        
-        // Start generating AI choices immediately without showing fallback choices first
-        setTimeout(() => {
-          console.log('⏱️ TIMEOUT: Now running delayed generatePlayerChoices for next segment');
-          generatePlayerChoices();
-        }, 500); // Reduced timeout since we're not showing immediate choices
+        if (isCustomInput) {
+          // Generate choices after a longer delay to ensure custom input is fully processed
+          setTimeout(() => {
+            generatePlayerChoices();
+          }, 2000); // Longer delay after custom input
+        } else {
+          // Start generating AI choices immediately without showing fallback choices first
+          setTimeout(() => {
+            generatePlayerChoices();
+          }, 500); // Normal timeout for predefined choices
+        }
       }
     } catch (err) {
       console.error(`Error generating narrative:`, err);

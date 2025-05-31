@@ -16,12 +16,6 @@ const meta: Meta<typeof ChoiceSelector> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Simple choices data
-const simpleChoices = [
-  { id: 'choice-1', text: 'Enter the mysterious cave' },
-  { id: 'choice-2', text: 'Continue along the path' },
-  { id: 'choice-3', text: 'Set up camp for the night' },
-];
 
 // Decision with hints
 const decisionWithHints: Decision = {
@@ -46,30 +40,50 @@ const decisionWithHints: Decision = {
   ],
 };
 
-export const SimpleChoices: Story = {
-  args: {
-    choices: simpleChoices,
-  },
-};
-
-export const DecisionWithHints: Story = {
+// Main implementation story - Decision with Hints and Custom Input
+export const DecisionWithCustomInput: Story = {
   args: {
     decision: decisionWithHints,
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
 };
 
-export const WithSelection: Story = {
+// Alternative prompt for variety
+export const CombatDecision: Story = {
   args: {
     decision: {
-      ...decisionWithHints,
-      selectedOptionId: 'opt-2',
+      id: 'combat-decision',
+      prompt: 'A bandit jumps out from behind the trees, sword drawn. What do you do?',
+      options: [
+        {
+          id: 'fight',
+          text: 'Draw your weapon and fight',
+          hint: 'Direct confrontation - requires combat skills',
+        },
+        {
+          id: 'dodge',
+          text: 'Duck and roll to avoid the attack',
+          hint: 'Defensive maneuver - requires agility',
+        },
+        {
+          id: 'negotiate',
+          text: 'Try to talk your way out',
+          hint: 'Peaceful approach - requires charisma',
+        },
+      ],
     },
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
 };
 
-export const Disabled: Story = {
+// Disabled state for testing
+export const DisabledState: Story = {
   args: {
-    choices: simpleChoices,
+    decision: decisionWithHints,
+    enableCustomInput: true,
     isDisabled: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
 };
