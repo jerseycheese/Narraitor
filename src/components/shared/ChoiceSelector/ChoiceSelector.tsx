@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Decision } from '@/types/narrative.types';
+import { Decision, ChoiceAlignment } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -29,6 +29,21 @@ interface ChoiceSelectorProps {
   customInputPlaceholder?: string;
   maxCustomLength?: number;
 }
+
+/**
+ * Get CSS classes for alignment-based styling
+ */
+const getAlignmentClasses = (alignment?: ChoiceAlignment): string => {
+  switch (alignment) {
+    case 'lawful':
+      return 'bg-blue-50 border-blue-300 hover:bg-blue-100';
+    case 'chaos':
+      return 'bg-red-50 border-red-300 hover:bg-red-100';
+    case 'neutral':
+    default:
+      return 'bg-white border-gray-200 hover:bg-gray-50';
+  }
+};
 
 /**
  * Unified choice selector component that handles both simple choices and complex decisions
@@ -63,17 +78,20 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     text: string;
     hint?: string;
     isSelected?: boolean;
+    alignment?: ChoiceAlignment;
   }> = isDecisionMode
     ? (decision.options || []).map(opt => ({
         id: opt.id,
         text: opt.text,
         hint: opt.hint,
         isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
+        alignment: opt.alignment,
       }))
     : (choices || []).map(choice => ({
         id: choice.id,
         text: choice.text,
         isSelected: choice.isSelected || choice.id === selectedOptionId,
+        alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
       }));
 
   // Add custom input option if enabled
@@ -82,6 +100,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     text: 'Custom response...',
     isSelected: showCustomInput,
     hint: undefined,
+    alignment: 'neutral' as ChoiceAlignment,
   } : null;
 
   // Combine options with custom option at the top
@@ -172,7 +191,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               className={`block w-full text-left p-3 border rounded transition-colors ${
                 option.isSelected
                   ? 'bg-blue-100 border-blue-500 font-bold'
-                  : 'bg-white hover:bg-gray-50'
+                  : getAlignmentClasses(option.alignment)
               } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               onClick={() => handleOptionSelect(option.id)}
               disabled={isDisabled}

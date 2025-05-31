@@ -4,6 +4,7 @@ import { initialSceneTemplate } from './initialSceneTemplate';
 import { sceneTemplate } from './sceneTemplate';
 import { transitionTemplate } from './transitionTemplate';
 import { playerChoiceTemplate } from './playerChoiceTemplate';
+import { alignedChoiceTemplate } from './choiceTypeTemplates';
 
 // Convert function templates to PromptTemplate objects
 export const narrativeTemplates: PromptTemplate[] = [
@@ -81,5 +82,20 @@ export const narrativeTemplates: PromptTemplate[] = [
       }
     ],
     generate: playerChoiceTemplate
+  },
+  {
+    id: 'narrative/alignedPlayerChoice',
+    name: 'Aligned Player Choice Template',
+    type: PromptType.NarrativeGeneration,
+    content: '{{prompt}}',
+    variables: [
+      {
+        name: 'prompt',
+        type: 'string',
+        description: 'The generated prompt for aligned player choices',
+        required: true
+      }
+    ],
+    generate: alignedChoiceTemplate
   }
 ];
