@@ -55,7 +55,7 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Custom input functionality', () => {
-    it('shows custom input option when enableCustomInput is true', () => {
+    it('shows custom input field when enableCustomInput is true', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -65,10 +65,10 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      expect(screen.getByText('Custom response...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
     });
 
-    it('does not show custom input option when enableCustomInput is false', () => {
+    it('does not show custom input field when enableCustomInput is false', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -77,10 +77,10 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      expect(screen.queryByText('Custom response...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Type your custom response...')).not.toBeInTheDocument();
     });
 
-    it('shows custom input option at the top of the list', () => {
+    it('shows custom input field at the top before choices', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -90,12 +90,14 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      const options = screen.getAllByRole('radio');
-      expect(options[0]).toHaveTextContent('Custom response...');
+      const customInput = screen.getByPlaceholderText('Type your custom response...');
+      const firstChoice = screen.getByText('Go north');
+      
+      // Custom input should appear before the first choice in DOM order
+      expect(customInput.compareDocumentPosition(firstChoice)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
-    it('reveals text input when custom option is selected', async () => {
-      const user = userEvent.setup();
+    it('shows text input and submit button by default', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -104,14 +106,12 @@ describe('ChoiceSelector', () => {
           onCustomSubmit={mockOnCustomSubmit}
         />
       );
-      
-      await user.click(screen.getByText('Custom response...'));
       
       expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
     });
 
-    it('auto-focuses input field when revealed', async () => {
+    it('allows typing in the input field', async () => {
       const user = userEvent.setup();
       render(
         <ChoiceSelector 
@@ -122,10 +122,10 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
-      
       const input = screen.getByPlaceholderText('Type your custom response...');
-      expect(input).toHaveFocus();
+      await user.type(input, 'Hello world');
+      
+      expect(input).toHaveValue('Hello world');
     });
 
     it('shows character count as user types', async () => {
@@ -139,9 +139,7 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
-      
       await user.type(input, 'Hello world');
       
       expect(screen.getByText('11/250')).toBeInTheDocument();
@@ -158,7 +156,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       const longText = 'a'.repeat(300);
@@ -179,7 +176,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       const nearLimitText = 'a'.repeat(240);
@@ -200,7 +196,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, 'My custom action');
@@ -220,7 +215,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, 'My custom action{enter}');
@@ -239,7 +233,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       await user.click(screen.getByRole('button', { name: /submit/i }));
       
       expect(mockOnCustomSubmit).not.toHaveBeenCalled();
@@ -256,7 +249,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, '   ');
@@ -276,7 +268,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, 'My custom action');
@@ -289,7 +280,7 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText('0/250')).toBeInTheDocument();
     });
 
-    it('hides input field when different choice is selected', async () => {
+    it('input field remains visible when predefined choice is selected', async () => {
       const user = userEvent.setup();
       render(
         <ChoiceSelector 
@@ -300,15 +291,16 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
+      // Input should be visible from the start
       expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
       
+      // Selecting a predefined choice should not hide the input
       await user.click(screen.getByText('Go north'));
-      expect(screen.queryByPlaceholderText('Type your custom response...')).not.toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Type your custom response...')).toBeInTheDocument();
+      expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
     });
 
-    it('uses custom placeholder text when provided', async () => {
-      const user = userEvent.setup();
+    it('uses custom placeholder text when provided', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -318,8 +310,6 @@ describe('ChoiceSelector', () => {
           customInputPlaceholder="Describe your action..."
         />
       );
-      
-      await user.click(screen.getByText('Custom response...'));
       
       expect(screen.getByPlaceholderText('Describe your action...')).toBeInTheDocument();
     });
@@ -336,7 +326,6 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByText('Custom response...'));
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, 'test');
@@ -357,8 +346,8 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      const customOption = screen.getByText('Custom response...');
-      expect(customOption.closest('button')).toBeDisabled();
+      const customInput = screen.getByPlaceholderText('Type your custom response...');
+      expect(customInput).toBeDisabled();
       
       simpleChoices.forEach(choice => {
         const option = screen.getByText(choice.text);
@@ -368,8 +357,7 @@ describe('ChoiceSelector', () => {
   });
 
   describe('Accessibility', () => {
-    it('has proper ARIA attributes for custom input', async () => {
-      const user = userEvent.setup();
+    it('has proper ARIA attributes for custom input', () => {
       render(
         <ChoiceSelector 
           choices={simpleChoices} 
@@ -378,11 +366,6 @@ describe('ChoiceSelector', () => {
           onCustomSubmit={mockOnCustomSubmit}
         />
       );
-      
-      const customOption = screen.getByText('Custom response...');
-      expect(customOption.closest('button')).toHaveAttribute('role', 'radio');
-      
-      await user.click(customOption);
       
       const input = screen.getByPlaceholderText('Type your custom response...');
       expect(input).toHaveAttribute('aria-label', 'Custom response input');

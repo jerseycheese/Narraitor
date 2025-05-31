@@ -186,8 +186,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       
       setCurrentDecision(updatedDecision);
       
-      // Store the custom choice in the narrative store
-      narrativeStore.getState().selectDecisionOption(currentDecision.id, customChoiceId);
+      // Check if decision exists in store before updating
+      const storeState = narrativeStore.getState();
+      const existingDecision = storeState.decisions[currentDecision.id];
+      
+      if (existingDecision) {
+        // Update the decision in the narrative store with the custom option
+        narrativeStore.getState().updateDecision(currentDecision.id, {
+          options: updatedDecision.options,
+          selectedOptionId: customChoiceId
+        });
+      } else {
+        // Decision doesn't exist in store yet, add it
+        narrativeStore.getState().addDecision(sessionId, {
+          prompt: updatedDecision.prompt,
+          options: updatedDecision.options,
+          selectedOptionId: customChoiceId
+        });
+      }
     }
     
     // Trigger narrative generation with the custom choice

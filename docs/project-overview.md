@@ -103,8 +103,27 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 - Implement initial utilities and helpers
 - Start world configuration system implementation with AI assistance
 
-## 9. Development Status
-The project has completed the requirements definition and planning phase. The next step is to begin implementation of the core infrastructure and state management components.
+## 9. Implemented Features
+
+### Custom Player Input System
+- **Full Implementation**: Players can type custom actions instead of only selecting from AI-generated choices
+- **Visual Design**: Prominent custom input field at top with suggested actions below
+- **Character Limits**: 250-character limit with live counting and visual feedback
+- **Validation**: Prevents empty submissions and handles edge cases
+- **Narrative Integration**: Custom actions are incorporated into AI-generated story segments
+- **Accessibility**: Full keyboard navigation and screen reader support
+- **Documentation**: Comprehensive docs and testing coverage
+
+### Core Game Systems
+- **World Creation**: Complete wizard-based world configuration system
+- **Character Creation**: Multi-step character creation with attributes and background
+- **Narrative Generation**: AI-powered story generation using Google Gemini
+- **Choice System**: Dynamic choice generation with custom input support
+- **Game Sessions**: Complete game session management and state persistence
+- **Storybook Integration**: Component development and testing framework
+
+## 10. Development Status
+The project has implemented the core MVP functionality and is ready for extended gameplay testing. The custom player input feature represents a significant enhancement to player agency and creative expression within the narrative framework.
 
 ## 10. Phased Development Plan
 

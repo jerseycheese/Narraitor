@@ -72,13 +72,21 @@ This roadmap outlines the development phases for the Narraitor project, focusing
 - [ ] Add item categorization
 - [ ] Create basic item interaction
 
-### 1.7 Narrative Engine
-- [ ] Set up Google Gemini AI integration
-- [ ] Create prompt template system
-- [ ] Implement context management (preserving 5-10 narrative segments)
-- [ ] Develop player choice system with 3-4 options per decision point
-- [ ] Add scene transition handling
-- [ ] Create error recovery mechanisms with retries and fallback content
+### 1.7 Narrative Engine ✅ COMPLETE
+- [x] Set up Google Gemini AI integration
+- [x] Create prompt template system
+- [x] Implement context management (preserving 5-10 narrative segments)
+- [x] Develop player choice system with 3-4 options per decision point
+- [x] **ENHANCED: Custom Player Input System** - Players can type custom actions in addition to selecting from AI-generated choices
+- [x] Add scene transition handling
+- [x] Create error recovery mechanisms with retries and fallback content
+
+**Implementation Notes:**
+- Complete AI-powered narrative generation using Google Gemini
+- Advanced choice system with both predefined and custom player input options
+- Custom input features: 250-character limit, live validation, accessibility support
+- Narrative integration ensures custom actions are incorporated into story progression
+- Delayed choice regeneration after custom input to prevent data conflicts
 
 ### 1.8 Journal System
 - [ ] Implement basic journal state reducer

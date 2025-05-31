@@ -16,12 +16,6 @@ const meta: Meta<typeof ChoiceSelector> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Simple choices data
-const simpleChoices = [
-  { id: 'choice-1', text: 'Enter the mysterious cave' },
-  { id: 'choice-2', text: 'Continue along the path' },
-  { id: 'choice-3', text: 'Set up camp for the night' },
-];
 
 // Decision with hints
 const decisionWithHints: Decision = {
@@ -46,68 +40,7 @@ const decisionWithHints: Decision = {
   ],
 };
 
-export const SimpleChoices: Story = {
-  args: {
-    choices: simpleChoices,
-  },
-};
-
-export const DecisionWithHints: Story = {
-  args: {
-    decision: decisionWithHints,
-  },
-};
-
-export const WithSelection: Story = {
-  args: {
-    decision: {
-      ...decisionWithHints,
-      selectedOptionId: 'opt-2',
-    },
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    choices: simpleChoices,
-    isDisabled: true,
-  },
-};
-
-export const WithCustomInput: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
-export const CustomInputActive: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
-export const CustomInputWithPlaceholder: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    customInputPlaceholder: 'Describe your action in detail...',
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
-export const CustomInputWithLimit: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    maxCustomLength: 100,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
+// Main implementation story - Decision with Hints and Custom Input
 export const DecisionWithCustomInput: Story = {
   args: {
     decision: decisionWithHints,
@@ -116,9 +49,39 @@ export const DecisionWithCustomInput: Story = {
   },
 };
 
-export const DisabledWithCustomInput: Story = {
+// Alternative prompt for variety
+export const CombatDecision: Story = {
   args: {
-    choices: simpleChoices,
+    decision: {
+      id: 'combat-decision',
+      prompt: 'A bandit jumps out from behind the trees, sword drawn. What do you do?',
+      options: [
+        {
+          id: 'fight',
+          text: 'Draw your weapon and fight',
+          hint: 'Direct confrontation - requires combat skills',
+        },
+        {
+          id: 'dodge',
+          text: 'Duck and roll to avoid the attack',
+          hint: 'Defensive maneuver - requires agility',
+        },
+        {
+          id: 'negotiate',
+          text: 'Try to talk your way out',
+          hint: 'Peaceful approach - requires charisma',
+        },
+      ],
+    },
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+// Disabled state for testing
+export const DisabledState: Story = {
+  args: {
+    decision: decisionWithHints,
     enableCustomInput: true,
     isDisabled: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
