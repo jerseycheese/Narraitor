@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Decision } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
@@ -22,6 +22,12 @@ interface ChoiceSelectorProps {
   isDisabled?: boolean;
   className?: string;
   showHints?: boolean; // Whether to show hints when available
+  
+  // Custom input props
+  enableCustomInput?: boolean;
+  onCustomSubmit?: (customText: string) => void;
+  customInputPlaceholder?: string;
+  maxCustomLength?: number;
 }
 
 /**
@@ -35,7 +41,19 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   isDisabled = false,
   className = '',
   showHints = true,
+  enableCustomInput = false,
+  onCustomSubmit,
+  customInputPlaceholder = 'Type your custom response...',
+  maxCustomLength = 250,
 }) => {
+  // Custom input state
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInputText, setCustomInputText] = useState('');
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  
+  // Ref for auto-focusing input
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
   // Determine what data we're working with
   const isDecisionMode = !!decision;
   
@@ -50,19 +68,83 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         id: opt.id,
         text: opt.text,
         hint: opt.hint,
-        isSelected: opt.id === decision.selectedOptionId,
+        isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
       }))
     : (choices || []).map(choice => ({
         id: choice.id,
         text: choice.text,
-        isSelected: choice.isSelected,
+        isSelected: choice.isSelected || choice.id === selectedOptionId,
       }));
+
+  // Add custom input option if enabled
+  const customOption = enableCustomInput ? {
+    id: 'custom-input',
+    text: 'Custom response...',
+    isSelected: showCustomInput,
+    hint: undefined,
+  } : null;
+
+  // Combine options with custom option at the top
+  const allOptions = customOption ? [customOption, ...normalizedOptions] : normalizedOptions;
 
   // Determine the prompt text
   const displayPrompt = prompt || (isDecisionMode ? decision.prompt : 'What will you do?');
 
+  // Auto-focus input when revealed
+  useEffect(() => {
+    if (showCustomInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [showCustomInput]);
+
+  // Handle option selection
+  const handleOptionSelect = useCallback((optionId: string) => {
+    if (optionId === 'custom-input') {
+      setShowCustomInput(true);
+      setSelectedOptionId('custom-input');
+    } else {
+      setShowCustomInput(false);
+      setSelectedOptionId(optionId);
+      onSelect(optionId);
+    }
+  }, [onSelect]);
+
+  // Handle custom input submission
+  const handleCustomSubmit = useCallback(() => {
+    const trimmedText = customInputText.trim();
+    if (trimmedText && onCustomSubmit) {
+      onCustomSubmit(trimmedText);
+      setCustomInputText('');
+      // Keep input field visible after submission
+    }
+  }, [customInputText, onCustomSubmit]);
+
+  // Handle Enter key in textarea
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCustomSubmit();
+    }
+  }, [handleCustomSubmit]);
+
+  // Handle input change with character limit
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= maxCustomLength) {
+      setCustomInputText(value);
+    }
+  }, [maxCustomLength]);
+
+  // Calculate character count styling
+  const characterCount = customInputText.length;
+  const characterCountClass = characterCount >= maxCustomLength 
+    ? 'text-red-600' 
+    : characterCount >= maxCustomLength * 0.8 
+    ? 'text-amber-600' 
+    : 'text-gray-500';
+
   // Don't render if no options
-  if (normalizedOptions.length === 0) {
+  if (allOptions.length === 0) {
     return null;
   }
 
@@ -83,25 +165,55 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         role="radiogroup" 
         aria-labelledby="choices-heading"
       >
-        {normalizedOptions.map((option) => (
-          <button
-            key={option.id}
-            data-testid={`choice-option-${option.id}`}
-            className={`block w-full text-left p-3 border rounded transition-colors ${
-              option.isSelected
-                ? 'bg-blue-100 border-blue-500 font-bold'
-                : 'bg-white hover:bg-gray-50'
-            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-            onClick={() => onSelect(option.id)}
-            disabled={isDisabled}
-            aria-checked={option.isSelected}
-            role="radio"
-          >
-            {option.isSelected ? '➤ ' : ''}{option.text}
-            {showHints && option.hint && (
-              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
+        {allOptions.map((option) => (
+          <div key={option.id}>
+            <button
+              data-testid={`choice-option-${option.id}`}
+              className={`block w-full text-left p-3 border rounded transition-colors ${
+                option.isSelected
+                  ? 'bg-blue-100 border-blue-500 font-bold'
+                  : 'bg-white hover:bg-gray-50'
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              onClick={() => handleOptionSelect(option.id)}
+              disabled={isDisabled}
+              aria-checked={option.isSelected}
+              role="radio"
+            >
+              {option.isSelected ? '➤ ' : ''}{option.text}
+              {showHints && option.hint && (
+                <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
+              )}
+            </button>
+            
+            {/* Custom input field */}
+            {option.id === 'custom-input' && showCustomInput && (
+              <div className="mt-3 ml-6 mr-2 bg-gray-50 p-4 rounded border">
+                <textarea
+                  ref={inputRef}
+                  value={customInputText}
+                  onChange={handleInputChange}
+                  onKeyPress={handleKeyPress}
+                  placeholder={customInputPlaceholder}
+                  disabled={isDisabled}
+                  aria-label="Custom response input"
+                  className="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  rows={3}
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <span className={`text-sm ${characterCountClass}`}>
+                    {characterCount}/{maxCustomLength}
+                  </span>
+                  <button
+                    onClick={handleCustomSubmit}
+                    disabled={isDisabled || !customInputText.trim()}
+                    className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
         ))}
       </div>
     </div>

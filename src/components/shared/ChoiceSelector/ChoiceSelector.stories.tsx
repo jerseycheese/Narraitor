@@ -73,3 +73,54 @@ export const Disabled: Story = {
     isDisabled: true,
   },
 };
+
+export const WithCustomInput: Story = {
+  args: {
+    choices: simpleChoices,
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+export const CustomInputActive: Story = {
+  args: {
+    choices: simpleChoices,
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+export const CustomInputWithPlaceholder: Story = {
+  args: {
+    choices: simpleChoices,
+    enableCustomInput: true,
+    customInputPlaceholder: 'Describe your action in detail...',
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+export const CustomInputWithLimit: Story = {
+  args: {
+    choices: simpleChoices,
+    enableCustomInput: true,
+    maxCustomLength: 100,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+export const DecisionWithCustomInput: Story = {
+  args: {
+    decision: decisionWithHints,
+    enableCustomInput: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};
+
+export const DisabledWithCustomInput: Story = {
+  args: {
+    choices: simpleChoices,
+    enableCustomInput: true,
+    isDisabled: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+};

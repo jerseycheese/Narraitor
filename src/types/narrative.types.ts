@@ -36,6 +36,9 @@ export interface DecisionOption {
   text: string;
   requirements?: DecisionRequirement[];
   hint?: string;
+  // Custom input support
+  isCustomInput?: boolean;
+  customText?: string;
 }
 
 /**
