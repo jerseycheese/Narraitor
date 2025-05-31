@@ -303,9 +303,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     // Do a fresh check of the store to get the latest state
     const existingSegments = getSessionSegments(sessionId);
     const hasAnySegments = existingSegments.length > 0;
-    const hasInitialScene = existingSegments.some(segment => 
-      segment.type === 'scene' && segment.metadata?.location === 'Starting Location'
-    );
     
     
     // If we have ANY segments, this is a resumed session - don't generate initial narrative
