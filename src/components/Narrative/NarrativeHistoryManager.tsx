@@ -38,10 +38,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       
       // Log deduplication info for debugging
       if (uniqueSegments.length !== existingSegments.length) {
-        console.debug(
-          `NarrativeHistoryManager: Deduplicated segments for session ${sessionId} ` +
-          `(${existingSegments.length} → ${uniqueSegments.length})`
-        );
+        // Deduplication occurred - segments were merged
       }
       
       // Set state with final deduplicated segments

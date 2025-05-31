@@ -222,6 +222,27 @@ describe('ChoiceSelector', () => {
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('My custom action');
     });
 
+    it('creates newline when Shift+Enter is pressed without submitting', async () => {
+      const user = userEvent.setup();
+      render(
+        <ChoiceSelector 
+          choices={simpleChoices} 
+          onSelect={mockOnSelect}
+          enableCustomInput
+          onCustomSubmit={mockOnCustomSubmit}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText('Type your custom response...');
+      
+      await user.type(input, 'Line 1{shift>}{enter}Line 2');
+      
+      // Should not submit
+      expect(mockOnCustomSubmit).not.toHaveBeenCalled();
+      // Should have both lines with newline character
+      expect(input).toHaveValue('Line 1\nLine 2');
+    });
+
     it('does not submit empty custom input', async () => {
       const user = userEvent.setup();
       render(

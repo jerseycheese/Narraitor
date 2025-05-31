@@ -1,5 +1,3 @@
-# Pull Request Template
-
 ## Description
 <!-- Provide a concise description of the changes -->
 

@@ -492,8 +492,8 @@ const validateCustomInput = (text: string): boolean => {
   // Check character limit
   if (trimmed.length > maxLength) return false;
   
-  // Additional validation rules
-  if (trimmed.length < 3) return false;
+  // Note: The ChoiceSelector component handles validation internally
+  // No minimum length requirement is enforced
   
   return true;
 };
