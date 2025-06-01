@@ -45,31 +45,21 @@ export const DevToolsProvider = ({
   initialIsOpen = false 
 }: DevToolsProviderProps) => {
   const [isOpen, setIsOpen] = useState(initialIsOpen);
-  const [isClient, setIsClient] = useState(false);
   const [isDev, setIsDev] = useState(false);
   
-  // Set client-side flag and check environment
+  // Set environment check
   useEffect(() => {
-    setIsClient(true);
     setIsDev(process.env.NODE_ENV === 'development');
-  }, [initialIsOpen]);
+  }, []);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {
     setIsOpen(prev => !prev);
   };
 
-  // On test page, we always want to render the DevTools provider
-  const isDevToolsTest = typeof window !== 'undefined' && 
-    window.location.pathname.includes('/dev/devtools-test');
-
-  // Skip rendering in production (but always render in test page)
-  if (isClient && !isDev && !isDevToolsTest) {
-    return null;
-  }
-
+  // Always render children, but only provide DevTools functionality in dev
   return (
-    <DevToolsContext.Provider value={{ isOpen, toggleDevTools }}>
+    <DevToolsContext.Provider value={{ isOpen: isDev ? isOpen : false, toggleDevTools }}>
       {children}
     </DevToolsContext.Provider>
   );

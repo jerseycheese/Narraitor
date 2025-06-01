@@ -61,7 +61,7 @@ describe('DevToolsContext', () => {
     process.env.NODE_ENV = originalNodeEnv;
   });
   
-  it('only renders children in development environment', () => {
+  it('always renders children but only provides DevTools functionality in development', () => {
     const originalNodeEnv = process.env.NODE_ENV;
     
     // Mock production environment
@@ -69,18 +69,23 @@ describe('DevToolsContext', () => {
     const { container: prodContainer } = render(
       <DevToolsProvider>
         <div data-testid="child-component">Child</div>
+        <TestConsumer />
       </DevToolsProvider>
     );
-    expect(prodContainer.textContent).toBe('');
+    expect(prodContainer.textContent).toContain('Child');
+    // In production, isOpen should always be false
+    expect(screen.getByTestId('devtools-status')).toHaveTextContent('closed');
     
     // Mock development environment
     process.env.NODE_ENV = 'development';
-    const { container: devContainer } = render(
-      <DevToolsProvider>
+    render(
+      <DevToolsProvider initialIsOpen={true}>
         <div data-testid="child-component">Child</div>
+        <TestConsumer />
       </DevToolsProvider>
     );
-    expect(devContainer.textContent).toBe('Child');
+    // In development, isOpen respects the initialIsOpen prop
+    expect(screen.getAllByTestId('devtools-status')[1]).toHaveTextContent('open');
     
     // Restore original environment
     process.env.NODE_ENV = originalNodeEnv;
