@@ -29,6 +29,8 @@ export class RateLimiter {
   /**
    * @param maxRequests Optional override for max requests. If not provided, uses environment-aware defaults
    * @param windowMs Optional override for time window in milliseconds. If not provided, uses environment-aware defaults
+   * @throws {Error} When maxRequests is provided but is zero or negative
+   * @throws {Error} When windowMs is provided but is zero or negative
    */
   constructor(maxRequests?: number, windowMs?: number) {
     // Validate input parameters
