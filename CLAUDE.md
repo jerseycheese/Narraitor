@@ -9,8 +9,15 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Zustand for state management
 - Storybook for component development
 - Jest and React Testing Library for testing
-- Google Gemini for AI integration
+- Google Gemini for AI integration (secure server-side implementation)
 - IndexedDB for client-side persistence
+
+## Security Architecture
+- **API Key Protection**: All API keys stored server-side only (`GEMINI_API_KEY`)
+- **Secure Proxy Pattern**: Client-side requests route through Next.js API endpoints
+- **Rate Limiting**: 50 requests per hour per IP to prevent abuse and control costs
+- **Request Validation**: Input sanitization and content filtering on all API routes
+- **No Client Exposure**: Zero sensitive data in browser or JavaScript bundles
 
 ## Development Workflow
 - Always write tests first (TDD)
@@ -226,6 +233,25 @@ See `/docs/development/claude-integration/mcp-github-usage.md` for complete MCP 
 - `npm run storybook`: Launch Storybook for component development
 - `npm run build-storybook`: Build Storybook for deployment
 - `npm run lint`: Run ESLint
+
+## Security Testing Commands
+- `./demo-secure-api.sh`: Quick verification of secure API implementation
+- `./test-secure-api.sh`: Comprehensive security testing (requires dev server)
+- See `SECURITY_TESTING_GUIDE.md` for manual browser testing instructions
+
+## Environment Configuration
+```bash
+# .env.local (Development)
+GEMINI_API_KEY=your-api-key  # Server-side only, never use NEXT_PUBLIC_*
+NEXT_PUBLIC_DEBUG_LOGGING=true
+GITHUB_TOKEN=your-github-token
+
+# .env.production (Production - set in deployment platform)
+GEMINI_API_KEY=your-api-key  # Server-side only
+NEXT_PUBLIC_DEBUG_LOGGING=false
+```
+
+**Security Note**: Always use `GEMINI_API_KEY` (server-side) never `NEXT_PUBLIC_GEMINI_API_KEY` (client-exposed)
 
 ## State Management Architecture
 Each domain has its own Zustand store following consistent patterns:
