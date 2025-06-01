@@ -33,16 +33,24 @@ interface ChoiceSelectorProps {
 /**
  * Get CSS classes for alignment-based styling
  */
-const getAlignmentClasses = (alignment?: ChoiceAlignment): string => {
-  switch (alignment) {
-    case 'lawful':
-      return 'bg-blue-50 border-blue-300 hover:bg-blue-100';
-    case 'chaos':
-      return 'bg-red-50 border-red-300 hover:bg-red-100';
-    case 'neutral':
-    default:
-      return 'bg-white border-gray-200 hover:bg-gray-50';
-  }
+const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
+  const baseClasses = {
+    lawful: 'bg-blue-50 border-blue-300',
+    chaos: 'bg-red-50 border-red-300',
+    neutral: 'bg-white border-gray-200'
+  };
+  
+  const hoverClasses = {
+    lawful: 'hover:bg-blue-100',
+    chaos: 'hover:bg-red-100', 
+    neutral: 'hover:bg-gray-50'
+  };
+  
+  const alignmentKey = alignment || 'neutral';
+  const base = baseClasses[alignmentKey];
+  const hover = isDisabled ? '' : hoverClasses[alignmentKey];
+  
+  return `${base} ${hover}`;
 };
 
 /**
@@ -191,7 +199,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               className={`block w-full text-left p-3 border rounded transition-colors ${
                 option.isSelected
                   ? 'bg-blue-100 border-blue-500 font-bold'
-                  : getAlignmentClasses(option.alignment)
+                  : getAlignmentClasses(option.alignment, isDisabled)
               } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               onClick={() => handleOptionSelect(option.id)}
               disabled={isDisabled}

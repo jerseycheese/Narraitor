@@ -98,83 +98,7 @@ export const MixedAlignment: Story = {
   },
 };
 
-export const AllLawfulChoices: Story = {
-  args: {
-    decision: {
-      id: 'mock-decision-all-lawful',
-      prompt: 'You witness a crime in progress. What will you do?',
-      options: [
-        {
-          id: 'option-1',
-          text: 'Call the city guards immediately',
-          alignment: 'lawful'
-        },
-        {
-          id: 'option-2',
-          text: 'Intervene to protect the victim',
-          alignment: 'lawful'
-        },
-        {
-          id: 'option-3',
-          text: 'Follow proper procedures and file a report',
-          alignment: 'lawful'
-        }
-      ]
-    },
-  },
-};
-
-export const AllChaosChoices: Story = {
-  args: {
-    decision: {
-      id: 'mock-decision-all-chaos',
-      prompt: 'The king has imposed an unfair tax. What will you do?',
-      options: [
-        {
-          id: 'option-1',
-          text: 'Start a rebellion in the town square',
-          alignment: 'chaos'
-        },
-        {
-          id: 'option-2',
-          text: 'Spread rumors to undermine the king\'s authority',
-          alignment: 'chaos'
-        },
-        {
-          id: 'option-3',
-          text: 'Organize a dramatic protest disrupting court',
-          alignment: 'chaos'
-        }
-      ]
-    },
-  },
-};
-
-export const NeutralChoicesOnly: Story = {
-  args: {
-    decision: {
-      id: 'mock-decision-neutral',
-      prompt: 'You find an ancient artifact. What will you do?',
-      options: [
-        {
-          id: 'option-1',
-          text: 'Examine it carefully for clues',
-          alignment: 'neutral'
-        },
-        {
-          id: 'option-2',
-          text: 'Ask a scholar for their opinion',
-          alignment: 'neutral'
-        },
-        {
-          id: 'option-3',
-          text: 'Consider its potential value',
-          alignment: 'neutral'
-        }
-      ]
-    },
-  },
-};
+// Removed trivial stories - keeping only essential alignment demonstrations
 
 export const DisabledAlignedChoices: Story = {
   args: {
@@ -184,28 +108,4 @@ export const DisabledAlignedChoices: Story = {
   },
 };
 
-export const LongTextAlignment: Story = {
-  args: {
-    decision: {
-      id: 'mock-decision-long',
-      prompt: 'The dragon demands tribute from your village. What will you do?',
-      options: [
-        {
-          id: 'option-1',
-          text: 'Negotiate formal terms of tribute following ancient customs and ensuring the village council approves',
-          alignment: 'lawful'
-        },
-        {
-          id: 'option-2',
-          text: 'Gather information about the dragon\'s weaknesses while considering multiple response strategies',
-          alignment: 'neutral'
-        },
-        {
-          id: 'option-3',
-          text: 'Challenge the dragon to single combat right here and now, regardless of the consequences',
-          alignment: 'chaos'
-        }
-      ]
-    },
-  },
-};
+// Removed LongTextAlignment story - not essential for alignment verification

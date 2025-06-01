@@ -14,28 +14,27 @@ export default function ChoiceAlignmentTestPage() {
   const [useAligned, setUseAligned] = useState(true);
   const [scenario, setScenario] = useState<'bandits' | 'merchant' | 'dragon'>('bandits');
   const [error, setError] = useState<string | null>(null);
+  const [worldId, setWorldId] = useState<string | null>(null);
 
   const choiceGenerator = new ChoiceGenerator(createDefaultGeminiClient());
-  const testWorldId = 'test-world-id';
 
   // Create a test world when component mounts
   useEffect(() => {
-    const existingWorld = worldStore.getState().worlds[testWorldId];
-    if (!existingWorld) {
-      worldStore.getState().createWorld({
-        name: 'Test World',
-        description: 'A fantasy world for testing choice alignment',
-        theme: 'fantasy',
-        attributes: [],
-        skills: [],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 100,
-          skillPointPool: 100
-        }
-      });
-    }
+    const newWorldId = worldStore.getState().createWorld({
+      name: 'Test World',
+      description: 'A fantasy world for testing choice alignment',
+      theme: 'fantasy',
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 100,
+        skillPointPool: 100
+      }
+    });
+    setWorldId(newWorldId);
+    console.log('Created test world with ID:', newWorldId);
   }, []);
 
   const scenarios = {
@@ -57,12 +56,17 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   const generateChoices = async () => {
+    if (!worldId) {
+      setError('World not yet created. Please wait a moment and try again.');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     
     try {
       const mockNarrativeContext: NarrativeContext = {
-        worldId: 'test-world',
+        worldId: worldId,
         currentSceneId: generateUniqueId('scene'),
         characterIds: [generateUniqueId('character')],
         previousSegments: [{
@@ -84,7 +88,7 @@ export default function ChoiceAlignmentTestPage() {
       };
 
       const result = await choiceGenerator.generateChoices({
-        worldId: testWorldId,
+        worldId: worldId,
         narrativeContext: mockNarrativeContext,
         characterIds: [generateUniqueId('character')],
         useAlignedChoices: useAligned
@@ -158,10 +162,10 @@ export default function ChoiceAlignmentTestPage() {
               <div className="flex items-end">
                 <button
                   onClick={generateChoices}
-                  disabled={loading}
+                  disabled={loading || !worldId}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {loading ? 'Generating...' : 'Generate Choices'}
+                  {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Choices'}
                 </button>
               </div>
             </div>
