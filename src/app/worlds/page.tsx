@@ -4,10 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { worldStore } from '@/state/worldStore';
-import { generateWorld } from '@/lib/ai/worldGenerator';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -59,8 +57,25 @@ export default function WorldsPage() {
       const { worlds } = worldStore.getState();
       const existingNames = Object.values(worlds).map(w => w.name);
 
-      // Generate the world data
-      const generatedData = await generateWorld(worldReference, existingNames, worldName);
+      // Generate the world data via API
+      const response = await fetch('/api/generate-world', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldReference,
+          existingNames,
+          suggestedName: worldName || undefined
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world');
+      }
+
+      const generatedData: GeneratedWorldData = await response.json();
 
       // Create attributes with IDs and worldId placeholder
       const attributes = generatedData.attributes.map(attr => ({
@@ -91,17 +106,28 @@ export default function WorldsPage() {
       setGeneratingStatus('Generating world image...');
       
       try {
-        const aiClient = createAIClient();
-        const imageGenerator = new WorldImageGenerator(aiClient);
-        
         // Get the created world to generate image for it
         const createdWorld = worldStore.getState().worlds[worldId];
-        const worldImage = await imageGenerator.generateWorldImage(createdWorld);
         
-        // Update the world with the generated image
-        worldStore.getState().updateWorld(worldId, {
-          image: worldImage
+        const imageResponse = await fetch('/api/generate-world-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            world: createdWorld
+          }),
         });
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          const worldImage = imageData.imageUrl;
+        
+          // Update the world with the generated image
+          worldStore.getState().updateWorld(worldId, {
+            image: worldImage
+          });
+        }
       } catch (imageError) {
         console.error('Failed to generate world image:', imageError);
         // Continue without image - world creation should still succeed
