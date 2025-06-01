@@ -87,13 +87,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
     if (sessionState.id) {
-      console.log(`[GameSession] Using existing session ID: ${sessionState.id}`);
       return sessionState.id;
     }
     
     // Check if we're resuming a saved session
     if (savedSession) {
-      console.log(`[GameSession] Using saved session ID: ${savedSession.id}`);
       return savedSession.id;
     }
     
@@ -120,7 +118,6 @@ const GameSession: React.FC<GameSessionProps> = ({
     
     // Create a new stable ID if no existing session found
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
-    console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
     
     return sessionId;
   }, [worldId, sessionState.id, savedSession]);
@@ -219,7 +216,6 @@ const GameSession: React.FC<GameSessionProps> = ({
       // Save the session when component unmounts (navigating away)
       const currentState = sessionStore.getState();
       if (currentState.status === 'active' && currentState.id) {
-        console.log('[GameSession] Saving session on unmount:', currentState.id);
         // Don't reset the session, just save it
         sessionStore.getState().endSession();
         

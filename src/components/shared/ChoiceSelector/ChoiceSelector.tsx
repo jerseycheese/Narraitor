@@ -153,8 +153,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     ? 'text-amber-600' 
     : 'text-gray-500';
 
-  // Don't render if no options
-  if (allOptions.length === 0) {
+  // Don't render if no options and custom input is disabled
+  if (allOptions.length === 0 && !enableCustomInput) {
     return null;
   }
 

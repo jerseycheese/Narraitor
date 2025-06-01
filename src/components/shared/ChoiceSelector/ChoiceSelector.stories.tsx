@@ -16,12 +16,6 @@ const meta: Meta<typeof ChoiceSelector> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Simple choices data (kept for potential future use)
-// const simpleChoices = [
-//   { id: 'choice-1', text: 'Enter the mysterious cave' },
-//   { id: 'choice-2', text: 'Continue along the path' },
-//   { id: 'choice-3', text: 'Set up camp for the night' },
-// ];
 
 // Decision with hints
 const decisionWithHints: Decision = {
@@ -99,8 +93,6 @@ const createAlignedDecision = (): Decision => ({
     }
   ]
 });
-
-// Removed mixedAlignmentDecision - using createAlignedDecision for all alignment testing
 
 export const AlignedChoices: Story = {
   args: {
