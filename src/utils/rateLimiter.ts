@@ -20,9 +20,12 @@ export class RateLimiter {
   private readonly maxRequests: number;
   private readonly windowMs: number;
 
-  constructor(maxRequests = 50, windowMs = 60 * 60 * 1000) { // 50 requests per hour by default
-    this.maxRequests = maxRequests;
-    this.windowMs = windowMs;
+  constructor(maxRequests?: number, windowMs?: number) {
+    // Use more lenient limits in development
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    this.maxRequests = maxRequests || (isDevelopment ? 500 : 50); // 500 requests in dev, 50 in prod
+    this.windowMs = windowMs || (isDevelopment ? 10 * 60 * 1000 : 60 * 60 * 1000); // 10 min in dev, 1 hour in prod
   }
 
   /**
