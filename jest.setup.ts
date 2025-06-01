@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 
 // DIAGNOSTIC: Log environment variable
 if (process.env.DEBUG_JEST_SETUP === 'true') {
-  console.log('[jest.setup.ts] GEMINI_API_KEY before setting:', process.env.GEMINI_API_KEY);
+  console.log('[jest.setup.ts] GEMINI_API_KEY before setting:', process.env.GEMINI_API_KEY ? '***MASKED***' : 'NOT SET');
 }
 // Mock the worldStore module
 jest.mock('@/state/worldStore');
@@ -29,7 +29,9 @@ jest.mock('next/navigation', () => {
 process.env.GEMINI_API_KEY = 'MOCK_API_KEY';
 
 // DIAGNOSTIC: Confirm environment variable was set
-console.log('[jest.setup.ts] GEMINI_API_KEY after setting:', process.env.GEMINI_API_KEY);
+if (process.env.DEBUG_JEST_SETUP === 'true') {
+  console.log('[jest.setup.ts] GEMINI_API_KEY after setting:', process.env.GEMINI_API_KEY ? '***MASKED***' : 'NOT SET');
+}
 
 // Mock crypto.randomUUID for Jest environment (jsdom)
 if (typeof global.self === 'undefined') {

@@ -127,8 +127,8 @@ echo "========================"
 
 # Make a valid request to test rate limiting headers
 run_test "Rate limiting headers present on valid requests" \
-    "curl -s -I -X POST -H 'Content-Type: application/json' -d '{\"prompt\":\"test\"}' http://localhost:$PORT/api/narrative/generate" \
-    "ratelimit"
+    "curl -s -I -X POST -H 'Content-Type: application/json' -d '{\"prompt\":\"test\"}' http://localhost:$PORT/api/narrative/generate | grep -i 'X-RateLimit-Limit'" \
+    "X-RateLimit-Limit"
 
 # Test 4: Verify request validation
 echo "📝 TESTING REQUEST VALIDATION"
