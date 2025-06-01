@@ -20,21 +20,34 @@ export default function ChoiceAlignmentTestPage() {
 
   // Create a test world when component mounts
   useEffect(() => {
-    const newWorldId = worldStore.getState().createWorld({
-      name: 'Test World',
-      description: 'A fantasy world for testing choice alignment',
-      theme: 'fantasy',
-      attributes: [],
-      skills: [],
-      settings: {
-        maxAttributes: 10,
-        maxSkills: 10,
-        attributePointPool: 100,
-        skillPointPool: 100
+    try {
+      const newWorldId = worldStore.getState().createWorld({
+        name: 'Test World',
+        description: 'A fantasy world for testing choice alignment',
+        theme: 'fantasy',
+        attributes: [],
+        skills: [],
+        settings: {
+          maxAttributes: 10,
+          maxSkills: 10,
+          attributePointPool: 100,
+          skillPointPool: 100
+        }
+      });
+      
+      // Verify the world was created and stored
+      const storedWorld = worldStore.getState().worlds[newWorldId];
+      if (storedWorld) {
+        setWorldId(newWorldId);
+        console.log('Created test world with ID:', newWorldId, storedWorld);
+      } else {
+        console.error('World was not stored properly');
+        setError('Failed to create test world');
       }
-    });
-    setWorldId(newWorldId);
-    console.log('Created test world with ID:', newWorldId);
+    } catch (err) {
+      console.error('Error creating world:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create world');
+    }
   }, []);
 
   const scenarios = {
@@ -58,6 +71,14 @@ export default function ChoiceAlignmentTestPage() {
   const generateChoices = async () => {
     if (!worldId) {
       setError('World not yet created. Please wait a moment and try again.');
+      return;
+    }
+    
+    // Double-check that the world still exists
+    const currentWorld = worldStore.getState().worlds[worldId];
+    if (!currentWorld) {
+      setError(`World ${worldId} no longer exists. This may be a persistence issue.`);
+      console.error('Available worlds:', Object.keys(worldStore.getState().worlds));
       return;
     }
     

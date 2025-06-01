@@ -82,45 +82,63 @@ export const WithCustomInput: Story = {
   },
 };
 
-export const CustomInputActive: Story = {
+// === ALIGNMENT STORIES ===
+// Mock aligned decision for alignment testing
+const createAlignedDecision = (): Decision => ({
+  id: 'mock-decision-aligned',
+  prompt: 'You encounter a group of bandits blocking the road ahead. What will you do?',
+  options: [
+    {
+      id: 'option-lawful',
+      text: 'Approach peacefully and try to negotiate passage',
+      alignment: 'lawful',
+      hint: 'Respects authority and seeks peaceful resolution'
+    },
+    {
+      id: 'option-neutral-1', 
+      text: 'Assess the situation and look for alternative routes',
+      alignment: 'neutral',
+      hint: 'Practical approach to the problem'
+    },
+    {
+      id: 'option-neutral-2',
+      text: 'Wait and observe their behavior before acting',
+      alignment: 'neutral',
+      hint: 'Balanced and cautious response'
+    },
+    {
+      id: 'option-chaos',
+      text: 'Create a loud distraction and rush past them',
+      alignment: 'chaos',
+      hint: 'Unexpected and disruptive action'
+    }
+  ]
+});
+
+// Removed mixedAlignmentDecision - using createAlignedDecision for all alignment testing
+
+export const AlignedChoices: Story = {
   args: {
-    choices: simpleChoices,
+    decision: createAlignedDecision(),
+    showHints: true,
+  },
+};
+
+export const AlignedChoicesWithCustomInput: Story = {
+  args: {
+    decision: createAlignedDecision(),
     enableCustomInput: true,
+    showHints: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
 };
 
-export const CustomInputWithPlaceholder: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    customInputPlaceholder: 'Describe your action in detail...',
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
+// Removed MixedAlignment story - redundant with AlignedChoices
 
-export const CustomInputWithLimit: Story = {
+export const DisabledAlignedChoices: Story = {
   args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
-    maxCustomLength: 100,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
-export const DecisionWithCustomInput: Story = {
-  args: {
-    decision: decisionWithHints,
-    enableCustomInput: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
-  },
-};
-
-export const DisabledWithCustomInput: Story = {
-  args: {
-    choices: simpleChoices,
-    enableCustomInput: true,
+    decision: createAlignedDecision(),
     isDisabled: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+    showHints: true,
   },
 };
