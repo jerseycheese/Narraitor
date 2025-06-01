@@ -63,7 +63,7 @@ export async function validateAIRequest(request: NextRequest): Promise<{
     }
     
     return body;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -120,8 +120,8 @@ export async function makeGeminiRequest(
     
     clearTimeout(timeoutId);
     return response;
-  } catch (error) {
+  } catch (err) {
     clearTimeout(timeoutId);
-    throw error;
+    throw err;
   }
 }
