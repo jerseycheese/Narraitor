@@ -50,7 +50,7 @@ Based on the ENTIRE narrative context, create 4 distinct action choices that fol
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- CHAOS: Unexpected actions, disrupts status quo, creative solutions, challenges authority, unpredictable
+- CHAOS: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
 
 REQUIREMENTS:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
@@ -68,7 +68,7 @@ Options:
 1. [LAWFUL] [First choice - follows rules/authority/order]
 2. [NEUTRAL] [Second choice - balanced/practical approach]
 3. [NEUTRAL] [Third choice - different practical approach]
-4. [CHAOS] [Fourth choice - unexpected/disruptive action]
+4. [CHAOS] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
 
 Keep your response EXACTLY in this format. Only include the Decision and Options sections with alignment tags.`;
 };

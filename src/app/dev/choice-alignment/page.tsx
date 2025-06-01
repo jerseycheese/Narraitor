@@ -54,17 +54,17 @@ export default function ChoiceAlignmentTestPage() {
     bandits: {
       location: 'Forest Path',
       situation: 'A group of bandits blocks your path',
-      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, demanding you pay a toll to pass.'
+      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, weapons drawn, demanding you pay a toll to pass. Their leader, a scarred man with a wicked grin, counts your coin purse with greedy eyes while his companions block all escape routes.'
     },
     merchant: {
       location: 'Town Market',
       situation: 'A suspicious merchant offers a deal',
-      context: 'A hooded merchant approaches you in the market with an ornate artifact, offering to sell it for much less than it appears to be worth.'
+      context: 'A hooded merchant approaches you in the bustling market square with an ornate, glowing artifact. The item pulses with magical energy, yet he offers to sell it for mere copper coins - far less than it appears to be worth. Other merchants nearby whisper nervously and avoid eye contact.'
     },
     dragon: {
       location: 'Mountain Cave',
       situation: 'A dragon guards its treasure',
-      context: 'You have found the legendary dragon\'s lair. The massive creature sits atop a pile of gold, watching you with intelligent, ancient eyes.'
+      context: 'You have found the legendary dragon\'s lair deep within the mountain. The massive ancient red dragon sits atop an enormous pile of gold and jewels, its intelligent amber eyes following your every movement. Smoke curls from its nostrils as it speaks in a voice like rolling thunder, offering you a riddle for safe passage.'
     }
   };
 
@@ -284,6 +284,8 @@ export default function ChoiceAlignmentTestPage() {
               <li>• Toggle &quot;Use Aligned Choices&quot; to see the difference between aligned and regular templates</li>
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>
+              <li>• <strong>CHAOS VERIFICATION:</strong> Red choices should be wildly unexpected, dramatic, and could completely change the situation</li>
+              <li>• Test that chaotic options ignore social norms and offer creative/disruptive solutions</li>
               <li>• Test the custom input feature alongside aligned choices</li>
               <li>• Check the debug information to verify alignment distribution</li>
             </ul>

@@ -108,9 +108,9 @@ const createAlignedDecision = (): Decision => ({
     },
     {
       id: 'option-chaos',
-      text: 'Create a loud distraction and rush past them',
+      text: 'Start loudly singing an epic ballad about bandit fashion choices',
       alignment: 'chaos',
-      hint: 'Unexpected and disruptive action'
+      hint: 'Wildly unexpected action that completely changes the situation'
     }
   ]
 });
