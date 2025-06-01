@@ -61,26 +61,41 @@ describe('DevToolsContext', () => {
     process.env.NODE_ENV = originalNodeEnv;
   });
   
-  it('only renders children in development environment', () => {
+  it('renders children in production but disables DevTools functionality', () => {
     const originalNodeEnv = process.env.NODE_ENV;
     
     // Mock production environment
     process.env.NODE_ENV = 'production';
-    const { container: prodContainer } = render(
+    render(
       <DevToolsProvider>
+        <TestConsumer />
         <div data-testid="child-component">Child</div>
       </DevToolsProvider>
     );
-    expect(prodContainer.textContent).toBe('');
+    // Children should render in production
+    expect(screen.getByTestId('child-component')).toHaveTextContent('Child');
+    // But DevTools should be disabled (always closed)
+    expect(screen.getByTestId('devtools-status')).toHaveTextContent('closed');
+    
+    // Restore original environment
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it('renders children in development with full DevTools functionality', () => {
+    const originalNodeEnv = process.env.NODE_ENV;
     
     // Mock development environment
     process.env.NODE_ENV = 'development';
-    const { container: devContainer } = render(
-      <DevToolsProvider>
-        <div data-testid="child-component">Child</div>
+    render(
+      <DevToolsProvider initialIsOpen={true}>
+        <TestConsumer />
+        <div data-testid="child-component-dev">Child</div>
       </DevToolsProvider>
     );
-    expect(devContainer.textContent).toBe('Child');
+    // Children should render in development
+    expect(screen.getByTestId('child-component-dev')).toHaveTextContent('Child');
+    // And DevTools should work normally (can be open)
+    expect(screen.getByTestId('devtools-status')).toHaveTextContent('open');
     
     // Restore original environment
     process.env.NODE_ENV = originalNodeEnv;
