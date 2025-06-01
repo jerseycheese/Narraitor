@@ -11,6 +11,12 @@ interface RateLimitResult {
   resetTime: number;
 }
 
+// Rate limiting constants
+const DEV_MAX_REQUESTS = 500; // Lenient limit for development/testing
+const PROD_MAX_REQUESTS = 50; // Strict limit for production
+const DEV_WINDOW_MS = 10 * 60 * 1000; // 10 minutes for development/testing
+const PROD_WINDOW_MS = 60 * 60 * 1000; // 1 hour for production
+
 /**
  * Simple in-memory rate limiter for API routes
  * Limits requests per IP address within a time window
@@ -25,11 +31,19 @@ export class RateLimiter {
    * @param windowMs Optional override for time window in milliseconds. If not provided, uses environment-aware defaults
    */
   constructor(maxRequests?: number, windowMs?: number) {
+    // Validate input parameters
+    if (maxRequests !== undefined && maxRequests <= 0) {
+      throw new Error('maxRequests must be a positive number');
+    }
+    if (windowMs !== undefined && windowMs <= 0) {
+      throw new Error('windowMs must be a positive number');
+    }
+
     // Use more lenient limits in development and test environments
     const isDevelopmentOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
     
-    this.maxRequests = maxRequests ?? (isDevelopmentOrTest ? 500 : 50); // 500 requests in dev/test, 50 in prod
-    this.windowMs = windowMs ?? (isDevelopmentOrTest ? 10 * 60 * 1000 : 60 * 60 * 1000); // 10 min in dev/test, 1 hour in prod
+    this.maxRequests = maxRequests ?? (isDevelopmentOrTest ? DEV_MAX_REQUESTS : PROD_MAX_REQUESTS);
+    this.windowMs = windowMs ?? (isDevelopmentOrTest ? DEV_WINDOW_MS : PROD_WINDOW_MS);
   }
 
   /**
