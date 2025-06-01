@@ -20,12 +20,16 @@ export class RateLimiter {
   private readonly maxRequests: number;
   private readonly windowMs: number;
 
+  /**
+   * @param maxRequests Optional override for max requests. If not provided, uses environment-aware defaults
+   * @param windowMs Optional override for time window in milliseconds. If not provided, uses environment-aware defaults
+   */
   constructor(maxRequests?: number, windowMs?: number) {
-    // Use more lenient limits in development
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    // Use more lenient limits in development and test environments
+    const isDevelopmentOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
     
-    this.maxRequests = maxRequests || (isDevelopment ? 500 : 50); // 500 requests in dev, 50 in prod
-    this.windowMs = windowMs || (isDevelopment ? 10 * 60 * 1000 : 60 * 60 * 1000); // 10 min in dev, 1 hour in prod
+    this.maxRequests = maxRequests ?? (isDevelopmentOrTest ? 500 : 50); // 500 requests in dev/test, 50 in prod
+    this.windowMs = windowMs ?? (isDevelopmentOrTest ? 10 * 60 * 1000 : 60 * 60 * 1000); // 10 min in dev/test, 1 hour in prod
   }
 
   /**
