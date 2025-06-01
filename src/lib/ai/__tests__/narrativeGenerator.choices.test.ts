@@ -92,7 +92,8 @@ describe('NarrativeGenerator - Player Choices', () => {
         narrativeContext: mockNarrativeContext,
         characterIds: ['character-1'],
         minOptions: 3,
-        maxOptions: 4
+        maxOptions: 4,
+        useAlignedChoices: true
       });
     });
 

@@ -40,50 +40,82 @@ const decisionWithHints: Decision = {
   ],
 };
 
-// Main implementation story - Decision with Hints and Custom Input
-export const DecisionWithCustomInput: Story = {
+export const BasicChoices: Story = {
+  args: {
+    decision: decisionWithHints,
+  },
+};
+
+export const WithCustomInput: Story = {
   args: {
     decision: decisionWithHints,
     enableCustomInput: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
-};
-
-// Alternative prompt for variety
-export const CombatDecision: Story = {
-  args: {
-    decision: {
-      id: 'combat-decision',
-      prompt: 'A bandit jumps out from behind the trees, sword drawn. What do you do?',
-      options: [
-        {
-          id: 'fight',
-          text: 'Draw your weapon and fight',
-          hint: 'Direct confrontation - requires combat skills',
-        },
-        {
-          id: 'dodge',
-          text: 'Duck and roll to avoid the attack',
-          hint: 'Defensive maneuver - requires agility',
-        },
-        {
-          id: 'negotiate',
-          text: 'Try to talk your way out',
-          hint: 'Peaceful approach - requires charisma',
-        },
-      ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the custom input field displayed above the choice options by default when enabled.',
+      },
     },
-    enableCustomInput: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
 };
 
-// Disabled state for testing
-export const DisabledState: Story = {
+// === ALIGNMENT STORIES ===
+// Mock aligned decision for alignment testing
+const createAlignedDecision = (): Decision => ({
+  id: 'mock-decision-aligned',
+  prompt: 'You encounter a group of bandits blocking the road ahead. What will you do?',
+  options: [
+    {
+      id: 'option-lawful',
+      text: 'Approach peacefully and try to negotiate passage',
+      alignment: 'lawful',
+      hint: 'Respects authority and seeks peaceful resolution'
+    },
+    {
+      id: 'option-neutral-1', 
+      text: 'Assess the situation and look for alternative routes',
+      alignment: 'neutral',
+      hint: 'Practical approach to the problem'
+    },
+    {
+      id: 'option-neutral-2',
+      text: 'Wait and observe their behavior before acting',
+      alignment: 'neutral',
+      hint: 'Balanced and cautious response'
+    },
+    {
+      id: 'option-chaotic',
+      text: 'Start loudly singing an epic ballad about bandit fashion choices',
+      alignment: 'chaotic',
+      hint: 'Wildly unexpected action that completely changes the situation'
+    }
+  ]
+});
+
+export const AlignedChoices: Story = {
   args: {
-    decision: decisionWithHints,
-    enableCustomInput: true,
-    isDisabled: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+    decision: createAlignedDecision(),
+    showHints: true,
   },
 };
+
+export const AlignedChoicesWithCustomInput: Story = {
+  args: {
+    decision: createAlignedDecision(),
+    enableCustomInput: true,
+    showHints: true,
+    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows aligned choices with custom input field displayed above for immediate use.',
+      },
+    },
+  },
+};
+
+// Removed MixedAlignment story - redundant with AlignedChoices
+

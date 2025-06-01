@@ -1,7 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { worldStore } from '@/state/worldStore';
-import { Decision, DecisionOption, NarrativeContext } from '@/types/narrative.types';
+import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
@@ -14,6 +14,7 @@ export interface ChoiceGenerationParams {
   characterIds: string[];
   maxOptions?: number;
   minOptions?: number;
+  useAlignedChoices?: boolean;
 }
 
 /**
@@ -29,9 +30,9 @@ export class ChoiceGenerator {
   async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
     
     try {
-      const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3 } = params;
+      const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3, useAlignedChoices = false } = params;
       const world = this.getWorld(worldId);
-      const template = this.getTemplate('playerChoice');
+      const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
       
       const context = this.buildContext(world, narrativeContext, characterIds);
       const prompt = template(context);
@@ -87,17 +88,43 @@ export class ChoiceGenerator {
         prompt = 'What will you do?';
       }
       
-      // Extract options
+      // Extract options with alignment tags
       const options: DecisionOption[] = [];
       
-      // Try to match numbered options (1. Option text)
+      // First, try to match all numbered options and parse alignment if present
       const numberedMatches = content.matchAll(/^\s*\d+\.\s*(.+)$/gm);
       for (const match of numberedMatches) {
         if (match[1] && match[1].trim()) {
-          options.push({
-            id: generateUniqueId('option'),
-            text: match[1].trim()
-          });
+          const fullText = match[1].trim();
+          
+          // Check if this option has an alignment tag
+          // Supported alignment tags: [LAWFUL], [NEUTRAL], [CHAOTIC]
+          const alignmentMatch = fullText.match(/^\[([^\]]+)\]\s*(.+)$/);
+          
+          if (alignmentMatch) {
+            // Has alignment tag
+            const alignmentText = alignmentMatch[1].trim().toLowerCase();
+            let alignment: ChoiceAlignment = 'neutral';
+            
+            if (alignmentText === 'lawful') {
+              alignment = 'lawful';
+            } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
+              alignment = 'chaotic';
+            }
+            
+            options.push({
+              id: generateUniqueId('option'),
+              text: alignmentMatch[2].trim(),
+              alignment
+            });
+          } else {
+            // No alignment tag, default to neutral
+            options.push({
+              id: generateUniqueId('option'),
+              text: fullText,
+              alignment: 'neutral'
+            });
+          }
         }
       }
       
@@ -108,7 +135,8 @@ export class ChoiceGenerator {
           if (match[1] && match[1].trim()) {
             options.push({
               id: generateUniqueId('option'),
-              text: match[1].trim()
+              text: match[1].trim(),
+              alignment: 'neutral'
             });
           }
         }
@@ -150,7 +178,8 @@ export class ChoiceGenerator {
       // Add a contextual option based on the current situation
       options.push({
         id: generateUniqueId('option'),
-        text: `Investigate further`
+        text: `Investigate further`,
+        alignment: 'neutral'
       });
     }
     
@@ -158,31 +187,31 @@ export class ChoiceGenerator {
     switch (theme) {
       case 'fantasy':
         options.push(
-          { id: generateUniqueId('option'), text: 'Search for clues' },
-          { id: generateUniqueId('option'), text: 'Talk to nearby characters' },
-          { id: generateUniqueId('option'), text: 'Move to a new location' }
+          { id: generateUniqueId('option'), text: 'Search for clues', alignment: 'neutral' },
+          { id: generateUniqueId('option'), text: 'Talk to nearby characters', alignment: 'lawful' },
+          { id: generateUniqueId('option'), text: 'Cast a random spell at the sky', alignment: 'chaotic' }
         );
         break;
       case 'sci-fi':
       case 'science fiction':
         options.push(
-          { id: generateUniqueId('option'), text: 'Scan the area' },
-          { id: generateUniqueId('option'), text: 'Access the terminal' },
-          { id: generateUniqueId('option'), text: 'Contact the crew' }
+          { id: generateUniqueId('option'), text: 'Scan the area', alignment: 'neutral' },
+          { id: generateUniqueId('option'), text: 'Access the terminal', alignment: 'lawful' },
+          { id: generateUniqueId('option'), text: 'Reroute power to the coffee machine', alignment: 'chaotic' }
         );
         break;
       case 'horror':
         options.push(
-          { id: generateUniqueId('option'), text: 'Hide' },
-          { id: generateUniqueId('option'), text: 'Find a weapon' },
-          { id: generateUniqueId('option'), text: 'Call for help' }
+          { id: generateUniqueId('option'), text: 'Hide', alignment: 'neutral' },
+          { id: generateUniqueId('option'), text: 'Call for help', alignment: 'lawful' },
+          { id: generateUniqueId('option'), text: 'Start laughing maniacally', alignment: 'chaotic' }
         );
         break;
       default:
         options.push(
-          { id: generateUniqueId('option'), text: 'Look around' },
-          { id: generateUniqueId('option'), text: 'Talk to someone' },
-          { id: generateUniqueId('option'), text: 'Leave this area' }
+          { id: generateUniqueId('option'), text: 'Look around', alignment: 'neutral' },
+          { id: generateUniqueId('option'), text: 'Talk to someone', alignment: 'lawful' },
+          { id: generateUniqueId('option'), text: 'Do something completely unexpected', alignment: 'chaotic' }
         );
     }
     
@@ -198,9 +227,9 @@ export class ChoiceGenerator {
    */
   private createDefaultOptions(): DecisionOption[] {
     return [
-      { id: generateUniqueId('option'), text: 'Continue' },
-      { id: generateUniqueId('option'), text: 'Look around' },
-      { id: generateUniqueId('option'), text: 'Wait' }
+      { id: generateUniqueId('option'), text: 'Continue', alignment: 'neutral' },
+      { id: generateUniqueId('option'), text: 'Look around', alignment: 'neutral' },
+      { id: generateUniqueId('option'), text: 'Wait', alignment: 'neutral' }
     ];
   }
 

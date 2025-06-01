@@ -46,6 +46,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const generateCount = useRef(0);
   // Use a ref to track if we've initiated generation in this component instance
   const initialGenerationInitiated = useRef(false);
+  // Use a ref to prevent overlapping choice generation
+  const choiceGenerationInProgress = useRef(false);
 
   // Load existing segments on mount and reset state when session changes
   useEffect(() => {
@@ -84,6 +86,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       // Clear mounted flag when component unmounts
       mountedRef.current = false;
       initialGenerationInitiated.current = false; // Reset generation init flag
+      choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
   }, [sessionId, getSessionSegments]);
 
@@ -146,9 +149,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         generateNextSegment(choiceId);
       }
       // Log if we're skipping generation
-      else if (segments.length > 0 && initialGenerationCompleted) {
-      } else {
-      }
+      // (No action needed for other cases)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);
@@ -161,13 +162,20 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       return;
     }
     
+    // Prevent overlapping choice generation using ref (more reliable than state)
+    if (choiceGenerationInProgress.current) {
+      return;
+    }
+    
+    choiceGenerationInProgress.current = true;
+    
     // Get fresh segments from the store instead of relying on component state
     const currentSegments = narrativeStore.getState().getSessionSegments(sessionId);
     
     if (currentSegments.length === 0) {
+      choiceGenerationInProgress.current = false;
       return;
     }
-    
     setIsGeneratingChoices(true);
     
     // Create fallback choices upfront - we'll use these immediately if something fails
@@ -198,12 +206,12 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         currentLocation: recentSegments[recentSegments.length - 1]?.metadata?.location || undefined
       };
       
-      // Generate choices with a 5-second timeout
+      // Generate choices with a 15-second timeout for real API calls
       let decision;
       try {
         // Set up a race between the AI generation and a timeout
         const timeoutPromise = new Promise<Decision>((_, reject) => {
-          setTimeout(() => reject(new Error('AI choice generation timed out')), 5000);
+          setTimeout(() => reject(new Error('AI choice generation timed out after 15 seconds')), 15000);
         });
         
         decision = await Promise.race([
@@ -216,7 +224,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         ]);
         
       } catch (error) {
-        console.error('⚡ CHOICE GENERATION: Generation failed or timed out, using fallback', error);
+        console.error('⚡ CHOICE GENERATION: Generation failed or timed out, using fallback. Error:', error);
+        console.log('⚡ CHOICE GENERATION: Narrative context was:', narrativeContext);
         decision = fallbackDecision;
       }
       
@@ -227,16 +236,18 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Verify decision structure and use fallback if invalid
       if (!decision || !decision.options || decision.options.length === 0) {
-        console.error('⚡ CHOICE GENERATION: Invalid decision structure, using fallback');
         decision = fallbackDecision;
       }
       
       
-      // Add decision to store
-      narrativeStore.getState().addDecision(sessionId, {
+      // Add decision to store and get the actual stored ID
+      const storedDecisionId = narrativeStore.getState().addDecision(sessionId, {
         prompt: decision.prompt,
         options: decision.options
       });
+      
+      // Update the decision with the stored ID before passing to parent
+      decision.id = storedDecisionId;
       
       // Only notify parent component if we have AI-generated choices (not fallback)
       if (decision !== fallbackDecision) {
@@ -250,7 +261,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             console.error('⚡ CHOICE GENERATION: Error calling onChoicesGenerated:', error);
           }
         }
-      } else {
       }
     } catch (error) {
       console.error('⚡ CHOICE GENERATION: Unhandled error in generatePlayerChoices:', error);
@@ -275,11 +285,14 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             ]
           };
           
-          // Add to store
-          narrativeStore.getState().addDecision(sessionId, {
+          // Add to store and get the actual stored ID
+          const storedFallbackId = narrativeStore.getState().addDecision(sessionId, {
             prompt: fallbackDecision.prompt,
             options: fallbackDecision.options
           });
+          
+          // Update the fallback decision with the stored ID
+          fallbackDecision.id = storedFallbackId;
           
           // Notify parent
           if (onChoicesGenerated && mountedRef.current) {
@@ -291,6 +304,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         console.error('⚡ CHOICE GENERATION: Failed to provide fallback choices:', fallbackError);
       }
     } finally {
+      choiceGenerationInProgress.current = false;
       if (mountedRef.current) {
         setIsGeneratingChoices(false);
       }
@@ -403,7 +417,10 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       for (const decision of decisions) {
         const selectedOption = decision.options.find(opt => opt.id === triggeringChoiceId);
         if (selectedOption) {
-          choiceText = selectedOption.text;
+          // For custom input, use the customText, otherwise use the regular text
+          choiceText = selectedOption.isCustomInput && selectedOption.customText 
+            ? selectedOption.customText 
+            : selectedOption.text;
           isCustomInput = selectedOption.isCustomInput || false;
           break;
         }

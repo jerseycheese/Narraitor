@@ -249,7 +249,8 @@ export class NarrativeGenerator {
         narrativeContext,
         characterIds,
         minOptions: 3,
-        maxOptions: 4
+        maxOptions: 4,
+        useAlignedChoices: true
       });
       
       

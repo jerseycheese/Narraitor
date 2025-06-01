@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
-import { Decision } from '@/types/narrative.types';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Decision, ChoiceAlignment } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -29,6 +29,29 @@ interface ChoiceSelectorProps {
   customInputPlaceholder?: string;
   maxCustomLength?: number;
 }
+
+/**
+ * Get CSS classes for alignment-based styling
+ */
+const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
+  const baseClasses = {
+    lawful: 'bg-blue-50 border-blue-300',
+    chaotic: 'bg-red-50 border-red-300',
+    neutral: 'bg-white border-gray-200'
+  };
+  
+  const hoverClasses = {
+    lawful: 'hover:bg-blue-100',
+    chaotic: 'hover:bg-red-100', 
+    neutral: 'hover:bg-gray-50'
+  };
+  
+  const alignmentKey = alignment || 'neutral';
+  const base = baseClasses[alignmentKey];
+  const hover = isDisabled ? '' : hoverClasses[alignmentKey];
+  
+  return `${base} ${hover}`;
+};
 
 /**
  * Unified choice selector component that handles both simple choices and complex decisions
@@ -62,24 +85,34 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     text: string;
     hint?: string;
     isSelected?: boolean;
+    alignment?: ChoiceAlignment;
   }> = isDecisionMode
     ? (decision.options || []).map(opt => ({
         id: opt.id,
         text: opt.text,
         hint: opt.hint,
         isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
+        alignment: opt.alignment,
       }))
     : (choices || []).map(choice => ({
         id: choice.id,
         text: choice.text,
         isSelected: choice.isSelected || choice.id === selectedOptionId,
+        alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
       }));
 
-  // Use the normalized options as-is when custom input is enabled
+  // Use normalized options without custom input option
   const allOptions = normalizedOptions;
 
   // Determine the prompt text
   const displayPrompt = prompt || (isDecisionMode ? decision.prompt : 'What will you do?');
+
+  // Auto-focus input when custom input is enabled
+  useEffect(() => {
+    if (enableCustomInput && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [enableCustomInput]);
 
   // Handle option selection
   const handleOptionSelect = useCallback((optionId: string) => {
@@ -93,7 +126,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     if (trimmedText && onCustomSubmit) {
       onCustomSubmit(trimmedText);
       setCustomInputText('');
-      // Keep input field visible after submission
     }
   }, [customInputText, onCustomSubmit]);
 
@@ -138,10 +170,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         {displayPrompt}
       </h3>
       
-      {/* Custom input field - shown at top when enabled */}
+      {/* Custom input field - shown first when enabled */}
       {enableCustomInput && (
-        <div className="mb-6 bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
+        <div className="mb-4 bg-gray-50 p-4 rounded border">
           <textarea
+            id="custom-input"
             ref={inputRef}
             value={customInputText}
             onChange={handleInputChange}
@@ -167,40 +200,40 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         </div>
       )}
       
-      {/* Predefined choices */}
+      {/* Label for suggested actions */}
       {allOptions.length > 0 && (
-        <div>
-          <h4 className="text-sm font-medium text-gray-600 mb-3">
-            Or choose a suggested action:
-          </h4>
-          <div 
-            className="space-y-1" 
-            role="radiogroup" 
-            aria-labelledby="choices-heading"
-          >
-          {allOptions.map((option) => (
-            <button
-              key={option.id}
-              data-testid={`choice-option-${option.id}`}
-              className={`block w-full text-left p-2 border rounded text-sm transition-colors ${
-                option.isSelected
-                  ? 'bg-blue-100 border-blue-500 font-medium'
-                  : 'bg-white hover:bg-gray-50 border-gray-200'
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              onClick={() => handleOptionSelect(option.id)}
-              disabled={isDisabled}
-              aria-checked={option.isSelected}
-              role="radio"
-            >
-              {option.isSelected ? '➤ ' : ''}{option.text}
-              {showHints && option.hint && (
-                <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
-              )}
-            </button>
-          ))}
-          </div>
+        <div className="mb-2">
+          <span className="text-sm font-medium text-gray-600">Or try a suggested action:</span>
         </div>
       )}
+      
+      {/* Regular choice options */}
+      <div 
+        className="space-y-2" 
+        role="radiogroup" 
+        aria-labelledby="choices-heading"
+      >
+        {allOptions.map((option) => (
+          <button
+            key={option.id}
+            data-testid={`choice-option-${option.id}`}
+            className={`block w-full text-left p-3 border rounded transition-colors ${
+              option.isSelected
+                ? 'bg-blue-100 border-blue-500 font-bold'
+                : getAlignmentClasses(option.alignment, isDisabled)
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={() => handleOptionSelect(option.id)}
+            disabled={isDisabled}
+            aria-checked={option.isSelected}
+            role="radio"
+          >
+            {option.isSelected ? '➤ ' : ''}{option.text}
+            {showHints && option.hint && (
+              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

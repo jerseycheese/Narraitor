@@ -29,6 +29,11 @@ export interface Decision {
 }
 
 /**
+ * Choice alignment types for personality-based variety
+ */
+export type ChoiceAlignment = 'lawful' | 'chaotic' | 'neutral';
+
+/**
  * Represents an option within a decision
  */
 export interface DecisionOption {
@@ -39,6 +44,8 @@ export interface DecisionOption {
   // Custom input support
   isCustomInput?: boolean;
   customText?: string;
+  // Choice alignment for personality-based variety
+  alignment?: ChoiceAlignment;
 }
 
 /**

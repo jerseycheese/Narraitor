@@ -95,18 +95,48 @@ const GameSession: React.FC<GameSessionProps> = ({
       return savedSession.id;
     }
     
-    // Create a new stable ID if one doesn't exist
+    // Check if there's existing narrative data for this world that we can resume
+    const narrativeState = narrativeStore.getState();
+    const existingSessions = Object.keys(narrativeState.sessionSegments);
+    
+    // Look for existing sessions that have segments for this world
+    for (const existingSessionId of existingSessions) {
+      const segments = narrativeState.sessionSegments[existingSessionId] || [];
+      if (segments.length > 0) {
+        // Check if any segments belong to this world by looking at the actual segments
+        const hasWorldSegments = segments.some(segmentId => {
+          const segment = narrativeState.segments[segmentId];
+          return segment && segment.worldId === worldId;
+        });
+        
+        if (hasWorldSegments) {
+          console.log(`[GameSession] Found existing narrative session for world ${worldId}: ${existingSessionId}`);
+          return existingSessionId;
+        }
+      }
+    }
+    
+    // Create a new stable ID if no existing session found
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
     
     return sessionId;
   }, [worldId, sessionState.id, savedSession]);
   
-  // Update session store and clear segments when session ID changes
+  // Update session store when session ID changes
   useEffect(() => {
     if (!stableSessionId) return;
     
-    // Clear any existing segments for this session ID to prevent duplicates
-    narrativeStore.getState().clearSessionSegments(stableSessionId);
+    // Only clear segments if this is a brand new session (not resuming existing)
+    const narrativeState = narrativeStore.getState();
+    const existingSegments = narrativeState.sessionSegments[stableSessionId] || [];
+    const isNewSession = existingSegments.length === 0;
+    
+    if (isNewSession) {
+      console.log(`[GameSession] New session - clearing any stale segments for: ${stableSessionId}`);
+      narrativeStore.getState().clearSessionSegments(stableSessionId);
+    } else {
+      console.log(`[GameSession] Resuming existing session with ${existingSegments.length} segments: ${stableSessionId}`);
+    }
     
     // Update the session store
     if (sessionStore.getState().setSessionId) {
