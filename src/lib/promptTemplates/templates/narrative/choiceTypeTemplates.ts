@@ -40,12 +40,17 @@ export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): str
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
-CURRENT CONTEXT (brief summary):
-${shortContext}
-${location ? `Current location: ${location}` : ''}
+=== CURRENT NARRATIVE SITUATION ===
+LOCATION: ${location || 'Unknown location'}
+SITUATION: ${narrativeContext?.currentSituation || 'General scenario'}
 
-INSTRUCTIONS:
-Based on the ENTIRE narrative context, create 4 distinct action choices that follow these alignment categories:
+FULL CONTEXT:
+${shortContext}
+
+=== CRITICAL INSTRUCTIONS ===
+You MUST create choices that directly respond to the specific situation described above. Do NOT create generic choices. Reference the specific characters, objects, and events mentioned in the context.
+
+Based on the SPECIFIC narrative situation above, create 4 distinct action choices that follow these alignment categories:
 
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
@@ -53,11 +58,12 @@ ALIGNMENT DEFINITIONS:
 - CHAOS: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
 
 REQUIREMENTS:
-1. Reference specific elements from the current scene (characters, objects, events, locations)
+1. MANDATORY: Reference the SPECIFIC characters, objects, and events from the context (e.g., if there's a dragon, mention the dragon; if there's treasure, mention treasure)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
 4. Consider both the immediate situation AND the broader story context
 5. Each choice must clearly fit its alignment category
+6. DO NOT use generic terms like "guard" when the context specifies "dragon"
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 

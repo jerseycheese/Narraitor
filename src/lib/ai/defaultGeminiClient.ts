@@ -16,6 +16,7 @@ class MockGeminiClient implements AIClient {
     
     // Generate appropriate response based on prompt content and world details
     const isInitialScene = prompt.includes('initialScene') || prompt.includes('opening scene');
+    const isChoiceGeneration = prompt.includes('create 4 distinct action choices') || prompt.includes('ALIGNMENT DEFINITIONS');
     
     if (isInitialScene) {
       // Generate a scene based on the genre/world name
@@ -26,6 +27,15 @@ class MockGeminiClient implements AIClient {
         finishReason: 'STOP',
         promptTokens: 100,
         completionTokens: 200
+      };
+    } else if (isChoiceGeneration) {
+      // Handle choice generation
+      const content = this.generateChoicesByContext(prompt);
+      return {
+        content,
+        finishReason: 'STOP',
+        promptTokens: 120,
+        completionTokens: 180
       };
     } else {
       // Handle continuing narrative
@@ -38,6 +48,53 @@ class MockGeminiClient implements AIClient {
         completionTokens: 180
       };
     }
+  }
+  
+  // Generate context-aware choices based on the prompt
+  private generateChoicesByContext(prompt: string): string {
+    // Check for specific entities/characters in the context
+    const hasDragon = prompt.toLowerCase().includes('dragon');
+    const hasBandits = prompt.toLowerCase().includes('bandit');
+    const hasMerchant = prompt.toLowerCase().includes('merchant');
+    
+    if (hasDragon) {
+      return `Decision: What will you do?
+
+Options:
+1. [LAWFUL] Respectfully accept the dragon's riddle challenge and answer honestly
+2. [NEUTRAL] Carefully study the dragon's body language for clues about its intentions
+3. [NEUTRAL] Offer a fair trade of knowledge or service for safe passage
+4. [CHAOS] Challenge the dragon to a dramatic poetry contest about treasure hoarding`;
+    }
+    
+    if (hasBandits) {
+      return `Decision: What will you do?
+
+Options:
+1. [LAWFUL] Calmly negotiate and offer to pay a reasonable toll
+2. [NEUTRAL] Look for alternative routes through the forest
+3. [NEUTRAL] Assess their weapons and numbers before deciding
+4. [CHAOS] Start loudly critiquing their bandit fashion choices and technique`;
+    }
+    
+    if (hasMerchant) {
+      return `Decision: What will you do?
+
+Options:
+1. [LAWFUL] Report the suspicious merchant to the market authorities
+2. [NEUTRAL] Politely decline and walk away from the deal
+3. [NEUTRAL] Ask detailed questions about the artifact's origin
+4. [CHAOS] Announce loudly that you're starting a bidding war for the item`;
+    }
+    
+    // Generic fallback with alignment
+    return `Decision: What will you do?
+
+Options:
+1. [LAWFUL] Follow proper procedures and seek guidance
+2. [NEUTRAL] Carefully assess the situation before acting
+3. [NEUTRAL] Look for a practical solution to the problem
+4. [CHAOS] Do something completely unexpected to change the dynamic`;
   }
   
   // Helper to extract details from the prompt
