@@ -37,7 +37,7 @@ npm install
 
 # Configure environment variables
 cp .env.example .env.local
-# Edit .env.local and add your NEXT_PUBLIC_GEMINI_API_KEY
+# Edit .env.local and add your GEMINI_API_KEY (server-side only for security)
 
 # Start the development server
 npm run dev
@@ -111,14 +111,21 @@ The application has been migrated from Next.js Pages Router to App Router, lever
 
 ## AI Service Integration
 
-Narraitor uses Google Gemini AI for dynamic narrative generation. Configure the service by setting environment variables:
+Narraitor uses Google Gemini AI for dynamic narrative generation through secure server-side API routes. Configure the service by setting environment variables:
 
 ```bash
 # .env.local
-NEXT_PUBLIC_GEMINI_API_KEY=your-api-key
+GEMINI_API_KEY=your-api-key  # Server-side only for security
 ```
 
-The AI service integrates with the template system to generate contextual narratives based on world and character data. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
+### Security Features
+
+- **Server-side API keys**: API keys are never exposed to the browser
+- **Rate limiting**: 50 requests per hour per IP to prevent abuse
+- **Secure proxy**: All AI requests route through Next.js API endpoints
+- **Request validation**: Input sanitization and error handling
+
+All AI requests are processed through secure API routes (`/api/narrative/generate`, `/api/narrative/choices`) instead of direct client-side calls. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
 
 ### Portrait Generation
 

@@ -64,3 +64,14 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     retryable: isRetryableError(error)
   };
 }
+
+/**
+ * Simple function that returns just the user-friendly message
+ * Used by components that just need the error message text
+ * @param error - The error to map
+ * @returns User-friendly error message string
+ */
+export function userFriendlyError(error: Error): string {
+  const friendlyError = getUserFriendlyError(error);
+  return friendlyError.message;
+}
