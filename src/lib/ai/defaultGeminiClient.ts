@@ -1,4 +1,5 @@
 import { GeminiClient } from './geminiClient';
+import { ClientGeminiClient } from './clientGeminiClient';
 import { getDefaultConfig } from './config';
 import { AIResponse, AIClient } from './types';
 
@@ -235,9 +236,21 @@ Options:
 
 // Create a default instance of GeminiClient for narrative generation
 export const createDefaultGeminiClient = () => {
-  // Use real client when API key is available
-  if (process.env.GOOGLE_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
-    console.log("Using real Gemini client with API key");
+  // In test environment, always use mock client
+  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+    console.log("Using mock Gemini client for testing");
+    return new MockGeminiClient();
+  }
+  
+  // In browser environment (client-side), use secure proxy
+  if (typeof window !== 'undefined') {
+    console.log("Using secure client proxy for browser");
+    return new ClientGeminiClient();
+  }
+  
+  // Server-side: use real client when API key is available
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'MOCK_API_KEY') {
+    console.log("Using real Gemini client with server-side API key");
     return new GeminiClient(getDefaultConfig());
   }
   

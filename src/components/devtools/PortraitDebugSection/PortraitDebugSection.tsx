@@ -1,6 +1,6 @@
 // src/components/devtools/PortraitDebugSection/PortraitDebugSection.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
@@ -21,7 +21,6 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
-  const [apiKeyStatus, setApiKeyStatus] = useState<boolean>(false);
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
   const [showBreakdown, setShowBreakdown] = useState(false);
   
@@ -33,13 +32,6 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   // Get worlds from store
   const worlds = worldStore((state) => state.worlds);
   const selectedWorld = selectedCharacter ? worlds[selectedCharacter.worldId] : null;
-  
-  // Use effect to check API key status on client side only
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setApiKeyStatus(!!process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-    }
-  }, []);
   
   // Use selected character data or passed props
   const effectiveCharacterData = selectedCharacter || characterData;
@@ -326,7 +318,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
           <div className="space-y-1 text-slate-300">
             <div><strong>Endpoint:</strong> /api/generate-portrait</div>
             <div><strong>Model:</strong> gemini-2.0-flash-preview-image-generation</div>
-            <div><strong>API Key Status:</strong> {apiKeyStatus ? '✅ Set' : '❌ Missing'}</div>
+            <div><strong>Security:</strong> ✅ Server-side API key (secure)</div>
           </div>
         </div>
       </div>
