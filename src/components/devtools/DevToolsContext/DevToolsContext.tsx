@@ -63,13 +63,9 @@ export const DevToolsProvider = ({
   const isDevToolsTest = typeof window !== 'undefined' && 
     window.location.pathname.includes('/dev/devtools-test');
 
-  // Skip rendering in production (but always render in test page)
-  if (isClient && !isDev && !isDevToolsTest) {
-    return null;
-  }
-
+  // Always render children, but only provide DevTools functionality in dev
   return (
-    <DevToolsContext.Provider value={{ isOpen, toggleDevTools }}>
+    <DevToolsContext.Provider value={{ isOpen: isDev ? isOpen : false, toggleDevTools }}>
       {children}
     </DevToolsContext.Provider>
   );

@@ -18,13 +18,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className="antialiased">
       <body className="font-sans m-0 p-0">
         <DevToolsProvider>
-          {/* Add DevMockState to initialize development data */}
-          <DevMockState />
+          {/* Only render DevMockState in development */}
+          {process.env.NODE_ENV === 'development' && <DevMockState />}
           <Navigation />
           <div className="min-h-screen pb-12 md:pb-14">
             {children}
           </div>
-          <DevToolsPanel />
+          {/* Only render DevToolsPanel in development */}
+          {process.env.NODE_ENV === 'development' && <DevToolsPanel />}
         </DevToolsProvider>
       </body>
     </html>
