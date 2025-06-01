@@ -149,9 +149,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         generateNextSegment(choiceId);
       }
       // Log if we're skipping generation
-      else if (segments.length > 0 && initialGenerationCompleted) {
-      } else {
-      }
+      // (No action needed for other cases)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerGeneration, choiceId, segments.length, isLoading, sessionId, sessionKey]);

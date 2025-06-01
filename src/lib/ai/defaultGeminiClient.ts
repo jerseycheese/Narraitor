@@ -5,7 +5,9 @@ import { AIResponse, AIClient } from './types';
 // For development/test environments, use mock implementation
 class MockGeminiClient implements AIClient {
   async generateContent(prompt: string): Promise<AIResponse> {
-    console.log('Using mock Gemini client');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Using mock Gemini client');
+    }
     
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -15,8 +17,12 @@ class MockGeminiClient implements AIClient {
     const genre = this.extractDetail(prompt, 'creating the opening scene for a', 'story');
     
     // Generate appropriate response based on prompt content and world details
+    // NOTE: This string matching approach is brittle. Consider refactoring to use
+    // explicit context flags or template IDs passed to generateContent() in the future.
     const isInitialScene = prompt.includes('initialScene') || prompt.includes('opening scene');
-    const isChoiceGeneration = prompt.includes('create 4 distinct action choices') || prompt.includes('ALIGNMENT DEFINITIONS');
+    const isChoiceGeneration = prompt.includes('create 4 distinct action choices') || 
+                              prompt.includes('ALIGNMENT DEFINITIONS') ||
+                              prompt.includes('alignedPlayerChoice');
     
     if (isInitialScene) {
       // Generate a scene based on the genre/world name
@@ -104,7 +110,9 @@ Options:
     const playerAction = actionMatch ? actionMatch[1] : null;
     
     if (playerAction) {
-      console.log('🎮 MOCK CLIENT: Generating narrative for player action:', playerAction);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎮 MOCK CLIENT: Generating narrative for player action:', playerAction);
+      }
       
       // Generate contextual narrative based on the player's action
       if (playerAction.toLowerCase().includes('sing') || playerAction.toLowerCase().includes('ballad')) {

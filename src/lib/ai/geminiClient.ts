@@ -62,7 +62,10 @@ export class GeminiClient implements AIClient {
    */
   private async makeRequest(prompt: string): Promise<AIResponse> {
     try {
-      console.log('🔥 GEMINI API: Making request with prompt length:', prompt.length);
+      // Log request for debugging (consider using configurable logger for production)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔥 GEMINI API: Making request with prompt length:', prompt.length);
+      }
       const response = await this.genAI.models.generateContent({
         model: this.config.modelName,
         contents: prompt,
@@ -72,7 +75,9 @@ export class GeminiClient implements AIClient {
         }
       });
       
-      console.log('🔥 GEMINI API: Response received, content length:', response.text?.length || 0);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔥 GEMINI API: Response received, content length:', response.text?.length || 0);
+      }
       return {
         content: response.text || '',
         finishReason: response.result?.finishReason || 'STOP',
