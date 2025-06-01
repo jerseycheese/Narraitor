@@ -16,6 +16,8 @@ interface NarrativeGenerateResponse {
   promptTokens?: number;
   completionTokens?: number;
   error?: string;
+  details?: string;
+  code?: string;
 }
 
 export async function POST(request: NextRequest) {
