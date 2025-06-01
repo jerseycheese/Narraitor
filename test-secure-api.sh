@@ -80,13 +80,19 @@ if ! kill -0 $DEV_SERVER_PID 2>/dev/null; then
     exit 1
 fi
 
-# Determine the port (3000 or 3001)
-if curl -s http://localhost:3000 >/dev/null 2>&1; then
-    PORT=3000
-elif curl -s http://localhost:3001 >/dev/null 2>&1; then
-    PORT=3001
-else
-    echo -e "${RED}❌ Server not responding on port 3000 or 3001${NC}"
+# Determine the port (try common Next.js ports)
+PORT=""
+for test_port in 3000 3001 3002 3003; do
+    if curl -s http://localhost:$test_port >/dev/null 2>&1; then
+        PORT=$test_port
+        break
+    fi
+done
+
+if [ -z "$PORT" ]; then
+    echo -e "${RED}❌ Server not responding on any common ports (3000-3003)${NC}"
+    echo "Checking server logs..."
+    tail -10 /tmp/narraitor-test.log
     kill $DEV_SERVER_PID 2>/dev/null
     exit 1
 fi
@@ -100,15 +106,15 @@ echo "==============================="
 
 run_test "Narrative generation API route exists" \
     "curl -s -o /dev/null -w '%{http_code}' http://localhost:$PORT/api/narrative/generate" \
-    "400"
+    "405"
 
 run_test "Choice generation API route exists" \
     "curl -s -o /dev/null -w '%{http_code}' http://localhost:$PORT/api/narrative/choices" \
-    "400"
+    "405"
 
 run_test "Portrait generation API route exists" \
     "curl -s -o /dev/null -w '%{http_code}' http://localhost:$PORT/api/generate-portrait" \
-    "400"
+    "405"
 
 # Test 2: Verify API key security (no API key should be visible in client)
 run_test "API debug endpoint shows server-side security" \
@@ -119,10 +125,10 @@ run_test "API debug endpoint shows server-side security" \
 echo "🚦 TESTING RATE LIMITING"
 echo "========================"
 
-# Make a few requests to test rate limiting headers
-run_test "Rate limiting headers present" \
+# Make a valid request to test rate limiting headers
+run_test "Rate limiting headers present on valid requests" \
     "curl -s -I -X POST -H 'Content-Type: application/json' -d '{\"prompt\":\"test\"}' http://localhost:$PORT/api/narrative/generate" \
-    "X-RateLimit"
+    "ratelimit"
 
 # Test 4: Verify request validation
 echo "📝 TESTING REQUEST VALIDATION"

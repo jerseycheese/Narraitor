@@ -1,7 +1,7 @@
 // src/app/api/narrative/choices/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { globalRateLimiter, RateLimiter } from '@/utils/rateLimiter';
+import { globalRateLimiter, RateLimiter } from '../../../../utils/rateLimiter';
 
 interface ChoiceGenerateRequest {
   prompt: string;
