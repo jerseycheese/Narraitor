@@ -70,7 +70,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   maxCustomLength = 250,
 }) => {
   // Custom input state
-  const [showCustomInput, setShowCustomInput] = useState(false);
   const [customInputText, setCustomInputText] = useState('');
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   
@@ -102,38 +101,23 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
       }));
 
-  // Add custom input option if enabled
-  const customOption = enableCustomInput ? {
-    id: 'custom-input',
-    text: 'Custom response...',
-    isSelected: showCustomInput,
-    hint: undefined,
-    alignment: 'neutral' as ChoiceAlignment,
-  } : null;
-
-  // Combine options with custom option at the top
-  const allOptions = customOption ? [customOption, ...normalizedOptions] : normalizedOptions;
+  // Use normalized options without custom input option
+  const allOptions = normalizedOptions;
 
   // Determine the prompt text
   const displayPrompt = prompt || (isDecisionMode ? decision.prompt : 'What will you do?');
 
-  // Auto-focus input when revealed
+  // Auto-focus input when custom input is enabled
   useEffect(() => {
-    if (showCustomInput && inputRef.current) {
+    if (enableCustomInput && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [showCustomInput]);
+  }, [enableCustomInput]);
 
   // Handle option selection
   const handleOptionSelect = useCallback((optionId: string) => {
-    if (optionId === 'custom-input') {
-      setShowCustomInput(true);
-      setSelectedOptionId('custom-input');
-    } else {
-      setShowCustomInput(false);
-      setSelectedOptionId(optionId);
-      onSelect(optionId);
-    }
+    setSelectedOptionId(optionId);
+    onSelect(optionId);
   }, [onSelect]);
 
   // Handle custom input submission
@@ -142,7 +126,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     if (trimmedText && onCustomSubmit) {
       onCustomSubmit(trimmedText);
       setCustomInputText('');
-      // Keep input field visible after submission
     }
   }, [customInputText, onCustomSubmit]);
 
@@ -187,60 +170,64 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         {displayPrompt}
       </h3>
       
+      {/* Custom input field - shown first when enabled */}
+      {enableCustomInput && (
+        <div className="mb-4 bg-gray-50 p-4 rounded border">
+          <label htmlFor="custom-input" className="block text-sm font-medium text-gray-700 mb-2">
+            Custom Response:
+          </label>
+          <textarea
+            id="custom-input"
+            ref={inputRef}
+            value={customInputText}
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            placeholder={customInputPlaceholder}
+            disabled={isDisabled}
+            aria-label="Custom response input"
+            className="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            rows={3}
+          />
+          <div className="flex justify-between items-center mt-2">
+            <span className={`text-sm ${characterCountClass}`}>
+              {characterCount}/{maxCustomLength}
+            </span>
+            <button
+              onClick={handleCustomSubmit}
+              disabled={isDisabled || !customInputText.trim()}
+              className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Submit Custom Response
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Regular choice options */}
       <div 
         className="space-y-2" 
         role="radiogroup" 
         aria-labelledby="choices-heading"
       >
         {allOptions.map((option) => (
-          <div key={option.id}>
-            <button
-              data-testid={`choice-option-${option.id}`}
-              className={`block w-full text-left p-3 border rounded transition-colors ${
-                option.isSelected
-                  ? 'bg-blue-100 border-blue-500 font-bold'
-                  : getAlignmentClasses(option.alignment, isDisabled)
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              onClick={() => handleOptionSelect(option.id)}
-              disabled={isDisabled}
-              aria-checked={option.isSelected}
-              role="radio"
-            >
-              {option.isSelected ? '➤ ' : ''}{option.text}
-              {showHints && option.hint && (
-                <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
-              )}
-            </button>
-            
-            {/* Custom input field */}
-            {option.id === 'custom-input' && showCustomInput && (
-              <div className="mt-3 ml-6 mr-2 bg-gray-50 p-4 rounded border">
-                <textarea
-                  ref={inputRef}
-                  value={customInputText}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder={customInputPlaceholder}
-                  disabled={isDisabled}
-                  aria-label="Custom response input"
-                  className="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  rows={3}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <span className={`text-sm ${characterCountClass}`}>
-                    {characterCount}/{maxCustomLength}
-                  </span>
-                  <button
-                    onClick={handleCustomSubmit}
-                    disabled={isDisabled || !customInputText.trim()}
-                    className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Submit
-                  </button>
-                </div>
-              </div>
+          <button
+            key={option.id}
+            data-testid={`choice-option-${option.id}`}
+            className={`block w-full text-left p-3 border rounded transition-colors ${
+              option.isSelected
+                ? 'bg-blue-100 border-blue-500 font-bold'
+                : getAlignmentClasses(option.alignment, isDisabled)
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={() => handleOptionSelect(option.id)}
+            disabled={isDisabled}
+            aria-checked={option.isSelected}
+            role="radio"
+          >
+            {option.isSelected ? '➤ ' : ''}{option.text}
+            {showHints && option.hint && (
+              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>

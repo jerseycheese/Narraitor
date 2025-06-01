@@ -80,6 +80,13 @@ export const WithCustomInput: Story = {
     enableCustomInput: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the custom input field displayed above the choice options by default when enabled.',
+      },
+    },
+  },
 };
 
 // === ALIGNMENT STORIES ===
@@ -130,6 +137,13 @@ export const AlignedChoicesWithCustomInput: Story = {
     enableCustomInput: true,
     showHints: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows aligned choices with custom input field displayed above for immediate use.',
+      },
+    },
   },
 };
 

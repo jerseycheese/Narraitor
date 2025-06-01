@@ -134,7 +134,7 @@ describe('ChoiceSelector - Alignment Styling', () => {
     expect(chaosButton).toHaveClass('bg-red-50', 'border-red-300', 'hover:bg-red-100');
   });
 
-  it('should apply neutral styling to custom input option', () => {
+  it('should show custom input field when enabled', () => {
     render(
       <ChoiceSelector
         decision={alignedDecision}
@@ -144,8 +144,11 @@ describe('ChoiceSelector - Alignment Styling', () => {
       />
     );
 
-    const customButton = screen.getByTestId('choice-option-custom-input');
-    expect(customButton).toHaveClass('bg-white', 'border-gray-200', 'hover:bg-gray-50');
+    const customInput = screen.getByLabelText('Custom response input');
+    expect(customInput).toBeInTheDocument();
+    
+    const submitButton = screen.getByText('Submit Custom Response');
+    expect(submitButton).toBeInTheDocument();
   });
 
   it('should handle mixed alignment combinations correctly', () => {
