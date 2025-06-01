@@ -50,12 +50,8 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           
           <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
           
-          {character.background?.personality && (
-            <p className="text-gray-700 mb-2">{character.background.personality}</p>
-          )}
-          
           {character.background?.history && (
-            <p className="text-sm text-gray-600 italic">{character.background.history}</p>
+            <p className="text-gray-700 mb-2">{character.background.history}</p>
           )}
         </div>
 

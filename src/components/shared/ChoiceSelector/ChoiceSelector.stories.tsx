@@ -16,12 +16,12 @@ const meta: Meta<typeof ChoiceSelector> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Simple choices data
-const simpleChoices = [
-  { id: 'choice-1', text: 'Enter the mysterious cave' },
-  { id: 'choice-2', text: 'Continue along the path' },
-  { id: 'choice-3', text: 'Set up camp for the night' },
-];
+// Simple choices data (kept for potential future use)
+// const simpleChoices = [
+//   { id: 'choice-1', text: 'Enter the mysterious cave' },
+//   { id: 'choice-2', text: 'Continue along the path' },
+//   { id: 'choice-3', text: 'Set up camp for the night' },
+// ];
 
 // Decision with hints
 const decisionWithHints: Decision = {
@@ -46,37 +46,15 @@ const decisionWithHints: Decision = {
   ],
 };
 
-export const SimpleChoices: Story = {
-  args: {
-    choices: simpleChoices,
-  },
-};
-
-export const DecisionWithHints: Story = {
+export const BasicChoices: Story = {
   args: {
     decision: decisionWithHints,
   },
 };
 
-export const WithSelection: Story = {
-  args: {
-    decision: {
-      ...decisionWithHints,
-      selectedOptionId: 'opt-2',
-    },
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    choices: simpleChoices,
-    isDisabled: true,
-  },
-};
-
 export const WithCustomInput: Story = {
   args: {
-    choices: simpleChoices,
+    decision: decisionWithHints,
     enableCustomInput: true,
     onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
@@ -114,9 +92,9 @@ const createAlignedDecision = (): Decision => ({
       hint: 'Balanced and cautious response'
     },
     {
-      id: 'option-chaos',
+      id: 'option-chaotic',
       text: 'Start loudly singing an epic ballad about bandit fashion choices',
-      alignment: 'chaos',
+      alignment: 'chaotic',
       hint: 'Wildly unexpected action that completely changes the situation'
     }
   ]
@@ -149,10 +127,3 @@ export const AlignedChoicesWithCustomInput: Story = {
 
 // Removed MixedAlignment story - redundant with AlignedChoices
 
-export const DisabledAlignedChoices: Story = {
-  args: {
-    decision: createAlignedDecision(),
-    isDisabled: true,
-    showHints: true,
-  },
-};

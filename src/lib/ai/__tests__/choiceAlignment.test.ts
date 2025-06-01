@@ -74,7 +74,7 @@ Options:
       expect(result.options[0].alignment).toBe('lawful');
       expect(result.options[1].alignment).toBe('neutral');
       expect(result.options[2].alignment).toBe('neutral');
-      expect(result.options[3].alignment).toBe('chaos');
+      expect(result.options[3].alignment).toBe('chaotic');
     });
 
     it('should handle CHAOTIC tag variant', async () => {
@@ -96,7 +96,7 @@ Options:
         useAlignedChoices: true
       });
 
-      expect(result.options[2].alignment).toBe('chaos');
+      expect(result.options[2].alignment).toBe('chaotic');
     });
 
     it('should fallback to neutral alignment when tag is missing', async () => {
@@ -105,7 +105,7 @@ Options:
 Options:
 1. Report the incident
 2. [NEUTRAL] Look around
-3. [CHAOS] Act wildly`;
+3. [CHAOTIC] Act wildly`;
 
       mockGeminiClient.generateContent.mockResolvedValueOnce({
         content: mockResponse
@@ -120,7 +120,7 @@ Options:
 
       expect(result.options[0].alignment).toBe('neutral'); // No tag = neutral fallback
       expect(result.options[1].alignment).toBe('neutral');
-      expect(result.options[2].alignment).toBe('chaos');
+      expect(result.options[2].alignment).toBe('chaotic');
     });
 
     it('should use aligned template when useAlignedChoices is true', async () => {
@@ -264,7 +264,7 @@ Options:
 
       expect(result.options[0].alignment).toBe('neutral'); // Unknown tag = neutral
       expect(result.options[1].alignment).toBe('lawful'); // Lowercase should work
-      expect(result.options[2].alignment).toBe('chaos');
+      expect(result.options[2].alignment).toBe('chaotic');
       expect(result.options[3].alignment).toBe('neutral'); // Empty tag = neutral
     });
 

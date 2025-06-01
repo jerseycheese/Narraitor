@@ -36,13 +36,13 @@ interface ChoiceSelectorProps {
 const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
   const baseClasses = {
     lawful: 'bg-blue-50 border-blue-300',
-    chaos: 'bg-red-50 border-red-300',
+    chaotic: 'bg-red-50 border-red-300',
     neutral: 'bg-white border-gray-200'
   };
   
   const hoverClasses = {
     lawful: 'hover:bg-blue-100',
-    chaos: 'hover:bg-red-100', 
+    chaotic: 'hover:bg-red-100', 
     neutral: 'hover:bg-gray-50'
   };
   
@@ -173,9 +173,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       {/* Custom input field - shown first when enabled */}
       {enableCustomInput && (
         <div className="mb-4 bg-gray-50 p-4 rounded border">
-          <label htmlFor="custom-input" className="block text-sm font-medium text-gray-700 mb-2">
-            Custom Response:
-          </label>
           <textarea
             id="custom-input"
             ref={inputRef}
@@ -197,9 +194,16 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               disabled={isDisabled || !customInputText.trim()}
               className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Custom Response
+              Submit
             </button>
           </div>
+        </div>
+      )}
+      
+      {/* Label for suggested actions */}
+      {allOptions.length > 0 && (
+        <div className="mb-2">
+          <span className="text-sm font-medium text-gray-600">Or try a suggested action:</span>
         </div>
       )}
       

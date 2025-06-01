@@ -9,7 +9,7 @@ interface PlayerChoiceTemplateContext {
 }
 
 /**
- * Prompt template for generating player choices with lawful/chaos alignment
+ * Prompt template for generating player choices with lawful/chaotic alignment
  * Generates a decision prompt with 1 lawful, 2 neutral, and 1 chaotic option
  */
 export const alignedChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
@@ -55,7 +55,7 @@ Based on the SPECIFIC narrative situation above, create 4 distinct action choice
 ALIGNMENT DEFINITIONS:
 - LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
 - NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response
-- CHAOS: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
+- CHAOTIC: WILDLY UNEXPECTED and DISRUPTIVE actions that completely change the situation. These should be dramatic, potentially dangerous, creative solutions that ignore social norms, defy expectations, and could lead to entirely different story outcomes. Think "throw a fireball at the ceiling," "start singing loudly to distract everyone," "pretend to be possessed by a spirit," or "challenge them to a dance-off." The goal is to provide players with options that can dramatically shift the narrative in surprising ways.
 
 REQUIREMENTS:
 1. MANDATORY: Reference the SPECIFIC characters, objects, and events from the context (e.g., if there's a dragon, mention the dragon; if there's treasure, mention treasure)
@@ -74,7 +74,7 @@ Options:
 1. [LAWFUL] [First choice - follows rules/authority/order]
 2. [NEUTRAL] [Second choice - balanced/practical approach]
 3. [NEUTRAL] [Third choice - different practical approach]
-4. [CHAOS] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
+4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
 
 Keep your response EXACTLY in this format. Only include the Decision and Options sections with alignment tags.`;
 };

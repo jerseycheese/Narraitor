@@ -61,20 +61,27 @@ export class GeminiClient implements AIClient {
    * @returns Promise resolving to AI response
    */
   private async makeRequest(prompt: string): Promise<AIResponse> {
-    const response = await this.genAI.models.generateContent({
-      model: this.config.modelName,
-      contents: prompt,
-      config: {
-        generationConfig: this.config.generationConfig,
-        safetySettings: this.config.safetySettings
-      }
-    });
-    
-    return {
-      content: response.text || '',
-      finishReason: response.result?.finishReason || 'STOP',
-      promptTokens: undefined,
-      completionTokens: undefined
-    };
+    try {
+      console.log('🔥 GEMINI API: Making request with prompt length:', prompt.length);
+      const response = await this.genAI.models.generateContent({
+        model: this.config.modelName,
+        contents: prompt,
+        config: {
+          generationConfig: this.config.generationConfig,
+          safetySettings: this.config.safetySettings
+        }
+      });
+      
+      console.log('🔥 GEMINI API: Response received, content length:', response.text?.length || 0);
+      return {
+        content: response.text || '',
+        finishReason: response.result?.finishReason || 'STOP',
+        promptTokens: undefined,
+        completionTokens: undefined
+      };
+    } catch (error) {
+      console.error('🔥 GEMINI API: Request failed:', error);
+      throw error;
+    }
   }
 }

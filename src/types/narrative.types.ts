@@ -31,7 +31,7 @@ export interface Decision {
 /**
  * Choice alignment types for personality-based variety
  */
-export type ChoiceAlignment = 'lawful' | 'chaos' | 'neutral';
+export type ChoiceAlignment = 'lawful' | 'chaotic' | 'neutral';
 
 /**
  * Represents an option within a decision

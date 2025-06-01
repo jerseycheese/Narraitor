@@ -50,17 +50,12 @@ describe('CharacterSummary', () => {
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
     });
 
-    it('displays character description', () => {
+    it('displays character history', () => {
       render(<CharacterSummary character={mockCharacter} />);
       
-      expect(screen.getByText('A brave knight with unwavering loyalty')).toBeInTheDocument();
+      expect(screen.getByText('Raised in a noble family, trained in the art of combat since childhood')).toBeInTheDocument();
     });
 
-    it('displays character background when available', () => {
-      render(<CharacterSummary character={mockCharacter} />);
-      
-      expect(screen.getByText(/Raised in a noble family/)).toBeInTheDocument();
-    });
 
     it('displays character level', () => {
       render(<CharacterSummary character={mockCharacter} />);
@@ -103,16 +98,16 @@ describe('CharacterSummary', () => {
   });
 
   describe('Missing Data Handling', () => {
-    it('handles missing personality gracefully', () => {
-      const characterWithoutPersonality = {
+    it('handles missing history gracefully', () => {
+      const characterWithoutHistory = {
         ...mockCharacter,
         background: {
           ...mockCharacter.background,
-          personality: ''
+          history: ''
         }
       };
       
-      render(<CharacterSummary character={characterWithoutPersonality} />);
+      render(<CharacterSummary character={characterWithoutHistory} />);
       
       // Should still render name and other available info
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
@@ -136,7 +131,7 @@ describe('CharacterSummary', () => {
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
       expect(screen.getByText(/Level 5/)).toBeInTheDocument();
       // Should not show empty background content
-      expect(screen.queryByText('A brave knight with unwavering loyalty')).not.toBeInTheDocument();
+      expect(screen.queryByText('Raised in a noble family, trained in the art of combat since childhood')).not.toBeInTheDocument();
     });
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
@@ -11,7 +12,6 @@ import { worldStore } from '@/state/worldStore';
 export default function ChoiceAlignmentTestPage() {
   const [decision, setDecision] = useState<Decision | null>(null);
   const [loading, setLoading] = useState(false);
-  const [useAligned, setUseAligned] = useState(true);
   const [scenario, setScenario] = useState<'bandits' | 'merchant' | 'dragon'>('bandits');
   const [error, setError] = useState<string | null>(null);
   const [worldId, setWorldId] = useState<string | null>(null);
@@ -112,7 +112,7 @@ export default function ChoiceAlignmentTestPage() {
         worldId: worldId,
         narrativeContext: mockNarrativeContext,
         characterIds: [generateUniqueId('character')],
-        useAlignedChoices: useAligned
+        useAlignedChoices: true
       });
 
       setDecision(result);
@@ -143,7 +143,14 @@ export default function ChoiceAlignmentTestPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          <Link 
+            href="/dev" 
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            ← Back to Dev Harnesses
+          </Link>
+          
+          <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-4">
             Choice Alignment Test
           </h1>
           
@@ -151,7 +158,7 @@ export default function ChoiceAlignmentTestPage() {
           <div className="bg-gray-100 rounded-lg p-4 mb-6">
             <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Scenario
@@ -167,26 +174,13 @@ export default function ChoiceAlignmentTestPage() {
                 </select>
               </div>
               
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="use-aligned"
-                  checked={useAligned}
-                  onChange={(e) => setUseAligned(e.target.checked)}
-                  className="mr-2"
-                />
-                <label htmlFor="use-aligned" className="text-sm font-medium text-gray-700">
-                  Use Aligned Choices
-                </label>
-              </div>
-              
               <div className="flex items-end">
                 <button
                   onClick={generateChoices}
                   disabled={loading || !worldId}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Choices'}
+                  {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Aligned Choices'}
                 </button>
               </div>
             </div>
@@ -250,7 +244,7 @@ export default function ChoiceAlignmentTestPage() {
               <div className="mt-6 bg-gray-100 rounded-lg p-4">
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">Debug Information:</h3>
                 <div className="text-xs text-gray-700 space-y-1">
-                  <p><strong>Template Used:</strong> {useAligned ? 'Aligned Choice Template' : 'Regular Choice Template'}</p>
+                  <p><strong>Template Used:</strong> Aligned Choice Template</p>
                   <p><strong>Options Count:</strong> {decision.options.length}</p>
                   <p><strong>Alignment Distribution:</strong></p>
                   <ul className="ml-4 space-y-1">
@@ -281,7 +275,6 @@ export default function ChoiceAlignmentTestPage() {
           <div className="mt-8 bg-amber-50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-amber-800 mb-2">Testing Instructions</h3>
             <ul className="text-sm text-amber-700 space-y-1">
-              <li>• Toggle &quot;Use Aligned Choices&quot; to see the difference between aligned and regular templates</li>
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>
               <li>• <strong>CHAOS VERIFICATION:</strong> Red choices should be wildly unexpected, dramatic, and could completely change the situation</li>

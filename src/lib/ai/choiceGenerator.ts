@@ -108,7 +108,7 @@ export class ChoiceGenerator {
             if (alignmentText === 'lawful') {
               alignment = 'lawful';
             } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
-              alignment = 'chaos';
+              alignment = 'chaotic';
             }
             
             options.push({
@@ -188,7 +188,7 @@ export class ChoiceGenerator {
         options.push(
           { id: generateUniqueId('option'), text: 'Search for clues', alignment: 'neutral' },
           { id: generateUniqueId('option'), text: 'Talk to nearby characters', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Cast a random spell at the sky', alignment: 'chaos' }
+          { id: generateUniqueId('option'), text: 'Cast a random spell at the sky', alignment: 'chaotic' }
         );
         break;
       case 'sci-fi':
@@ -196,21 +196,21 @@ export class ChoiceGenerator {
         options.push(
           { id: generateUniqueId('option'), text: 'Scan the area', alignment: 'neutral' },
           { id: generateUniqueId('option'), text: 'Access the terminal', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Reroute power to the coffee machine', alignment: 'chaos' }
+          { id: generateUniqueId('option'), text: 'Reroute power to the coffee machine', alignment: 'chaotic' }
         );
         break;
       case 'horror':
         options.push(
           { id: generateUniqueId('option'), text: 'Hide', alignment: 'neutral' },
           { id: generateUniqueId('option'), text: 'Call for help', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Start laughing maniacally', alignment: 'chaos' }
+          { id: generateUniqueId('option'), text: 'Start laughing maniacally', alignment: 'chaotic' }
         );
         break;
       default:
         options.push(
           { id: generateUniqueId('option'), text: 'Look around', alignment: 'neutral' },
           { id: generateUniqueId('option'), text: 'Talk to someone', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Do something completely unexpected', alignment: 'chaos' }
+          { id: generateUniqueId('option'), text: 'Do something completely unexpected', alignment: 'chaotic' }
         );
     }
     
