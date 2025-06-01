@@ -47,6 +47,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
   const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
+  const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
   // Get character ID from session store
   const characterId = sessionStore(state => state.characterId);
@@ -118,6 +119,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     return () => {
       // Mark component as unmounted to prevent state updates after unmounting
       isMounted = false;
+      
+      // Clear any pending choice generation timeout
+      if (choiceGenerationTimeoutRef.current) {
+        clearTimeout(choiceGenerationTimeoutRef.current);
+        choiceGenerationTimeoutRef.current = null;
+      }
     };
   }, [sessionId, worldId, controllerKey]);
 
@@ -154,7 +161,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }, 15000); // 15 second timeout (increased from 10)
     
     // Store timeout ID for potential cleanup
-    (window as unknown as { choiceGenerationTimeout?: NodeJS.Timeout }).choiceGenerationTimeout = timeoutId;
+    choiceGenerationTimeoutRef.current = timeoutId;
   };
 
   const handleChoiceSelected = (choiceId: string) => {
@@ -216,10 +223,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }
     
     // Clear the fallback timeout since we have real AI choices
-    const windowWithTimeout = window as unknown as { choiceGenerationTimeout?: NodeJS.Timeout };
-    if (windowWithTimeout.choiceGenerationTimeout) {
-      clearTimeout(windowWithTimeout.choiceGenerationTimeout);
-      windowWithTimeout.choiceGenerationTimeout = undefined;
+    if (choiceGenerationTimeoutRef.current) {
+      clearTimeout(choiceGenerationTimeoutRef.current);
+      choiceGenerationTimeoutRef.current = null;
     }
     
     // Force update with a new object reference to ensure React detects the change

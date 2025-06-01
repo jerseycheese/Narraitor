@@ -98,6 +98,7 @@ export class ChoiceGenerator {
           const fullText = match[1].trim();
           
           // Check if this option has an alignment tag
+          // Supported alignment tags: [LAWFUL], [NEUTRAL], [CHAOTIC]
           const alignmentMatch = fullText.match(/^\[([^\]]+)\]\s*(.+)$/);
           
           if (alignmentMatch) {
