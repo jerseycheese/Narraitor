@@ -30,7 +30,7 @@ export class ChoiceGenerator {
   async generateChoices(params: ChoiceGenerationParams): Promise<Decision> {
     
     try {
-      const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3, useAlignedChoices = true } = params;
+      const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3, useAlignedChoices = false } = params;
       const world = this.getWorld(worldId);
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
       

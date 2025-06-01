@@ -217,12 +217,12 @@ Options:
   });
 
   describe('Template Selection', () => {
-    it('should default to aligned choices when useAlignedChoices is not specified', async () => {
+    it('should default to regular choices when useAlignedChoices is not specified', async () => {
       const mockResponse = `Decision: What will you do?
 
 Options:
-1. [LAWFUL] Follow protocol
-2. [NEUTRAL] Consider options`;
+1. Follow protocol
+2. Consider options`;
 
       mockGeminiClient.generateContent.mockResolvedValueOnce({
         content: mockResponse
@@ -232,10 +232,10 @@ Options:
         worldId: 'test-world',
         narrativeContext: mockNarrativeContext,
         characterIds: ['char-1']
-        // useAlignedChoices not specified, should default to true
+        // useAlignedChoices not specified, should default to false
       });
 
-      expect(mockGeminiClient.generateContent).toHaveBeenCalledWith(
+      expect(mockGeminiClient.generateContent).not.toHaveBeenCalledWith(
         expect.stringContaining('ALIGNMENT DEFINITIONS')
       );
     });

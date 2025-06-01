@@ -248,7 +248,7 @@ export default function ChoiceAlignmentTestPage() {
                   <p><strong>Options Count:</strong> {decision.options.length}</p>
                   <p><strong>Alignment Distribution:</strong></p>
                   <ul className="ml-4 space-y-1">
-                    {['lawful', 'neutral', 'chaos'].map(alignment => {
+                    {['lawful', 'neutral', 'chaotic'].map(alignment => {
                       const count = decision.options.filter(opt => opt.alignment === alignment).length;
                       return (
                         <li key={alignment}>

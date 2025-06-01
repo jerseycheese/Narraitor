@@ -175,6 +175,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     const currentSegments = narrativeStore.getState().getSessionSegments(sessionId);
     
     if (currentSegments.length === 0) {
+      choiceGenerationInProgress.current = false;
       return;
     }
     setIsGeneratingChoices(true);
