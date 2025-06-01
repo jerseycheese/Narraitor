@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+/* Base layer for HTML element styles */
+@layer base {
+  /* Button defaults */
+  button {
+    cursor: pointer;
+  }
+  
+  /* Form element defaults */
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700);
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: 0.375rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px var(--color-blue-500);
+    border-color: var(--color-blue-500);
+  }
+  
+  /* Form spacing */
+  label + input,
+  label + textarea,
+  label + select {
+    margin-top: 0.5rem;
+  }
+  
+  form > div + div {
+    margin-top: 1rem;
+  }
+}
+
+/* Space utilities - explicit rules for Tailwind v4 */
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Alternative more specific selector */
+.space-y-2 > :not(:first-child) {
+  margin-top: 0.5rem;
+}
+
+.space-y-4 > :not(:first-child) {
+  margin-top: 1rem;
+}
+
+.space-y-6 > :not(:first-child) {
+  margin-top: 1.5rem;
+}
+
+/* Component layer for reusable classes */
+@layer components {
+  .card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--rounded-lg);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--rounded);
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition-property: background-color, border-color, color;
+    transition-duration: 150ms;
+  }
+  
+  .btn-primary {
+    background-color: var(--color-blue-600);
+    color: var(--color-white);
+    border: 0;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-blue-700);
+  }
+}
+
+/* DevTools specific styling - not in a layer */
+.devtools-panel {
+  font-size: 12px;
+  background-color: var(--color-slate-800);
+  color: var(--color-slate-200);
+}
+
+.devtools-panel h1,
+.devtools-panel h2, 
+.devtools-panel h3,
+.devtools-panel h4,
+.devtools-panel h5,
+.devtools-panel h6 {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+  color: var(--color-slate-200);
+}
+
+.devtools-panel p {
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+  color: var(--color-slate-300);
+}
+
+.devtools-panel button {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--rounded);
+  border: 1px solid var(--color-slate-500);
+  cursor: pointer;
+  background-color: var(--color-slate-600);
+  color: var(--color-slate-200);
+}
+
+.devtools-panel button:hover {
+  background-color: var(--color-slate-500);
+}
+
+/* Utility layer for custom animations */
+@layer utilities {
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+}

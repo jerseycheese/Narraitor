@@ -1,0 +1,111 @@
+User Story Title Summary,User Story,Priority,Estimated Complexity,Acceptance Criteria,GitHub Issue Link,Technical Requirements,Implementation Considerations,Related Documentation,Related Issues/Stories,Plain Language Summary
+Store world facts for developer tools and debugging,"As a developer, I want the system to store world facts so they can be referenced consistently",High (MVP),Medium,"New `LoreFact` objects can be created and stored in the `LoreStore`
+Each fact includes an ID, content, category, and timestamps
+Facts are properly indexed by their category
+The system prevents duplicate fact content for the same world
+Facts persist across browser sessions using IndexedDB",https://github.com/jerseycheese/Narraitor/issues/182,"The system must store world facts in a structured format with appropriate metadata. Facts must include unique identifiers, content, categorization, and timestamps. The system must provide efficient access to facts by category and prevent duplicate entries. Facts must persist across sessions",Consider the balance between simplicity and flexibility in the fact storage structure. Think about how to efficiently detect duplicates while allowing for fact updates and variations. The persistence mechanism should be reliable while maintaining good performance when dealing with potentially large numbers of facts,"docs/requirements/core/lore-management-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#180
+#281
+#202
+#221
+#219
+#220
+#100
+#101
+#167
+#163",Allows developers to save world details so the AI can remember them.
+Categorize facts for developer tools and debugging,"As a developer, I want facts categorized to better organize world knowledge",High (MVP),Small,"Facts can be categorized into one of five types: character, location, history, item, or concept
+The system maintains indexes of facts by category for quick retrieval
+Categories help organize and filter facts for relevance
+Category types are clearly defined with guidelines for classification
+The categorization system is extensible for potential future enhancements",https://github.com/jerseycheese/Narraitor/issues/183,"The system must support categorizing facts into predefined types (character, location, history, item, concept). It must maintain indexes for efficient retrieval by category. The categorization system must be designed with potential future extensibility in mind",Consider how rigid or flexible the categorization system should be. Think about edge cases where facts might belong to multiple categories. The category system should balance current needs with potential future expansion while maintaining clear classification guidelines,"docs/requirements/core/lore-management-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#245
+#246
+#172
+#171",Helps developers organize world details by type (like characters or places).
+Ensure AI consistency for enhanced player experience,"As a player, I want the AI to remember established world details for a coherent experience",High (MVP),Medium,"The AI consistently refers to established lore when generating content
+Narrative responses reflect previously established facts
+The AI avoids contradicting previously established world details
+Character references maintain consistent traits and backgrounds
+Location descriptions remain consistent throughout the narrative",https://github.com/jerseycheese/Narraitor/issues/184,The system must provide established lore facts to the AI as part of its context. The AI must be instructed to reference and adhere to this lore in its responses. The system must work to prevent contradictions in AI-generated content,Consider the balance between providing comprehensive lore and staying within context limits. Think about how to prioritize critical world facts that are most important for maintaining consistency. The prompting approach should encourage the AI to explicitly reference established facts,"docs/requirements/core/lore-management-system.md, docs/requirements/integrations/ai-service.md, docs/requirements/core/narrative-engine.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#273
+#259
+#245
+#198
+#143
+#201
+#199
+#200
+#111
+#103
+#105
+#110
+#140
+#142
+#247
+#248",Ensures the AI uses existing world details to keep the story consistent for players.
+Include lore in context for developer tools and,"As a developer, I want relevant lore included in AI prompts for consistent storytelling",High (MVP),Medium,"A subset of relevant lore facts is included in AI context
+Fact selection uses basic heuristics like category matching
+The AI context format includes lore facts in a structured way
+The system limits the number of facts to avoid exceeding context limits
+The most recent or relevant facts are prioritized when space is limited",https://github.com/jerseycheese/Narraitor/issues/185,The system must select relevant lore facts based on the current narrative context. It must format these facts in a structured way for the AI prompt. The system must manage context size to stay within token limits and prioritize facts when space is limited,"Consider what makes a fact relevant to the current context - categories, recency, explicit mentions, etc. Think about how to format lore for maximum AI comprehension and adherence. The selection algorithm should balance comprehensive context with token efficiency","docs/requirements/core/lore-management-system.md, docs/requirements/integrations/ai-service.md, docs/requirements/core/narrative-engine.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#273
+#203
+#110
+#140
+#137
+#136
+#168",Provides the AI with important world details to help it tell a consistent story.
+Maintain narrative consistency for enhanced player experience,"As a player, I want the narrative to maintain consistent details about the world",High (MVP),Large,"The narrative generated by the AI reflects established world details
+Character descriptions remain consistent with previous mentions
+Location descriptions maintain consistency across the narrative
+Historical events are referenced consistently throughout the story
+World rules and concepts remain stable across sessions",https://github.com/jerseycheese/Narraitor/issues/186,The system must ensure that narrative consistency mechanisms are robust and consistently applied. The integration between the lore system and narrative generation must work effectively to maintain world coherence,Consider this as a holistic requirement that depends on the successful implementation of other lore-related features. The focus should be on how different systems interact to produce consistent narrative results. Regular testing with varied scenarios will help identify consistency issues,"docs/requirements/core/lore-management-system.md, docs/requirements/integrations/ai-service.md, docs/requirements/core/narrative-engine.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#273
+#198
+#143
+#196
+#210
+#211
+#142
+#140
+#135",Keeps the story consistent for players by making sure the AI remembers world details.
+Track fact sources for developer tools and debugging,"As a developer, I want to trace facts back to their original sources for verification",Medium (MVP Enhancement),Small,"Each lore fact stores a reference to its original source
+The `sourceId` field links a fact to its origin (e.g., narrative event ID)
+Source references are maintained when facts are updated
+The system can retrieve the original source when requested
+Source tracking helps with fact verification and context",https://github.com/jerseycheese/Narraitor/issues/187,The system must track the origin of each lore fact by storing a reference to its source. Fact records must maintain this lineage even when updated. The system must provide a way to retrieve original sources when needed for verification,Consider what constitutes a valid source for a fact and how to handle facts that may derive from multiple sources. Think about the information needed to trace back to the original narrative moment or input that created a fact. Source tracking should enhance debugging without adding excessive overhead,"docs/requirements/core/lore-management-system.md, docs/requirements/core/journal-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#260
+#174
+#175
+#176
+#179
+#208
+#209
+#169",Lets developers see where world details came from to check if they are correct.
+Debug lore system for developer tools and debugging,"As a developer, I want access to debug tools to inspect the lore database during development",Medium (MVP Enhancement),Small,"DevTools allow inspection of the current `LoreStore` content
+Facts can be viewed by category in the debugging interface
+DevTools show which facts were included in recent AI contexts
+Debugging tools provide timestamp information for facts
+The tools allow basic filtering and searching of facts",https://github.com/jerseycheese/Narraitor/issues/188,"The system must provide debugging tools for inspecting the lore database. These tools must show facts grouped by category, display timestamps, indicate which facts were included in recent AI contexts, and support basic filtering and searching capabilities",Consider the most useful ways to present lore information for debugging purposes. Think about what filtering and searching capabilities would be most beneficial during development. The tools should help identify issues like missing facts or facts that aren't being correctly utilized,"docs/requirements/core/lore-management-system.md, docs/requirements/core/devtools.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#202
+#203
+#213
+#212
+#141
+#224
+#223
+#106
+#108
+#107",Gives developers tools to look at the world details database while building the system.
+Monitor lore usage for developer tools and debugging,"As a developer, I want to see how lore is being used in AI contexts to improve the system",Medium (MVP Enhancement),Small,"DevTools track which facts are included in AI contexts
+Usage frequency of facts is monitored
+The system logs when facts influence AI responses
+Developers can identify unused or rarely used facts
+Monitoring helps optimize fact selection algorithms",https://github.com/jerseycheese/Narraitor/issues/189,The system must track which facts are included in AI contexts and monitor their usage frequency. It should identify when facts explicitly influence AI responses when possible. The system must provide tools to identify unused or rarely used facts to help optimize selection algorithms,Consider what usage metrics would be most valuable for improving fact selection. Think about how to detect when a fact has actually influenced an AI response versus merely being included in context. The monitoring system should provide insights that directly inform system improvements,"docs/requirements/core/lore-management-system.md, docs/requirements/core/devtools.md, docs/requirements/integrations/ai-service.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#273
+#203
+#110
+#140
+#136
+#137
+#168
+#245
+#171
+#103
+#105
+#111
+#199
+#200",Helps developers see which world details the AI is using to make the system better.

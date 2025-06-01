@@ -1,0 +1,145 @@
+User Story Title Summary,Plain Language Summary,User Story,Priority,Estimated Complexity,Acceptance Criteria,GitHub Issue Link,Technical Requirements,Implementation Considerations,Related Documentation,Related Issues/Stories
+Create new character for enhanced player experience,"Allows players to build a custom character with a name, description, attributes, and skills to use in the game world","As a user, I want to create a new character for my selected world so I can have a persona in the narrative",High (MVP),Medium,"Users can enter a name and description for their character
+Users can allocate attribute points according to the world's constraints
+Users can select and rate skills based on the world's definitions
+Users can provide a background and personality description
+The created character is saved and appears in the character list",https://github.com/jerseycheese/Narraitor/issues/115,"The system must provide ways to capture character information including personal details, attributes, skills, and background. The system must validate character data against world constraints. Integration with world configuration is needed to ensure character elements align with world settings",Consider a guided character creation process that helps users complete all necessary information. Data must be maintained throughout the creation process. Validation should ensure character data meets world requirements while providing a smooth user experience,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#116
+#251
+#118
+#119
+#214
+#215
+#226
+#227
+#228
+#229
+#230
+#232
+#237
+#249
+#250
+#252
+#259
+#273
+#286
+#287
+#288
+#289
+#290
+#305"
+Distribute attribute points to customize character strengths,Lets players customize their character's strengths and weaknesses by distributing points to different attributes,"As a user, I want to allocate attribute points to customize my character's strengths and weaknesses",High (MVP),Small,"Users can distribute a fixed number of attribute points among available attributes
+The interface enforces minimum and maximum values for each attribute
+The interface shows remaining points as attributes are allocated
+Users can reset attribute allocations to start over
+Users cannot proceed until all attribute points are allocated",https://github.com/jerseycheese/Narraitor/issues/116,"The system must track total available points, points allocated, and enforce minimum and maximum values for each attribute. Reset functionality is needed to allow users to start over. The system should validate point allocation completeness before allowing progress",Consider how to provide clear feedback on remaining points and allocation limits. The allocation interface should be intuitive while enforcing the rules of the world's attribute system. Think about how to guide users through the process of distributing points effectively,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#115
+#251
+#118
+#119
+#230
+#249
+#250
+#252
+#285
+#288
+#289"
+Choose and rate character skills from world options,Allows players to choose and set skill levels for their character based on what's available in the game world,"As a user, I want to select and rate skills that define my character's abilities",High (MVP),Small,"Users can select skills from a list defined by the world configuration
+Users can assign ratings to selected skills within allowed ranges
+The interface enforces any skill selection limits (e.g., maximum number of skills)
+Users can remove or change selections before finalizing
+Selected skills appear on the character sheet with their ratings",https://github.com/jerseycheese/Narraitor/issues/251,The system must retrieve available skills from world configuration and present them for selection. It must enforce rating ranges and selection limits based on world rules. Selected skills and their ratings must be saved with the character data and displayed on the character sheet,"Consider how to organize skills for selection, especially if the world defines many skills. The interface should make it clear which skills are selected and what their current ratings are. Think about how users will modify or remove skills before finalizing","docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#115
+#116
+#118
+#119
+#232
+#249
+#250
+#252
+#286
+#287
+#290"
+Write detailed character background and personality description,"Enables players to create their character's appearance, personality, and history to establish their identity in the game","As a user, I want to write a description and background for my character to establish their identity",High (MVP),Small,"Users can enter a physical description of their character
+Users can enter personality traits for their character
+Users can enter a background story for their character
+The interface validates that required fields are completed
+Character descriptions are properly formatted and displayed on the character sheet",https://github.com/jerseycheese/Narraitor/issues/118,"The system must capture character description, personality traits, and background story. Validation is needed to ensure required character information is provided. The system must store and display this narrative information in a readable format",Consider how much text to allow for each section and how to present text entry fields. Think about providing guidance on what information is most useful for character descriptions and backgrounds. The interface should support creative writing while ensuring essential information is captured,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#115
+#116
+#251
+#119
+#249
+#252
+#256
+#259
+#305"
+Auto-save and resume interrupted character creation process,Automatically saves progress during character creation so players can continue later if they close the browser,"As a user, I want to resume character creation if I accidentally navigate away or close the browser",Medium (MVP Enhancement),Medium,"The system automatically saves character creation progress periodically
+When returning to character creation, the system detects and offers to restore previous work
+Users can choose to continue from saved progress or start fresh
+All previously entered data is correctly restored when resuming
+The recovery system works across browser sessions",https://github.com/jerseycheese/Narraitor/issues/119,"The system must periodically save character creation progress automatically. It must detect previously saved work when users return to character creation. The system must provide options to continue from saved progress or start fresh, and correctly restore all previously entered data when resuming",Consider the frequency of auto-saving and what storage mechanism would be appropriate. The user should be informed that their work is being saved and given a clear choice when returning to in-progress character creation. Think about how to handle conflicts between saved drafts,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#115
+#116
+#251
+#118
+#180
+#215
+#219
+#220
+#221
+#233
+#281"
+Display all created characters for selection and management,Shows players all their created characters so they can easily find and select one to play,"As a user, I want to view all my created characters so I can select one for play",High (MVP),Small,"All characters created by the user are displayed in a list
+Each character entry shows basic information (name, world, description)
+Characters are loaded from persistent storage when the page loads
+The list is responsive and works on different screen sizes
+The user can select a character from the list for detailed view or gameplay",https://github.com/jerseycheese/Narraitor/issues/253,"The system must retrieve and display a list of all characters created by the user. Each character entry must show essential information like name, world, and a description preview. The list must be responsive for different screen sizes and support character selection for viewing details or gameplay",Consider how to organize and present the character list for quick scanning and selection. Think about what information is most important to display in the preview. The interface should make it clear how to select a character for play or detailed viewing,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#121
+#122
+#123
+#124
+#214
+#215
+#254
+#255
+#256
+#292"
+Modify character attributes skills and descriptions post-creation,"Allows players to change and update their character's information, attributes, and skills after creation","As a user, I want to edit my existing characters to refine their attributes, skills, or descriptions",High (MVP),Medium,"Users can modify all aspects of an existing character
+The system validates changes against the world's constraints
+Changes are saved immediately when submitted
+The interface provides clear feedback when changes are saved
+Users can cancel edits without saving changes",https://github.com/jerseycheese/Narraitor/issues/121,The system must allow modification of all character aspects while maintaining world constraint validation. Changes must be saved when submitted with appropriate feedback to users. The system must support cancellation of edits without affecting the stored character data,Consider how much of the character creation interface can be repurposed for editing. The system should make it clear which aspects of the character are being edited and provide confirmation of successful changes. Think about how to handle validation in the context of editing vs. creation,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#253
+#122
+#118
+#233
+#236
+#249
+#250
+#251
+#252
+#254
+#256"
+Permanently remove unwanted characters with confirmation safeguard,Lets players permanently remove characters they no longer want to use from the game,"As a user, I want to delete characters I no longer want to use",Medium (MVP Enhancement),Small,"Users can initiate character deletion from the character list or detail view
+The system requires confirmation before completing deletion
+Deleted characters are permanently removed from storage
+The interface provides feedback when deletion is complete
+The character list updates immediately after deletion",https://github.com/jerseycheese/Narraitor/issues/122,"The system must provide a way for users to initiate character deletion. A confirmation step is required to prevent accidental data loss. The system must remove all campaign data including associated content (narrative sessions, journal entries, etc.) from storage",Consider where in the interface deletion options should be placed for easy access while preventing accidental deletion. The confirmation process should clearly communicate the permanence of deletion. Think about whether any related data (like journal entries) should be handled during character deletion,"docs/requirements/core/character-system.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#253
+#121
+#216
+#255"
+Choose active character for narrative gameplay session,Allows players to choose which character they want to use when starting a game session,"As a user, I want to select a character to use in my narrative session",High (MVP),Small,"The user can select a character from their list of created characters
+The selected character is properly loaded into the narrative session
+The character selection is persisted between browser sessions
+The user interface provides clear feedback when a character is selected
+A summary of the selected character is displayed during gameplay, including key derived stats",https://github.com/jerseycheese/Narraitor/issues/123,The system must allow character selection from the user's character list. Selected character data must load into the game session. Character selection must persist between sessions. The system must provide clear selection feedback and display a character summary during gameplay,"docs/requirements/core/character-system.md, docs/requirements/ui/game-session.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#253
+#124
+#180
+#215
+#219
+#221
+#233
+#281",
+Access quick character reference during active gameplay,Shows players a quick reference of their character's key information and stats during gameplay,"As a user, I want to see a summary of my character during gameplay for reference, including key derived stats",High (MVP),Small,"Character summary is accessible throughout the gameplay session
+Summary displays character name, attributes, skills, and key derived stats
+Summary information is presented in a compact, readable format
+Character summary is updated if character data changes during gameplay
+The summary view is responsive and adapts to different screen sizes",https://github.com/jerseycheese/Narraitor/issues/124,"The system must provide access to character summary information throughout gameplay. The summary must display character name, attributes, skills, and key derived stats in a readable format. It must update when character data changes and adapt to different screen sizes","docs/requirements/core/character-system.md, docs/requirements/ui/game-session.md, docs/workflows/user-story-workflow.md, docs/workflows/user-story-template.md","#253
+#123
+#244
+#256
+#259",

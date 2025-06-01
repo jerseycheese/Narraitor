@@ -1,0 +1,13 @@
+"User Story Title Summary","Plain Language Summary","User Story","Priority","Estimated Complexity","Acceptance Criteria","Technical Requirements","Implementation Considerations","Related Issues/Stories","Related Documentation","GitHub Issue Link"
+"Example Story Title","A 1-2 sentence explanation in simple language that non-technical stakeholders can understand","As a [type of user], I want [goal/need] so that [benefit/value]","High (MVP), Medium (MVP Enhancement), Low (Nice to Have), or Post-MVP","Small (1-2 days), Medium (3-5 days), or Large (1+ week)","Criteria 1
+Criteria 2
+Criteria 3
+Criteria 4
+Criteria 5","https://github.com/jerseycheese/Narraitor/issues/XXX","Technical requirement 1
+Technical requirement 2
+Technical requirement 3
+Technical requirement 4","Implementation consideration 1
+Implementation consideration 2
+Implementation consideration 3","doc1.md, doc2.md, doc3.md","#123
+#456
+#789"

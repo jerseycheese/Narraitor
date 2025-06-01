@@ -1,0 +1,57 @@
+Mock AI responses for developer tools and debugging,Allows testing with fake AI responses so developers don't need to make real API calls,"As a developer, I want to mock AI responses so that I can test edge cases without making real API calls",Medium,Medium,"DevTools include controls to enable/disable AI response mocking.
+Mock responses can be configured for different scenarios (success, failure, timeout).
+Mock mode bypasses actual API calls while maintaining response format.",https://github.com/jerseycheese/Narraitor/issues/156,"The system must provide AI response mocking capabilities in the developer tools. Mock responses must match the format of real API responses. The system must allow configuration of different response scenarios.",Consider creating a library of common mock responses for testing. Provide easy switching between mock and live API modes. Include realistic delays to simulate actual API response times.,docs/requirements/core/devtools.md,#154
+#155
+#151
+#203
+#301
+View errors from AI service calls,Shows detailed information about what went wrong when calls to the AI service fail,"As a developer, I want to view errors from AI service calls so that I can identify failure points",High,Medium,"AI service errors are captured and displayed in the DevTools panel.
+Error details include request/response data, error codes, and timing information.
+Error logs can be filtered by type and time range.",https://github.com/jerseycheese/Narraitor/issues/155,"The system must capture and display detailed information about AI service errors. Error information must include full request/response context and timing data. The system must provide filtering and search capabilities for error logs.",Consider implementing retry logic visualization and rate limiting information. Include network condition detection and related error context. Provide export functionality for error analysis.,docs/requirements/core/devtools.md,#154
+#158
+#159
+#299
+#300
+Monitor AI service requests and responses,Displays what's being sent to and received from the AI service to debug integration issues,"As a developer, I want to monitor AI service requests and responses so that I can debug integration issues",High,Medium,"DevTools display real-time AI service request/response data.
+Request/response data is formatted for easy reading and analysis.
+Monitoring can be enabled/disabled and includes filtering options.",https://github.com/jerseycheese/Narraitor/issues/154,"The system must provide real-time monitoring of AI service requests and responses. Data must be formatted for easy analysis and include comprehensive filtering options. Monitoring must be toggleable to avoid performance impact.",Consider implementing request/response diff tools and token usage tracking. Provide response time analysis and failure rate monitoring. Include data export for analysis.,docs/requirements/core/devtools.md,#155
+#156
+#157
+#203
+#295
+#296
+#297
+Analyze narrative content patterns for developer tools and debugging,Provides tools to examine patterns in AI-generated story content to ensure quality,"As a developer, I want to analyze narrative content patterns so that I can ensure content quality",Medium,Low,"DevTools include content analysis tools for narrative patterns.
+Analysis covers content quality metrics (coherence, consistency, tone).
+Pattern analysis results are displayed with actionable insights.",https://github.com/jerseycheese/Narraitor/issues/153,"The system must provide tools for analyzing narrative content patterns and quality. Analysis must cover multiple quality dimensions and provide actionable insights. Results must be clearly presented with supporting data.",Consider implementing sentiment analysis, coherence scoring, and character consistency tracking. Provide comparison tools for different narrative versions. Include export functionality for content analysis reports.,docs/requirements/core/devtools.md,#151
+#203
+#231
+#273
+#303
+Trigger test decisions for developer tools and debugging,Lets developers simulate player decisions to test how they're handled by the game,"As a developer, I want to trigger test decisions so that I can verify decision handling",Medium,Medium,"DevTools include controls to simulate player decisions.
+Test decisions trigger normal game flow and state updates.
+Decision testing includes edge cases and invalid input scenarios.",https://github.com/jerseycheese/Narraitor/issues/152,"The system must provide controls for simulating player decisions in the developer tools. Decision simulation must trigger normal game flow and state updates. The system must support testing edge cases and error conditions.",Consider providing decision templates for common test scenarios. Include batch testing capabilities for multiple decision paths. Provide rollback functionality to reset state after testing.,docs/requirements/core/devtools.md,#162
+#151
+#213
+#212
+#248
+#234
+#304
+Test narrative generation with custom inputs,Allows developers to try different inputs for the AI story generator to verify it works correctly,"As a developer, I want to test narrative generation with custom inputs so that I can verify it produces expected content",High,Medium,"DevTools include interface for testing narrative generation with custom inputs.
+Custom inputs can override normal game state and context.
+Generation testing includes comparison with expected outputs.",https://github.com/jerseycheese/Narraitor/issues/151,"The system must provide interface for testing narrative generation with custom inputs. Custom inputs must be able to override normal game context. The system must support comparison between actual and expected outputs.",Consider providing templates for common narrative testing scenarios. Include context manipulation tools and output comparison utilities. Provide save/load functionality for test scenarios.,docs/requirements/core/devtools.md,#152
+#153
+#156
+#162
+#273
+#303
+#203
+Visually explore state tree for developer tools and debugging,Provides an interactive visual display of the application's state structure for better understanding,"As a developer, I want to visually explore the state tree so that I can understand state relationships",Medium,Medium,"DevTools include interactive visual representation of application state tree.
+State tree visualization supports expansion/collapse and search functionality.
+Visual display updates in real-time as state changes.",https://github.com/jerseycheese/Narraitor/issues/150,"The system must provide interactive visual representation of the application state tree. Visualization must support navigation, search, and real-time updates. The interface must handle large state structures efficiently.",Consider implementing tree visualization with zoom and pan capabilities. Provide highlighting for recently changed state values. Include filtering options for different state domains.,docs/requirements/core/devtools.md,#146
+#147
+#148
+#149
+#161
+#223
+#224
