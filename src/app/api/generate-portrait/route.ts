@@ -7,11 +7,6 @@ import { World } from '@/types/world.types';
 
 const logger = new Logger('API');
 
-interface GeneratePortraitRequest {
-  character: Character;
-  world?: World;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -33,11 +28,11 @@ export async function POST(request: NextRequest) {
       const customDescription = body.customDescription;
       
       // Build a prompt from character data
-      const physicalDesc = customDescription || character.background?.physicalDescription || 'No specific appearance described';
+      const physicalDesc = customDescription || character?.background?.physicalDescription || 'No specific appearance described';
       const worldTheme = world?.theme || 'fantasy';
-      const isKnownFigure = character.background?.isKnownFigure;
+      const isKnownFigure = character?.background?.isKnownFigure;
       
-      prompt = `Create a professional portrait of ${character.name}, ${physicalDesc}. ${isKnownFigure ? `This should be recognizable as ${character.name} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+      prompt = `Create a professional portrait of ${character?.name || 'character'}, ${physicalDesc}. ${isKnownFigure ? `This should be recognizable as ${character?.name} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
     } else {
       return NextResponse.json(
         { error: 'Either prompt string or character object is required' },

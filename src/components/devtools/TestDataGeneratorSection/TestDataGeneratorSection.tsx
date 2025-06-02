@@ -23,14 +23,12 @@ export const TestDataGeneratorSection: React.FC = () => {
     try {
       // Generate a diverse mix of world types for testing (my enhancement)
       const worldTypeRandom = Math.random();
-      let worldOptions;
       let randomReference;
       let randomRelationship;
       
       if (worldTypeRandom < 0.33) {
         // 33% - Original worlds (no reference)
         console.log(`[DevTools] Generating original world...`);
-        worldOptions = { method: 'ai' as const };
       } else if (worldTypeRandom < 0.66) {
         // 33% - "Set in" worlds (existing universe)
         const tvMovieUniverses = [
@@ -41,11 +39,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'set_in';
         console.log(`[DevTools] Generating "set in" world for ${randomReference} (canonical theme will be applied)...`);
-        worldOptions = { 
-          method: 'ai' as const, 
-          reference: randomReference, 
-          relationship: randomRelationship as const 
-        };
       } else {
         // 34% - "Based on" worlds (inspired by existing universe)
         const tvMovieUniverses = [
@@ -56,11 +49,6 @@ export const TestDataGeneratorSection: React.FC = () => {
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
         randomRelationship = 'based_on';
         console.log(`[DevTools] Generating "based on" world inspired by ${randomReference}...`);
-        worldOptions = { 
-          method: 'ai' as const, 
-          reference: randomReference, 
-          relationship: randomRelationship as const 
-        };
       }
       
       const existingNames = Object.values(worlds).map(w => w.name);
@@ -193,7 +181,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         }
         
         // Include existing names plus already created worlds in this batch to avoid duplicates
-        const allExistingNames = [...existingNames, ...createdWorlds.map(w => w.name)];
+        const allExistingNames: string[] = [...existingNames, ...createdWorlds.map(w => w.name)];
         
         // Use the secure API route approach from develop branch
         const response = await fetch('/api/generate-world', {
@@ -755,7 +743,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       </div>
       
       <p className="text-xs text-gray-400">
-        AI generators create diverse content for testing: original worlds, "set in" universes, and "based on" worlds.
+        AI generators create diverse content for testing: original worlds, &quot;set in&quot; universes, and &quot;based on&quot; worlds.
         {!effectiveWorldId && ' Select a world to enable character generation.'}
         {worldIdFromUrl && <span className="block mt-1 text-blue-400">Using world from current page: {worlds[worldIdFromUrl]?.name}</span>}
       </p>
