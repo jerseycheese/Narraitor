@@ -104,8 +104,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   return (
     <article
       data-testid="world-card"
-      onClick={() => onSelect?.(world.id)}
-      className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full cursor-pointer ${
+      className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full ${
         isActive 
           ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
           : 'border-gray-300 bg-white hover:shadow-lg'

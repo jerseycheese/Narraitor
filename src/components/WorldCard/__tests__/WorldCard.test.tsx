@@ -65,12 +65,28 @@ describe('WorldCard', () => {
     expect(screen.queryByTestId('world-card-theme')).not.toBeInTheDocument();
   });
 
-  // Test case for triggering selection
-  test('calls onSelect when clicked', () => {
+  // Test case for triggering selection via Make Active button
+  test('calls onSelect when Make Active button is clicked', () => {
     const mockOnSelect = jest.fn();
     render(<WorldCard world={mockWorld} onSelect={mockOnSelect} onDelete={jest.fn()} />);
-    fireEvent.click(screen.getByTestId('world-card')); // Assuming the card itself is clickable
+    
+    // Find and click the "Make Active" button (only visible for inactive worlds)
+    const makeActiveButton = screen.getByRole('button', { name: /make active/i });
+    fireEvent.click(makeActiveButton);
+    
     expect(mockOnSelect).toHaveBeenCalledWith(mockWorld.id);
+  });
+
+  // Test case to ensure clicking the card itself does NOT trigger selection
+  test('does not call onSelect when clicking the card area', () => {
+    const mockOnSelect = jest.fn();
+    render(<WorldCard world={mockWorld} onSelect={mockOnSelect} onDelete={jest.fn()} />);
+    
+    // Click on the card itself (but not any buttons)
+    fireEvent.click(screen.getByTestId('world-card'));
+    
+    // onSelect should not have been called
+    expect(mockOnSelect).not.toHaveBeenCalled();
   });
 
   // New test for Play functionality
