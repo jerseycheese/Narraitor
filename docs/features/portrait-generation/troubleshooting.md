@@ -17,15 +17,16 @@ This guide helps resolve common issues with the portrait generation system.
 
 **Solution:**
 1. Create a `.env.local` file in your project root
-2. Add your Gemini API key:
+2. Add your Gemini API key (server-side only):
    ```bash
    GEMINI_API_KEY=your-actual-api-key-here
-   # or
-   NEXT_PUBLIC_GEMINI_API_KEY=your-actual-api-key-here
    ```
+   **⚠️ Security Note**: Never use `NEXT_PUBLIC_GEMINI_API_KEY` as this exposes your API key to client-side JavaScript, creating a security vulnerability.
+
 3. Restart your development server
-4. Verify the key is loaded:
+4. Verify the key is loaded (server-side only):
    ```javascript
+   // This check should only be done in API routes or server components
    console.log(process.env.GEMINI_API_KEY ? 'Key found' : 'Key missing');
    ```
 
@@ -178,19 +179,28 @@ async function generateWithRetry(prompt: string, maxRetries = 3) {
 
 2. **Debug Detection Results**:
    ```javascript
-   // Enable debug logging
+   // Enable debug logging in .env.local
    NEXT_PUBLIC_DEBUG_LOGGING=true
    
-   // Check detection results in console
+   // Check detection results in console (client-side debugging only)
    console.log(window.lastDetectionResult);
    ```
 
-3. **Override Detection**: For misidentified characters
+3. **Override Detection**: For misidentified characters, use API endpoint
    ```typescript
-   const portrait = await portraitGenerator.generatePortrait(character, {
-     isKnownFigure: false, // Force original character generation
-     worldTheme: 'Modern'
+   const response = await fetch('/api/generate-portrait', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+       character: character,
+       world: world,
+       options: {
+         isKnownFigure: false, // Force original character generation
+         worldTheme: 'Modern'
+       }
+     })
    });
+   const { portrait } = await response.json();
    ```
 
 ### 7. Browser Storage Issues
@@ -284,7 +294,13 @@ curl -X POST http://localhost:3000/api/generate-portrait \
 const startTime = performance.now();
 
 try {
-  const portrait = await portraitGenerator.generatePortrait(character);
+  const response = await fetch('/api/generate-portrait', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ character, world })
+  });
+  
+  const { portrait } = await response.json();
   const endTime = performance.now();
   
   console.log(`Portrait generated in ${endTime - startTime}ms`);

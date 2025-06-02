@@ -78,13 +78,9 @@ function CustomNarrativeComponent() {
 For complete custom control, use the `ChoiceGenerator` service:
 
 ```tsx
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
-import { defaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { narrativeStore } from '@/state/narrativeStore';
 
 async function generateCustomChoices(worldId: string, sessionId: string) {
-  const choiceGenerator = new ChoiceGenerator(defaultGeminiClient);
-  
   // Get recent narrative context
   const segments = narrativeStore.getState().getSessionSegments(sessionId);
   const recentSegments = segments.slice(-5); // Last 5 segments
@@ -97,14 +93,26 @@ async function generateCustomChoices(worldId: string, sessionId: string) {
   };
   
   try {
-    const decision = await choiceGenerator.generateChoices({
-      worldId,
-      narrativeContext,
-      characterIds: [], // Add character IDs if available
-      maxOptions: 4,
-      minOptions: 3
+    // Use secure API endpoint instead of direct AI client
+    const response = await fetch('/api/narrative/choices', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        worldId,
+        narrativeContext,
+        characterIds: [], // Add character IDs if available
+        maxOptions: 4,
+        minOptions: 3
+      }),
     });
-    
+
+    if (!response.ok) {
+      throw new Error('Failed to generate choices');
+    }
+
+    const decision = await response.json();
     console.log('Generated decision:', decision);
     return decision;
   } catch (error) {
@@ -213,22 +221,50 @@ function setCachedChoices(contextKey: string, decision: Decision): void {
 ### Unit Testing Example
 
 ```typescript
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
-import { mockAIClient } from '@/lib/ai/__mocks__/geminiClient.mock';
+// ❌ OLD PATTERN - Testing direct AI clients (deprecated)
+// Use API endpoint testing instead
 
-describe('AI Choice Generation', () => {
-  test('generates choices with valid context', async () => {
-    const choiceGenerator = new ChoiceGenerator(mockAIClient);
+// ✅ NEW SECURE PATTERN - Test API endpoints
+describe('AI Choice Generation API', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn();
+  });
+  
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test('generates choices with valid context via API', async () => {
+    const mockResponse = {
+      id: 'test-decision',
+      prompt: 'What do you want to do?',
+      options: [
+        { id: 'choice-1', text: 'Explore the cave' },
+        { id: 'choice-2', text: 'Turn back' },
+        { id: 'choice-3', text: 'Light a torch' }
+      ]
+    };
     
-    const result = await choiceGenerator.generateChoices({
-      worldId: 'test-world',
-      narrativeContext: {
-        recentSegments: [
-          { content: 'You enter a dark cave...', type: 'scene' }
-        ]
-      },
-      characterIds: []
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse
     });
+    
+    const response = await fetch('/api/narrative/choices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        worldId: 'test-world',
+        narrativeContext: {
+          recentSegments: [
+            { content: 'You enter a dark cave...', type: 'scene' }
+          ]
+        },
+        characterIds: []
+      })
+    });
+    
+    const result = await response.json();
     
     expect(result.options).toHaveLength(3);
     expect(result.prompt).toBeTruthy();

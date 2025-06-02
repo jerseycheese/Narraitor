@@ -15,29 +15,34 @@ This guide explains how to integrate portrait generation into your components an
 ### Step 1: Import Required Dependencies
 
 ```typescript
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import type { Character } from '@/types/character.types';
+import type { World } from '@/types/world.types';
 ```
 
-### Step 2: Initialize Portrait Generator
+### Step 2: Create Portrait Generation Function
 
 ```typescript
-// In your component or service
-const aiClient = createAIClient();
-const portraitGenerator = new PortraitGenerator(aiClient);
-```
-
-### Step 3: Generate a Portrait
-
-```typescript
-async function generateCharacterPortrait(character: Character, worldTheme?: string) {
+// Use secure API endpoint instead of direct AI client
+async function generateCharacterPortrait(character: Character, world: World) {
   try {
-    const portrait = await portraitGenerator.generatePortrait(character, {
-      worldTheme: worldTheme || 'Fantasy'
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        character: character,
+        world: world
+      }),
     });
-    
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Portrait generation failed');
+    }
+
+    const { portrait } = await response.json();
     return portrait;
   } catch (error) {
     console.error('Portrait generation failed:', error);
@@ -57,18 +62,19 @@ async function generateCharacterPortrait(character: Character, worldTheme?: stri
 ```typescript
 import React, { useState } from 'react';
 import { characterStore } from '@/state/characterStore';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import type { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
 
 export function CharacterCreationForm() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [portrait, setPortrait] = useState<CharacterPortrait>({
+  const [portrait, setPortrait] = useState<CharacterPortraitType>({
     type: 'placeholder',
     url: null
   });
   
   const { createCharacter, updateCharacter } = characterStore();
+  const { currentWorld } = worldStore();
   
   const handleCreateCharacter = async (formData: CharacterFormData) => {
     // Create character with placeholder portrait
@@ -80,16 +86,25 @@ export function CharacterCreationForm() {
       }
     });
     
-    // Generate portrait asynchronously
+    // Generate portrait asynchronously using secure API
     setIsGenerating(true);
     try {
-      const aiClient = createAIClient();
-      const portraitGenerator = new PortraitGenerator(aiClient);
-      
-      const generatedPortrait = await portraitGenerator.generatePortrait(
-        { id: characterId, ...formData },
-        { worldTheme: formData.worldTheme }
-      );
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: { id: characterId, ...formData },
+          world: currentWorld
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Portrait generation failed');
+      }
+
+      const { portrait: generatedPortrait } = await response.json();
       
       // Update character with generated portrait
       updateCharacter(characterId, { portrait: generatedPortrait });
@@ -198,28 +213,34 @@ interface PortraitGenerationResult {
 
 async function safeGeneratePortrait(
   character: Character,
-  options?: PortraitGenerationOptions
+  world: World
 ): Promise<PortraitGenerationResult> {
   try {
-    // Check for API key
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    if (!apiKey || apiKey === 'MOCK_API_KEY') {
+    // Use secure API endpoint - no need to check API keys client-side
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        character: character,
+        world: world
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
         success: false,
-        error: 'API key not configured',
+        error: errorData.error || 'Portrait generation failed',
         portrait: { type: 'placeholder', url: null }
       };
     }
-    
-    // Attempt generation
-    const aiClient = createAIClient();
-    const portraitGenerator = new PortraitGenerator(aiClient);
-    
-    const portrait = await portraitGenerator.generatePortrait(character, options);
-    
+
+    const { portrait } = await response.json();
     return {
       success: true,
-      portrait
+      portrait: portrait
     };
     
   } catch (error) {
@@ -364,28 +385,44 @@ async function regeneratePortrait(character: Character) {
 ### Unit Testing Portrait Generation
 
 ```typescript
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+// ❌ OLD PATTERN - Testing direct AI clients (deprecated)
+// Use API endpoint testing instead
 
-describe('Portrait Generation', () => {
-  const mockAIClient = {
-    generateContent: jest.fn(),
-    generateImage: jest.fn()
-  };
-  
+// ✅ NEW SECURE PATTERN - Test API endpoints
+describe('Portrait Generation API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Mock fetch for API calls
+    global.fetch = jest.fn();
   });
   
-  it('should generate portrait for character', async () => {
-    mockAIClient.generateImage.mockResolvedValue({
-      image: 'data:image/png;base64,mockImageData',
-      prompt: 'Test prompt'
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+  
+  it('should generate portrait for character via API', async () => {
+    const mockResponse = {
+      portrait: {
+        type: 'ai-generated',
+        url: 'data:image/png;base64,mockImageData',
+        generatedAt: new Date().toISOString(),
+        prompt: 'Test prompt'
+      }
+    };
+    
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse
     });
     
-    const generator = new PortraitGenerator(mockAIClient);
-    const portrait = await generator.generatePortrait(mockCharacter);
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ character: mockCharacter, world: mockWorld })
+    });
     
-    expect(portrait).toEqual({
+    const result = await response.json();
+    
+    expect(result.portrait).toEqual({
       type: 'ai-generated',
       url: 'data:image/png;base64,mockImageData',
       generatedAt: expect.any(String),
@@ -393,13 +430,21 @@ describe('Portrait Generation', () => {
     });
   });
   
-  it('should handle generation failure gracefully', async () => {
-    mockAIClient.generateImage.mockRejectedValue(new Error('API Error'));
+  it('should handle API generation failure gracefully', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({ error: 'Internal server error' })
+    });
     
-    const generator = new PortraitGenerator(mockAIClient);
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ character: mockCharacter, world: mockWorld })
+    });
     
-    await expect(generator.generatePortrait(mockCharacter))
-      .rejects.toThrow('Failed to generate character portrait');
+    expect(response.ok).toBe(false);
+    expect(response.status).toBe(500);
   });
 });
 ```
