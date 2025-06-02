@@ -22,6 +22,8 @@ export interface World extends NamedEntity, TimestampedEntity {
   skills: WorldSkill[];
   settings: WorldSettings;
   image?: WorldImage;
+  universeReference?: string;
+  universeRelationship?: 'set_in' | 'based_on';
 }
 
 /**
