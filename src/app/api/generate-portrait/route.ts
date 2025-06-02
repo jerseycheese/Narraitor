@@ -14,16 +14,45 @@ interface GeneratePortraitRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const { character, world } = await request.json() as GeneratePortraitRequest;
+    const body = await request.json();
     
-    if (!character) {
+    // Handle different input formats
+    let prompt: string;
+    let character: Character | undefined;
+    let world: World | undefined;
+    
+    if (typeof body === 'string') {
+      prompt = body;
+    } else if (body.prompt) {
+      // Direct prompt format
+      prompt = body.prompt;
+    } else if (body.character) {
+      // Character + world format - need to build prompt
+      character = body.character;
+      world = body.world;
+      const customDescription = body.customDescription;
+      
+      // Build a prompt from character data
+      const physicalDesc = customDescription || character.background?.physicalDescription || 'No specific appearance described';
+      const worldTheme = world?.theme || 'fantasy';
+      const isKnownFigure = character.background?.isKnownFigure;
+      
+      prompt = `Create a professional portrait of ${character.name}, ${physicalDesc}. ${isKnownFigure ? `This should be recognizable as ${character.name} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+    } else {
       return NextResponse.json(
-        { error: 'Character is required' },
+        { error: 'Either prompt string or character object is required' },
+        { status: 400 }
+      );
+    }
+    
+    if (!prompt) {
+      return NextResponse.json(
+        { error: 'Prompt could not be determined from input' },
         { status: 400 }
       );
     }
 
-    logger.debug('generate-portrait API', 'Generating portrait for character:', character.name);
+    logger.debug('generate-portrait API', 'Generating portrait with prompt:', prompt.substring(0, 100) + '...');
 
     const apiKey = process.env.GEMINI_API_KEY;
     
@@ -31,18 +60,17 @@ export async function POST(request: NextRequest) {
       // Return a mock portrait for development
       const mockPortrait = {
         type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character.name)}`,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
         generatedAt: new Date().toISOString(),
-        prompt: `Portrait of ${character.name}`
+        prompt: prompt
       };
       
-      logger.debug('generate-portrait API', 'Using mock portrait for development:', character.name);
-      return NextResponse.json({ portrait: mockPortrait });
+      logger.debug('generate-portrait API', 'Using mock portrait for development');
+      return NextResponse.json({ 
+        portrait: mockPortrait,
+        image: mockPortrait.url // For backward compatibility
+      });
     }
-
-    // Build portrait prompt
-    const isKnownFigure = character.background.isKnownFigure;
-    const prompt = `Create a professional portrait of ${character.name}, ${character.background.physicalDescription || 'a person with distinctive features'}. ${isKnownFigure ? `This should be recognizable as ${character.name} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. ${world?.theme ? `Setting theme: ${world.theme}.` : ''}`;
     
     // Call Google's Gemini API for image generation
     const response = await fetch(
@@ -71,12 +99,15 @@ export async function POST(request: NextRequest) {
       // Return mock portrait as fallback
       const fallbackPortrait = {
         type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character.name)}`,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
         generatedAt: new Date().toISOString(),
         prompt: prompt
       };
       
-      return NextResponse.json({ portrait: fallbackPortrait });
+      return NextResponse.json({ 
+        portrait: fallbackPortrait,
+        image: fallbackPortrait.url // For backward compatibility
+      });
     }
 
     const data = await response.json();
@@ -95,28 +126,34 @@ export async function POST(request: NextRequest) {
       // Return mock portrait as fallback
       const fallbackPortrait = {
         type: 'ai-generated' as const,
-        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character.name)}`,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
         generatedAt: new Date().toISOString(),
         prompt: prompt
       };
       
-      return NextResponse.json({ portrait: fallbackPortrait });
+      return NextResponse.json({ 
+        portrait: fallbackPortrait,
+        image: fallbackPortrait.url // For backward compatibility
+      });
     }
 
     // Return the generated portrait
     const mimeType = imagePart.inlineData.mimeType;
     const base64Data = imagePart.inlineData.data;
     
-    const portrait = {
+    const portraitData = {
       type: 'ai-generated' as const,
       url: `data:${mimeType};base64,${base64Data}`,
       generatedAt: new Date().toISOString(),
       prompt: prompt
     };
     
-    logger.debug('generate-portrait API', 'Portrait generated successfully for:', character.name);
+    logger.debug('generate-portrait API', 'Portrait generated successfully');
 
-    return NextResponse.json({ portrait });
+    return NextResponse.json({
+      portrait: portraitData,
+      image: `data:${mimeType};base64,${base64Data}` // For backward compatibility
+    });
 
   } catch (error) {
     logger.error('generate-portrait API', 'Portrait generation failed:', error);
@@ -129,6 +166,9 @@ export async function POST(request: NextRequest) {
       prompt: `Portrait fallback`
     };
     
-    return NextResponse.json({ portrait: fallbackPortrait });
+    return NextResponse.json({ 
+      portrait: fallbackPortrait,
+      image: fallbackPortrait.url // For backward compatibility
+    });
   }
 }
