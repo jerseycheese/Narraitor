@@ -30,6 +30,7 @@ interface CharacterBackground {
   goals: string[];
   fears: string[];
   physicalDescription?: string;
+  isKnownFigure?: boolean;
 }
 
 interface CharacterStatus {
