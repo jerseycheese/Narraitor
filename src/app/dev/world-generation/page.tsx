@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
+import type { WorldImage } from '@/types/world.types';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -90,9 +91,14 @@ export default function WorldGenerationTestPage() {
 
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
+          const worldImage: WorldImage = {
+            type: 'ai-generated' as const,
+            url: imageData.imageUrl,
+            generatedAt: new Date().toISOString()
+          };
           // Update the world with the generated image
           worldStore.getState().updateWorld(worldId, {
-            image: imageData.imageUrl
+            image: worldImage
           });
           console.log(`Generated image for world "${generatedWorld.name}"`);
         }

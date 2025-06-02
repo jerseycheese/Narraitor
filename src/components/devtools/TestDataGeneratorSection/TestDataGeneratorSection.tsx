@@ -5,6 +5,7 @@ import { characterStore } from '@/state/characterStore';
 import { generateTestWorld } from '@/lib/generators/worldGenerator';
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import type { WorldImage } from '@/types/world.types';
 // Removed direct AI client imports - using API routes instead
 
 export const TestDataGeneratorSection: React.FC = () => {
@@ -61,8 +62,13 @@ export const TestDataGeneratorSection: React.FC = () => {
           
           if (response.ok) {
             const { imageUrl } = await response.json();
+            const worldImage: WorldImage = {
+              type: 'ai-generated' as const,
+              url: imageUrl,
+              generatedAt: new Date().toISOString()
+            };
             // Update the world with the generated image
-            worldStore.getState().updateWorld(worldId, { image: imageUrl });
+            worldStore.getState().updateWorld(worldId, { image: worldImage });
             console.log(`Generated image for test world "${testWorldData.name}"`);
           }
         }
@@ -126,8 +132,13 @@ export const TestDataGeneratorSection: React.FC = () => {
             
             if (response.ok) {
               const { imageUrl } = await response.json();
+              const worldImage: WorldImage = {
+                type: 'ai-generated' as const,
+                url: imageUrl,
+                generatedAt: new Date().toISOString()
+              };
               // Update the world with the generated image
-              worldStore.getState().updateWorld(worldId, { image: imageUrl });
+              worldStore.getState().updateWorld(worldId, { image: worldImage });
               console.log(`Generated image for test world "${testWorldData.name}"`);
             }
           }

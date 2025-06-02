@@ -6,6 +6,7 @@ import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { worldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
+import type { WorldImage } from '@/types/world.types';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -121,7 +122,11 @@ export default function WorldsPage() {
 
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
-          const worldImage = imageData.imageUrl;
+          const worldImage: WorldImage = {
+            type: 'ai-generated' as const,
+            url: imageData.imageUrl,
+            generatedAt: new Date().toISOString()
+          };
         
           // Update the world with the generated image
           worldStore.getState().updateWorld(worldId, {
