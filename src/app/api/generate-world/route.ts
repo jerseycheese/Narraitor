@@ -13,9 +13,12 @@ interface GenerateWorldRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    logger.debug('generate-world API', 'Request received');
     const body = await request.json() as GenerateWorldRequest;
+    logger.debug('generate-world API', 'Request body parsed:', JSON.stringify(body));
     
     if (body.worldRelationship && !body.worldReference?.trim()) {
+      logger.debug('generate-world API', 'Validation failed: relationship without reference');
       return NextResponse.json(
         { error: 'Existing setting is required when world type is selected' },
         { status: 400 }
