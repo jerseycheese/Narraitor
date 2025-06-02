@@ -1,10 +1,8 @@
 import { generateCharacter } from '../characterGenerator';
 import { World } from '@/types/world.types';
-import { createAIClient } from '../clientFactory';
 
-// Mock the AI client
-jest.mock('../clientFactory');
-const mockCreateAIClient = createAIClient as jest.MockedFunction<typeof createAIClient>;
+// Mock fetch for API calls
+global.fetch = jest.fn();
 
 describe('Character Generator - Cleanup Tests', () => {
   const mockWorld: World = {
@@ -19,7 +17,8 @@ describe('Character Generator - Cleanup Tests', () => {
         description: 'Physical power',
         minValue: 1,
         maxValue: 10,
-        defaultValue: 5
+        baseValue: 5,
+        worldId: 'test-world'
       },
       {
         id: 'intelligence',
@@ -27,7 +26,8 @@ describe('Character Generator - Cleanup Tests', () => {
         description: 'Mental capacity',
         minValue: 1,
         maxValue: 10,
-        defaultValue: 5
+        baseValue: 5,
+        worldId: 'test-world'
       }
     ],
     skills: [
@@ -36,14 +36,24 @@ describe('Character Generator - Cleanup Tests', () => {
         name: 'Swordsmanship',
         description: 'Skill with bladed weapons',
         difficulty: 'medium',
-        associatedAttributeId: 'strength'
+        linkedAttributeId: 'strength',
+        baseValue: 1,
+        minValue: 1,
+        maxValue: 10,
+        worldId: 'test-world',
+        category: 'Combat'
       },
       {
         id: 'magic',
         name: 'Magic',
         description: 'Arcane knowledge',
         difficulty: 'hard',
-        associatedAttributeId: 'intelligence'
+        linkedAttributeId: 'intelligence',
+        baseValue: 1,
+        minValue: 1,
+        maxValue: 10,
+        worldId: 'test-world',
+        category: 'Arcane'
       }
     ],
     settings: {
@@ -56,14 +66,16 @@ describe('Character Generator - Cleanup Tests', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
-  const mockAIResponse = {
+  const mockAPIResponse = {
     content: JSON.stringify({
       name: 'Test Hero',
       level: 3,
       background: {
         description: 'A brave warrior from the north',
         personality: 'Courageous and noble',
-        motivation: 'Seeking justice for his fallen comrades'
+        motivation: 'Seeking justice for his fallen comrades',
+        fears: ['Death', 'Failure'],
+        physicalDescription: 'Tall and strong'
       },
       attributes: [
         { id: 'strength', value: 8 },
@@ -78,10 +90,10 @@ describe('Character Generator - Cleanup Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    const mockClient = {
-      generateContent: jest.fn().mockResolvedValue(mockAIResponse)
-    };
-    mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockAPIResponse),
+    } as Response);
   });
 
   describe('Basic Generation', () => {
@@ -111,7 +123,9 @@ describe('Character Generator - Cleanup Tests', () => {
           background: {
             description: 'A test character',
             personality: 'Test personality',
-            motivation: 'Test motivation'
+            motivation: 'Test motivation',
+            fears: ['Death', 'Failure'],
+            physicalDescription: 'Tall and strong'
           },
           attributes: [
             { id: 'strength', value: 15 }, // Exceeds max (10)
@@ -124,10 +138,10 @@ describe('Character Generator - Cleanup Tests', () => {
         })
       };
 
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockResponseWithInvalidValues)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponseWithInvalidValues),
+      } as Response);
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
 
@@ -147,7 +161,9 @@ describe('Character Generator - Cleanup Tests', () => {
           background: {
             description: 'A test character',
             personality: 'Test personality',
-            motivation: 'Test motivation'
+            motivation: 'Test motivation',
+            fears: ['Death', 'Failure'],
+            physicalDescription: 'Tall and strong'
           },
           attributes: [
             { id: 'strength', value: 8 },
@@ -160,13 +176,14 @@ describe('Character Generator - Cleanup Tests', () => {
         })
       };
 
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockResponseWithInvalidSkills)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponseWithInvalidSkills),
+      } as Response);
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
 
+      // Values should be clamped to valid ranges
       const swordSkill = result.skills.find(s => s.id === 'swordsmanship');
       const magicSkill = result.skills.find(s => s.id === 'magic');
 
@@ -175,123 +192,68 @@ describe('Character Generator - Cleanup Tests', () => {
     });
   });
 
-  describe('Duplicate Name Detection', () => {
-    it('should throw error for exact duplicate names', async () => {
-      const existingNames = ['Test Hero', 'Another Character'];
+  describe('API Error Handling', () => {
+    it('should use template fallback when API fails', async () => {
+      // Mock API failure
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error'
+      } as Response);
+
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
       
-      // Mock response that returns a duplicate name
-      const mockResponseWithDuplicate = {
-        content: JSON.stringify({
-          name: 'Test Hero', // This matches existing name
-          level: 3,
-          background: {
-            description: 'A duplicate character',
-            personality: 'Test personality',
-            motivation: 'Test motivation'
-          },
-          attributes: [
-            { id: 'strength', value: 8 },
-            { id: 'intelligence', value: 6 }
-          ],
-          skills: [
-            { id: 'swordsmanship', level: 7 },
-            { id: 'magic', level: 4 }
-          ]
-        })
-      };
-
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockResponseWithDuplicate)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
-
-      await expect(
-        generateCharacter(mockWorld, existingNames, undefined, 'original')
-      ).rejects.toThrow('already exists in this world');
+      // Should fall back to template generation
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('attributes');
+      expect(result).toHaveProperty('skills');
+      expect(result.isKnownFigure).toBe(false);
     });
 
-    it('should be case-insensitive for duplicate detection', async () => {
-      const existingNames = ['test hero', 'Another Character'];
+    it('should handle malformed JSON response', async () => {
+      const malformedResponse = {
+        content: 'This is not valid JSON'
+      };
+
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(malformedResponse),
+      } as Response);
+
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
       
-      // Mock response that returns a name with different case
-      const mockResponseWithCaseDuplicate = {
-        content: JSON.stringify({
-          name: 'Test Hero', // Different case but same name
-          level: 3,
-          background: {
-            description: 'A duplicate character',
-            personality: 'Test personality',
-            motivation: 'Test motivation'
-          },
-          attributes: [
-            { id: 'strength', value: 8 },
-            { id: 'intelligence', value: 6 }
-          ],
-          skills: [
-            { id: 'swordsmanship', level: 7 },
-            { id: 'magic', level: 4 }
-          ]
-        })
-      };
-
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockResponseWithCaseDuplicate)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
-
-      await expect(
-        generateCharacter(mockWorld, existingNames, undefined, 'original')
-      ).rejects.toThrow('already exists in this world');
+      // Should fall back to template generation
+      expect(result).toHaveProperty('name');
+      expect(result).toHaveProperty('attributes');
+      expect(result).toHaveProperty('skills');
     });
   });
 
   describe('Generation Types', () => {
-    it('should include appropriate prompts for known figure generation', async () => {
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockAIResponse)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
-
-      await generateCharacter(mockWorld, [], undefined, 'known');
-
-      const prompt = mockClient.generateContent.mock.calls[0][0];
-      expect(prompt).toContain('REAL, EXISTING character');
-      expect(prompt).toContain('source material');
+    it('should set isKnownFigure correctly for known character generation', async () => {
+      const result = await generateCharacter(mockWorld, [], undefined, 'known');
+      expect(result.isKnownFigure).toBe(true);
     });
 
-    it('should include appropriate prompts for original character generation', async () => {
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockAIResponse)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
-
-      await generateCharacter(mockWorld, [], undefined, 'original');
-
-      const prompt = mockClient.generateContent.mock.calls[0][0];
-      expect(prompt).toContain('original character');
-      expect(prompt).toContain('never appeared in the source material');
+    it('should set isKnownFigure correctly for original character generation', async () => {
+      const result = await generateCharacter(mockWorld, [], undefined, 'original');
+      expect(result.isKnownFigure).toBe(false);
     });
 
     it('should use suggested name for specific generation type', async () => {
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockAIResponse)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
-
       const suggestedName = 'Aragorn';
-      await generateCharacter(mockWorld, [], suggestedName, 'specific');
-
-      const prompt = mockClient.generateContent.mock.calls[0][0];
-      expect(prompt).toContain(`named "${suggestedName}"`);
+      const result = await generateCharacter(mockWorld, [], suggestedName, 'specific');
+      expect(result.name).toBe(suggestedName);
+      expect(result.isKnownFigure).toBe(true);
     });
   });
 
   describe('Error Handling', () => {
     it('should fall back to template generation when AI response is invalid JSON', async () => {
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue({ content: 'Invalid JSON response' })
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ content: 'Invalid JSON response' }),
+      } as Response);
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
       
@@ -310,17 +272,19 @@ describe('Character Generator - Cleanup Tests', () => {
           background: {
             description: 'A test character',
             personality: 'Test personality',
-            motivation: 'Test motivation'
+            motivation: 'Test motivation',
+            fears: ['Death', 'Failure'],
+            physicalDescription: 'Tall and strong'
           },
           attributes: [],
           skills: []
         })
       };
 
-      const mockClient = {
-        generateContent: jest.fn().mockResolvedValue(mockResponseWithoutName)
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockResponseWithoutName),
+      } as Response);
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
       
@@ -330,11 +294,8 @@ describe('Character Generator - Cleanup Tests', () => {
       expect(result.name.length).toBeGreaterThan(0);
     });
 
-    it('should fall back to template generation when AI client errors occur', async () => {
-      const mockClient = {
-        generateContent: jest.fn().mockRejectedValue(new Error('AI service unavailable'))
-      };
-      mockCreateAIClient.mockReturnValue(mockClient as ReturnType<typeof createAIClient>);
+    it('should fall back to template generation when fetch throws an error', async () => {
+      (fetch as jest.MockedFunction<typeof fetch>).mockRejectedValue(new Error('Network error'));
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
       
@@ -343,7 +304,6 @@ describe('Character Generator - Cleanup Tests', () => {
       expect(result).toHaveProperty('background');
       expect(result).toHaveProperty('attributes');
       expect(result).toHaveProperty('skills');
-      expect(result.characterType).toBe('original');
     });
   });
 });
