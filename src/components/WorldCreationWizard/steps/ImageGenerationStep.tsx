@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { World, WorldImage } from '@/types/world.types';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
-import { createAIClient } from '@/lib/ai';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+// Removed direct AI client imports - using API routes instead
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 
@@ -35,10 +34,29 @@ export default function ImageGenerationStep({
     setError(null);
 
     try {
-      const aiClient = createAIClient();
-      const imageGenerator = new WorldImageGenerator(aiClient);
+      // Use the world image generation API route
+      const response = await fetch('/api/generate-world-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          world: worldData as World
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world image');
+      }
+
+      const { imageUrl } = await response.json();
       
-      const image = await imageGenerator.generateWorldImage(worldData as World);
+      const image: WorldImage = {
+        type: 'ai-generated',
+        url: imageUrl,
+        generatedAt: new Date().toISOString()
+      };
       
       setGeneratedImage(image);
       onUpdate({ image });

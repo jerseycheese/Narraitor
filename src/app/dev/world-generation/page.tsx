@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
-import { generateWorld, type GeneratedWorldData } from '@/lib/ai/worldGenerator';
+import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -25,13 +25,26 @@ export default function WorldGenerationTestPage() {
     setGeneratedWorld(null);
     
     try {
+      // Use the world generation API route
       const existingNames = Object.values(worlds).map(w => w.name);
-      const result = await generateWorld(
-        worldReference.trim(),
-        existingNames,
-        suggestedName.trim() || undefined
-      );
-      
+      const response = await fetch('/api/generate-world', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldReference: worldReference.trim(),
+          existingNames,
+          suggestedName: suggestedName.trim() || undefined
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world');
+      }
+
+      const result: GeneratedWorldData = await response.json();
       setGeneratedWorld(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Generation failed');
@@ -40,10 +53,11 @@ export default function WorldGenerationTestPage() {
     }
   };
   
-  const handleCreateWorld = () => {
+  const handleCreateWorld = async () => {
     if (!generatedWorld) return;
     
-    worldStore.getState().createWorld({
+    // Create the world
+    const worldId = worldStore.getState().createWorld({
       name: generatedWorld.name,
       theme: generatedWorld.theme,
       description: generatedWorld.description,
@@ -59,6 +73,34 @@ export default function WorldGenerationTestPage() {
       })),
       settings: generatedWorld.settings
     });
+    
+    // Generate world image
+    try {
+      const createdWorld = worldStore.getState().worlds[worldId];
+      if (createdWorld) {
+        const imageResponse = await fetch('/api/generate-world-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            world: createdWorld
+          }),
+        });
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          // Update the world with the generated image
+          worldStore.getState().updateWorld(worldId, {
+            image: imageData.imageUrl
+          });
+          console.log(`Generated image for world "${generatedWorld.name}"`);
+        }
+      }
+    } catch (imageError) {
+      console.error('Failed to generate world image:', imageError);
+      // Continue without image - world creation should still succeed
+    }
     
     setGeneratedWorld(null);
     setWorldReference('');

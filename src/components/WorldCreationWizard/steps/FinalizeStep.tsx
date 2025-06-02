@@ -6,8 +6,7 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { DataField } from '@/components/shared/DataField';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
-import { createAIClient } from '@/lib/ai';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+// Removed direct AI client imports - using API routes instead
 
 interface FinalizeStepProps {
   worldData: Partial<World>;
@@ -41,9 +40,6 @@ export default function FinalizeStep({
     
     setIsGeneratingImage(true);
     try {
-      const aiClient = createAIClient();
-      const imageGenerator = new WorldImageGenerator(aiClient);
-      
       // Create a temporary world object for image generation
       const tempWorld = {
         id: 'temp',
@@ -53,7 +49,31 @@ export default function FinalizeStep({
         ...worldData
       } as World;
       
-      const image = await imageGenerator.generateWorldImage(tempWorld, customPrompt);
+      // Use the world image generation API route
+      const response = await fetch('/api/generate-world-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          world: tempWorld,
+          customPrompt
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world image');
+      }
+
+      const { imageUrl } = await response.json();
+      
+      const image: WorldImage = {
+        type: 'ai-generated',
+        url: imageUrl,
+        generatedAt: new Date().toISOString()
+      };
+      
       onUpdateWorldData({ image });
     } catch (err) {
       console.error('Failed to generate world image:', err);

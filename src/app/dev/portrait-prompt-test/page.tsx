@@ -4,8 +4,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai';
+// Removed direct AI client imports - using API routes instead
 import { Character } from '@/types/character.types';
 
 export default function PortraitPromptTestPage() {
@@ -32,9 +31,6 @@ export default function PortraitPromptTestPage() {
     setGeneratedImage(null);
     
     try {
-      const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
-      
       const testCharacter: Character = {
         id: 'test',
         name: characterName,
@@ -56,13 +52,27 @@ export default function PortraitPromptTestPage() {
         updatedAt: new Date().toISOString()
       };
 
-      // Generate the portrait which includes detection and prompt generation
-      const result = await generator.generatePortrait(testCharacter, {
-        worldTheme
+      // Use the portrait generation API route
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: testCharacter,
+          world: { theme: worldTheme }
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate portrait');
+      }
+
+      const { portrait: result } = await response.json();
       
       // The actual prompt used is returned in the result
-      setGeneratedPrompt(result.prompt || 'No prompt returned');
+      setGeneratedPrompt(result.prompt || 'No prompt returned from API');
       setGeneratedImage(result.url);
       
       // Get detection info from the portrait generator's detection results

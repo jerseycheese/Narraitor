@@ -17,8 +17,7 @@ import AttributeReviewStep from './steps/AttributeReviewStep';
 import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
 import { WizardState, WIZARD_STEPS } from './WizardState';
-import { createAIClient } from '@/lib/ai';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+// Removed direct AI client imports - using API routes instead
 
 export type { AttributeSuggestion, SkillSuggestion } from './WizardState';
 
@@ -185,21 +184,37 @@ export default function WorldCreationWizard({
         
         const generateWorldImage = async () => {
           try {
-            const aiClient = createAIClient();
-            const imageGenerator = new WorldImageGenerator(aiClient);
-            
             // Get the created world from store
             const world = worldStore.getState().worlds[worldId];
             console.log('[WorldCreationWizard] Retrieved world for image generation:', world);
             
             if (world) {
-              console.log('[WorldCreationWizard] Starting world image generation...');
-              const image = await imageGenerator.generateWorldImage(world);
-              console.log('[WorldCreationWizard] Generated world image:', image);
+              console.log('[WorldCreationWizard] Starting world image generation via API...');
               
-              // Update the world with the generated image
-              worldStore.getState().updateWorld(worldId, { image });
-              console.log('[WorldCreationWizard] Updated world with generated image');
+              const response = await fetch('/api/generate-world-image', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  world
+                }),
+              });
+
+              if (response.ok) {
+                const { imageUrl } = await response.json();
+                const image = {
+                  type: 'ai-generated' as const,
+                  url: imageUrl,
+                  generatedAt: new Date().toISOString()
+                };
+                
+                console.log('[WorldCreationWizard] Generated world image:', image);
+                
+                // Update the world with the generated image
+                worldStore.getState().updateWorld(worldId, { image });
+                console.log('[WorldCreationWizard] Updated world with generated image');
+              }
             } else {
               console.error('[WorldCreationWizard] World not found in store for image generation');
             }

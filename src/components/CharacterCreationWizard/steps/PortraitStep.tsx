@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { CharacterPortrait } from '../../CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
-import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
-import { createAIClient } from '../../../lib/ai/clientFactory';
+// Removed direct AI client imports - using API routes instead
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
 import { LoadingState } from '../../ui/LoadingState';
@@ -55,10 +54,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     setError(null);
 
     try {
-      const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
-      
-      // Create a character object for the generator with local overrides
+      // Create a character object for the API
       const characterForGeneration: Character = {
         id: 'temp',
         name: data.characterData.name,
@@ -90,15 +86,25 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         updatedAt: new Date().toISOString()
       };
 
-      // Always use photorealistic style for MVP
-      const effectiveTheme = worldConfig.theme;
+      // Use the portrait generation API route
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: characterForGeneration,
+          world: worldConfig,
+          customDescription: localPhysicalDescription
+        }),
+      });
 
-      const generatedPortrait = await generator.generatePortrait(
-        characterForGeneration,
-        { 
-          worldTheme: effectiveTheme
-        }
-      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate portrait');
+      }
+
+      const { portrait: generatedPortrait } = await response.json();
 
       onUpdate({
         portrait: generatedPortrait

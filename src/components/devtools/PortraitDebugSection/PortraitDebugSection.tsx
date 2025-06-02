@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
-import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
-import { createAIClient } from '../../../lib/ai';
+// Removed direct AI client imports - using API routes instead
+// Note: Some debug functionality may be limited without direct API access
 import { characterStore } from '../../../state/characterStore';
 import { worldStore } from '../../../state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
@@ -60,60 +60,9 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     }
 
     try {
-      const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
-      
-      // Create a mock character for prompt generation
-      // Handle the different attribute/skill formats between store and types
-      type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
-      type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
-      
-      const mockAttributes = effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
-        attributeId: attr.attributeId || attr.id || 'attr-1',
-        value: attr.value || attr.baseValue || 10
-      })) || [];
-      
-      const mockSkills = effectiveCharacterData.skills?.map((skill: AnySkill) => ({
-        skillId: skill.skillId || skill.id || 'skill-1',
-        level: skill.level || 1,
-        experience: skill.experience || 0,
-        isActive: skill.isActive !== undefined ? skill.isActive : true
-      })) || [];
-      
-      const mockCharacter: Character = {
-        id: 'preview',
-        name: effectiveCharacterData.name || 'Test Character',
-        description: '',
-        worldId: effectiveCharacterData.worldId || 'world-1',
-        attributes: mockAttributes,
-        skills: mockSkills,
-        background: {
-          history: getBackgroundProp('history') || '',
-          personality: getBackgroundProp('personality') || '',
-          goals: getBackgroundProp('goals') || [],
-          fears: getBackgroundProp('fears') || [],
-          relationships: getBackgroundProp('relationships') || []
-        },
-        inventory: { 
-          items: [], 
-          capacity: 100, 
-          categories: [], 
-          characterId: 'preview' 
-        },
-        status: { 
-          health: getStatusProp('health') || getStatusProp('hp') || 100, 
-          maxHealth: getStatusProp('maxHealth') || 100, 
-          conditions: getStatusProp('conditions') || [] 
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      const prompt = generator.buildPortraitPrompt(mockCharacter, {
-        worldTheme: effectiveWorldConfig?.theme
-      });
-
-      setGeneratedPrompt(prompt);
+      // Note: Prompt-only generation is not available via API route
+      // This would require exposing the prompt building logic separately
+      setGeneratedPrompt('Prompt-only generation not available via API route. Use "Test Generation" instead.');
     } catch (error) {
       setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -124,9 +73,6 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
 
     setIsGenerating(true);
     try {
-      const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
-      
       // Handle the different attribute/skill formats between store and types
       type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
       type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
@@ -172,12 +118,27 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         updatedAt: new Date().toISOString()
       };
 
-      const result = await generator.generatePortrait(mockCharacter, {
-        worldTheme: effectiveWorldConfig?.theme
+      // Use the portrait generation API route
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          character: mockCharacter,
+          world: effectiveWorldConfig
+        }),
       });
 
-      setLastGeneratedImage(result.url);
-      setGeneratedPrompt(result.prompt || 'No prompt returned');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate portrait');
+      }
+
+      const { portrait } = await response.json();
+
+      setLastGeneratedImage(portrait.url);
+      setGeneratedPrompt(portrait.prompt || 'No prompt returned from API');
     } catch (error) {
       setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {

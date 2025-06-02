@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { World, WorldImage } from '@/types/world.types';
-import { createAIClient } from '@/lib/ai';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+// Removed direct AI client imports - using API routes instead
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
 
@@ -17,10 +16,30 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
     setIsGenerating(true);
 
     try {
-      const aiClient = createAIClient();
-      const imageGenerator = new WorldImageGenerator(aiClient);
+      // Use the world image generation API route
+      const response = await fetch('/api/generate-world-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          world,
+          customPrompt
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world image');
+      }
+
+      const { imageUrl } = await response.json();
       
-      const image = await imageGenerator.generateWorldImage(world, customPrompt);
+      const image: WorldImage = {
+        type: 'ai-generated',
+        url: imageUrl,
+        generatedAt: new Date().toISOString()
+      };
       
       onChange({ image });
     } catch (err) {
