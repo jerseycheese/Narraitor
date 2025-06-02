@@ -99,27 +99,13 @@ Make the world interesting and playable while staying true to the source materia
 IMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
 
   try {
-    // Use secure API endpoint instead of direct AI client
-    const response = await fetch('/api/generate-world', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        prompt,
-        reference,
-        relationship: options.relationship || 'based_on',
-        suggestedName: options.suggestedName,
-        existingNames: options.existingNames
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const apiResponse = await response.json();
-    const text = apiResponse.content.trim();
+    // Import the AI client for server-side usage
+    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+    const client = createDefaultGeminiClient();
+    
+    // Generate with AI
+    const response = await client.generateContent(prompt);
+    const text = response.content.trim();
     
     // Clean up the response - remove any markdown formatting
     const jsonText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
