@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import BasicInfoStep from './BasicInfoStep';
 import { World } from '@/types/world.types';
 
-describe.skip('BasicInfoStep', () => {
+describe('BasicInfoStep', () => {
   const mockWorldData: Partial<World> = {
     name: '',
     description: '',
@@ -29,6 +29,8 @@ describe.skip('BasicInfoStep', () => {
     expect(screen.getByTestId('world-name-input')).toBeInTheDocument();
     expect(screen.getByTestId('world-description-textarea')).toBeInTheDocument();
     expect(screen.getByTestId('world-genre-select')).toBeInTheDocument();
+    expect(screen.getByTestId('relationship-based-on-radio')).toBeInTheDocument();
+    expect(screen.getByTestId('relationship-set-in-radio')).toBeInTheDocument();
   });
 
   test('displays error for world name when provided', () => {
@@ -45,9 +47,7 @@ describe.skip('BasicInfoStep', () => {
     );
 
     // Should display the error
-    expect(screen.getByTestId('name-error')).toHaveTextContent(
-      'World name must be at least 3 characters'
-    );
+    expect(screen.getByText('World name must be at least 3 characters')).toBeInTheDocument();
   });
 
   test('displays error for description when provided', () => {
@@ -64,9 +64,7 @@ describe.skip('BasicInfoStep', () => {
     );
 
     // Should display the error
-    expect(screen.getByTestId('description-error')).toHaveTextContent(
-      'Description must be at least 10 characters'
-    );
+    expect(screen.getByText('Description must be at least 10 characters')).toBeInTheDocument();
   });
 
   test('updates world data on input change', () => {
@@ -138,8 +136,8 @@ describe.skip('BasicInfoStep', () => {
       />
     );
 
-    expect(screen.getByTestId('name-error')).toHaveTextContent('Name is too short');
-    expect(screen.getByTestId('description-error')).toHaveTextContent('Description is required');
+    expect(screen.getByText('Name is too short')).toBeInTheDocument();
+    expect(screen.getByText('Description is required')).toBeInTheDocument();
   });
 
   test('allows entering all basic info fields', () => {
@@ -173,15 +171,16 @@ describe.skip('BasicInfoStep', () => {
     const genreSelect = screen.getByTestId('world-genre-select');
     const options = genreSelect.querySelectorAll('option');
 
-    expect(options).toHaveLength(8);
-    expect(options[0]).toHaveValue('fantasy');
-    expect(options[1]).toHaveValue('sci-fi');
-    expect(options[2]).toHaveValue('modern');
-    expect(options[3]).toHaveValue('historical');
-    expect(options[4]).toHaveValue('post-apocalyptic');
-    expect(options[5]).toHaveValue('cyberpunk');
-    expect(options[6]).toHaveValue('western');
-    expect(options[7]).toHaveValue('other');
+    expect(options).toHaveLength(9); // Including "Select an option" placeholder
+    expect(options[0]).toHaveValue(''); // Placeholder
+    expect(options[1]).toHaveValue('fantasy');
+    expect(options[2]).toHaveValue('sci-fi');
+    expect(options[3]).toHaveValue('modern');
+    expect(options[4]).toHaveValue('historical');
+    expect(options[5]).toHaveValue('post-apocalyptic');
+    expect(options[6]).toHaveValue('cyberpunk');
+    expect(options[7]).toHaveValue('western');
+    expect(options[8]).toHaveValue('other');
   });
 
   test('preserves field values when re-rendered', () => {
@@ -209,5 +208,91 @@ describe.skip('BasicInfoStep', () => {
 
     // Value should be preserved
     expect(screen.getByTestId('world-name-input')).toHaveValue('Test World');
+  });
+
+  test('shows existing setting field when world type is selected', () => {
+    render(
+      <BasicInfoStep
+        worldData={{ ...mockWorldData, relationship: 'based_on' }}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.getByTestId('world-reference-input')).toBeInTheDocument();
+  });
+
+  test('hides existing setting field when original world is selected', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.queryByTestId('world-reference-input')).not.toBeInTheDocument();
+  });
+
+  test('updates world type when radio button is selected', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    // Select "inspired by" world type
+    fireEvent.click(screen.getByTestId('relationship-based-on-radio'));
+    expect(mockOnUpdate).toHaveBeenCalledWith({
+      ...mockWorldData,
+      relationship: 'based_on',
+    });
+  });
+
+  test('original world is selected by default', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const originalRadio = screen.getByRole('radio', { name: /Original World/ });
+    expect(originalRadio).toBeChecked();
+  });
+
+  test('displays helpful description when existing setting field is shown', () => {
+    render(
+      <BasicInfoStep
+        worldData={{ ...mockWorldData, relationship: 'set_in' }}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.getByText(/Enter the fictional universe or real setting where your world exists/)).toBeInTheDocument();
+  });
+
+  test('updates existing setting field when world type is selected', () => {
+    render(
+      <BasicInfoStep
+        worldData={{ ...mockWorldData, relationship: 'based_on' }}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    // Add setting name
+    fireEvent.change(screen.getByTestId('world-reference-input'), {
+      target: { value: 'Victorian London' },
+    });
+    expect(mockOnUpdate).toHaveBeenCalledWith({
+      ...mockWorldData,
+      relationship: 'based_on',
+      reference: 'Victorian London',
+    });
   });
 });

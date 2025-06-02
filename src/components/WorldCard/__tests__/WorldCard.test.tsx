@@ -121,4 +121,58 @@ describe('WorldCard', () => {
     // Verify navigation to edit page
     expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/edit`);
   });
+
+  // Test for world type badges
+  test('displays correct world type badges', () => {
+    const mockOnSelect = jest.fn();
+    const mockOnDelete = jest.fn();
+
+    // Test "Set In" world
+    const setInWorld = createMockWorld({
+      name: 'Star Wars Adventure',
+      reference: 'Star Wars',
+      relationship: 'set_in'
+    });
+    const { rerender } = render(
+      <WorldCard 
+        world={setInWorld} 
+        onSelect={mockOnSelect} 
+        onDelete={mockOnDelete}
+      />
+    );
+    expect(screen.getByText('🌍 Set in Star Wars')).toBeInTheDocument();
+    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-purple-100', 'text-purple-800');
+
+    // Test "Based On" world
+    const basedOnWorld = createMockWorld({
+      name: 'Fantasy Adventure',
+      reference: 'Lord of the Rings',
+      relationship: 'based_on'
+    });
+    rerender(
+      <WorldCard 
+        world={basedOnWorld} 
+        onSelect={mockOnSelect} 
+        onDelete={mockOnDelete}
+      />
+    );
+    expect(screen.getByText('✨ Inspired by Lord of the Rings')).toBeInTheDocument();
+    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-green-100', 'text-green-800');
+
+    // Test Original world (no reference/relationship)
+    const originalWorld = createMockWorld({
+      name: 'Original World',
+      reference: undefined,
+      relationship: undefined
+    });
+    rerender(
+      <WorldCard 
+        world={originalWorld} 
+        onSelect={mockOnSelect} 
+        onDelete={mockOnDelete}
+      />
+    );
+    expect(screen.getByText('⚡ Original World')).toBeInTheDocument();
+    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-blue-100', 'text-blue-800');
+  });
 });

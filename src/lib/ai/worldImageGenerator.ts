@@ -94,13 +94,13 @@ export class WorldImageGenerator {
         };
       }
       
-      // Make the API call through our existing portrait generation endpoint
-      const response = await fetch('/api/generate-portrait', {
+      // Make the API call through our dedicated world image generation endpoint
+      const response = await fetch('/api/generate-world-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ world }),
       });
 
       if (!response.ok) {
@@ -111,10 +111,10 @@ export class WorldImageGenerator {
       const data = await response.json();
       
       return {
-        type: 'ai-generated',
-        url: data.image,
+        type: data.aiGenerated ? 'ai-generated' : 'placeholder',
+        url: data.imageUrl,
         generatedAt: new Date().toISOString(),
-        prompt: prompt
+        prompt: data.prompt || prompt
       };
     } catch (error) {
       console.error('World image generation error:', error);

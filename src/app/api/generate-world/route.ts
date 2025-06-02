@@ -1,34 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateWorld } from '@/lib/ai/worldGenerator';
+import { generateWorld } from '@/lib/generators/worldGenerator';
+import Logger from '@/lib/utils/logger';
+
+const logger = new Logger('API');
 
 interface GenerateWorldRequest {
-  worldReference: string;
-  existingNames: string[];
+  worldReference?: string;
+  worldRelationship?: 'based_on' | 'set_in';
   suggestedName?: string;
+  existingNames?: string[];
 }
 
 export async function POST(request: NextRequest) {
   try {
+    logger.debug('generate-world API', 'Request received');
     const body = await request.json() as GenerateWorldRequest;
+    logger.debug('generate-world API', 'Request body parsed:', JSON.stringify(body));
     
-    if (!body.worldReference?.trim()) {
+    if (body.worldRelationship && !body.worldReference?.trim()) {
+      logger.debug('generate-world API', 'Validation failed: relationship without reference');
       return NextResponse.json(
-        { error: 'World reference is required' },
+        { error: 'Existing setting is required when world type is selected' },
         { status: 400 }
       );
     }
 
-    const generatedData = await generateWorld(
-      body.worldReference,
-      body.existingNames || [],
-      body.suggestedName
-    );
+    logger.debug('generate-world API', 'Generating world for reference:', body.worldReference);
 
-    return NextResponse.json(generatedData);
+    // Generate the world using the generator
+    const generatedWorld = await generateWorld({
+      method: 'ai',
+      reference: body.worldReference,
+      relationship: body.worldRelationship || 'based_on',
+      existingNames: body.existingNames,
+      suggestedName: body.suggestedName
+    });
+    
+    logger.debug('generate-world API', 'World generated:', generatedWorld.name);
+
+    return NextResponse.json(generatedWorld);
+
   } catch (error) {
-    console.error('World generation failed:', error);
+    logger.error('generate-world API', 'World generation failed:', error);
+    
     return NextResponse.json(
-      { error: 'Failed to generate world configuration. Please try again.' },
+      { 
+        error: 'Failed to generate world',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

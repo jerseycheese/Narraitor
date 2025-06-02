@@ -69,6 +69,90 @@ export default function BasicInfoStep({
             testId="world-genre-select"
           />
         </WizardFormGroup>
+
+        <WizardFormGroup label="World Type" error={combinedErrors.relationship}>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <input
+                type="radio"
+                id="relationship-none"
+                name="relationship"
+                value=""
+                checked={!worldData.relationship}
+                onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
+                className="mt-1 text-blue-600 focus:ring-blue-500"
+              />
+              <div>
+                <label htmlFor="relationship-none" className="text-sm font-medium text-gray-900">
+                  Original World
+                </label>
+                <p className="text-sm text-gray-600">
+                  Create a completely original world from your imagination
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <input
+                type="radio"
+                id="relationship-based-on"
+                name="relationship"
+                value="based_on"
+                checked={worldData.relationship === 'based_on'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'based_on' })}
+                className="mt-1 text-blue-600 focus:ring-blue-500"
+                data-testid="relationship-based-on-radio"
+              />
+              <div>
+                <label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-900">
+                  Inspired By
+                </label>
+                <p className="text-sm text-gray-600">
+                  Create an original world inspired by an existing fictional universe or real setting
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <input
+                type="radio"
+                id="relationship-set-in"
+                name="relationship"
+                value="set_in"
+                checked={worldData.relationship === 'set_in'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'set_in' })}
+                className="mt-1 text-blue-600 focus:ring-blue-500"
+                data-testid="relationship-set-in-radio"
+              />
+              <div>
+                <label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-900">
+                  Set Within
+                </label>
+                <p className="text-sm text-gray-600">
+                  Place your world directly within an existing fictional universe or real setting
+                </p>
+              </div>
+            </div>
+          </div>
+        </WizardFormGroup>
+
+        {worldData.relationship && (
+          <WizardFormGroup label="Existing Setting" error={combinedErrors.reference} required>
+            <WizardTextField
+              value={worldData.reference || ''}
+              onChange={(value) => onUpdate({ ...worldData, reference: value })}
+              placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York"
+              error={combinedErrors.reference}
+              testId="world-reference-input"
+            />
+            <div className="text-sm text-gray-500 mt-1">
+              {worldData.relationship === 'set_in' 
+                ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
+                : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
+              }
+            </div>
+          </WizardFormGroup>
+        )}
       </WizardFormSection>
     </div>
   );
