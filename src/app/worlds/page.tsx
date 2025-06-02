@@ -242,7 +242,7 @@ export default function WorldsPage() {
                           Original World
                         </label>
                         <p className="text-sm text-gray-600">
-                          Create a completely original world from your imagination
+                          Generate a completely original world with unique settings and themes
                         </p>
                       </div>
                     </div>
@@ -263,7 +263,7 @@ export default function WorldsPage() {
                           Inspired By
                         </label>
                         <p className="text-sm text-gray-600">
-                          Create an original world inspired by an existing fictional universe or real setting
+                          Generate an original world inspired by an existing fictional universe or real setting
                         </p>
                       </div>
                     </div>
@@ -284,7 +284,7 @@ export default function WorldsPage() {
                           Set Within
                         </label>
                         <p className="text-sm text-gray-600">
-                          Place your world directly within an existing fictional universe or real setting
+                          Generate a world directly within an existing fictional universe or real setting
                         </p>
                       </div>
                     </div>
