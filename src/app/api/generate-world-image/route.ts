@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const imageGenerator = new WorldImageGenerator(aiClient);
     const worldImage = await imageGenerator.generateWorldImage(body.world);
 
-    return NextResponse.json({ imageUrl: worldImage });
+    return NextResponse.json({ imageUrl: worldImage.url });
   } catch (error) {
     console.error('World image generation failed:', error);
     return NextResponse.json(
