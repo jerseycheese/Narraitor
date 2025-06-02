@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     
     if (body.worldRelationship && !body.worldReference?.trim()) {
       return NextResponse.json(
-        { error: 'Setting or time period is required when relationship is selected' },
+        { error: 'Existing setting is required when world type is selected' },
         { status: 400 }
       );
     }

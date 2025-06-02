@@ -210,7 +210,7 @@ describe('BasicInfoStep', () => {
     expect(screen.getByTestId('world-name-input')).toHaveValue('Test World');
   });
 
-  test('shows setting field when relationship is selected', () => {
+  test('shows existing setting field when world type is selected', () => {
     render(
       <BasicInfoStep
         worldData={{ ...mockWorldData, relationship: 'based_on' }}
@@ -222,7 +222,7 @@ describe('BasicInfoStep', () => {
     expect(screen.getByTestId('world-reference-input')).toBeInTheDocument();
   });
 
-  test('hides setting field when no relationship selected', () => {
+  test('hides existing setting field when original world is selected', () => {
     render(
       <BasicInfoStep
         worldData={mockWorldData}
@@ -234,7 +234,7 @@ describe('BasicInfoStep', () => {
     expect(screen.queryByTestId('world-reference-input')).not.toBeInTheDocument();
   });
 
-  test('updates relationship when radio button is selected', () => {
+  test('updates world type when radio button is selected', () => {
     render(
       <BasicInfoStep
         worldData={mockWorldData}
@@ -243,7 +243,7 @@ describe('BasicInfoStep', () => {
       />
     );
 
-    // Select "based_on" relationship
+    // Select "inspired by" world type
     fireEvent.click(screen.getByTestId('relationship-based-on-radio'));
     expect(mockOnUpdate).toHaveBeenCalledWith({
       ...mockWorldData,
@@ -251,7 +251,7 @@ describe('BasicInfoStep', () => {
     });
   });
 
-  test('no relationship is selected by default', () => {
+  test('original world is selected by default', () => {
     render(
       <BasicInfoStep
         worldData={mockWorldData}
@@ -264,7 +264,7 @@ describe('BasicInfoStep', () => {
     expect(originalRadio).toBeChecked();
   });
 
-  test('displays helpful description when setting field is shown', () => {
+  test('displays helpful description when existing setting field is shown', () => {
     render(
       <BasicInfoStep
         worldData={{ ...mockWorldData, relationship: 'set_in' }}
@@ -273,10 +273,10 @@ describe('BasicInfoStep', () => {
       />
     );
 
-    expect(screen.getByText(/Enter the fictional universe or historical period your world exists within/)).toBeInTheDocument();
+    expect(screen.getByText(/Enter the fictional universe or real setting where your world exists/)).toBeInTheDocument();
   });
 
-  test('updates setting field when relationship is selected', () => {
+  test('updates existing setting field when world type is selected', () => {
     render(
       <BasicInfoStep
         worldData={{ ...mockWorldData, relationship: 'based_on' }}

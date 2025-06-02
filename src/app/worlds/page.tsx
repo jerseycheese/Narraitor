@@ -46,7 +46,7 @@ export default function WorldsPage() {
 
   const handleGenerateWorld = async () => {
     if (worldRelationship && !worldReference.trim()) {
-      setError('Please enter a setting or time period');
+      setError('Please enter an existing setting');
       return;
     }
 
@@ -220,10 +220,10 @@ export default function WorldsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
-                    World Inspiration
+                    World Type
                   </label>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
                       <input
                         type="radio"
                         id="generate-relationship-none"
@@ -234,15 +234,20 @@ export default function WorldsPage() {
                           setWorldRelationship(undefined);
                           setWorldReference('');
                         }}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
                         disabled={isGenerating}
                       />
-                      <label htmlFor="generate-relationship-none" className="text-sm font-medium text-gray-700">
-                        Original World - Create a completely original world
-                      </label>
+                      <div>
+                        <label htmlFor="generate-relationship-none" className="text-sm font-medium text-gray-900">
+                          Original World
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Create a completely original world from your imagination
+                        </p>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-start space-x-3">
                       <input
                         type="radio"
                         id="generate-relationship-based-on"
@@ -250,15 +255,20 @@ export default function WorldsPage() {
                         value="based_on"
                         checked={worldRelationship === 'based_on'}
                         onChange={() => setWorldRelationship('based_on')}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
                         disabled={isGenerating}
                       />
-                      <label htmlFor="generate-relationship-based-on" className="text-sm font-medium text-gray-700">
-                        Based On - Original world inspired by a setting or time period
-                      </label>
+                      <div>
+                        <label htmlFor="generate-relationship-based-on" className="text-sm font-medium text-gray-900">
+                          Inspired By
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Create an original world inspired by an existing fictional universe or real setting
+                        </p>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-start space-x-3">
                       <input
                         type="radio"
                         id="generate-relationship-set-in"
@@ -266,12 +276,17 @@ export default function WorldsPage() {
                         value="set_in"
                         checked={worldRelationship === 'set_in'}
                         onChange={() => setWorldRelationship('set_in')}
-                        className="text-purple-600 focus:ring-purple-500"
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
                         disabled={isGenerating}
                       />
-                      <label htmlFor="generate-relationship-set-in" className="text-sm font-medium text-gray-700">
-                        Set In - World exists within an established setting or time period
-                      </label>
+                      <div>
+                        <label htmlFor="generate-relationship-set-in" className="text-sm font-medium text-gray-900">
+                          Set Within
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Place your world directly within an existing fictional universe or real setting
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -279,20 +294,20 @@ export default function WorldsPage() {
                 {worldRelationship && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Setting or Time Period <span className="text-red-500">*</span>
+                      Existing Setting <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={worldReference}
                       onChange={(e) => setWorldReference(e.target.value)}
-                      placeholder="e.g., Star Wars, Victorian London, The Clinton Administration, Beatlemania..."
+                      placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       disabled={isGenerating}
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       {worldRelationship === 'set_in' 
-                        ? 'Enter the fictional universe or historical period your world exists within. Characters will be from this setting.'
-                        : 'Enter the fictional universe or historical period that inspires your world. Your world will have original characters and locations.'
+                        ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
+                        : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
                       }
                     </p>
                   </div>
