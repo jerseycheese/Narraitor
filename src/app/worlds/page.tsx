@@ -102,9 +102,12 @@ export default function WorldsPage() {
         skills,
         settings: generatedData.settings
       });
+      
+      console.log('[World Creation] Created world with ID:', worldId);
 
       // Now generate the world image
       setGeneratingStatus('Generating world image...');
+      console.log('[World Creation] Starting image generation...');
       
       try {
         // Get the created world to generate image for it
@@ -122,16 +125,24 @@ export default function WorldsPage() {
 
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
+          console.log('[World Creation] Image API response:', imageData);
           const worldImage: WorldImage = {
             type: 'ai-generated' as const,
             url: imageData.imageUrl,
             generatedAt: new Date().toISOString()
           };
+          console.log('[World Creation] Created WorldImage object:', worldImage);
         
           // Update the world with the generated image
           worldStore.getState().updateWorld(worldId, {
             image: worldImage
           });
+          
+          // Verify the world was updated
+          const updatedWorld = worldStore.getState().worlds[worldId];
+          console.log('[World Creation] World after image update:', updatedWorld?.image);
+        } else {
+          console.error('[World Creation] Image generation failed:', imageResponse.status, imageResponse.statusText);
         }
       } catch (imageError) {
         console.error('Failed to generate world image:', imageError);
