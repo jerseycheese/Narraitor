@@ -3,6 +3,7 @@ import { generateWorld } from '@/lib/ai/worldGenerator';
 
 interface GenerateWorldRequest {
   worldReference: string;
+  worldRelationship: 'based_on' | 'set_in';
   existingNames: string[];
   suggestedName?: string;
 }
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     const generatedData = await generateWorld(
       body.worldReference,
+      body.worldRelationship,
       body.existingNames || [],
       body.suggestedName
     );

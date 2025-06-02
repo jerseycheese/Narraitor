@@ -15,6 +15,7 @@ export default function WorldsPage() {
   const [generatingStatus, setGeneratingStatus] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldReference, setWorldReference] = useState('');
+  const [worldRelationship, setWorldRelationship] = useState<'based_on' | 'set_in'>('set_in');
   const [worldName, setWorldName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +30,7 @@ export default function WorldsPage() {
         if (e.key === 'Escape' && !isGenerating) {
           setShowPrompt(false);
           setWorldReference('');
+          setWorldRelationship('set_in');
           setWorldName('');
           setError(null);
         }
@@ -66,6 +68,7 @@ export default function WorldsPage() {
         },
         body: JSON.stringify({
           worldReference,
+          worldRelationship,
           existingNames,
           suggestedName: worldName || undefined
         }),
@@ -229,19 +232,61 @@ export default function WorldsPage() {
                   </p>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    World Relationship <span className="text-red-500">*</span>
+                  </label>
+                  <div className="space-y-3 mb-4">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="worldRelationship"
+                        value="set_in"
+                        checked={worldRelationship === 'set_in'}
+                        onChange={(e) => setWorldRelationship(e.target.value as 'set_in')}
+                        disabled={isGenerating}
+                        className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">Set in existing world</div>
+                        <div className="text-sm text-gray-600">Create a world that takes place within the existing universe (e.g., a region of Middle-earth, a planet in the Star Wars galaxy)</div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="worldRelationship"
+                        value="based_on"
+                        checked={worldRelationship === 'based_on'}
+                        onChange={(e) => setWorldRelationship(e.target.value as 'based_on')}
+                        disabled={isGenerating}
+                        className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      />
+                      <div>
+                        <div className="font-medium text-gray-900">Inspired by existing world</div>
+                        <div className="text-sm text-gray-600">Create an original world that captures the themes and style (e.g., fantasy like Lord of the Rings, space opera like Star Wars)</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Based On <span className="text-red-500">*</span>
+                    {worldRelationship === 'set_in' ? 'Universe/Setting' : 'Inspiration'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={worldReference}
                     onChange={(e) => setWorldReference(e.target.value)}
-                    placeholder="e.g., Middle Earth, Star Wars, Victorian London..."
+                    placeholder={worldRelationship === 'set_in' 
+                      ? "e.g., Middle-earth, Star Wars galaxy, Westeros..." 
+                      : "e.g., Lord of the Rings, Star Wars, Game of Thrones..."}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Enter a fictional or non-fictional world to base your new world on
+                    {worldRelationship === 'set_in' 
+                      ? 'Enter the specific universe or setting where your world will be located'
+                      : 'Enter a fictional or non-fictional world to inspire your new world'
+                    }
                   </p>
                 </div>
               </div>
@@ -259,6 +304,7 @@ export default function WorldsPage() {
                   onClick={() => {
                     setShowPrompt(false);
                     setWorldReference('');
+                    setWorldRelationship('set_in');
                     setWorldName('');
                     setError(null);
                   }}
