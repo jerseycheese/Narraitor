@@ -91,9 +91,12 @@ export const TestDataGeneratorSection: React.FC = () => {
       for (let i = 0; i < 5; i++) {
         console.log(`[DevTools] Generating test world ${i + 1}/5 with TV/movie themes...`);
         
-        // Pick a random TV/movie universe and use API to generate world
+        // Pick a random TV/movie universe and randomly choose relationship type
         const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+        const randomRelationship = Math.random() < 0.5 ? 'set_in' : 'based_on';
         const existingNames = Object.values(worlds).map(w => w.name);
+        
+        console.log(`[DevTools] Generating world ${randomRelationship} "${randomReference}"`);
         
         const response = await fetch('/api/generate-world', {
           method: 'POST',
@@ -102,7 +105,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           },
           body: JSON.stringify({
             worldReference: randomReference,
-            worldRelationship: 'based_on', // Use inspired by for test worlds
+            worldRelationship: randomRelationship, // Mix of set_in and based_on
             existingNames
           }),
         });
