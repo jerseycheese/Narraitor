@@ -126,12 +126,14 @@ export default function WorldsPage() {
 
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
-          const worldImage = imageData.imageUrl;
-        
-          // Update the world with the generated image
-          worldStore.getState().updateWorld(worldId, {
-            image: worldImage
-          });
+          
+          // Only update with image if we actually got one
+          if (imageData.imageUrl) {
+            worldStore.getState().updateWorld(worldId, {
+              image: imageData.imageUrl
+            });
+          }
+          // If no image was generated (placeholder mode), just continue without image
         }
       } catch (imageError) {
         console.error('Failed to generate world image:', imageError);
