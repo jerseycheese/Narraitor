@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import { generateCharacter, type GeneratedCharacterData } from '@/lib/ai/characterGenerator';
+import type { GeneratedCharacterData } from '@/lib/generators/characterGenerator';
 
 export default function CharacterGenerationTestPage() {
   const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
@@ -33,12 +33,27 @@ export default function CharacterGenerationTestPage() {
         .filter(c => c.worldId === selectedWorldId)
         .map(c => c.name);
       
-      const result = await generateCharacter(
-        world,
-        existingNames,
-        generationType === 'specific' ? suggestedName : undefined,
-        generationType
-      );
+      // Use the character generation API route
+      const response = await fetch('/api/generate-character', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId: selectedWorldId,
+          characterType: generationType,
+          existingNames: existingNames,
+          suggestedName: generationType === 'specific' ? suggestedName : undefined,
+          world: world // Pass the world data to the API
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate character');
+      }
+
+      const result: GeneratedCharacterData = await response.json();
       
       setGeneratedCharacter(result);
     } catch (err) {

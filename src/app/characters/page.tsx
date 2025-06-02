@@ -6,10 +6,8 @@ import Link from 'next/link';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { generateCharacter, GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
 
@@ -63,55 +61,34 @@ async function generateCharacterPortrait(
   updateCharacter: (id: string, updates: CharacterPortraitUpdate) => void
 ) {
   try {
-    const aiClient = createAIClient();
-    const portraitGenerator = new PortraitGenerator(aiClient);
-    
-    // Create a Character-like object for portrait generation
-    const characterForPortrait = {
-      id: characterId,
-      name: generatedData.name,
-      description: generatedData.background.description,
-      worldId: currentWorldId,
-      background: {
-        history: generatedData.background.description,
-        personality: generatedData.background.personality,
-        physicalDescription: generatedData.background.physicalDescription || '',
-        goals: [],
-        fears: [],
-        relationships: []
+    // Use the portrait generation API route
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      attributes: generatedData.attributes.map((attr) => ({
-        attributeId: attr.id,
-        value: attr.value
-      })),
-      skills: generatedData.skills.map((skill) => ({
-        skillId: skill.id,
-        level: skill.level,
-        experience: 0,
-        isActive: true
-      })),
-      inventory: {
-        characterId: characterId,
-        items: [],
-        capacity: 100,
-        categories: []
-      },
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-        location: currentWorld.name
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-      worldTheme: currentWorld.theme
+      body: JSON.stringify({
+        character: {
+          name: generatedData.name,
+          background: generatedData.background.description,
+          physicalDescription: generatedData.background.physicalDescription || ''
+        },
+        worldTheme: currentWorld.theme
+      }),
     });
-    
-    // Update character with generated portrait
-    updateCharacter(characterId, { portrait });
+
+    if (response.ok) {
+      const portrait = await response.json();
+      // Update character with generated portrait
+      updateCharacter(characterId, { 
+        portrait: {
+          type: 'ai-generated',
+          url: portrait.image,
+          generatedAt: new Date().toISOString(),
+          prompt: portrait.prompt
+        }
+      });
+    }
   } catch (portraitError) {
     console.error('Failed to generate portrait:', portraitError);
     // Continue without portrait - character already has placeholder
@@ -163,12 +140,27 @@ export default function CharactersPage() {
       // Generate character data based on type
       const nameToUse = generationType === 'specific' ? characterName : undefined;
       
-      const generatedData = await generateCharacter(
-        currentWorld, 
-        existingNames, 
-        nameToUse,
-        generationType
-      );
+      // Use the character generation API route
+      const response = await fetch('/api/generate-character', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId: effectiveWorldId,
+          characterType: generationType,
+          existingNames: existingNames,
+          suggestedName: nameToUse,
+          world: currentWorld // Pass the world data to the API
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate character');
+      }
+
+      const generatedData: GeneratedCharacterData = await response.json();
       
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({
