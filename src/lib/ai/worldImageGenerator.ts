@@ -2,6 +2,8 @@
 
 import { World, WorldImage } from '../../types/world.types';
 import { AIClient } from './types';
+import { GeminiClient } from './geminiClient';
+import { getDefaultConfig } from './config';
 
 export class WorldImageGenerator {
   constructor(private aiClient: AIClient) {}
@@ -94,7 +96,30 @@ export class WorldImageGenerator {
         };
       }
       
-      // Use the AI client's generateImage method
+      // For server-side image generation, use GeminiClient directly to avoid circular API calls
+      if (typeof window === 'undefined') {
+        // Server-side: use direct Gemini client
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey || apiKey === 'MOCK_API_KEY') {
+          throw new Error('GEMINI_API_KEY not configured for server-side image generation');
+        }
+        
+        const config = getDefaultConfig();
+        config.apiKey = apiKey;
+        const directClient = new GeminiClient(config);
+        
+        console.log('🔥 World Image Generator: Using direct Gemini client for server-side generation');
+        const response = await directClient.generateImage(prompt);
+        
+        return {
+          type: 'ai-generated',
+          url: response.image,
+          generatedAt: new Date().toISOString(),
+          prompt: response.prompt
+        };
+      }
+      
+      // Client-side: use the provided AI client
       if (!this.aiClient.generateImage) {
         throw new Error('AI client does not support image generation');
       }

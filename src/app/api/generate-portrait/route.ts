@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
             ]
           }],
           generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"]
+            responseModalities: ["IMAGE", "TEXT"]
           }
         })
       }
