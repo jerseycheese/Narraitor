@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
-import { getDefaultConfig } from '@/lib/ai/config';
-import { GeminiClient } from '@/lib/ai/geminiClient';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { worldId, characterType, existingNames, suggestedName, world } = body;
+    const { characterType, existingNames, suggestedName, world } = body;
 
     if (!world) {
       return NextResponse.json(
@@ -15,10 +13,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use the AI character generator with proper server-side client
-    const config = getDefaultConfig();
-    const client = new GeminiClient(config);
-    
     // Generate character using the existing function
     const generatedCharacter = await generateCharacter(
       world,
