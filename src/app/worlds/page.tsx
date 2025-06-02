@@ -15,7 +15,7 @@ export default function WorldsPage() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldReference, setWorldReference] = useState('');
   const [worldName, setWorldName] = useState('');
-  const [worldRelationship, setWorldRelationship] = useState<'set_in' | 'based_on'>('based_on');
+  const [worldRelationship, setWorldRelationship] = useState<'set_in' | 'based_on' | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   // Handle focus when modal opens/closes
@@ -30,7 +30,7 @@ export default function WorldsPage() {
           setShowPrompt(false);
           setWorldReference('');
           setWorldName('');
-          setWorldRelationship('based_on');
+          setWorldRelationship(undefined);
           setError(null);
         }
       };
@@ -45,8 +45,8 @@ export default function WorldsPage() {
   };
 
   const handleGenerateWorld = async () => {
-    if (!worldReference.trim()) {
-      setError('Please enter a world reference');
+    if (worldRelationship && !worldReference.trim()) {
+      setError('Please enter a setting or time period');
       return;
     }
 
@@ -66,8 +66,8 @@ export default function WorldsPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          worldReference,
-          worldRelationship,
+          worldReference: worldReference || undefined,
+          worldRelationship: worldRelationship || undefined,
           existingNames,
           suggestedName: worldName || undefined
         }),
@@ -100,8 +100,8 @@ export default function WorldsPage() {
         name: generatedData.name,
         theme: generatedData.theme,
         description: generatedData.description,
-        reference: worldReference,
-        relationship: worldRelationship,
+        reference: worldReference || undefined,
+        relationship: worldRelationship || undefined,
         attributes,
         skills,
         settings: generatedData.settings
@@ -145,7 +145,7 @@ export default function WorldsPage() {
       setShowPrompt(false);
       setWorldReference('');
       setWorldName('');
-      setWorldRelationship('based_on');
+      setWorldRelationship(undefined);
       setIsGenerating(false);
       
       // Stay on worlds page to see the new world
@@ -219,40 +219,80 @@ export default function WorldsPage() {
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Reference <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    World Inspiration
                   </label>
-                  <input
-                    type="text"
-                    value={worldReference}
-                    onChange={(e) => setWorldReference(e.target.value)}
-                    placeholder="e.g., Lord of the Rings, Star Wars, The Office..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    disabled={isGenerating}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter a fictional universe, TV show, movie, or book that your world relates to
-                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="generate-relationship-none"
+                        name="generate-relationship"
+                        value=""
+                        checked={!worldRelationship}
+                        onChange={() => {
+                          setWorldRelationship(undefined);
+                          setWorldReference('');
+                        }}
+                        className="text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <label htmlFor="generate-relationship-none" className="text-sm font-medium text-gray-700">
+                        Original World - Create a completely original world
+                      </label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="generate-relationship-based-on"
+                        name="generate-relationship"
+                        value="based_on"
+                        checked={worldRelationship === 'based_on'}
+                        onChange={() => setWorldRelationship('based_on')}
+                        className="text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <label htmlFor="generate-relationship-based-on" className="text-sm font-medium text-gray-700">
+                        Based On - Original world inspired by a setting or time period
+                      </label>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        id="generate-relationship-set-in"
+                        name="generate-relationship"
+                        value="set_in"
+                        checked={worldRelationship === 'set_in'}
+                        onChange={() => setWorldRelationship('set_in')}
+                        className="text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <label htmlFor="generate-relationship-set-in" className="text-sm font-medium text-gray-700">
+                        Set In - World exists within an established setting or time period
+                      </label>
+                    </div>
+                  </div>
                 </div>
                 
-                {worldReference && (
+                {worldRelationship && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Relationship to Reference <span className="text-red-500">*</span>
+                      Setting or Time Period <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={worldRelationship}
-                      onChange={(e) => setWorldRelationship(e.target.value as 'set_in' | 'based_on')}
+                    <input
+                      type="text"
+                      value={worldReference}
+                      onChange={(e) => setWorldReference(e.target.value)}
+                      placeholder="e.g., Star Wars, Victorian London, The Clinton Administration, Beatlemania..."
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       disabled={isGenerating}
-                    >
-                      <option value="based_on">Based On - Original world inspired by the reference</option>
-                      <option value="set_in">Set In - Characters and locations from the original universe</option>
-                    </select>
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       {worldRelationship === 'set_in' 
-                        ? 'Your world exists within the reference universe. Characters will be from that universe.'
-                        : 'Your world is inspired by the reference but has original characters and locations.'
+                        ? 'Enter the fictional universe or historical period your world exists within. Characters will be from this setting.'
+                        : 'Enter the fictional universe or historical period that inspires your world. Your world will have original characters and locations.'
                       }
                     </p>
                   </div>
@@ -273,7 +313,7 @@ export default function WorldsPage() {
                     setShowPrompt(false);
                     setWorldReference('');
                     setWorldName('');
-                    setWorldRelationship('based_on');
+                    setWorldRelationship(undefined);
                     setError(null);
                   }}
                   disabled={isGenerating}
@@ -283,7 +323,7 @@ export default function WorldsPage() {
                 </button>
                 <button
                   onClick={handleGenerateWorld}
-                  disabled={isGenerating || !worldReference.trim()}
+                  disabled={isGenerating || (worldRelationship && !worldReference.trim())}
                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? 'Generating...' : 'Generate'}

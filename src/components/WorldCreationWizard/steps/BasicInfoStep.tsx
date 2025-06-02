@@ -70,34 +70,70 @@ export default function BasicInfoStep({
           />
         </WizardFormGroup>
 
-        <WizardFormGroup label="Reference (Optional)" error={combinedErrors.reference}>
-          <WizardTextField
-            value={worldData.reference || ''}
-            onChange={(value) => onUpdate({ ...worldData, reference: value })}
-            placeholder="e.g., Lord of the Rings, Star Wars, The Office"
-            error={combinedErrors.reference}
-            testId="world-reference-input"
-          />
-          <div className="text-sm text-gray-500 mt-1">
-            Enter a fictional universe, TV show, movie, or book that your world relates to.
+        <WizardFormGroup label="World Inspiration (Optional)" error={combinedErrors.relationship}>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                id="relationship-none"
+                name="relationship"
+                value=""
+                checked={!worldData.relationship}
+                onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
+                className="text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="relationship-none" className="text-sm font-medium text-gray-700">
+                Original World - Create a completely original world
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                id="relationship-based-on"
+                name="relationship"
+                value="based_on"
+                checked={worldData.relationship === 'based_on'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'based_on' })}
+                className="text-blue-600 focus:ring-blue-500"
+                data-testid="relationship-based-on-radio"
+              />
+              <label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-700">
+                Based On - Original world inspired by a setting or time period
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <input
+                type="radio"
+                id="relationship-set-in"
+                name="relationship"
+                value="set_in"
+                checked={worldData.relationship === 'set_in'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'set_in' })}
+                className="text-blue-600 focus:ring-blue-500"
+                data-testid="relationship-set-in-radio"
+              />
+              <label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-700">
+                Set In - World exists within an established setting or time period
+              </label>
+            </div>
           </div>
         </WizardFormGroup>
 
-        {worldData.reference && (
-          <WizardFormGroup label="Relationship to Reference" required>
-            <WizardSelect
-              value={worldData.relationship || 'based_on'}
-              onChange={(value) => onUpdate({ ...worldData, relationship: value as 'set_in' | 'based_on' })}
-              options={[
-                { value: 'set_in', label: 'Set In - Characters and locations from the original universe' },
-                { value: 'based_on', label: 'Based On - Original world inspired by the reference' }
-              ]}
-              testId="world-relationship-select"
+        {worldData.relationship && (
+          <WizardFormGroup label="Setting or Time Period" error={combinedErrors.reference} required>
+            <WizardTextField
+              value={worldData.reference || ''}
+              onChange={(value) => onUpdate({ ...worldData, reference: value })}
+              placeholder="e.g., Star Wars, Victorian London, The Clinton Administration, Beatlemania"
+              error={combinedErrors.reference}
+              testId="world-reference-input"
             />
             <div className="text-sm text-gray-500 mt-1">
               {worldData.relationship === 'set_in' 
-                ? 'Your world exists within the reference universe. Characters will be from that universe.'
-                : 'Your world is inspired by the reference but has original characters and locations.'
+                ? 'Enter the fictional universe or historical period your world exists within. Characters will be from this setting.'
+                : 'Enter the fictional universe or historical period that inspires your world. Your world will have original characters and locations.'
               }
             </div>
           </WizardFormGroup>

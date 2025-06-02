@@ -5,7 +5,7 @@ import Logger from '@/lib/utils/logger';
 const logger = new Logger('API');
 
 interface GenerateWorldRequest {
-  worldReference: string;
+  worldReference?: string;
   worldRelationship?: 'based_on' | 'set_in';
   suggestedName?: string;
   existingNames?: string[];
@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as GenerateWorldRequest;
     
-    if (!body.worldReference?.trim()) {
+    if (body.worldRelationship && !body.worldReference?.trim()) {
       return NextResponse.json(
-        { error: 'World reference is required' },
+        { error: 'Setting or time period is required when relationship is selected' },
         { status: 400 }
       );
     }

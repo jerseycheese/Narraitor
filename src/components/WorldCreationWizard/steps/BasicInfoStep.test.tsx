@@ -29,7 +29,8 @@ describe('BasicInfoStep', () => {
     expect(screen.getByTestId('world-name-input')).toBeInTheDocument();
     expect(screen.getByTestId('world-description-textarea')).toBeInTheDocument();
     expect(screen.getByTestId('world-genre-select')).toBeInTheDocument();
-    expect(screen.getByTestId('world-reference-input')).toBeInTheDocument();
+    expect(screen.getByTestId('relationship-based-on-radio')).toBeInTheDocument();
+    expect(screen.getByTestId('relationship-set-in-radio')).toBeInTheDocument();
   });
 
   test('displays error for world name when provided', () => {
@@ -209,19 +210,19 @@ describe('BasicInfoStep', () => {
     expect(screen.getByTestId('world-name-input')).toHaveValue('Test World');
   });
 
-  test('shows relationship dropdown when reference is provided', () => {
+  test('shows setting field when relationship is selected', () => {
     render(
       <BasicInfoStep
-        worldData={{ ...mockWorldData, reference: 'Star Wars' }}
+        worldData={{ ...mockWorldData, relationship: 'based_on' }}
         errors={{}}
         onUpdate={mockOnUpdate}
       />
     );
 
-    expect(screen.getByTestId('world-relationship-select')).toBeInTheDocument();
+    expect(screen.getByTestId('world-reference-input')).toBeInTheDocument();
   });
 
-  test('hides relationship dropdown when no reference', () => {
+  test('hides setting field when no relationship selected', () => {
     render(
       <BasicInfoStep
         worldData={mockWorldData}
@@ -230,10 +231,10 @@ describe('BasicInfoStep', () => {
       />
     );
 
-    expect(screen.queryByTestId('world-relationship-select')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('world-reference-input')).not.toBeInTheDocument();
   });
 
-  test('updates reference and relationship fields', () => {
+  test('updates relationship when radio button is selected', () => {
     render(
       <BasicInfoStep
         worldData={mockWorldData}
@@ -242,37 +243,56 @@ describe('BasicInfoStep', () => {
       />
     );
 
-    // Add reference
+    // Select "based_on" relationship
+    fireEvent.click(screen.getByTestId('relationship-based-on-radio'));
+    expect(mockOnUpdate).toHaveBeenCalledWith({
+      ...mockWorldData,
+      relationship: 'based_on',
+    });
+  });
+
+  test('no relationship is selected by default', () => {
+    render(
+      <BasicInfoStep
+        worldData={mockWorldData}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    const originalRadio = screen.getByRole('radio', { name: /Original World/ });
+    expect(originalRadio).toBeChecked();
+  });
+
+  test('displays helpful description when setting field is shown', () => {
+    render(
+      <BasicInfoStep
+        worldData={{ ...mockWorldData, relationship: 'set_in' }}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    expect(screen.getByText(/Enter the fictional universe or historical period your world exists within/)).toBeInTheDocument();
+  });
+
+  test('updates setting field when relationship is selected', () => {
+    render(
+      <BasicInfoStep
+        worldData={{ ...mockWorldData, relationship: 'based_on' }}
+        errors={{}}
+        onUpdate={mockOnUpdate}
+      />
+    );
+
+    // Add setting name
     fireEvent.change(screen.getByTestId('world-reference-input'), {
-      target: { value: 'Lord of the Rings' },
+      target: { value: 'Victorian London' },
     });
     expect(mockOnUpdate).toHaveBeenCalledWith({
       ...mockWorldData,
-      reference: 'Lord of the Rings',
+      relationship: 'based_on',
+      reference: 'Victorian London',
     });
-  });
-
-  test('relationship field defaults to "based_on"', () => {
-    render(
-      <BasicInfoStep
-        worldData={{ ...mockWorldData, reference: 'Star Wars' }}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByTestId('world-relationship-select')).toHaveValue('based_on');
-  });
-
-  test('displays helpful description for relationship types', () => {
-    render(
-      <BasicInfoStep
-        worldData={{ ...mockWorldData, reference: 'Star Wars', relationship: 'set_in' }}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByText(/Your world exists within the reference universe/)).toBeInTheDocument();
   });
 });
