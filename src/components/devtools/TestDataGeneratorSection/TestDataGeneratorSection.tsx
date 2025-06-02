@@ -50,12 +50,12 @@ export const TestDataGeneratorSection: React.FC = () => {
       // Transform the generated data to match the store's expected format
       const worldDataForStore = {
         ...testWorldData,
-        attributes: testWorldData.attributes.map((attr: any) => ({
+        attributes: testWorldData.attributes.map((attr: { name: string; description: string; minValue: number; maxValue: number; defaultValue: number }) => ({
           ...attr,
           id: generateUniqueId('attr'),
           worldId: '' // Will be set by store
         })),
-        skills: testWorldData.skills.map((skill: any) => ({
+        skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
           ...skill,
           id: generateUniqueId('skill'),
           worldId: '' // Will be set by store
@@ -141,12 +141,12 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Transform the generated data to match the store's expected format
         const worldDataForStore = {
           ...testWorldData,
-          attributes: testWorldData.attributes.map((attr: any) => ({
+          attributes: testWorldData.attributes.map((attr: { name: string; description: string; minValue: number; maxValue: number; defaultValue: number }) => ({
             ...attr,
             id: generateUniqueId('attr'),
             worldId: '' // Will be set by store
           })),
-          skills: testWorldData.skills.map((skill: any) => ({
+          skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
             ...skill,
             id: generateUniqueId('skill'),
             worldId: '' // Will be set by store
@@ -522,7 +522,7 @@ export const TestDataGeneratorSection: React.FC = () => {
                     fears: storeCharacter.background.fears,
                     relationships: []
                   },
-                  attributes: storeCharacter.attributes.map((attr: any) => ({
+                  attributes: storeCharacter.attributes.map((attr: { id: string; name: string; baseValue: number }) => ({
                     attributeId: currentWorld.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
                     value: attr.baseValue
                   })),
