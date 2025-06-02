@@ -22,6 +22,8 @@ export interface World extends NamedEntity, TimestampedEntity {
   skills: WorldSkill[];
   settings: WorldSettings;
   image?: WorldImage;
+  universeReference?: string; // The fictional universe this world relates to (e.g., "Star Wars", "Lord of the Rings")
+  universeRelationship?: 'set_in' | 'based_on'; // Whether the world is set within or inspired by the universe
 }
 
 /**

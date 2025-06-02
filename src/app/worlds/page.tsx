@@ -103,7 +103,9 @@ export default function WorldsPage() {
         description: generatedData.description,
         attributes,
         skills,
-        settings: generatedData.settings
+        settings: generatedData.settings,
+        universeReference: worldReference,
+        universeRelationship: worldRelationship
       });
       
       console.log('[World Creation] Created world with ID:', worldId);

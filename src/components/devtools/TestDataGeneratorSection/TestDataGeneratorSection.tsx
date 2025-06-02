@@ -23,9 +23,30 @@ export const TestDataGeneratorSection: React.FC = () => {
   
   const handleGenerateWorld = async () => {
     try {
-      // Use the test world generator which includes TV/movie themes
-      console.log(`[DevTools] Generating test world with TV/movie themes...`);
-      const testWorldData = await generateTestWorld();
+      // Pick a random TV/movie universe and randomly choose relationship type
+      const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+      const randomRelationship = Math.random() < 0.5 ? 'set_in' : 'based_on';
+      const existingNames = Object.values(worlds).map(w => w.name);
+      
+      console.log(`[DevTools] Generating single test world ${randomRelationship} "${randomReference}"`);
+      
+      const response = await fetch('/api/generate-world', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldReference: randomReference,
+          worldRelationship: randomRelationship,
+          existingNames
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate test world via API');
+      }
+      
+      const testWorldData = await response.json();
       
       // Transform the generated data to match the store's expected format
       const worldDataForStore = {
@@ -39,7 +60,9 @@ export const TestDataGeneratorSection: React.FC = () => {
           ...skill,
           id: generateUniqueId('skill'),
           worldId: '' // Will be set by store
-        }))
+        })),
+        universeReference: randomReference,
+        universeRelationship: randomRelationship
       };
       
       const worldId = createWorld(worldDataForStore);
@@ -128,7 +151,9 @@ export const TestDataGeneratorSection: React.FC = () => {
             ...skill,
             id: generateUniqueId('skill'),
             worldId: '' // Will be set by store
-          }))
+          })),
+          universeReference: randomReference,
+          universeRelationship: randomRelationship
         };
         
         const worldId = createWorld(worldDataForStore);

@@ -28,7 +28,7 @@ export const TV_MOVIE_UNIVERSES = [
   'Twin Peaks',
   'Stranger Things',
   'Deadwood',
-  'The Witcher',
+  'The Office',
   'The Walking Dead',
   'Black Mirror',
   'The Matrix',
@@ -38,7 +38,8 @@ export const TV_MOVIE_UNIVERSES = [
   'Dune',
   'The Mandalorian',
   'Breaking Bad',
-  'True Detective'
+  'True Detective',
+  'UHF'
 ];
 
 /**
