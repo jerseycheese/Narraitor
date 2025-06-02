@@ -52,27 +52,57 @@ export async function generateWorld(options: WorldGenerationOptions): Promise<Ge
  * Generate world using AI through secure API
  */
 async function generateWithAI(options: WorldGenerationOptions): Promise<GeneratedWorldData> {
-  // If no reference provided, pick a random TV/movie universe
-  const reference = options.reference || TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+  // Handle different world generation types
+  let prompt: string;
   
-  // Determine if this world should be set in the reference universe or just inspired by it
-  const isSetIn = options.relationship === 'set_in';
-  
-  const prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
+  if (!options.reference && !options.relationship) {
+    // Completely original world
+    prompt = `Generate a complete world configuration for a text-based RPG with a completely original setting.
+
+IMPORTANT: Create a COMPLETELY ORIGINAL world from your imagination. Do not base it on any existing fictional universe, TV show, movie, or book. The world should have:
+- Unique name, geography, and history
+- Original cultures, societies, and conflicts
+- Creative magic systems, technology, or supernatural elements
+- Fresh themes and concepts not directly borrowed from existing media
+- Interesting locations and environments that feel new and engaging`
+  } else {
+    // World with reference (inspired by or set within)
+    const reference = options.reference!;
+    const isSetIn = options.relationship === 'set_in';
+    
+    prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
 ${isSetIn 
   ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, planet, or area that fits within the established ${reference} lore and setting. Use existing ${reference} terminology, species, magic systems, technology, etc. where appropriate.`
   : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore.`
-}
+}`
+  }
 
-${options.suggestedName ? `\nThe world should be named: "${options.suggestedName}"` : ''}
-${options.existingNames?.length ? `\nExisting worlds to avoid duplicating: ${options.existingNames.join(', ')}` : ''}
+  // Add common constraints
+  if (options.suggestedName) {
+    prompt += `\n\nThe world should be named: "${options.suggestedName}"`;
+  }
+  if (options.existingNames?.length) {
+    prompt += `\n\nExisting worlds to avoid duplicating: ${options.existingNames.join(', ')}`;
+  }
 
-Provide a JSON response with this exact structure:
+  // Add JSON structure requirements
+  prompt += `\n\nProvide a JSON response with this exact structure:
 {
-  "name": "${isSetIn ? `A name that fits within the ${reference} universe` : 'A unique name for this world (not just the reference name)'}",
+  "name": "A unique name for this world",
   "theme": "The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)",
-  "description": "A 2-3 sentence description of the world and its unique features. ${isSetIn ? `MUST clearly establish that this is part of the ${reference} universe.` : `MUST mention that this world is inspired by ${reference}.`}",
+  "description": "A 2-3 sentence description of the world and its unique features`;
+  
+  if (options.reference) {
+    const isSetIn = options.relationship === 'set_in';
+    prompt += isSetIn 
+      ? `. MUST clearly establish that this is part of the ${options.reference} universe."`
+      : `. MUST mention that this world is inspired by ${options.reference}."`;
+  } else {
+    prompt += `. MUST be completely original with no references to existing media."`;
+  }
+  
+  prompt += `,
   "attributes": [
     {
       "name": "Attribute Name",
@@ -93,10 +123,15 @@ Provide a JSON response with this exact structure:
 }
 
 Generate 4-6 attributes that make sense for this world setting.
-Generate 6-10 skills that would be relevant in this world.
-Make the world interesting and playable while staying true to the source material.
+Generate 6-10 skills that would be relevant in this world.`;
 
-IMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
+  if (options.reference) {
+    prompt += `\nMake the world interesting and playable while staying true to the source material.`;
+  } else {
+    prompt += `\nMake the world interesting and playable with completely original concepts.`;
+  }
+
+  prompt += `\n\nIMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
 
   try {
     // Import the AI client for server-side usage
