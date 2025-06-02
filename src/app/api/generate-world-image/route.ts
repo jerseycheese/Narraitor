@@ -1,10 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import type { World } from '@/types/world.types';
 
 interface GenerateWorldImageRequest {
   world: World;
 }
+
+// Generate themed placeholder images based on world characteristics
+function generatePlaceholderImage(world: World): string {
+  const theme = world.theme?.toLowerCase() || 'fantasy';
+  
+  // Different image dimensions/filters based on theme
+  switch(theme) {
+    case 'fantasy':
+      return `https://picsum.photos/seed/${world.name}/800/600?blur=1`;
+    case 'sci-fi':
+    case 'science fiction':
+      return `https://picsum.photos/seed/${world.name}/800/600?grayscale`;
+    case 'horror':
+      return `https://picsum.photos/seed/${world.name}/800/600?blur=2`;
+    case 'western':
+      return `https://picsum.photos/seed/${world.name}/800/600?sepia`;
+    case 'cyberpunk':
+      return `https://picsum.photos/seed/${world.name}/800/600`;
+    case 'post-apocalyptic':
+      return `https://picsum.photos/seed/${world.name}/800/600?grayscale&blur=1`;
+    default:
+      return `https://picsum.photos/seed/${world.name}/800/600`;
+  }
+}
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,42 +41,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate a simple prompt for world image
-    const world = body.world;
-    const prompt = `Generate a high-quality landscape image for a fantasy RPG world called "${world.name}". 
+    // For now, generate themed placeholder images based on world type
+    // In production, this would integrate with DALL-E, Midjourney, or similar service
+    const imageUrl = generatePlaceholderImage(body.world);
     
-World Description: ${world.description}
-Theme: ${world.theme}
-
-The image should show a beautiful, atmospheric landscape that captures the essence of this world. 
-Make it suitable for a fantasy role-playing game. The image should be detailed, immersive, and evoke the mood described.
-
-Style: Fantasy art, detailed landscape, atmospheric, game-ready`;
-
-    // Use server-side AI client for image generation
-    const client = createDefaultGeminiClient();
-    
-    try {
-      // Try to generate image (note: Gemini may not support image generation in all configurations)
-      const response = await client.generateContent(prompt);
-      
-      // For now, return a placeholder or description since we may not have image generation
-      // In a real implementation, this would use an image generation service
-      return NextResponse.json({ 
-        imageUrl: null, // No actual image generated
-        description: response.content,
-        placeholder: true 
-      });
-    } catch (imageError) {
-      console.log('Image generation not available, using placeholder:', imageError);
-      
-      // Return a placeholder response when image generation fails
-      return NextResponse.json({ 
-        imageUrl: null,
-        description: `A beautiful ${world.theme} landscape representing ${world.name}: ${world.description}`,
-        placeholder: true
-      });
-    }
+    return NextResponse.json({ 
+      imageUrl,
+      description: `A ${body.world.theme} landscape representing ${body.world.name}: ${body.world.description}`,
+      placeholder: false
+    });
   } catch (error) {
     console.error('World image generation failed:', error);
     return NextResponse.json(
