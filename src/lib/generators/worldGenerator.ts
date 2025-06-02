@@ -21,7 +21,7 @@ export interface WorldGenerationOptions {
 }
 
 // List of TV/movie universes for AI inspiration
-const TV_MOVIE_UNIVERSES = [
+export const TV_MOVIE_UNIVERSES = [
   'Game of Thrones',
   'Lord of the Rings',
   'Star Wars',

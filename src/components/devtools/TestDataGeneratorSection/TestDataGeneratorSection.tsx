@@ -2,8 +2,9 @@ import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import { generateTestWorld } from '@/lib/generators/worldGenerator';
+// Removed direct generateTestWorld import - using API route instead
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
+import { TV_MOVIE_UNIVERSES } from '@/lib/generators/worldGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { WorldImage } from '@/types/world.types';
 // Removed direct AI client imports - using API routes instead
@@ -90,8 +91,27 @@ export const TestDataGeneratorSection: React.FC = () => {
       for (let i = 0; i < 5; i++) {
         console.log(`[DevTools] Generating test world ${i + 1}/5 with TV/movie themes...`);
         
-        // Use the test world generator which includes TV/movie themes
-        const testWorldData = await generateTestWorld();
+        // Pick a random TV/movie universe and use API to generate world
+        const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+        const existingNames = Object.values(worlds).map(w => w.name);
+        
+        const response = await fetch('/api/generate-world', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            worldReference: randomReference,
+            worldRelationship: 'based_on', // Use inspired by for test worlds
+            existingNames
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to generate test world via API');
+        }
+        
+        const testWorldData = await response.json();
         
         // Transform the generated data to match the store's expected format
         const worldDataForStore = {
