@@ -1,5 +1,4 @@
 import { World } from '@/types/world.types';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import Logger from '../utils/logger';
 
 const logger = new Logger('CharacterGenerator');
@@ -201,16 +200,28 @@ CRITICAL INSTRUCTIONS:
 
     logger.debug('CharacterGenerator', 'Generated prompt:', prompt);
     
-    const client = createAIClient();
-    const response = await client.generateContent(prompt);
+    // Use secure API endpoint instead of direct AI client
+    const response = await fetch('/api/ai/generate-character', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const apiResponse = await response.json();
     
     // Log the raw response for debugging
-    logger.debug('CharacterGenerator', 'Raw AI response:', response.content);
+    logger.debug('CharacterGenerator', 'Raw AI response:', apiResponse.content);
     
     // Extract JSON from response
-    const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+    const jsonMatch = apiResponse.content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logger.error('CharacterGenerator', 'No JSON found in response:', response.content);
+      logger.error('CharacterGenerator', 'No JSON found in response:', apiResponse.content);
       throw new Error('No valid JSON found in response');
     }
     
@@ -225,7 +236,7 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove multi-line comments
     
     // Remove any placeholder text that wasn't replaced with random values within ranges
-    jsonString = jsonString.replace(/REPLACE_WITH_NUMBER_(\d+)_TO_(\d+)/g, (match, min, max) => {
+    jsonString = jsonString.replace(/REPLACE_WITH_NUMBER_(\d+)_TO_(\d+)/g, (match: string, min: string, max: string) => {
       const minVal = parseInt(min, 10);
       const maxVal = parseInt(max, 10);
       const randomValue = Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
@@ -234,7 +245,7 @@ CRITICAL INSTRUCTIONS:
     });
     
     // Fallback for any remaining number placeholders
-    jsonString = jsonString.replace(/<number>/g, (match) => {
+    jsonString = jsonString.replace(/<number>/g, (match: string) => {
       logger.debug('CharacterGenerator', `Found unhandled placeholder ${match}, using fallback value 5`);
       return '5';
     });
@@ -251,7 +262,7 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
     
     // Ensure proper escaping of quotes inside strings
-    jsonString = jsonString.replace(/"([^"]*)":/g, (match, key) => {
+    jsonString = jsonString.replace(/"([^"]*)":/g, (match: string, key: string) => {
       // Escape any unescaped quotes inside the key
       const escapedKey = key.replace(/\\"/g, '"').replace(/"/g, '\\"');
       return `"${escapedKey}":`;

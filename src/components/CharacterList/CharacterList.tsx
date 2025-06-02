@@ -12,6 +12,7 @@ interface Character {
   };
   background?: {
     description?: string;
+    isKnownFigure?: boolean;
   };
   attributes: Array<{ name: string; modifiedValue: number }>;
   skills: Array<{ name: string; level: number }>;
@@ -51,7 +52,24 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                     {character.name}
                   </h3>
                 </Link>
-                <span className="text-sm text-gray-500 block mb-2">Level {character.level}</span>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-gray-500">Level {character.level}</span>
+                  {character.background?.isKnownFigure !== undefined && (
+                    <span 
+                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        character.background.isKnownFigure 
+                          ? 'bg-amber-100 text-amber-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {character.background.isKnownFigure ? (
+                        <>⭐ Known Figure</>
+                      ) : (
+                        <>➕ Original</>
+                      )}
+                    </span>
+                  )}
+                </div>
                 {character.background?.description && (
                   <p className="text-sm text-gray-600">
                     {character.background.description}

@@ -69,6 +69,39 @@ export default function BasicInfoStep({
             testId="world-genre-select"
           />
         </WizardFormGroup>
+
+        <WizardFormGroup label="Reference (Optional)" error={combinedErrors.reference}>
+          <WizardTextField
+            value={worldData.reference || ''}
+            onChange={(value) => onUpdate({ ...worldData, reference: value })}
+            placeholder="e.g., Lord of the Rings, Star Wars, The Office"
+            error={combinedErrors.reference}
+            testId="world-reference-input"
+          />
+          <div className="text-sm text-gray-500 mt-1">
+            Enter a fictional universe, TV show, movie, or book that your world relates to.
+          </div>
+        </WizardFormGroup>
+
+        {worldData.reference && (
+          <WizardFormGroup label="Relationship to Reference" required>
+            <WizardSelect
+              value={worldData.relationship || 'based_on'}
+              onChange={(value) => onUpdate({ ...worldData, relationship: value as 'set_in' | 'based_on' })}
+              options={[
+                { value: 'set_in', label: 'Set In - Characters and locations from the original universe' },
+                { value: 'based_on', label: 'Based On - Original world inspired by the reference' }
+              ]}
+              testId="world-relationship-select"
+            />
+            <div className="text-sm text-gray-500 mt-1">
+              {worldData.relationship === 'set_in' 
+                ? 'Your world exists within the reference universe. Characters will be from that universe.'
+                : 'Your world is inspired by the reference but has original characters and locations.'
+              }
+            </div>
+          </WizardFormGroup>
+        )}
       </WizardFormSection>
     </div>
   );

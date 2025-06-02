@@ -1,4 +1,3 @@
-import { createAIClient } from '@/lib/ai/clientFactory';
 import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 
 export interface GeneratedWorldData {
@@ -15,6 +14,7 @@ export type WorldGenerationMethod = 'template' | 'ai';
 export interface WorldGenerationOptions {
   method: WorldGenerationMethod;
   reference?: string; // For AI generation or specific template selection
+  relationship?: 'based_on' | 'set_in'; // Whether world is set in or based on the reference
   existingNames?: string[];
   suggestedName?: string;
 }
@@ -49,26 +49,30 @@ export async function generateWorld(options: WorldGenerationOptions): Promise<Ge
 }
 
 /**
- * Generate world using AI
+ * Generate world using AI through secure API
  */
 async function generateWithAI(options: WorldGenerationOptions): Promise<GeneratedWorldData> {
-  const client = createAIClient();
-  
   // If no reference provided, pick a random TV/movie universe
   const reference = options.reference || TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
   
-  const prompt = `Generate a complete world configuration for a text-based RPG inspired by the ${reference} universe.
+  // Determine if this world should be set in the reference universe or just inspired by it
+  const isSetIn = options.relationship === 'set_in';
+  
+  const prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
-IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore.
+${isSetIn 
+  ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, planet, or area that fits within the established ${reference} lore and setting. Use existing ${reference} terminology, species, magic systems, technology, etc. where appropriate.`
+  : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore.`
+}
 
 ${options.suggestedName ? `\nThe world should be named: "${options.suggestedName}"` : ''}
 ${options.existingNames?.length ? `\nExisting worlds to avoid duplicating: ${options.existingNames.join(', ')}` : ''}
 
 Provide a JSON response with this exact structure:
 {
-  "name": "A unique name for this world (not just the reference name)",
+  "name": "${isSetIn ? `A name that fits within the ${reference} universe` : 'A unique name for this world (not just the reference name)'}",
   "theme": "The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)",
-  "description": "A 2-3 sentence description of the world and its unique features. MUST mention that this world is inspired by ${reference}",
+  "description": "A 2-3 sentence description of the world and its unique features. ${isSetIn ? `MUST clearly establish that this is part of the ${reference} universe.` : `MUST mention that this world is inspired by ${reference}.`}",
   "attributes": [
     {
       "name": "Attribute Name",
@@ -95,8 +99,27 @@ Make the world interesting and playable while staying true to the source materia
 IMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
 
   try {
-    const response = await client.generateContent(prompt);
-    const text = response.content.trim();
+    // Use secure API endpoint instead of direct AI client
+    const response = await fetch('/api/generate-world', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        prompt,
+        reference,
+        relationship: options.relationship || 'based_on',
+        suggestedName: options.suggestedName,
+        existingNames: options.existingNames
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const apiResponse = await response.json();
+    const text = apiResponse.content.trim();
     
     // Clean up the response - remove any markdown formatting
     const jsonText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();

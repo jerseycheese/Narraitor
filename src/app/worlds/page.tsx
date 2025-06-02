@@ -15,6 +15,7 @@ export default function WorldsPage() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldReference, setWorldReference] = useState('');
   const [worldName, setWorldName] = useState('');
+  const [worldRelationship, setWorldRelationship] = useState<'set_in' | 'based_on'>('based_on');
   const [error, setError] = useState<string | null>(null);
 
   // Handle focus when modal opens/closes
@@ -29,6 +30,7 @@ export default function WorldsPage() {
           setShowPrompt(false);
           setWorldReference('');
           setWorldName('');
+          setWorldRelationship('based_on');
           setError(null);
         }
       };
@@ -65,6 +67,7 @@ export default function WorldsPage() {
         },
         body: JSON.stringify({
           worldReference,
+          worldRelationship,
           existingNames,
           suggestedName: worldName || undefined
         }),
@@ -97,6 +100,8 @@ export default function WorldsPage() {
         name: generatedData.name,
         theme: generatedData.theme,
         description: generatedData.description,
+        reference: worldReference,
+        relationship: worldRelationship,
         attributes,
         skills,
         settings: generatedData.settings
@@ -140,6 +145,7 @@ export default function WorldsPage() {
       setShowPrompt(false);
       setWorldReference('');
       setWorldName('');
+      setWorldRelationship('based_on');
       setIsGenerating(false);
       
       // Stay on worlds page to see the new world
@@ -214,20 +220,43 @@ export default function WorldsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Based On <span className="text-red-500">*</span>
+                    Reference <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={worldReference}
                     onChange={(e) => setWorldReference(e.target.value)}
-                    placeholder="e.g., Middle Earth, Star Wars, Victorian London..."
+                    placeholder="e.g., Lord of the Rings, Star Wars, The Office..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Enter a fictional or non-fictional world to base your new world on
+                    Enter a fictional universe, TV show, movie, or book that your world relates to
                   </p>
                 </div>
+                
+                {worldReference && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Relationship to Reference <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={worldRelationship}
+                      onChange={(e) => setWorldRelationship(e.target.value as 'set_in' | 'based_on')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      disabled={isGenerating}
+                    >
+                      <option value="based_on">Based On - Original world inspired by the reference</option>
+                      <option value="set_in">Set In - Characters and locations from the original universe</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {worldRelationship === 'set_in' 
+                        ? 'Your world exists within the reference universe. Characters will be from that universe.'
+                        : 'Your world is inspired by the reference but has original characters and locations.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
               {error && (
                 <p className="text-red-600 text-sm mb-4">{error}</p>
@@ -244,6 +273,7 @@ export default function WorldsPage() {
                     setShowPrompt(false);
                     setWorldReference('');
                     setWorldName('');
+                    setWorldRelationship('based_on');
                     setError(null);
                   }}
                   disabled={isGenerating}

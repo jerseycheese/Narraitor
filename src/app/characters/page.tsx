@@ -8,8 +8,6 @@ import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { generateCharacter, GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
 
@@ -63,14 +61,10 @@ async function generateCharacterPortrait(
   updateCharacter: (id: string, updates: CharacterPortraitUpdate) => void
 ) {
   try {
-    const aiClient = createAIClient();
-    const portraitGenerator = new PortraitGenerator(aiClient);
-    
     // Create a Character-like object for portrait generation
     const characterForPortrait = {
       id: characterId,
       name: generatedData.name,
-      description: generatedData.background.description,
       worldId: currentWorldId,
       background: {
         history: generatedData.background.description,
@@ -78,40 +72,27 @@ async function generateCharacterPortrait(
         physicalDescription: generatedData.background.physicalDescription || '',
         goals: [],
         fears: [],
-        relationships: []
-      },
-      attributes: generatedData.attributes.map((attr) => ({
-        attributeId: attr.id,
-        value: attr.value
-      })),
-      skills: generatedData.skills.map((skill) => ({
-        skillId: skill.id,
-        level: skill.level,
-        experience: 0,
-        isActive: true
-      })),
-      inventory: {
-        characterId: characterId,
-        items: [],
-        capacity: 100,
-        categories: []
-      },
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-        location: currentWorld.name
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+        isKnownFigure: generatedData.isKnownFigure || false
+      }
     };
     
-    const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-      worldTheme: currentWorld.theme
+    // Use secure API endpoint for portrait generation
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        character: characterForPortrait,
+        world: currentWorld
+      })
     });
     
-    // Update character with generated portrait
-    updateCharacter(characterId, { portrait });
+    if (response.ok) {
+      const { portrait } = await response.json();
+      // Update character with generated portrait
+      updateCharacter(characterId, { portrait });
+    } else {
+      console.warn(`Failed to generate portrait for "${generatedData.name}": ${response.status}`);
+    }
   } catch (portraitError) {
     console.error('Failed to generate portrait:', portraitError);
     // Continue without portrait - character already has placeholder
@@ -182,7 +163,8 @@ export default function CharactersPage() {
           personality: generatedData.background.personality,
           goals: generatedData.background.motivation ? [generatedData.background.motivation] : [],
           fears: generatedData.background.fears || [], // AI-generated fears
-          physicalDescription: generatedData.background.physicalDescription || ''
+          physicalDescription: generatedData.background.physicalDescription || '',
+          isKnownFigure: generatedData.isKnownFigure || false
         },
         isPlayer: true,
         status: {
@@ -455,7 +437,24 @@ export default function CharactersPage() {
                     >
                       {character.name}
                     </h3>
-                    <span className="text-sm text-gray-500 block mb-3">Level {character.level || 1}</span>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm text-gray-500">Level {character.level || 1}</span>
+                      {character.background?.isKnownFigure !== undefined && (
+                        <span 
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            character.background.isKnownFigure 
+                              ? 'bg-amber-100 text-amber-800' 
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {character.background.isKnownFigure ? (
+                            <>⭐ Known Figure</>
+                          ) : (
+                            <>➕ Original</>
+                          )}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-600 leading-relaxed">
                       {character.background.personality || 'No description provided'}
                     </p>
