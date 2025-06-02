@@ -2,13 +2,11 @@ import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import { generateTestWorld } from '@/lib/generators/worldGenerator';
-import { generateTestCharacter } from '@/lib/generators/characterGenerator';
+// Removed direct generateTestWorld import - using API route instead
+import { TV_MOVIE_UNIVERSES } from '@/lib/generators/worldGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { createAIClient } from '@/lib/ai';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { generateCharacter } from '@/lib/ai/characterGenerator';
+import type { WorldImage } from '@/types/world.types';
+// Removed direct AI client imports - using API routes instead
 
 export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
@@ -24,23 +22,46 @@ export const TestDataGeneratorSection: React.FC = () => {
   
   const handleGenerateWorld = async () => {
     try {
-      // Use the test world generator which includes TV/movie themes
-      console.log(`[DevTools] Generating test world with TV/movie themes...`);
-      const testWorldData = await generateTestWorld();
+      // Pick a random TV/movie universe and randomly choose relationship type
+      const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+      const randomRelationship = Math.random() < 0.5 ? 'set_in' : 'based_on';
+      const existingNames = Object.values(worlds).map(w => w.name);
+      
+      console.log(`[DevTools] Generating single test world ${randomRelationship} "${randomReference}"`);
+      
+      const response = await fetch('/api/generate-world', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldReference: randomReference,
+          worldRelationship: randomRelationship,
+          existingNames
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate test world via API');
+      }
+      
+      const testWorldData = await response.json();
       
       // Transform the generated data to match the store's expected format
       const worldDataForStore = {
         ...testWorldData,
-        attributes: testWorldData.attributes.map(attr => ({
+        attributes: testWorldData.attributes.map((attr: { name: string; description: string; minValue: number; maxValue: number; defaultValue: number }) => ({
           ...attr,
           id: generateUniqueId('attr'),
           worldId: '' // Will be set by store
         })),
-        skills: testWorldData.skills.map(skill => ({
+        skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
           ...skill,
           id: generateUniqueId('skill'),
           worldId: '' // Will be set by store
-        }))
+        })),
+        universeReference: randomReference,
+        universeRelationship: randomRelationship
       };
       
       const worldId = createWorld(worldDataForStore);
@@ -51,19 +72,28 @@ export const TestDataGeneratorSection: React.FC = () => {
       setCurrentWorld(worldId);
       console.log(`[DevTools] Set newly generated world as active: ${worldId}`);
       
-      // Generate world image asynchronously
+      // Generate world image asynchronously via API route
       try {
-        const aiClient = createAIClient();
-        const imageGenerator = new WorldImageGenerator(aiClient);
-        
         // Get the created world from store
         const world = worldStore.getState().worlds[worldId];
         if (world) {
-          const image = await imageGenerator.generateWorldImage(world);
+          const response = await fetch('/api/generate-world-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ world })
+          });
           
-          // Update the world with the generated image
-          worldStore.getState().updateWorld(worldId, { image });
-          console.log(`Generated image for test world "${testWorldData.name}"`);
+          if (response.ok) {
+            const { imageUrl } = await response.json();
+            const worldImage: WorldImage = {
+              type: 'ai-generated' as const,
+              url: imageUrl,
+              generatedAt: new Date().toISOString()
+            };
+            // Update the world with the generated image
+            worldStore.getState().updateWorld(worldId, { image: worldImage });
+            console.log(`Generated image for test world "${testWorldData.name}"`);
+          }
         }
       } catch (error) {
         console.error('Failed to generate world image for test world:', error);
@@ -83,22 +113,46 @@ export const TestDataGeneratorSection: React.FC = () => {
       for (let i = 0; i < 5; i++) {
         console.log(`[DevTools] Generating test world ${i + 1}/5 with TV/movie themes...`);
         
-        // Use the test world generator which includes TV/movie themes
-        const testWorldData = await generateTestWorld();
+        // Pick a random TV/movie universe and randomly choose relationship type
+        const randomReference = TV_MOVIE_UNIVERSES[Math.floor(Math.random() * TV_MOVIE_UNIVERSES.length)];
+        const randomRelationship = Math.random() < 0.5 ? 'set_in' : 'based_on';
+        const existingNames = Object.values(worlds).map(w => w.name);
+        
+        console.log(`[DevTools] Generating world ${randomRelationship} "${randomReference}"`);
+        
+        const response = await fetch('/api/generate-world', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            worldReference: randomReference,
+            worldRelationship: randomRelationship, // Mix of set_in and based_on
+            existingNames
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to generate test world via API');
+        }
+        
+        const testWorldData = await response.json();
         
         // Transform the generated data to match the store's expected format
         const worldDataForStore = {
           ...testWorldData,
-          attributes: testWorldData.attributes.map(attr => ({
+          attributes: testWorldData.attributes.map((attr: { name: string; description: string; minValue: number; maxValue: number; defaultValue: number }) => ({
             ...attr,
             id: generateUniqueId('attr'),
             worldId: '' // Will be set by store
           })),
-          skills: testWorldData.skills.map(skill => ({
+          skills: testWorldData.skills.map((skill: { name: string; description: string; difficulty: string; category: string }) => ({
             ...skill,
             id: generateUniqueId('skill'),
             worldId: '' // Will be set by store
-          }))
+          })),
+          universeReference: randomReference,
+          universeRelationship: randomRelationship
         };
         
         const worldId = createWorld(worldDataForStore);
@@ -112,19 +166,28 @@ export const TestDataGeneratorSection: React.FC = () => {
           console.log(`[DevTools] Set first generated world as active: ${worldId}`);
         }
         
-        // Generate world image asynchronously for each world
+        // Generate world image asynchronously for each world via API route
         try {
-          const aiClient = createAIClient();
-          const imageGenerator = new WorldImageGenerator(aiClient);
-          
           // Get the created world from store
           const world = worldStore.getState().worlds[worldId];
           if (world) {
-            const image = await imageGenerator.generateWorldImage(world);
+            const response = await fetch('/api/generate-world-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ world })
+            });
             
-            // Update the world with the generated image
-            worldStore.getState().updateWorld(worldId, { image });
-            console.log(`Generated image for test world "${testWorldData.name}"`);
+            if (response.ok) {
+              const { imageUrl } = await response.json();
+              const worldImage: WorldImage = {
+                type: 'ai-generated' as const,
+                url: imageUrl,
+                generatedAt: new Date().toISOString()
+              };
+              // Update the world with the generated image
+              worldStore.getState().updateWorld(worldId, { image: worldImage });
+              console.log(`Generated image for test world "${testWorldData.name}"`);
+            }
           }
         } catch (error) {
           console.error(`Failed to generate world image for test world "${testWorldData.name}":`, error);
@@ -149,8 +212,136 @@ export const TestDataGeneratorSection: React.FC = () => {
       return;
     }
     
-    // Generate test data
-    const testData = generateTestCharacter(currentWorld);
+    try {
+      // Choose character type based on world's universe relationship
+      let characterType: 'known' | 'original';
+      if (currentWorld.universeRelationship === 'set_in') {
+        // For "set in" worlds, heavily favor known figures (75% chance)
+        characterType = Math.random() < 0.75 ? 'known' : 'original';
+      } else if (currentWorld.universeRelationship === 'based_on') {
+        // For "based on" worlds, favor original characters (75% chance)
+        characterType = Math.random() < 0.25 ? 'known' : 'original';
+      } else {
+        // For original worlds with no universe reference, always create original characters
+        characterType = 'original';
+      }
+      const { characters } = characterStore.getState();
+      const existingNames = Object.values(characters).filter(char => char.worldId === currentWorld.id).map(char => char.name);
+      
+      console.log(`[DevTools] Generating ${characterType} character for world: ${currentWorld.name}`);
+      
+      const response = await fetch('/api/generate-character', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId: currentWorld.id,
+          characterType,
+          existingNames,
+          world: currentWorld
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate character via API');
+      }
+      
+      const generatedCharacter = await response.json();
+      
+      // Convert AI-generated character to test data format
+      const testData: {
+        name: string;
+        attributes: Array<{ attributeId: string; value: number }>;
+        skills: Array<{ skillId: string; level: number; experience: number; isActive: boolean }>;
+        background: {
+          history: string;
+          personality: string;
+          goals: string[];
+          motivation: string;
+          physicalDescription: string;
+          isKnownFigure: boolean;
+        };
+        portrait?: unknown;
+      } = {
+        name: generatedCharacter.name,
+        attributes: generatedCharacter.attributes.map((attr: { id: string; value: number }) => ({
+          attributeId: attr.id,
+          value: attr.value
+        })),
+        skills: generatedCharacter.skills.map((skill: { id: string; level: number }) => ({
+          skillId: skill.id,
+          level: skill.level,
+          experience: 0,
+          isActive: true
+        })),
+        background: {
+          history: generatedCharacter.background.description,
+          personality: generatedCharacter.background.personality,
+          goals: [generatedCharacter.background.motivation],
+          motivation: generatedCharacter.background.motivation,
+          physicalDescription: generatedCharacter.background.physicalDescription,
+          isKnownFigure: generatedCharacter.isKnownFigure || characterType === 'known'
+        }
+      };
+
+      // Generate portrait for the character
+      let portrait = null;
+      try {
+        console.log(`[DevTools] Generating portrait for ${characterType} character "${generatedCharacter.name}"...`);
+        
+        const portraitResponse = await fetch('/api/generate-portrait', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            character: {
+              id: 'temp-' + Date.now(),
+              name: generatedCharacter.name,
+              worldId: currentWorld.id,
+              background: {
+                history: generatedCharacter.background.description,
+                personality: generatedCharacter.background.personality,
+                physicalDescription: generatedCharacter.background.physicalDescription || '',
+                goals: [generatedCharacter.background.motivation],
+                fears: [],
+                relationships: []
+              },
+              attributes: generatedCharacter.attributes,
+              skills: generatedCharacter.skills,
+              inventory: {
+                characterId: 'temp-' + Date.now(),
+                items: [],
+                capacity: 100,
+                categories: []
+              },
+              status: {
+                health: 100,
+                maxHealth: 100,
+                conditions: []
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            },
+            world: currentWorld
+          })
+        });
+        
+        if (portraitResponse.ok) {
+          const portraitData = await portraitResponse.json();
+          portrait = portraitData.portrait;
+          console.log(`[DevTools] Generated portrait for ${characterType} character "${generatedCharacter.name}"`);
+        } else {
+          console.warn(`[DevTools] Portrait generation failed for ${characterType} character "${generatedCharacter.name}"`);
+        }
+      } catch (error) {
+        console.error(`[DevTools] Failed to generate portrait for ${characterType} character "${generatedCharacter.name}":`, error);
+        // Don't block character creation if portrait generation fails
+      }
+
+      // Add portrait to test data if generated
+      if (portrait) {
+        testData.portrait = portrait;
+      }
     
     // Store the complete wizard state
     const wizardState = {
@@ -192,6 +383,10 @@ export const TestDataGeneratorSection: React.FC = () => {
     } catch (error) {
       console.error('[TestDataGenerator] Error storing test data:', error);
       alert('Failed to store test data. Check console for details.');
+    }
+    } catch (error) {
+      console.error('[DevTools] Error generating character:', error);
+      alert(`Error generating character: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
   
@@ -236,13 +431,39 @@ export const TestDataGeneratorSection: React.FC = () => {
       for (let i = 0; i < 5; i++) {
         console.log(`[DevTools] Generating character ${i + 1}/5 for world "${currentWorld.name}"...`);
         
-        // Use the AI character generator (same as the regular generate button)
-        const aiCharacterData = await generateCharacter(
-          currentWorld,
-          [...existingCharacterNames, ...createdCharacters.map(c => c.name)], // Avoid duplicate names
-          undefined, // No suggested name
-          'original' // Generate original characters
-        );
+        // Choose character type based on world's universe relationship
+        let characterType: 'known' | 'original';
+        if (currentWorld.universeRelationship === 'set_in') {
+          // For "set in" worlds, heavily favor known figures (75% chance)
+          characterType = Math.random() < 0.75 ? 'known' : 'original';
+        } else if (currentWorld.universeRelationship === 'based_on') {
+          // For "based on" worlds, favor original characters (75% chance)
+          characterType = Math.random() < 0.25 ? 'known' : 'original';
+        } else {
+          // For original worlds with no universe reference, always create original characters
+          characterType = 'original';
+        }
+        
+        console.log(`[DevTools] Generating ${characterType} character ${i + 1}/5...`);
+        
+        // Use the AI character generator via API route
+        const response: Response = await fetch('/api/generate-character', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            worldId: currentWorld.id,
+            characterType,
+            existingNames: [...existingCharacterNames, ...createdCharacters.map(c => c.name)],
+            world: currentWorld
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to generate character');
+        }
+        
+        const aiCharacterData = await response.json();
 
 
         // Convert AI-generated data to character store format
@@ -251,7 +472,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           worldId: currentWorld.id,
           level: aiCharacterData.level || 1,
           isPlayer: true,
-          attributes: aiCharacterData.attributes.map(attr => {
+          attributes: aiCharacterData.attributes.map((attr: { id: string; value: number }) => {
             const worldAttr = currentWorld.attributes.find(wa => wa.id === attr.id);
             return {
               id: generateUniqueId('attr'),
@@ -262,7 +483,7 @@ export const TestDataGeneratorSection: React.FC = () => {
               category: worldAttr?.category
             };
           }),
-          skills: aiCharacterData.skills.map(skill => {
+          skills: aiCharacterData.skills.map((skill: { id: string; level: number }) => {
             const worldSkill = currentWorld.skills.find(ws => ws.id === skill.id);
             return {
               id: generateUniqueId('skill'),
@@ -277,7 +498,8 @@ export const TestDataGeneratorSection: React.FC = () => {
             personality: aiCharacterData.background.personality || '',
             physicalDescription: aiCharacterData.background.physicalDescription || '',
             goals: aiCharacterData.background.motivation ? [aiCharacterData.background.motivation] : [],
-            fears: []
+            fears: [],
+            isKnownFigure: characterType === 'known'
           },
           status: {
             hp: 100,
@@ -288,75 +510,78 @@ export const TestDataGeneratorSection: React.FC = () => {
 
         const characterId = createCharacter(characterData);
         createdCharacters.push({ id: characterId, name: characterData.name });
-        console.log(`[DevTools] Created AI character: ${characterData.name}`);
+        console.log(`[DevTools] Created AI ${characterType} character: ${characterData.name}`);
         
-        // Generate portrait asynchronously
+        // Generate portrait asynchronously via API route
         try {
-          const aiClient = createAIClient();
-          const portraitGenerator = new PortraitGenerator(aiClient);
-          
-          // Get the created character from store and transform it for PortraitGenerator
+          // Get the created character from store
           const storeCharacter = characterStore.getState().characters[characterId];
           if (storeCharacter) {
-            console.log(`[DevTools] Generating portrait for character "${characterData.name}"...`);
+            console.log(`[DevTools] Generating portrait for ${characterType} character "${characterData.name}"...`);
             
-            // Create a character object compatible with PortraitGenerator
-            const characterForPortrait = {
-              id: storeCharacter.id,
-              name: storeCharacter.name,
-              description: storeCharacter.background.history,
-              worldId: storeCharacter.worldId,
-              background: {
-                history: storeCharacter.background.history,
-                personality: storeCharacter.background.personality,
-                physicalDescription: storeCharacter.background.physicalDescription || '',
-                goals: storeCharacter.background.goals,
-                fears: storeCharacter.background.fears,
-                relationships: []
-              },
-              attributes: storeCharacter.attributes.map(attr => ({
-                attributeId: currentWorld.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
-                value: attr.baseValue
-              })),
-              skills: storeCharacter.skills.map(skill => ({
-                skillId: currentWorld.skills.find(ws => ws.name === skill.name)?.id || skill.id,
-                level: skill.level,
-                experience: 0,
-                isActive: true
-              })),
-              inventory: {
-                characterId: storeCharacter.id,
-                items: [],
-                capacity: 100,
-                categories: []
-              },
-              status: {
-                health: storeCharacter.status.hp,
-                maxHealth: storeCharacter.status.hp,
-                conditions: [],
-                location: currentWorld.name
-              },
-              createdAt: storeCharacter.createdAt,
-              updatedAt: storeCharacter.updatedAt
-            };
-            
-            const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-              worldTheme: currentWorld.theme
+            const response = await fetch('/api/generate-portrait', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                character: {
+                  id: storeCharacter.id,
+                  name: storeCharacter.name,
+                  worldId: storeCharacter.worldId,
+                  background: {
+                    history: storeCharacter.background.history,
+                    personality: storeCharacter.background.personality,
+                    physicalDescription: storeCharacter.background.physicalDescription || '',
+                    goals: storeCharacter.background.goals,
+                    fears: storeCharacter.background.fears,
+                    relationships: []
+                  },
+                  attributes: storeCharacter.attributes.map((attr: { id: string; name: string; baseValue: number }) => ({
+                    attributeId: currentWorld.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+                    value: attr.baseValue
+                  })),
+                  skills: storeCharacter.skills.map(skill => ({
+                    skillId: currentWorld.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+                    level: skill.level,
+                    experience: 0,
+                    isActive: true
+                  })),
+                  inventory: {
+                    characterId: storeCharacter.id,
+                    items: [],
+                    capacity: 100,
+                    categories: []
+                  },
+                  status: {
+                    health: storeCharacter.status.hp,
+                    maxHealth: storeCharacter.status.hp,
+                    conditions: [],
+                    location: currentWorld.name
+                  },
+                  createdAt: storeCharacter.createdAt,
+                  updatedAt: storeCharacter.updatedAt
+                },
+                world: currentWorld
+              })
             });
             
-            // Update the character with the generated portrait
-            characterStore.getState().updateCharacter(characterId, { portrait });
-            console.log(`[DevTools] Generated portrait for character "${characterData.name}"`)
+            if (response.ok) {
+              const { portrait } = await response.json();
+              // Update the character with the generated portrait
+              characterStore.getState().updateCharacter(characterId, { portrait });
+              console.log(`[DevTools] Generated portrait for ${characterType} character "${characterData.name}"`);
+            } else {
+              console.warn(`[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`);
+            }
           }
         } catch (error) {
-          console.error(`[DevTools] Failed to generate portrait for character "${characterData.name}":`, error);
+          console.error(`[DevTools] Failed to generate portrait for ${characterType} character "${characterData.name}":`, error);
           // Don't block character creation if portrait generation fails
         }
       }
 
       const characterNames = createdCharacters.map(c => c.name).join(', ');
-      console.log(`[DevTools] Generated 5 AI characters with portraits for world "${currentWorld.name}":`, createdCharacters);
-      alert(`Successfully generated 5 AI characters with portraits: ${characterNames}`);
+      console.log(`[DevTools] Generated 5 AI characters (mix of known/original) with portraits for world "${currentWorld.name}":`, createdCharacters);
+      alert(`Successfully generated 5 AI characters (mix of known/original) with portraits: ${characterNames}`);
       
     } catch (error) {
       console.error('[DevTools] Error generating AI characters:', error);
@@ -547,16 +772,16 @@ export const TestDataGeneratorSection: React.FC = () => {
           disabled={!effectiveWorldId}
           title="Creates test character data and navigates to character creation form"
         >
-          Generate & Fill Character Form
+          Generate AI Character & Fill Form
         </button>
         
         <button
           onClick={handleGenerate5Characters}
           className="w-full px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm transition-colors"
           disabled={!effectiveWorldId}
-          title="Creates 5 AI-generated characters directly in the selected world using the same AI as the Generate Character button"
+          title="Creates 5 AI-generated characters (mix of known figures and original characters) directly in the selected world with portraits"
         >
-          Generate 5 AI Characters for World
+          Generate 5 AI Characters (Mix) for World
         </button>
         
         <button

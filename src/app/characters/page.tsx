@@ -6,10 +6,9 @@ import Link from 'next/link';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { generateCharacter, GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
+// Removed direct AI client imports - using API routes instead
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
 
@@ -63,55 +62,34 @@ async function generateCharacterPortrait(
   updateCharacter: (id: string, updates: CharacterPortraitUpdate) => void
 ) {
   try {
-    const aiClient = createAIClient();
-    const portraitGenerator = new PortraitGenerator(aiClient);
-    
-    // Create a Character-like object for portrait generation
-    const characterForPortrait = {
-      id: characterId,
-      name: generatedData.name,
-      description: generatedData.background.description,
-      worldId: currentWorldId,
-      background: {
-        history: generatedData.background.description,
-        personality: generatedData.background.personality,
-        physicalDescription: generatedData.background.physicalDescription || '',
-        goals: [],
-        fears: [],
-        relationships: []
+    // Use the portrait generation API route
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      attributes: generatedData.attributes.map((attr) => ({
-        attributeId: attr.id,
-        value: attr.value
-      })),
-      skills: generatedData.skills.map((skill) => ({
-        skillId: skill.id,
-        level: skill.level,
-        experience: 0,
-        isActive: true
-      })),
-      inventory: {
-        characterId: characterId,
-        items: [],
-        capacity: 100,
-        categories: []
-      },
-      status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-        location: currentWorld.name
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-      worldTheme: currentWorld.theme
+      body: JSON.stringify({
+        character: {
+          name: generatedData.name,
+          background: generatedData.background.description,
+          physicalDescription: generatedData.background.physicalDescription || ''
+        },
+        worldTheme: currentWorld.theme
+      }),
     });
-    
-    // Update character with generated portrait
-    updateCharacter(characterId, { portrait });
+
+    if (response.ok) {
+      const portrait = await response.json();
+      // Update character with generated portrait
+      updateCharacter(characterId, { 
+        portrait: {
+          type: 'ai-generated',
+          url: portrait.image,
+          generatedAt: new Date().toISOString(),
+          prompt: portrait.prompt
+        }
+      });
+    }
   } catch (portraitError) {
     console.error('Failed to generate portrait:', portraitError);
     // Continue without portrait - character already has placeholder
@@ -163,12 +141,27 @@ export default function CharactersPage() {
       // Generate character data based on type
       const nameToUse = generationType === 'specific' ? characterName : undefined;
       
-      const generatedData = await generateCharacter(
-        currentWorld, 
-        existingNames, 
-        nameToUse,
-        generationType
-      );
+      // Use the character generation API route
+      const response = await fetch('/api/generate-character', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId: effectiveWorldId,
+          characterType: generationType,
+          existingNames: existingNames,
+          suggestedName: nameToUse,
+          world: currentWorld // Pass the world data to the API
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate character');
+      }
+
+      const generatedData: GeneratedCharacterData = await response.json();
       
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({
@@ -182,7 +175,8 @@ export default function CharactersPage() {
           personality: generatedData.background.personality,
           goals: generatedData.background.motivation ? [generatedData.background.motivation] : [],
           fears: generatedData.background.fears || [], // AI-generated fears
-          physicalDescription: generatedData.background.physicalDescription || ''
+          physicalDescription: generatedData.background.physicalDescription || '',
+          isKnownFigure: generatedData.isKnownFigure || false
         },
         isPlayer: true,
         status: {
@@ -417,7 +411,6 @@ export default function CharactersPage() {
                     ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
                     : 'border-gray-300 bg-white hover:shadow-lg'
                 }`}
-                onClick={() => handleSelectCharacter(character.id)}
               >
                 {/* Active Character Header */}
                 {currentCharacterId === character.id && (
@@ -455,7 +448,17 @@ export default function CharactersPage() {
                     >
                       {character.name}
                     </h3>
-                    <span className="text-sm text-gray-500 block mb-3">Level {character.level || 1}</span>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm text-gray-500">Level {character.level || 1}</span>
+                      {character.background?.isKnownFigure && (
+                        <span className="inline-flex items-center gap-1 text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          Known Figure
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-600 leading-relaxed">
                       {character.background.personality || 'No description provided'}
                     </p>

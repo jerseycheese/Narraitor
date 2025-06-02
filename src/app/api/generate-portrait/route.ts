@@ -4,11 +4,37 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const body = await request.json();
+    
+    // Handle different input formats
+    let prompt: string;
+    
+    if (typeof body === 'string') {
+      prompt = body;
+    } else if (body.prompt) {
+      // Direct prompt format
+      prompt = body.prompt;
+    } else if (body.character) {
+      // Character + world format - need to build prompt
+      const character = body.character;
+      const world = body.world;
+      const customDescription = body.customDescription;
+      
+      // Build a prompt from character data
+      const physicalDesc = customDescription || character.background?.physicalDescription || 'No specific appearance described';
+      const worldTheme = world?.theme || 'fantasy';
+      
+      prompt = `Create a photorealistic portrait of a character named "${character.name}" in a ${worldTheme} setting. Physical description: ${physicalDesc}. Character background: ${character.background?.history || 'Unknown background'}. Personality: ${character.background?.personality || 'Unknown personality'}. Make the portrait detailed and atmospheric, matching the ${worldTheme} theme.`;
+    } else {
+      return NextResponse.json(
+        { error: 'Either prompt string or character object is required' },
+        { status: 400 }
+      );
+    }
     
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: 'Prompt could not be determined from input' },
         { status: 400 }
       );
     }
@@ -118,8 +144,17 @@ export async function POST(request: NextRequest) {
     const mimeType = imagePart.inlineData!.mimeType;
     const base64Data = imagePart.inlineData!.data;
     
+    // Return the portrait object that components expect
+    const portraitData = {
+      type: 'ai-generated' as const,
+      url: `data:${mimeType};base64,${base64Data}`,
+      generatedAt: new Date().toISOString(),
+      prompt: prompt
+    };
+    
     return NextResponse.json({
-      image: `data:${mimeType};base64,${base64Data}`,
+      portrait: portraitData,
+      image: `data:${mimeType};base64,${base64Data}`, // For backward compatibility
       prompt: prompt
     });
 
