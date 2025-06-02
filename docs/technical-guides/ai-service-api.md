@@ -261,59 +261,69 @@ function NarrativeGenerator() {
 ### Basic Content Generation
 
 ```typescript
-import { GeminiClient } from '@/lib/ai';
+// ❌ OLD PATTERN (Security Vulnerability)
+// Never use direct AI clients in browser code
 
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-  modelName: 'gemini-2.0-flash',
-  maxRetries: 3,
-  timeout: 30000
-};
+// ✅ NEW SECURE PATTERN
+// Use API endpoints for all AI operations
 
-const client = new GeminiClient(config);
-
-try {
-  const response = await client.generateContent('Tell me a story');
-  console.log(response.content);
-} catch (error) {
-  console.error('Generation failed:', error.message);
+async function generateContent(prompt: string) {
+  try {
+    const response = await fetch('/api/narrative/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Generation failed');
+    }
+    
+    const data = await response.json();
+    console.log(data.content);
+    return data;
+  } catch (error) {
+    console.error('Generation failed:', error.message);
+    throw error;
+  }
 }
 ```
 
 ### With Template Processing
 
 ```typescript
-import { AIPromptProcessor, getAIConfig } from '@/lib/ai';
-import { PromptTemplateManager, PromptType } from '@/lib/promptTemplates';
+// ❌ OLD PATTERN (Security Vulnerability)
+// Never use AIPromptProcessor directly in browser code
 
-// Initialize template manager
-const templateManager = new PromptTemplateManager();
-templateManager.addTemplate({
-  id: 'narrative-intro',
-  type: PromptType.NARRATIVE,
-  content: 'Create an introduction for {{characterName}} in {{location}}',
-  variables: [
-    { name: 'characterName', description: 'Character name' },
-    { name: 'location', description: 'Story location' }
-  ]
-});
+// ✅ NEW SECURE PATTERN  
+// Templates are processed server-side via API endpoints
 
-// Create processor
-const processor = new AIPromptProcessor({
-  templateManager,
-  config: getAIConfig()
-});
-
-// Generate content with automatic formatting
-try {
-  const response = await processor.processAndSend('narrative-intro', {
-    characterName: 'John the Brave',
-    location: 'Narraitor Castle'
-  });
-  console.log(response.content);          // Raw content
-  console.log(response.formattedContent); // Formatted content
-} catch (error) {
-  console.error('AI generation failed:', error.message);
+async function generateNarrative(characterName: string, location: string) {
+  try {
+    const response = await fetch('/api/narrative/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        templateId: 'narrative-intro',
+        variables: {
+          characterName: characterName,
+          location: location
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Narrative generation failed');
+    }
+    
+    const data = await response.json();
+    console.log(data.content);          // Raw content
+    console.log(data.formattedContent); // Formatted content
+    return data;
+  } catch (error) {
+    console.error('AI generation failed:', error.message);
+    throw error;
+  }
 }
 ```
 

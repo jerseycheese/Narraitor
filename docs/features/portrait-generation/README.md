@@ -4,12 +4,13 @@ The portrait generation system allows Narraitor to create AI-generated character
 
 ## Overview
 
-The portrait generation system consists of several key components:
+The portrait generation system uses a secure server-side architecture with the following components:
 
-- **API Endpoint** - Server-side endpoint that interfaces with Google Gemini
-- **Portrait Generator** - Core logic for constructing prompts and managing generation
+- **`/api/generate-portrait` Endpoint** - Secure Next.js API route that interfaces with Google Gemini
+- **Server-side Portrait Generator** - Core logic for constructing prompts and managing generation (server-only)
 - **Character Portrait Component** - UI component for displaying portraits with fallbacks
 - **Character Detection** - Intelligent detection of known fictional and real characters
+- **Client-side API Integration** - Components call secure API endpoints instead of direct AI clients
 
 ## Documentation Index
 
@@ -24,17 +25,36 @@ The portrait generation system consists of several key components:
 ### Basic Usage
 
 ```typescript
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+// Generate portrait for a character using secure API endpoint
+const generatePortraitForCharacter = async (character: Character, world: World) => {
+  try {
+    const response = await fetch('/api/generate-portrait', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        character: character,
+        world: world
+      })
+    });
 
-// Create portrait generator instance
-const aiClient = createAIClient();
-const portraitGenerator = new PortraitGenerator(aiClient);
+    if (!response.ok) {
+      throw new Error('Portrait generation failed');
+    }
 
-// Generate portrait for a character
-const portrait = await portraitGenerator.generatePortrait(character, {
-  worldTheme: 'Fantasy'
-});
+    const { portrait } = await response.json();
+    return portrait;
+  } catch (error) {
+    console.error('Portrait generation error:', error);
+    // Return placeholder portrait
+    return {
+      type: 'placeholder',
+      url: null
+    };
+  }
+};
+
+// Usage in component
+const portrait = await generatePortraitForCharacter(character, world);
 
 // Display the portrait
 <CharacterPortrait 
@@ -46,13 +66,42 @@ const portrait = await portraitGenerator.generatePortrait(character, {
 
 ### Environment Setup
 
-The portrait generation system requires a Google Gemini API key:
+The portrait generation system requires a Google Gemini API key configured server-side only:
 
 ```bash
-# .env.local
+# .env.local (Server-side only - secure)
 GEMINI_API_KEY=your-api-key-here
-# or
-NEXT_PUBLIC_GEMINI_API_KEY=your-api-key-here
+```
+
+**⚠️ Security Note**: Never use `NEXT_PUBLIC_GEMINI_API_KEY` as this exposes your API key to the client-side, creating a security vulnerability. All AI operations are handled through secure server-side API endpoints.
+
+## Security Architecture (Issue #470)
+
+The portrait generation system implements a secure API-only architecture:
+
+- **🔒 Server-side Only**: All AI operations happen on the server through Next.js API routes
+- **🚫 No Client Exposure**: API keys never reach the browser or client-side JavaScript  
+- **🛡️ Rate Limiting**: Built-in protection against API abuse
+- **✅ Input Validation**: All requests are validated and sanitized server-side
+- **🔐 Secure Headers**: Proper authentication headers for Google Gemini API
+
+### Migration from Direct Client Usage
+
+If you have existing code that uses direct AI clients, update it to use the secure API pattern:
+
+```typescript
+// ❌ Old pattern (security vulnerability - DO NOT USE)
+// const aiClient = createAIClient();
+// const portraitGenerator = new PortraitGenerator(aiClient);
+// const portrait = await portraitGenerator.generatePortrait(character);
+
+// ✅ New secure pattern (ALWAYS USE)
+const response = await fetch('/api/generate-portrait', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ character, world })
+});
+const { portrait } = await response.json();
 ```
 
 ## Key Features

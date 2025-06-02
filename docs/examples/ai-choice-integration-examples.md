@@ -153,8 +153,6 @@ This example shows how to prepare for character integration (ready for when char
 ```tsx
 // components/CharacterAwareChoiceSystem.tsx
 import React, { useState } from 'react';
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
-import { defaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { narrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
 
@@ -173,7 +171,6 @@ export const CharacterAwareChoiceSystem: React.FC<CharacterAwareChoiceSystemProp
 }) => {
   const [choices, setChoices] = useState<Decision | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const choiceGenerator = new ChoiceGenerator(defaultGeminiClient);
 
   const generateChoicesWithCharacterContext = async () => {
     setIsGenerating(true);
@@ -190,15 +187,26 @@ export const CharacterAwareChoiceSystem: React.FC<CharacterAwareChoiceSystemProp
         // characterData: characterId ? getCharacterData(characterId) : undefined // Future integration
       };
 
-      // Generate choices with character context
-      const decision = await choiceGenerator.generateChoices({
-        worldId,
-        narrativeContext,
-        characterIds: characterId ? [characterId] : [], // Ready for character integration
-        maxOptions: 4,
-        minOptions: 3
+      // Use secure API endpoint instead of direct AI client
+      const response = await fetch('/api/narrative/choices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId,
+          narrativeContext,
+          characterIds: characterId ? [characterId] : [], // Ready for character integration
+          maxOptions: 4,
+          minOptions: 3
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate choices');
+      }
+
+      const decision = await response.json();
       setChoices(decision);
     } catch (error) {
       console.error('Failed to generate character-aware choices:', error);
@@ -278,8 +286,6 @@ Use this component to test choice generation in isolation:
 ```tsx
 // components/ChoiceGenerationTester.tsx
 import React, { useState } from 'react';
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
-import { defaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 
 export const ChoiceGenerationTester: React.FC = () => {
@@ -288,8 +294,6 @@ export const ChoiceGenerationTester: React.FC = () => {
   const [generatedChoices, setGeneratedChoices] = useState<Decision | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string>('');
-
-  const choiceGenerator = new ChoiceGenerator(defaultGeminiClient);
 
   const testChoiceGeneration = async () => {
     if (!worldId.trim() || !narrativeContent.trim()) {
@@ -310,16 +314,28 @@ export const ChoiceGenerationTester: React.FC = () => {
         timestamp: Date.now()
       };
 
-      const decision = await choiceGenerator.generateChoices({
-        worldId,
-        narrativeContext: {
-          recentSegments: [mockSegment]
+      // Use secure API endpoint instead of direct AI client
+      const response = await fetch('/api/narrative/choices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        characterIds: [],
-        maxOptions: 4,
-        minOptions: 3
+        body: JSON.stringify({
+          worldId,
+          narrativeContext: {
+            recentSegments: [mockSegment]
+          },
+          characterIds: [],
+          maxOptions: 4,
+          minOptions: 3
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate choices');
+      }
+
+      const decision = await response.json();
       setGeneratedChoices(decision);
     } catch (err: any) {
       setError(`Generation failed: ${err.message}`);
@@ -400,8 +416,6 @@ Create a reusable hook for choice generation logic:
 ```tsx
 // hooks/useAIChoiceGeneration.ts
 import { useState, useCallback } from 'react';
-import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
-import { defaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
 
 interface UseAIChoiceGenerationOptions {
@@ -416,8 +430,6 @@ export const useAIChoiceGeneration = (options: UseAIChoiceGenerationOptions) => 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const choiceGenerator = new ChoiceGenerator(defaultGeminiClient);
-
   const generateChoices = useCallback(async (
     narrativeContext: NarrativeContext,
     characterIds: string[] = []
@@ -426,14 +438,26 @@ export const useAIChoiceGeneration = (options: UseAIChoiceGenerationOptions) => 
     setError(null);
 
     try {
-      const decision = await choiceGenerator.generateChoices({
-        worldId: options.worldId,
-        narrativeContext,
-        characterIds,
-        maxOptions: options.maxOptions || 4,
-        minOptions: options.minOptions || 3
+      // Use secure API endpoint instead of direct AI client
+      const response = await fetch('/api/narrative/choices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldId: options.worldId,
+          narrativeContext,
+          characterIds,
+          maxOptions: options.maxOptions || 4,
+          minOptions: options.minOptions || 3
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate choices');
+      }
+
+      const decision = await response.json();
       setChoices(decision);
       return decision;
     } catch (err: any) {
