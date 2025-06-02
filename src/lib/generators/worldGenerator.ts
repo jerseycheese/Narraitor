@@ -42,6 +42,98 @@ export const TV_MOVIE_UNIVERSES = [
   'UHF'
 ];
 
+// Universe context for accurate generation
+interface UniverseContext {
+  genre: string;
+  description: string;
+  techLevel: string;
+  setting: string;
+}
+
+function getUniverseContext(universe: string): UniverseContext {
+  const contexts: Record<string, UniverseContext> = {
+    'Game of Thrones': {
+      genre: 'Medieval Fantasy',
+      description: 'a medieval fantasy world with political intrigue, dragons, and magic',
+      techLevel: 'Medieval (swords, castles, no gunpowder)',
+      setting: 'Westeros and Essos continents with kingdoms, houses, and ancient magic'
+    },
+    'Lord of the Rings': {
+      genre: 'High Fantasy',
+      description: 'a high fantasy world with elves, dwarves, hobbits, wizards, and epic quests',
+      techLevel: 'Medieval/Ancient (no advanced technology)',
+      setting: 'Middle-earth with different races, magical rings, and dark lords'
+    },
+    'Star Wars': {
+      genre: 'Space Opera',
+      description: 'a space opera with the Force, Jedi, Sith, space travel, and galactic empires',
+      techLevel: 'Advanced sci-fi (lightsabers, starships, droids)',
+      setting: 'Galaxy far, far away with multiple planets and species'
+    },
+    'The Office': {
+      genre: 'Modern Workplace Comedy',
+      description: 'a modern workplace mockumentary about office life and mundane corporate culture',
+      techLevel: 'Modern day (computers, phones, office equipment)',
+      setting: 'Contemporary office building in Scranton, Pennsylvania'
+    },
+    'Breaking Bad': {
+      genre: 'Modern Crime Drama',
+      description: 'a modern crime drama about drug manufacturing and criminal underworld',
+      techLevel: 'Modern day (cars, phones, chemistry equipment)',
+      setting: 'Contemporary Albuquerque, New Mexico'
+    },
+    'The Matrix': {
+      genre: 'Cyberpunk Sci-Fi',
+      description: 'a cyberpunk world where reality is a computer simulation and humans fight machines',
+      techLevel: 'Near-future/cyberpunk (advanced computers, virtual reality)',
+      setting: 'Post-apocalyptic real world and simulated 1990s reality'
+    },
+    'Mad Max': {
+      genre: 'Post-Apocalyptic',
+      description: 'a post-apocalyptic wasteland with vehicular combat and resource scarcity',
+      techLevel: 'Post-apocalyptic (modified vehicles, scavenged tech)',
+      setting: 'Australian wasteland after societal collapse'
+    },
+    'Star Trek': {
+      genre: 'Optimistic Sci-Fi',
+      description: 'an optimistic sci-fi future with space exploration, alien species, and advanced technology',
+      techLevel: 'Far future (transporters, warp drive, replicators)',
+      setting: 'Federation space with multiple planets and species'
+    },
+    'Westworld': {
+      genre: 'Sci-Fi Western',
+      description: 'a sci-fi western with android hosts in a theme park and AI consciousness',
+      techLevel: 'Near future (advanced AI, robotics) in Wild West setting',
+      setting: 'Western theme park with android hosts and human guests'
+    },
+    'The Walking Dead': {
+      genre: 'Zombie Apocalypse',
+      description: 'a zombie apocalypse survival story with undead walkers and human communities',
+      techLevel: 'Modern day (limited resources, scavenged equipment)',
+      setting: 'Post-zombie-apocalypse Georgia and surrounding areas'
+    },
+    'Black Mirror': {
+      genre: 'Dark Sci-Fi Anthology',
+      description: 'a dark sci-fi anthology exploring technology\'s impact on society and human behavior',
+      techLevel: 'Near future (advanced social media, VR, AI)',
+      setting: 'Various near-future settings with dystopian technology'
+    },
+    'Stranger Things': {
+      genre: '1980s Supernatural',
+      description: 'a 1980s supernatural story with parallel dimensions, government experiments, and monsters',
+      techLevel: '1980s (walkie-talkies, arcade games, no internet)',
+      setting: 'Small town Hawkins, Indiana in the 1980s'
+    }
+  };
+
+  return contexts[universe] || {
+    genre: 'Unknown',
+    description: 'an unknown fictional universe',
+    techLevel: 'Unspecified',
+    setting: 'Unspecified setting'
+  };
+}
+
 /**
  * Unified world generation function
  */
@@ -62,10 +154,20 @@ async function generateWithAI(options: WorldGenerationOptions): Promise<Generate
   // Determine if this world should be set in the reference universe or just inspired by it
   const isSetIn = options.relationship === 'set_in';
   
+  // Get universe-specific context for better generation
+  const universeContext = getUniverseContext(reference);
+  
   const prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
+UNIVERSE CONTEXT: ${reference} is ${universeContext.description}
+
 ${isSetIn 
-  ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, planet, or area that fits within the established ${reference} lore and setting. Use existing ${reference} terminology, species, magic systems, technology, etc. where appropriate.`
+  ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, or area that fits perfectly within the established ${reference} setting. The world MUST:
+     - Use the EXACT same genre/theme as ${reference} (${universeContext.genre})
+     - Follow the established technology level, time period, and rules of ${reference}
+     - Use appropriate ${reference} terminology, locations, species, and lore
+     - Feel like it could actually exist within the ${reference} storyline
+     - NOT change the fundamental nature or genre of ${reference}`
   : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore.`
 }
 
@@ -75,7 +177,7 @@ ${options.existingNames?.length ? `\nExisting worlds to avoid duplicating: ${opt
 Provide a JSON response with this exact structure:
 {
   "name": "${isSetIn ? `A name that fits within the ${reference} universe` : 'A unique name for this world (not just the reference name)'}",
-  "theme": "The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)",
+  "theme": "${isSetIn ? universeContext.genre : 'The genre/setting that captures the essence of ' + reference}",
   "description": "A 2-3 sentence description of the world and its unique features. ${isSetIn ? `MUST clearly establish that this is part of the ${reference} universe.` : `MUST mention that this world is inspired by ${reference}.`}",
   "attributes": [
     {
@@ -96,8 +198,9 @@ Provide a JSON response with this exact structure:
   ]
 }
 
-Generate 4-6 attributes that make sense for this world setting.
-Generate 6-10 skills that would be relevant in this world.
+Generate 4-6 attributes that make sense for this world setting and the ${reference} universe.
+Generate 6-10 skills that would be relevant in this world and appropriate for the ${universeContext.techLevel} technology level.
+${isSetIn ? `Make sure all attributes and skills fit perfectly within the ${reference} universe and its established rules/lore.` : `Create attributes and skills that capture the feeling of ${reference} but in your original world.`}
 Make the world interesting and playable while staying true to the source material.
 
 IMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
