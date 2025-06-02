@@ -1,17 +1,86 @@
 // src/app/api/generate-portrait/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
+import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { GeminiClient } from '@/lib/ai/geminiClient';
+import { getDefaultConfig } from '@/lib/ai/config';
+import type { Character } from '@/types/character.types';
+import type { World } from '@/types/world.types';
+
+interface PortraitRequestBody {
+  prompt?: string;
+  character?: Character;
+  world?: World;
+  customDescription?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const body: PortraitRequestBody = await request.json();
     
-    if (!prompt) {
+    // Handle both old format (prompt only) and new format (character + world)
+    if (body.character) {
+      // New format: character + world objects - use full portrait generation pipeline
+      const config = getDefaultConfig();
+      const client = new GeminiClient(config);
+      const generator = new PortraitGenerator(client);
+      
+      // Build the options for portrait generation
+      const options = {
+        worldTheme: body.world?.theme,
+        isKnownFigure: body.character.background?.isKnownFigure
+      };
+      
+      // Override physical description if provided
+      let character = body.character;
+      if (body.customDescription) {
+        character = {
+          ...character,
+          background: {
+            ...character.background,
+            physicalDescription: body.customDescription
+          }
+        };
+      }
+      
+      console.log('[Portrait API] Generating portrait for character:', {
+        name: character.name,
+        worldTheme: options.worldTheme,
+        isKnownFigure: options.isKnownFigure,
+        physicalDescription: character.background?.physicalDescription
+      });
+      
+      try {
+        // Use the full generatePortrait method which handles the entire pipeline
+        const portraitResult = await generator.generatePortrait(character, options);
+        
+        console.log('[Portrait API] Successfully generated portrait for:', character.name);
+        
+        // Return the result directly for character/world format
+        return NextResponse.json({
+          portrait: portraitResult
+        });
+      } catch (portraitError) {
+        console.error('[Portrait API] Portrait generation failed:', portraitError);
+        return NextResponse.json(
+          { 
+            error: 'Portrait generation failed',
+            details: portraitError instanceof Error ? portraitError.message : 'Unknown error'
+          },
+          { status: 500 }
+        );
+      }
+    } else if (body.prompt) {
+      // Old format: direct prompt - continue with existing Gemini API flow
+    } else {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: 'Either prompt or character data is required' },
         { status: 400 }
       );
     }
+    
+    // Continue with old prompt-based flow for backwards compatibility
+    const prompt = body.prompt as string;
 
     const apiKey = process.env.GEMINI_API_KEY;
     
@@ -118,10 +187,26 @@ export async function POST(request: NextRequest) {
     const mimeType = imagePart.inlineData!.mimeType;
     const base64Data = imagePart.inlineData!.data;
     
-    return NextResponse.json({
-      image: `data:${mimeType};base64,${base64Data}`,
-      prompt: prompt
-    });
+    const imageUrl = `data:${mimeType};base64,${base64Data}`;
+    
+    // Return in both old and new formats for compatibility
+    if (body.character) {
+      // New format: return portrait object for character creation
+      return NextResponse.json({
+        portrait: {
+          type: 'ai-generated',
+          url: imageUrl,
+          generatedAt: new Date().toISOString(),
+          prompt: prompt
+        }
+      });
+    } else {
+      // Old format: return image and prompt directly
+      return NextResponse.json({
+        image: imageUrl,
+        prompt: prompt
+      });
+    }
 
   } catch (error) {
     console.error('Portrait generation error:', error);

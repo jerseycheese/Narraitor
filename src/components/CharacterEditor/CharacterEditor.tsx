@@ -104,7 +104,6 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           character: {
             id: characterId,
             name: character.name,
-            description: character.background?.history || '',
             worldId: character.worldId,
             background: {
               history: character.background.history,
@@ -133,8 +132,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
             status: {
               health: character.status.hp,
               maxHealth: 100,
-              conditions: [],
-              location: undefined
+              conditions: []
             },
             createdAt: character.createdAt,
             updatedAt: character.updatedAt
