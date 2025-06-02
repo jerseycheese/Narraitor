@@ -250,7 +250,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       const generatedCharacter = await response.json();
       
       // Convert AI-generated character to test data format
-      const testData = {
+      const testData: any = {
         name: generatedCharacter.name,
         attributes: generatedCharacter.attributes.map((attr: { id: string; value: number }) => ({
           attributeId: attr.id,
