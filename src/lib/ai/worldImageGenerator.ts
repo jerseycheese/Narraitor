@@ -94,27 +94,18 @@ export class WorldImageGenerator {
         };
       }
       
-      // Make the API call through our existing portrait generation endpoint
-      const response = await fetch('/api/generate-portrait', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate world image');
+      // Use the AI client's generateImage method
+      if (!this.aiClient.generateImage) {
+        throw new Error('AI client does not support image generation');
       }
-
-      const data = await response.json();
+      
+      const response = await this.aiClient.generateImage(prompt);
       
       return {
         type: 'ai-generated',
-        url: data.image,
+        url: response.image,
         generatedAt: new Date().toISOString(),
-        prompt: prompt
+        prompt: response.prompt
       };
     } catch (error) {
       console.error('World image generation error:', error);
