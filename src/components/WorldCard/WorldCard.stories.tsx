@@ -240,3 +240,74 @@ export const NoImageInactive: Story = {
     }
   },
 };
+
+// Story showing "Set In" world type
+export const SetInWorld: Story = {
+  args: {
+    world: {
+      ...mockWorld,
+      name: 'Middle-earth Adventure',
+      description: 'Journey through the Shire, visit Rivendell, and brave the paths to Mordor in this epic quest through Tolkien\'s beloved world.',
+      theme: 'Fantasy',
+      reference: 'Lord of the Rings',
+      relationship: 'set_in'
+    },
+    characterCount: 5,
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'A WorldCard showing a world set within the Lord of the Rings universe with purple "Set in" badge'
+      }
+    }
+  },
+};
+
+// Story showing "Based On" world type
+export const BasedOnWorld: Story = {
+  args: {
+    world: {
+      ...sciFiWorld,
+      name: 'Chrome Shadows',
+      description: 'A neon-soaked metropolis where corporate espionage and street-level hackers clash in a world inspired by classic cyberpunk themes.',
+      theme: 'Cyberpunk',
+      reference: 'Blade Runner',
+      relationship: 'based_on'
+    },
+    characterCount: 2,
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'A WorldCard showing a world inspired by Blade Runner with green "Inspired by" badge'
+      }
+    }
+  },
+};
+
+// Story showing Original world type
+export const OriginalWorld: Story = {
+  args: {
+    world: {
+      ...westernWorld,
+      name: 'Dreamscape Frontier',
+      description: 'A completely original world where reality bends to the will of dreamwalkers and nightmares take physical form in the waking world.',
+      theme: 'Surreal Western',
+      // No reference or relationship = original world
+    },
+    characterCount: 3,
+    onSelect: (id: string) => console.log(`Selected world: ${id}`),
+    onDelete: (id: string) => console.log(`Delete world: ${id}`),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'A WorldCard showing a completely original world with blue "Original World" badge'
+      }
+    }
+  },
+};

@@ -164,6 +164,33 @@ const WorldCard: React.FC<WorldCardProps> = ({
               )}
             </div>
           
+          {/* World type badge */}
+          <div className="mt-2 flex items-center gap-2">
+            {world.relationship && world.reference ? (
+              <span 
+                data-testid="world-card-type"
+                className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  world.relationship === 'set_in'
+                    ? 'bg-purple-100 text-purple-800'
+                    : 'bg-green-100 text-green-800'
+                }`}
+              >
+                {world.relationship === 'set_in' ? (
+                  <>🌍 Set in {world.reference}</>
+                ) : (
+                  <>✨ Inspired by {world.reference}</>
+                )}
+              </span>
+            ) : (
+              <span 
+                data-testid="world-card-type"
+                className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-800"
+              >
+                ⚡ Original World
+              </span>
+            )}
+          </div>
+          
           {/* Character count for all worlds */}
           <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
             <span className="flex items-center gap-1">

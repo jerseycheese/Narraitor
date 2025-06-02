@@ -40,6 +40,59 @@ const TV_MOVIE_UNIVERSES = [
   'True Detective'
 ];
 
+// Canonical themes for known universes (for "set in" worlds)
+const CANONICAL_THEMES: Record<string, string> = {
+  'Star Wars': 'Space Opera',
+  'The Mandalorian': 'Space Opera',
+  'Star Trek': 'Science Fiction',
+  'Dune': 'Science Fiction',
+  'The Matrix': 'Cyberpunk',
+  'Black Mirror': 'Dystopian Sci-Fi',
+  'Westworld': 'Western Sci-Fi',
+  'Mad Max': 'Post-Apocalyptic',
+  'The Walking Dead': 'Post-Apocalyptic Horror',
+  'Game of Thrones': 'Medieval Fantasy',
+  'Lord of the Rings': 'High Fantasy',
+  'The Witcher': 'Dark Fantasy',
+  'Stranger Things': 'Supernatural Horror',
+  'Twin Peaks': 'Supernatural Mystery',
+  'Deadwood': 'Western',
+  'Breaking Bad': 'Crime Drama',
+  'True Detective': 'Crime Thriller'
+};
+
+/**
+ * Get the canonical theme for a known universe
+ */
+function getCanonicalTheme(reference: string): string {
+  // Check for exact match first
+  if (CANONICAL_THEMES[reference]) {
+    return CANONICAL_THEMES[reference];
+  }
+  
+  // Check for partial matches (case insensitive)
+  const lowerRef = reference.toLowerCase();
+  for (const [universe, theme] of Object.entries(CANONICAL_THEMES)) {
+    if (universe.toLowerCase().includes(lowerRef) || lowerRef.includes(universe.toLowerCase())) {
+      return theme;
+    }
+  }
+  
+  // Fallback based on common patterns
+  if (lowerRef.includes('star') && (lowerRef.includes('wars') || lowerRef.includes('trek'))) {
+    return 'Science Fiction';
+  }
+  if (lowerRef.includes('lord') && lowerRef.includes('rings')) {
+    return 'High Fantasy';
+  }
+  if (lowerRef.includes('game') && lowerRef.includes('thrones')) {
+    return 'Medieval Fantasy';
+  }
+  
+  // Generic fallback
+  return 'Fantasy';
+}
+
 /**
  * Unified world generation function
  */
@@ -70,11 +123,21 @@ IMPORTANT: Create a COMPLETELY ORIGINAL world from your imagination. Do not base
     const reference = options.reference!;
     const isSetIn = options.relationship === 'set_in';
     
+    // Get canonical theme for "set in" worlds
+    const canonicalTheme = getCanonicalTheme(reference);
+    const themeInstruction = isSetIn 
+      ? `The theme MUST be "${canonicalTheme}" to match the ${reference} universe.`
+      : `Choose an appropriate theme that captures the essence of ${reference}.`;
+    
+    if (isSetIn) {
+      console.log(`[WorldGenerator] "Set in" world for ${reference} - canonical theme: ${canonicalTheme}`);
+    }
+    
     prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
 ${isSetIn 
-  ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, planet, or area that fits within the established ${reference} lore and setting. Use existing ${reference} terminology, species, magic systems, technology, etc. where appropriate.`
-  : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore.`
+  ? `IMPORTANT: Create a world that exists WITHIN the ${reference} universe. This should be a specific location, region, planet, or area that fits within the established ${reference} lore and setting. Use existing ${reference} terminology, species, magic systems, technology, etc. where appropriate. ${themeInstruction}`
+  : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore. ${themeInstruction}`
 }`
   }
 
@@ -86,11 +149,43 @@ ${isSetIn
     prompt += `\n\nExisting worlds to avoid duplicating: ${options.existingNames.join(', ')}`;
   }
 
-  // Add JSON structure requirements
-  prompt += `\n\nProvide a JSON response with this exact structure:
+  // Add creative naming guidance based on prompt content
+  const themeHint = prompt.toLowerCase();
+  let namingGuidance = '';
+  
+  if (themeHint.includes('fantasy')) {
+    namingGuidance = `
+- Use Celtic, Norse, or other cultural linguistics (e.g., "Vryndaal", "Korvathia", "Zhengara")
+- Combine natural elements creatively (e.g., "Thornspire", "Mistholm", "Dragonmere")
+- Use abstract concepts (e.g., "The Sundering", "Whisperlands", "Evermoon")`;
+  } else if (themeHint.includes('sci-fi') || themeHint.includes('cyberpunk')) {
+    namingGuidance = `
+- Use technical/scientific terms (e.g., "Nexus Prime", "Quantum Gate", "Neural Collective")
+- Combine numbers/codes (e.g., "Sector 7", "Alpha Station", "Grid 2049")
+- Use corporate/futuristic names (e.g., "Neo Singapore", "CyberCore City", "Titanfall Industries")`;
+  } else if (themeHint.includes('western')) {
+    namingGuidance = `
+- Use frontier/geographic names (e.g., "Copper Canyon", "Deadwater Gulch", "Sunset Ridge")
+- Historical American names (e.g., "Fort Meridian", "Silver Creek", "Tombstone Valley")`;
+  } else if (themeHint.includes('horror')) {
+    namingGuidance = `
+- Dark, ominous names (e.g., "Ravenshollow", "The Blackmoor", "Grimhaven")
+- Gothic or Victorian names (e.g., "Ashworth Manor", "Bleakshire", "Morrighan's Rest")`;
+  } else {
+    namingGuidance = `
+- Names from different cultures and languages
+- Made-up words that sound natural
+- Descriptive names based on geography or history
+- Abstract or poetic names`;
+  }
+
+  prompt += `\n\nIMPORTANT: Create a UNIQUE and CREATIVE world name. Avoid overused fantasy names like "Aethelgard", "Eldoria", "Avalon", "Mystara", "Drakmoor", etc. Consider:${namingGuidance}
+- Avoid generic patterns like "[Adjective][Place]" (e.g., "Darklands", "Brightshire")
+
+Provide a JSON response with this exact structure:
 {
-  "name": "A unique name for this world",
-  "theme": "The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)",
+  "name": "A creative, unique name for this world (avoid common fantasy tropes)",
+  "theme": "${options.relationship === 'set_in' && options.reference ? getCanonicalTheme(options.reference) : 'The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)'}",
   "description": "A 2-3 sentence description of the world and its unique features`;
   
   if (options.reference) {

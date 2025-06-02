@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import { generateTestWorld } from '@/lib/generators/worldGenerator';
+// Removed unused import: generateTestWorld
 import { generateTestCharacter, generateAICharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
@@ -20,13 +20,60 @@ export const TestDataGeneratorSection: React.FC = () => {
   
   const handleGenerateWorld = async () => {
     try {
-      // Use the test world generator which includes TV/movie themes
-      console.log(`[DevTools] Generating test world with TV/movie themes...`);
-      const testWorldData = await generateTestWorld();
+      // Generate a diverse mix of world types for testing
+      const worldTypeRandom = Math.random();
+      let worldOptions;
+      
+      if (worldTypeRandom < 0.33) {
+        // 33% - Original worlds (no reference)
+        console.log(`[DevTools] Generating original world...`);
+        worldOptions = { method: 'ai' as const };
+      } else if (worldTypeRandom < 0.66) {
+        // 33% - "Set in" worlds (existing universe)
+        const tvMovieUniverses = [
+          'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
+          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
+        ];
+        const randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
+        console.log(`[DevTools] Generating "set in" world for ${randomReference} (canonical theme will be applied)...`);
+        worldOptions = { 
+          method: 'ai' as const, 
+          reference: randomReference, 
+          relationship: 'set_in' as const 
+        };
+      } else {
+        // 34% - "Based on" worlds (inspired by existing universe)
+        const tvMovieUniverses = [
+          'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
+          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
+        ];
+        const randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
+        console.log(`[DevTools] Generating "based on" world inspired by ${randomReference}...`);
+        worldOptions = { 
+          method: 'ai' as const, 
+          reference: randomReference, 
+          relationship: 'based_on' as const 
+        };
+      }
+      
+      // Get existing world names to ensure uniqueness
+      const existingNames = Object.values(worlds).map(w => w.name);
+      
+      // Import the generateWorld function directly for diverse world types
+      const { generateWorld } = await import('@/lib/generators/worldGenerator');
+      const testWorldData = await generateWorld({
+        ...worldOptions,
+        existingNames
+      });
       
       // Transform the generated data to match the store's expected format
       const worldDataForStore = {
         ...testWorldData,
+        // Include the reference and relationship from worldOptions
+        reference: worldOptions.reference,
+        relationship: worldOptions.relationship,
         attributes: testWorldData.attributes.map(attr => ({
           ...attr,
           id: generateUniqueId('attr'),
@@ -51,6 +98,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       try {
         // Get the created world from store
         const world = worldStore.getState().worlds[worldId];
+        console.log(`[DevTools] Attempting to generate image for world:`, world?.name);
         if (world) {
           const response = await fetch('/api/generate-world-image', {
             method: 'POST',
@@ -59,12 +107,18 @@ export const TestDataGeneratorSection: React.FC = () => {
           });
           
           if (response.ok) {
-            const { image } = await response.json();
-            // Update the world with the generated image
+            const { imageUrl, aiGenerated, service } = await response.json();
+            // Update the world with the generated image in WorldImage format
+            const image = {
+              type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
+              url: imageUrl,
+              generatedAt: new Date().toISOString()
+            };
             worldStore.getState().updateWorld(worldId, { image });
-            console.log(`Generated image for test world "${testWorldData.name}"`);
+            console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);
           } else {
-            console.warn(`Failed to generate world image: ${response.status}`);
+            const errorText = await response.text();
+            console.warn(`[DevTools] Failed to generate world image: ${response.status} - ${errorText}`);
           }
         }
       } catch (error) {
@@ -82,15 +136,67 @@ export const TestDataGeneratorSection: React.FC = () => {
     const createdWorlds = [];
     
     try {
+      // Import the generateWorld function for diverse world types
+      const { generateWorld } = await import('@/lib/generators/worldGenerator');
+      
+      // Get existing world names to ensure uniqueness
+      const existingNames = Object.values(worlds).map(w => w.name);
+      
       for (let i = 0; i < 5; i++) {
-        console.log(`[DevTools] Generating test world ${i + 1}/5 with TV/movie themes...`);
+        console.log(`[DevTools] Generating diverse world ${i + 1}/5...`);
         
-        // Use the test world generator which includes TV/movie themes
-        const testWorldData = await generateTestWorld();
+        // Generate a diverse mix of world types for testing
+        const worldTypeRandom = Math.random();
+        let worldOptions;
+        
+        if (worldTypeRandom < 0.33) {
+          // 33% - Original worlds (no reference)
+          console.log(`[DevTools] Generating original world ${i + 1}/5...`);
+          worldOptions = { method: 'ai' as const };
+        } else if (worldTypeRandom < 0.66) {
+          // 33% - "Set in" worlds (existing universe)
+          const tvMovieUniverses = [
+            'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
+            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
+          ];
+          const randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
+          console.log(`[DevTools] Generating "set in" world ${i + 1}/5 for ${randomReference} (canonical theme will be applied)...`);
+          worldOptions = { 
+            method: 'ai' as const, 
+            reference: randomReference, 
+            relationship: 'set_in' as const 
+          };
+        } else {
+          // 34% - "Based on" worlds (inspired by existing universe)
+          const tvMovieUniverses = [
+            'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
+            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
+          ];
+          const randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
+          console.log(`[DevTools] Generating "based on" world ${i + 1}/5 inspired by ${randomReference}...`);
+          worldOptions = { 
+            method: 'ai' as const, 
+            reference: randomReference, 
+            relationship: 'based_on' as const 
+          };
+        }
+        
+        // Include existing names plus already created worlds in this batch to avoid duplicates
+        const allExistingNames = [...existingNames, ...createdWorlds.map(w => w.name)];
+        
+        const testWorldData = await generateWorld({
+          ...worldOptions,
+          existingNames: allExistingNames
+        });
         
         // Transform the generated data to match the store's expected format
         const worldDataForStore = {
           ...testWorldData,
+          // Include the reference and relationship from worldOptions
+          reference: worldOptions.reference,
+          relationship: worldOptions.relationship,
           attributes: testWorldData.attributes.map(attr => ({
             ...attr,
             id: generateUniqueId('attr'),
@@ -118,6 +224,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         try {
           // Get the created world from store
           const world = worldStore.getState().worlds[worldId];
+          console.log(`[DevTools] Attempting to generate image for world ${i + 1}/5:`, world?.name);
           if (world) {
             const response = await fetch('/api/generate-world-image', {
               method: 'POST',
@@ -126,12 +233,18 @@ export const TestDataGeneratorSection: React.FC = () => {
             });
             
             if (response.ok) {
-              const { image } = await response.json();
-              // Update the world with the generated image
+              const { imageUrl, aiGenerated, service } = await response.json();
+              // Update the world with the generated image in WorldImage format
+              const image = {
+                type: aiGenerated ? 'ai-generated' as const : 'placeholder' as const,
+                url: imageUrl,
+                generatedAt: new Date().toISOString()
+              };
               worldStore.getState().updateWorld(worldId, { image });
-              console.log(`Generated image for test world "${testWorldData.name}"`);
+              console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);
             } else {
-              console.warn(`Failed to generate world image for "${testWorldData.name}": ${response.status}`);
+              const errorText = await response.text();
+              console.warn(`[DevTools] Failed to generate world image for "${testWorldData.name}": ${response.status} - ${errorText}`);
             }
           }
         } catch (error) {
@@ -531,16 +644,17 @@ export const TestDataGeneratorSection: React.FC = () => {
         <button
           onClick={handleGenerateWorld}
           className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm transition-colors"
+          title="Creates diverse AI worlds: 33% original, 33% set in existing universes, 34% based on existing universes"
         >
-          Generate AI World
+          Generate Diverse AI World
         </button>
         
         <button
           onClick={handleGenerate5Worlds}
           className="w-full px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm transition-colors"
-          title="Creates 5 complete AI worlds with randomized themes, attributes, and skills"
+          title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
         >
-          Generate 5 AI Worlds
+          Generate 5 Diverse AI Worlds
         </button>
         
         <button
@@ -581,7 +695,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       </div>
       
       <p className="text-xs text-gray-400">
-        AI generators create unique content for development testing.
+        AI generators create diverse content for testing: original worlds, &quot;set in&quot; universes, and &quot;based on&quot; worlds.
         {!effectiveWorldId && ' Select a world to enable character generation.'}
         {worldIdFromUrl && <span className="block mt-1 text-blue-400">Using world from current page: {worlds[worldIdFromUrl]?.name}</span>}
       </p>
