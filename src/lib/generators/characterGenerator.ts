@@ -119,7 +119,7 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
     name: finalName,
     level: Math.floor(Math.random() * 3) + 1, // Level 1-3
     background: {
-      description: `A ${finalName.toLowerCase()} from the ${world.name} world with an interesting past.`,
+      description: `A mysterious figure with an interesting past${world.reference ? ` from the ${world.reference} universe` : ''}.`,
       personality: personalities[Math.floor(Math.random() * personalities.length)],
       motivation: motivations[Math.floor(Math.random() * motivations.length)],
       fears: fears[Math.floor(Math.random() * fears.length)],
@@ -138,22 +138,31 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
 async function generateWithAI(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
   const { world, existingNames = [], suggestedName, generationType = 'known' } = options;
   
+  logger.debug('CharacterGenerator', `Generating ${generationType} character for world:`, {
+    worldName: world.name,
+    worldReference: world.reference,
+    worldRelationship: world.relationship,
+    theme: world.theme
+  });
+  
   try {
     const prompt = `
-You are creating a character for the world "${world.name}" with the theme "${world.theme}".
+You are creating a character for a ${world.theme} themed world${world.reference ? ` based on ${world.reference}` : ''}.
+${world.reference && world.relationship === 'set_in' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
+${world.reference && world.relationship === 'based_on' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
 ${world.description ? `\nWorld Context: ${world.description}` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
-${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist in this world and must NOT be used: ${existingNames.join(', ')}` : ''}
+${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}
 
 World Attributes: ${world.attributes.map(a => `${a.name} (${a.minValue}-${a.maxValue})`).join(', ')}
 World Skills: ${world.skills.map(s => s.name).join(', ')}
 
 Create a character that:
 ${generationType === 'specific' && suggestedName ? 
-  `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from the actual ${world.name} source material` :
+  `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from ${world.reference ? `the actual ${world.reference} source material` : 'this world'}` :
   generationType === 'known' ?
-  `1. MUST be a REAL, EXISTING character from the actual ${world.name} source material (NOT made up)` :
-  `1. Should be an original character that fits the ${world.name} world theme and has never appeared in the source material`
+  `1. MUST be a REAL, EXISTING character from ${world.reference ? `the actual ${world.reference} source material. Use only actual named characters that appear in ${world.reference}. Do NOT make up new characters!` : 'this world'} (NOT made up)` :
+  `1. Should be an original character that fits the world theme and has never appeared in any source material`
 }
 2. Is NOT one of the existing characters listed above (check names carefully)
 3. Has an interesting background story that fits the world
@@ -200,20 +209,16 @@ CRITICAL INSTRUCTIONS:
 
     logger.debug('CharacterGenerator', 'Generated prompt:', prompt);
     
-    // Use secure API endpoint instead of direct AI client
-    const response = await fetch('/api/ai/generate-character', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ prompt }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const apiResponse = await response.json();
+    // Import and use the AI client directly for server-side usage
+    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+    const client = createDefaultGeminiClient();
+    
+    // Generate with AI
+    const response = await client.generateContent(prompt);
+    const apiResponse = {
+      content: response.content,
+      finishReason: response.finishReason
+    };
     
     // Log the raw response for debugging
     logger.debug('CharacterGenerator', 'Raw AI response:', apiResponse.content);
@@ -386,8 +391,13 @@ CRITICAL INSTRUCTIONS:
     
     logger.error('CharacterGenerator', 'AI generation failed:', error);
     
-    // If AI generation fails, fall back to template generation
-    logger.debug('CharacterGenerator', 'Falling back to template generation due to AI error');
+    // For known figures, we should never fall back to template generation
+    if (generationType === 'known' || generationType === 'specific') {
+      throw new Error(`Failed to generate known character from ${world.reference || 'this world'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    
+    // Only fall back to template generation for original characters
+    logger.debug('CharacterGenerator', 'Falling back to template generation for original character due to AI error');
     try {
       return generateFromTemplate({ 
         method: 'template', 

@@ -386,7 +386,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         console.log(`[DevTools] Generating ${characterType} character for ${currentWorld.relationship || currentWorld.universeRelationship || 'no reference'} world`);
         
         // Use the AI character generator via API route (secure approach from develop)
-        const response: Response = await fetch('/api/ai/generate-character', {
+        const response: Response = await fetch('/api/generate-character', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

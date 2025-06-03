@@ -7,7 +7,8 @@ const path = require('path');
 const config = {
   stories: [
     // Include all stories from the project
-    '../src/**/*.stories.@(js|jsx|ts|tsx)'
+    '../src/**/*.stories.@(js|jsx|ts|tsx)',
+    '../src/**/*.mdx'
   ],
   addons: [
     '@storybook/addon-essentials'

@@ -251,7 +251,7 @@ export default function CharactersPage() {
 
   if (!effectiveWorldId || !currentWorld) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Characters</h1>
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
@@ -288,7 +288,7 @@ export default function CharactersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Show back link if viewing from a specific world */}
         {worldIdFromUrl && (
@@ -302,12 +302,12 @@ export default function CharactersPage() {
           </div>
         )}
         
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">Characters</h1>
             <p className="text-gray-600 mt-2">World: {currentWorld.name}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {currentCharacterId && effectiveWorldId && (
               <button
                 onClick={() => {

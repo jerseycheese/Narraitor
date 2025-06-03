@@ -20,6 +20,9 @@ export function Navigation() {
     char => char.worldId === currentWorldId
   ).length;
   
+  // Check if we should show breadcrumbs
+  const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
+  
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,30 +74,11 @@ export function Navigation() {
                 >
                   Worlds
                 </Link>
-                
-                {currentWorld && (
-                  <>
-                    <span className="text-gray-500 mx-1">|</span>
-                    <Link 
-                      href="/characters" 
-                      className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors ${
-                        pathname.startsWith('/characters') ? 'bg-gray-800' : ''
-                      }`}
-                    >
-                      Characters in {currentWorld.name}
-                      {worldCharacterCount > 0 && (
-                        <span className="ml-2 text-xs bg-gray-700 px-2 py-1 rounded-full">
-                          {worldCharacterCount}
-                        </span>
-                      )}
-                    </Link>
-                  </>
-                )}
               </div>
             </div>
             
             {/* Right side - Quick actions and current context */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* World Switcher Dropdown */}
               {Object.keys(worlds).length > 0 && (
                 <div className="relative" ref={dropdownRef}>
@@ -108,6 +92,11 @@ export function Navigation() {
                     <span className="hidden sm:inline">
                       {currentWorld ? currentWorld.name : 'Select World'}
                     </span>
+                    {currentWorld && worldCharacterCount > 0 && (
+                      <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">
+                        {worldCharacterCount}
+                      </span>
+                    )}
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -187,14 +176,9 @@ export function Navigation() {
                 Worlds
               </Link>
               {currentWorld && (
-                <>
-                  <Link href="/characters" className="hover:text-gray-300">
-                    Characters ({worldCharacterCount})
-                  </Link>
-                  <Link href="/characters/create" className="text-green-400 hover:text-green-300">
-                    + New Character
-                  </Link>
-                </>
+                <Link href="/characters/create" className="text-green-400 hover:text-green-300">
+                  + New Character
+                </Link>
               )}
             </div>
           </div>
@@ -202,12 +186,14 @@ export function Navigation() {
       </nav>
       
       {/* Breadcrumbs */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <Breadcrumbs className="sm:hidden" maxItems={2} />
-          <Breadcrumbs className="hidden sm:flex" />
+      {shouldShowBreadcrumbs && (
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <Breadcrumbs className="sm:hidden" maxItems={2} />
+            <Breadcrumbs className="hidden sm:flex" />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
