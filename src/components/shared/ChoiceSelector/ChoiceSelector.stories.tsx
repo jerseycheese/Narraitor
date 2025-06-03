@@ -3,7 +3,7 @@ import ChoiceSelector from './ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
 
 const meta: Meta<typeof ChoiceSelector> = {
-  title: 'Narraitor/Shared/ChoiceSelector',
+  title: 'Narraitor/Narrative/Input/ChoiceSelector',
   component: ChoiceSelector,
   parameters: {
     layout: 'padded',

@@ -10,7 +10,7 @@ const mockSettings: WorldSettings = {
 };
 
 const meta: Meta<typeof WorldSettingsForm> = {
-  title: 'Narraitor/UI/Forms/WorldSettingsForm',
+  title: 'Narraitor/World/Forms/WorldSettingsForm',
   component: WorldSettingsForm,
   parameters: {
     layout: 'padded',

@@ -6,7 +6,7 @@ import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
 const meta: Meta<typeof Navigation> = {
-  title: 'Narraitor/Navigation/Navigation',
+  title: 'Narraitor/UI/Navigation/Navigation',
   component: Navigation,
   parameters: {
     layout: 'fullscreen',

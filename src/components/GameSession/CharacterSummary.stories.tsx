@@ -23,7 +23,7 @@ interface Character {
 }
 
 const meta = {
-  title: 'Narraitor/GameSession/CharacterSummary',
+  title: 'Narraitor/Game/Session/CharacterSummary',
   component: CharacterSummary,
   parameters: {
     layout: 'centered',
@@ -93,51 +93,3 @@ export const WithPlaceholderPortrait: Story = {
   }
 };
 
-export const WithNicknamePortrait: Story = {
-  args: {
-    character: {
-      ...baseCharacter,
-      name: 'Marcus "The Shield" Valorian',
-      portrait: {
-        type: 'placeholder',
-        url: null,
-      },
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Character with nickname in name - portrait initials should ignore the quoted nickname (MV)'
-      }
-    }
-  }
-};
-
-export const MinimalInfo: Story = {
-  args: {
-    character: {
-      ...baseCharacter,
-      background: {
-        history: '',
-        personality: '',
-        goals: [],
-        fears: []
-      },
-    },
-  },
-};
-
-export const LongDescription: Story = {
-  args: {
-    character: {
-      ...baseCharacter,
-      background: {
-        history: 'Born into a noble family but chose the path of adventure after witnessing injustice. Trained at the Academy of High Magic for ten years before setting out on a quest to right the wrongs of the world. Has traveled to every corner of the realm, learning from masters of various disciplines and gathering allies for the fight against evil.',
-        personality: 'A highly skilled warrior-mage who has mastered both the arcane arts and swordsmanship. Noble and courageous, with an unwavering sense of justice',
-        goals: ['Right the wrongs of the world and bring justice to all'],
-        fears: ['Failing those who depend on them', 'Losing their magical abilities'],
-        physicalDescription: 'Tall and imposing with battle scars and magical aura'
-      },
-    },
-  },
-};

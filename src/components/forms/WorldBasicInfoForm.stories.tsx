@@ -20,7 +20,7 @@ const mockWorld: World = {
 };
 
 const meta: Meta<typeof WorldBasicInfoForm> = {
-  title: 'Narraitor/UI/Forms/WorldBasicInfoForm',
+  title: 'Narraitor/World/Forms/WorldBasicInfoForm',
   component: WorldBasicInfoForm,
   parameters: {
     layout: 'padded',

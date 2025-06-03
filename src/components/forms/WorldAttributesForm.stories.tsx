@@ -27,7 +27,7 @@ const mockAttributes: WorldAttribute[] = [
 ];
 
 const meta: Meta<typeof WorldAttributesForm> = {
-  title: 'Narraitor/UI/Forms/WorldAttributesForm',
+  title: 'Narraitor/World/Forms/WorldAttributesForm',
   component: WorldAttributesForm,
   parameters: {
     layout: 'padded',
