@@ -6,6 +6,13 @@ import { World } from '../../types/world.types';
 import { worldStore } from '../../state/worldStore';
 import { sessionStore } from '../../state/sessionStore';
 import { characterStore } from '../../state/characterStore';
+import { 
+  ActiveStateCard, 
+  ActiveStateIndicator, 
+  MakeActiveButton, 
+  CardActionGroup, 
+  EntityBadge 
+} from '../shared/cards';
 
 interface WorldCardProps {
   world: World;
@@ -102,14 +109,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
   };
 
   return (
-    <article
-      data-testid="world-card"
+    <ActiveStateCard
+      isActive={isActive}
       onClick={() => onSelect?.(world.id)}
-      className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full cursor-pointer ${
-        isActive 
-          ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
-          : 'border-gray-300 bg-white hover:shadow-lg'
-      }`}
+      data-testid="world-card"
+      element="article"
     >
       {/* World Image */}
       {world.image?.url && (
@@ -126,14 +130,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       
       {/* Active World Header */}
       {isActive && (
-        <div className="bg-green-600 text-white px-4 py-2 flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <span className="font-medium text-sm">Currently Active World</span>
-          </div>
-        </div>
+        <ActiveStateIndicator text="Currently Active World" />
       )}
       
       <div className="p-4 flex-grow flex flex-col">
@@ -165,27 +162,19 @@ const WorldCard: React.FC<WorldCardProps> = ({
               
               {/* World type badge */}
               {world.relationship && world.reference ? (
-                <span 
+                <EntityBadge
+                  icon={world.relationship === 'set_in' ? '🌍' : '✨'}
+                  text={world.relationship === 'set_in' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
+                  variant={world.relationship === 'set_in' ? 'purple' : 'green'}
                   data-testid="world-card-type"
-                  className={`text-xs px-2 py-1 rounded-full font-medium inline-block ${
-                    world.relationship === 'set_in'
-                      ? 'bg-purple-100 text-purple-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                >
-                  {world.relationship === 'set_in' ? (
-                    <>🌍 Set in {world.reference}</>
-                  ) : (
-                    <>✨ Inspired by {world.reference}</>
-                  )}
-                </span>
+                />
               ) : (
-                <span 
+                <EntityBadge
+                  icon="⚡"
+                  text="Original World"
+                  variant="blue"
                   data-testid="world-card-type"
-                  className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-800 inline-block"
-                >
-                  ⚡ Original World
-                </span>
+                />
               )}
             </div>
           
@@ -223,70 +212,75 @@ const WorldCard: React.FC<WorldCardProps> = ({
         <div className="space-y-2">
           {/* Make Active button for inactive worlds */}
           {!isActive && (
-            <button
+            <MakeActiveButton
               onClick={handleMakeActive}
-              className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 hover:text-green-900 rounded-md transition-colors border border-green-300 hover:border-green-400 font-medium flex items-center justify-center gap-2 mb-3"
-              title="Set as active world"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Make Active
-            </button>
+              className="mb-3"
+            />
           )}
           
-          {/* Primary Actions Row */}
-          <div className="flex gap-2">
-            <button
-              onClick={handleCreateCharacter}
-              className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors flex items-center justify-center gap-2"
-              title="Create a new character in this world"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Create Character
-            </button>
-            <button
-              onClick={handlePlayClick}
-              data-testid="world-card-actions-play-button"
-              className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 font-medium transition-colors flex items-center justify-center gap-2"
-              title="Start playing in this world"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Play
-            </button>
-          </div>
-          {/* Secondary Actions Row */}
-          <div className="flex gap-2">
-            <Link
-              href={`/world/${world.id}`}
-              onClick={(e) => e.stopPropagation()}
-              className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors text-sm text-center"
-            >
-              View
-            </Link>
-            <button
-              onClick={handleEditClick}
-              data-testid="world-card-actions-edit-button"
-              className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors text-sm"
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDeleteClick}
-              className="px-3 py-2 bg-gray-100 text-red-600 rounded-md hover:bg-red-50 font-medium transition-colors text-sm"
-            >
-              Delete
-            </button>
-          </div>
+          <CardActionGroup
+            primaryActions={[
+              {
+                key: 'create-character',
+                text: 'Create Character',
+                onClick: handleCreateCharacter,
+                variant: 'primary',
+                flex: true,
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                )
+              },
+              {
+                key: 'play',
+                text: 'Play',
+                onClick: handlePlayClick,
+                variant: 'primary',
+                flex: true,
+                className: 'bg-indigo-600 hover:bg-indigo-700',
+                icon: (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                ),
+                testId: 'world-card-actions-play-button'
+              }
+            ]}
+            secondaryActions={[
+              {
+                key: 'view',
+                text: 'View',
+                onClick: (e) => {
+                  e.stopPropagation();
+                  if (actualRouter) {
+                    actualRouter.push(`/world/${world.id}`);
+                  }
+                },
+                variant: 'secondary',
+                flex: true
+              },
+              {
+                key: 'edit',
+                text: 'Edit',
+                onClick: handleEditClick,
+                variant: 'secondary',
+                flex: true,
+                testId: 'world-card-actions-edit-button'
+              },
+              {
+                key: 'delete',
+                text: 'Delete',
+                onClick: handleDeleteClick,
+                variant: 'danger'
+              }
+            ]}
+          />
         </div>
       </footer>
       </div>
-    </article>
+    </ActiveStateCard>
   );
 };
 

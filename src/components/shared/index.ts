@@ -4,4 +4,8 @@ export { PointPoolManager } from './PointPoolManager';
 export { CustomPromptSection, PromptOverrideSection } from './CustomPromptSection';
 export { PortraitCustomizationSection } from './PortraitCustomizationSection';
 export { ImageGenerationSection } from './ImageGenerationSection';
+export { BackNavigation } from './BackNavigation';
+export { NotFoundState } from './NotFoundState';
+export { ActionButtonGroup } from './ActionButtonGroup';
+export { SectionWrapper } from './SectionWrapper';
 export * from './wizard';

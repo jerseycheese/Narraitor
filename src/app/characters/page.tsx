@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { characterStore } from '@/state/characterStore';
 import { worldStore } from '@/state/worldStore';
-import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { CharacterCard } from '@/components/CharacterCard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 // Using API routes for secure AI operations
@@ -415,127 +415,19 @@ export default function CharactersPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {worldCharacters.map(character => (
-              <div
+              <CharacterCard
                 key={character.id}
-                className={`border rounded-lg transition-all duration-200 relative overflow-hidden flex flex-col h-full ${
-                  currentCharacterId === character.id 
-                    ? 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400' 
-                    : 'border-gray-300 bg-white hover:shadow-lg'
-                }`}
-              >
-                {/* Active Character Header */}
-                {currentCharacterId === character.id && (
-                  <div className="bg-green-600 text-white px-4 py-2 flex items-center justify-center">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="font-medium text-sm">Currently Active Character</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="p-8 flex-grow flex flex-col">
-                  <div className="flex-grow mb-6">
-                    <div 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewCharacter(character.id);
-                      }}
-                      className="cursor-pointer float-right ml-4 mb-3"
-                    >
-                      <CharacterPortrait
-                        portrait={character.portrait || { type: 'placeholder', url: null }}
-                        characterName={character.name}
-                        size="large"
-                      />
-                    </div>
-                    <h3 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewCharacter(character.id);
-                      }}
-                      className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1"
-                    >
-                      {character.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm text-gray-500">Level {character.level || 1}</span>
-                      {character.background?.isKnownFigure !== undefined && (
-                        <span 
-                          className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            character.background.isKnownFigure 
-                              ? 'bg-amber-100 text-amber-800' 
-                              : 'bg-blue-100 text-blue-800'
-                          }`}
-                        >
-                          {character.background.isKnownFigure ? (
-                            <>⭐ Known Figure</>
-                          ) : (
-                            <>➕ Original</>
-                          )}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">
-                      {character.background.personality || 'No description provided'}
-                    </p>
-                    <div className="clear-both"></div>
-                  </div>
-                  
-                  {/* Footer with buttons - always at bottom */}
-                  <footer className="mt-auto pt-6 border-t border-gray-200">
-                    {/* Make Active button for inactive characters */}
-                    {currentCharacterId !== character.id && (
-                      <div className="mb-3">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectCharacter(character.id);
-                          }}
-                          className="w-full px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 hover:text-green-900 rounded-md transition-colors border border-green-300 hover:border-green-400 font-medium flex items-center justify-center gap-2"
-                          title="Set as active character"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Make Active
-                        </button>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-3">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewCharacter(character.id);
-                        }}
-                        className="flex-1 px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditCharacter(character.id);
-                        }}
-                        className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteCharacter(character.id);
-                        }}
-                        className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </footer>
-                </div>
-              </div>
+                character={character}
+                isActive={currentCharacterId === character.id}
+                onMakeActive={() => handleSelectCharacter(character.id)}
+                onView={() => handleViewCharacter(character.id)}
+                onPlay={() => {
+                  setCurrentCharacter(character.id);
+                  router.push(`/world/${character.worldId}/play`);
+                }}
+                onEdit={() => handleEditCharacter(character.id)}
+                onDelete={() => handleDeleteCharacter(character.id)}
+              />
             ))}
           </div>
         )}
