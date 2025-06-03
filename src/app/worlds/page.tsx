@@ -177,10 +177,10 @@ export default function WorldsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-4 sm:p-8">
       <div className="max-w-4xl mx-auto">
         <header className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
             <h1 className="text-4xl font-bold">
               My Worlds
             </h1>
@@ -202,7 +202,7 @@ export default function WorldsPage() {
             </div>
           </div>
           <p className="text-gray-600">
-            Select a world to make it active, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
+            Use the "Make Active" button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
           </p>
         </header>
 
@@ -230,12 +230,12 @@ export default function WorldsPage() {
                     type="text"
                     value={worldName}
                     onChange={(e) => setWorldName(e.target.value)}
-                    placeholder="e.g., The Shattered Realms, Neo Tokyo 2185..."
+                    placeholder="e.g., The Lost Kingdom"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Leave empty for an auto-generated name
+                    Give your world a custom name, or leave empty for an auto-generated name
                   </p>
                 </div>
                 <div>
@@ -320,7 +320,7 @@ export default function WorldsPage() {
                       type="text"
                       value={worldReference}
                       onChange={(e) => setWorldReference(e.target.value)}
-                      placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York..."
+                      placeholder="e.g., Star Wars, Victorian era"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       disabled={isGenerating}
                     />
@@ -334,15 +334,15 @@ export default function WorldsPage() {
                 )}
               </div>
               {error && (
-                <p className="text-red-600 text-sm mb-4">{error}</p>
+                <p className="text-red-600 text-sm mt-4 mb-4">{error}</p>
               )}
               {isGenerating && (
-                <p className="text-purple-600 text-sm mb-4 flex items-center gap-2">
+                <p className="text-purple-600 text-sm mt-4 mb-4 flex items-center gap-2">
                   <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
                   {generatingStatus}
                 </p>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <button
                   onClick={() => {
                     setShowPrompt(false);

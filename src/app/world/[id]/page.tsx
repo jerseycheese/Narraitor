@@ -14,7 +14,7 @@ export default function WorldViewPage() {
 
   if (!world) {
     return (
-      <main className="min-h-screen bg-gray-100 p-8">
+      <main className="min-h-screen bg-gray-100 p-4 sm:p-8">
         <div className="max-w-4xl mx-auto">
           <SectionError
             title="World Not Found"
@@ -30,7 +30,7 @@ export default function WorldViewPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-4 sm:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <Link href="/worlds" className="text-blue-600 hover:text-blue-800 flex items-center gap-2">

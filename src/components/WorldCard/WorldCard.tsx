@@ -140,56 +140,54 @@ const WorldCard: React.FC<WorldCardProps> = ({
         {/* Content area that grows to fill space */}
         <div className="flex-grow">
           <header className="mb-4"> 
-            <div className="flex items-center justify-between mb-2">
-              <Link 
-                href={`/world/${world.id}`}
-                className="inline-block flex-1 pr-4"
+            <Link 
+              href={`/world/${world.id}`}
+              className="inline-block"
+            >
+              <h2 
+                data-testid="world-card-name" 
+                className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight mb-2"
               >
-                <h2 
-                  data-testid="world-card-name" 
-                  className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight"
-                >
-                  {world.name}
-                </h2>
-              </Link>
-              
-              {/* Theme badge inline with title */}
+                {world.name}
+              </h2>
+            </Link>
+            
+            {/* Theme and world type badges */}
+            <div className="flex flex-wrap items-center gap-2">
               {world.theme && (
                 <span 
                   data-testid="world-card-theme" 
-                  className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full flex-shrink-0"
+                  className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
                 >
                   {world.theme.charAt(0).toUpperCase() + world.theme.slice(1)}
                 </span>
               )}
+              
+              {/* World type badge */}
+              {world.relationship && world.reference ? (
+                <span 
+                  data-testid="world-card-type"
+                  className={`text-xs px-2 py-1 rounded-full font-medium inline-block ${
+                    world.relationship === 'set_in'
+                      ? 'bg-purple-100 text-purple-800'
+                      : 'bg-green-100 text-green-800'
+                  }`}
+                >
+                  {world.relationship === 'set_in' ? (
+                    <>🌍 Set in {world.reference}</>
+                  ) : (
+                    <>✨ Inspired by {world.reference}</>
+                  )}
+                </span>
+              ) : (
+                <span 
+                  data-testid="world-card-type"
+                  className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-800 inline-block"
+                >
+                  ⚡ Original World
+                </span>
+              )}
             </div>
-          
-          {/* World type badge */}
-          <div className="mt-2 flex items-center gap-2">
-            {world.relationship && world.reference ? (
-              <span 
-                data-testid="world-card-type"
-                className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  world.relationship === 'set_in'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-green-100 text-green-800'
-                }`}
-              >
-                {world.relationship === 'set_in' ? (
-                  <>🌍 Set in {world.reference}</>
-                ) : (
-                  <>✨ Inspired by {world.reference}</>
-                )}
-              </span>
-            ) : (
-              <span 
-                data-testid="world-card-type"
-                className="text-xs px-2 py-1 rounded-full font-medium bg-blue-100 text-blue-800"
-              >
-                ⚡ Original World
-              </span>
-            )}
-          </div>
           
           {/* Character count for all worlds */}
           <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
@@ -264,12 +262,19 @@ const WorldCard: React.FC<WorldCardProps> = ({
           </div>
           {/* Secondary Actions Row */}
           <div className="flex gap-2">
+            <Link
+              href={`/world/${world.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors text-sm text-center"
+            >
+              View
+            </Link>
             <button
               onClick={handleEditClick}
               data-testid="world-card-actions-edit-button"
               className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium transition-colors text-sm"
             >
-              Edit World
+              Edit
             </button>
             <button
               onClick={handleDeleteClick}
