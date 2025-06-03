@@ -2,6 +2,31 @@
 
 /* Base layer for HTML element styles */
 @layer base {
+  /* Link defaults */
+  a {
+    color: #2563eb; /* blue-600 */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  a:hover {
+    color: #1d4ed8; /* blue-700 */
+    text-decoration: underline;
+  }
+  
+  /* Links in dark backgrounds should remain light */
+  .bg-gray-900 a,
+  .bg-gray-800 a,
+  .bg-slate-800 a {
+    color: inherit;
+  }
+  
+  .bg-gray-900 a:hover,
+  .bg-gray-800 a:hover,
+  .bg-slate-800 a:hover {
+    text-decoration: none;
+  }
+  
   /* Button defaults */
   button {
     cursor: pointer;
