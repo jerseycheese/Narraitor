@@ -1,19 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 
 export default function WorldListScreenTestHarness() {
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <Link 
-          href="/dev" 
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          ← Back to Dev Harnesses
-        </Link>
-        <header className="mb-8 mt-4">
+        <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">World List Screen Test Harness</h1>
           <p className="text-gray-600">
             Test world deletion functionality with the confirmation dialog

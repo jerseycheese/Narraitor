@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
@@ -97,14 +96,6 @@ export default function AttributeEditorTestPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-4">
-        <Link 
-          href="/dev" 
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          ← Back to Dev Harnesses
-        </Link>
-      </div>
       <h1 className="text-2xl font-bold mb-6">Attribute Editor Test Harness</h1>
       
       <div className="mb-6">

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
@@ -143,14 +142,7 @@ export default function ChoiceAlignmentTestPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <Link 
-            href="/dev" 
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            ← Back to Dev Harnesses
-          </Link>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-6 mt-4">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Choice Alignment Test
           </h1>
           
