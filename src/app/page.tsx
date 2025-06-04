@@ -10,7 +10,7 @@ export default function HomePage() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           {/* Logo */}
-          <div className="mb-2 flex justify-center">
+          <div className="mb-0 flex justify-center">
             <img 
               src="/narraitor-logo.svg" 
               alt="Narraitor Logo" 
