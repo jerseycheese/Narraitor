@@ -117,7 +117,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       isActive={isActive}
       activeText="Currently Active World"
       onClick={() => onSelect?.(world.id)}
-      data-testid="world-card"
+      testId="world-card"
       hasImage={!!world.image?.url}
     >
       {/* World Image */}
@@ -165,15 +165,15 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 <EntityBadge
                   icon={world.relationship === 'set_in' ? '🌍' : '✨'}
                   text={world.relationship === 'set_in' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
-                  variant={world.relationship === 'set_in' ? 'purple' : 'green'}
-                  data-testid="world-card-type"
+                  variant={world.relationship === 'set_in' ? 'info' : 'success'}
+                  testId="world-card-type"
                 />
               ) : (
                 <EntityBadge
                   icon="⚡"
                   text="Original World"
-                  variant="blue"
-                  data-testid="world-card-type"
+                  variant="primary"
+                  testId="world-card-type"
                 />
               )}
             </div>
