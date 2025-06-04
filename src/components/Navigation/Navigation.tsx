@@ -68,8 +68,8 @@ export function Navigation() {
               <div className="hidden sm:flex items-center space-x-1 ml-8">
                 <Link 
                   href="/worlds" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'bg-gray-800' : ''
+                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : ''
                   }`}
                 >
                   Worlds
