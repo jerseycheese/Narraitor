@@ -98,7 +98,7 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
             placeholder="Describe your character's appearance, distinctive features, clothing style..."
           />
           <p className="text-xs text-gray-500 mt-1">
-            This description will be used when generating character portraits
+            This description will be used when generating character portraits. Tip: Add "looks like [actor name]" to generate a portrait resembling a specific person.
           </p>
         </div>
       </div>
