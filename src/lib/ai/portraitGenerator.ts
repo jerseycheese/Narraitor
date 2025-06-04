@@ -50,7 +50,7 @@ Answer with JSON only: {"isKnownFigure": true/false, "figureType": "fictional/ce
         const detectJson = JSON.parse(detectText.match(/\{[\s\S]*?\}/)?.[0] || '{}');
         isKnown = detectJson.isKnownFigure || false;
         figureType = detectJson.figureType;
-      } catch (e) {
+      } catch {
         console.log('🔍 Failed to parse initial detection');
       }
       
@@ -72,7 +72,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           const actorJson = JSON.parse(actorText.match(/\{[\s\S]*?\}/)?.[0] || '{}');
           actorName = actorJson.actorName;
           figureName = actorJson.figureName;
-        } catch (e) {
+        } catch {
           console.log('🔍 Failed to parse actor lookup');
         }
       }

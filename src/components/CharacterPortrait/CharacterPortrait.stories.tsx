@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterPortrait } from './CharacterPortrait';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { SectionError } from '@/components/ui/ErrorDisplay';
+// import { SectionError } from '@/components/ui/ErrorDisplay';
 
 const meta: Meta<typeof CharacterPortrait> = {
   title: 'Narraitor/Character/Display/CharacterPortrait',

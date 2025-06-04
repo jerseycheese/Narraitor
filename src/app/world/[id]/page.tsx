@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
-import Link from 'next/link';
+// import Link from 'next/link';
 import Image from 'next/image';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
 import { NotFoundState } from '@/components/shared/NotFoundState';

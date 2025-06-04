@@ -1,16 +1,17 @@
 import { WorldImageGenerator } from '../worldImageGenerator';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { AIClient } from '../types';
 
 describe('WorldImageGenerator theme handling', () => {
   let generator: WorldImageGenerator;
-  let mockAIClient: { generateImage: jest.Mock };
+  let mockAIClient: Pick<AIClient, 'generateImage'>;
 
   beforeEach(() => {
     mockAIClient = {
       generateImage: jest.fn()
     };
-    generator = new WorldImageGenerator(mockAIClient as any);
+    generator = new WorldImageGenerator(mockAIClient as AIClient);
   });
 
   const createMockWorld = (theme: string, description?: string): World => ({
@@ -35,7 +36,7 @@ describe('WorldImageGenerator theme handling', () => {
       const world = createMockWorld('Modern', 'A corporate office environment');
       
       // Access the private buildPrompt method via reflection
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       expect(prompt).toContain('modern realistic style');
@@ -51,7 +52,7 @@ describe('WorldImageGenerator theme handling', () => {
     it('should not include fantasy elements for Comedy theme', async () => {
       const world = createMockWorld('Comedy', 'A workplace comedy setting');
       
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       expect(prompt).toContain('modern realistic style');
@@ -65,7 +66,7 @@ describe('WorldImageGenerator theme handling', () => {
     it('should allow fantasy elements for Fantasy theme', async () => {
       const world = createMockWorld('Fantasy', 'A magical realm');
       
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       expect(prompt).toContain('epic fantasy style');
@@ -76,7 +77,7 @@ describe('WorldImageGenerator theme handling', () => {
     it('should use sci-fi elements for Sci-Fi theme', async () => {
       const world = createMockWorld('Sci-Fi', 'A space station');
       
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       expect(prompt).toContain('science fiction style');
@@ -87,7 +88,7 @@ describe('WorldImageGenerator theme handling', () => {
     it('should use western elements for Western theme', async () => {
       const world = createMockWorld('Western', 'A frontier town');
       
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       expect(prompt).toContain('western style');
@@ -103,7 +104,7 @@ describe('WorldImageGenerator theme handling', () => {
         'A paper supply company office in Scranton, PA where everyday workplace situations become comedic adventures'
       );
       
-      const buildPrompt = (generator as any).buildPrompt.bind(generator);
+      const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
 
       // Should include the world description

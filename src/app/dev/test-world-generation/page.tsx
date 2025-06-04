@@ -34,7 +34,7 @@ export default function TestWorldGeneration() {
 
       // Check if theme matches expected
       if (result.theme !== testCase.expectedTheme) {
-        setError(`Expected theme "${testCase.expectedTheme}" but got "${result.theme}"`);
+        setError(`Expected theme &quot;${testCase.expectedTheme}&quot; but got &quot;${result.theme}&quot;`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -49,7 +49,7 @@ export default function TestWorldGeneration() {
       
       <div className="mb-6">
         <p className="text-gray-600 mb-4">
-          Test that worlds set within non-fantasy universes don't get fantasy themes or elements.
+          Test that worlds set within non-fantasy universes don&apos;t get fantasy themes or elements.
         </p>
       </div>
 
@@ -61,7 +61,7 @@ export default function TestWorldGeneration() {
               disabled={isGenerating}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
             >
-              Test "{testCase.reference}"
+              Test &quot;{testCase.reference}&quot;
             </button>
             <span className="text-sm text-gray-600">
               Expected theme: {testCase.expectedTheme}

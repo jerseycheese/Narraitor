@@ -353,7 +353,7 @@ export default function CharactersPage() {
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-2">No characters in {currentWorld.name} yet</h2>
             <p className="text-gray-600 mb-2">
-              Choose how you'd like to add your first character.
+              Choose how you&apos;d like to add your first character.
             </p>
           </div>
           <div className="flex gap-3 justify-center">

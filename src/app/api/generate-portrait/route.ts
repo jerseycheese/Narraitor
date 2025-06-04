@@ -38,7 +38,7 @@ async function buildPortraitPrompt(
         goals: [],
         fears: []
       }
-    } as any;
+    } as Character;
     
     logger.debug('generate-portrait API', 'Calling buildPortraitPrompt directly to avoid image generation');
     
