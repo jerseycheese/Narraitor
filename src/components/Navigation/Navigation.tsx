@@ -151,7 +151,7 @@ export function Navigation() {
                 <>
                   <Link 
                     href={`/characters?worldId=${currentWorld.id}`}
-                    className="hidden sm:inline-flex items-center px-3 py-2 text-white text-sm font-medium hover:bg-gray-800 rounded-md transition-colors"
+                    className="hidden sm:inline-flex items-center px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-md transition-colors"
                   >
                     Characters
                   </Link>
