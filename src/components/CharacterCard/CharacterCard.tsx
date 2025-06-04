@@ -32,11 +32,8 @@ export function CharacterCard({
   return (
     <ActiveStateCard 
       isActive={isActive}
+      activeText="Currently Active Character"
     >
-      {/* Active Character Header */}
-      {isActive && (
-        <ActiveStateIndicator text="Currently Active Character" />
-      )}
 
       <div className="p-8 flex-grow flex flex-col">
         <div className="flex-grow mb-6">
@@ -72,8 +69,19 @@ export function CharacterCard({
               />
             )}
           </div>
-          <p className="text-gray-600 leading-relaxed">
-            {character.background.personality || 'No description provided'}
+          <p className="text-gray-600 text-sm leading-snug">
+            {(() => {
+              const text = character.background.history || character.background.personality || 'No description provided';
+              const sentences = text.split(/[.!?]+/);
+              let result = '';
+              for (const sentence of sentences) {
+                const trimmed = sentence.trim();
+                if (!trimmed) continue;
+                if ((result + trimmed + '.').length > 280) break;
+                result += (result ? ' ' : '') + trimmed + '.';
+              }
+              return result || text.substring(0, 280) + (text.length > 280 ? '...' : '');
+            })()}
           </p>
           <div className="clear-both"></div>
         </div>
@@ -94,7 +102,7 @@ export function CharacterCard({
                 text: 'View',
                 onClick: onView,
                 variant: 'primary',
-                className: 'bg-green-600 hover:bg-green-700'
+                className: 'bg-blue-600 hover:bg-blue-700'
               },
               {
                 key: 'play',

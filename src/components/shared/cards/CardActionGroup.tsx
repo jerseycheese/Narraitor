@@ -86,9 +86,9 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
         break;
     }
 
-    // If custom className includes bg-, use it instead of variant classes
+    // If custom className includes bg-, ensure white text for primary buttons
     if (action.variant === 'primary' && action.className?.includes('bg-')) {
-      return `${baseClasses} ${flexClass} ${action.className}`;
+      return `${baseClasses} ${flexClass} text-white ${action.className}`;
     }
 
     return `${baseClasses} ${variantClasses} ${flexClass} ${action.className || ''}`;
@@ -99,15 +99,15 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
       <button
         key={action.key}
         onClick={action.onClick}
-        className={getButtonClasses(action)}
+        className={`${getButtonClasses(action)} flex items-center justify-center gap-2`}
         title={action.title}
         data-testid={action.testId}
         type="button"
       >
         {action.icon && (
-          <span className="inline-flex items-center">{action.icon}</span>
+          <span className="flex items-center">{action.icon}</span>
         )}
-        {action.text}
+        <span>{action.text}</span>
       </button>
     ));
   };

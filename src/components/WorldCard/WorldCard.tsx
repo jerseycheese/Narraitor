@@ -180,12 +180,20 @@ const WorldCard: React.FC<WorldCardProps> = ({
           
           {/* Character count for all worlds */}
           <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
-            <span className="flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (actualRouter) {
+                  actualRouter.push(`/characters?worldId=${world.id}`);
+                }
+              }}
+              className="text-link-button"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               {characterCount} character{characterCount !== 1 ? 's' : ''}
-            </span>
+            </button>
           </div>
           </header>
           
@@ -226,6 +234,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 onClick: handleCreateCharacter,
                 variant: 'primary',
                 flex: true,
+                className: 'bg-green-600 hover:bg-green-700',
                 icon: (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -258,14 +267,16 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     actualRouter.push(`/world/${world.id}`);
                   }
                 },
-                variant: 'secondary',
+                variant: 'primary',
+                className: 'bg-blue-600 hover:bg-blue-700',
                 flex: true
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: handleEditClick,
-                variant: 'secondary',
+                variant: 'primary',
+                className: 'bg-blue-600 hover:bg-blue-700',
                 flex: true,
                 testId: 'world-card-actions-edit-button'
               },
