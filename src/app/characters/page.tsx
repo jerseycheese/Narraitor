@@ -401,7 +401,7 @@ export default function CharactersPage() {
               </button>
             </div>
             <div className="mt-6 text-sm text-gray-500">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                 <div>
                   <p className="font-medium text-purple-600 mb-1">Generate Character</p>
                   <p>AI creates a character {currentWorld.reference ? `from ${currentWorld.reference}` : 'for your world'}</p>
@@ -409,7 +409,7 @@ export default function CharactersPage() {
                 </div>
                 <div>
                   <p className="font-medium text-green-600 mb-1">Create Character</p>
-                  <p>Design your own character step-by-step</p>
+                  <p>Design your own character with custom details</p>
                   <p className="text-xs mt-1">Full control over attributes, skills, and background</p>
                 </div>
               </div>
