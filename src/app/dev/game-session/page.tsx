@@ -30,6 +30,7 @@ const mockWorld: World = {
 const mockCharacter = {
   id: 'test-character-123',
   name: 'Test Hero',
+  description: 'A test character for debugging purposes',
   worldId: 'world-1',
   level: 5,
   background: {
@@ -37,7 +38,8 @@ const mockCharacter = {
     personality: 'Deterministic and reliable',
     goals: ['To pass all tests'],
     fears: ['Null pointer exceptions', 'Infinite loops'],
-    physicalDescription: 'A well-structured test character'
+    physicalDescription: 'A well-structured test character',
+    relationships: []
   },
   portrait: {
     type: 'placeholder' as const,
@@ -47,9 +49,15 @@ const mockCharacter = {
   skills: [],
   isPlayer: true,
   status: {
-    hp: 100,
-    mp: 50,
-    stamina: 80
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
+  inventory: {
+    characterId: 'test-character-123',
+    items: [],
+    capacity: 20,
+    categories: []
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()

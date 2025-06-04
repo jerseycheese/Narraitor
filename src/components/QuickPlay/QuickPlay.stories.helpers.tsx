@@ -25,6 +25,7 @@ export const mockCharacter = {
   id: 'char-1',
   worldId: 'world-1',
   name: 'Aria the Brave',
+  description: 'A courageous warrior with noble intentions',
   level: 3,
   isPlayer: true,
   background: {
@@ -32,6 +33,7 @@ export const mockCharacter = {
     personality: 'Bold and adventurous',
     goals: ['To protect the innocent and seek adventure'],
     fears: ['Failing those who depend on her'],
+    relationships: [],
   },
   attributes: [],
   skills: [],
@@ -42,9 +44,9 @@ export const mockCharacter = {
     categories: [],
   },
   status: {
-    hp: 100,
-    mp: 50,
-    stamina: 80,
+    health: 100,
+    maxHealth: 100,
+    conditions: [],
   },
   portrait: { type: 'placeholder' as const, url: null },
   createdAt: new Date().toISOString(),

@@ -178,6 +178,7 @@ export default function CharactersPage() {
       // Create the character with transformed attributes and skills
       const characterId = createCharacter({
         name: generatedData.name,
+        description: generatedData.background.description || '',
         worldId: effectiveWorldId,
         level: generatedData.level,
         attributes: transformGeneratedAttributes(generatedData, currentWorld),
@@ -188,13 +189,20 @@ export default function CharactersPage() {
           goals: generatedData.background.motivation ? [generatedData.background.motivation] : [],
           fears: generatedData.background.fears || [], // AI-generated fears
           physicalDescription: generatedData.background.physicalDescription || '',
+          relationships: [], // Initialize empty relationships array
           isKnownFigure: generatedData.isKnownFigure || false
         },
         isPlayer: true,
         status: {
-          hp: 100,
-          mp: 50,
-          stamina: 100,
+          health: 100,
+          maxHealth: 100,
+          conditions: [],
+        },
+        inventory: {
+          characterId: '', // Will be set by the store
+          items: [],
+          capacity: 20,
+          categories: []
         },
         portrait: {
           type: 'placeholder',

@@ -120,6 +120,7 @@ const setupWorlds = () => {
 const setupCharacters = (worldId1: string, worldId2: string) => {
   const character1 = {
     name: 'Aria Starweaver',
+    description: 'A brave warrior from the fantasy realm',
     worldId: worldId1,
     level: 5,
     isPlayer: true,
@@ -131,11 +132,18 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       goals: ['Protect the innocent'],
       fears: ['Failing in duty'],
       physicalDescription: 'Tall and strong',
+      relationships: [],
     },
     status: {
-      hp: 100,
-      mp: 50,
-      stamina: 75,
+      health: 100,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,
@@ -145,6 +153,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
   
   const character2 = {
     name: 'Zara Chen',
+    description: 'A skilled mage with ancient knowledge',
     worldId: worldId1,
     level: 3,
     isPlayer: true,
@@ -155,12 +164,19 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       personality: 'Wise and mysterious',
       goals: ['Seek ancient knowledge'],
       fears: ['Losing magical powers'],
-      physicalDescription: 'Small and quick'
+      physicalDescription: 'Small and quick',
+      relationships: [],
     },
     status: {
-      hp: 80,
-      mp: 120,
-      stamina: 60,
+      health: 80,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,
@@ -170,6 +186,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
   
   const character3 = {
     name: 'Jack Harrison',
+    description: 'A cyber-enhanced detective investigating corruption',
     worldId: worldId2,
     level: 1,
     isPlayer: true,
@@ -180,12 +197,19 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       personality: 'Cynical but determined',
       goals: ['Uncover corporate conspiracy'],
       fears: ['Corporate retaliation'],
-      physicalDescription: 'Scarred face, cybernetic eyes'
+      physicalDescription: 'Scarred face, cybernetic eyes',
+      relationships: [],
     },
     status: {
-      hp: 90,
-      mp: 30,
-      stamina: 85,
+      health: 90,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,

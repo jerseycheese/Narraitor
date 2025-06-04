@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { QuickPlay } from '@/components/QuickPlay';
 
 export default function HomePage() {
@@ -11,9 +12,11 @@ export default function HomePage() {
         <div className="text-center mb-12">
           {/* Logo */}
           <div className="mb-0 flex justify-center">
-            <img 
+            <Image 
               src="/narraitor-logo.svg" 
               alt="Narraitor Logo" 
+              width={160}
+              height={160}
               className="w-32 h-32 md:w-40 md:h-40"
             />
           </div>

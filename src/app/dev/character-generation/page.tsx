@@ -54,6 +54,7 @@ export default function CharacterGenerationTestPage() {
     
     characterStore.getState().createCharacter({
       name: generatedCharacter.name,
+      description: generatedCharacter.background.description || '',
       worldId: selectedWorldId,
       level: generatedCharacter.level || 1,
       attributes: generatedCharacter.attributes.map((attr) => {
@@ -80,13 +81,20 @@ export default function CharacterGenerationTestPage() {
         personality: generatedCharacter.background.personality,
         goals: generatedCharacter.background.motivation ? [generatedCharacter.background.motivation] : [],
         fears: generatedCharacter.background.fears || [],
-        physicalDescription: generatedCharacter.background.physicalDescription
+        physicalDescription: generatedCharacter.background.physicalDescription,
+        relationships: []
       },
       isPlayer: true,
       status: {
-        hp: 100,
-        mp: 50,
-        stamina: 75
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
+      inventory: {
+        characterId: '',
+        items: [],
+        capacity: 20,
+        categories: []
       }
     });
     
