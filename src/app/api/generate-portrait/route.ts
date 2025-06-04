@@ -28,17 +28,35 @@ async function buildPortraitPrompt(
     const generator = new PortraitGenerator(aiClient);
     
     // Create a minimal character object for detection
-    const mockCharacter = {
+    const mockCharacter: Character = {
       id: 'detection-temp',
       name: characterName,
+      description: '',
+      worldId: 'temp',
       background: {
         physicalDescription: physicalDescription,
         history: '',
         personality: '',
         goals: [],
-        fears: []
-      }
-    } as Character;
+        fears: [],
+        relationships: []
+      },
+      attributes: [],
+      skills: [],
+      inventory: {
+        characterId: 'detection-temp',
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
     
     logger.debug('generate-portrait API', 'Calling buildPortraitPrompt directly to avoid image generation');
     
@@ -231,7 +249,7 @@ export async function POST(request: NextRequest) {
       type: 'ai-generated' as const,
       url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
       generatedAt: new Date().toISOString(),
-      prompt: `Portrait fallback - character: ${!!character}, promptOnly: ${body.promptOnly}, bodyKeys: ${Object.keys(body).join(',')}`
+      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
     
     return NextResponse.json({ 
