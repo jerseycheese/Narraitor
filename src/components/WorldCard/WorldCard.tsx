@@ -64,25 +64,30 @@ const WorldCard: React.FC<WorldCardProps> = ({
       const storeActions = _storeActions || worldStore.getState();
       storeActions.setCurrentWorld(world.id);
       
-      // Check for saved session
+      // Check for characters in this world
       const characterState = characterStore.getState();
       const worldCharacters = Object.values(characterState.characters)
         .filter(char => char.worldId === world.id);
       
-      let hasSession = false;
-      if (worldCharacters.length > 0) {
-        // Check if there's a saved session for any character in this world
-        const savedSession = sessionStore.getState().getSavedSession(
-          world.id, 
-          worldCharacters[0].id
-        );
-        
-        if (savedSession) {
-          hasSession = true;
-          console.log('[WorldCard] Found saved session:', savedSession.id);
+      if (worldCharacters.length === 0) {
+        // No characters exist - redirect to characters page
+        console.log('[WorldCard] No characters exist for this world, redirecting to characters page');
+        if (actualRouter) {
+          actualRouter.push(`/characters?worldId=${world.id}`);
         }
-      } else {
-        console.log('[WorldCard] No characters exist for this world yet');
+        return;
+      }
+      
+      // Check for saved session
+      let hasSession = false;
+      const savedSession = sessionStore.getState().getSavedSession(
+        world.id, 
+        worldCharacters[0].id
+      );
+      
+      if (savedSession) {
+        hasSession = true;
+        console.log('[WorldCard] Found saved session:', savedSession.id);
       }
       
       if (actualRouter) {
