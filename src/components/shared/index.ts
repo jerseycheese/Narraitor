@@ -8,4 +8,5 @@ export { BackNavigation } from './BackNavigation';
 export { NotFoundState } from './NotFoundState';
 export { ActionButtonGroup } from './ActionButtonGroup';
 export { SectionWrapper } from './SectionWrapper';
+export { PageLayout } from './PageLayout';
 export * from './wizard';

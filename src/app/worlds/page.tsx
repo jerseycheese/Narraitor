@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
+import { PageLayout } from '@/components/shared/PageLayout';
 import { worldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
@@ -176,38 +177,34 @@ export default function WorldsPage() {
     }
   };
 
-  return (
-    <main className="min-h-screen p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold">
-              My Worlds
-            </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={handleCreateWorld}
-                data-testid="create-world-button"
-                className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
-              >
-                Create World
-              </button>
-              <button
-                onClick={() => setShowPrompt(true)}
-                disabled={isGenerating}
-                className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Generate World
-              </button>
-            </div>
-          </div>
-          <p className="text-gray-600">
-            Use the "Make Active" button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
-          </p>
-        </header>
+  const actions = (
+    <>
+      <button
+        onClick={handleCreateWorld}
+        data-testid="create-world-button"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+      >
+        Create World
+      </button>
+      <button
+        onClick={() => setShowPrompt(true)}
+        disabled={isGenerating}
+        className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Generate World
+      </button>
+    </>
+  );
 
-        {/* World Generation Prompt */}
-        {showPrompt && (
+  return (
+    <PageLayout
+      title="My Worlds"
+      description="Use the 'Make Active' button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar."
+      actions={actions}
+    >
+
+      {/* World Generation Prompt */}
+      {showPrompt && (
           <div 
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             role="dialog"
@@ -368,10 +365,7 @@ export default function WorldsPage() {
           </div>
         )}
 
-        <section>
-          <WorldListScreen />
-        </section>
-      </div>
-    </main>
+      <WorldListScreen />
+    </PageLayout>
   );
 }
