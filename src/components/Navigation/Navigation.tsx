@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { Breadcrumbs } from './Breadcrumbs';
+import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -60,9 +61,10 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/" 
-                className="text-xl hover:text-gray-300 transition-colors"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
+                <LogoIcon size="small" className="brightness-0 invert" />
+                <LogoText size="sm" className="text-white" />
               </Link>
               
               <div className="hidden sm:flex items-center space-x-1 ml-8">
