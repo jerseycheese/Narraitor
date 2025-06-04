@@ -41,10 +41,8 @@ export function Navigation() {
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
     setShowWorldSwitcher(false);
-    // If on a world-specific page, redirect to the new world
-    if (pathname.includes('/world/') || pathname.includes('/characters')) {
-      router.push('/worlds');
-    }
+    // Navigate to the selected world's view page
+    router.push(`/world/${worldId}`);
   };
   
   // Don't show navigation on dev pages
