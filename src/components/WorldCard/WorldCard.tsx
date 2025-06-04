@@ -8,7 +8,6 @@ import { sessionStore } from '../../state/sessionStore';
 import { characterStore } from '../../state/characterStore';
 import { 
   ActiveStateCard, 
-  ActiveStateIndicator, 
   MakeActiveButton, 
   CardActionGroup, 
   EntityBadge 
@@ -111,9 +110,10 @@ const WorldCard: React.FC<WorldCardProps> = ({
   return (
     <ActiveStateCard
       isActive={isActive}
+      activeText="Currently Active World"
       onClick={() => onSelect?.(world.id)}
       data-testid="world-card"
-      element="article"
+      hasImage={!!world.image?.url}
     >
       {/* World Image */}
       {world.image?.url && (
@@ -126,11 +126,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
             className="w-full h-full object-cover"
           />
         </div>
-      )}
-      
-      {/* Active World Header */}
-      {isActive && (
-        <ActiveStateIndicator text="Currently Active World" />
       )}
       
       <div className="p-4 flex-grow flex flex-col">

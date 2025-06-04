@@ -3,7 +3,6 @@ import { Character } from '@/types/character.types';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { 
   ActiveStateCard, 
-  ActiveStateIndicator, 
   MakeActiveButton, 
   CardActionGroup, 
   EntityBadge 
