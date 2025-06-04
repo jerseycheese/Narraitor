@@ -58,7 +58,7 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       const storageError = handleStorageError(error as Error);
       if (storageError.shouldNotify) {
         // In production, this should be replaced with a proper notification system
-        console.error(storageError.userMessage);
+        // Note: Storage error occurred but app will continue without persistence
       }
       // Don't throw - allow app to continue without persistence
     }

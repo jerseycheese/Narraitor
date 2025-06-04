@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { QuickPlay } from '@/components/QuickPlay';
 import { GameStartWizard } from '@/components/GameStartWizard';
 import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
@@ -27,12 +26,6 @@ export default function NavigationFlowTestPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <Link 
-          href="/dev" 
-          className="text-blue-600 hover:text-blue-800 underline inline-block mb-4"
-        >
-          ← Back to Dev Harnesses
-        </Link>
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Navigation Flow Test Harness</h1>
           <p className="text-gray-600">

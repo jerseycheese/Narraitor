@@ -101,7 +101,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
             />
             <p className="mt-1 text-sm text-gray-500">
-              This will be used to generate your character&apos;s portrait
+              This will be used to generate your character&apos;s portrait. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
             </p>
           </div>
 

@@ -110,7 +110,6 @@ const GameSession: React.FC<GameSessionProps> = ({
         });
         
         if (hasWorldSegments) {
-          console.log(`[GameSession] Found existing narrative session for world ${worldId}: ${existingSessionId}`);
           return existingSessionId;
         }
       }
@@ -132,10 +131,10 @@ const GameSession: React.FC<GameSessionProps> = ({
     const isNewSession = existingSegments.length === 0;
     
     if (isNewSession) {
-      console.log(`[GameSession] New session - clearing any stale segments for: ${stableSessionId}`);
+      // New session - clearing any stale segments
       narrativeStore.getState().clearSessionSegments(stableSessionId);
     } else {
-      console.log(`[GameSession] Resuming existing session with ${existingSegments.length} segments: ${stableSessionId}`);
+      // Resuming existing session with segments
     }
     
     // Update the session store

@@ -1,41 +1,69 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
-import Link from 'next/link';
+import { characterStore } from '@/state/characterStore';
+// import Link from 'next/link';
 import Image from 'next/image';
-import { SectionError } from '@/components/ui/ErrorDisplay';
-import { DataField } from '@/components/shared/DataField';
+import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
+import { NotFoundState } from '@/components/shared/NotFoundState';
+import { BackNavigation } from '@/components/shared/BackNavigation';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 
 export default function WorldViewPage() {
   const params = useParams();
+  const router = useRouter();
   const worldId = params.id as string;
   const world = worldStore((state) => state.worlds[worldId]);
+  const characters = characterStore((state) => state.characters);
+  
+  // Check if this world has any characters
+  const worldCharacters = Object.values(characters).filter(char => char.worldId === worldId);
 
   if (!world) {
     return (
-      <main className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <SectionError
-            title="World Not Found"
-            message="The world you're looking for doesn't exist."
-            severity="error"
-          />
-          <Link href="/worlds" className="text-blue-600 hover:underline mt-4 inline-block">
-            ← Back to Worlds
-          </Link>
-        </div>
-      </main>
+      <NotFoundState
+        title="World Not Found"
+        message="The world you're looking for doesn't exist."
+        backUrl="/worlds"
+        backLabel="Back to Worlds"
+      />
     );
   }
 
+  const handlePlayInWorld = () => {
+    if (worldCharacters.length === 0) {
+      // No characters in this world, redirect to characters page
+      router.push(`/characters?worldId=${worldId}`);
+    } else {
+      // Has characters, go to play page
+      router.push(`/world/${worldId}/play`);
+    }
+  };
+
+  const actionButtons = [
+    {
+      label: 'Edit World',
+      onClick: () => router.push(`/world/${worldId}/edit`),
+      variant: 'primary' as const
+    },
+    {
+      label: 'Play in World',
+      onClick: handlePlayInWorld,
+      variant: 'success' as const
+    },
+    {
+      label: 'View Characters',
+      onClick: () => router.push(`/characters?worldId=${worldId}`),
+      variant: 'primary' as const
+    }
+  ];
+
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen p-4 sm:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link href="/worlds" className="text-blue-600 hover:text-blue-800 flex items-center gap-2">
-            <span>←</span> Back to Worlds
-          </Link>
+          <BackNavigation href="/worlds" label="Back to Worlds" />
         </div>
 
         {/* Hero Image */}
@@ -60,57 +88,9 @@ export default function WorldViewPage() {
           )}
         </header>
 
-        <div className="flex gap-3 mb-8">
-          <Link
-            href={`/world/${worldId}/edit`}
-            className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-          >
-            Edit World
-          </Link>
-          <Link
-            href={`/world/${worldId}/play`}
-            className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
-          >
-            Play in World
-          </Link>
-          <Link
-            href={`/characters?worldId=${worldId}`}
-            className="px-4 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium transition-colors"
-          >
-            View Characters
-          </Link>
-        </div>
+        <ActionButtonGroup actions={actionButtons} className="mb-8" />
 
-        <section className="bg-white rounded-lg p-6 shadow mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Description</h2>
-          <p className="text-gray-700 leading-relaxed">{world.description}</p>
-        </section>
-
-        <section className="bg-white rounded-lg p-6 shadow mb-6">
-          <h2 className="text-2xl font-semibold mb-4">World Details</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <DataField 
-              label="Created" 
-              value={new Date(world.createdAt).toLocaleDateString()} 
-              variant="inline"
-            />
-            <DataField 
-              label="Updated" 
-              value={new Date(world.updatedAt).toLocaleDateString()} 
-              variant="inline"
-            />
-            <DataField 
-              label="Attributes" 
-              value={world.attributes?.length || 0} 
-              variant="inline"
-            />
-            <DataField 
-              label="Skills" 
-              value={world.skills?.length || 0} 
-              variant="inline"
-            />
-          </div>
-        </section>
+        <WorldDetailsDisplay world={world} />
       </div>
     </main>
   );

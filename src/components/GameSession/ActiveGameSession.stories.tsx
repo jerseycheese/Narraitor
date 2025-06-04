@@ -8,7 +8,7 @@ import { sessionStore } from '@/state/sessionStore';
 import { characterStore } from '@/state/characterStore';
 
 const meta: Meta<typeof ActiveGameSession> = {
-  title: 'Narraitor/GameSession/ActiveGameSession',
+  title: 'Narraitor/Game/Session/ActiveGameSession',
   component: ActiveGameSession,
   parameters: {
     layout: 'padded',

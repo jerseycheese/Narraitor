@@ -47,22 +47,18 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       }, 0);
       
       return worldId;
-    } catch (error) {
-      console.error('Error applying template:', error);
+    } catch {
+      // Error applying template
       setIsApplying(false);
     }
   };
   
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
-    console.log('handleCreateOwnWorld called');
     // Clear any selected template and set createOwnWorld flag
     onUpdate({ selectedTemplateId: null, createOwnWorld: true });
-    console.log('selectedTemplateId set to null, createOwnWorld set to true');
     // Proceed to next step without applying a template, passing createOwnWorld flag
-    console.log('calling onComplete with createOwnWorld=true');
     onComplete(true);
-    console.log('onComplete called');
   };
   
   return (

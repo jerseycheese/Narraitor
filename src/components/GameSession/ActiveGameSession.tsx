@@ -106,9 +106,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           // No existing segments found, will generate initial scene
           setInitialized(true);
         }
-      } catch (err) {
-        console.error(`Error setting up narrative:`, err);
-        // Set initialized anyway so we don't get stuck
+      } catch {
+        // Error setting up narrative, continue with initialization
         setInitialized(true);
       }
     };
@@ -217,7 +216,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
     if (!decision || !decision.options || decision.options.length === 0) {
-      console.error('Invalid decision received:', decision);
+      // Invalid decision received, stop generation
       setIsGeneratingChoices(false);
       return;
     }

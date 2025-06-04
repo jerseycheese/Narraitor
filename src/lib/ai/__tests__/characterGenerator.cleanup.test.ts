@@ -1,7 +1,15 @@
 import { generateCharacter } from '../characterGenerator';
 import { World } from '@/types/world.types';
 
-// Mock fetch for API calls
+// Mock the AI client
+const mockGenerateContent = jest.fn();
+jest.mock('@/lib/ai/defaultGeminiClient', () => ({
+  createDefaultGeminiClient: jest.fn(() => ({
+    generateContent: mockGenerateContent
+  }))
+}));
+
+// Mock fetch for API calls (fallback)
 global.fetch = jest.fn();
 
 describe('Character Generator - Cleanup Tests', () => {
@@ -66,34 +74,33 @@ describe('Character Generator - Cleanup Tests', () => {
     updatedAt: '2024-01-01T00:00:00.000Z'
   };
 
-  const mockAPIResponse = {
-    content: JSON.stringify({
-      name: 'Test Hero',
-      level: 3,
-      background: {
-        description: 'A brave warrior from the north',
-        personality: 'Courageous and noble',
-        motivation: 'Seeking justice for his fallen comrades',
-        fears: ['Death', 'Failure'],
-        physicalDescription: 'Tall and strong'
-      },
-      attributes: [
-        { id: 'strength', value: 8 },
-        { id: 'intelligence', value: 6 }
-      ],
-      skills: [
-        { id: 'swordsmanship', level: 7 },
-        { id: 'magic', level: 4 }
-      ]
-    })
-  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockAPIResponse),
-    } as Response);
+    
+    // Setup default AI client response for original character generation
+    mockGenerateContent.mockResolvedValue({
+      content: JSON.stringify({
+        name: 'Test Character',
+        level: 5,
+        background: {
+          description: 'A brave adventurer',
+          personality: 'Courageous and determined',
+          motivation: 'To explore the world',
+          fears: ['Death', 'Failure'],
+          physicalDescription: 'Tall and strong'
+        },
+        attributes: [
+          { id: 'strength', value: 8 },
+          { id: 'intelligence', value: 6 }
+        ],
+        skills: [
+          { id: 'swordsmanship', level: 7 },
+          { id: 'magic', level: 4 }
+        ]
+      }),
+      finishReason: 'stop'
+    });
   });
 
   describe('Basic Generation', () => {
@@ -116,32 +123,31 @@ describe('Character Generator - Cleanup Tests', () => {
     });
 
     it('should validate attribute values within world bounds', async () => {
-      const mockResponseWithInvalidValues = {
-        content: JSON.stringify({
-          name: 'Test Hero',
-          level: 3,
-          background: {
-            description: 'A test character',
-            personality: 'Test personality',
-            motivation: 'Test motivation',
-            fears: ['Death', 'Failure'],
-            physicalDescription: 'Tall and strong'
-          },
-          attributes: [
-            { id: 'strength', value: 15 }, // Exceeds max (10)
-            { id: 'intelligence', value: -5 } // Below min (1)
-          ],
-          skills: [
-            { id: 'swordsmanship', level: 7 },
-            { id: 'magic', level: 4 }
-          ]
-        })
+      const mockCharacterWithInvalidValues = {
+        name: 'Test Hero',
+        level: 3,
+        background: {
+          description: 'A test character',
+          personality: 'Test personality',
+          motivation: 'Test motivation',
+          fears: ['Death', 'Failure'],
+          physicalDescription: 'Tall and strong'
+        },
+        attributes: [
+          { id: 'strength', value: 15 }, // Exceeds max (10)
+          { id: 'intelligence', value: -5 } // Below min (1)
+        ],
+        skills: [
+          { id: 'swordsmanship', level: 7 },
+          { id: 'magic', level: 4 }
+        ]
       };
 
-      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockResponseWithInvalidValues),
-      } as Response);
+      // Mock AI client to return invalid values
+      mockGenerateContent.mockResolvedValueOnce({
+        content: JSON.stringify(mockCharacterWithInvalidValues),
+        finishReason: 'stop'
+      });
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
 
@@ -154,32 +160,31 @@ describe('Character Generator - Cleanup Tests', () => {
     });
 
     it('should validate skill levels within 0-10 range', async () => {
-      const mockResponseWithInvalidSkills = {
-        content: JSON.stringify({
-          name: 'Test Hero',
-          level: 3,
-          background: {
-            description: 'A test character',
-            personality: 'Test personality',
-            motivation: 'Test motivation',
-            fears: ['Death', 'Failure'],
-            physicalDescription: 'Tall and strong'
-          },
-          attributes: [
-            { id: 'strength', value: 8 },
-            { id: 'intelligence', value: 6 }
-          ],
-          skills: [
-            { id: 'swordsmanship', level: 15 }, // Exceeds max (10)
-            { id: 'magic', level: -2 } // Below min (0)
-          ]
-        })
+      const mockCharacterWithInvalidSkills = {
+        name: 'Test Hero',
+        level: 3,
+        background: {
+          description: 'A test character',
+          personality: 'Test personality',
+          motivation: 'Test motivation',
+          fears: ['Death', 'Failure'],
+          physicalDescription: 'Tall and strong'
+        },
+        attributes: [
+          { id: 'strength', value: 8 },
+          { id: 'intelligence', value: 6 }
+        ],
+        skills: [
+          { id: 'swordsmanship', level: 15 }, // Exceeds max (10)
+          { id: 'magic', level: -2 } // Below min (0)
+        ]
       };
 
-      (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockResponseWithInvalidSkills),
-      } as Response);
+      // Mock AI client to return invalid skill values
+      mockGenerateContent.mockResolvedValueOnce({
+        content: JSON.stringify(mockCharacterWithInvalidSkills),
+        finishReason: 'stop'
+      });
 
       const result = await generateCharacter(mockWorld, [], undefined, 'original');
 

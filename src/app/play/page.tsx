@@ -50,7 +50,7 @@ export default function PlayPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <main className="min-h-screen flex items-center justify-center">
         <LoadingPulse message="Preparing your adventure..." />
       </main>
     );
@@ -58,7 +58,7 @@ export default function PlayPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-100 p-8">
+      <main className="min-h-screen p-8">
         <div className="max-w-4xl mx-auto">
           <SectionError
             title="Failed to Start Game"
@@ -86,7 +86,7 @@ export default function PlayPage() {
 
   if (!currentSessionId) {
     return (
-      <main className="min-h-screen bg-gray-100 p-8">
+      <main className="min-h-screen p-8">
         <div className="max-w-4xl mx-auto">
           <SectionError
             title="No Active Session"
@@ -99,7 +99,7 @@ export default function PlayPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen">
       <GameSession worldId={currentWorldId!} />
     </main>
   );

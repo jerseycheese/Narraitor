@@ -1,12 +1,33 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { Breadcrumbs } from './Breadcrumbs';
+import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
+/**
+ * Navigation - Main application navigation component
+ * 
+ * Provides the primary navigation bar with logo, main navigation links,
+ * world switcher dropdown, and contextual action buttons. Automatically
+ * adapts based on current route and available worlds/characters.
+ * 
+ * Features:
+ * - Responsive design with mobile-friendly layout
+ * - World switcher dropdown with character counts
+ * - Contextual play button when world is selected
+ * - Breadcrumb navigation for deeper pages
+ * - Automatic current world and character tracking
+ * 
+ * @returns The main navigation component with header and breadcrumbs
+ * 
+ * @example
+ * // Used in root layout - no props needed
+ * <Navigation />
+ */
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
@@ -19,6 +40,9 @@ export function Navigation() {
   const worldCharacterCount = Object.values(characters).filter(
     char => char.worldId === currentWorldId
   ).length;
+  
+  // Check if we should show breadcrumbs
+  const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
   
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -37,10 +61,8 @@ export function Navigation() {
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
     setShowWorldSwitcher(false);
-    // If on a world-specific page, redirect to the new world
-    if (pathname.includes('/world/') || pathname.includes('/characters')) {
-      router.push('/worlds');
-    }
+    // Navigate to the selected world's view page
+    router.push(`/world/${worldId}`);
   };
   
   // Don't show navigation on dev pages
@@ -57,44 +79,34 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/" 
-                className="text-xl hover:text-gray-300 transition-colors"
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                <span className="font-light">Narr</span><span className="font-bold">ai</span><span className="font-light">tor</span>
+                <LogoIcon size="small" className="brightness-0 invert" />
+                <LogoText size="sm" className="text-white" />
               </Link>
               
               <div className="hidden sm:flex items-center space-x-1 ml-8">
                 <Link 
                   href="/worlds" 
-                  className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'bg-gray-800' : ''
+                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : ''
                   }`}
                 >
                   Worlds
                 </Link>
-                
-                {currentWorld && (
-                  <>
-                    <span className="text-gray-500 mx-1">|</span>
-                    <Link 
-                      href="/characters" 
-                      className={`px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors ${
-                        pathname.startsWith('/characters') ? 'bg-gray-800' : ''
-                      }`}
-                    >
-                      Characters in {currentWorld.name}
-                      {worldCharacterCount > 0 && (
-                        <span className="ml-2 text-xs bg-gray-700 px-2 py-1 rounded-full">
-                          {worldCharacterCount}
-                        </span>
-                      )}
-                    </Link>
-                  </>
-                )}
+                <Link 
+                  href="/characters" 
+                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : ''
+                  }`}
+                >
+                  Characters
+                </Link>
               </div>
             </div>
             
             {/* Right side - Quick actions and current context */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* World Switcher Dropdown */}
               {Object.keys(worlds).length > 0 && (
                 <div className="relative" ref={dropdownRef}>
@@ -108,6 +120,11 @@ export function Navigation() {
                     <span className="hidden sm:inline">
                       {currentWorld ? currentWorld.name : 'Select World'}
                     </span>
+                    {currentWorld && worldCharacterCount > 0 && (
+                      <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">
+                        {worldCharacterCount}
+                      </span>
+                    )}
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -143,14 +160,14 @@ export function Navigation() {
                       
                       <div className="border-t border-gray-200 mt-1 pt-1">
                         <Link
-                          href="/world/create"
+                          href="/worlds"
                           className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-blue-600 hover:text-blue-700"
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                           </svg>
-                          Create New World
+                          Create a world
                         </Link>
                       </div>
                     </div>
@@ -159,15 +176,16 @@ export function Navigation() {
               )}
               
               {currentWorld && (
-                <>
-                  <Link 
-                    href="/characters/create" 
-                    className="hidden sm:inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
-                  >
-                    <span className="mr-1">+</span>
-                    New Character
-                  </Link>
-                </>
+                <Link 
+                  href={`/world/${currentWorld.id}/play`}
+                  className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Play
+                </Link>
               )}
               {!currentWorld && Object.keys(worlds).length === 0 && (
                 <Link 
@@ -183,18 +201,18 @@ export function Navigation() {
           {/* Mobile menu hint */}
           <div className="sm:hidden py-2 border-t border-gray-800">
             <div className="flex items-center justify-between text-sm">
-              <Link href="/worlds" className="hover:text-gray-300">
-                Worlds
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link href="/worlds" className="hover:text-gray-300">
+                  Worlds
+                </Link>
+                <Link href="/characters" className="hover:text-gray-300">
+                  Characters
+                </Link>
+              </div>
               {currentWorld && (
-                <>
-                  <Link href="/characters" className="hover:text-gray-300">
-                    Characters ({worldCharacterCount})
-                  </Link>
-                  <Link href="/characters/create" className="text-green-400 hover:text-green-300">
-                    + New Character
-                  </Link>
-                </>
+                <Link href={`/world/${currentWorld.id}/play`} className="text-indigo-400 hover:text-indigo-300">
+                  ▶ Play
+                </Link>
               )}
             </div>
           </div>
@@ -202,12 +220,14 @@ export function Navigation() {
       </nav>
       
       {/* Breadcrumbs */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <Breadcrumbs className="sm:hidden" maxItems={2} />
-          <Breadcrumbs className="hidden sm:flex" />
+      {shouldShowBreadcrumbs && (
+        <div className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <Breadcrumbs className="sm:hidden" maxItems={2} />
+            <Breadcrumbs className="hidden sm:flex" />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

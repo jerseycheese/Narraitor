@@ -3,10 +3,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterPortrait } from './CharacterPortrait';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { SectionError } from '@/components/ui/ErrorDisplay';
+// import { SectionError } from '@/components/ui/ErrorDisplay';
 
 const meta: Meta<typeof CharacterPortrait> = {
-  title: 'Narraitor/Character/CharacterPortrait',
+  title: 'Narraitor/Character/Display/CharacterPortrait',
   component: CharacterPortrait,
   parameters: {
     layout: 'centered',
@@ -84,80 +84,6 @@ export const Error: Story = {
     size: 'medium',
     error: 'Failed to generate portrait',
   },
-};
-
-// Error state - Using shared ErrorDisplay component
-export const ErrorWithRetry: Story = {
-  decorators: [
-    () => (
-      <div className="p-8 bg-gray-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">Portrait Generation Error</h3>
-        <SectionError
-          title="Portrait Generation Failed"
-          message="We encountered an error while generating the character portrait. Please try again."
-          showRetry={true}
-          onRetry={() => alert('Retrying portrait generation...')}
-        />
-      </div>
-    )
-  ]
-};
-
-// Nickname handling - Single quoted nickname
-export const WithSingleQuotedNickname: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: "John 'The Beast' Smith",
-    size: 'medium',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows proper initials generation (JS) when character name contains a single-quoted nickname'
-      }
-    }
-  }
-};
-
-// Nickname handling - Double quoted nickname
-export const WithDoubleQuotedNickname: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Maria "Lightning" Rodriguez',
-    size: 'medium',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows proper initials generation (MR) when character name contains a double-quoted nickname'
-      }
-    }
-  }
-};
-
-// Complex name with multiple nicknames
-export const WithMultipleNicknames: Story = {
-  args: {
-    portrait: {
-      type: 'placeholder',
-      url: null,
-    },
-    characterName: 'Sir Alexander "The Great" \'Dragon Slayer\' Blackwood',
-    size: 'medium',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows proper initials generation (SB) when character name contains multiple quoted nicknames'
-      }
-    }
-  }
 };
 
 // All sizes comparison

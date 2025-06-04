@@ -68,13 +68,9 @@ export function QuickPlay() {
     <div className="space-y-6">
       {/* Continue Last Game - Primary CTA */}
       <div className="bg-white rounded-lg shadow-md p-6 border-2 border-blue-500">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Pick Up Where You Left Off
-        </h3>
-        
-        <div className="flex gap-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
           {/* Character Portrait */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 mx-auto sm:mx-0">
             <CharacterPortrait
               portrait={character.portrait || { type: 'placeholder', url: null }}
               characterName={character.name}
@@ -84,12 +80,12 @@ export function QuickPlay() {
           
           {/* Game Info */}
           <div className="flex-1 space-y-3">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <DataField label="World" value={world.name} />
               <DataField label="Character" value={character.name} />
             </div>
             
-            <div className="flex justify-between items-center border-t pt-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border-t pt-3">
               <DataField 
                 label="Progress" 
                 value={`${mostRecentSession.narrativeCount} entries`}

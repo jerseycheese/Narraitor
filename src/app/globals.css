@@ -2,6 +2,68 @@
 
 /* Base layer for HTML element styles */
 @layer base {
+  /* Main element background */
+  main {
+    background-color: #f7f3ed;
+  }
+  
+  /* Link defaults */
+  a {
+    color: #2563eb; /* blue-600 */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  a:hover {
+    color: #1d4ed8; /* blue-700 */
+    text-decoration: underline;
+  }
+  
+  /* Text links in content */
+  .prose a,
+  p a,
+  li a,
+  span a {
+    color: #2563eb; /* blue-600 */
+    text-decoration: underline;
+    text-decoration-color: #93c5fd; /* blue-300 - subtle underline */
+  }
+  
+  .prose a:hover,
+  p a:hover,
+  li a:hover,
+  span a:hover {
+    color: #1d4ed8; /* blue-700 */
+    text-decoration-color: #2563eb; /* blue-600 - stronger underline */
+  }
+  
+  /* Button-style text links */
+  .text-link-button {
+    @apply inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors;
+  }
+  
+  .text-link-button:hover {
+    text-decoration: none;
+  }
+  
+  /* Subtle text links */
+  .text-link-subtle {
+    @apply text-gray-600 hover:text-blue-600 transition-colors;
+  }
+  
+  /* Links in dark backgrounds should remain light */
+  .bg-gray-900 a,
+  .bg-gray-800 a,
+  .bg-slate-800 a {
+    color: inherit;
+  }
+  
+  .bg-gray-900 a:hover,
+  .bg-gray-800 a:hover,
+  .bg-slate-800 a:hover {
+    text-decoration: none;
+  }
+  
   /* Button defaults */
   button {
     cursor: pointer;

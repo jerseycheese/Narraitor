@@ -223,9 +223,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           timeoutPromise
         ]);
         
-      } catch (error) {
-        console.error('⚡ CHOICE GENERATION: Generation failed or timed out, using fallback. Error:', error);
-        console.log('⚡ CHOICE GENERATION: Narrative context was:', narrativeContext);
+      } catch {
+        // Choice generation failed, using fallback choices
         decision = fallbackDecision;
       }
       
@@ -257,13 +256,13 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = JSON.parse(JSON.stringify(decision));
             onChoicesGenerated(decisionCopy);
-          } catch (error) {
-            console.error('⚡ CHOICE GENERATION: Error calling onChoicesGenerated:', error);
+          } catch {
+            // Error calling onChoicesGenerated callback
           }
         }
       }
-    } catch (error) {
-      console.error('⚡ CHOICE GENERATION: Unhandled error in generatePlayerChoices:', error);
+    } catch {
+      // Unhandled error in generatePlayerChoices
       setError('Unable to generate choices. Please check your connection and try again.');
       
       // Even if we get an unhandled error, try to provide fallback choices
@@ -300,8 +299,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
             onChoicesGenerated(decisionCopy);
           }
         }
-      } catch (fallbackError) {
-        console.error('⚡ CHOICE GENERATION: Failed to provide fallback choices:', fallbackError);
+      } catch {
+        // Failed to provide fallback choices
       }
     } finally {
       choiceGenerationInProgress.current = false;
@@ -385,8 +384,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           generatePlayerChoices();
         }, 500); // Reduced timeout since we're not showing immediate choices
       }
-    } catch (err) {
-      console.error(`Error generating narrative:`, err);
+    } catch {
+      // Error generating narrative
       setError('Unable to generate narrative. Please check your connection and try again.');
     } finally {
       if (mountedRef.current) {
@@ -496,8 +495,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           }, 500); // Normal timeout for predefined choices
         }
       }
-    } catch (err) {
-      console.error(`Error generating narrative:`, err);
+    } catch {
+      // Error generating narrative
       setError('Unable to generate narrative. Please check your connection and try again.');
     } finally {
       if (mountedRef.current) {

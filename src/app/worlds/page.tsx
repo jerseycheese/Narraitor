@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
+import { PageLayout } from '@/components/shared/PageLayout';
 import { worldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
@@ -113,8 +114,6 @@ export default function WorldsPage() {
       try {
         // Get the created world to generate image for it
         const createdWorld = worldStore.getState().worlds[worldId];
-        console.log('🖼️ WORLD IMAGE: Starting image generation for world:', createdWorld.name);
-        console.log('🖼️ WORLD IMAGE: World data being sent:', JSON.stringify(createdWorld, null, 2));
         
         const imageResponse = await fetch('/api/generate-world-image', {
           method: 'POST',
@@ -126,16 +125,11 @@ export default function WorldsPage() {
           }),
         });
 
-        console.log('🖼️ WORLD IMAGE: API response status:', imageResponse.status);
-        console.log('🖼️ WORLD IMAGE: API response ok:', imageResponse.ok);
-
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
-          console.log('🖼️ WORLD IMAGE: API response data:', imageData);
           
           // Only update with image if we actually got one
           if (imageData.imageUrl) {
-            console.log('🖼️ WORLD IMAGE: Updating world with image URL:', imageData.imageUrl);
             worldStore.getState().updateWorld(worldId, {
               image: {
                 type: 'placeholder' as const,
@@ -143,18 +137,10 @@ export default function WorldsPage() {
                 generatedAt: new Date().toISOString()
               }
             });
-            console.log('🖼️ WORLD IMAGE: World updated successfully');
-          } else {
-            console.log('🖼️ WORLD IMAGE: No imageUrl in response data');
           }
           // If no image was generated (placeholder mode), just continue without image
-        } else {
-          console.error('🖼️ WORLD IMAGE: API request failed with status:', imageResponse.status);
-          const errorText = await imageResponse.text();
-          console.error('🖼️ WORLD IMAGE: Error response:', errorText);
         }
-      } catch (imageError) {
-        console.error('🖼️ WORLD IMAGE: Exception during image generation:', imageError);
+      } catch {
         // Continue without image - world creation should still succeed
       }
 
@@ -170,44 +156,39 @@ export default function WorldsPage() {
       
       // Stay on worlds page to see the new world
     } catch (err) {
-      console.error('Failed to generate world:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate world');
       setIsGenerating(false);
     }
   };
 
-  return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-4xl font-bold">
-              My Worlds
-            </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={handleCreateWorld}
-                data-testid="create-world-button"
-                className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
-              >
-                Create World
-              </button>
-              <button
-                onClick={() => setShowPrompt(true)}
-                disabled={isGenerating}
-                className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Generate World
-              </button>
-            </div>
-          </div>
-          <p className="text-gray-600">
-            Select a world to make it active, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
-          </p>
-        </header>
+  const actions = (
+    <>
+      <button
+        onClick={handleCreateWorld}
+        data-testid="create-world-button"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+      >
+        Create World
+      </button>
+      <button
+        onClick={() => setShowPrompt(true)}
+        disabled={isGenerating}
+        className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Generate World
+      </button>
+    </>
+  );
 
-        {/* World Generation Prompt */}
-        {showPrompt && (
+  return (
+    <PageLayout
+      title="My Worlds"
+      description="Use the 'Make Active' button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar."
+      actions={actions}
+    >
+
+      {/* World Generation Prompt */}
+      {showPrompt && (
           <div 
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             role="dialog"
@@ -230,12 +211,12 @@ export default function WorldsPage() {
                     type="text"
                     value={worldName}
                     onChange={(e) => setWorldName(e.target.value)}
-                    placeholder="e.g., The Shattered Realms, Neo Tokyo 2185..."
+                    placeholder="e.g., The Lost Kingdom"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Leave empty for an auto-generated name
+                    Give your world a custom name, or leave empty for an auto-generated name
                   </p>
                 </div>
                 <div>
@@ -320,7 +301,7 @@ export default function WorldsPage() {
                       type="text"
                       value={worldReference}
                       onChange={(e) => setWorldReference(e.target.value)}
-                      placeholder="e.g., Star Wars, Victorian London, Ancient Rome, 1960s New York..."
+                      placeholder="e.g., Star Wars, Victorian era"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       disabled={isGenerating}
                     />
@@ -334,15 +315,15 @@ export default function WorldsPage() {
                 )}
               </div>
               {error && (
-                <p className="text-red-600 text-sm mb-4">{error}</p>
+                <p className="text-red-600 text-sm mt-4 mb-4">{error}</p>
               )}
               {isGenerating && (
-                <p className="text-purple-600 text-sm mb-4 flex items-center gap-2">
+                <p className="text-purple-600 text-sm mt-4 mb-4 flex items-center gap-2">
                   <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
                   {generatingStatus}
                 </p>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <button
                   onClick={() => {
                     setShowPrompt(false);
@@ -368,10 +349,7 @@ export default function WorldsPage() {
           </div>
         )}
 
-        <section>
-          <WorldListScreen />
-        </section>
-      </div>
-    </main>
+      <WorldListScreen />
+    </PageLayout>
   );
 }

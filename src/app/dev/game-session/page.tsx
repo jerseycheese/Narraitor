@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
 import { worldStore } from '@/state/worldStore';
@@ -31,6 +30,7 @@ const mockWorld: World = {
 const mockCharacter = {
   id: 'test-character-123',
   name: 'Test Hero',
+  description: 'A test character for debugging purposes',
   worldId: 'world-1',
   level: 5,
   background: {
@@ -38,7 +38,8 @@ const mockCharacter = {
     personality: 'Deterministic and reliable',
     goals: ['To pass all tests'],
     fears: ['Null pointer exceptions', 'Infinite loops'],
-    physicalDescription: 'A well-structured test character'
+    physicalDescription: 'A well-structured test character',
+    relationships: []
   },
   portrait: {
     type: 'placeholder' as const,
@@ -48,9 +49,15 @@ const mockCharacter = {
   skills: [],
   isPlayer: true,
   status: {
-    hp: 100,
-    mp: 50,
-    stamina: 80
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
+  inventory: {
+    characterId: 'test-character-123',
+    items: [],
+    capacity: 20,
+    categories: []
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
@@ -140,13 +147,7 @@ export default function GameSessionTestHarness() {
   
   return (
     <div className="p-6">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-2xl font-bold mb-4 mt-4">Game Session Test Harness</h1>
+      <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
       
       <div className="mb-4">
         <button 

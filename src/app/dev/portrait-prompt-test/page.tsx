@@ -3,7 +3,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
 import { createAIClient } from '@/lib/ai';
 import { Character } from '@/types/character.types';
@@ -162,19 +161,20 @@ export default function PortraitPromptTestPage() {
         setHistory('Senior member of the Van der Linde gang in the dying days of the Wild West');
         setWorldTheme('western');
         break;
+      case 'ryan-howard':
+        setCharacterName('Ryan Howard');
+        setPhysicalDescription('Young ambitious office worker with styled hair and trendy business casual attire');
+        setPersonality('Ambitious, self-centered, trendy, and opportunistic with a superiority complex');
+        setHistory('Started as a temp at Dunder Mifflin but climbed the corporate ladder through manipulation');
+        setWorldTheme('office comedy');
+        break;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-6xl mx-auto">
-        <Link 
-          href="/dev" 
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          ← Back to Dev Harnesses
-        </Link>
-        <h1 className="text-3xl font-bold mb-6 mt-4">Portrait Prompt Testing</h1>
+        <h1 className="text-3xl font-bold mb-6">Portrait Prompt Testing</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Controls */}
@@ -227,6 +227,13 @@ export default function PortraitPromptTestPage() {
                     className="px-4 py-2 bg-orange-600 text-white rounded font-medium hover:bg-orange-700 transition-colors"
                   >
                     Arthur Morgan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyPreset('ryan-howard')}
+                    className="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors"
+                  >
+                    Ryan Howard
                   </button>
                 </div>
               </div>

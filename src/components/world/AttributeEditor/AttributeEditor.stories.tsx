@@ -4,7 +4,7 @@ import { EntityID } from '@/types/common.types';
 import { action } from '@storybook/addon-actions';
 
 const meta = {
-  title: 'Narraitor/World/AttributeEditor',
+  title: 'Narraitor/World/Edit/AttributeEditor',
   component: AttributeEditor,
   parameters: {
     layout: 'centered',
@@ -119,72 +119,3 @@ export const EditWithLinkedSkills: Story = {
   },
 };
 
-export const WithValidationErrors: Story = {
-  args: {
-    worldId: mockWorldId,
-    mode: 'edit',
-    attributeId: mockAttributeId,
-    onSave: action('onSave'),
-    onDelete: action('onDelete'),
-    onCancel: action('onCancel'),
-  },
-  parameters: {
-    mockData: {
-      world: {
-        id: mockWorldId,
-        attributes: {
-          [mockAttributeId]: {
-            id: mockAttributeId,
-            name: '', // Empty name to trigger validation
-            description: 'This attribute has no name',
-            minValue: 10,
-            maxValue: 5, // Invalid range
-          },
-          'attr-456': {
-            id: 'attr-456' as EntityID,
-            name: 'Dexterity',
-            description: 'Agility and reflexes',
-            minValue: 1,
-            maxValue: 10,
-          },
-        },
-        skills: {},
-      },
-    },
-  },
-};
-
-export const DeleteConfirmation: Story = {
-  args: {
-    worldId: mockWorldId,
-    mode: 'edit',
-    attributeId: mockAttributeId,
-    onSave: action('onSave'),
-    onDelete: action('onDelete'),
-    onCancel: action('onCancel'),
-  },
-  parameters: {
-    mockData: {
-      world: {
-        id: mockWorldId,
-        attributes: {
-          [mockAttributeId]: {
-            id: mockAttributeId,
-            name: 'Charisma',
-            description: 'Force of personality and social skills',
-            minValue: 1,
-            maxValue: 10,
-          },
-        },
-        skills: {},
-      },
-    },
-  },
-  play: async ({ canvasElement }) => {
-    // Automatically open delete confirmation dialog
-    const deleteButton = canvasElement.querySelector('button[aria-label*="delete"]');
-    if (deleteButton instanceof HTMLElement) {
-      setTimeout(() => deleteButton.click(), 500);
-    }
-  },
-};

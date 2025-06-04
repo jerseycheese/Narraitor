@@ -38,6 +38,8 @@ Generate a narrative segment that:
 3. Is approximately ${lengthDescription} in length
 4. Continues naturally from the previous context (if provided)
 5. Engages the reader and moves the story forward
+6. Uses varied sensory descriptions (primarily visual, auditory, tactile)
+7. Avoids repetitive olfactory descriptions unless essential to the scene
 
 Response Format:
 {

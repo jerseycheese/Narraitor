@@ -7,9 +7,80 @@ import { World } from '@/types/world.types';
 
 const logger = new Logger('API');
 
+/**
+ * Single function to build portrait prompts with AI-powered actor detection
+ */
+async function buildPortraitPrompt(
+  characterName: string,
+  physicalDescription: string,
+  worldTheme: string,
+  isKnownFigure?: boolean
+): Promise<string> {
+  try {
+    logger.debug('generate-portrait API', 'Starting AI character detection for:', characterName);
+    
+    // Use only the character detection part, not the full image generation
+    const { PortraitGenerator } = await import('@/lib/ai/portraitGenerator');
+    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+    
+    logger.debug('generate-portrait API', 'Creating AI client and generator');
+    const aiClient = createDefaultGeminiClient();
+    const generator = new PortraitGenerator(aiClient);
+    
+    // Create a minimal character object for detection
+    const mockCharacter: Character = {
+      id: 'detection-temp',
+      name: characterName,
+      description: '',
+      worldId: 'temp',
+      background: {
+        physicalDescription: physicalDescription,
+        history: '',
+        personality: '',
+        goals: [],
+        fears: [],
+        relationships: []
+      },
+      attributes: [],
+      skills: [],
+      inventory: {
+        characterId: 'detection-temp',
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    logger.debug('generate-portrait API', 'Calling buildPortraitPrompt directly to avoid image generation');
+    
+    // Call buildPortraitPrompt directly to avoid the image generation requirement
+    const prompt = await generator.buildPortraitPrompt(mockCharacter, {
+      worldTheme: worldTheme
+    });
+    
+    logger.debug('generate-portrait API', 'AI detection successful, prompt:', prompt.substring(0, 100) + '...');
+    return prompt;
+    
+  } catch (error) {
+    logger.debug('generate-portrait API', 'AI detection failed, using fallback. Error:', error);
+    
+    // Fallback to basic prompt if AI detection fails
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    logger.debug('generate-portrait API', 'Request body keys:', Object.keys(body));
+    logger.debug('generate-portrait API', 'Request body:', JSON.stringify(body, null, 2));
     
     // Handle different input formats
     let prompt: string;
@@ -26,13 +97,33 @@ export async function POST(request: NextRequest) {
       character = body.character;
       world = body.world;
       const customDescription = body.customDescription;
+      const promptOnly = body.promptOnly;
       
-      // Build a prompt from character data
-      const physicalDesc = customDescription || character?.background?.physicalDescription || 'No specific appearance described';
-      const worldTheme = world?.theme || 'fantasy';
-      const isKnownFigure = character?.background?.isKnownFigure;
+      logger.debug('generate-portrait API', 'Character format detected, promptOnly:', promptOnly);
       
-      prompt = `Create a professional portrait of ${character?.name || 'character'}, ${physicalDesc}. ${isKnownFigure ? `This should be recognizable as ${character?.name} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+      if (promptOnly) {
+        logger.debug('generate-portrait API', 'Using promptOnly mode');
+        
+        const characterName = character?.name || 'Unknown';
+        const physicalDesc = customDescription || character?.background?.physicalDescription || '';
+        const worldTheme = world?.theme || 'Modern';
+        const isKnownFigure = character?.background?.isKnownFigure;
+        
+        const prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+        
+        return NextResponse.json({ 
+          prompt: prompt,
+          promptOnly: true
+        });
+      } else {
+        // Build a prompt for actual image generation
+        const characterName = character?.name || 'character';
+        const physicalDesc = customDescription || character?.background?.physicalDescription || 'No specific appearance described';
+        const worldTheme = world?.theme || 'fantasy';
+        const isKnownFigure = character?.background?.isKnownFigure;
+        
+        prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+      }
     } else {
       return NextResponse.json(
         { error: 'Either prompt string or character object is required' },
@@ -158,7 +249,7 @@ export async function POST(request: NextRequest) {
       type: 'ai-generated' as const,
       url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
       generatedAt: new Date().toISOString(),
-      prompt: `Portrait fallback`
+      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
     
     return NextResponse.json({ 

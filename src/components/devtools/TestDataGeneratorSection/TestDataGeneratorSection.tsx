@@ -372,10 +372,10 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         // Smart character type selection based on world relationship (my enhancement)
         let characterType: 'known' | 'original';
-        if (currentWorld.relationship === 'set_in' || currentWorld.universeRelationship === 'set_in') {
+        if (currentWorld.relationship === 'set_in') {
           // 100% known figures for "set in" worlds - all characters from that universe
           characterType = 'known';
-        } else if (currentWorld.relationship === 'based_on' || currentWorld.universeRelationship === 'based_on') {
+        } else if (currentWorld.relationship === 'based_on') {
           // 100% original characters for "based on" worlds - inspired by but not from that universe
           characterType = 'original';
         } else {
@@ -383,10 +383,10 @@ export const TestDataGeneratorSection: React.FC = () => {
           characterType = Math.random() < 0.5 ? 'known' : 'original';
         }
         
-        console.log(`[DevTools] Generating ${characterType} character for ${currentWorld.relationship || currentWorld.universeRelationship || 'no reference'} world`);
+        console.log(`[DevTools] Generating ${characterType} character for ${currentWorld.relationship || 'no reference'} world`);
         
         // Use the AI character generator via API route (secure approach from develop)
-        const response: Response = await fetch('/api/ai/generate-character', {
+        const response: Response = await fetch('/api/generate-character', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -407,6 +407,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Convert AI-generated data to character store format
         const characterData = {
           name: aiCharacterData.name,
+          description: `A character from ${currentWorld.name}`,
           worldId: currentWorld.id,
           level: aiCharacterData.level || 1,
           isPlayer: true,
@@ -437,12 +438,19 @@ export const TestDataGeneratorSection: React.FC = () => {
             physicalDescription: aiCharacterData.background.physicalDescription || '',
             goals: aiCharacterData.background.motivation ? [aiCharacterData.background.motivation] : [],
             fears: [],
+            relationships: [],
             isKnownFigure: characterType === 'known'
           },
           status: {
-            hp: 100,
-            mp: 50,
-            stamina: 100
+            health: 100,
+            maxHealth: 100,
+            conditions: []
+          },
+          inventory: {
+            characterId: '', // Will be set by store
+            items: [],
+            capacity: 100,
+            categories: []
           }
         };
 
@@ -490,9 +498,9 @@ export const TestDataGeneratorSection: React.FC = () => {
                     categories: []
                   },
                   status: {
-                    health: storeCharacter.status.hp,
-                    maxHealth: storeCharacter.status.hp,
-                    conditions: [],
+                    health: storeCharacter.status.health,
+                    maxHealth: storeCharacter.status.maxHealth,
+                    conditions: storeCharacter.status.conditions,
                     location: currentWorld.name
                   },
                   createdAt: storeCharacter.createdAt,

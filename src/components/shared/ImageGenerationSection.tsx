@@ -47,13 +47,13 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
     onGenerate(showCustomPrompt && customPrompt ? customPrompt : undefined);
   };
 
-  // Update local state when currentPrompt changes
+  // Update local state when currentPrompt changes from props
   React.useEffect(() => {
-    if (currentPrompt && currentPrompt !== customPrompt) {
+    if (currentPrompt) {
       setCustomPrompt(currentPrompt);
       setShowCustomPrompt(true);
     }
-  }, [currentPrompt, customPrompt]);
+  }, [currentPrompt]);
 
   const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
 

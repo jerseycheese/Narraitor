@@ -245,9 +245,9 @@ describe('CharacterCreationWizard - Navigation to Game Session', () => {
           }),
           isPlayer: true,
           status: expect.objectContaining({
-            hp: expect.any(Number),
-            mp: expect.any(Number),
-            stamina: expect.any(Number),
+            health: expect.any(Number),
+            maxHealth: expect.any(Number),
+            conditions: expect.any(Array),
           }),
         })
       );

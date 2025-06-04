@@ -45,6 +45,8 @@ export class WorldImageGenerator {
       themeContext = 'in steampunk style, brass machinery, steam-powered technology';
     } else if (themeLC.includes('medieval')) {
       themeContext = 'in medieval style, historical architecture, period atmosphere';
+    } else if (themeLC.includes('modern') || themeLC.includes('comedy') || themeLC.includes('workplace') || themeLC.includes('crime') || themeLC.includes('drama') || themeLC.includes('contemporary')) {
+      themeContext = 'in modern realistic style, contemporary setting, real-world environment, no fantasy or magical elements';
     } else {
       themeContext = `in ${world.theme} style`;
     }

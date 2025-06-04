@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { worldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -105,13 +104,7 @@ export default function CharacterCreationTestPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link 
-            href="/dev" 
-            className="text-blue-600 hover:text-blue-800 underline"
-          >
-            ← Back to Dev Harnesses
-          </Link>
-          <h1 className="text-2xl font-bold mt-4">Character Creation Test Harness</h1>
+          <h2 className="text-2xl font-bold mb-6">Character Creation Test Harness</h2>
         </div>
       </div>
 

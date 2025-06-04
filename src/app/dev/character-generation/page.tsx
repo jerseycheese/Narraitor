@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { worldStore } from '@/state/worldStore';
 import { characterStore } from '@/state/characterStore';
 import { generateCharacter, type GeneratedCharacterData } from '@/lib/ai/characterGenerator';
@@ -55,6 +54,7 @@ export default function CharacterGenerationTestPage() {
     
     characterStore.getState().createCharacter({
       name: generatedCharacter.name,
+      description: generatedCharacter.background.description || '',
       worldId: selectedWorldId,
       level: generatedCharacter.level || 1,
       attributes: generatedCharacter.attributes.map((attr) => {
@@ -81,13 +81,20 @@ export default function CharacterGenerationTestPage() {
         personality: generatedCharacter.background.personality,
         goals: generatedCharacter.background.motivation ? [generatedCharacter.background.motivation] : [],
         fears: generatedCharacter.background.fears || [],
-        physicalDescription: generatedCharacter.background.physicalDescription
+        physicalDescription: generatedCharacter.background.physicalDescription,
+        relationships: []
       },
       isPlayer: true,
       status: {
-        hp: 100,
-        mp: 50,
-        stamina: 75
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
+      inventory: {
+        characterId: '',
+        items: [],
+        capacity: 20,
+        categories: []
       }
     });
     
@@ -97,13 +104,7 @@ export default function CharacterGenerationTestPage() {
   
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-3xl font-bold mb-6 mt-4">Character Generation Test Harness</h1>
+      <h1 className="text-3xl font-bold mb-6">Character Generation Test Harness</h1>
       
       <div className="space-y-6">
         {/* World Selection */}

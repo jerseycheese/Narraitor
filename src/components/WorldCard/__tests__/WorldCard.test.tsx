@@ -73,8 +73,8 @@ describe('WorldCard', () => {
     expect(mockOnSelect).toHaveBeenCalledWith(mockWorld.id);
   });
 
-  // New test for Play functionality
-  test('sets current world and navigates to game session when Play is clicked', () => {
+  // New test for Play functionality (navigates to characters when no characters exist)
+  test('sets current world and navigates to characters when Play is clicked', () => {
     // Setup mocks
     const mockSetCurrentWorld = jest.fn();
     const mockRouterPush = jest.fn();
@@ -96,8 +96,8 @@ describe('WorldCard', () => {
     // Verify world is set as current world
     expect(mockSetCurrentWorld).toHaveBeenCalledWith(mockWorld.id);
     
-    // Verify navigation to game session page
-    expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/play`);
+    // Verify navigation to characters page (since no characters exist in the world)
+    expect(mockRouterPush).toHaveBeenCalledWith(`/characters?worldId=${mockWorld.id}`);
   });
 
   // Test for Edit functionality
@@ -140,8 +140,10 @@ describe('WorldCard', () => {
         onDelete={mockOnDelete}
       />
     );
-    expect(screen.getByText('🌍 Set in Star Wars')).toBeInTheDocument();
-    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-purple-100', 'text-purple-800');
+    // Check badge content and styling
+    const setBadge = screen.getByTestId('world-card-type');
+    expect(setBadge).toHaveTextContent('Set in Star Wars');
+    expect(setBadge).toHaveClass('bg-purple-100', 'text-purple-800');
 
     // Test "Based On" world
     const basedOnWorld = createMockWorld({
@@ -156,12 +158,13 @@ describe('WorldCard', () => {
         onDelete={mockOnDelete}
       />
     );
-    expect(screen.getByText('✨ Inspired by Lord of the Rings')).toBeInTheDocument();
-    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-green-100', 'text-green-800');
+    const basedBadge = screen.getByTestId('world-card-type');
+    expect(basedBadge).toHaveTextContent('Inspired by Lord of the Rings');
+    expect(basedBadge).toHaveClass('bg-green-100', 'text-green-800');
 
     // Test Original world (no reference/relationship)
     const originalWorld = createMockWorld({
-      name: 'Original World',
+      name: 'My Custom World',
       reference: undefined,
       relationship: undefined
     });
@@ -172,7 +175,8 @@ describe('WorldCard', () => {
         onDelete={mockOnDelete}
       />
     );
-    expect(screen.getByText('⚡ Original World')).toBeInTheDocument();
-    expect(screen.getByTestId('world-card-type')).toHaveClass('bg-blue-100', 'text-blue-800');
+    const originalBadge = screen.getByTestId('world-card-type');
+    expect(originalBadge).toHaveTextContent('Original World');
+    expect(originalBadge).toHaveClass('bg-blue-100', 'text-blue-800');
   });
 });
