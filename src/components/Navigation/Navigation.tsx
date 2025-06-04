@@ -74,6 +74,14 @@ export function Navigation() {
                 >
                   Worlds
                 </Link>
+                <Link 
+                  href="/characters" 
+                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : ''
+                  }`}
+                >
+                  Characters
+                </Link>
               </div>
             </div>
             
@@ -148,24 +156,16 @@ export function Navigation() {
               )}
               
               {currentWorld && (
-                <>
-                  <Link 
-                    href={`/characters?worldId=${currentWorld.id}`}
-                    className="hidden sm:inline-flex items-center px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-md transition-colors"
-                  >
-                    Characters
-                  </Link>
-                  <Link 
-                    href={`/world/${currentWorld.id}/play`}
-                    className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
-                  >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Play
-                  </Link>
-                </>
+                <Link 
+                  href={`/world/${currentWorld.id}/play`}
+                  className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Play
+                </Link>
               )}
               {!currentWorld && Object.keys(worlds).length === 0 && (
                 <Link 
@@ -181,18 +181,18 @@ export function Navigation() {
           {/* Mobile menu hint */}
           <div className="sm:hidden py-2 border-t border-gray-800">
             <div className="flex items-center justify-between text-sm">
-              <Link href="/worlds" className="hover:text-gray-300">
-                Worlds
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link href="/worlds" className="hover:text-gray-300">
+                  Worlds
+                </Link>
+                <Link href="/characters" className="hover:text-gray-300">
+                  Characters
+                </Link>
+              </div>
               {currentWorld && (
-                <div className="flex items-center gap-3">
-                  <Link href={`/characters?worldId=${currentWorld.id}`} className="hover:text-gray-300">
-                    Characters
-                  </Link>
-                  <Link href={`/world/${currentWorld.id}/play`} className="text-indigo-400 hover:text-indigo-300">
-                    ▶ Play
-                  </Link>
-                </div>
+                <Link href={`/world/${currentWorld.id}/play`} className="text-indigo-400 hover:text-indigo-300">
+                  ▶ Play
+                </Link>
               )}
             </div>
           </div>
