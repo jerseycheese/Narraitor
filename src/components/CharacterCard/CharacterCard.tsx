@@ -1,5 +1,8 @@
 import React from 'react';
-import { Character } from '@/types/character.types';
+// Use the store's Character type since it's more complete
+import { characterStore } from '@/state/characterStore';
+
+type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { 
   ActiveStateCard, 
@@ -9,7 +12,7 @@ import {
 } from '@/components/shared/cards';
 
 interface CharacterCardProps {
-  character: Character;
+  character: StoreCharacter;
   isActive: boolean;
   onMakeActive: () => void;
   onView: () => void;

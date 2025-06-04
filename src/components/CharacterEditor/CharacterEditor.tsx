@@ -130,9 +130,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
               categories: []
             },
             status: {
-              health: character.status.hp,
-              maxHealth: 100,
-              conditions: []
+              health: character.status.health,
+              maxHealth: character.status.maxHealth,
+              conditions: character.status.conditions
             },
             createdAt: character.createdAt,
             updatedAt: character.updatedAt
@@ -200,8 +200,20 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Background Section */}
       <BackgroundForm
-        background={character.background}
-        onBackgroundChange={(background) => setCharacter({ ...character, background })}
+        background={{
+          history: character.background.history,
+          personality: character.background.personality,
+          goals: character.background.goals,
+          fears: character.background.fears,
+          physicalDescription: character.background.physicalDescription
+        }}
+        onBackgroundChange={(background) => setCharacter({ 
+          ...character, 
+          background: {
+            ...character.background,
+            ...background
+          }
+        })}
       />
       
       {/* Attributes Section */}

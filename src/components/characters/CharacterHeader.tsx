@@ -2,11 +2,14 @@
 
 import React from 'react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
-import { Character } from '@/types/character.types';
+// Use the store's Character type since it's more complete
+import { characterStore } from '@/state/characterStore';
+
+type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 
 interface CharacterHeaderProps {
-  character: Character;
+  character: StoreCharacter;
   world: World;
 }
 

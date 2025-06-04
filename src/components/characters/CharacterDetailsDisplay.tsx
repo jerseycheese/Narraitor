@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Character } from '@/types/character.types';
+// Use the store's Character type since it's more complete
+import { characterStore } from '@/state/characterStore';
+
+type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 import { CharacterAttributeDisplay } from './CharacterAttributeDisplay';
 import { CharacterSkillDisplay } from './CharacterSkillDisplay';
@@ -9,7 +12,7 @@ import { CharacterBackgroundDisplay } from './CharacterBackgroundDisplay';
 import { enrichCharacterAttributes, enrichCharacterSkills } from '@/lib/utils/characterDataEnrichment';
 
 interface CharacterDetailsDisplayProps {
-  character: Character;
+  character: StoreCharacter;
   world: World;
   showAttributes?: boolean;
   showSkills?: boolean;

@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterHeader } from './CharacterHeader';
-import { Character } from '@/types/character.types';
+// Use the store's Character type since it's more complete
+import { characterStore } from '@/state/characterStore';
+
+type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 
 const meta = {
@@ -21,28 +24,51 @@ const mockWorld: World = {
   name: 'Middle Earth',
   description: 'A fantasy world of magic and adventure',
   theme: 'Fantasy',
-  relationship: 'set_in_existing_world',
-  worldReference: 'Lord of the Rings',
+  relationship: 'set_in',
+  reference: 'Lord of the Rings',
   attributes: [],
   skills: [],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 10,
+    attributePointPool: 27,
+    skillPointPool: 15
+  },
   createdAt: '2024-12-03T10:00:00Z',
   updatedAt: '2024-12-03T10:00:00Z',
 };
 
-const mockCharacter: Character = {
+const mockCharacter: StoreCharacter = {
   id: 'char-1',
   name: 'Aragorn',
+  description: 'A noble ranger destined to become king',
   worldId: 'world-1',
   level: 15,
-  attributes: {},
-  skills: {},
+  attributes: [],
+  skills: [],
   background: {
+    history: 'Raised by elves in Rivendell, trained as a Ranger of the North.',
     personality: 'A noble ranger with a strong sense of duty and honor, destined to become king.',
-    backstory: 'Raised by elves in Rivendell, trained as a Ranger of the North.',
+    goals: ['Become king of Gondor'],
+    fears: ['Failing his people'],
+    physicalDescription: 'Tall, dark-haired ranger with weathered features',
+    relationships: [],
     isKnownFigure: true,
   },
+  isPlayer: true,
+  status: {
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
+  inventory: {
+    characterId: 'char-1',
+    items: [],
+    capacity: 20,
+    categories: []
+  },
   portrait: {
-    type: 'ai_generated',
+    type: 'ai-generated',
     url: 'https://via.placeholder.com/200x200/4F46E5/FFFFFF?text=Aragorn',
     prompt: 'A noble ranger in dark clothing',
   },
@@ -74,8 +100,12 @@ export const LowLevelCharacter: Story = {
       name: 'Pippin',
       level: 1,
       background: {
+        history: 'A young hobbit from the Shire who joined the Fellowship.',
         personality: 'A curious and brave hobbit with a love for adventure and second breakfast.',
-        backstory: 'A young hobbit from the Shire who joined the Fellowship.',
+        goals: ['Have adventures'],
+        fears: ['Missing second breakfast'],
+        physicalDescription: 'Young hobbit with curly hair',
+        relationships: [],
         isKnownFigure: true,
       },
     },
@@ -91,12 +121,16 @@ export const OriginalCharacter: Story = {
       name: 'Lyra Moonwhisper',
       level: 8,
       background: {
+        history: 'Born in the ancient forests, trained in the old ways of magic.',
         personality: 'A mysterious elven mage with a deep connection to nature and ancient magic.',
-        backstory: 'Born in the ancient forests, trained in the old ways of magic.',
+        goals: ['Master ancient magic'],
+        fears: ['Loss of nature'],
+        physicalDescription: 'Tall elf with flowing robes and mystical aura',
+        relationships: [],
         isKnownFigure: false,
       },
       portrait: {
-        type: 'ai_generated',
+        type: 'ai-generated',
         url: 'https://via.placeholder.com/200x200/10B981/FFFFFF?text=Lyra',
         prompt: 'An elven mage with silver hair',
       },
@@ -116,12 +150,16 @@ export const HighLevelCharacter: Story = {
       name: 'Gandalf the Grey',
       level: 50,
       background: {
+        history: 'One of the Istari, sent to Middle-earth to oppose the growing power of darkness.',
         personality: 'A wise and powerful wizard who guides others on their journeys.',
-        backstory: 'One of the Istari, sent to Middle-earth to oppose the growing power of darkness.',
+        goals: ['Guide the free peoples', 'Defeat darkness'],
+        fears: ['Failing his mission'],
+        physicalDescription: 'An old wizard with a long grey beard and robes',
+        relationships: [],
         isKnownFigure: true,
       },
       portrait: {
-        type: 'ai_generated',
+        type: 'ai-generated',
         url: 'https://via.placeholder.com/200x200/6B7280/FFFFFF?text=Gandalf',
         prompt: 'An old wizard with a long grey beard and pointed hat',
       },
@@ -136,7 +174,11 @@ export const NoPersonality: Story = {
       ...mockCharacter,
       name: 'Basic Character',
       background: {
-        backstory: 'A simple character with minimal background.',
+        history: 'A simple character with minimal background.',
+        personality: 'Basic personality.',
+        goals: [],
+        fears: [],
+        relationships: [],
         isKnownFigure: false,
       },
     },
@@ -150,8 +192,12 @@ export const LongPersonality: Story = {
       ...mockCharacter,
       name: 'Thorin Oakenshield',
       background: {
+        history: 'Heir to the throne of Erebor, exiled when Smaug took the mountain.',
         personality: 'A proud and stubborn dwarf king with a deep sense of honor and loyalty to his people. Driven by a desire to reclaim his ancestral home and restore the glory of the Kingdom under the Mountain. Can be both noble and petty, brave and reckless, wise and foolish. His pride often leads him into conflict, but his heart is ultimately in the right place.',
-        backstory: 'Heir to the throne of Erebor, exiled when Smaug took the mountain.',
+        goals: ['Reclaim Erebor'],
+        fears: ['Failing his people'],
+        physicalDescription: 'Proud dwarf king with royal bearing and warrior\'s build',
+        relationships: [],
         isKnownFigure: true,
       },
     },
@@ -166,12 +212,16 @@ export const SciFiCharacter: Story = {
       name: 'Commander Nova',
       level: 25,
       background: {
+        history: 'Former military officer turned space explorer.',
         personality: 'A tactical genius with cybernetic enhancements and unwavering determination.',
-        backstory: 'Former military officer turned space explorer.',
+        goals: ['Explore the galaxy'],
+        fears: ['System failures'],
+        physicalDescription: 'Cybernetically enhanced human with tactical gear',
+        relationships: [],
         isKnownFigure: false,
       },
       portrait: {
-        type: 'ai_generated',
+        type: 'ai-generated',
         url: 'https://via.placeholder.com/200x200/3B82F6/FFFFFF?text=Nova',
         prompt: 'A futuristic commander with cybernetic implants',
       },

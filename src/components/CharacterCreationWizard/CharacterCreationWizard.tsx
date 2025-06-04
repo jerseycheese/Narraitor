@@ -321,6 +321,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     // Create character
     const characterId = createCharacter({
       name: state.characterData.name,
+      description: state.characterData.background.history,
       worldId,
       level: 1,
       attributes: state.characterData.attributes.map(attr => {
@@ -354,6 +355,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
         fears: [],
         physicalDescription: state.characterData.background.physicalDescription || '',
+        relationships: [],
       },
       portrait: state.characterData.portrait || {
         type: 'placeholder',
@@ -361,9 +363,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
       isPlayer: true,
       status: {
-        hp: 100,
-        mp: 50,
-        stamina: 100,
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+      },
+      inventory: {
+        characterId: '', // Will be set by the store
+        items: [],
+        capacity: 20,
+        categories: []
       },
     });
 
