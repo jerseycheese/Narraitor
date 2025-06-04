@@ -74,12 +74,22 @@ IMPORTANT: Create a COMPLETELY ORIGINAL world from your imagination. Do not base
     prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
 ${isSetIn 
-  ? `CRITICAL: This world must exist WITHIN the actual ${reference} universe and follow its EXACT canon. Do NOT add fantasy, supernatural, or magical elements unless they actually exist in ${reference}. Do NOT invent new magic systems, supernatural powers, or fantastical locations. This should be a realistic location that could actually exist in the ${reference} setting. For example:
-  - If ${reference} is a modern-day movie/show, the world should be modern and realistic
-  - If ${reference} is historical, the world should match that historical period
-  - If ${reference} is sci-fi, only use the sci-fi elements that actually exist in that universe
-  - The theme MUST exactly match the genre of ${reference}
-  - Use only the actual technology, social structures, and rules that exist in ${reference}`
+  ? `CRITICAL: This world must exist WITHIN the actual ${reference} universe and follow its EXACT canon. 
+
+ABSOLUTE REQUIREMENTS:
+- Do NOT add fantasy, supernatural, or magical elements unless they actually exist in ${reference}
+- Do NOT invent new magic systems, supernatural powers, or fantastical locations
+- This should be a realistic location that could actually exist in the ${reference} setting
+- The theme MUST exactly match the genre of ${reference}
+- Use only the actual technology, social structures, and rules that exist in ${reference}
+
+EXAMPLES TO CLARIFY:
+- If ${reference} is "The Office": Create a modern office/workplace setting with NO magic, NO fantasy elements
+- If ${reference} is "Breaking Bad": Create a modern crime/drama setting with NO supernatural elements
+- If ${reference} is "Star Wars": You CAN include the Force and space technology because they exist in that universe
+- If ${reference} is "Lord of the Rings": You CAN include magic and fantasy races because they exist in that universe
+
+REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think would make it more interesting!`
   : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore. Choose an appropriate theme that captures the essence of ${reference}.`
 }`
   }
@@ -128,8 +138,8 @@ ${isSetIn
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "theme": "${options.relationship === 'set_in' && options.reference ? `The canonical genre/theme that matches ${options.reference} (e.g., Horror for horror movies, Sci-Fi for sci-fi shows, Fantasy for fantasy, Crime Drama for crime shows, etc.)` : 'The genre/setting (e.g., Fantasy, Sci-Fi, Historical, Modern, Post-Apocalyptic)'}",
-  "description": "A 2-3 sentence description of the world and its unique features`;
+  "theme": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The genre/setting (choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other)'}",
+  "description": "A 2-3 sentence description of the world and its unique features${options.relationship === 'set_in' && options.reference && (options.reference.toLowerCase().includes('office') || options.reference.toLowerCase().includes('comedy') || options.reference.toLowerCase().includes('drama')) ? '. CRITICAL: Use realistic, mundane language. Avoid flowery or fantastical descriptions. This should sound like a real place that could exist today.' : ''}`;
   
   if (options.reference) {
     const isSetIn = options.relationship === 'set_in';

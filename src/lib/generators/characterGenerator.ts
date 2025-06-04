@@ -123,7 +123,7 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
       personality: personalities[Math.floor(Math.random() * personalities.length)],
       motivation: motivations[Math.floor(Math.random() * motivations.length)],
       fears: fears[Math.floor(Math.random() * fears.length)],
-      physicalDescription: `Average height and build with distinctive features befitting the ${world.theme} setting.`
+      physicalDescription: `${Math.floor(Math.random() * 40) + 20}-year-old human of average height and build with distinctive features befitting the ${world.theme} setting.`
     },
     attributes,
     skills: selectedSkills,
@@ -190,7 +190,7 @@ Generate a character and return ONLY a valid JSON object:
     "personality": "Their personality traits and behavioral patterns", 
     "motivation": "What drives them and their goals",
     "fears": ["List 2-3 specific fears or anxieties this character has"],
-    "physicalDescription": "Their appearance including height, build, hair, eyes, clothing"
+    "physicalDescription": "Their appearance including age, race/ethnicity, height, build, hair, eyes, and typical clothing"
   },
   "attributes": [${world.attributes.map((a) => `
     {"id": "${a.id}", "value": REPLACE_WITH_NUMBER_${a.minValue}_TO_${a.maxValue}}`).join(',')}
