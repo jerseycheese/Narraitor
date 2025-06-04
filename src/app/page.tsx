@@ -5,7 +5,7 @@ import { QuickPlay } from '@/components/QuickPlay';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen py-6 sm:py-12" style={{ backgroundColor: '#f7f3ed' }}>
+    <main className="min-h-screen py-6 sm:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-12">

@@ -2,6 +2,11 @@
 
 /* Base layer for HTML element styles */
 @layer base {
+  /* Main element background */
+  main {
+    background-color: #f7f3ed;
+  }
+  
   /* Link defaults */
   a {
     color: #2563eb; /* blue-600 */
