@@ -30,18 +30,22 @@ interface CharacterBackground {
   goals: string[];
   fears: string[];
   physicalDescription?: string;
+  relationships: unknown[];
   isKnownFigure?: boolean;
+  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
 }
 
 interface CharacterStatus {
-  hp: number;
-  mp: number;
-  stamina: number;
+  health: number;
+  maxHealth: number;
+  conditions: string[];
+  location?: string;
 }
 
 interface Character {
   id: EntityID;
   name: string;
+  description: string;
   worldId: EntityID;
   level: number;
   attributes: CharacterAttribute[];
@@ -49,6 +53,12 @@ interface Character {
   background: CharacterBackground;
   isPlayer: boolean;
   status: CharacterStatus;
+  inventory: {
+    characterId: EntityID;
+    items: unknown[];
+    capacity: number;
+    categories: string[];
+  };
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
@@ -117,6 +127,18 @@ export const characterStore = create<CharacterStore>()(
           ...characterData,
           id: characterId,
           level: characterData.level || 1, // Default to level 1 if not provided
+          inventory: {
+            ...characterData.inventory,
+            characterId: characterId
+          },
+          attributes: characterData.attributes.map(attr => ({
+            ...attr,
+            characterId: characterId
+          })),
+          skills: characterData.skills.map(skill => ({
+            ...skill,
+            characterId: characterId
+          })),
           createdAt: now,
           updatedAt: now,
         };
