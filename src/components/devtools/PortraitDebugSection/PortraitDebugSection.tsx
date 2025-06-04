@@ -53,7 +53,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     return status?.[prop];
   };
 
-  const generatePromptPreview = () => {
+  const generatePromptPreview = async () => {
     if (!effectiveCharacterData) {
       setGeneratedPrompt('No character data available. Please select a character or provide character data.');
       return;
@@ -109,7 +109,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         updatedAt: new Date().toISOString()
       };
 
-      const prompt = generator.buildPortraitPrompt(mockCharacter, {
+      const prompt = await generator.buildPortraitPrompt(mockCharacter, {
         worldTheme: effectiveWorldConfig?.theme
       });
 

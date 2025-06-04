@@ -163,7 +163,7 @@ export class PortraitGenerator {
         detection
       };
       
-      const prompt = this.buildPortraitPrompt(character, mergedOptions);
+      const prompt = await this.buildPortraitPrompt(character, mergedOptions);
       
       // Log the generated prompt for debugging
       if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
@@ -189,10 +189,10 @@ export class PortraitGenerator {
    * Build a descriptive prompt for portrait generation following Gemini's guidelines
    * Structure: Subject, Context, Style
    */
-  buildPortraitPrompt(
+  async buildPortraitPrompt(
     character: Character,
     options: PortraitGenerationOptions = {}
-  ): string {
+  ): Promise<string> {
     const subject: string[] = [];
     const context: string[] = [];
     const style: string[] = [];
@@ -223,34 +223,27 @@ export class PortraitGenerator {
         
         if (options.actorName) {
           // Live-action character with specific actor (e.g., Bob Wiley)
+          // Put actor name FIRST for better recognition
+          subject.push(`${options.actorName} as ${character.name}`);
+          
+          if (options.detection?.figureName) {
+            subject.push(`from ${options.detection.figureName}`);
+          }
+          
           if (character.background.physicalDescription) {
             const cleanedDesc = character.background.physicalDescription
               .trim()
               .replace(/\s+/g, ' ')
-              .replace(/[,\s]+$/, '')
-              .toLowerCase();
-            subject.push(`Cinematic portrait of ${character.name} character, ${cleanedDesc}`);
-            
-            // If there are very specific details, emphasize them
-            if (hasSpecificDetails) {
-              if (specificClothing) {
-                context.push(`MUST be wearing ${specificClothing}`);
-              }
-              if (distinctiveFeatures.length > 0) {
-                context.push(`MUST show: ${distinctiveFeatures.join(', ')}`);
-              }
-            }
-          } else {
-            subject.push(`Cinematic portrait of ${character.name} character`);
+              .replace(/[,\s]+$/, '');
+            context.push(cleanedDesc);
           }
           
-          context.push(`${options.actorName} as ${character.name}`);
-          context.push(`authentic character portrayal`);
-          context.push(`accurate costume and appearance from the source material`);
-          
-          // Add world theme styling if provided
-          if (options.worldTheme) {
-            context.push(`${options.worldTheme} style atmosphere`);
+          // Add specific costume/clothing details if present
+          if (specificClothing) {
+            context.push(`wearing ${specificClothing}`);
+          }
+          if (distinctiveFeatures.length > 0) {
+            context.push(`showing ${distinctiveFeatures.join(', ')}`);
           }
         } else {
           // Video game/animated character (e.g., Arthur Morgan)
@@ -322,11 +315,11 @@ export class PortraitGenerator {
           }
         }
         
-        // Add personality traits to help capture character essence
+        // Add personality converted to visual traits
         if (character.background.personality) {
-          const traits = this.extractKeyTraits(character.background.personality);
-          if (traits) {
-            context.push(`expressing ${traits}`);
+          const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
+          if (visualTraits) {
+            context.push(visualTraits);
           }
         }
       } else {
@@ -372,13 +365,8 @@ export class PortraitGenerator {
         }
       }
       
-      // STYLE: Photorealistic photography specifications (wider framing for circular crop)
-      style.push(`medium portrait shot with some shoulder and chest visible`);
-      style.push(`sharp focus throughout entire image`);
-      style.push(`high-resolution photorealistic quality`);
-      style.push(`natural skin tones and textures`);
-      style.push(`realistic imperfections, blemishes, wrinkles, and asymmetry`);
-      style.push(`authentic human diversity in features`);
+      // STYLE: Keep it minimal
+      style.push(`portrait photograph`);
       
     } else {
       // Unknown/original characters - context-based approach
@@ -393,9 +381,16 @@ export class PortraitGenerator {
         // SUBJECT: Fantasy character
         subject.push(`Fantasy character portrait of ${character.name}`);
         
-        // Add physical description
-        if (character.background.physicalDescription) {
-          const cleanedDesc = character.background.physicalDescription
+        // Add physical description with enhanced diversity
+        let physicalDesc = character.background.physicalDescription || '';
+        
+        // Enhance diversity for original characters
+        if (!options.isKnownFigure || !options.actorName) {
+          physicalDesc = await this.enhancePhysicalDiversity(physicalDesc, character.name);
+        }
+        
+        if (physicalDesc) {
+          const cleanedDesc = physicalDesc
             .trim()
             .replace(/\s+/g, ' ')
             .replace(/[,\s]+$/, '');
@@ -416,28 +411,31 @@ export class PortraitGenerator {
         
         // Add personality-based appearance
         if (character.background.personality) {
-          const traits = this.extractKeyTraits(character.background.personality);
-          if (traits) {
-            subject.push(`with ${traits}`);
+          const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
+          if (visualTraits) {
+            context.push(visualTraits);
           }
         }
         
-        // CONTEXT: Fantasy setting with realistic diversity
+        // CONTEXT: Fantasy setting
         context.push(`${options.worldTheme} world setting`);
-        context.push(`dramatic atmospheric lighting`);
-        context.push(`mystical environment`);
-        context.push(`heroic pose`);
-        context.push(`detailed costume and equipment`);
-        context.push(`weathered and lived-in appearance`);
-        context.push(`realistic body types and proportions`);
-        context.push(`diverse facial features and characteristics`);
+        if (character.background.history && character.background.history.toLowerCase().includes('battle')) {
+          context.push(`battle-worn appearance`);
+        }
       } else {
         // SUBJECT: Realistic character portrait
         subject.push(`Character portrait of ${character.name}`);
         
-        // Add physical description
-        if (character.background.physicalDescription) {
-          const cleanedDesc = character.background.physicalDescription
+        // Add physical description with enhanced diversity for non-actor characters
+        let physicalDesc = character.background.physicalDescription || '';
+        
+        // Enhance diversity for original characters (not known figures without actors)
+        if (!options.isKnownFigure || !options.actorName) {
+          physicalDesc = await this.enhancePhysicalDiversity(physicalDesc, character.name);
+        }
+        
+        if (physicalDesc) {
+          const cleanedDesc = physicalDesc
             .trim()
             .replace(/\s+/g, ' ')
             .replace(/[,\s]+$/, '');
@@ -448,42 +446,29 @@ export class PortraitGenerator {
         
         // Add personality-based traits
         if (character.background.personality) {
-          const traits = this.extractKeyTraits(character.background.personality);
-          if (traits) {
-            context.push(`expressing ${traits}`);
+          const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
+          if (visualTraits) {
+            context.push(visualTraits);
           }
         }
         
-        // CONTEXT: Neutral/realistic setting with authentic diversity
+        // CONTEXT: Simple setting
         if (options.worldTheme) {
           context.push(`${options.worldTheme} setting`);
-        } else {
-          context.push(`neutral background`);
         }
-        context.push(`natural lighting`);
-        context.push(`authentic appearance`);
-        context.push(`realistic human diversity: varying body types, ages, and features`);
-        context.push(`natural imperfections and asymmetry`);
-        context.push(`unidealized, genuine human appearance`);
       }
       
       // STYLE: Based on fantasy vs realistic
       if (isFantasy) {
-        style.push(`medium portrait shot with some shoulder and chest visible`);
-        style.push(`digital painting masterpiece`);
-        style.push(`concept art quality`);
-        style.push(`highly detailed brushwork`);
-        style.push(`rich color palette`);
-        style.push(`fantasy illustration`);
-        style.push(`artstation trending quality`);
-        style.push(`volumetric lighting effects`);
+        style.push(`fantasy art portrait`);
+        style.push(`digital painting`);
       } else {
-        style.push(`medium portrait shot with some shoulder and chest visible`);
-        style.push(`photorealistic quality`);
-        style.push(`detailed rendering`);
-        style.push(`natural colors`);
-        style.push(`illustration`);
-        style.push(`high resolution`);
+        style.push(`portrait`);
+      }
+      
+      // Add emphasis on realistic diversity for non-actor characters
+      if (!options.isKnownFigure || !options.actorName) {
+        style.push(`realistic person, not a model or actor`);
       }
     }
 
@@ -534,6 +519,7 @@ export class PortraitGenerator {
         const prompt = `Provide an accurate physical description of ${character.name} (the ${contextHint}) in 30-35 words. 
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
         MUST include: hair length (short/medium/long/shoulder-length/etc), hair style, hair color, facial features, build/body type, and typical clothing. 
+        ${!detection.actorName ? 'Include realistic imperfections like weight, balding, scars, or plain features - not everyone is beautiful.' : ''}
         Be accurate to their actual appearance. Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
@@ -643,7 +629,86 @@ export class PortraitGenerator {
   }
 
   /**
-   * Extract key personality traits in a concise format
+   * Convert personality traits to visual expressions using AI
+   */
+  private async convertPersonalityToVisualTraits(personality: string): Promise<string> {
+    try {
+      const prompt = `Convert these personality traits into visible physical expressions and body language: "${personality}"
+      
+      Examples:
+      - "desperate and anxious" → "wide eyes, tense shoulders, fidgeting hands"
+      - "confident leader" → "straight posture, steady gaze, slight smile"
+      - "exhausted workaholic" → "dark circles under eyes, disheveled hair, loosened tie"
+      
+      Provide only visual cues that a portrait artist could depict. 20 words max. Answer with just the visual description.`;
+      
+      const response = await this.aiClient.generateContent(prompt);
+      return response.content.trim();
+    } catch {
+      // Fallback to simple extraction
+      return this.extractKeyTraits(personality);
+    }
+  }
+
+  /**
+   * Add realistic physical diversity to character descriptions
+   */
+  private async enhancePhysicalDiversity(description: string, characterName: string): Promise<string> {
+    // If description is already detailed with non-idealized features, return as-is
+    if (description && (
+      description.match(/\b(overweight|obese|fat|chubby|stocky|thin|gaunt|skinny|bald|balding|ugly|plain|homely|scarred|weathered|wrinkled|aged)\b/i) ||
+      description.match(/\b(crooked|missing|gap|acne|blemish|scar|mole|birthmark)\b/i)
+    )) {
+      return description;
+    }
+
+    try {
+      const prompt = `Given this character description: "${description || 'No description provided'}"
+      
+      Add realistic, non-idealized physical features. Characters should look like real people with varied body types and features.
+      Include things like: weight (skinny/average/overweight/obese), facial features (plain/asymmetrical/distinctive), skin (acne/scars/wrinkles/blemishes), hair (thinning/bald/unkempt).
+      
+      Examples of good additions:
+      - "slightly overweight with thinning hair"
+      - "gaunt face with acne scars"
+      - "heavyset build with double chin"
+      - "bald with liver spots"
+      - "crooked nose and gap teeth"
+      
+      Keep the original description but add 1-2 realistic imperfections. 40 words max total. Answer with just the enhanced description.`;
+      
+      const response = await this.aiClient.generateContent(prompt);
+      return response.content.trim();
+    } catch {
+      // Fallback - add some variety based on character name hash
+      const hash = characterName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const varieties = [
+        'slightly overweight build',
+        'thin and angular features',
+        'heavyset with round face',
+        'gaunt with prominent cheekbones',
+        'stocky build',
+        'soft features with double chin'
+      ];
+      
+      const additionalFeatures = [
+        'thinning hair',
+        'receding hairline',
+        'visible acne scars',
+        'weathered skin',
+        'crooked teeth',
+        'prominent nose'
+      ];
+      
+      const bodyType = varieties[hash % varieties.length];
+      const feature = additionalFeatures[(hash * 3) % additionalFeatures.length];
+      
+      return description ? `${description}, ${bodyType}, ${feature}` : `${bodyType}, ${feature}`;
+    }
+  }
+
+  /**
+   * Extract key personality traits in a concise format (fallback method)
    */
   private extractKeyTraits(personality: string): string {
     // Take first 2-3 descriptive words from personality
@@ -653,7 +718,7 @@ export class PortraitGenerator {
       !['with', 'and', 'the', 'very', 'quite', 'rather'].includes(word)
     ).slice(0, 3);
     
-    return descriptiveWords.length > 0 ? descriptiveWords.join(' ') + ' character' : '';
+    return descriptiveWords.length > 0 ? descriptiveWords.join(' ') + ' expression' : '';
   }
 
 
