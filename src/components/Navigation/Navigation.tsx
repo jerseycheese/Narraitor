@@ -150,11 +150,20 @@ export function Navigation() {
               {currentWorld && (
                 <>
                   <Link 
-                    href="/characters/create" 
-                    className="hidden sm:inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors"
+                    href={`/characters?worldId=${currentWorld.id}`}
+                    className="hidden sm:inline-flex items-center px-3 py-2 text-white text-sm font-medium hover:bg-gray-800 rounded-md transition-colors"
                   >
-                    <span className="mr-1">+</span>
-                    New Character
+                    Characters
+                  </Link>
+                  <Link 
+                    href={`/world/${currentWorld.id}/play`}
+                    className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Play
                   </Link>
                 </>
               )}
@@ -176,9 +185,14 @@ export function Navigation() {
                 Worlds
               </Link>
               {currentWorld && (
-                <Link href="/characters/create" className="text-green-400 hover:text-green-300">
-                  + New Character
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link href={`/characters?worldId=${currentWorld.id}`} className="hover:text-gray-300">
+                    Characters
+                  </Link>
+                  <Link href={`/world/${currentWorld.id}/play`} className="text-indigo-400 hover:text-indigo-300">
+                    ▶ Play
+                  </Link>
+                </div>
               )}
             </div>
           </div>
