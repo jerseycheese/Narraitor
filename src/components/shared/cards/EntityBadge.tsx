@@ -23,20 +23,33 @@ export interface EntityBadgeProps {
 /**
  * EntityBadge - Displays entity type badges with consistent styling
  * 
- * @example World type badge
+ * A flexible badge component for displaying entity types, statuses, or
+ * other categorical information. Supports different sizes, color variants,
+ * and custom or automatic icons based on entity type.
+ * 
+ * @param props - Badge configuration including text, type, styling options
+ * @returns A styled badge with optional icon and customizable appearance
+ * 
+ * @example World type badge with automatic icon
  * <EntityBadge 
  *   type="world" 
  *   text="Set in Middle Earth" 
- *   icon="🌍"
  *   variant="info"
  * />
  * 
- * @example Character type badge
+ * @example Custom badge with custom icon
  * <EntityBadge 
- *   type="character" 
  *   text="Known Figure" 
  *   icon="⭐"
  *   variant="warning"
+ *   size="md"
+ * />
+ * 
+ * @example Simple text badge
+ * <EntityBadge 
+ *   text="Active"
+ *   variant="success"
+ *   size="sm"
  * />
  */
 export const EntityBadge: React.FC<EntityBadgeProps> = ({

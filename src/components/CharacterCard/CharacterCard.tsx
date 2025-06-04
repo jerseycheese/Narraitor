@@ -12,15 +12,43 @@ import {
 } from '@/components/shared/cards';
 
 interface CharacterCardProps {
+  /** The character data to display */
   character: StoreCharacter;
+  /** Whether this character is currently active */
   isActive: boolean;
+  /** Callback when user wants to make this character active */
   onMakeActive: () => void;
+  /** Callback when user wants to view character details */
   onView: () => void;
+  /** Callback when user wants to play with this character */
   onPlay: () => void;
+  /** Callback when user wants to edit this character */
   onEdit: () => void;
+  /** Callback when user wants to delete this character */
   onDelete: () => void;
 }
 
+/**
+ * CharacterCard - Display card for a character with actions
+ * 
+ * Shows character information including portrait, name, level, type badges,
+ * and description. Provides action buttons for viewing, playing, editing,
+ * and deleting the character. Active characters get special styling.
+ * 
+ * @param props - Character card configuration and event handlers
+ * @returns A formatted character card with portrait and action buttons
+ * 
+ * @example Basic usage
+ * <CharacterCard
+ *   character={character}
+ *   isActive={character.id === currentCharacterId}
+ *   onMakeActive={() => setActiveCharacter(character.id)}
+ *   onView={() => router.push(`/characters/${character.id}`)}
+ *   onPlay={() => startGame(character)}
+ *   onEdit={() => router.push(`/characters/${character.id}/edit`)}
+ *   onDelete={() => deleteCharacter(character.id)}
+ * />
+ */
 export function CharacterCard({
   character,
   isActive,

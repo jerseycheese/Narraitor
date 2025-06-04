@@ -29,18 +29,14 @@ export class PortraitGenerator {
     actorName?: string;
     figureName?: string;
   }> {
-    console.log('🚀 DETECTION CALLED for:', characterName);
     try {
       // First, check if this is a known character
       const detectPrompt = `Is "${characterName}" a character from any form of media (movie, TV, book, game, etc.) or a real person?
 
 Answer with JSON only: {"isKnownFigure": true/false, "figureType": "fictional/celebrity/historical/other" or null}`;
 
-      console.log('🔍 Making initial detection request...');
       const detectResponse = await this.aiClient.generateContent(detectPrompt);
       const detectText = detectResponse.content;
-      
-      console.log('🔍 Initial detection response:', detectText);
       
       // Parse initial detection
       let isKnown = false;
@@ -51,7 +47,7 @@ Answer with JSON only: {"isKnownFigure": true/false, "figureType": "fictional/ce
         isKnown = detectJson.isKnownFigure || false;
         figureType = detectJson.figureType;
       } catch {
-        console.log('🔍 Failed to parse initial detection');
+        // Failed to parse initial detection, continue with defaults
       }
       
       // If it's a known fictional character, ask specifically who played them
@@ -66,14 +62,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         const actorResponse = await this.aiClient.generateContent(actorPrompt);
         const actorText = actorResponse.content;
         
-        console.log('🔍 Actor lookup response:', actorText);
-        
         try {
           const actorJson = JSON.parse(actorText.match(/\{[\s\S]*?\}/)?.[0] || '{}');
           actorName = actorJson.actorName;
           figureName = actorJson.figureName;
         } catch {
-          console.log('🔍 Failed to parse actor lookup');
+          // Failed to parse actor lookup, continue with defaults
         }
       }
       
@@ -84,17 +78,10 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         figureName: figureName
       };
       
-      console.log('🔍 Final detection result:', result);
-      
-      // Debug logging
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-        console.log('Detection result for', characterName, ':', result);
-      }
-      
       return result;
     } catch (error) {
       // If detection fails, assume not a known figure
-      console.error('🔍 Detection error:', error);
+      console.error('Character detection failed:', error);
       return { isKnownFigure: false };
     }
   }
@@ -123,15 +110,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         character = await this.enhanceKnownCharacter(character, detection);
       }
       
-      // Log detection results for debugging
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-        console.log('Portrait Detection Results:', {
-          characterName: character.name,
-          detection,
-          providedOptions: options
-        });
-      }
-      
       // Store detection result for test page
       if (typeof window !== 'undefined') {
         const windowWithDetection = window as Window & { lastDetectionResult?: typeof detection };
@@ -148,11 +126,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       };
       
       const prompt = await this.buildPortraitPrompt(character, mergedOptions);
-      
-      // Log the generated prompt for debugging
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-        console.log('Generated Portrait Prompt:', prompt);
-      }
       
       const response = await this.aiClient.generateImage(prompt);
 
@@ -177,13 +150,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
     character: Character,
     options: PortraitGenerationOptions = {}
   ): Promise<string> {
-    console.log('🎨 BUILD PROMPT CALLED for:', character.name);
-    
     // If no detection options provided, run AI detection
     if (!options.detection && !options.isKnownFigure) {
-      console.log('🔍 No detection options provided, running AI detection...');
       const detection = await this.detectKnownFigure(character.name);
-      console.log('🔍 Detection result:', detection);
       
       // Merge detection results into options
       options = {
@@ -283,10 +252,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
               if (gameName) {
                 subject.push(`from ${gameName}`);
               } else {
-                // Debug logging to see what history was generated
-                if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-                  console.log('Could not extract game name from history:', character.background.history);
-                }
                 subject.push(`from the video game`);
               }
             } else {
@@ -615,10 +580,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         // Fix multiple periods
         enhancements.physicalDescription = description.replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Generated physical description for', character.name, ':', enhancements.physicalDescription);
-        }
       } else {
         // User provided input - enhance it with AI knowledge
         const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${character.background.physicalDescription}"
@@ -628,10 +589,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         const response = await this.aiClient.generateContent(prompt);
         enhancements.physicalDescription = response.content.trim().replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Enhanced physical description for', character.name, ':', enhancements.physicalDescription);
-        }
       }
       
       // Generate or enhance personality
@@ -643,10 +600,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         const response = await this.aiClient.generateContent(prompt);
         enhancements.personality = response.content.trim().replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Generated personality for', character.name, ':', enhancements.personality);
-        }
       } else {
         // User provided input - enhance it with AI knowledge
         const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${character.background.personality}"
@@ -655,10 +608,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         const response = await this.aiClient.generateContent(prompt);
         enhancements.personality = response.content.trim().replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Enhanced personality for', character.name, ':', enhancements.personality);
-        }
       }
       
       // Generate or enhance history
@@ -671,11 +620,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         const response = await this.aiClient.generateContent(prompt);
         enhancements.history = response.content.trim().replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Generated history for', character.name, ':', enhancements.history);
-          console.log('Detection type:', detection.figureType);
-        }
       } else {
         // User provided input - enhance it with AI knowledge
         const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${character.background.history}"
@@ -685,10 +629,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         const response = await this.aiClient.generateContent(prompt);
         enhancements.history = response.content.trim().replace(/\.+$/, '.');
-        
-        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-          console.log('Enhanced history for', character.name, ':', enhancements.history);
-        }
       }
       
       // Return a new character object with the generated enhancements

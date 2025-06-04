@@ -33,10 +33,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       
       setWorld(worldData);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError('Failed to load world data');
       setLoading(false);
-      console.error('Error loading world:', err);
     }
   }, [worldId]);
   
@@ -53,9 +52,8 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push('/worlds'); // Navigate back to worlds list
-    } catch (err) {
+    } catch {
       setError('Failed to save world');
-      console.error('Error saving world:', err);
     } finally {
       setSaving(false);
     }

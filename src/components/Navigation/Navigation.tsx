@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { worldStore } from '@/state/worldStore';
@@ -8,6 +8,26 @@ import { characterStore } from '@/state/characterStore';
 import { Breadcrumbs } from './Breadcrumbs';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
+/**
+ * Navigation - Main application navigation component
+ * 
+ * Provides the primary navigation bar with logo, main navigation links,
+ * world switcher dropdown, and contextual action buttons. Automatically
+ * adapts based on current route and available worlds/characters.
+ * 
+ * Features:
+ * - Responsive design with mobile-friendly layout
+ * - World switcher dropdown with character counts
+ * - Contextual play button when world is selected
+ * - Breadcrumb navigation for deeper pages
+ * - Automatic current world and character tracking
+ * 
+ * @returns The main navigation component with header and breadcrumbs
+ * 
+ * @example
+ * // Used in root layout - no props needed
+ * <Navigation />
+ */
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();

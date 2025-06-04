@@ -153,3 +153,18 @@ const WorldCard = ({ world, isActive, onSelect, onDelete }) => {
 3. **Accessibility**: All interactive elements have proper ARIA attributes and keyboard support
 4. **Type Safety**: Full TypeScript support with exported types
 5. **Testing**: Components include data-testid attributes for easy testing
+
+## Recent Improvements
+
+These shared card components have been enhanced as part of walkthrough improvements:
+
+- **Better Navigation Integration**: Cards now work seamlessly with the improved Navigation component
+- **Enhanced Visual Design**: Updated button styling and spacing for better user experience
+- **Improved Action Button Layouts**: More intuitive action button groupings
+- **PageLayout Integration**: Cards work well within the new PageLayout component structure
+
+## Related Components
+
+- **PageLayout**: New shared layout component for consistent page structure
+- **Navigation**: Enhanced navigation with better world switching and actions
+- **ActionButtonGroup**: Improved action button layouts for cards

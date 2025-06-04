@@ -43,7 +43,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
       
       return () => unsubscribe();
     } catch (err) {
-      console.error('Error loading worlds:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setLoading(false);
     }

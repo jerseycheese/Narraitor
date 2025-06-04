@@ -154,8 +154,6 @@ export const narrativeStore = create<NarrativeStore>()(
     
     if (segmentIdsToRemove.length === 0) return;
     
-    console.log(`Clearing ${segmentIdsToRemove.length} segments for session ${sessionId}`);
-    
     // Remove segments from the segments record
     const updatedSegments = { ...state.segments };
     segmentIdsToRemove.forEach(id => {

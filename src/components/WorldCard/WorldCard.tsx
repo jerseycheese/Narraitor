@@ -14,19 +14,54 @@ import {
 } from '../shared/cards';
 
 interface WorldCardProps {
+  /** The world data to display */
   world: World;
+  /** Whether this world is currently active */
   isActive?: boolean;
+  /** Callback when user selects this world */
   onSelect: (worldId: string) => void;
+  /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
+  /** Number of characters in this world */
   characterCount?: number;
+  /** Optional store actions for testing */
   _storeActions?: {
     setCurrentWorld: (id: string) => void;
   };
+  /** Optional router for testing */
   _router?: {
     push: (url: string) => void;
   };
 }
 
+/**
+ * WorldCard - Display card for a world with actions and information
+ * 
+ * Shows world details including name, theme, description, character count,
+ * and world type (original, set in, inspired by). Provides action buttons
+ * for playing, creating characters, viewing, editing, and deleting.
+ * Active worlds get special styling and indicate current selection.
+ * 
+ * Features:
+ * - World image display if available
+ * - Theme and world type badges
+ * - Character count with navigation to characters list
+ * - Smart play button that handles session resume
+ * - Make active button for non-active worlds
+ * - Comprehensive action buttons
+ * 
+ * @param props - World card configuration and event handlers
+ * @returns A formatted world card with image, details, and action buttons
+ * 
+ * @example Basic usage
+ * <WorldCard
+ *   world={world}
+ *   isActive={world.id === currentWorldId}
+ *   onSelect={(id) => setCurrentWorld(id)}
+ *   onDelete={(id) => deleteWorld(id)}
+ *   characterCount={getCharacterCount(world.id)}
+ * />
+ */
 const WorldCard: React.FC<WorldCardProps> = ({ 
   world, 
   isActive = false,
@@ -71,7 +106,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
       
       if (worldCharacters.length === 0) {
         // No characters exist - redirect to characters page
-        console.log('[WorldCard] No characters exist for this world, redirecting to characters page');
         if (actualRouter) {
           actualRouter.push(`/characters?worldId=${world.id}`);
         }
@@ -87,7 +121,6 @@ const WorldCard: React.FC<WorldCardProps> = ({
       
       if (savedSession) {
         hasSession = true;
-        console.log('[WorldCard] Found saved session:', savedSession.id);
       }
       
       if (actualRouter) {
@@ -97,8 +130,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
           : `/world/${world.id}/play`;
         actualRouter.push(url);
       }
-    } catch (exception) {
-      console.error('Error in handlePlayClick:', exception);
+    } catch {
+      // Handle navigation errors gracefully
     }
   };
 
@@ -107,8 +140,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
       if (actualRouter) {
         actualRouter.push(`/world/${world.id}/edit`);
       }
-    } catch (exception) {
-      console.error('Error in handleEditClick:', exception);
+    } catch {
+      // Handle navigation errors gracefully
     }
   };
 

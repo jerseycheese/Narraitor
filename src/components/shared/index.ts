@@ -9,4 +9,6 @@ export { NotFoundState } from './NotFoundState';
 export { ActionButtonGroup } from './ActionButtonGroup';
 export { SectionWrapper } from './SectionWrapper';
 export { PageLayout } from './PageLayout';
+export type { PageLayoutProps } from './PageLayout';
 export * from './wizard';
+export * from './cards';

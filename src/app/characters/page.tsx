@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { characterStore } from '@/state/characterStore';
@@ -99,12 +99,10 @@ async function generateCharacterPortrait(
       };
       // Update character with generated portrait
       updateCharacter(characterId, { portrait });
-    } else {
-      console.warn(`Failed to generate portrait for "${generatedData.name}": ${response.status}`);
     }
-  } catch (portraitError) {
-    console.error('Failed to generate portrait:', portraitError);
-    // Continue without portrait - character already has placeholder
+    // If portrait generation fails, continue without portrait - character already has placeholder
+  } catch {
+    // Portrait generation failed, but character creation should continue
   }
 }
 
@@ -232,7 +230,6 @@ export default function CharactersPage() {
       // Navigate to view the character
       router.push(`/characters/${characterId}`);
     } catch (error) {
-      console.error('Failed to generate character:', error);
       setGenerateError(error instanceof Error ? error.message : 'Failed to generate character');
     } finally {
       setIsGenerating(false);

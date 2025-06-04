@@ -31,6 +31,11 @@ This document summarizes all the Storybook stories created for the abstracted co
 
 ## Other Shared Components (`/src/components/shared/`)
 
+### PageLayout.stories.tsx
+- **Path**: `Narraitor/Shared/PageLayout`
+- **Stories**: Default, NoActions, NoDescription, MinimalPage, WorldsPageExample, CharactersPageExample, DifferentWidths
+- **Features**: Responsive page structure, configurable max-width, action button integration, real-world examples
+
 ### BackNavigation.stories.tsx
 - **Path**: `Narraitor/Shared/Navigation/BackNavigation`
 - **Stories**: Default, WithHref, WithCustomClick, ContextualExamples, InPageHeader, DifferentContexts

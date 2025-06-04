@@ -107,9 +107,7 @@ export function useWizardAI<TInput, TOutput>(
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Analysis failed';
       
-      if (debug) {
-        console.error('[useWizardAI] Analysis error:', error);
-      }
+      // Analysis error occurred, using fallback suggestions if available
 
       setState({
         suggestions: fallbackSuggestions || null,

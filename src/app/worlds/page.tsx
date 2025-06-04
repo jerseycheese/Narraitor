@@ -114,8 +114,6 @@ export default function WorldsPage() {
       try {
         // Get the created world to generate image for it
         const createdWorld = worldStore.getState().worlds[worldId];
-        console.log('🖼️ WORLD IMAGE: Starting image generation for world:', createdWorld.name);
-        console.log('🖼️ WORLD IMAGE: World data being sent:', JSON.stringify(createdWorld, null, 2));
         
         const imageResponse = await fetch('/api/generate-world-image', {
           method: 'POST',
@@ -127,16 +125,11 @@ export default function WorldsPage() {
           }),
         });
 
-        console.log('🖼️ WORLD IMAGE: API response status:', imageResponse.status);
-        console.log('🖼️ WORLD IMAGE: API response ok:', imageResponse.ok);
-
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
-          console.log('🖼️ WORLD IMAGE: API response data:', imageData);
           
           // Only update with image if we actually got one
           if (imageData.imageUrl) {
-            console.log('🖼️ WORLD IMAGE: Updating world with image URL:', imageData.imageUrl);
             worldStore.getState().updateWorld(worldId, {
               image: {
                 type: 'placeholder' as const,
@@ -144,18 +137,10 @@ export default function WorldsPage() {
                 generatedAt: new Date().toISOString()
               }
             });
-            console.log('🖼️ WORLD IMAGE: World updated successfully');
-          } else {
-            console.log('🖼️ WORLD IMAGE: No imageUrl in response data');
           }
           // If no image was generated (placeholder mode), just continue without image
-        } else {
-          console.error('🖼️ WORLD IMAGE: API request failed with status:', imageResponse.status);
-          const errorText = await imageResponse.text();
-          console.error('🖼️ WORLD IMAGE: Error response:', errorText);
         }
-      } catch (imageError) {
-        console.error('🖼️ WORLD IMAGE: Exception during image generation:', imageError);
+      } catch {
         // Continue without image - world creation should still succeed
       }
 
@@ -171,7 +156,6 @@ export default function WorldsPage() {
       
       // Stay on worlds page to see the new world
     } catch (err) {
-      console.error('Failed to generate world:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate world');
       setIsGenerating(false);
     }
