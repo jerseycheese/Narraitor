@@ -10,6 +10,47 @@ describe('PortraitGenerator - Known Characters', () => {
 
   beforeEach(() => {
     mockAIClient = createMockAIClient();
+    
+    // Setup specific mock responses for different prompt types
+    mockAIClient.generateContent.mockImplementation((prompt: string) => {
+      // Handle detection requests
+      if (prompt.includes('Is "') && prompt.includes('" a character from any form of media')) {
+        // Return based on character name
+        if (prompt.includes('Gandalf')) {
+          return Promise.resolve({
+            content: '{"isKnownFigure": true, "figureType": "fictional"}',
+            finishReason: 'stop'
+          });
+        }
+        return Promise.resolve({
+          content: '{"isKnownFigure": false, "figureType": null}',
+          finishReason: 'stop'
+        });
+      }
+      
+      // Handle personality to visual traits conversion
+      if (prompt.includes('Convert these personality traits into visible physical expressions')) {
+        return Promise.resolve({
+          content: 'expressing courageous wise character',
+          finishReason: 'stop'
+        });
+      }
+      
+      // Handle physical diversity enhancement  
+      if (prompt.includes('Add specific, non-idealized physical features')) {
+        return Promise.resolve({
+          content: 'realistic average person with natural imperfections',
+          finishReason: 'stop'
+        });
+      }
+      
+      // Default fallback for any other prompts
+      return Promise.resolve({
+        content: 'Mock response',
+        finishReason: 'stop'
+      });
+    });
+    
     generator = new PortraitGenerator(mockAIClient);
   });
 
@@ -34,9 +75,9 @@ describe('PortraitGenerator - Known Characters', () => {
   });
 
   describe('Known fictional characters', () => {
-    test('should recognize Gandalf and generate appropriate prompt', () => {
+    test('should recognize Gandalf and generate appropriate prompt', async () => {
       const character = createTestCharacter('Gandalf');
-      const prompt = generator.buildPortraitPrompt(character, { 
+      const prompt = await generator.buildPortraitPrompt(character, { 
         isKnownFigure: true, 
         knownFigureContext: 'fictional',
         detection: {
@@ -132,22 +173,22 @@ describe('PortraitGenerator - Known Characters', () => {
   });
 
   describe('Original characters', () => {
-    test('should generate standard prompts for unknown characters', () => {
+    test('should generate standard prompts for unknown characters', async () => {
       const character = createTestCharacter('Elara Moonshadow');
-      const prompt = generator.buildPortraitPrompt(character);
+      const prompt = await generator.buildPortraitPrompt(character);
       
       expect(prompt).toContain('Character portrait of Elara Moonshadow');
       expect(prompt).toContain('expressing courageous wise character');
-      expect(prompt).toContain('photorealistic quality');
+      expect(prompt).toContain('photorealistic portrait');
       expect(prompt).not.toContain('as they appear in');
       expect(prompt).not.toContain('official art style');
     });
 
-    test('should extract class from background for original characters', () => {
+    test('should extract class from background for original characters', async () => {
       const character = createTestCharacter('Original Hero');
       character.background.history = 'A powerful wizard who studied magic';
       
-      const prompt = generator.buildPortraitPrompt(character, { worldTheme: 'fantasy' });
+      const prompt = await generator.buildPortraitPrompt(character, { worldTheme: 'fantasy' });
       
       expect(prompt).toContain('wizard character');
       expect(prompt).toContain('Fantasy character portrait');
@@ -155,16 +196,16 @@ describe('PortraitGenerator - Known Characters', () => {
   });
 
   describe('World theme integration', () => {
-    test('should include world theme for original characters', () => {
+    test('should include world theme for original characters', async () => {
       const character = createTestCharacter('New Character');
-      const prompt = generator.buildPortraitPrompt(character, { worldTheme: 'cyberpunk' });
+      const prompt = await generator.buildPortraitPrompt(character, { worldTheme: 'cyberpunk' });
       
-      expect(prompt).toContain('cyberpunk setting');
+      expect(prompt).toContain('cyberpunk world environment');
     });
 
-    test('should include world theme for adaptable known characters', () => {
+    test('should include world theme for adaptable known characters', async () => {
       const character = createTestCharacter('Gandalf');
-      const prompt = generator.buildPortraitPrompt(character, { 
+      const prompt = await generator.buildPortraitPrompt(character, { 
         worldTheme: 'cyberpunk',
         isKnownFigure: true, 
         knownFigureContext: 'fictional',
