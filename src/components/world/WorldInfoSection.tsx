@@ -30,10 +30,10 @@ export function WorldInfoSection({ world }: WorldInfoSectionProps) {
             variant="inline"
           />
         )}
-        {world.worldReference && (
+        {world.reference && (
           <DataField 
             label="Reference" 
-            value={world.worldReference} 
+            value={world.reference} 
             variant="inline"
           />
         )}

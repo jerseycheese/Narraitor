@@ -51,6 +51,8 @@ export const PartialSettings: Story = {
     settings: {
       maxAttributes: 6,
       maxSkills: 12,
+      attributePointPool: 27,
+      skillPointPool: 15,
     },
   },
 };

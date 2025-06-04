@@ -131,6 +131,11 @@ export const Clickable: Story = {
 };
 
 export const Grid: Story = {
+  args: {
+    isActive: false,
+    onClick: () => console.log('Card clicked'),
+    children: <div>Default content</div>,
+  },
   render: () => (
     <div className="grid grid-cols-3 gap-4 p-4" style={{ width: '800px' }}>
       <ActiveStateCard isActive={true} activeText="Active Item">

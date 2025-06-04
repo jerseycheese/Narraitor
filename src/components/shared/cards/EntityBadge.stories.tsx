@@ -45,6 +45,10 @@ export const Default: Story = {
 };
 
 export const WorldBadges: Story = {
+  args: {
+    type: 'world',
+    text: 'Default Badge',
+  },
   render: () => (
     <div className="space-y-2">
       <div>
@@ -61,6 +65,10 @@ export const WorldBadges: Story = {
 };
 
 export const CharacterBadges: Story = {
+  args: {
+    type: 'character',
+    text: 'Default Character Badge',
+  },
   render: () => (
     <div className="space-y-2">
       <div>
@@ -77,6 +85,9 @@ export const CharacterBadges: Story = {
 };
 
 export const CustomIcons: Story = {
+  args: {
+    text: 'Default Icon Badge',
+  },
   render: () => (
     <div className="space-y-2">
       <div>
@@ -96,6 +107,9 @@ export const CustomIcons: Story = {
 };
 
 export const AllVariants: Story = {
+  args: {
+    text: 'Default Variant Badge',
+  },
   render: () => (
     <div className="space-y-2">
       <div>
@@ -121,6 +135,9 @@ export const AllVariants: Story = {
 };
 
 export const AllSizes: Story = {
+  args: {
+    text: 'Default Size Badge',
+  },
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -138,6 +155,9 @@ export const AllSizes: Story = {
 };
 
 export const AllEntityTypes: Story = {
+  args: {
+    text: 'Default Entity Badge',
+  },
   render: () => (
     <div className="space-y-2">
       <div>
@@ -160,6 +180,9 @@ export const AllEntityTypes: Story = {
 };
 
 export const InContext: Story = {
+  args: {
+    text: 'Context Badge',
+  },
   render: () => (
     <div className="w-80 border border-gray-300 rounded-lg p-6">
       <div className="flex items-start justify-between mb-4">
@@ -179,6 +202,9 @@ export const InContext: Story = {
 };
 
 export const BadgeCollection: Story = {
+  args: {
+    text: 'Collection Badge',
+  },
   render: () => (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">

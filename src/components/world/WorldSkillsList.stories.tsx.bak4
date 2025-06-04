@@ -25,6 +25,9 @@ const mockAttributes: WorldAttribute[] = [
     maxValue: 20,
     baseValue: 10,
     category: 'Physical',
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'dex',
@@ -35,6 +38,9 @@ const mockAttributes: WorldAttribute[] = [
     maxValue: 20,
     baseValue: 10,
     category: 'Physical',
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'int',
@@ -45,6 +51,9 @@ const mockAttributes: WorldAttribute[] = [
     maxValue: 20,
     baseValue: 10,
     category: 'Mental',
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'wis',
@@ -55,6 +64,9 @@ const mockAttributes: WorldAttribute[] = [
     maxValue: 20,
     baseValue: 10,
     category: 'Mental',
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
 ];
 
@@ -68,9 +80,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'str',
     difficulty: 'medium',
     category: 'Combat',
-    minValue: 1,
-    maxValue: 20,
-    baseValue: 5,
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'stealth',
@@ -80,9 +92,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'dex',
     difficulty: 'hard',
     category: 'Utility',
-    minValue: 1,
-    maxValue: 20,
-    baseValue: 3,
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'lore',
@@ -92,9 +104,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'int',
     difficulty: 'easy',
     category: 'Knowledge',
-    minValue: 1,
-    maxValue: 20,
-    baseValue: 7,
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
   {
     id: 'perception',
@@ -104,9 +116,9 @@ const mockSkills: WorldSkill[] = [
     linkedAttributeId: 'wis',
     difficulty: 'medium',
     category: 'Utility',
-    minValue: 1,
-    maxValue: 20,
-    baseValue: 5,
+        minValue: 1,
+        maxValue: 20,
+        baseValue: 5,
   },
 ];
 
@@ -122,7 +134,7 @@ export const MinimalSkills: Story = {
     skills: [
       {
         id: 'combat',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Combat',
         description: 'Fighting ability',
         linkedAttributeId: 'str',
@@ -134,7 +146,7 @@ export const MinimalSkills: Story = {
       },
       {
         id: 'magic',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Magic',
         description: 'Spellcasting ability',
         linkedAttributeId: 'int',
@@ -154,9 +166,8 @@ export const WithoutDescriptions: Story = {
     skills: [
       {
         id: 'swordsmanship',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Swordsmanship',
-        description: '',
         linkedAttributeId: 'str',
         difficulty: 'medium',
         category: 'Combat',
@@ -166,9 +177,8 @@ export const WithoutDescriptions: Story = {
       },
       {
         id: 'stealth',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Stealth',
-        description: '',
         linkedAttributeId: 'dex',
         difficulty: 'hard',
         category: 'Utility',
@@ -186,7 +196,7 @@ export const WithoutLinkedAttributes: Story = {
     skills: [
       {
         id: 'leadership',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Leadership',
         description: 'Ability to inspire and command others',
         difficulty: 'hard',
@@ -197,7 +207,7 @@ export const WithoutLinkedAttributes: Story = {
       },
       {
         id: 'survival',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Survival',
         description: 'Living off the land and in harsh conditions',
         difficulty: 'medium',
@@ -216,7 +226,7 @@ export const Fantasy: Story = {
     skills: [
       {
         id: 'swordsmanship',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Swordsmanship',
         description: 'Mastery of blade combat and weapon techniques',
         linkedAttributeId: 'str',
@@ -228,7 +238,7 @@ export const Fantasy: Story = {
       },
       {
         id: 'archery',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Archery',
         description: 'Precision shooting with bow and arrow',
         linkedAttributeId: 'dex',
@@ -240,7 +250,7 @@ export const Fantasy: Story = {
       },
       {
         id: 'magic',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Arcane Magic',
         description: 'Manipulation of mystical forces and spellcasting',
         linkedAttributeId: 'int',
@@ -252,7 +262,7 @@ export const Fantasy: Story = {
       },
       {
         id: 'divine_magic',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Divine Magic',
         description: 'Channeling divine power for healing and protection',
         linkedAttributeId: 'wis',
@@ -264,7 +274,7 @@ export const Fantasy: Story = {
       },
       {
         id: 'stealth',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Stealth',
         description: 'Moving silently and remaining hidden',
         linkedAttributeId: 'dex',
@@ -276,7 +286,7 @@ export const Fantasy: Story = {
       },
       {
         id: 'lore',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Ancient Lore',
         description: 'Knowledge of history, legends, and forgotten secrets',
         linkedAttributeId: 'int',
@@ -296,7 +306,7 @@ export const SciFi: Story = {
     skills: [
       {
         id: 'piloting',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Spacecraft Piloting',
         description: 'Operating various types of spacecraft and vehicles',
         linkedAttributeId: 'dex',
@@ -308,7 +318,7 @@ export const SciFi: Story = {
       },
       {
         id: 'hacking',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'System Hacking',
         description: 'Breaking into computer systems and networks',
         linkedAttributeId: 'int',
@@ -320,7 +330,7 @@ export const SciFi: Story = {
       },
       {
         id: 'cybercombat',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Cyber Combat',
         description: 'Fighting in virtual and augmented reality',
         linkedAttributeId: 'int',
@@ -332,7 +342,7 @@ export const SciFi: Story = {
       },
       {
         id: 'engineering',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Engineering',
         description: 'Design and maintenance of advanced technology',
         linkedAttributeId: 'int',
@@ -346,33 +356,30 @@ export const SciFi: Story = {
     attributes: [
       {
         id: 'body',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Body',
         description: 'Physical conditioning',
         minValue: 1,
         maxValue: 10,
         baseValue: 5,
-        category: 'Physical',
       },
       {
         id: 'mind',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Mind',
         description: 'Neural processing',
         minValue: 1,
         maxValue: 10,
         baseValue: 5,
-        category: 'Mental',
       },
       {
         id: 'tech',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Tech',
         description: 'Technology integration',
         minValue: 1,
         maxValue: 10,
         baseValue: 5,
-        category: 'Technical',
       },
     ],
   },
@@ -383,7 +390,7 @@ export const VariedDifficulties: Story = {
     skills: [
       {
         id: 'walking',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Walking',
         description: 'Basic movement on foot',
         linkedAttributeId: 'str',
@@ -395,7 +402,7 @@ export const VariedDifficulties: Story = {
       },
       {
         id: 'reading',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Reading',
         description: 'Understanding written text',
         linkedAttributeId: 'int',
@@ -407,7 +414,7 @@ export const VariedDifficulties: Story = {
       },
       {
         id: 'cooking',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Cooking',
         description: 'Preparing meals and food',
         linkedAttributeId: 'dex',
@@ -419,7 +426,7 @@ export const VariedDifficulties: Story = {
       },
       {
         id: 'surgery',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Surgery',
         description: 'Advanced medical procedures',
         linkedAttributeId: 'dex',
@@ -431,7 +438,7 @@ export const VariedDifficulties: Story = {
       },
       {
         id: 'time_travel',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Time Travel',
         description: 'Manipulating the flow of time itself',
         linkedAttributeId: 'int',
@@ -458,7 +465,7 @@ export const SingleSkill: Story = {
     skills: [
       {
         id: 'ultimate_power',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Ultimate Power',
         description: 'The ability to do anything and everything with pure will',
         linkedAttributeId: 'wis',
@@ -478,7 +485,7 @@ export const ManySkills: Story = {
     skills: [
       {
         id: 'athletics',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Athletics',
         description: 'Running, jumping, climbing',
         linkedAttributeId: 'str',
@@ -490,7 +497,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'acrobatics',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Acrobatics',
         description: 'Balance and agility',
         linkedAttributeId: 'dex',
@@ -502,7 +509,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'investigation',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Investigation',
         description: 'Finding clues and solving mysteries',
         linkedAttributeId: 'int',
@@ -514,7 +521,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'insight',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Insight',
         description: 'Reading people and situations',
         linkedAttributeId: 'wis',
@@ -526,7 +533,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'medicine',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Medicine',
         description: 'Healing and medical knowledge',
         linkedAttributeId: 'wis',
@@ -538,7 +545,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'performance',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Performance',
         description: 'Entertaining others',
         linkedAttributeId: 'str',
@@ -550,7 +557,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'persuasion',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Persuasion',
         description: 'Convincing others',
         linkedAttributeId: 'str',
@@ -562,7 +569,7 @@ export const ManySkills: Story = {
       },
       {
         id: 'sleight_of_hand',
-        worldId: 'world-test',
+    worldId: 'world-test',
         name: 'Sleight of Hand',
         description: 'Manual dexterity and tricks',
         linkedAttributeId: 'dex',
