@@ -43,6 +43,11 @@ Examples:
 
 The opening should immerse the reader in the world while leaving room for the story to develop.
 
+SENSORY WRITING GUIDELINES:
+- Focus on visual, auditory, and tactile descriptions primarily
+- Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
+- Use fresh, varied sensory language to avoid clichéd phrases
+
 Response Format:
 {
   "content": "The opening narrative text goes here...",

@@ -52,7 +52,10 @@ Examples:
 ✗ WRONG: "${playerCharacterName || 'The character'} feels the cold wind..."
 ✓ CORRECT (dialogue): "'${playerCharacterName || 'Friend'}, are you alright?' the guard asks."
 
-Focus on sensory details and the character's reactions to bring the scene to life.
+Focus on varied sensory details and the character's reactions to bring the scene to life. 
+- Use visual, auditory, and tactile descriptions primarily
+- Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
+- Vary your sensory language to avoid overused phrases
 
 Response Format:
 {
