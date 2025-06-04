@@ -29,88 +29,72 @@ export class PortraitGenerator {
     actorName?: string;
     figureName?: string;
   }> {
+    console.log('🚀 DETECTION CALLED for:', characterName);
     try {
-      const prompt = `Is "${characterName}" a known real person or fictional character from movies, TV, video games, books, or other media? 
-      Mark ALL recognizable characters and real people as known figures, including:
-      - Real people: celebrities, comedians, actors, musicians, athletes, politicians
-      - Fictional characters from: movies, TV shows, video games, books, comics, anime
-      - For characters played by specific actors in live-action, include the actor's name
-      - Be especially careful to identify characters with unusual or distinctive appearances
+      // First, check if this is a known character
+      const detectPrompt = `Is "${characterName}" a character from any form of media (movie, TV, book, game, etc.) or a real person?
+
+Answer with JSON only: {"isKnownFigure": true/false, "figureType": "fictional/celebrity/historical/other" or null}`;
+
+      console.log('🔍 Making initial detection request...');
+      const detectResponse = await this.aiClient.generateContent(detectPrompt);
+      const detectText = detectResponse.content;
       
-      Examples: 
-      - "Bob Wiley" is a fictional character played by Bill Murray (figureName: "What About Bob?")
-      - "Arthur Morgan" is a fictional character from video game (figureName: "Red Dead Redemption 2")
-      - "Mario" is a fictional character from Nintendo video games (figureName: "Super Mario")
-      - "Gizmo" is a fictional character from movies (figureName: "Gremlins")
-      - "Hermione Granger" is a fictional character played by Emma Watson (figureName: "Harry Potter")
-      - "Nathan Fielder" is a real comedian/TV personality (figureName: null)
-      - "Master Chief" is a fictional character from video game (figureName: "Halo")
-      - "Yoda" is a fictional character from movies (figureName: "Star Wars")
-      - "Judy Gemstone" is a fictional character played by Edi Patterson (figureName: "The Righteous Gemstones")
-      - "Sloth" is a fictional character played by John Matuszak (figureName: "The Goonies")
+      console.log('🔍 Initial detection response:', detectText);
       
-      Answer with JSON: {"isKnownFigure": true/false, "figureType": "historical/fictional/celebrity/comedian/musician/athlete/politician/videogame/anime/other" or null, "actorName": "actor name if applicable" or null, "figureName": "game/movie/show title if applicable" or null}`;
+      // Parse initial detection
+      let isKnown = false;
+      let figureType = null;
       
-      const response = await this.aiClient.generateContent(prompt);
-      const text = response.content;
+      try {
+        const detectJson = JSON.parse(detectText.match(/\{[\s\S]*?\}/)?.[0] || '{}');
+        isKnown = detectJson.isKnownFigure || false;
+        figureType = detectJson.figureType;
+      } catch (e) {
+        console.log('🔍 Failed to parse initial detection');
+      }
+      
+      // If it's a known fictional character, ask specifically who played them
+      let actorName = null;
+      let figureName = null;
+      
+      if (isKnown && figureType === 'fictional') {
+        const actorPrompt = `Who played the character "${characterName}" in the movie or TV show? What is the name of the movie/show?
+
+Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": "movie/show title" or null}`;
+        
+        const actorResponse = await this.aiClient.generateContent(actorPrompt);
+        const actorText = actorResponse.content;
+        
+        console.log('🔍 Actor lookup response:', actorText);
+        
+        try {
+          const actorJson = JSON.parse(actorText.match(/\{[\s\S]*?\}/)?.[0] || '{}');
+          actorName = actorJson.actorName;
+          figureName = actorJson.figureName;
+        } catch (e) {
+          console.log('🔍 Failed to parse actor lookup');
+        }
+      }
+      
+      const result = {
+        isKnownFigure: isKnown,
+        figureType: figureType,
+        actorName: actorName,
+        figureName: figureName
+      };
+      
+      console.log('🔍 Final detection result:', result);
       
       // Debug logging
       if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-        console.log('Detection AI Response for', characterName, ':', text);
+        console.log('Detection result for', characterName, ':', result);
       }
       
-      // Try multiple approaches to extract JSON
-      let jsonStr = '';
-      
-      // Method 1: Look for JSON in code blocks
-      const codeBlockMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        jsonStr = codeBlockMatch[1];
-      } else {
-        // Method 2: Look for raw JSON
-        const jsonMatch = text.match(/\{[\s\S]*?\}/);
-        if (jsonMatch) {
-          jsonStr = jsonMatch[0];
-        }
-      }
-      
-      if (jsonStr) {
-        try {
-          const result = JSON.parse(jsonStr);
-          
-          // Debug logging
-          if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-            console.log('Parsed detection result:', result);
-          }
-          
-          // If it's a fictional character (including video games), it should be treated as "known"
-          const isKnown = result.isKnownFigure === true || 
-                         (result.figureType === 'fictional' && result.actorName) ||
-                         result.figureType === 'videogame' ||
-                         result.figureType === 'anime';
-          
-          return {
-            isKnownFigure: isKnown,
-            figureType: result.figureType || undefined,
-            actorName: result.actorName || undefined,
-            figureName: result.figureName || undefined
-          };
-        } catch (e) {
-          // If JSON parsing fails, fall back to text analysis
-          if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_DEBUG_LOGGING === 'true') {
-            console.error('Failed to parse detection JSON:', e, 'JSON string:', jsonStr);
-          }
-        }
-      }
-      
-      // Fallback: analyze text response
-      const isKnown = text.toLowerCase().includes('yes') || 
-                     text.toLowerCase().includes('known') ||
-                     text.toLowerCase().includes('famous');
-      
-      return { isKnownFigure: isKnown };
-    } catch {
+      return result;
+    } catch (error) {
       // If detection fails, assume not a known figure
+      console.error('🔍 Detection error:', error);
       return { isKnownFigure: false };
     }
   }
@@ -193,9 +177,33 @@ export class PortraitGenerator {
     character: Character,
     options: PortraitGenerationOptions = {}
   ): Promise<string> {
+    console.log('🎨 BUILD PROMPT CALLED for:', character.name);
+    
+    // If no detection options provided, run AI detection
+    if (!options.detection && !options.isKnownFigure) {
+      console.log('🔍 No detection options provided, running AI detection...');
+      const detection = await this.detectKnownFigure(character.name);
+      console.log('🔍 Detection result:', detection);
+      
+      // Merge detection results into options
+      options = {
+        ...options,
+        isKnownFigure: detection.isKnownFigure,
+        knownFigureContext: detection.figureType || options.knownFigureContext,
+        actorName: detection.actorName || options.actorName,
+        detection
+      };
+    }
+    
     const subject: string[] = [];
     const context: string[] = [];
     const style: string[] = [];
+    
+    // Determine if this is a fantasy setting (needed for multiple parts of the prompt)
+    const isFantasy = options.worldTheme && 
+      ['fantasy', 'medieval', 'magic', 'mystical', 'epic'].some(term => 
+        options.worldTheme?.toLowerCase().includes(term)
+      );
     
     // Extract key visual elements for emphasis
     const physicalDesc = character.background.physicalDescription || '';
@@ -223,8 +231,8 @@ export class PortraitGenerator {
         
         if (options.actorName) {
           // Live-action character with specific actor (e.g., Bob Wiley)
-          // Put actor name FIRST for better recognition
-          subject.push(`${options.actorName} as ${character.name}`);
+          // Put actor name FIRST with heavy emphasis for better recognition
+          subject.push(`((${options.actorName})) as ${character.name}`);
           
           if (options.detection?.figureName) {
             subject.push(`from ${options.detection.figureName}`);
@@ -371,12 +379,6 @@ export class PortraitGenerator {
     } else {
       // Unknown/original characters - context-based approach
       
-      // Determine style based on world theme
-      const isFantasy = options.worldTheme && 
-        ['fantasy', 'medieval', 'magic', 'mystical', 'epic'].some(term => 
-          options.worldTheme?.toLowerCase().includes(term)
-        );
-      
       if (isFantasy) {
         // SUBJECT: Fantasy character
         subject.push(`Fantasy character portrait of ${character.name}`);
@@ -452,9 +454,16 @@ export class PortraitGenerator {
           }
         }
         
-        // CONTEXT: Simple setting
+        // CONTEXT: World-appropriate setting
         if (options.worldTheme) {
-          context.push(`${options.worldTheme} setting`);
+          // Only add theme context if it's meaningful for the portrait
+          const themeLC = options.worldTheme.toLowerCase();
+          if (themeLC === 'modern' || themeLC === 'contemporary') {
+            // Don't add generic "modern setting" - it's not helpful
+            // The physical description should provide enough context
+          } else {
+            context.push(`${options.worldTheme} world environment`);
+          }
         }
       }
       
@@ -466,34 +475,105 @@ export class PortraitGenerator {
         style.push(`portrait`);
       }
       
-      // Add emphasis on realistic diversity for non-actor characters
+      // Add strong emphasis on realistic diversity for non-actor characters
       if (!options.isKnownFigure || !options.actorName) {
-        style.push(`realistic person, not a model or actor`);
+        style.push(`realistic average person`);
+        style.push(`NOT a model or actor`);
+        style.push(`photorealistic imperfections visible`);
+        
+        // Extract specific imperfections from the description and emphasize them
+        const imperfections = [];
+        const physicalDesc = subject.join(' ') + ' ' + context.join(' ');
+        
+        // Weight-related
+        if (physicalDesc.match(/\b(pot belly|beer gut|double chin|jowls|overweight|heavy|barrel chest)\b/i)) {
+          imperfections.push('visible weight');
+        }
+        
+        // Hair-related
+        if (physicalDesc.match(/\b(bald|balding|receding|thinning hair|bald spot)\b/i)) {
+          imperfections.push('realistic hair loss');
+        }
+        
+        // Skin-related
+        if (physicalDesc.match(/\b(acne|pockmark|scar|wrinkle|liver spot|sun damage|weathered)\b/i)) {
+          imperfections.push('skin imperfections clearly visible');
+        }
+        
+        // Face-related
+        if (physicalDesc.match(/\b(crooked|uneven|droopy|weak chin|heavy brow|gaunt|sunken)\b/i)) {
+          imperfections.push('asymmetrical or non-ideal facial features');
+        }
+        
+        if (imperfections.length > 0) {
+          style.push(imperfections.join(', '));
+        }
       }
     }
 
-    // Combine all parts with clear structure
+    // Combine all parts following Gemini's best practices: Subject, Context, Style
     const promptParts: string[] = [];
     
-    // Add subject
+    // SUBJECT - Most important, comes first
     if (subject.length > 0) {
-      promptParts.push(subject.join(', '));
+      let subjectText = subject.join(', ');
+      
+      // If there's an actor name, add extra emphasis
+      if (options.actorName) {
+        subjectText = `${options.actorName}, ${subjectText}`;
+      }
+      
+      promptParts.push(subjectText);
     }
     
-    // Add context with separator
+    // Handle photography style based on whether we have an actor
+    if (options.actorName) {
+      // For actor-based portraits, use high-quality photography to capture likeness
+      promptParts.push('professional portrait photography');
+      promptParts.push('high resolution');
+      promptParts.push('accurate facial likeness');
+    } else if (!options.isKnownFigure) {
+      // For non-actor characters, add photographic specifics for realism
+      const physicalDesc = subject.join(' ') + ' ' + context.join(' ');
+      const hasAttractiveDescriptor = physicalDesc.match(/\b(beautiful|handsome|pretty|gorgeous|attractive|stunning)\b/i);
+      
+      if (!hasAttractiveDescriptor) {
+        // For average/imperfect characters, use documentary photography style
+        promptParts.push('35mm portrait');
+        promptParts.push('documentary photography');
+        promptParts.push('candid portrait with visible skin texture and imperfections');
+      } else {
+        // For attractive characters, use standard portrait style
+        promptParts.push('35mm portrait');
+      }
+    }
+    
+    // CONTEXT - Setting and additional details
     if (context.length > 0) {
       promptParts.push(context.join(', '));
     }
     
-    // Add style with separator
-    if (style.length > 0) {
-      promptParts.push(style.join(', '));
+    // STYLE - Photography style and technical details
+    if (isFantasy) {
+      promptParts.push('fantasy art portrait, digital painting');
+    } else {
+      promptParts.push('photorealistic portrait');
+    }
+    
+    // For non-beautiful characters, emphasize the imperfections
+    if (!options.isKnownFigure || !options.actorName) {
+      const physicalDesc = subject.join(' ') + ' ' + context.join(' ');
+      const hasAttractiveDescriptor = physicalDesc.match(/\b(beautiful|handsome|pretty|gorgeous|attractive|stunning)\b/i);
+      
+      if (!hasAttractiveDescriptor && style.some(s => s.includes('imperfections'))) {
+        promptParts.push('showing realistic flaws and asymmetry');
+      }
     }
     
     // Build final prompt
-    const fullPrompt = promptParts.join('. ');
+    const fullPrompt = promptParts.join(', ');
     
-    // Ensure under token limit (approximately 480 tokens)
+    // Ensure under token limit
     return this.truncateText(fullPrompt, 1900);
   }
 
@@ -518,7 +598,7 @@ export class PortraitGenerator {
         // No user input - generate from scratch
         const prompt = `Provide an accurate physical description of ${character.name} (the ${contextHint}) in 30-35 words. 
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
-        MUST include: hair length (short/medium/long/shoulder-length/etc), hair style, hair color, facial features, build/body type, and typical clothing. 
+        MUST include: age, race/ethnicity, hair length (short/medium/long/shoulder-length/etc), hair style, hair color, facial features, build/body type, and typical clothing. 
         ${!detection.actorName ? 'Include realistic imperfections like weight, balding, scars, or plain features - not everyone is beautiful.' : ''}
         Be accurate to their actual appearance. Answer with just the description, no extra text.`;
         
@@ -654,7 +734,15 @@ export class PortraitGenerator {
    * Add realistic physical diversity to character descriptions
    */
   private async enhancePhysicalDiversity(description: string, characterName: string): Promise<string> {
-    // If description is already detailed with non-idealized features, return as-is
+    // Check if description explicitly mentions attractiveness
+    const hasAttractiveDescriptor = description && description.match(/\b(beautiful|handsome|pretty|gorgeous|attractive|stunning|hot|cute)\b/i);
+    
+    // If they're explicitly described as attractive, keep it
+    if (hasAttractiveDescriptor) {
+      return description;
+    }
+    
+    // If description already has realistic/non-idealized features, return as-is
     if (description && (
       description.match(/\b(overweight|obese|fat|chubby|stocky|thin|gaunt|skinny|bald|balding|ugly|plain|homely|scarred|weathered|wrinkled|aged)\b/i) ||
       description.match(/\b(crooked|missing|gap|acne|blemish|scar|mole|birthmark)\b/i)
@@ -665,39 +753,40 @@ export class PortraitGenerator {
     try {
       const prompt = `Given this character description: "${description || 'No description provided'}"
       
-      Add realistic, non-idealized physical features. Characters should look like real people with varied body types and features.
-      Include things like: weight (skinny/average/overweight/obese), facial features (plain/asymmetrical/distinctive), skin (acne/scars/wrinkles/blemishes), hair (thinning/bald/unkempt).
+      Add specific, non-idealized physical features that make the character look like a real, average person.
+      Be VERY SPECIFIC about imperfections. Don't just say "weathered" - say what makes them weathered.
       
-      Examples of good additions:
-      - "slightly overweight with thinning hair"
-      - "gaunt face with acne scars"
-      - "heavyset build with double chin"
-      - "bald with liver spots"
-      - "crooked nose and gap teeth"
+      Choose 2-3 from these categories:
+      - Weight: "pot belly", "beer gut", "double chin", "jowls", "skinny arms", "bony shoulders"
+      - Face: "uneven eyes", "crooked nose", "thin lips", "weak chin", "heavy brow", "droopy eyelids"
+      - Skin: "acne scars on cheeks", "pockmarked skin", "liver spots", "deep wrinkles", "sun damage", "rosacea"
+      - Hair: "receding hairline", "bald spot on crown", "thinning at temples", "greasy hair", "unkempt beard"
+      - Teeth: "yellowed teeth", "missing molar", "gap between front teeth", "crooked bottom teeth"
+      - Other: "slouched posture", "rounded shoulders", "thick glasses", "hearing aid"
       
-      Keep the original description but add 1-2 realistic imperfections. 40 words max total. Answer with just the enhanced description.`;
+      Keep the original description but add specific imperfections. 50 words max total. Answer with just the enhanced description.`;
       
       const response = await this.aiClient.generateContent(prompt);
       return response.content.trim();
     } catch {
-      // Fallback - add some variety based on character name hash
+      // Fallback - add very specific variety based on character name hash
       const hash = characterName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
       const varieties = [
-        'slightly overweight build',
-        'thin and angular features',
-        'heavyset with round face',
-        'gaunt with prominent cheekbones',
-        'stocky build',
-        'soft features with double chin'
+        'pot belly and double chin',
+        'gaunt face with sunken cheeks',
+        'heavy jowls and thick neck',
+        'bony frame with protruding collarbones',
+        'pear-shaped body with narrow shoulders',
+        'barrel chest and beer gut'
       ];
       
       const additionalFeatures = [
-        'thinning hair',
-        'receding hairline',
-        'visible acne scars',
-        'weathered skin',
-        'crooked teeth',
-        'prominent nose'
+        'receding hairline with bald spot',
+        'thinning hair at temples',
+        'pockmarked cheeks from old acne',
+        'deep crow\'s feet and forehead lines',
+        'yellowed, crooked teeth',
+        'large nose with visible pores'
       ];
       
       const bodyType = varieties[hash % varieties.length];

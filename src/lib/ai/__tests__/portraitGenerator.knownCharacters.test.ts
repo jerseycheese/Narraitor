@@ -58,6 +58,32 @@ describe('PortraitGenerator - Known Characters', () => {
   });
 
   describe('Characters played by specific actors', () => {
+    test('should detect Ryan Howard from The Office played by B.J. Novak', async () => {
+      // Mock the AI response for detection
+      mockAIClient.generateContent.mockResolvedValueOnce({
+        content: '{"isKnownFigure": true, "figureType": "fictional", "actorName": "B.J. Novak", "figureName": "The Office"}',
+        finishReason: 'stop'
+      });
+      
+      // Mock the image generation
+      if (mockAIClient.generateImage) {
+        mockAIClient.generateImage.mockResolvedValueOnce({
+          image: 'https://example.com/ryan.jpg',
+          prompt: '((B.J. Novak)) as Ryan Howard, from The Office'
+        });
+      }
+
+      const character = createTestCharacter('Ryan Howard');
+      character.background.physicalDescription = 'Young ambitious office worker with styled hair and trendy business casual attire';
+      character.background.personality = 'Ambitious, self-centered, trendy, and opportunistic with a superiority complex';
+      character.background.history = 'Started as a temp at Dunder Mifflin but climbed the corporate ladder through manipulation';
+      
+      const result = await generator.generatePortrait(character, { worldTheme: 'office comedy' });
+      
+      expect(result.prompt).toContain('((B.J. Novak)) as Ryan Howard');
+      expect(result.prompt).toContain('The Office');
+    });
+
     test('should detect Sloth from The Goonies played by John Matuszak', async () => {
       // Mock the AI response for detection
       mockAIClient.generateContent.mockResolvedValueOnce({
