@@ -3,241 +3,218 @@ title: Narraitor Development Roadmap
 aliases: [Roadmap, Implementation Plan]
 tags: [narraitor, documentation, planning, roadmap]
 created: 2025-04-27
-updated: 2025-05-13
+updated: 2025-01-16
 ---
 
 # Narraitor Development Roadmap
 
 ## Overview
-This roadmap outlines the development phases for the Narraitor project, focusing on an MVP approach with clear milestones and deliverables.
+This roadmap outlines the development phases for the Narraitor project, with a streamlined 6-8 week MVP approach focused on delivering a complete narrative experience.
 
-## Phase 1: Core Framework (MVP)
+## Phase 1: Core Framework (MVP) - 6-8 Weeks
 
-### Current MVP Focus Issues
-- **Improve Navigation & User Flow** - Streamline world → character → game flow
-- **Narrative Ending System** - Implement graceful story conclusions with AI epilogues
+### Week 1-2: Foundation & Core Systems
+**Focus**: Navigation improvements, Character UI completion, Journal UI setup
 
-### 1.1 Environment Setup ✅ COMPLETE
-- [x] Initialize Next.js 14 project with TypeScript
-- [x] Configure ESLint, Prettier, and EditorConfig
-- [x] Set up Jest and React Testing Library
-- [x] Configure Storybook for component development
-- [x] Create initial project structure
+#### Navigation System (NEW EPIC)
+- [ ] Fix world switcher dropdown behavior (#432)
+- [ ] Improve breadcrumb navigation for deep routes
+- [ ] Add mobile navigation improvements
+- [ ] Create consistent navigation patterns
+- [ ] Add keyboard navigation support
 
-### 1.2 Core Types and Interfaces ✅ COMPLETE
-- [x] Define simplified world configuration interfaces
-- [x] Create basic character system types
-- [x] Establish minimal narrative engine interfaces
-- [x] Design essential journal system types
-- [x] Define state persistence interfaces
+#### Character System UI
+- [ ] Complete character viewing interface (#256)
+- [ ] Add character editing capabilities (#305)
+- [ ] Fix character-world associations
+- [ ] Polish character UI/UX
+- [ ] Define character attributes (#285)
+- [ ] Build character skills interface (#286)
+- [ ] Link skills to attributes (#287)
 
-### 1.3 State Management Foundation ✅ COMPLETE
-- [x] Implement core state management architecture (Using Zustand)
-- [x] Create domain-specific stores (World, Character, Inventory, Narrative, Journal, Session, AI Context)
-- [x] Initialize stores with default MVP values
-- [x] Add basic state persistence configuration for IndexedDB
-- [x] Implement unit tests for store initialization
+#### Journal System UI (NEW EPIC)
+- [ ] Create journal UI components
+  - [ ] JournalPanel.tsx - Collapsible panel
+  - [ ] JournalList.tsx - Entry list view
+  - [ ] JournalEntry.tsx - Detail view
+  - [ ] JournalHeader.tsx - Controls
+- [ ] Implement collapsible journal panel (#278)
+- [ ] Set up journal entry creation hooks
+- [ ] Add responsive journal layout (#280)
 
-**Implementation Notes:**
-- Implemented MVP-level Zustand stores with basic state initialization only
-- Each domain has its own store with typed initial state
-- Persistence configuration created for future IndexedDB integration
-- Tests verify store initialization (TDD approach used)
-- No complex actions or cross-domain interactions included (as per MVP scope)
+### Week 3-4: Core Gameplay Loop
+**Focus**: Narrative polish and journal integration
 
-### 1.4 World Configuration System ✅ COMPLETE
-- [x] Implement world configuration reducer (via Zustand store)
-- [x] Create minimal world creation UI components (6-step wizard)
-- [x] Build freeform world description analyzer using AI
-- [x] Implement attribute and skill suggestion system
-- [x] Create user interface for reviewing and editing AI suggestions
-- [x] Develop basic world template system as fallback option
-- [x] Add basic validation for world configurations
-- [x] Create test worlds for development (can be generated via AI)
-- [x] World editor interface for post-creation editing
-- [x] AI-powered world generation with name suggestions
+#### Narrative Engine Enhancement
+- [ ] Implement narrative ending system (#462)
+- [ ] Add proper scene transitions
+- [ ] Create fallback content system
+- [ ] Polish decision presentation (#248)
+- [ ] Ensure AI epilogue generation
+- [ ] Add narrative conclusion states
 
-### 1.5 Character System ✅ COMPLETE
-- [x] Implement character state reducer
-- [x] Create 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
-- [x] Develop basic character sheet component
-- [x] Add point-buy attribute allocation with world-defined constraints
-- [x] Implement skill selection (max 8 skills per character)
-- [x] Create test characters for each world
+#### Journal Integration
+- [ ] Enable journal during gameplay (#278)
+- [ ] Store journal entries permanently (#281)
+- [ ] Add session grouping logic
+- [ ] Create entry formatting system
+- [ ] Test journal persistence
 
-### 1.6 Basic Inventory System
-- [ ] Implement inventory state reducer
-- [ ] Create simple item management
-- [ ] Develop inventory UI component
-- [ ] Add item categorization
-- [ ] Create basic item interaction
+### Week 5-6: Polish & Launch Preparation
+**Focus**: UI polish, testing, and launch setup
 
-### 1.7 Narrative Engine ✅ COMPLETE
-- [x] Set up Google Gemini AI integration
-- [x] Create prompt template system
-- [x] Implement context management (preserving 5-10 narrative segments)
-- [x] Develop player choice system with 3-4 options per decision point
-- [x] **ENHANCED: Custom Player Input System** - Players can type custom actions in addition to selecting from AI-generated choices
-- [x] Add scene transition handling
-- [x] Create error recovery mechanisms with retries and fallback content
+#### UI/UX Polish
+- [ ] Responsive design improvements
+- [ ] Performance optimization
+- [ ] Loading states and error handling
+- [ ] Cross-browser testing
+- [ ] Accessibility improvements
 
-**Implementation Notes:**
-- Complete AI-powered narrative generation using Google Gemini
-- Advanced choice system with both predefined and custom player input options
-- Custom input features: 250-character limit, live validation, accessibility support
-- Narrative integration ensures custom actions are incorporated into story progression
-- Delayed choice regeneration after custom input to prevent data conflicts
+#### Launch Preparation (NEW EPIC)
+- [ ] Create marketing landing page
+- [ ] Write getting started guide
+- [ ] Create world creation tutorial
+- [ ] Set up payment integration
+- [ ] Configure analytics
+- [ ] Prepare support channels
 
-### 1.8 Journal System
-- [ ] Implement basic journal state reducer
-- [ ] Create automatic entry generation
-- [ ] Develop simple journal viewer component
-- [ ] Add entry categorization (4 primary types, major/minor significance)
-- [ ] Implement new/unread entry indicators and session date grouping
-- [ ] Add filtering by entry type and significance
+### Week 7-8: Beta Testing & Launch
+**Focus**: Testing with friends and public launch
 
-### 1.9 Basic UI Components
-- [ ] Create navigation structure (**Issue: Improve Navigation & User Flow**)
-- [ ] Implement world selection interface
-- [ ] Develop game session UI
-- [ ] Add essential form components
-- [ ] Create themed container components
+#### Beta Testing
+- [ ] Friends & family testing (10-20 users)
+- [ ] Set up feedback collection
+- [ ] Daily bug fix deployments
+- [ ] Performance monitoring
+- [ ] Iterate based on feedback
 
-### 1.10 Game Session Management
-- [ ] Implement narrative ending system (**Issue: Narrative Ending System**)
-- [ ] Add session completion states
-- [ ] Create epilogue generation
-- [ ] Develop character retirement flow
+#### Public Launch
+- [ ] Activate payment system
+- [ ] Announce in communities
+- [ ] Monitor user onboarding
+- [ ] Quick issue response
+- [ ] Track success metrics
 
-## Phase 2: Enhanced Narrative
+### ✅ Completed MVP Components
+- [x] Environment Setup
+- [x] Core Types and Interfaces
+- [x] State Management (Zustand stores)
+- [x] World Configuration System
+- [x] Character System (backend)
+- [x] Narrative Engine Core
+- [x] AI Integration (Google Gemini)
+- [x] Journal System (backend)
 
-### 2.1 Improved AI Integration
-- [ ] Enhance prompt engineering
-- [ ] Implement context window management
-- [ ] Add memory system for narrative consistency
-- [ ] Develop error handling and fallbacks
-- [ ] Create content filtering controls
+### 🔄 In Progress
+- [ ] IndexedDB persistence (#340)
+- [ ] Navigation improvements
+- [ ] Character UI components
+- [ ] Journal UI components
 
-### 2.2 NPC System
-- [ ] Implement basic NPC state reducer
-- [ ] Create NPC generation system
-- [ ] Develop NPC interaction components
-- [ ] Add relationship tracking
-- [ ] Implement NPC memory and consistency
+## Phase 2: Post-MVP Enhancements
 
-### 2.3 Expanded Journal
-- [ ] Add character relationship tracking
-- [ ] Implement NPC entry generation
-- [ ] Create event categorization
-- [ ] Develop timeline visualization
-- [ ] Add search functionality
+### 2.1 Gamification System (#429)
+- [ ] Achievement system
+- [ ] Progress tracking
+- [ ] Experience points
+- [ ] Unlockable content
+- [ ] Leaderboards
 
-### 2.4 Enhanced UI
-- [ ] Improve responsiveness
-- [ ] Add animations and transitions
-- [ ] Enhance accessibility
-- [ ] Implement dark mode support
-- [ ] Create world-specific UI themes
+### 2.2 Content Preferences
+- [ ] Content boundary settings
+- [ ] Theme customization
+- [ ] Violence/romance filters
+- [ ] Custom content rules
+- [ ] Preference profiles
 
-## Phase 3: Extended Systems
+### 2.3 Advanced AI Features
+- [ ] Multi-model support
+- [ ] Character voice customization
+- [ ] Dynamic world evolution
+- [ ] AI-generated imagery
+- [ ] Predictive branching
 
-### 3.1 Character Advancement
-- [ ] Implement experience tracking
-- [ ] Create attribute/skill improvement
-- [ ] Add character development events
-- [ ] Develop milestone tracking
-- [ ] Create character history visualization
+### 2.4 Inventory System UI
+- [ ] Item management interface
+- [ ] Equipment system
+- [ ] Item categorization UI
+- [ ] Trading interface
+- [ ] Crafting system
 
-### 3.2 Simple Combat System (Optional)
-- [ ] Implement combat state reducer
-- [ ] Create turn management system
-- [ ] Develop basic action resolution
-- [ ] Add combat log functionality
-- [ ] Create simple combat UI
+## Success Metrics
 
-### 3.3 Advanced Inventory System
-- [ ] Add item effects and usage
-- [ ] Implement equipment system
-- [ ] Add item weight and encumbrance
-- [ ] Create item trading/economy
-- [ ] Develop crafting system
+### MVP Success (Week 8)
+1. **Initial**: Friends testing and having fun
+2. **Growth**: Users paying for the experience
+3. **Scale**: Efficient platform scaling
 
-### 3.4 Enhanced Visualization
-- [ ] Improve character portraits
-- [ ] Add scene illustrations
-- [ ] Create item visualizations
-- [ ] Develop location imagery
-- [ ] Add thematic UI elements
+### Key Performance Indicators
+- First paying customer within 48 hours
+- 100 users in first week
+- 10% conversion to paid
+- Average session > 20 minutes
+- $1000 MRR within 30 days
 
-## Phase 4: Polish and Integration
+### Quality Standards
+- No critical bugs
+- Page loads < 3 seconds
+- Responsive on all devices
+- Clear error messages
+- Accessibility compliant
 
-### 4.1 System Integration
-- [ ] Connect all core systems
-- [ ] Implement end-to-end workflows
-- [ ] Add error boundaries
-- [ ] Create loading states
-- [ ] Implement transitions
+## Technical Stack
 
-### 4.2 Performance Optimization
-- [ ] Optimize component rendering
-- [ ] Improve state update efficiency
-- [ ] Enhance AI response handling
-- [ ] Optimize data persistence
-- [ ] Reduce initial load time
+### Core Technologies
+- **Framework**: Next.js 14+ with App Router
+- **State**: Zustand stores
+- **Persistence**: IndexedDB
+- **Styling**: Tailwind CSS
+- **AI**: Google Gemini API
+- **Testing**: Jest + React Testing Library
+- **Analytics**: Privacy-focused solution
+- **Payments**: Stripe/Paddle (generic)
 
-### 4.3 UI Polish
-- [ ] Refine component styling
-- [ ] Improve responsiveness
-- [ ] Enhance accessibility
-- [ ] Add animations and transitions
-- [ ] Create world-specific themes
+### Development Principles
+- Test-Driven Development (TDD)
+- Component-first with Storybook
+- KISS principle
+- Accessibility first
+- Performance monitoring
 
-### 4.4 Documentation and Testing
-- [ ] Complete user documentation
-- [ ] Enhance developer documentation
-- [ ] Add comprehensive testing
-- [ ] Create onboarding experience
-- [ ] Add usage examples
+## Issue Tracking
 
-## Success Criteria (MVP)
+### High Priority MVP Issues
+- #462: Narrative Ending System
+- #432: World Switcher Dropdown
+- #278: Open journal during gameplay
+- #280: Responsive journal layout
+- #281: Store journal entries permanently
+- #248: Present clear decision points
+- #256: Character viewing interface
+- #305: Character editing interface
+- #285: Define character attributes
+- #286: Build character skills
+- #287: Link skills to attributes
+- #340: IndexedDB persistence
 
-The MVP will be considered complete when:
+### Deferred to Post-MVP
+- #429: Gamification Epic (entire epic)
+- #384: Visual regression testing
+- #303: Personalized narrative content
+- Portrait generation system
+- Lore management
+- Mobile applications
 
-1. Users can create worlds by providing freeform descriptions that are processed by AI to suggest attributes and skills
-2. Character creation works with a minimal attribute/skill system
-3. Basic inventory system allows characters to carry items
-4. The narrative engine generates appropriate content for different worlds
-5. The journal system records game events
-6. The state management system persists game state between sessions
-7. The application runs with acceptable performance
-8. Core user journeys are covered by tests
-9. Documentation is sufficient for understanding the codebase
-10. **Navigation flow is intuitive from world selection through game start**
-11. **Players can end their stories with AI-generated narrative conclusions**
+## Timeline Summary
 
-## Future Enhancements (Post-MVP)
+**Weeks 1-2**: Foundation (Navigation, Character UI, Journal UI)  
+**Weeks 3-4**: Core Loop (Narrative, Journal integration)  
+**Weeks 5-6**: Polish (Testing, Launch prep)  
+**Weeks 7-8**: Launch (Beta, Public release)  
 
-### Content and Features
-- Enhanced AI capabilities with memory and personality
-- More sophisticated character development
-- Advanced world customization options including tone settings
-- Combat systems for different genres
-- Expanded inventory with equipment and effects
-- Complex relationship tracking between characters
-- Quest and objective management
-- Map and location visualization
+**Post-MVP**: Based on user feedback and metrics
 
-### Technical Improvements
-- Backend integration for state persistence
-- Multi-user collaboration
-- Mobile optimization
-- Offline support
-- Performance enhancements
-- Additional AI provider options
+---
 
-## Ongoing Tasks
-- Bug fixes and issue resolution
-- Documentation updates
-- Code refactoring for maintainability
-- Performance monitoring and optimization
-- Regular testing and validation
+**Last Updated**: January 16, 2025  
+**Next Review**: End of Week 2 (Progress check)
