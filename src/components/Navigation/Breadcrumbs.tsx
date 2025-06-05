@@ -3,9 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
 import { cn } from '@/lib/utils/classNames';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
@@ -25,9 +25,9 @@ export function Breadcrumbs({
 }: BreadcrumbsProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { worlds, currentWorldId } = worldStore();
-  const { characters } = characterStore();
-  const { initializeSession } = sessionStore();
+  const { worlds, currentWorldId } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { initializeSession } = useSessionStore();
   const { getNextStep } = useNavigationFlow();
   
   // Build breadcrumb segments

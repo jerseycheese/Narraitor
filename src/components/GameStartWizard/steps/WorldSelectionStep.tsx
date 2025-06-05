@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import WorldCard from '@/components/WorldCard/WorldCard';
 
 export interface WorldSelectionStepProps {
@@ -10,7 +10,7 @@ export interface WorldSelectionStepProps {
 }
 
 export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
-  const { worlds } = worldStore();
+  const { worlds } = useWorldStore();
   const worldList = Object.values(worlds);
 
   if (worldList.length === 0) {

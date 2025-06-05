@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { NotFoundState } from '@/components/shared/NotFoundState';
 import { BackNavigation } from '@/components/shared/BackNavigation';
@@ -15,8 +15,8 @@ export default function CharacterViewPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters, setCurrentCharacter, deleteCharacter } = characterStore();
-  const { worlds } = worldStore();
+  const { characters, setCurrentCharacter, deleteCharacter } = useCharacterStore();
+  const { worlds } = useWorldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const character = characters[characterId];

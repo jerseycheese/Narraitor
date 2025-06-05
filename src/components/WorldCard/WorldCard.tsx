@@ -3,9 +3,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { World } from '../../types/world.types';
-import { worldStore } from '../../state/worldStore';
-import { sessionStore } from '../../state/sessionStore';
-import { characterStore } from '../../state/characterStore';
+import { useWorldStore } from '../../state/worldStore';
+import { useSessionStore } from '../../state/sessionStore';
+import { useCharacterStore } from '../../state/characterStore';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
@@ -83,7 +83,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
   const handleCreateCharacter = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const storeActions = _storeActions || worldStore.getState();
+    const storeActions = _storeActions || useWorldStore.getState();
     storeActions.setCurrentWorld(world.id);
     if (actualRouter) {
       actualRouter.push('/characters/create');
@@ -96,11 +96,11 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
   const handlePlayClick = () => {
     try {
-      const storeActions = _storeActions || worldStore.getState();
+      const storeActions = _storeActions || useWorldStore.getState();
       storeActions.setCurrentWorld(world.id);
       
       // Check for characters in this world
-      const characterState = characterStore.getState();
+      const characterState = useCharacterStore.getState();
       const worldCharacters = Object.values(characterState.characters)
         .filter(char => char.worldId === world.id);
       
@@ -114,7 +114,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       
       // Check for saved session
       let hasSession = false;
-      const savedSession = sessionStore.getState().getSavedSession(
+      const savedSession = useSessionStore.getState().getSavedSession(
         world.id, 
         worldCharacters[0].id
       );

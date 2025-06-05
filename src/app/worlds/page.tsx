@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
@@ -57,7 +57,7 @@ export default function WorldsPage() {
 
     try {
       // Get existing world names to ensure uniqueness
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const existingNames = Object.values(worlds).map(w => w.name);
 
       // Generate the world data via API
@@ -97,7 +97,7 @@ export default function WorldsPage() {
       }));
 
       // Create the world initially without an image
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: generatedData.name,
         theme: generatedData.theme,
         description: generatedData.description,
@@ -113,7 +113,7 @@ export default function WorldsPage() {
       
       try {
         // Get the created world to generate image for it
-        const createdWorld = worldStore.getState().worlds[worldId];
+        const createdWorld = useWorldStore.getState().worlds[worldId];
         
         const imageResponse = await fetch('/api/generate-world-image', {
           method: 'POST',
@@ -130,7 +130,7 @@ export default function WorldsPage() {
           
           // Only update with image if we actually got one
           if (imageData.imageUrl) {
-            worldStore.getState().updateWorld(worldId, {
+            useWorldStore.getState().updateWorld(worldId, {
               image: {
                 type: 'placeholder' as const,
                 url: imageData.imageUrl,
@@ -145,7 +145,7 @@ export default function WorldsPage() {
       }
 
       // Set as current world
-      worldStore.getState().setCurrentWorld(worldId);
+      useWorldStore.getState().setCurrentWorld(worldId);
 
       // Hide the prompt and reset state
       setShowPrompt(false);

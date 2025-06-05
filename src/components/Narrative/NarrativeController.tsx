@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 
 interface NarrativeControllerProps {
@@ -34,8 +34,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const [error, setError] = useState<string | null>(null);
   
   // Access store methods in a way that works with testing
-  const addSegment = narrativeStore(state => state.addSegment);
-  const getSessionSegments = narrativeStore(state => state.getSessionSegments);
+  const addSegment = useNarrativeStore(state => state.addSegment);
+  const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(createDefaultGeminiClient()), []);
 
   // Track if we've already generated a narrative for this session
@@ -170,7 +170,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     choiceGenerationInProgress.current = true;
     
     // Get fresh segments from the store instead of relying on component state
-    const currentSegments = narrativeStore.getState().getSessionSegments(sessionId);
+    const currentSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
     
     if (currentSegments.length === 0) {
       choiceGenerationInProgress.current = false;
@@ -240,7 +240,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       
       // Add decision to store and get the actual stored ID
-      const storedDecisionId = narrativeStore.getState().addDecision(sessionId, {
+      const storedDecisionId = useNarrativeStore.getState().addDecision(sessionId, {
         prompt: decision.prompt,
         options: decision.options
       });
@@ -269,7 +269,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       try {
         // Only try to create fallback choices if we haven't already added any for this session
-        const existingDecisions = narrativeStore.getState().getSessionDecisions(sessionId);
+        const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
         
         if (existingDecisions.length === 0 && mountedRef.current) {
           // Create and add fallback choices to the store
@@ -285,7 +285,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
           };
           
           // Add to store and get the actual stored ID
-          const storedFallbackId = narrativeStore.getState().addDecision(sessionId, {
+          const storedFallbackId = useNarrativeStore.getState().addDecision(sessionId, {
             prompt: fallbackDecision.prompt,
             options: fallbackDecision.options
           });
@@ -408,7 +408,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       const recentSegments = segments.slice(-5);
       
       // Get the actual choice text from the narrative store
-      const decisions = narrativeStore.getState().getSessionDecisions(sessionId);
+      const decisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
       let choiceText = triggeringChoiceId;
       
       // Find the decision that contains this choice

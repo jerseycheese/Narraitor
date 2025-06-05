@@ -2,18 +2,18 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { formatDistanceToNow } from '@/lib/utils/textFormatter';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 
 export function QuickPlay() {
   const router = useRouter();
-  const { worlds } = worldStore();
-  const { characters } = characterStore();
-  const { savedSessions, resumeSavedSession } = sessionStore();
+  const { worlds } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { savedSessions, resumeSavedSession } = useSessionStore();
 
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
@@ -31,8 +31,8 @@ export function QuickPlay() {
     if (!mostRecentSession) return;
 
     // Set the current world and character before resuming session
-    const { setCurrentWorld } = worldStore.getState();
-    const { setCurrentCharacter } = characterStore.getState();
+    const { setCurrentWorld } = useWorldStore.getState();
+    const { setCurrentCharacter } = useCharacterStore.getState();
     
     setCurrentWorld(mostRecentSession.worldId);
     setCurrentCharacter(mostRecentSession.characterId);

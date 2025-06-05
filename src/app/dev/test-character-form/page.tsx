@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 
 interface DebugInfo {
@@ -16,7 +16,7 @@ interface DebugInfo {
 }
 
 export default function TestCharacterFormPage() {
-  const { worlds, currentWorldId } = worldStore();
+  const { worlds, currentWorldId } = useWorldStore();
   const [debugInfo, setDebugInfo] = useState<DebugInfo>({
     currentWorldId: null,
     worldName: 'None',

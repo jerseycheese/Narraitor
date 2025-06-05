@@ -1,8 +1,8 @@
-import { journalStore } from '../index';
+import { useJournalStore } from '../index';
 
 describe('journalStore', () => {
   it('initializes with default state', () => {
-    const state = journalStore.getState();
+    const state = useJournalStore.getState();
     expect(state).toBeDefined();
   });
 });

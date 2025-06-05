@@ -109,7 +109,7 @@ const initialState = {
 };
 
 // Character Store implementation with persistence
-export const characterStore = create<CharacterStore>()(
+export const useCharacterStore = create<CharacterStore>()(
   persist(
     (set) => ({
       ...initialState,

@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GameStartWizard } from '../GameStartWizard';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -73,17 +73,17 @@ describe('GameStartWizard', () => {
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     
     // Default store mocks
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: {
         'world-1': { id: 'world-1', name: 'Test World' },
       },
     });
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: {
         'char-1': { id: 'char-1', name: 'Test Character', worldId: 'world-1' },
       },
     });
-    (sessionStore as unknown as jest.Mock).mockReturnValue({
+    (useSessionStore as unknown as jest.Mock).mockReturnValue({
       initializeSession: jest.fn(),
     });
   });
@@ -172,7 +172,7 @@ describe('GameStartWizard', () => {
       onComplete();
     });
     
-    (sessionStore as unknown as jest.Mock).mockReturnValue({
+    (useSessionStore as unknown as jest.Mock).mockReturnValue({
       initializeSession: mockInitializeSession,
     });
     

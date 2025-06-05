@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { 
   WizardContainer, 
@@ -36,7 +36,7 @@ export default function WorldCreationWizard({
   initialData
 }: WorldCreationWizardProps) {
   const router = useRouter();
-  const createWorld = worldStore((state) => state.createWorld);
+  const createWorld = useWorldStore((state) => state.createWorld);
   const [wizardState, setWizardState] = useState<WizardState>({
     currentStep: initialStep,
     worldData: initialData?.worldData || {
@@ -172,7 +172,7 @@ export default function WorldCreationWizard({
       });
       
       // Set the newly created world as the active world
-      const { setCurrentWorld } = worldStore.getState();
+      const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
       console.log('[WorldCreationWizard] Set newly created world as active:', worldId);
       
@@ -189,7 +189,7 @@ export default function WorldCreationWizard({
             const imageGenerator = new WorldImageGenerator(aiClient);
             
             // Get the created world from store
-            const world = worldStore.getState().worlds[worldId];
+            const world = useWorldStore.getState().worlds[worldId];
             console.log('[WorldCreationWizard] Retrieved world for image generation:', world);
             
             if (world) {
@@ -198,7 +198,7 @@ export default function WorldCreationWizard({
               console.log('[WorldCreationWizard] Generated world image:', image);
               
               // Update the world with the generated image
-              worldStore.getState().updateWorld(worldId, { image });
+              useWorldStore.getState().updateWorld(worldId, { image });
               console.log('[WorldCreationWizard] Updated world with generated image');
             } else {
               console.error('[WorldCreationWizard] World not found in store for image generation');

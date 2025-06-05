@@ -19,15 +19,16 @@ jest.mock('@/components/Narrative/NarrativeHistoryManager', () => ({
 
 // Mock the narrativeStore
 jest.mock('@/state/narrativeStore', () => ({
-  narrativeStore: {
-    getState: jest.fn().mockReturnValue({
-      addDecision: jest.fn(),
-      selectDecisionOption: jest.fn(),
-      getSessionSegments: jest.fn().mockReturnValue([]),
-      getSessionDecisions: jest.fn().mockReturnValue([]),
-      clearSessionSegments: jest.fn()
-    })
-  }
+  useNarrativeStore: jest.fn(() => ({
+    currentEnding: null,
+    isGeneratingEnding: false,
+    generateEnding: jest.fn(),
+    addDecision: jest.fn(),
+    selectDecisionOption: jest.fn(),
+    getSessionSegments: jest.fn().mockReturnValue([]),
+    getSessionDecisions: jest.fn().mockReturnValue([]),
+    clearSessionSegments: jest.fn()
+  }))
 }));
 
 // Mock generateUniqueId
@@ -37,7 +38,7 @@ jest.mock('@/lib/utils/generateId', () => ({
 
 // Mock sessionStore
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: jest.fn(() => ({
+  useSessionStore: jest.fn(() => ({
     id: 'test-session',
     worldId: 'test-world',
     characterId: 'test-character',
@@ -47,7 +48,7 @@ jest.mock('@/state/sessionStore', () => ({
 
 // Mock characterStore
 jest.mock('@/state/characterStore', () => ({
-  characterStore: jest.fn((selector) => {
+  useCharacterStore: jest.fn((selector) => {
     const state = {
       characters: {
         'test-character': {

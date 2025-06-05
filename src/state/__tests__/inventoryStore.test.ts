@@ -1,13 +1,13 @@
-import { inventoryStore } from '../inventoryStore';
+import { useInventoryStore } from '../inventoryStore';
 
-describe('inventoryStore', () => {
+describe('useInventoryStore', () => {
   beforeEach(() => {
-    inventoryStore.getState().reset();
+    useInventoryStore.getState().reset();
   });
 
   describe('initialization', () => {
     test('should initialize with default state', () => {
-      const state = inventoryStore.getState();
+      const state = useInventoryStore.getState();
       expect(state.items).toEqual({});
       expect(state.characterInventories).toEqual({});
       expect(state.error).toBeNull();
@@ -27,8 +27,8 @@ describe('inventoryStore', () => {
         equipped: false
       };
 
-      const itemId = inventoryStore.getState().addItem(characterId, itemData);
-      const state = inventoryStore.getState();
+      const itemId = useInventoryStore.getState().addItem(characterId, itemData);
+      const state = useInventoryStore.getState();
 
       expect(itemId).toBeDefined();
       expect(state.items[itemId]).toBeDefined();
@@ -49,7 +49,7 @@ describe('inventoryStore', () => {
       };
 
       expect(() => {
-        inventoryStore.getState().addItem(characterId, invalidItemData);
+        useInventoryStore.getState().addItem(characterId, invalidItemData);
       }).toThrow('Item name is required');
     });
 
@@ -64,8 +64,8 @@ describe('inventoryStore', () => {
         equipped: false
       };
 
-      const itemId = inventoryStore.getState().addItem(characterId, itemData);
-      const state = inventoryStore.getState();
+      const itemId = useInventoryStore.getState().addItem(characterId, itemData);
+      const state = useInventoryStore.getState();
 
       expect(state.characterInventories[characterId]).toBeDefined();
       expect(state.characterInventories[characterId]).toContain(itemId);
@@ -75,7 +75,7 @@ describe('inventoryStore', () => {
   describe('updateItem', () => {
     test('should update existing item', () => {
       const characterId = 'character-1';
-      const itemId = inventoryStore.getState().addItem(characterId, {
+      const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'Old Sword',
         category: 'weapon',
         quantity: 1,
@@ -84,21 +84,21 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      inventoryStore.getState().updateItem(itemId, {
+      useInventoryStore.getState().updateItem(itemId, {
         name: 'Enchanted Sword',
         value: 500,
         equipped: true
       });
 
-      const state = inventoryStore.getState();
+      const state = useInventoryStore.getState();
       expect(state.items[itemId].name).toBe('Enchanted Sword');
       expect(state.items[itemId].value).toBe(500);
       expect(state.items[itemId].equipped).toBe(true);
     });
 
     test('should handle non-existent item', () => {
-      inventoryStore.getState().updateItem('non-existent-id', { name: 'Updated' });
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().updateItem('non-existent-id', { name: 'Updated' });
+      const state = useInventoryStore.getState();
       expect(state.error).toBe('Item not found');
     });
   });
@@ -106,7 +106,7 @@ describe('inventoryStore', () => {
   describe('removeItem', () => {
     test('should remove item from inventory', () => {
       const characterId = 'character-1';
-      const itemId = inventoryStore.getState().addItem(characterId, {
+      const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'To Remove',
         category: 'misc',
         quantity: 1,
@@ -115,8 +115,8 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      inventoryStore.getState().removeItem(itemId);
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().removeItem(itemId);
+      const state = useInventoryStore.getState();
 
       expect(state.items[itemId]).toBeUndefined();
       expect(state.characterInventories[characterId]).not.toContain(itemId);
@@ -124,7 +124,7 @@ describe('inventoryStore', () => {
 
     test('should handle removing item from non-existent inventory', () => {
       const characterId = 'character-1';
-      const itemId = inventoryStore.getState().addItem(characterId, {
+      const itemId = useInventoryStore.getState().addItem(characterId, {
         name: 'Item',
         category: 'misc',
         quantity: 1,
@@ -134,10 +134,10 @@ describe('inventoryStore', () => {
       });
 
       // Remove character inventory manually to simulate edge case
-      delete inventoryStore.getState().characterInventories[characterId];
+      delete useInventoryStore.getState().characterInventories[characterId];
 
-      inventoryStore.getState().removeItem(itemId);
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().removeItem(itemId);
+      const state = useInventoryStore.getState();
 
       expect(state.items[itemId]).toBeUndefined();
       expect(state.error).toBeNull(); // Should handle gracefully
@@ -149,7 +149,7 @@ describe('inventoryStore', () => {
       const fromCharacterId = 'character-1';
       const toCharacterId = 'character-2';
       
-      const itemId = inventoryStore.getState().addItem(fromCharacterId, {
+      const itemId = useInventoryStore.getState().addItem(fromCharacterId, {
         name: 'Transferable Item',
         category: 'misc',
         quantity: 1,
@@ -158,8 +158,8 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      inventoryStore.getState().transferItem(itemId, toCharacterId);
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().transferItem(itemId, toCharacterId);
+      const state = useInventoryStore.getState();
 
       expect(state.items[itemId].characterId).toBe(toCharacterId);
       expect(state.characterInventories[fromCharacterId]).not.toContain(itemId);
@@ -170,7 +170,7 @@ describe('inventoryStore', () => {
       const fromCharacterId = 'character-1';
       const toCharacterId = 'new-character';
       
-      const itemId = inventoryStore.getState().addItem(fromCharacterId, {
+      const itemId = useInventoryStore.getState().addItem(fromCharacterId, {
         name: 'Transferable Item',
         category: 'misc',
         quantity: 1,
@@ -179,8 +179,8 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      inventoryStore.getState().transferItem(itemId, toCharacterId);
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().transferItem(itemId, toCharacterId);
+      const state = useInventoryStore.getState();
 
       expect(state.characterInventories[toCharacterId]).toBeDefined();
       expect(state.characterInventories[toCharacterId]).toContain(itemId);
@@ -190,7 +190,7 @@ describe('inventoryStore', () => {
       const fromCharacterId = 'character-1';
       const toCharacterId = 'character-2';
       
-      const itemId = inventoryStore.getState().addItem(fromCharacterId, {
+      const itemId = useInventoryStore.getState().addItem(fromCharacterId, {
         name: 'Equipped Item',
         category: 'weapon',
         quantity: 1,
@@ -199,8 +199,8 @@ describe('inventoryStore', () => {
         equipped: true
       });
 
-      inventoryStore.getState().transferItem(itemId, toCharacterId);
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().transferItem(itemId, toCharacterId);
+      const state = useInventoryStore.getState();
 
       expect(state.items[itemId].equipped).toBe(false);
     });
@@ -210,7 +210,7 @@ describe('inventoryStore', () => {
     test('should get all items for a character', () => {
       const characterId = 'character-1';
       
-      const itemId1 = inventoryStore.getState().addItem(characterId, {
+      const itemId1 = useInventoryStore.getState().addItem(characterId, {
         name: 'Item 1',
         category: 'misc',
         quantity: 1,
@@ -219,7 +219,7 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      const itemId2 = inventoryStore.getState().addItem(characterId, {
+      const itemId2 = useInventoryStore.getState().addItem(characterId, {
         name: 'Item 2',
         category: 'misc',
         quantity: 2,
@@ -228,7 +228,7 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      const items = inventoryStore.getState().getCharacterItems(characterId);
+      const items = useInventoryStore.getState().getCharacterItems(characterId);
 
       expect(items).toHaveLength(2);
       expect(items.map(item => item.id)).toContain(itemId1);
@@ -236,7 +236,7 @@ describe('inventoryStore', () => {
     });
 
     test('should return empty array for character with no items', () => {
-      const items = inventoryStore.getState().getCharacterItems('no-items-character');
+      const items = useInventoryStore.getState().getCharacterItems('no-items-character');
       expect(items).toEqual([]);
     });
   });
@@ -245,7 +245,7 @@ describe('inventoryStore', () => {
     test('should get only equipped items for a character', () => {
       const characterId = 'character-1';
       
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Equipped Sword',
         category: 'weapon',
         quantity: 1,
@@ -254,7 +254,7 @@ describe('inventoryStore', () => {
         equipped: true
       });
 
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Unequipped Sword',
         category: 'weapon',
         quantity: 1,
@@ -263,7 +263,7 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      const equippedItems = inventoryStore.getState().getEquippedItems(characterId);
+      const equippedItems = useInventoryStore.getState().getEquippedItems(characterId);
 
       expect(equippedItems).toHaveLength(1);
       expect(equippedItems[0].name).toBe('Equipped Sword');
@@ -274,7 +274,7 @@ describe('inventoryStore', () => {
     test('should calculate total weight of character inventory', () => {
       const characterId = 'character-1';
       
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Heavy Item',
         category: 'misc',
         quantity: 2,
@@ -283,7 +283,7 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Light Item',
         category: 'misc',
         quantity: 3,
@@ -292,7 +292,7 @@ describe('inventoryStore', () => {
         equipped: false
       });
 
-      const totalWeight = inventoryStore.getState().calculateTotalWeight(characterId);
+      const totalWeight = useInventoryStore.getState().calculateTotalWeight(characterId);
 
       // Heavy Item: 2 * 10 = 20
       // Light Item: 3 * 0.5 = 1.5
@@ -301,28 +301,28 @@ describe('inventoryStore', () => {
     });
 
     test('should return 0 for character with no items', () => {
-      const totalWeight = inventoryStore.getState().calculateTotalWeight('no-items-character');
+      const totalWeight = useInventoryStore.getState().calculateTotalWeight('no-items-character');
       expect(totalWeight).toBe(0);
     });
   });
 
   describe('error handling', () => {
     test('should set and clear errors', () => {
-      inventoryStore.getState().setError('Test error');
-      expect(inventoryStore.getState().error).toBe('Test error');
+      useInventoryStore.getState().setError('Test error');
+      expect(useInventoryStore.getState().error).toBe('Test error');
 
-      inventoryStore.getState().clearError();
-      expect(inventoryStore.getState().error).toBeNull();
+      useInventoryStore.getState().clearError();
+      expect(useInventoryStore.getState().error).toBeNull();
     });
   });
 
   describe('loading state', () => {
     test('should set loading state', () => {
-      inventoryStore.getState().setLoading(true);
-      expect(inventoryStore.getState().loading).toBe(true);
+      useInventoryStore.getState().setLoading(true);
+      expect(useInventoryStore.getState().loading).toBe(true);
 
-      inventoryStore.getState().setLoading(false);
-      expect(inventoryStore.getState().loading).toBe(false);
+      useInventoryStore.getState().setLoading(false);
+      expect(useInventoryStore.getState().loading).toBe(false);
     });
   });
 
@@ -330,7 +330,7 @@ describe('inventoryStore', () => {
     test('should reset store to initial state', () => {
       // Add some data
       const characterId = 'character-1';
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Test Item',
         category: 'misc',
         quantity: 1,
@@ -338,12 +338,12 @@ describe('inventoryStore', () => {
         value: 10,
         equipped: false
       });
-      inventoryStore.getState().setError('Some error');
-      inventoryStore.getState().setLoading(true);
+      useInventoryStore.getState().setError('Some error');
+      useInventoryStore.getState().setLoading(true);
 
       // Reset
-      inventoryStore.getState().reset();
-      const state = inventoryStore.getState();
+      useInventoryStore.getState().reset();
+      const state = useInventoryStore.getState();
 
       expect(state.items).toEqual({});
       expect(state.characterInventories).toEqual({});

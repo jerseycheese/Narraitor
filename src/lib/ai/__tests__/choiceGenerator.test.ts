@@ -10,7 +10,7 @@ const mockAIClient: jest.Mocked<AIClient> = {
 
 // Mock the worldStore
 jest.mock('@/state/worldStore', () => ({
-  worldStore: {
+  useWorldStore: {
     getState: jest.fn().mockReturnValue({
       worlds: {
         'world-1': {

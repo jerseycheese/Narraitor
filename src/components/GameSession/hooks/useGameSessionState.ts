@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { worldStore } from '@/state/worldStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { GameSessionState } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
 
@@ -16,9 +16,9 @@ interface UseGameSessionStateOptions {
   disableAutoResume?: boolean;
   router?: { push: (url: string) => void };
   _stores?: {
-    worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
-    characterStore?: Partial<ReturnType<typeof characterStore.getState>> | (() => Partial<ReturnType<typeof characterStore.getState>>);
+    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
+    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
+    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
   };
 }
 
@@ -50,9 +50,9 @@ export const useGameSessionState = ({
   const [error, setError] = useState<Error | null>(null);
   
   // Always call store hooks unconditionally
-  const worldStoreHook = worldStore();
-  const sessionStoreHook = sessionStore();
-  const characterStoreHook = characterStore();
+  const worldStoreHook = useWorldStore();
+  const sessionStoreHook = useSessionStore();
+  const characterStoreHook = useCharacterStore();
   
   // Use provided stores or real stores for testing
   const actualWorldState = _stores?.worldStore 
@@ -222,7 +222,7 @@ export const useGameSessionState = ({
     
     // Function to update state from the store
     const updateStateFromStore = () => {
-      const storeState = sessionStore.getState();
+      const storeState = useSessionStore.getState();
       
       // Only update if there's a meaningful change to avoid unnecessary re-renders
       const shouldUpdate = 

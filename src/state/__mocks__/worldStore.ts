@@ -71,6 +71,7 @@ interface WorldStoreActions {
   setError: jest.Mock;
   clearError: jest.Mock;
   setLoading: jest.Mock;
+  getWorldById: jest.Mock;
 }
 
 type WorldStore = MockWorldState & WorldStoreActions;
@@ -216,6 +217,11 @@ const mockUpdateSettings = jest.fn((worldId: string, settings: Partial<WorldSett
   };
 });
 
+const mockGetWorldById = jest.fn((worldId: string) => {
+  console.log('[__mocks__/worldStore.ts] getWorldById called:', worldId);
+  return mockState.worlds[worldId] || null;
+});
+
 const mockReset = jest.fn(() => {
   console.log('[__mocks__/worldStore.ts] reset called');
   mockState = {
@@ -261,6 +267,7 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -296,6 +303,7 @@ const mockGetState = jest.fn((): WorldStore => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -337,6 +345,8 @@ export const worldStore = Object.assign(mockWorldStore, {
   },
   getState: mockGetState,
 });
+
+export const useWorldStore = worldStore;
 
 console.log('[__mocks__/worldStore.ts] Mock module exported');
 console.log('[__mocks__/worldStore.ts] worldStore has getState:', typeof worldStore.getState);

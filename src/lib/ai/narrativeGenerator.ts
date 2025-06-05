@@ -1,7 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import {
   Decision,
   NarrativeContext,
@@ -71,7 +71,7 @@ export class NarrativeGenerator {
       const template = this.getTemplate('initialScene');
       
       // Get character details
-      const { characters } = characterStore.getState();
+      const { characters } = useCharacterStore.getState();
       const playerCharacterId = characterIds[0]; // First character is the player
       const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
       
@@ -138,7 +138,7 @@ export class NarrativeGenerator {
   }
 
   private getWorld(worldId: string): World {
-    const { worlds } = worldStore.getState();
+    const { worlds } = useWorldStore.getState();
     const world = worlds[worldId];
     
     if (!world) {
@@ -155,7 +155,7 @@ export class NarrativeGenerator {
 
   private buildContext(world: World, request: NarrativeGenerationRequest) {
     // Get character details
-    const { characters } = characterStore.getState();
+    const { characters } = useCharacterStore.getState();
     const playerCharacterId = request.characterIds?.[0]; // First character is the player
     const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
     
@@ -199,7 +199,7 @@ export class NarrativeGenerator {
   // Helper methods for mock generation
   private getWorldGenre(): string | null {
     try {
-      const world = this.getWorld(worldStore.getState().currentWorldId || '');
+      const world = this.getWorld(useWorldStore.getState().currentWorldId || '');
       return world?.theme?.toLowerCase() || null;
     } catch {
       return null;

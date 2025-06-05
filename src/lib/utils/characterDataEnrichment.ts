@@ -1,8 +1,8 @@
 // Use the store's Character type since it's more complete
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { World } from '@/types/world.types';
 
-type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
 export function enrichCharacterAttributes(character: StoreCharacter, world: World) {
   return character.attributes.map((charAttr) => {

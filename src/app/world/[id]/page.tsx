@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 // import Link from 'next/link';
 import Image from 'next/image';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
@@ -14,8 +14,8 @@ export default function WorldViewPage() {
   const params = useParams();
   const router = useRouter();
   const worldId = params.id as string;
-  const world = worldStore((state) => state.worlds[worldId]);
-  const characters = characterStore((state) => state.characters);
+  const world = useWorldStore((state) => state.worlds[worldId]);
+  const characters = useCharacterStore((state) => state.characters);
   
   // Check if this world has any characters
   const worldCharacters = Object.values(characters).filter(char => char.worldId === worldId);

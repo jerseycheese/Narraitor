@@ -2,9 +2,9 @@
 
 import React from 'react';
 // Use the store's Character type since it's more complete
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 import { CharacterAttributeDisplay } from './CharacterAttributeDisplay';
 import { CharacterSkillDisplay } from './CharacterSkillDisplay';

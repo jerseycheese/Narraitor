@@ -50,7 +50,7 @@ const initialState = {
 };
 
 // Journal Store implementation
-export const journalStore = create<JournalStore>()((set, get) => ({
+export const useJournalStore = create<JournalStore>()((set, get) => ({
   ...initialState,
 
   // Add entry

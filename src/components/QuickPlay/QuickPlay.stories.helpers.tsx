@@ -1,7 +1,7 @@
 import React from 'react';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 // Shared mock data
 export const mockWorld = {
@@ -65,16 +65,16 @@ export const createMockStoreState = (options: MockStoreOptions) => {
     
     if (!hasSession) {
       // Empty state
-      worldStore.setState({ 
+      useWorldStore.setState({ 
         worlds: {}, 
         currentWorldId: null,
         setCurrentWorld: (id: string) => console.log('Set world:', id),
       });
-      characterStore.setState({ 
+      useCharacterStore.setState({ 
         characters: {},
         setCurrentCharacter: (id: string) => console.log('Set character:', id),
       });
-      sessionStore.setState({ 
+      useSessionStore.setState({ 
         savedSessions: {},
         resumeSavedSession: (id: string) => {
           console.log('Resume session:', id);
@@ -91,16 +91,16 @@ export const createMockStoreState = (options: MockStoreOptions) => {
         narrativeCount,
       };
 
-      worldStore.setState({ 
+      useWorldStore.setState({ 
         worlds: { [mockWorld.id]: mockWorld },
         currentWorldId: null,
         setCurrentWorld: (id: string) => console.log('Set world:', id),
       });
-      characterStore.setState({ 
+      useCharacterStore.setState({ 
         characters: { [mockCharacter.id]: mockCharacter },
         setCurrentCharacter: (id: string) => console.log('Set character:', id),
       });
-      sessionStore.setState({ 
+      useSessionStore.setState({ 
         savedSessions: { [mockSavedSession.id]: mockSavedSession },
         resumeSavedSession: (id: string) => {
           console.log('Resume session:', id);

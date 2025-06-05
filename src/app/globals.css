@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+/* Ending Screen Tone Styles */
+.ending-triumphant {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+}
+
+.ending-bittersweet {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+}
+
+.ending-mysterious {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #6b7280 100%);
+}
+
+.ending-tragic {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #dc2626 100%);
+}
+
+.ending-hopeful {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+}
+
 /* Base layer for HTML element styles */
 @layer base {
   /* Main element background */

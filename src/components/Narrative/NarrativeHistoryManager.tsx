@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 /**
@@ -22,7 +22,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   const [error] = useState<string | null>(null);
   
   // Get segments from the store
-  const getSegments = narrativeStore(state => state.getSessionSegments);
+  const getSegments = useNarrativeStore(state => state.getSessionSegments);
   
   // Subscribe to narrative store updates
   useEffect(() => {
@@ -49,7 +49,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     loadSegments();
     
     // Subscribe to store updates
-    const unsubscribe = narrativeStore.subscribe(loadSegments);
+    const unsubscribe = useNarrativeStore.subscribe(loadSegments);
     
     // Cleanup on unmount
     return () => {

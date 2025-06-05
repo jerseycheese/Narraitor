@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 // Removed direct AI client imports - using API routes instead
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
@@ -14,7 +14,7 @@ import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 
 // Use the Character type from the store since it's different from the main types
-type Character = ReturnType<typeof characterStore.getState>['characters'][string];
+type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
 interface CharacterEditorProps {
   characterId: string;
@@ -33,7 +33,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   // Load character data on mount
   useEffect(() => {
     try {
-      const { characters } = characterStore.getState();
+      const { characters } = useCharacterStore.getState();
       const characterData = characters[characterId];
       
       if (!characterData) {
@@ -43,7 +43,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
       
       // Load world data for attribute/skill limits
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldData = worlds[characterData.worldId];
       setWorld(worldData);
       
@@ -62,7 +62,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     
     setSaving(true);
     try {
-      const { updateCharacter } = characterStore.getState();
+      const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, character);
       
       // Small delay to show save state
@@ -84,7 +84,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   
   // Handle character deletion
   const handleDelete = () => {
-    characterStore.getState().deleteCharacter(characterId);
+    useCharacterStore.getState().deleteCharacter(characterId);
     router.push('/characters');
   };
   
@@ -153,7 +153,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       setCharacter({ ...character, portrait });
       
       // Also update the character store
-      characterStore.getState().updateCharacter(characterId, { portrait });
+      useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       console.error('Failed to generate portrait:', error);
       setError('Failed to generate portrait. Please try again.');

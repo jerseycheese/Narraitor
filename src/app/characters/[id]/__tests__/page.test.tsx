@@ -12,7 +12,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock character store
 jest.mock('@/state/characterStore', () => ({
-  characterStore: jest.fn(() => ({
+  useCharacterStore: jest.fn(() => ({
     characters: {
       'char-123': {
         id: 'char-123',
@@ -53,7 +53,7 @@ jest.mock('@/state/characterStore', () => ({
 
 // Mock world store
 jest.mock('@/state/worldStore', () => ({
-  worldStore: jest.fn(() => ({
+  useWorldStore: jest.fn(() => ({
     worlds: {
       'world-1': {
         id: 'world-1',

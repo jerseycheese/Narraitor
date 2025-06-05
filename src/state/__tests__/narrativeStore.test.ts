@@ -1,8 +1,8 @@
-import { narrativeStore } from '../index';
+import { useNarrativeStore } from '../index';
 
 describe('narrativeStore', () => {
   it('initializes with default state', () => {
-    const state = narrativeStore.getState();
+    const state = useNarrativeStore.getState();
     expect(state).toBeDefined();
   });
 });

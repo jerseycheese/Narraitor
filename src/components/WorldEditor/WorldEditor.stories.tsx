@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldEditor from './WorldEditor';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { fn } from '@storybook/test';
@@ -81,9 +81,9 @@ const meta: Meta<typeof WorldEditor> = {
   decorators: [
     (Story) => {
       // Mock the worldStore for all stories
-      const originalGetState = worldStore.getState;
+      const originalGetState = useWorldStore.getState;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (worldStore as any).getState = () => ({
+      (useWorldStore as any).getState = () => ({
         worlds: {
           'world-123': mockWorld,
           'world-456': {
@@ -100,7 +100,7 @@ const meta: Meta<typeof WorldEditor> = {
       
       // Restore original
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (worldStore as any).getState = originalGetState;
+      (useWorldStore as any).getState = originalGetState;
       
       return result;
     },
@@ -130,9 +130,9 @@ export const NonExistentWorld: Story = {
   decorators: [
     (Story) => {
       // Override the store mock for this story
-      const originalGetState = worldStore.getState;
+      const originalGetState = useWorldStore.getState;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (worldStore as any).getState = () => ({
+      (useWorldStore as any).getState = () => ({
         worlds: {},
         currentWorldId: null,
         error: null,
@@ -159,7 +159,7 @@ export const NonExistentWorld: Story = {
       
       // Restore original
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (worldStore as any).getState = originalGetState;
+      (useWorldStore as any).getState = originalGetState;
       
       return result;
     },

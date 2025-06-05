@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import ActiveGameSession from './ActiveGameSession';
 import { World } from '@/types/world.types';
 import { NarrativeSegment, Decision } from '@/types/narrative.types';
-import { narrativeStore } from '@/state/narrativeStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 const meta: Meta<typeof ActiveGameSession> = {
   title: 'Narraitor/Game/Session/ActiveGameSession',
@@ -51,14 +51,14 @@ const meta: Meta<typeof ActiveGameSession> = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      narrativeStore.setState({
+      useNarrativeStore.setState({
         segments: {},
         decisions: {},
         error: null,
         loading: false,
       });
       
-      sessionStore.setState({
+      useSessionStore.setState({
         id: null,
         status: 'initializing',
         currentSceneId: null,
@@ -69,7 +69,7 @@ const meta: Meta<typeof ActiveGameSession> = {
         savedSessions: {},
       });
       
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {},
         currentCharacterId: null,
         error: null,
@@ -115,7 +115,7 @@ const populateNarrativeStore = (
     sessionDecisions['session-123'].push(dec.id);
   });
   
-  narrativeStore.setState({
+  useNarrativeStore.setState({
     segments: segmentMap,
     sessionSegments,
     decisions: decisionMap,
@@ -314,7 +314,7 @@ export const LoadingNarrative: Story = {
   decorators: [
     (Story) => {
       // Set loading state in narrative store
-      narrativeStore.setState({
+      useNarrativeStore.setState({
         loading: true,
       });
       
@@ -341,8 +341,8 @@ export const ErrorState: Story = {
   decorators: [
     (Story) => {
       // Set error state
-      narrativeStore.setState({
-        ...narrativeStore.getState(),
+      useNarrativeStore.setState({
+        ...useNarrativeStore.getState(),
         error: 'Failed to generate narrative: API request timeout',
       });
       
@@ -378,15 +378,15 @@ export const WithCharacter: Story = {
     (Story) => {
       // Set up character in stores
       // Set up character in store
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {
-          ...characterStore.getState().characters,
+          ...useCharacterStore.getState().characters,
           'char-123': mockCharacter,
         },
         currentCharacterId: 'char-123',
       });
       
-      sessionStore.setState({
+      useSessionStore.setState({
         characterId: 'char-123',
       });
       

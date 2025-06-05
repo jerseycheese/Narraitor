@@ -6,7 +6,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 // Sample narrative context for testing
 const createSampleNarrativeContext = (): NarrativeContext => {
@@ -54,12 +54,12 @@ export default function ChoiceGeneratorTestPage() {
   // Initialize a test world in the store if it doesn't exist
   useEffect(() => {
     // Check if the test world already exists
-    const worldExists = worldStore.getState().worlds[worldId];
+    const worldExists = useWorldStore.getState().worlds[worldId];
     
     if (!worldExists) {
       try {
         // Create a test world
-        const newWorldId = worldStore.getState().createWorld({
+        const newWorldId = useWorldStore.getState().createWorld({
           name: worldName,
           description: worldDescription,
           theme: worldTheme,
@@ -88,13 +88,13 @@ export default function ChoiceGeneratorTestPage() {
 
     try {
       // Update world properties if they've changed
-      const currentWorld = worldStore.getState().worlds[worldId];
+      const currentWorld = useWorldStore.getState().worlds[worldId];
       if (currentWorld && (
         currentWorld.name !== worldName ||
         currentWorld.description !== worldDescription ||
         currentWorld.theme !== worldTheme
       )) {
-        worldStore.getState().updateWorld(worldId, {
+        useWorldStore.getState().updateWorld(worldId, {
           name: worldName,
           description: worldDescription,
           theme: worldTheme

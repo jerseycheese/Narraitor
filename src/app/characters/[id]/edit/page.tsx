@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { CharacterEditor } from '@/components/CharacterEditor';
 
 export default function CharacterEditPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters } = characterStore();
+  const { characters } = useCharacterStore();
   
   const character = characters[characterId];
 

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
@@ -14,10 +14,10 @@ export default function PlayPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const currentWorldId = worldStore(state => state.currentWorldId);
-  const currentCharacterId = characterStore(state => state.currentCharacterId);
-  const initializeSession = sessionStore(state => state.initializeSession);
-  const currentSessionId = sessionStore(state => state.id);
+  const currentWorldId = useWorldStore(state => state.currentWorldId);
+  const currentCharacterId = useCharacterStore(state => state.currentCharacterId);
+  const initializeSession = useSessionStore(state => state.initializeSession);
+  const currentSessionId = useSessionStore(state => state.id);
   useEffect(() => {
     const setupSession = async () => {
       try {
