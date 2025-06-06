@@ -1,5 +1,5 @@
 import { WorldTemplate, templates } from './worldTemplates';
-import { worldStore } from '../../state/worldStore';
+import { useWorldStore } from '../../state/worldStore';
 import { generateUniqueId } from '../utils/generateId';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
 
@@ -57,7 +57,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
   }));
   
   // Update the world store with the new world
-  worldStore.setState(state => {
+  useWorldStore.setState(state => {
     // Create a copy of the existing state
     const newState = { ...state };
     

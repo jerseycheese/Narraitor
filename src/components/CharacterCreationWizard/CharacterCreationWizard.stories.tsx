@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterCreationWizard } from './CharacterCreationWizard';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { World } from '@/types/world.types';
 
 const meta: Meta<typeof CharacterCreationWizard> = {
@@ -18,8 +18,8 @@ type Story = StoryObj<typeof meta>;
 // Helper to create test world
 const createTestWorld = () => {
   // Reset stores
-  characterStore.getState().reset();
-  worldStore.getState().reset();
+  useCharacterStore.getState().reset();
+  useWorldStore.getState().reset();
   
   const testWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Storybook Test World',
@@ -53,8 +53,8 @@ const createTestWorld = () => {
     },
   };
   
-  const worldId = worldStore.getState().createWorld(testWorld);
-  worldStore.getState().setCurrentWorld(worldId);
+  const worldId = useWorldStore.getState().createWorld(testWorld);
+  useWorldStore.getState().setCurrentWorld(worldId);
   
   return worldId;
 };

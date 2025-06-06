@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Navigation } from './Navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
@@ -31,14 +31,14 @@ const meta: Meta<typeof Navigation> = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      worldStore.setState({
+      useWorldStore.setState({
         worlds: {},
         currentWorldId: null,
         error: null,
         loading: false,
       });
       
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {},
         currentCharacterId: null,
         error: null,
@@ -110,9 +110,9 @@ const setupWorlds = () => {
     },
   };
   
-  const worldId1 = worldStore.getState().createWorld(fantasyWorld);
-  const worldId2 = worldStore.getState().createWorld(scifiWorld);
-  const worldId3 = worldStore.getState().createWorld(westernWorld);
+  const worldId1 = useWorldStore.getState().createWorld(fantasyWorld);
+  const worldId2 = useWorldStore.getState().createWorld(scifiWorld);
+  const worldId3 = useWorldStore.getState().createWorld(westernWorld);
   
   return { worldId1, worldId2, worldId3 };
 };
@@ -217,9 +217,9 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     },
   };
   
-  characterStore.getState().createCharacter(character1);
-  characterStore.getState().createCharacter(character2);
-  characterStore.getState().createCharacter(character3);
+  useCharacterStore.getState().createCharacter(character1);
+  useCharacterStore.getState().createCharacter(character2);
+  useCharacterStore.getState().createCharacter(character3);
 };
 
 export const NoWorlds: Story = {
@@ -254,7 +254,7 @@ export const WithActiveWorld: Story = {
     (Story) => {
       const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
-      worldStore.getState().setCurrentWorld(worldId1);
+      useWorldStore.getState().setCurrentWorld(worldId1);
       return <Story />;
     },
   ],
@@ -272,7 +272,7 @@ export const WorldSwitcherOpen: Story = {
     (Story) => {
       const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
-      worldStore.getState().setCurrentWorld(worldId1);
+      useWorldStore.getState().setCurrentWorld(worldId1);
       
       // Simulate opened dropdown by adding CSS to show it
       const style = document.createElement('style');

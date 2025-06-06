@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 
 export interface CharacterSelectionStepProps {
   worldId: string;
@@ -12,8 +12,8 @@ export interface CharacterSelectionStepProps {
 }
 
 export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSelectionStepProps) {
-  const { characters } = characterStore();
-  const { worlds } = worldStore();
+  const { characters } = useCharacterStore();
+  const { worlds } = useWorldStore();
   const world = worlds[worldId];
   
   const worldCharacters = Object.values(characters).filter(

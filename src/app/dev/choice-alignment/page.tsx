@@ -6,7 +6,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 export default function ChoiceAlignmentTestPage() {
   const [decision, setDecision] = useState<Decision | null>(null);
@@ -20,7 +20,7 @@ export default function ChoiceAlignmentTestPage() {
   // Create a test world when component mounts
   useEffect(() => {
     try {
-      const newWorldId = worldStore.getState().createWorld({
+      const newWorldId = useWorldStore.getState().createWorld({
         name: 'Test World',
         description: 'A fantasy world for testing choice alignment',
         theme: 'fantasy',
@@ -35,7 +35,7 @@ export default function ChoiceAlignmentTestPage() {
       });
       
       // Verify the world was created and stored
-      const storedWorld = worldStore.getState().worlds[newWorldId];
+      const storedWorld = useWorldStore.getState().worlds[newWorldId];
       if (storedWorld) {
         setWorldId(newWorldId);
         console.log('Created test world with ID:', newWorldId, storedWorld);
@@ -74,10 +74,10 @@ export default function ChoiceAlignmentTestPage() {
     }
     
     // Double-check that the world still exists
-    const currentWorld = worldStore.getState().worlds[worldId];
+    const currentWorld = useWorldStore.getState().worlds[worldId];
     if (!currentWorld) {
       setError(`World ${worldId} no longer exists. This may be a persistence issue.`);
-      console.error('Available worlds:', Object.keys(worldStore.getState().worlds));
+      console.error('Available worlds:', Object.keys(useWorldStore.getState().worlds));
       return;
     }
     

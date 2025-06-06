@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { worldStore } from '../../state/worldStore';
+import { useWorldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 import { LoadingPulse } from '../ui/LoadingState';
@@ -27,14 +27,14 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   useEffect(() => {
     try {
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
       setCurrentWorldId(state.currentWorldId);
       setLoading(state.loading);
       setError(state.error);
       
-      const unsubscribe = worldStore.subscribe(() => {
-        const newState = worldStore.getState();
+      const unsubscribe = useWorldStore.subscribe(() => {
+        const newState = useWorldStore.getState();
         setWorlds(Object.values(newState.worlds || {}));
         setCurrentWorldId(newState.currentWorldId);
         setLoading(newState.loading);
@@ -49,7 +49,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   }, []);
 
   const handleSelectWorld = (worldId: string) => {
-    worldStore.setState((state) => ({
+    useWorldStore.setState((state) => ({
       ...state,
       currentWorldId: worldId
     }));
@@ -67,7 +67,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   const handleConfirmDelete = () => {
     if (worldToDeleteId) {
-      worldStore.setState((state) => {
+      useWorldStore.setState((state) => {
         const newWorlds = { ...state.worlds };
         delete newWorlds[worldToDeleteId];
         return {

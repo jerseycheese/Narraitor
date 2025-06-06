@@ -1,14 +1,14 @@
-import { sessionStore } from '../sessionStore';
+import { useSessionStore } from '../sessionStore';
 
-describe('sessionStore', () => {
+describe('useSessionStore', () => {
   beforeEach(() => {
     // Reset the store before each test
-    sessionStore.getState().endSession();
+    useSessionStore.getState().endSession();
   });
 
   it('initializes with default state', () => {
     // Reset to a fresh store state
-    sessionStore.setState({
+    useSessionStore.setState({
       status: 'initializing',
       currentSceneId: null,
       playerChoices: [],
@@ -17,7 +17,7 @@ describe('sessionStore', () => {
       characterId: null,
     });
     
-    const state = sessionStore.getState();
+    const state = useSessionStore.getState();
     expect(state).toMatchObject({
       status: 'initializing',
       currentSceneId: null,
@@ -35,10 +35,10 @@ describe('sessionStore', () => {
     const onComplete = jest.fn();
     
     // Act
-    await sessionStore.getState().initializeSession(worldId, characterId, onComplete);
+    await useSessionStore.getState().initializeSession(worldId, characterId, onComplete);
     
     // Assert - after initialization
-    const state = sessionStore.getState();
+    const state = useSessionStore.getState();
     expect(state.status).toBe('active');
     expect(state.worldId).toBe(worldId);
     expect(state.characterId).toBe(characterId);
@@ -51,13 +51,13 @@ describe('sessionStore', () => {
     // Arrange - initialize a session first
     const worldId = 'test-world-id';
     const characterId = 'test-character-id';
-    await sessionStore.getState().initializeSession(worldId, characterId);
+    await useSessionStore.getState().initializeSession(worldId, characterId);
     
     // Act - end the session
-    sessionStore.getState().endSession();
+    useSessionStore.getState().endSession();
     
     // Assert
-    const state = sessionStore.getState();
+    const state = useSessionStore.getState();
     expect(state.status).toBe('initializing');
     expect(state.worldId).toBe(null);
     expect(state.characterId).toBe(null);
@@ -67,36 +67,36 @@ describe('sessionStore', () => {
 
   it('allows setting session status', () => {
     // Arrange
-    const store = sessionStore.getState();
+    const store = useSessionStore.getState();
     
     // Act
     store.setStatus('loading');
     
     // Assert
-    expect(sessionStore.getState().status).toBe('loading');
+    expect(useSessionStore.getState().status).toBe('loading');
     
     // Act again
     store.setStatus('paused');
     
     // Assert again
-    expect(sessionStore.getState().status).toBe('paused');
+    expect(useSessionStore.getState().status).toBe('paused');
   });
 
   it('allows setting error message', () => {
     // Arrange
-    const store = sessionStore.getState();
+    const store = useSessionStore.getState();
     const errorMessage = 'Test error message';
     
     // Act
     store.setError(errorMessage);
     
     // Assert
-    expect(sessionStore.getState().error).toBe(errorMessage);
+    expect(useSessionStore.getState().error).toBe(errorMessage);
   });
 
   it('allows setting player choices', () => {
     // Arrange
-    const store = sessionStore.getState();
+    const store = useSessionStore.getState();
     const playerChoices = [
       { id: 'choice-1', text: 'Option 1', isSelected: false },
       { id: 'choice-2', text: 'Option 2', isSelected: false },
@@ -106,73 +106,73 @@ describe('sessionStore', () => {
     store.setPlayerChoices(playerChoices);
     
     // Assert
-    expect(sessionStore.getState().playerChoices).toEqual(playerChoices);
+    expect(useSessionStore.getState().playerChoices).toEqual(playerChoices);
   });
 
   it('allows selecting a player choice', async () => {
     // Arrange - initialize a session and set up player choices
-    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
+    await useSessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     const testChoices = [
       { id: 'choice-1', text: 'Option 1', isSelected: false },
       { id: 'choice-2', text: 'Option 2', isSelected: false },
     ];
-    sessionStore.getState().setPlayerChoices(testChoices);
+    useSessionStore.getState().setPlayerChoices(testChoices);
     
     // Act - select a choice
-    sessionStore.getState().selectChoice('choice-1');
+    useSessionStore.getState().selectChoice('choice-1');
     
     // Assert
-    const state = sessionStore.getState();
+    const state = useSessionStore.getState();
     expect(state.playerChoices[0].isSelected).toBe(true);
     expect(state.playerChoices[1].isSelected).toBe(false);
     
     // Act again - select a different choice
-    sessionStore.getState().selectChoice('choice-2');
+    useSessionStore.getState().selectChoice('choice-2');
     
     // Assert again
-    const updatedState = sessionStore.getState();
+    const updatedState = useSessionStore.getState();
     expect(updatedState.playerChoices[0].isSelected).toBe(false);
     expect(updatedState.playerChoices[1].isSelected).toBe(true);
   });
 
   it('allows clearing player choices', async () => {
     // Arrange - initialize a session first to get default choices
-    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
+    await useSessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     // Act - clear the choices
-    sessionStore.getState().clearPlayerChoices();
+    useSessionStore.getState().clearPlayerChoices();
     
     // Assert
-    expect(sessionStore.getState().playerChoices).toHaveLength(0);
+    expect(useSessionStore.getState().playerChoices).toHaveLength(0);
   });
 
   it('allows setting current scene', () => {
     // Arrange
-    const store = sessionStore.getState();
+    const store = useSessionStore.getState();
     const sceneId = 'new-scene-id';
     
     // Act
     store.setCurrentScene(sceneId);
     
     // Assert
-    expect(sessionStore.getState().currentSceneId).toBe(sceneId);
+    expect(useSessionStore.getState().currentSceneId).toBe(sceneId);
   });
 
   it('allows pausing and resuming a session', async () => {
     // Arrange - initialize a session first
-    await sessionStore.getState().initializeSession('test-world-id', 'test-character-id');
+    await useSessionStore.getState().initializeSession('test-world-id', 'test-character-id');
     
     // Act - pause the session
-    sessionStore.getState().pauseSession();
+    useSessionStore.getState().pauseSession();
     
     // Assert
-    expect(sessionStore.getState().status).toBe('paused');
+    expect(useSessionStore.getState().status).toBe('paused');
     
     // Act again - resume the session
-    sessionStore.getState().resumeSession();
+    useSessionStore.getState().resumeSession();
     
     // Assert again
-    expect(sessionStore.getState().status).toBe('active');
+    expect(useSessionStore.getState().status).toBe('active');
   });
 });

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { MockNarrativeController } from './MockNarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { World } from '@/types/world.types';
 // PlayerChoice import removed as it's not needed
 import { NarrativeSegment } from '@/types/narrative.types';
@@ -68,8 +68,8 @@ export default function NarrativeSystemHarness() {
     setIsClient(true);
     
     // Subscribe to narrative store updates
-    const unsubscribe = narrativeStore.subscribe(() => {
-      const state = narrativeStore.getState();
+    const unsubscribe = useNarrativeStore.subscribe(() => {
+      const state = useNarrativeStore.getState();
       setSegments(state.getSessionSegments(sessionId));
     });
     
@@ -107,7 +107,7 @@ export default function NarrativeSystemHarness() {
         }
       };
       
-      narrativeStore.getState().addSegment(sessionId, {
+      useNarrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         worldId: newSegment.worldId,
@@ -143,7 +143,7 @@ export default function NarrativeSystemHarness() {
         }
       };
       
-      narrativeStore.getState().addSegment(sessionId, {
+      useNarrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         worldId: newSegment.worldId,
@@ -156,7 +156,7 @@ export default function NarrativeSystemHarness() {
 
   const handleClearSession = () => {
     // Reset the narrative store
-    narrativeStore.getState().reset();
+    useNarrativeStore.getState().reset();
     
     // Clear local state
     setSegments([]);
@@ -184,7 +184,7 @@ export default function NarrativeSystemHarness() {
     
     // Clear any existing segments for the new session ID
     // to prevent duplications
-    narrativeStore.getState().clearSessionSegments(newSessionId);
+    useNarrativeStore.getState().clearSessionSegments(newSessionId);
     
     console.log(`New session created and cleared: ${newSessionId}`);
     
@@ -312,7 +312,7 @@ export default function NarrativeSystemHarness() {
         <div>
           <h2 className="text-xl font-semibold mb-2">Store State</h2>
           <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
-            <pre style={{ background: 'transparent' }}>{JSON.stringify(narrativeStore.getState(), null, 2)}</pre>
+            <pre style={{ background: 'transparent' }}>{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         

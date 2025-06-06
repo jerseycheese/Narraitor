@@ -8,6 +8,7 @@ interface SessionControlsProps {
   onResume: () => void;
   onEnd: () => void;
   onRestart?: () => void;
+  onEndStory?: () => void;
 }
 
 const SessionControls: React.FC<SessionControlsProps> = ({
@@ -16,6 +17,7 @@ const SessionControls: React.FC<SessionControlsProps> = ({
   onResume,
   onEnd,
   onRestart,
+  onEndStory,
 }) => {
   const isPaused = status === 'paused';
   
@@ -41,6 +43,16 @@ const SessionControls: React.FC<SessionControlsProps> = ({
             onClick={onRestart}
           >
             New Session
+          </button>
+        )}
+        {onEndStory && (
+          <button
+            data-testid="game-session-controls-end-story"
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+            onClick={onEndStory}
+            title="End your story with an AI-generated epilogue"
+          >
+            End Story
           </button>
         )}
         <button

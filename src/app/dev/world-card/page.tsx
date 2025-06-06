@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import { World } from '@/types/world.types';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 // Mock world data
 const mockWorld: World = {
@@ -43,7 +43,7 @@ export default function WorldCardTestHarness() {
       console.log(`Setting current world: ${id}`);
       setSelectedWorldId(id);
       // Still call the real implementation for consistency
-      const { setCurrentWorld } = worldStore.getState();
+      const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(id);
     }
   };

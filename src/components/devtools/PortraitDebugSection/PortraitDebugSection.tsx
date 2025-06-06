@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
 import { createAIClient } from '../../../lib/ai';
-import { characterStore } from '../../../state/characterStore';
-import { worldStore } from '../../../state/worldStore';
+import { useCharacterStore } from '../../../state/characterStore';
+import { useWorldStore } from '../../../state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
@@ -25,12 +25,12 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   const [showBreakdown, setShowBreakdown] = useState(false);
   
   // Get characters from store
-  const characters = characterStore((state) => state.characters);
+  const characters = useCharacterStore((state) => state.characters);
   const charactersArray = Object.values(characters);
   const selectedCharacter = selectedCharacterId ? characters[selectedCharacterId] : null;
   
   // Get worlds from store
-  const worlds = worldStore((state) => state.worlds);
+  const worlds = useWorldStore((state) => state.worlds);
   const selectedWorld = selectedCharacter ? worlds[selectedCharacter.worldId] : null;
   
   // Use selected character data or passed props

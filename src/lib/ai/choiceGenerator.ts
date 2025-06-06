@@ -1,6 +1,6 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -237,7 +237,7 @@ export class ChoiceGenerator {
    * Get world data from the store
    */
   private getWorld(worldId: string): World {
-    const { worlds } = worldStore.getState();
+    const { worlds } = useWorldStore.getState();
     const world = worlds[worldId];
     
     if (!world) {

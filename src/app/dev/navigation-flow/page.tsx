@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { QuickPlay } from '@/components/QuickPlay';
 import { GameStartWizard } from '@/components/GameStartWizard';
 import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 
 export default function NavigationFlowTestPage() {
@@ -14,9 +14,9 @@ export default function NavigationFlowTestPage() {
   const [wizardWorldId, setWizardWorldId] = useState<string>('');
   const [wizardCharacterId, setWizardCharacterId] = useState<string>('');
   
-  const { worlds } = worldStore();
-  const { characters } = characterStore();
-  const { savedSessions } = sessionStore();
+  const { worlds } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { savedSessions } = useSessionStore();
   const { getNextStep, canQuickStart, getQuickStartInfo, getCurrentFlowStep } = useNavigationFlow();
 
   const worldList = Object.values(worlds);

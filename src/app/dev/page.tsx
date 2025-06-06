@@ -6,6 +6,7 @@ export default function DevPage() {
   const testHarnesses = {
     'Core Systems': [
       { href: '/dev/game-session', label: 'Game Session', color: 'blue' },
+      { href: '/dev/ending-screen', label: 'Ending Screen', color: 'blue' },
       { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
       { href: '/dev/choice-generator', label: 'Player Choice Generator', color: 'blue' },
       { href: '/dev/choice-alignment', label: 'Choice Alignment Test', color: 'blue' },

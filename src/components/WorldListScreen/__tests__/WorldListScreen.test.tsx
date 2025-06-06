@@ -115,7 +115,7 @@ jest.mock('../../../state/worldStore', () => {
   });
   
   return {
-    worldStore: mockStore
+    useWorldStore: mockStore
   };
 });
 
@@ -126,7 +126,7 @@ type WorldStoreFunction = {
 };
 
 // Mock getState for the store
-(jest.requireMock('../../../state/worldStore').worldStore as WorldStoreFunction).getState = mockGetState;
+(jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction).getState = mockGetState;
 
 // Import after mocks are set up
 import WorldListScreen from '../WorldListScreen';
@@ -270,7 +270,7 @@ describe('WorldListScreen', () => {
     await user.click(selectButton);
     
     // Check setState was called
-    expect(jest.requireMock('../../../state/worldStore').worldStore.setState).toHaveBeenCalled();
+    expect(jest.requireMock('../../../state/worldStore').useWorldStore.setState).toHaveBeenCalled();
 
     // Simulate deleting a world
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
@@ -289,6 +289,6 @@ describe('WorldListScreen', () => {
     await user.click(confirmButton);
     
     // Check setState was called for deletion
-    expect(jest.requireMock('../../../state/worldStore').worldStore.setState).toHaveBeenCalledTimes(2);
+    expect(jest.requireMock('../../../state/worldStore').useWorldStore.setState).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,9 +1,30 @@
 @import "tailwindcss";
 
+/* Ending Screen Tone Styles */
+.ending-triumphant {
+  background-color: #f59e0b; /* amber-500 */
+}
+
+.ending-bittersweet {
+  background-color: #8b5cf6; /* violet-500 */
+}
+
+.ending-mysterious {
+  background-color: #374151; /* gray-700 */
+}
+
+.ending-tragic {
+  background-color: #991b1b; /* red-800 */
+}
+
+.ending-hopeful {
+  background-color: #10b981; /* emerald-500 */
+}
+
 /* Base layer for HTML element styles */
 @layer base {
-  /* Main element background */
-  main {
+  /* Main element background - only for non-ending screens */
+  main:not(.ending-screen) {
     background-color: #f7f3ed;
   }
   

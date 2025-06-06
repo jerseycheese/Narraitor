@@ -51,7 +51,7 @@ const initialState = {
 };
 
 // World Store implementation with persistence
-export const worldStore = create<WorldStore>()(
+export const useWorldStore = create<WorldStore>()(
   persist(
     (set) => ({
       ...initialState,

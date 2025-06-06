@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { endingGenerator } from '../lib/ai/endingGenerator';
+import { logger } from '../lib/utils/logger';
 
 /**
  * Narrative store interface with state and actions
@@ -14,6 +16,10 @@ interface NarrativeStore {
   sessionSegments: Record<EntityID, EntityID[]>;
   decisions: Record<EntityID, Decision>;
   sessionDecisions: Record<EntityID, EntityID[]>;
+  endedSessions: Record<EntityID, boolean>; // Track sessions that have ended with an ending
+  currentEnding: StoryEnding | null;
+  isGeneratingEnding: boolean;
+  endingError: string | null;
   error: string | null;
   loading: boolean;
 
@@ -39,6 +45,22 @@ interface NarrativeStore {
   setError: (error: string | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  
+  // Ending actions
+  generateEnding: (endingType: EndingType, params: {
+    sessionId: EntityID;
+    characterId: EntityID;
+    worldId: EntityID;
+    desiredTone?: EndingTone;
+    customPrompt?: string;
+  }) => Promise<void>;
+  clearEnding: () => void;
+  setCurrentEnding: (ending: StoryEnding | null) => void;
+  saveEndingToHistory: () => void;
+  hasActiveEnding: () => boolean;
+  getEndingForSession: (sessionId: EntityID) => StoryEnding | null;
+  isSessionEnded: (sessionId: EntityID) => boolean;
+  markSessionEnded: (sessionId: EntityID) => void;
 }
 
 // Initial state
@@ -47,12 +69,16 @@ const initialState = {
   sessionSegments: {},
   decisions: {},
   sessionDecisions: {},
+  endedSessions: {},
+  currentEnding: null,
+  isGeneratingEnding: false,
+  endingError: null,
   error: null,
   loading: false,
 };
 
 // Narrative Store implementation with persistence
-export const narrativeStore = create<NarrativeStore>()(
+export const useNarrativeStore = create<NarrativeStore>()(
   persist(
     (set, get) => ({
   ...initialState,
@@ -61,6 +87,11 @@ export const narrativeStore = create<NarrativeStore>()(
   addSegment: (sessionId, segmentData) => {
     if (!segmentData.content || segmentData.content.trim() === '') {
       throw new Error('Segment content is required');
+    }
+    
+    // Prevent adding segments to ended sessions
+    if (get().isSessionEnded(sessionId)) {
+      throw new Error('Cannot add segments to an ended session');
     }
 
     const segmentId = generateUniqueId('segment');
@@ -276,6 +307,148 @@ export const narrativeStore = create<NarrativeStore>()(
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
+  
+  // Ending actions
+  generateEnding: async (endingType, params) => {
+    set({ isGeneratingEnding: true, endingError: null });
+    
+    try {
+      const result = await endingGenerator.generateEnding({
+        sessionId: params.sessionId,
+        characterId: params.characterId,
+        worldId: params.worldId,
+        endingType,
+        desiredTone: params.desiredTone,
+        customPrompt: params.customPrompt
+      });
+      
+      const endingId = generateUniqueId('ending');
+      const now = new Date();
+      const isoNow = now.toISOString();
+      
+      const ending: StoryEnding = {
+        id: endingId,
+        sessionId: params.sessionId,
+        characterId: params.characterId,
+        worldId: params.worldId,
+        type: endingType,
+        tone: result.tone,
+        epilogue: result.epilogue,
+        characterLegacy: result.characterLegacy,
+        worldImpact: result.worldImpact,
+        timestamp: now,
+        createdAt: isoNow,
+        updatedAt: isoNow,
+        achievements: result.achievements,
+        playTime: result.playTime
+      };
+      
+      set({ 
+        currentEnding: ending, 
+        isGeneratingEnding: false,
+        endingError: null
+      });
+      
+      // Mark the session as ended to prevent further generation
+      get().markSessionEnded(params.sessionId);
+    } catch (error) {
+      logger.error('Failed to generate ending', { error, endingType, params });
+      
+      // Show the actual error instead of fallback for debugging
+      set({ 
+        currentEnding: null,
+        isGeneratingEnding: false, 
+        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}. Check your GEMINI_API_KEY configuration.`
+      });
+    }
+  },
+  
+  clearEnding: () => set({ currentEnding: null, endingError: null }),
+  
+  setCurrentEnding: (ending) => set({ currentEnding: ending, endingError: null }),
+  
+  saveEndingToHistory: () => {
+    const state = get();
+    const ending = state.currentEnding;
+    if (!ending) return;
+    
+    // Create a special segment for the ending
+    const endingSegmentId = generateUniqueId('segment');
+    const now = new Date();
+    const isoNow = now.toISOString();
+    
+    const endingSegment: NarrativeSegment = {
+      id: endingSegmentId,
+      sessionId: ending.sessionId,
+      worldId: ending.worldId,
+      content: ending.epilogue,
+      type: 'ending',
+      timestamp: now,
+      createdAt: isoNow,
+      updatedAt: isoNow,
+      metadata: {
+        tags: ['ending', ending.type],
+        mood: 'emotional',
+        tone: ending.tone,
+        endingId: ending.id,
+        endingData: ending
+      }
+    };
+    
+    set((state) => {
+      const sessionSegments = state.sessionSegments[ending.sessionId] || [];
+      
+      return {
+        segments: {
+          ...state.segments,
+          [endingSegmentId]: endingSegment
+        },
+        sessionSegments: {
+          ...state.sessionSegments,
+          [ending.sessionId]: [...sessionSegments, endingSegmentId]
+        }
+      };
+    });
+  },
+  
+  hasActiveEnding: () => {
+    return get().currentEnding !== null;
+  },
+  
+  getEndingForSession: (sessionId) => {
+    const state = get();
+    
+    // Check if the current ending is for this session
+    if (state.currentEnding?.sessionId === sessionId) {
+      return state.currentEnding;
+    }
+    
+    // Look for ending in all segments (not just session segments)
+    // This handles cases where segments are added directly without sessionSegments mapping
+    const allSegments = Object.values(state.segments);
+    const endingSegment = allSegments.find(seg => 
+      seg.sessionId === sessionId &&
+      seg.type === 'ending' &&
+      seg.metadata.tags?.includes('ending') && 
+      seg.metadata.endingData
+    );
+    
+    return endingSegment?.metadata.endingData as StoryEnding || null;
+  },
+  
+  // Session ending tracking
+  isSessionEnded: (sessionId) => {
+    return get().endedSessions[sessionId] === true;
+  },
+  
+  markSessionEnded: (sessionId) => {
+    set((state) => ({
+      endedSessions: {
+        ...state.endedSessions,
+        [sessionId]: true,
+      }
+    }));
+  },
 }),
 {
   name: 'narraitor-narrative-store',

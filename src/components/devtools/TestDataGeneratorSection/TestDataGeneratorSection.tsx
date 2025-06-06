@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 // Using API routes for secure AI operations - combines both approaches
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -11,8 +11,8 @@ export const TestDataGeneratorSection: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { worlds, currentWorldId, createWorld } = worldStore();
-  const { createCharacter } = characterStore();
+  const { worlds, currentWorldId, createWorld } = useWorldStore();
+  const { createCharacter } = useCharacterStore();
   
   // Check if we're on the characters page and get the worldId from URL
   const isOnCharactersPage = pathname === '/characters';
@@ -33,7 +33,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // 33% - "Set in" worlds (existing universe)
         const tvMovieUniverses = [
           'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Stranger Things', 'Deadwood', 'The Walking Dead',
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -43,7 +43,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // 34% - "Based on" worlds (inspired by existing universe)
         const tvMovieUniverses = [
           'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Stranger Things', 'Deadwood', 'The Walking Dead',
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -96,14 +96,14 @@ export const TestDataGeneratorSection: React.FC = () => {
       console.log(`Test world "${testWorldData.name}" created with ID: ${worldId}`);
       
       // Set the newly created world as the active world
-      const { setCurrentWorld } = worldStore.getState();
+      const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
       console.log(`[DevTools] Set newly generated world as active: ${worldId}`);
       
       // Generate world image asynchronously using my enhanced API
       try {
         // Get the created world from store
-        const world = worldStore.getState().worlds[worldId];
+        const world = useWorldStore.getState().worlds[worldId];
         console.log(`[DevTools] Attempting to generate image for world:`, world?.name);
         if (world) {
           const response = await fetch('/api/generate-world-image', {
@@ -120,7 +120,7 @@ export const TestDataGeneratorSection: React.FC = () => {
               url: imageUrl,
               generatedAt: new Date().toISOString()
             };
-            worldStore.getState().updateWorld(worldId, { image });
+            useWorldStore.getState().updateWorld(worldId, { image });
             console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);
           } else {
             const errorText = await response.text();
@@ -162,7 +162,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           // 33% - "Set in" worlds (existing universe)
           const tvMovieUniverses = [
             'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Stranger Things', 'Deadwood', 'The Walking Dead',
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -172,7 +172,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           // 34% - "Based on" worlds (inspired by existing universe)
           const tvMovieUniverses = [
             'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Stranger Things', 'Deadwood', 'The Walking Dead',
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -228,7 +228,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         // Set the first created world as active (for batch generation)
         if (i === 0) {
-          const { setCurrentWorld } = worldStore.getState();
+          const { setCurrentWorld } = useWorldStore.getState();
           setCurrentWorld(worldId);
           console.log(`[DevTools] Set first generated world as active: ${worldId}`);
         }
@@ -236,7 +236,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Generate world image asynchronously for each world using my enhanced API
         try {
           // Get the created world from store
-          const world = worldStore.getState().worlds[worldId];
+          const world = useWorldStore.getState().worlds[worldId];
           console.log(`[DevTools] Attempting to generate image for world ${i + 1}/5:`, world?.name);
           if (world) {
             const response = await fetch('/api/generate-world-image', {
@@ -253,7 +253,7 @@ export const TestDataGeneratorSection: React.FC = () => {
                 url: imageUrl,
                 generatedAt: new Date().toISOString()
               };
-              worldStore.getState().updateWorld(worldId, { image });
+              useWorldStore.getState().updateWorld(worldId, { image });
               console.log(`[DevTools] Generated ${service} image for test world "${testWorldData.name}":`, imageUrl);
             } else {
               const errorText = await response.text();
@@ -361,7 +361,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const createdCharacters = [];
-    const { characters } = characterStore.getState();
+    const { characters } = useCharacterStore.getState();
     const existingCharacterNames = Object.values(characters)
       .filter(char => char.worldId === currentWorld.id)
       .map(char => char.name);
@@ -461,7 +461,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // Generate portrait asynchronously via API route (secure approach)
         try {
           // Get the created character from store
-          const storeCharacter = characterStore.getState().characters[characterId];
+          const storeCharacter = useCharacterStore.getState().characters[characterId];
           if (storeCharacter) {
             console.log(`[DevTools] Generating portrait for ${characterType} character "${characterData.name}"...`);
             
@@ -513,7 +513,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             if (response.ok) {
               const { portrait } = await response.json();
               // Update the character with the generated portrait
-              characterStore.getState().updateCharacter(characterId, { portrait });
+              useCharacterStore.getState().updateCharacter(characterId, { portrait });
               console.log(`[DevTools] Generated portrait for ${characterType} character "${characterData.name}"`);
             } else {
               console.warn(`[DevTools] Portrait generation failed for ${characterType} character "${characterData.name}"`);
@@ -547,8 +547,8 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     try {
       // Get fresh references to the store methods
-      const characterStoreState = characterStore.getState();
-      const worldStoreState = worldStore.getState();
+      const characterStoreState = useCharacterStore.getState();
+      const worldStoreState = useWorldStore.getState();
       
       // Delete all characters first
       const characterIds = Object.keys(characterStoreState.characters);
@@ -584,7 +584,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       return;
     }
 
-    const { characters } = characterStore.getState();
+    const { characters } = useCharacterStore.getState();
     const worldCharacters = Object.values(characters).filter(char => char.worldId === currentWorld.id);
     
     if (worldCharacters.length === 0) {
@@ -596,7 +596,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     if (!confirmed) return;
 
     try {
-      const { deleteCharacter } = characterStore.getState();
+      const { deleteCharacter } = useCharacterStore.getState();
       
       for (const character of worldCharacters) {
         deleteCharacter(character.id);
@@ -614,7 +614,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
   const handleNukeEverything = async () => {
     const worldCount = Object.keys(worlds).length;
-    const { characters } = characterStore.getState();
+    const { characters } = useCharacterStore.getState();
     const characterCount = Object.keys(characters).length;
     const totalItems = worldCount + characterCount;
 
@@ -631,8 +631,8 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     try {
       // Use the reset methods to completely clear both stores
-      const characterStoreState = characterStore.getState();
-      const worldStoreState = worldStore.getState();
+      const characterStoreState = useCharacterStore.getState();
+      const worldStoreState = useWorldStore.getState();
 
       // Reset character store first
       characterStoreState.reset();
@@ -666,8 +666,8 @@ export const TestDataGeneratorSection: React.FC = () => {
   };
 
   const handleDebugPersistence = () => {
-    const worldStoreState = worldStore.getState();
-    const characterStoreState = characterStore.getState();
+    const worldStoreState = useWorldStore.getState();
+    const characterStoreState = useCharacterStore.getState();
     
     console.log('[DevTools] Current Store States:');
     console.log('World Store:', {

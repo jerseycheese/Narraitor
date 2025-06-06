@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
-import { worldStore } from '@/state/worldStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 import Logger from '@/lib/utils/logger';
 
 // Mock world
@@ -80,12 +80,12 @@ export default function GameSessionTestHarness() {
   
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
-    const worlds = worldStore.getState().worlds || {};
-    const characters = characterStore.getState().characters || {};
+    const worlds = useWorldStore.getState().worlds || {};
+    const characters = useCharacterStore.getState().characters || {};
     
     // Only create if they don't exist
     if (!worlds[mockWorld.id]) {
-      worldStore.setState({
+      useWorldStore.setState({
         worlds: {
           ...worlds,
           [mockWorld.id]: mockWorld
@@ -95,7 +95,7 @@ export default function GameSessionTestHarness() {
     }
     
     if (!characters[mockCharacter.id]) {
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {
           ...characters,
           [mockCharacter.id]: mockCharacter
@@ -114,11 +114,11 @@ export default function GameSessionTestHarness() {
     createTestWorld();
     
     // Get initial state
-    setCurrentState({...sessionStore.getState()});
+    setCurrentState({...useSessionStore.getState()});
     
     // Setup state display refreshing
     const intervalId = setInterval(() => {
-      setCurrentState({...sessionStore.getState()});
+      setCurrentState({...useSessionStore.getState()});
     }, 1000);
     
     return () => {
@@ -171,7 +171,7 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
-            const store = sessionStore.getState();
+            const store = useSessionStore.getState();
             if (store.initializeSession) {
               // Use the test character ID
               store.initializeSession(mockWorld.id, mockCharacter.id, handleSessionStart);
@@ -188,7 +188,7 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // End current session only
             logger.info('Ending session');
-            sessionStore.getState().endSession();
+            useSessionStore.getState().endSession();
           }}
         >
           End Session
@@ -214,8 +214,8 @@ export default function GameSessionTestHarness() {
           Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
         </p>
         <p className="text-sm text-gray-600 mb-2">
-          Store methods: {Object.keys(sessionStore.getState()).filter(key => {
-            const value = sessionStore.getState()[key as keyof typeof sessionStore.getState];
+          Store methods: {Object.keys(useSessionStore.getState()).filter(key => {
+            const value = useSessionStore.getState()[key as keyof typeof useSessionStore.getState];
             return typeof value === 'function';
           }).join(', ')}
         </p>

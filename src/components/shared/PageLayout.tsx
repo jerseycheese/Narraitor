@@ -78,7 +78,7 @@ export function PageLayout({
             )}
           </div>
           {description && (
-            <p className="text-gray-600">
+            <p className="opacity-90">
               {description}
             </p>
           )}

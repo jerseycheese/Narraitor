@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldListScreen from './WorldListScreen';
-import { worldStore } from '../../state/worldStore';
+import { useWorldStore } from '../../state/worldStore';
 import { World } from '../../types/world.types';
 
 // Mock worlds data
@@ -66,7 +66,7 @@ const meta: Meta<typeof WorldListScreen> = {
   decorators: [
     (Story) => {
       // Clear the store before each story
-      worldStore.setState({ 
+      useWorldStore.setState({ 
         worlds: {}, 
         currentWorldId: null,
         loading: false,
@@ -102,7 +102,7 @@ export const Default: Story = {
         return acc;
       }, {} as Record<string, World>);
       
-      worldStore.setState({ worlds: worldsMap });
+      useWorldStore.setState({ worlds: worldsMap });
       return <Story />;
     },
   ],
@@ -111,7 +111,7 @@ export const Default: Story = {
 export const Loading: Story = {
   decorators: [
     (Story) => {
-      worldStore.setState({ loading: true });
+      useWorldStore.setState({ loading: true });
       return <Story />;
     },
   ],
@@ -120,7 +120,7 @@ export const Loading: Story = {
 export const EmptyState: Story = {
   decorators: [
     (Story) => {
-      worldStore.setState({ worlds: {}, loading: false });
+      useWorldStore.setState({ worlds: {}, loading: false });
       return <Story />;
     },
   ],
@@ -129,7 +129,7 @@ export const EmptyState: Story = {
 export const WithError: Story = {
   decorators: [
     (Story) => {
-      worldStore.setState({ 
+      useWorldStore.setState({ 
         worlds: {}, 
         loading: false,
         error: 'Failed to load worlds' 
@@ -142,7 +142,7 @@ export const WithError: Story = {
 export const SingleWorld: Story = {
   decorators: [
     (Story) => {
-      worldStore.setState({ 
+      useWorldStore.setState({ 
         worlds: { '1': mockWorlds[0] },
         loading: false 
       });
@@ -195,7 +195,7 @@ export const ManyWorlds: Story = {
         return acc;
       }, {} as Record<string, World>);
       
-      worldStore.setState({ worlds: worldsMap });
+      useWorldStore.setState({ worlds: worldsMap });
       return <Story />;
     },
   ],

@@ -1,8 +1,8 @@
 import React from 'react';
 // Use the store's Character type since it's more complete
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { 
   ActiveStateCard, 

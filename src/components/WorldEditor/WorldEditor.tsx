@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
@@ -22,7 +22,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   // Load world data on mount
   useEffect(() => {
     try {
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldData = worlds[worldId];
       
       if (!worldData) {
@@ -45,7 +45,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     
     setSaving(true);
     try {
-      const { updateWorld } = worldStore.getState();
+      const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, world);
       
       // Small delay to show save state

@@ -1,6 +1,6 @@
 import { applyWorldTemplate } from '../templateLoader';
 import { templates } from '../worldTemplates';
-import { worldStore } from '../../../state/worldStore';
+import { useWorldStore } from '../../../state/worldStore';
 
 // Mock the generateUniqueId function
 jest.mock('../../utils/generateId', () => ({
@@ -12,12 +12,12 @@ jest.mock('../../utils/generateId', () => ({
   }),
 }));
 
-// Mock the worldStore
+// Mock the useWorldStore
 jest.mock('../../../state/worldStore', () => {
   const mockSetState = jest.fn();
   
   return {
-    worldStore: {
+    useWorldStore: {
       setState: mockSetState,
       getState: jest.fn(() => ({ worlds: {} }))
     }
@@ -40,7 +40,7 @@ describe('Template Loader', () => {
     expect(worldId).toBe('world-123');
     
     // Check that setState was called
-    expect(worldStore.setState).toHaveBeenCalled();
+    expect(useWorldStore.setState).toHaveBeenCalled();
   });
 
   test('applyWorldTemplate uses template name when no world name provided', () => {
@@ -51,7 +51,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the first setState call
-    const setStateCall = worldStore.setState.mock.calls[0][0];
+    const setStateCall = useWorldStore.setState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -70,7 +70,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the setState call
-    const setStateCall = worldStore.setState.mock.calls[0][0];
+    const setStateCall = useWorldStore.setState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -107,7 +107,7 @@ describe('Template Loader', () => {
     expect(worldId).toBe('world-123');
     
     // Extract the updater function from the setState call
-    const setStateCall = worldStore.setState.mock.calls[0][0];
+    const setStateCall = useWorldStore.setState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -132,6 +132,6 @@ describe('Template Loader', () => {
     }).toThrow(`Template with ID "${invalidTemplateId}" not found`);
     
     // Check that setState was not called
-    expect(worldStore.setState).not.toHaveBeenCalled();
+    expect(useWorldStore.setState).not.toHaveBeenCalled();
   });
 });

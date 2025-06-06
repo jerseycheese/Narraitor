@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
@@ -69,7 +69,7 @@ type TestWorldKey = keyof typeof testWorlds;
 export default function CharacterCreationTestPage() {
   const [selectedWorld, setSelectedWorld] = useState<TestWorldKey>('fantasy');
   const [testWorldId, setTestWorldId] = useState<string | null>(null);
-  const { createWorld, setCurrentWorld } = worldStore();
+  const { createWorld, setCurrentWorld } = useWorldStore();
 
   useEffect(() => {
     // Create the test world on mount
