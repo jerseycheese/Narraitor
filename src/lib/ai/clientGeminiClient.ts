@@ -34,7 +34,7 @@ export class ClientGeminiClient implements AIClient {
           prompt,
           config: {
             temperature: 0.7,
-            maxTokens: 2048
+            maxTokens: 1024
           }
         })
       });
@@ -100,7 +100,7 @@ export class ClientGeminiClient implements AIClient {
           prompt,
           config: {
             temperature: 0.7,
-            maxTokens: 2048
+            maxTokens: 1024
           }
         })
       });

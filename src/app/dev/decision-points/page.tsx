@@ -215,8 +215,9 @@ export default function DecisionPointsTestPage() {
             <div className="p-4 bg-purple-50 border border-purple-200 rounded">
               <h3 className="font-semibold mb-2">Visual Cues</h3>
               <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Color-coded decision weights (blue/amber/red)</li>
-                <li>• Enhanced visual prominence for important decisions</li>
+                <li>• Decision weight indicated by border thickness (2px/4px/6px)</li>
+                <li>• Subtle background tints for visual hierarchy</li>
+                <li>• Choice alignment colors remain distinct (blue/red/gray)</li>
                 <li>• Clear visual separation from narrative text</li>
                 <li>• Responsive design for all screen sizes</li>
               </ul>

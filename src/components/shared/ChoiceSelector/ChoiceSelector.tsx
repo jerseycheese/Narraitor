@@ -54,28 +54,29 @@ const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean):
 };
 
 /**
- * Get styling for decision weight
+ * Get styling for decision weight using border thickness and subtle backgrounds
+ * This avoids color conflicts with choice alignment colors (blue/red)
  */
 const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   switch (weight) {
     case 'critical':
       return {
-        container: 'border-red-400 bg-red-50/30',
-        dot: 'bg-red-500',
-        label: 'text-red-700'
+        container: 'border-6 border-gray-500 bg-gray-500/15',
+        dot: 'bg-gray-600',
+        label: 'text-gray-800'
       };
     case 'major':
       return {
-        container: 'border-amber-400 bg-amber-50/30',
-        dot: 'bg-amber-500',
-        label: 'text-amber-700'
+        container: 'border-4 border-gray-500 bg-gray-500/10',
+        dot: 'bg-gray-600',
+        label: 'text-gray-800'
       };
     case 'minor':
     default:
       return {
-        container: 'border-blue-300 bg-blue-50/30',
-        dot: 'bg-blue-500',
-        label: 'text-blue-700'
+        container: 'border-2 border-gray-500 bg-gray-500/5',
+        dot: 'bg-gray-600',
+        label: 'text-gray-800'
       };
   }
 };

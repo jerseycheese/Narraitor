@@ -27,7 +27,7 @@ Create an engaging opening scene that:
 3. Follows ${genre} genre conventions
 4. Hooks the reader with intrigue or action
 5. Establishes the initial setting and situation
-6. Is approximately 2-3 paragraphs long
+6. Is concise and engaging - approximately 1-2 short paragraphs (4-6 sentences total)
 
 CRITICAL INSTRUCTIONS:
 1. Write the narrative in SECOND PERSON perspective (using "you" instead of character names or "they")

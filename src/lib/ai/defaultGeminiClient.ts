@@ -152,30 +152,30 @@ Options:
     
     switch(genre?.toLowerCase()) {
       case 'fantasy':
-        return `The ancient forest of Eldoria stretched before you, a tapestry of emerald and gold bathed in dappled sunlight. Towering trees with trunks wider than castle towers reached toward the heavens, their canopies rustling with secrets as old as time itself. In the distance, the crystalline spires of the elven city${worldRef} glimmered like jewels, a beacon of magic and mystery in this realm of wonder and danger.`;
+        return `The ancient forest${worldRef} stretched before you, emerald and gold in dappled sunlight. Towering trees rustled with ancient secrets. In the distance, crystalline spires glimmered like jewels.`;
       
       case 'sci-fi':
       case 'science fiction':
-        return `The observation deck offered a breathtaking view of Nexus Station${worldRef}, a massive orbital construct of gleaming metal and pulsing energy fields. Beyond it, the gas giant Cerulean VI dominated the starscape, its swirling azure storms casting an eerie blue glow throughout the chamber. Your neural implant pinged softly, alerting you to an incoming transmission – the mission briefing you'd been waiting for.`;
+        return `The observation deck offered a view of Nexus Station${worldRef}, gleaming metal and pulsing energy. Beyond it, gas giant Cerulean VI dominated the starscape. Your neural implant pinged softly – an incoming transmission.`;
       
       case 'western':
-        return `The unforgiving sun beat down on the dusty main street of Redemption${worldRef}, the wooden buildings weathered by time and the harsh desert climate. A tumbleweed rolled lazily past the saloon, where piano notes spilled out alongside raucous laughter. Your hand instinctively moved to the revolver at your hip as you noticed several horses tied outside the sheriff's office – strangers had come to town.`;
+        return `The sun beat down on the dusty main street of Redemption${worldRef}. A tumbleweed rolled past the saloon where piano notes spilled out with laughter. Your hand moved to your revolver – strangers' horses were tied outside the sheriff's office.`;
       
       case 'horror':
-        return `The old mansion${worldRef} loomed against the night sky, its windows like dead eyes staring into your soul. A flash of lightning illuminated the decaying façade, revealing grotesque gargoyles that seemed to follow your movement. The iron gate creaked open at your touch, an invitation you knew you should refuse. Yet something pulled you forward, into the shadows that promised only dread and secrets better left buried.`;
+        return `The old mansion${worldRef} loomed against the night sky, windows like dead eyes. Lightning illuminated grotesque gargoyles that seemed to follow you. The iron gate creaked open at your touch, though something warned you to stay away.`;
       
       case 'cyberpunk':
-        return `Neon advertisements bathed the rain-slick streets of Night City${worldRef} in a kaleidoscope of unnatural colors, reflected in puddles of polluted water. The constant hum of the megacity vibrated through your cybernetic enhancements as you navigated the crowded undercity, corporate drones and street hustlers alike seeking shelter from the acid rain. Your HUD highlighted a message from a mysterious fixer – a job offer too lucrative to ignore, even with its obvious dangers.`;
+        return `Neon ads bathed the rain-slick streets of Night City${worldRef} in unnatural colors. The megacity's hum vibrated through your cybernetic enhancements. Your HUD highlighted a message from a mysterious fixer – a lucrative job offer.`;
       
       case 'steampunk':
-        return `Massive brass gears turned overhead as the airship docking tower of New Albion${worldRef} released clouds of steam into the already fog-thick sky. The cobblestone streets below teemed with life: inventors showcasing their latest mechanical marvels, aristocrats in their finest attire attended by clockwork servants, and urchins darting between steam vents for warmth. Your attention was drawn to the bulletin board where the Royal Society had posted a most unusual request.`;
+        return `Massive brass gears turned overhead as New Albion${worldRef} released steam into the fog-thick sky. The cobblestone streets teemed with inventors, aristocrats, and their clockwork servants. A bulletin board caught your attention – the Royal Society had posted an unusual request.`;
       
       case 'post-apocalyptic':
-        return `The ruins of what was once a proud metropolis sprawled before you, nature reclaiming concrete and steel with vines and roots that cracked through foundations. This was all that remained of the old world${worldRef}, before the Fall. Your radiation counter ticked softly as you adjusted your makeshift mask and checked your dwindling supplies. In the distance, smoke rose from a settlement – perhaps friendly, perhaps not – but shelter was becoming a necessity as the contaminated storm clouds gathered on the horizon.`;
+        return `The ruins of a once-proud metropolis sprawled before you, nature reclaiming concrete and steel. This was the old world${worldRef}, before the Fall. Your radiation counter ticked as storm clouds gathered – shelter was becoming necessary.`;
       
       default:
         // Default to fantasy if genre not recognized
-        return `You stand at the threshold of a new adventure in the land${worldRef}, the path ahead shrouded in both promise and peril. The morning sun casts long shadows across the landscape, highlighting the ancient stones that mark the boundary between the known world and the wilderness beyond. A gentle breeze carries whispers of the stories waiting to be told, of treasures to be discovered, and of destinies to be fulfilled.`;
+        return `You stand at the threshold of adventure in ${worldRef}, the path ahead shrouded in promise and peril. Ancient stones mark the boundary between the known world and wilderness beyond. A gentle breeze carries whispers of stories waiting to be told.`;
     }
   }
   
