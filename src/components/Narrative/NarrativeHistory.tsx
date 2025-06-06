@@ -112,8 +112,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     );
   };
 
-  // Only apply fixed height after 2 segments
-  const heightClass = segments.length >= 2 ? 'h-[600px]' : '';
+  // Use min-height instead of fixed height to allow proper centering
+  const heightClass = segments.length >= 2 ? 'min-h-[610px] max-h-[610px]' : 'min-h-[300px]';
   
   return (
     <div 
@@ -121,7 +121,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       className={`narrative-history ${heightClass} overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner snap-y snap-mandatory ${className}`}
       onScroll={handleScroll}
     >
-      <div className="space-y-6 px-4 py-6">
+      <div className="space-y-4 px-4 py-4">
         {renderContent()}
       </div>
     </div>

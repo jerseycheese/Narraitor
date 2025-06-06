@@ -64,8 +64,8 @@ export function PageLayout({
   };
 
   return (
-    <main className={`min-h-screen p-4 sm:p-8 ${className}`}>
-      <div className={`${maxWidthClasses[maxWidth]} mx-auto`}>
+    <main className={`min-h-screen ${className}`}>
+      <div className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8`}>
         <header className="mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
             <h1 className="text-4xl font-bold">

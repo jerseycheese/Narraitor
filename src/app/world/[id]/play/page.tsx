@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
+import { PageLayout } from '@/components/shared/PageLayout';
 
 /**
  * Play page component that initializes a game session with a worldId
@@ -20,13 +21,11 @@ export default function PlayPage() {
   // For server rendering, show a simple placeholder
   if (!isClient) {
     return (
-      <div className="min-h-screen p-4 sm:p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="p-4 text-center">
-            <p>Loading game session...</p>
-          </div>
+      <PageLayout title="" maxWidth="7xl">
+        <div className="p-4 text-center">
+          <p>Loading game session...</p>
         </div>
-      </div>
+      </PageLayout>
     );
   }
   
@@ -36,10 +35,8 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        <GameSession worldId={worldId} />
-      </div>
-    </div>
+    <PageLayout title="" maxWidth="7xl" className="pb-0">
+      <GameSession worldId={worldId} />
+    </PageLayout>
   );
 }

@@ -8,6 +8,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
+import { PageLayout } from '@/components/shared/PageLayout';
 
 export default function PlayPage() {
   const router = useRouter();
@@ -58,51 +59,45 @@ export default function PlayPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="max-w-4xl mx-auto">
-          <SectionError
-            title="Failed to Start Game"
-            message={error}
-            severity="error"
-          />
-          <div className="mt-4 flex gap-4">
-            <button
-              onClick={() => router.push('/worlds')}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Select World
-            </button>
-            <button
-              onClick={() => router.push('/characters')}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Select Character
-            </button>
-          </div>
+      <PageLayout title="Game Session Error" maxWidth="4xl">
+        <SectionError
+          title="Failed to Start Game"
+          message={error}
+          severity="error"
+        />
+        <div className="mt-4 flex gap-4">
+          <button
+            onClick={() => router.push('/worlds')}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Select World
+          </button>
+          <button
+            onClick={() => router.push('/characters')}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Select Character
+          </button>
         </div>
-      </main>
+      </PageLayout>
     );
   }
 
   if (!currentSessionId) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="max-w-4xl mx-auto">
-          <SectionError
-            title="No Active Session"
-            message="Unable to create or resume a game session."
-            severity="warning"
-          />
-        </div>
-      </main>
+      <PageLayout title="No Active Session" maxWidth="4xl">
+        <SectionError
+          title="No Active Session"
+          message="Unable to create or resume a game session."
+          severity="warning"
+        />
+      </PageLayout>
     );
   }
 
   return (
-    <main className="min-h-screen p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        <GameSession worldId={currentWorldId!} />
-      </div>
-    </main>
+    <PageLayout title="" maxWidth="7xl" className="pb-0">
+      <GameSession worldId={currentWorldId!} />
+    </PageLayout>
   );
 }
