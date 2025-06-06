@@ -208,7 +208,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   return (
     <div 
       data-testid="choice-selector" 
-      className={`choice-selector mt-6 p-4 border-2 border-dashed rounded-lg ${weightStyling.container} ${className}`}
+      className={`choice-selector mt-6 p-4 border-solid rounded-lg ${weightStyling.container} ${className}`}
       role="group"
       aria-labelledby="choices-heading"
     >
