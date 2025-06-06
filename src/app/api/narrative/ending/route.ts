@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { endingGenerator } from '../../../../lib/ai/endingGenerator';
 import { logger } from '../../../../lib/utils/logger';
-import type { EndingGenerationRequest } from '../../../../types/narrative.types';
+import type { EndingGenerationRequest, EndingType, EndingTone } from '../../../../types/narrative.types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,19 +20,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate ending type
-    const validEndingTypes = ['player-choice', 'story-complete', 'session-limit', 'character-retirement'];
-    if (!validEndingTypes.includes(endingType)) {
+    // Validate ending type using type-safe constants
+    const validEndingTypes: EndingType[] = ['player-choice', 'story-complete', 'session-limit', 'character-retirement'];
+    if (!validEndingTypes.includes(endingType as EndingType)) {
       return NextResponse.json(
         { error: `Invalid ending type. Must be one of: ${validEndingTypes.join(', ')}` },
         { status: 400 }
       );
     }
 
-    // Validate desiredTone if provided
+    // Validate desiredTone if provided using type-safe constants
     if (body.desiredTone) {
-      const validTones = ['heroic', 'melancholic', 'triumphant', 'mysterious', 'bittersweet', 'hopeful'];
-      if (!validTones.includes(body.desiredTone)) {
+      const validTones: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
+      if (!validTones.includes(body.desiredTone as EndingTone)) {
         return NextResponse.json(
           { error: `Invalid tone. Must be one of: ${validTones.join(', ')}` },
           { status: 400 }
@@ -107,8 +107,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json(
     { 
-      error: 'Method not allowed',
-      message: 'Use POST to generate a story ending'
+      error: 'Method not allowed. Use POST to generate a story ending'
     },
     { status: 405 }
   );
