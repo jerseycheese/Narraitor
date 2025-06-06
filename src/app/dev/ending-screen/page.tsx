@@ -7,13 +7,8 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { StoryEnding } from '@/types/narrative.types';
 
-export default function EndingScreenTestPage() {
-  const { setCurrentEnding } = useNarrativeStore();
-  const { createCharacter } = useCharacterStore();
-  const { createWorld } = useWorldStore();
-
-  // Mock character data (without id, createdAt, updatedAt)
-  const mockCharacterData = {
+// Move mock data outside component to prevent re-creation
+const MOCK_CHARACTER_DATA = {
     name: 'Aria Stormblade',
     description: 'A seasoned warrior seeking redemption',
     worldId: 'test-world-456',
@@ -47,8 +42,8 @@ export default function EndingScreenTestPage() {
     }
   };
 
-  // Mock world data (without id, createdAt, updatedAt)
-  const mockWorldData = {
+// Move mock world data outside component to prevent re-creation
+const MOCK_WORLD_DATA = {
     name: 'Eldoria',
     description: 'A realm where magic and technology coexist',
     theme: 'High Fantasy',
@@ -62,8 +57,8 @@ export default function EndingScreenTestPage() {
     }
   };
 
-  // Mock ending templates for different tones
-  const mockEndings: Record<string, StoryEnding> = {
+// Mock ending templates for different tones
+const MOCK_ENDINGS: Record<string, StoryEnding> = {
     triumphant: {
       id: 'ending-triumphant',
       sessionId: 'test-session-123',
@@ -156,24 +151,29 @@ The realm's approach to challenges shifted from combat to collaboration. Problem
     }
   };
 
+export default function EndingScreenTestPage() {
+  const { createWorld } = useWorldStore();
+  const { createCharacter } = useCharacterStore();
+  const { setCurrentEnding } = useNarrativeStore();
+
+  // Track created IDs
+  const [createdIds, setCreatedIds] = useState<{characterId: string, worldId: string} | null>(null);
+
   // Initialize stores with mock data
   useEffect(() => {
-    const worldId = createWorld(mockWorldData);
-    const characterData = { ...mockCharacterData, worldId };
+    const worldId = createWorld(MOCK_WORLD_DATA);
+    const characterData = { ...MOCK_CHARACTER_DATA, worldId };
     characterData.inventory.characterId = ''; // Will be set by createCharacter
     const characterId = createCharacter(characterData);
     
     // Store the created IDs for use in mock endings
     setCreatedIds({ characterId, worldId });
-  }, [createCharacter, createWorld, mockCharacterData, mockWorldData]);
-
-  // Track created IDs
-  const [createdIds, setCreatedIds] = useState<{characterId: string, worldId: string} | null>(null);
+  }, [createCharacter, createWorld]);
 
   const handleTestEnding = (tone: string) => {
     if (!createdIds) return;
     
-    const ending = mockEndings[tone];
+    const ending = MOCK_ENDINGS[tone];
     if (ending) {
       // Update the ending with the actual created IDs
       const updatedEnding = {

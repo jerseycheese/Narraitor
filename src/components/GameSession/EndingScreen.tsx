@@ -85,19 +85,22 @@ export function EndingScreen() {
     }
   }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments]);
 
-  // Generate ending image when ending is available (but not in Storybook)
+  // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
-    // Skip image generation in Storybook environment
-    const isStorybook = window.location.port === '6006' || window.location.hostname.includes('storybook');
+    // Skip image generation in Storybook or test environment
+    const isStorybook = typeof window !== 'undefined' && 
+      (window.location.port === '6006' || window.location.hostname.includes('storybook'));
+    const isTest = process.env.NODE_ENV === 'test';
     
     if (currentEnding && 
         !endingImage && 
         !isGeneratingImage && 
         !isStorybook &&
+        !isTest &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }
-  }, [currentEnding?.id, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
+  }, [currentEnding, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
 
   // Note: Removed automatic cleanup to prevent clearing ending during development re-renders
   // The ending should be cleared manually when navigating away
