@@ -11,7 +11,7 @@ export default function WorldGenerationTestPage() {
   const [generatedWorld, setGeneratedWorld] = useState<GeneratedWorldData | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { worlds } = useWorldStore();
+  const { worlds, createWorld } = useWorldStore();
   
   const handleGenerate = async () => {
     if (!worldReference.trim()) {
@@ -42,7 +42,7 @@ export default function WorldGenerationTestPage() {
   const handleCreateWorld = () => {
     if (!generatedWorld) return;
     
-    useWorldStore.getState().createWorld({
+    createWorld({
       name: generatedWorld.name,
       theme: generatedWorld.theme,
       description: generatedWorld.description,

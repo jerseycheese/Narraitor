@@ -29,6 +29,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate desiredTone if provided
+    if (body.desiredTone) {
+      const validTones = ['heroic', 'melancholic', 'triumphant', 'mysterious', 'bittersweet', 'hopeful'];
+      if (!validTones.includes(body.desiredTone)) {
+        return NextResponse.json(
+          { error: `Invalid tone. Must be one of: ${validTones.join(', ')}` },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create the ending generation request
     const endingRequest: EndingGenerationRequest = {
       sessionId,
