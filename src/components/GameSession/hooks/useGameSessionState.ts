@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionState } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
 
@@ -143,6 +144,10 @@ export const useGameSessionState = ({
   // Manual session initialization
   const startSession = useCallback(() => {
     logger.debug('Manual session start requested');
+    
+    // Clear any existing ending state
+    useNarrativeStore.getState().clearEnding();
+    
     if (actualSessionState.initializeSession) {
       if (!sessionCharacterId) {
         logger.warn('No character available for this world');
@@ -197,6 +202,9 @@ export const useGameSessionState = ({
     
     // Only initialize if session is not already active
     if (sessionState.status === 'initializing' && worldExists && sessionCharacterId) {
+      // Clear any existing ending state when starting any session
+      useNarrativeStore.getState().clearEnding();
+      
       // Check if there's a saved session for this world/character combo
       const currentSavedSession = actualSessionState.getSavedSession?.(worldId, sessionCharacterId);
       
@@ -273,6 +281,8 @@ export const useGameSessionState = ({
   const handleResumeSession = () => {
     if (savedSession && actualSessionState.resumeSavedSession) {
       logger.debug('Resuming saved session:', savedSession.id);
+      // Clear any existing ending state when resuming
+      useNarrativeStore.getState().clearEnding();
       actualSessionState.resumeSavedSession(savedSession.id);
     }
   };
@@ -281,6 +291,8 @@ export const useGameSessionState = ({
   const handleNewSession = useCallback(() => {
     if (sessionCharacterId && actualSessionState.initializeSession) {
       logger.debug('Starting new session, character:', sessionCharacterId);
+      // Clear any existing ending state when starting new session
+      useNarrativeStore.getState().clearEnding();
       actualSessionState.initializeSession(worldId, sessionCharacterId, onSessionStart);
     }
   }, [sessionCharacterId, worldId, onSessionStart, actualSessionState, logger]);

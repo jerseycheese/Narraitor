@@ -4,6 +4,8 @@ import type { PromptTemplate } from '../types';
 import { PromptType } from '../types';
 import type { EndingType, EndingTone } from '../../../types/narrative.types';
 
+// Tone descriptions for reference (currently unused but may be needed for future enhancements)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const toneDescriptions: Record<EndingTone, string> = {
   triumphant: 'victorious and celebratory, emphasizing achievements and success',
   bittersweet: 'mixed emotions combining victory with loss or sacrifice',
@@ -36,41 +38,40 @@ Character Goals: {{characterGoals}}
 ENDING TYPE: {{endingType}}
 {{endingTypeDescription}}
 
-DESIRED TONE: {{desiredTone}}
-The ending should be {{toneDescription}}.
-
 STORY SUMMARY:
 Recent narrative events:
 {{recentNarrative}}
 
-{{#if journalEntries}}
 Key moments from the journey:
 {{journalEntries}}
-{{/if}}
 
-{{#if customPrompt}}
-SPECIAL INSTRUCTION: {{customPrompt}}
-{{/if}}
+Additional instructions:
+{{customPrompt}}
 
 Generate a complete story ending with the following components:
 
-1. EPILOGUE (2-3 paragraphs):
+1. CHOOSE AN APPROPRIATE TONE:
+   - Analyze the story context and choose the most fitting emotional tone
+   - Available tones: triumphant, bittersweet, mysterious, tragic, hopeful
+   - Base your choice on the character's journey and recent events
+
+2. EPILOGUE (2-3 paragraphs):
    - Describe how the story concludes for {{characterName}}
    - Reference specific events from their journey
-   - Match the {{desiredTone}} tone
+   - Match the chosen tone throughout
    - Provide narrative closure while respecting the ending type
 
-2. CHARACTER LEGACY (1-2 paragraphs):
+3. CHARACTER LEGACY (1 paragraph):
    - How will {{characterName}} be remembered?
    - What impact did they have on others?
-   - What personal growth or change did they experience?
+   - Keep it concise and meaningful
 
-3. WORLD IMPACT (1 paragraph):
+4. WORLD IMPACT (1 short paragraph):
    - How has {{worldName}} changed because of {{characterName}}'s actions?
    - What lasting effects remain from their journey?
-   - How does the world move forward?
+   - Keep it brief and focused
 
-4. ACHIEVEMENTS (3-5 specific accomplishments):
+5. ACHIEVEMENTS (3-5 specific accomplishments):
    - List concrete achievements based on the narrative
    - Make them feel earned and specific to this story
    - Avoid generic achievements
@@ -80,14 +81,17 @@ FORMAT YOUR RESPONSE AS JSON:
   "epilogue": "Your epilogue text here...",
   "characterLegacy": "Your character legacy text here...",
   "worldImpact": "Your world impact text here...",
-  "tone": "{{desiredTone}}",
+  "tone": "triumphant",
   "achievements": ["Achievement 1", "Achievement 2", "Achievement 3"]
 }
 
+IMPORTANT: The "tone" field must be exactly one of these values: triumphant, bittersweet, mysterious, tragic, hopeful
+
 Remember to:
+- Choose the tone that best fits the story's context and events
 - Make the ending feel earned and satisfying
 - Reference specific story events, not generic fantasy tropes
-- Match the requested tone throughout
+- Match your chosen tone throughout all sections
 - Provide closure while leaving room for imagination
 - Keep the language evocative and engaging`,
 
@@ -102,8 +106,6 @@ Remember to:
     { name: 'characterGoals', type: 'string', description: 'Goals of the character' },
     { name: 'endingType', type: 'string', description: 'Type of ending' },
     { name: 'endingTypeDescription', type: 'string', description: 'Description of ending type' },
-    { name: 'desiredTone', type: 'string', description: 'Desired tone for the ending' },
-    { name: 'toneDescription', type: 'string', description: 'Description of the tone' },
     { name: 'recentNarrative', type: 'string', description: 'Recent narrative content' },
     { name: 'journalEntries', type: 'string', description: 'Journal entries' },
     { name: 'customPrompt', type: 'string', description: 'Custom prompt from user' }
@@ -115,7 +117,6 @@ export function prepareEndingTemplateVariables(
   world: { name: string; description?: string },
   character: { name: string; class?: string; level?: number; background?: string; personality?: string; goals?: string },
   endingType: EndingType,
-  desiredTone: EndingTone,
   recentNarrative: string[],
   journalEntries?: string[],
   customPrompt?: string
@@ -131,10 +132,8 @@ export function prepareEndingTemplateVariables(
     characterGoals: character.goals || 'Seek adventure and glory',
     endingType,
     endingTypeDescription: endingTypeDescriptions[endingType],
-    desiredTone: desiredTone || 'hopeful',
-    toneDescription: toneDescriptions[desiredTone || 'hopeful'],
     recentNarrative: recentNarrative.join('\n'),
-    journalEntries: journalEntries?.join('\n') || '',
-    customPrompt: customPrompt || ''
+    journalEntries: journalEntries?.length ? journalEntries.join('\n') : 'No significant events recorded in journal.',
+    customPrompt: customPrompt || 'No additional instructions.'
   };
 }

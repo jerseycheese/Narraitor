@@ -1,6 +1,6 @@
 // src/lib/ai/endingGenerator.ts
 
-import { geminiClient } from './geminiClient';
+import { createDefaultGeminiClient } from './defaultGeminiClient';
 import { contextManager } from './contextManager';
 import { promptTemplateManager } from '../promptTemplates/promptTemplateManager';
 import { endingTemplate, prepareEndingTemplateVariables } from '../promptTemplates/templates/endingTemplates';
@@ -42,7 +42,7 @@ class EndingGenerator {
       const characterForTemplate = {
         name: context.character.name,
         class: 'Adventurer', // Default class since it's not in the interface
-        level: 1, // Default level since it's not in the interface
+        level: 1, // Default level since it's not in the character interface
         background: context.character.background.history,
         personality: context.character.background.personality,
         goals: context.character.background.goals.join(', ')
@@ -52,7 +52,6 @@ class EndingGenerator {
         context.world,
         characterForTemplate,
         request.endingType,
-        request.desiredTone || this.determineAutoTone(context),
         recentNarrative,
         journalSummary,
         request.customPrompt
@@ -80,7 +79,8 @@ class EndingGenerator {
       let lastError: Error | null = null;
       for (let i = 0; i <= this.maxRetries; i++) {
         try {
-          const response = await geminiClient.generateContent(finalPrompt);
+          const client = createDefaultGeminiClient();
+          const response = await client.generateContent(finalPrompt);
           const result = this.parseResponse(response.content);
           
           // Calculate play time if session data available
@@ -108,7 +108,13 @@ class EndingGenerator {
 
       throw new Error(`Failed to generate ending after ${this.maxRetries + 1} attempts: ${lastError?.message}`);
     } catch (error) {
-      logger.error('Failed to generate ending', { error });
+      logger.error('Failed to generate ending', { 
+        error,
+        requestType: request.endingType,
+        tone: request.desiredTone,
+        characterId: request.characterId,
+        worldId: request.worldId 
+      });
       throw new Error('Failed to generate ending: ' + (error as Error).message);
     }
   }
@@ -136,25 +142,6 @@ class EndingGenerator {
     return importantEntries.map(entry => entry.content);
   }
 
-  private determineAutoTone(context: EndingContext): EndingTone {
-    // Analyze recent narrative to determine appropriate tone
-    const recentMoods = context.narrativeSegments
-      .slice(0, 5)
-      .map(seg => seg.metadata.mood)
-      .filter(Boolean);
-
-    if (recentMoods.includes('action') || recentMoods.includes('tense')) {
-      return 'triumphant';
-    }
-    if (recentMoods.includes('emotional')) {
-      return 'bittersweet';
-    }
-    if (recentMoods.includes('mysterious')) {
-      return 'mysterious';
-    }
-    
-    return 'hopeful'; // Default tone
-  }
 
   private renderTemplate(template: string, variables: Record<string, string | number>): string {
     // Simple template rendering (replace with proper template engine if needed)
@@ -185,11 +172,24 @@ class EndingGenerator {
           throw new Error('Missing required fields in response');
         }
 
+        // Validate and clean the tone value
+        const validTones: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
+        let cleanTone: EndingTone = 'hopeful'; // default
+        
+        if (parsed.tone) {
+          const toneString = parsed.tone.toLowerCase().trim();
+          // Check if the tone contains any of the valid tones
+          const foundTone = validTones.find(tone => toneString.includes(tone));
+          if (foundTone) {
+            cleanTone = foundTone;
+          }
+        }
+
         return {
           epilogue: parsed.epilogue,
           characterLegacy: parsed.characterLegacy,
           worldImpact: parsed.worldImpact,
-          tone: parsed.tone || 'hopeful',
+          tone: cleanTone,
           achievements: parsed.achievements || [],
           playTime: parsed.playTime
         };

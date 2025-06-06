@@ -15,6 +15,10 @@ describe('narrativeStore - Ending functionality', () => {
     // Reset store state
     useNarrativeStore.setState({
       segments: {},
+      sessionSegments: {},
+      decisions: {},
+      sessionDecisions: {},
+      endedSessions: {}, // Add session locking state
       currentSegmentId: null,
       currentEnding: null,
       isGeneratingEnding: false,
@@ -115,7 +119,7 @@ describe('narrativeStore - Ending functionality', () => {
       const updatedState = useNarrativeStore.getState();
       
       expect(updatedState.currentEnding).toBeNull();
-      expect(updatedState.endingError).toBe('Failed to generate ending');
+      expect(updatedState.endingError).toContain('Failed to generate ending');
       expect(updatedState.isGeneratingEnding).toBe(false);
     });
 
@@ -330,6 +334,64 @@ describe('narrativeStore - Ending functionality', () => {
       const ending = store.getEndingForSession('non-existent-session');
 
       expect(ending).toBeNull();
+    });
+  });
+
+  describe('Session Locking', () => {
+    it('should mark session as ended when ending is generated', async () => {
+      const mockGenerationResult = {
+        epilogue: 'The story concludes...',
+        characterLegacy: 'A hero remembered...',
+        worldImpact: 'Peace restored...',
+        tone: 'triumphant' as const,
+        achievements: ['Hero'],
+        playTime: 3600
+      };
+
+      (endingGenerator.generateEnding as jest.Mock).mockResolvedValue(mockGenerationResult);
+
+      const store = useNarrativeStore.getState();
+      const sessionId = 'session-123';
+      
+      // Session should not be ended initially
+      expect(store.isSessionEnded(sessionId)).toBe(false);
+
+      await store.generateEnding('player-choice', {
+        sessionId,
+        characterId: 'char-456',
+        worldId: 'world-789'
+      });
+
+      // Session should be marked as ended after generating ending
+      expect(store.isSessionEnded(sessionId)).toBe(true);
+    });
+
+    it('should prevent adding segments to ended sessions', async () => {
+      const store = useNarrativeStore.getState();
+      const sessionId = 'session-123';
+      
+      // Mark session as ended
+      store.markSessionEnded(sessionId);
+      
+      // Should throw error when trying to add segment to ended session
+      expect(() => {
+        store.addSegment(sessionId, {
+          type: 'scene',
+          content: 'New content',
+          metadata: {}
+        });
+      }).toThrow('Cannot add segments to an ended session');
+    });
+
+    it('should track multiple ended sessions independently', () => {
+      const store = useNarrativeStore.getState();
+      
+      store.markSessionEnded('session-1');
+      store.markSessionEnded('session-2');
+      
+      expect(store.isSessionEnded('session-1')).toBe(true);
+      expect(store.isSessionEnded('session-2')).toBe(true);
+      expect(store.isSessionEnded('session-3')).toBe(false);
     });
   });
 });

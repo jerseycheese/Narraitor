@@ -17,6 +17,13 @@ jest.mock('@/components/Narrative/NarrativeHistoryManager', () => ({
   ))
 }));
 
+// Mock DeleteConfirmationDialog
+jest.mock('@/components/DeleteConfirmationDialog/DeleteConfirmationDialog', () => {
+  return jest.fn(({ isOpen, title, children }) => 
+    isOpen ? <div data-testid="mock-confirmation-dialog">{title} {children}</div> : null
+  );
+});
+
 // Mock the narrativeStore
 jest.mock('@/state/narrativeStore', () => ({
   useNarrativeStore: jest.fn(() => ({
@@ -27,7 +34,9 @@ jest.mock('@/state/narrativeStore', () => ({
     selectDecisionOption: jest.fn(),
     getSessionSegments: jest.fn().mockReturnValue([]),
     getSessionDecisions: jest.fn().mockReturnValue([]),
-    clearSessionSegments: jest.fn()
+    clearSessionSegments: jest.fn(),
+    isSessionEnded: jest.fn().mockReturnValue(false), // Add session locking support
+    markSessionEnded: jest.fn()
   }))
 }));
 
