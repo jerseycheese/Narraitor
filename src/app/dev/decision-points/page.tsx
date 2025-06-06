@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
-import { DecisionPointIndicator } from '@/components/Narrative/DecisionPointIndicator';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
 import { generateUniqueId } from '@/lib/utils/generateId';
 
@@ -24,9 +23,7 @@ export default function DecisionPointsTestPage() {
       },
       timestamp: new Date(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      triggersDecision: true,
-      decisionId: 'decision-major'
+      updatedAt: new Date().toISOString()
     },
     {
       id: 'seg-2',
@@ -39,9 +36,7 @@ export default function DecisionPointsTestPage() {
       },
       timestamp: new Date(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      triggersDecision: true,
-      decisionId: 'decision-critical'
+      updatedAt: new Date().toISOString()
     }
   ];
 
@@ -100,35 +95,13 @@ export default function DecisionPointsTestPage() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Decision Points Test Harness</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Enhanced Choice Presentation Test Harness</h1>
           <p className="text-gray-600">
-            Test the enhanced decision point presentation system with visual indicators, 
-            context summaries, and decision weight styling.
+            Test the enhanced choice presentation system with context summaries, 
+            decision weight styling, and improved visual clarity.
           </p>
         </div>
 
-        {/* Decision Point Indicators Showcase */}
-        <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Decision Point Indicators</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Inactive</h3>
-              <DecisionPointIndicator isActive={false} decisionWeight="minor" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Minor Decision</h3>
-              <DecisionPointIndicator isActive={true} decisionWeight="minor" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Major Decision</h3>
-              <DecisionPointIndicator isActive={true} decisionWeight="major" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Critical Decision</h3>
-              <DecisionPointIndicator isActive={true} decisionWeight="critical" />
-            </div>
-          </div>
-        </div>
 
         {/* Enhanced Choice Selectors */}
         <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
@@ -165,25 +138,19 @@ export default function DecisionPointsTestPage() {
           </div>
         </div>
 
-        {/* Narrative Flow with Decision Indicators */}
+        {/* Narrative Flow with Enhanced Choices */}
         <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Narrative Flow with Decision Indicators</h2>
+          <h2 className="text-2xl font-semibold mb-4">Narrative Flow with Enhanced Choices</h2>
           <div className="space-y-6">
             {sampleSegments.map((segment, index) => {
               const isLastSegment = index === sampleSegments.length - 1;
-              const associatedDecision = segment.decisionId ? sampleDecisions[segment.decisionId] : null;
+              // For demo purposes, show different decision types for different segments
+              const decisionKey = index === 0 ? 'decision-major' : 'decision-critical';
+              const associatedDecision = sampleDecisions[decisionKey];
               
               return (
                 <div key={segment.id} className="space-y-4">
                   <NarrativeDisplay segment={segment} />
-                  
-                  {/* Decision Point Indicator */}
-                  {segment.triggersDecision && (
-                    <DecisionPointIndicator
-                      isActive={isLastSegment}
-                      decisionWeight={associatedDecision?.decisionWeight || 'minor'}
-                    />
-                  )}
                   
                   {/* Show choices for the last segment */}
                   {isLastSegment && associatedDecision && (
@@ -207,13 +174,11 @@ export default function DecisionPointsTestPage() {
         <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Mobile Responsiveness</h2>
           <p className="text-gray-600 mb-4">
-            Resize your browser window to test mobile behavior. Decision indicators should 
-            show arrows instead of connecting lines on mobile devices.
+            Resize your browser window to test mobile behavior of the enhanced choice selector.
           </p>
           <div className="max-w-sm mx-auto border-2 border-gray-300 rounded-lg p-4">
             <div className="space-y-4">
               <NarrativeDisplay segment={sampleSegments[0]} />
-              <DecisionPointIndicator isActive={true} decisionWeight="major" />
               <ChoiceSelector
                 decision={sampleDecisions['decision-major']}
                 onSelect={handleChoiceSelect}
@@ -232,10 +197,10 @@ export default function DecisionPointsTestPage() {
             <div className="p-4 bg-blue-50 border border-blue-200 rounded">
               <h3 className="font-semibold mb-2">ARIA Labels and Roles</h3>
               <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Decision point indicators have proper ARIA labels when active</li>
                 <li>• Choice selectors use role=&ldquo;group&rdquo; and aria-labelledby</li>
                 <li>• Individual choices use role=&ldquo;radio&rdquo; and aria-checked</li>
                 <li>• Custom input has proper aria-label</li>
+                <li>• Context summaries are properly associated with choices</li>
               </ul>
             </div>
             <div className="p-4 bg-green-50 border border-green-200 rounded">
@@ -251,7 +216,7 @@ export default function DecisionPointsTestPage() {
               <h3 className="font-semibold mb-2">Visual Cues</h3>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>• Color-coded decision weights (blue/amber/red)</li>
-                <li>• Pulsing animation for active indicators</li>
+                <li>• Enhanced visual prominence for important decisions</li>
                 <li>• Clear visual separation from narrative text</li>
                 <li>• Responsive design for all screen sizes</li>
               </ul>

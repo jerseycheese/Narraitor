@@ -35,18 +35,12 @@ describe('ChoiceSelector Context Display', () => {
     expect(container).toHaveClass('border-amber-400', 'bg-amber-50/30');
   });
 
-  it('shows decision weight indicator', () => {
-    render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
-    
-    const weightIndicator = screen.getByTestId('decision-weight-indicator');
-    expect(weightIndicator).toBeInTheDocument();
-    expect(weightIndicator).toHaveClass('bg-amber-500');
-  });
 
-  it('displays decision point label', () => {
+  it('applies decision weight container styling', () => {
     render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
     
-    expect(screen.getByText('Decision Point')).toBeInTheDocument();
+    const container = screen.getByTestId('choice-selector');
+    expect(container).toHaveClass('border-amber-400', 'bg-amber-50/30');
   });
 
   it('works without context summary', () => {
@@ -72,9 +66,6 @@ describe('ChoiceSelector Context Display', () => {
     
     const container = screen.getByTestId('choice-selector');
     expect(container).toHaveClass('border-red-400', 'bg-red-50/30');
-    
-    const weightIndicator = screen.getByTestId('decision-weight-indicator');
-    expect(weightIndicator).toHaveClass('bg-red-500');
   });
 
   it('applies minor decision weight styling', () => {
@@ -87,9 +78,6 @@ describe('ChoiceSelector Context Display', () => {
     
     const container = screen.getByTestId('choice-selector');
     expect(container).toHaveClass('border-blue-300', 'bg-blue-50/30');
-    
-    const weightIndicator = screen.getByTestId('decision-weight-indicator');
-    expect(weightIndicator).toHaveClass('bg-blue-500');
   });
 
   it('defaults to minor weight when not specified', () => {

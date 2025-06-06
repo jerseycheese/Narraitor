@@ -15,9 +15,6 @@ export interface NarrativeSegment extends TimestampedEntity {
   decisions?: Decision[];
   metadata: NarrativeMetadata;
   timestamp: Date;
-  // Enhanced fields for decision point indication
-  triggersDecision?: boolean;
-  decisionId?: EntityID;
 }
 
 /**

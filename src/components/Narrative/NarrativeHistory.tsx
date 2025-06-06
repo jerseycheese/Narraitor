@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { NarrativeDisplay } from './NarrativeDisplay';
-import { DecisionPointIndicator } from './DecisionPointIndicator';
-import { useNarrativeStore } from '@/state/narrativeStore';
 
 interface NarrativeHistoryProps {
   segments: NarrativeSegment[];
@@ -10,7 +8,6 @@ interface NarrativeHistoryProps {
   error?: string;
   className?: string;
   onRetry?: () => void;
-  sessionId?: string; // For getting decision information
 }
 
 export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
@@ -18,12 +15,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   isLoading = false,
   error,
   className = '',
-  onRetry,
-  sessionId
+  onRetry
 }) => {
-  // Get decisions for this session to determine which segments trigger decisions
-  const getSessionDecisions = useNarrativeStore(state => state.getSessionDecisions);
-  const sessionDecisions = sessionId ? getSessionDecisions(sessionId) : [];
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const prevSegmentCountRef = useRef(segments.length);
   const userHasScrolledRef = useRef(false);
@@ -86,37 +79,16 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     
     // If we have segments, render them
     if (segments.length > 0) {
-      
       return (
         <>
-          {segments.map((segment, index) => {
-            // Check if this segment should trigger a decision indicator
-            const isLastSegment = index === segments.length - 1;
-            const hasDecisionAfter = segment.triggersDecision || segment.decisionId;
-            
-            // Find associated decision if any
-            const associatedDecision = sessionDecisions.find(decision => 
-              decision.id === segment.decisionId
-            );
-            
-            return (
-              <React.Fragment key={segment.id}>
-                <NarrativeDisplay 
-                  segment={segment}
-                  isLoading={false}
-                  error={undefined}
-                />
-                
-                {/* Show decision point indicator after segments that trigger decisions */}
-                {hasDecisionAfter && (
-                  <DecisionPointIndicator
-                    isActive={isLastSegment && !isLoading}
-                    decisionWeight={associatedDecision?.decisionWeight || 'minor'}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
+          {segments.map((segment) => (
+            <NarrativeDisplay 
+              key={segment.id}
+              segment={segment}
+              isLoading={false}
+              error={undefined}
+            />
+          ))}
           
           {/* Loading indicator for additional segments */}
           {isLoading && (

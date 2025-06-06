@@ -196,17 +196,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       role="group"
       aria-labelledby="choices-heading"
     >
-      {/* Decision Point Indicator */}
-      <div className="flex items-center gap-2 mb-3">
-        <div 
-          data-testid="decision-weight-indicator"
-          className={`w-3 h-3 rounded-full animate-pulse ${weightStyling.dot}`} 
-          aria-hidden="true"
-        />
-        <span className={`text-xs uppercase font-bold tracking-wide ${weightStyling.label}`}>
-          Decision Point
-        </span>
-      </div>
 
       {/* Context Summary */}
       {isDecisionMode && decision.contextSummary && (

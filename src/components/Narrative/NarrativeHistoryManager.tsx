@@ -134,7 +134,6 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
         // Always show loading animation until stabilized, regardless of whether we have segments
         isLoading={isLoading || !stabilized}
         error={error || undefined}
-        sessionId={sessionId}
       />
     </div>
   );
