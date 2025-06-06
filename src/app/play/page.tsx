@@ -99,8 +99,10 @@ export default function PlayPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      <GameSession worldId={currentWorldId!} />
+    <main className="min-h-screen p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto">
+        <GameSession worldId={currentWorldId!} />
+      </div>
     </main>
   );
 }

@@ -20,9 +20,11 @@ export default function PlayPage() {
   // For server rendering, show a simple placeholder
   if (!isClient) {
     return (
-      <div className="play-page-container">
-        <div className="p-4 text-center">
-          <p>Loading game session...</p>
+      <div className="min-h-screen p-4 sm:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="p-4 text-center">
+            <p>Loading game session...</p>
+          </div>
         </div>
       </div>
     );
@@ -34,8 +36,10 @@ export default function PlayPage() {
   }
 
   return (
-    <div className="play-page-container">
-      <GameSession worldId={worldId} />
+    <div className="min-h-screen p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto">
+        <GameSession worldId={worldId} />
+      </div>
     </div>
   );
 }

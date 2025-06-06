@@ -202,7 +202,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     <div className="space-y-3">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
-        <p className={`text-lg leading-relaxed whitespace-pre-wrap ${styles.text}`}>
+        <p className={`text-xl leading-relaxed whitespace-pre-wrap ${styles.text}`}>
           {displayContent}
         </p>
         {segment.metadata?.location && (

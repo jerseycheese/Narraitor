@@ -356,7 +356,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         {/* Story Column */}
         <div className="order-1">
           <div className="p-4 bg-gray-100 rounded">
-            <h2 className="text-xl font-bold mb-2">Story</h2>
             {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
             <NarrativeHistoryManager
               key={`display-${controllerKey}`}
