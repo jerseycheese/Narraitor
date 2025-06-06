@@ -54,16 +54,16 @@ const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean):
 };
 
 /**
- * Get styling for decision weight using border thickness and subtle backgrounds
- * This avoids color conflicts with choice alignment colors (blue/red)
+ * Get styling for decision weight using border thickness and strategic colors
+ * Critical decisions use bright red, while choice alignments use muted red
  */
 const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   switch (weight) {
     case 'critical':
       return {
-        container: 'border-6 border-gray-500 bg-gray-500/15',
-        dot: 'bg-gray-600',
-        label: 'text-gray-800'
+        container: 'border-6 border-red-600 bg-red-100/20',
+        dot: 'bg-red-600',
+        label: 'text-red-800'
       };
     case 'major':
       return {

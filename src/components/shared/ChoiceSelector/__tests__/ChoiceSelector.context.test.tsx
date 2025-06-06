@@ -65,7 +65,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={criticalDecision} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-6', 'border-gray-500', 'bg-gray-500/15');
+    expect(container).toHaveClass('border-6', 'border-red-600', 'bg-red-100/20');
   });
 
   it('applies minor decision weight styling', () => {
