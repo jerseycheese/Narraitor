@@ -10,6 +10,7 @@ export default function DevPage() {
       { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
       { href: '/dev/choice-generator', label: 'Player Choice Generator', color: 'blue' },
       { href: '/dev/choice-alignment', label: 'Choice Alignment Test', color: 'blue' },
+      { href: '/dev/decision-points', label: 'Decision Points Test', color: 'blue' },
       { href: '/dev/lore-viewer', label: 'Lore Viewer', color: 'indigo' },
     ],
     'World Management': [

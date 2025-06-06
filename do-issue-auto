@@ -1,0 +1,2 @@
+#!/bin/bash
+./scripts/claude-workflow.sh do-issue-auto "$@"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Decision, ChoiceAlignment } from '@/types/narrative.types';
+import { Decision, ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -51,6 +51,33 @@ const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean):
   const hover = isDisabled ? '' : hoverClasses[alignmentKey];
   
   return `${base} ${hover}`;
+};
+
+/**
+ * Get styling for decision weight
+ */
+const getDecisionWeightStyling = (weight?: DecisionWeight) => {
+  switch (weight) {
+    case 'critical':
+      return {
+        container: 'border-red-400 bg-red-50/30',
+        dot: 'bg-red-500',
+        label: 'text-red-700'
+      };
+    case 'major':
+      return {
+        container: 'border-amber-400 bg-amber-50/30',
+        dot: 'bg-amber-500',
+        label: 'text-amber-700'
+      };
+    case 'minor':
+    default:
+      return {
+        container: 'border-blue-300 bg-blue-50/30',
+        dot: 'bg-blue-500',
+        label: 'text-blue-700'
+      };
+  }
 };
 
 /**
@@ -158,13 +185,43 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     return null;
   }
 
+  // Get decision weight styling
+  const decisionWeight = isDecisionMode ? decision.decisionWeight : undefined;
+  const weightStyling = getDecisionWeightStyling(decisionWeight);
+
   return (
     <div 
       data-testid="choice-selector" 
-      className={`choice-selector mt-6 ${className}`}
+      className={`choice-selector mt-6 p-4 border-2 border-dashed rounded-lg ${weightStyling.container} ${className}`}
+      role="group"
+      aria-labelledby="choices-heading"
     >
+      {/* Decision Point Indicator */}
+      <div className="flex items-center gap-2 mb-3">
+        <div 
+          data-testid="decision-weight-indicator"
+          className={`w-3 h-3 rounded-full animate-pulse ${weightStyling.dot}`} 
+          aria-hidden="true"
+        />
+        <span className={`text-xs uppercase font-bold tracking-wide ${weightStyling.label}`}>
+          Decision Point
+        </span>
+      </div>
+
+      {/* Context Summary */}
+      {isDecisionMode && decision.contextSummary && (
+        <div 
+          data-testid="context-summary"
+          className="mb-4 p-3 bg-white/50 rounded border border-gray-200"
+        >
+          <p className="text-sm text-gray-600 italic">
+            {decision.contextSummary}
+          </p>
+        </div>
+      )}
+      
       <h3 
-        className="text-lg font-semibold mb-2" 
+        className="text-lg font-bold mb-4 text-gray-900" 
         id="choices-heading"
       >
         {displayPrompt}
