@@ -49,7 +49,7 @@ export function PageLayout({
   description, 
   actions, 
   children, 
-  maxWidth = '4xl',
+  maxWidth = '7xl',
   className = '' 
 }: PageLayoutProps) {
   const maxWidthClasses = {

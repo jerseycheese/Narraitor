@@ -21,7 +21,7 @@ export default function PlayPage() {
   if (!isClient) {
     return (
       <div className="min-h-screen p-4 sm:p-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="p-4 text-center">
             <p>Loading game session...</p>
           </div>
@@ -37,7 +37,7 @@ export default function PlayPage() {
 
   return (
     <div className="min-h-screen p-4 sm:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <GameSession worldId={worldId} />
       </div>
     </div>

@@ -14,6 +14,7 @@ import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 interface ActiveGameSessionProps {
   worldId: string;

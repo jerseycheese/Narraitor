@@ -118,7 +118,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   return (
     <div 
       ref={scrollContainerRef}
-      className={`narrative-history ${heightClass} overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner ${className}`}
+      className={`narrative-history ${heightClass} overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner snap-y snap-mandatory ${className}`}
       onScroll={handleScroll}
     >
       <div className="space-y-6 p-4">

@@ -17,7 +17,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="p-8">
+      <div className="p-8 snap-start">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent dark:border-blue-400 dark:border-r-transparent">
             <span className="sr-only">Loading...</span>
@@ -30,14 +30,16 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   if (error) {
     return (
-      <ErrorDisplay
-        variant="section"
-        severity="error"
-        title="Unable to Generate Narrative"
-        message={error}
-        showRetry={!!onRetry}
-        onRetry={onRetry}
-      />
+      <div className="snap-start">
+        <ErrorDisplay
+          variant="section"
+          severity="error"
+          title="Unable to Generate Narrative"
+          message={error}
+          showRetry={!!onRetry}
+          onRetry={onRetry}
+        />
+      </div>
     );
   }
 
@@ -199,7 +201,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   const displayContent = parseContent(segment.content);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 snap-start">
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
         <p className={`text-xl leading-relaxed whitespace-pre-wrap ${styles.text}`}>
