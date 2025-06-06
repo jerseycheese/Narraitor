@@ -33,7 +33,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // 33% - "Set in" worlds (existing universe)
         const tvMovieUniverses = [
           'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Stranger Things', 'Deadwood', 'The Walking Dead',
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -43,7 +43,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         // 34% - "Based on" worlds (inspired by existing universe)
         const tvMovieUniverses = [
           'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-          'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+          'Stranger Things', 'Deadwood', 'The Walking Dead',
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -162,7 +162,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           // 33% - "Set in" worlds (existing universe)
           const tvMovieUniverses = [
             'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Stranger Things', 'Deadwood', 'The Walking Dead',
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
@@ -172,7 +172,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           // 34% - "Based on" worlds (inspired by existing universe)
           const tvMovieUniverses = [
             'Game of Thrones', 'Lord of the Rings', 'Star Wars', 'Twin Peaks', 
-            'Stranger Things', 'Deadwood', 'The Witcher', 'The Walking Dead',
+            'Stranger Things', 'Deadwood', 'The Walking Dead',
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];

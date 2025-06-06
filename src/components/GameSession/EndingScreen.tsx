@@ -85,11 +85,15 @@ export function EndingScreen() {
     }
   }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments]);
 
-  // Generate ending image when ending is available
+  // Generate ending image when ending is available (but not in Storybook)
   useEffect(() => {
+    // Skip image generation in Storybook environment
+    const isStorybook = window.location.port === '6006' || window.location.hostname.includes('storybook');
+    
     if (currentEnding && 
         !endingImage && 
         !isGeneratingImage && 
+        !isStorybook &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }

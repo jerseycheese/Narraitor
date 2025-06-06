@@ -5,6 +5,7 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
+import { logger } from '../lib/utils/logger';
 
 /**
  * Narrative store interface with state and actions
@@ -15,6 +16,7 @@ interface NarrativeStore {
   sessionSegments: Record<EntityID, EntityID[]>;
   decisions: Record<EntityID, Decision>;
   sessionDecisions: Record<EntityID, EntityID[]>;
+  endedSessions: Record<EntityID, boolean>; // Track sessions that have ended with an ending
   currentEnding: StoryEnding | null;
   isGeneratingEnding: boolean;
   endingError: string | null;
@@ -53,9 +55,12 @@ interface NarrativeStore {
     customPrompt?: string;
   }) => Promise<void>;
   clearEnding: () => void;
+  setCurrentEnding: (ending: StoryEnding | null) => void;
   saveEndingToHistory: () => void;
   hasActiveEnding: () => boolean;
   getEndingForSession: (sessionId: EntityID) => StoryEnding | null;
+  isSessionEnded: (sessionId: EntityID) => boolean;
+  markSessionEnded: (sessionId: EntityID) => void;
 }
 
 // Initial state
@@ -64,6 +69,7 @@ const initialState = {
   sessionSegments: {},
   decisions: {},
   sessionDecisions: {},
+  endedSessions: {},
   currentEnding: null,
   isGeneratingEnding: false,
   endingError: null,
@@ -81,6 +87,11 @@ export const useNarrativeStore = create<NarrativeStore>()(
   addSegment: (sessionId, segmentData) => {
     if (!segmentData.content || segmentData.content.trim() === '') {
       throw new Error('Segment content is required');
+    }
+    
+    // Prevent adding segments to ended sessions
+    if (get().isSessionEnded(sessionId)) {
+      throw new Error('Cannot add segments to an ended session');
     }
 
     const segmentId = generateUniqueId('segment');
@@ -337,15 +348,24 @@ export const useNarrativeStore = create<NarrativeStore>()(
         isGeneratingEnding: false,
         endingError: null
       });
+      
+      // Mark the session as ended to prevent further generation
+      get().markSessionEnded(params.sessionId);
     } catch (error) {
+      logger.error('Failed to generate ending', { error, endingType, params });
+      
+      // Show the actual error instead of fallback for debugging
       set({ 
+        currentEnding: null,
         isGeneratingEnding: false, 
-        endingError: (error as Error).message || 'Failed to generate ending'
+        endingError: `AI ending generation failed: ${error instanceof Error ? error.message : 'Unknown error'}. Check your GEMINI_API_KEY configuration.`
       });
     }
   },
   
   clearEnding: () => set({ currentEnding: null, endingError: null }),
+  
+  setCurrentEnding: (ending) => set({ currentEnding: ending, endingError: null }),
   
   saveEndingToHistory: () => {
     const state = get();
@@ -414,6 +434,20 @@ export const useNarrativeStore = create<NarrativeStore>()(
     );
     
     return endingSegment?.metadata.endingData as StoryEnding || null;
+  },
+  
+  // Session ending tracking
+  isSessionEnded: (sessionId) => {
+    return get().endedSessions[sessionId] === true;
+  },
+  
+  markSessionEnded: (sessionId) => {
+    set((state) => ({
+      endedSessions: {
+        ...state.endedSessions,
+        [sessionId]: true,
+      }
+    }));
   },
 }),
 {

@@ -8,13 +8,13 @@ import { useWorldStore } from '../../state/worldStore';
 import type { StoryEnding } from '../../types/narrative.types';
 
 const meta: Meta<typeof EndingScreen> = {
-  title: 'Game/EndingScreen',
+  title: 'Narraitor/Game/EndingScreen',
   component: EndingScreen,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Story ending screen with AI-generated epilogue, character legacy, and world impact.'
+        component: 'Story ending screen that provides narrative closure with AI-generated epilogue, character legacy, and world impact. Uses shared components and existing tone-based styling.'
       }
     }
   }
@@ -290,56 +290,3 @@ The realm's approach to challenges shifted from combat to collaboration. Problem
   }
 };
 
-export const Loading: Story = {
-  decorators: [(Story: React.ComponentType) => {
-    useNarrativeStore.setState({
-      currentEnding: null,
-      isGeneratingEnding: true,
-      endingError: null
-    });
-    return <Story />;
-  }],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Loading state shown while the AI generates the story ending.'
-      }
-    }
-  }
-};
-
-export const Error: Story = {
-  decorators: [(Story: React.ComponentType) => {
-    useNarrativeStore.setState({
-      currentEnding: null,
-      isGeneratingEnding: false,
-      endingError: 'Failed to connect to AI service. Please try again later.'
-    });
-    return <Story />;
-  }],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Error state shown when ending generation fails.'
-      }
-    }
-  }
-};
-
-export const NoData: Story = {
-  decorators: [(Story: React.ComponentType) => {
-    useNarrativeStore.setState({
-      currentEnding: null,
-      isGeneratingEnding: false,
-      endingError: null
-    });
-    return <Story />;
-  }],
-  parameters: {
-    docs: {
-      description: {
-        story: 'State shown when no ending data is available.'
-      }
-    }
-  }
-};

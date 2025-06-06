@@ -12,6 +12,8 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
+import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
+import type { EndingType } from '@/types/narrative.types';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -50,6 +52,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
+  // Ending suggestion state
+  const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
+  const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
+  const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
+  
+  // Manual end story confirmation
+  const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
+  
   // Get character ID from session store
   const characterId = useSessionStore(state => state.characterId);
   
@@ -59,7 +69,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   );
   
   // Get narrative store for ending functionality
-  const { currentEnding, isGeneratingEnding, generateEnding } = useNarrativeStore();
+  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
@@ -168,6 +178,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
 
   const handleChoiceSelected = (choiceId: string) => {
+    // Check if session has ended - if so, prevent further generation
+    if (isSessionEnded(sessionId)) {
+      return;
+    }
+    
     // Player choice was selected
     setIsGenerating(true);
     setIsGeneratingChoices(true); // Start generating new choices
@@ -186,6 +201,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
 
   const handleCustomSubmit = (customText: string) => {
+    // Check if session has ended - if so, prevent further generation
+    if (isSessionEnded(sessionId)) {
+      return;
+    }
+    
     // Handle custom player input
     const customChoiceId = generateUniqueId('custom');
     
@@ -255,7 +275,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     useSessionStore.getState().setPlayerChoices(playerChoices);
   };
   
-  // Handle ending story functionality
+  // Handle ending story functionality with confirmation
   const handleEndStory = async () => {
     if (!characterId || !world) return;
     
@@ -268,6 +288,45 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     } catch (error) {
       console.error('Failed to generate ending:', error);
     }
+  };
+  
+  // Handle ending suggestion from AI
+  const handleEndingSuggested = (reason: string, endingType: EndingType) => {
+    setEndingSuggestionReason(reason);
+    setSuggestedEndingType(endingType);
+    setShowEndingSuggestion(true);
+  };
+  
+  // Accept AI ending suggestion
+  const handleAcceptEndingSuggestion = async () => {
+    setShowEndingSuggestion(false);
+    if (!characterId || !world) return;
+    
+    try {
+      await generateEnding(suggestedEndingType, {
+        sessionId,
+        characterId,
+        worldId: world.id
+      });
+    } catch (error) {
+      console.error('Failed to generate ending:', error);
+    }
+  };
+  
+  // Reject AI ending suggestion
+  const handleRejectEndingSuggestion = () => {
+    setShowEndingSuggestion(false);
+  };
+  
+  // Handle manual end story button click
+  const handleEndStoryClick = () => {
+    setShowEndConfirmation(true);
+  };
+  
+  // Confirm manual end story
+  const handleConfirmEndStory = () => {
+    setShowEndConfirmation(false);
+    handleEndStory();
   };
 
   // If we have an ending, show the ending screen instead
@@ -318,6 +377,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 choiceId={localSelectedChoiceId || selectedChoiceId}
                 onNarrativeGenerated={handleNarrativeGenerated}
                 onChoicesGenerated={handleChoicesGenerated}
+                onEndingSuggested={handleEndingSuggested}
                 generateChoices={true}
               />
             </div>
@@ -334,7 +394,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
               />
             </div>
           ) : isGeneratingChoices ? (
@@ -355,7 +415,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
               />
             </div>
           ) : (
@@ -429,11 +489,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <button
             data-testid="game-session-end-story"
             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
-            onClick={handleEndStory}
-            disabled={isGeneratingEnding}
+            onClick={handleEndStoryClick}
+            disabled={isGeneratingEnding || isSessionEnded(sessionId)}
             title="End your story with an AI-generated epilogue"
           >
-            {isGeneratingEnding ? '⏳ Generating...' : '📖 End Story'}
+            {isGeneratingEnding ? 'Generating...' : 'End Story'}
           </button>
           <button
             data-testid="game-session-end"
@@ -444,6 +504,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           </button>
         </div>
       )}
+
+      {/* Ending Suggestion Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showEndingSuggestion}
+        onConfirm={handleAcceptEndingSuggestion}
+        onClose={handleRejectEndingSuggestion}
+        title="Story Ending Suggested"
+        description="The AI has detected that your story might be ready to conclude."
+        itemName={endingSuggestionReason}
+        confirmButtonText="Generate Ending"
+        cancelButtonText="Continue Playing"
+      />
+
+      {/* Manual End Story Confirmation */}
+      <DeleteConfirmationDialog
+        isOpen={showEndConfirmation}
+        onConfirm={handleConfirmEndStory}
+        onClose={() => setShowEndConfirmation(false)}
+        title="End Story"
+        description="Are you sure you want to end your story? This will generate a final ending based on your current progress and cannot be undone."
+        itemName=""
+        confirmButtonText="End Story"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 };

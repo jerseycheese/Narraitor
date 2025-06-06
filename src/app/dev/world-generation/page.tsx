@@ -70,7 +70,6 @@ export default function WorldGenerationTestPage() {
     'Harry Potter',
     'Game of Thrones',
     'Cyberpunk 2077',
-    'The Witcher',
     'Ancient Rome',
     'Victorian England',
     'Wild West',

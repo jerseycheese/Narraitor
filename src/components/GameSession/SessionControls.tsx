@@ -52,7 +52,7 @@ const SessionControls: React.FC<SessionControlsProps> = ({
             onClick={onEndStory}
             title="End your story with an AI-generated epilogue"
           >
-            📖 End Story
+            End Story
           </button>
         )}
         <button

@@ -11,6 +11,7 @@ interface NarrativeControllerProps {
   characterId?: string;
   onNarrativeGenerated?: (segment: NarrativeSegment) => void;
   onChoicesGenerated?: (decision: Decision) => void;
+  onEndingSuggested?: (reason: string, endingType: import('@/types/narrative.types').EndingType) => void;
   triggerGeneration?: boolean;
   choiceId?: string; // ID of the choice that triggered this narrative
   className?: string;
@@ -23,6 +24,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   characterId,
   onNarrativeGenerated,
   onChoicesGenerated,
+  onEndingSuggested,
   triggerGeneration = true,
   choiceId,
   className,
@@ -48,6 +50,8 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const initialGenerationInitiated = useRef(false);
   // Use a ref to prevent overlapping choice generation
   const choiceGenerationInProgress = useRef(false);
+  // Track if we've already suggested an ending for this session
+  const endingSuggestedRef = useRef(false);
 
   // Load existing segments on mount and reset state when session changes
   useEffect(() => {
@@ -89,6 +93,123 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
   }, [sessionId, getSessionSegments]);
+
+  /**
+   * Check narrative content for ending indicators and suggest ending if appropriate
+   */
+  const checkForEndingIndicators = async (newSegment: NarrativeSegment) => {
+    // Don't suggest multiple times
+    if (endingSuggestedRef.current || !onEndingSuggested) return;
+    
+    // Get all segments including the new one
+    const allSegments = [...segments, newSegment];
+    
+    // Analyze the narrative for ending indicators
+    const recentContent = allSegments.slice(-5).map(s => s.content.toLowerCase()).join(' ');
+    
+    // Check for completion indicators
+    const completionIndicators = [
+      'quest complete', 'mission accomplished', 'journey ends', 'story concludes',
+      'returned home', 'peace restored', 'evil defeated', 'finally over',
+      'quest fulfilled', 'destiny fulfilled', 'adventure ends', 'chapter closes',
+      'task complete', 'objective achieved', 'goal reached', 'victory achieved'
+    ];
+    
+    const hasCompletionIndicator = completionIndicators.some(indicator => 
+      recentContent.includes(indicator)
+    );
+    
+    // Check for conclusive narrative patterns
+    const conclusivePatterns = [
+      /the (hero|protagonist|adventurer) returned/,
+      /peace (was|has been) restored/,
+      /evil (was|has been) (defeated|vanquished)/,
+      /journey (came|comes) to an end/,
+      /quest (was|is) (complete|fulfilled)/,
+      /finally found peace/,
+      /new chapter begins/,
+      /sun (rose|rises) on a new day/
+    ];
+    
+    const hasConclusivePattern = conclusivePatterns.some(pattern => 
+      pattern.test(recentContent)
+    );
+    
+    // Check for character arc completion
+    const characterArcIndicators = [
+      'found what they were looking for',
+      'learned the true meaning',
+      'discovered their purpose',
+      'became who they were meant to be',
+      'transformation complete'
+    ];
+    
+    const hasCharacterArcCompletion = characterArcIndicators.some(indicator =>
+      recentContent.includes(indicator)
+    );
+    
+    // Determine ending type and reason
+    let shouldSuggestEnding = false;
+    let endingType: import('@/types/narrative.types').EndingType = 'story-complete';
+    let reason = '';
+    
+    if (hasCompletionIndicator || hasConclusivePattern) {
+      shouldSuggestEnding = true;
+      endingType = 'story-complete';
+      reason = 'Your main quest appears to be complete. The narrative has reached a natural conclusion.';
+    } else if (hasCharacterArcCompletion) {
+      shouldSuggestEnding = true;
+      endingType = 'character-retirement';
+      reason = 'Your character\'s personal journey seems complete. They have achieved their growth and transformation.';
+    } else if (allSegments.length > 20) {
+      // Check for session length
+      shouldSuggestEnding = true;
+      endingType = 'session-limit';
+      reason = 'You\'ve had quite an adventure! This might be a good place to conclude your story.';
+    }
+    
+    // Use AI to confirm ending suggestion if we have indicators
+    if (shouldSuggestEnding && !endingSuggestedRef.current) {
+      try {
+        const client = createDefaultGeminiClient();
+        const analysisPrompt = `Analyze this narrative to determine if it's reaching a natural conclusion:
+
+Recent narrative:
+${recentContent}
+
+Is this story reaching a natural ending point? Consider:
+- Has the main conflict been resolved?
+- Has the character achieved their goal?
+- Is there a sense of closure or completion?
+- Are there strong indicators this is ending?
+
+Respond with JSON: { "suggestEnding": true/false, "confidence": "high/medium/low", "reason": "brief explanation" }`;
+
+        const response = await client.generateContent(analysisPrompt);
+        
+        try {
+          const analysis = JSON.parse(response.content);
+          
+          if (analysis.suggestEnding && (analysis.confidence === 'high' || analysis.confidence === 'medium')) {
+            endingSuggestedRef.current = true;
+            onEndingSuggested(analysis.reason || reason, endingType);
+          }
+        } catch {
+          // If AI analysis fails, use our rule-based detection
+          if (hasCompletionIndicator || hasConclusivePattern || hasCharacterArcCompletion) {
+            endingSuggestedRef.current = true;
+            onEndingSuggested(reason, endingType);
+          }
+        }
+      } catch {
+        // Fallback to rule-based detection if AI fails
+        if (hasCompletionIndicator || hasConclusivePattern || hasCharacterArcCompletion) {
+          endingSuggestedRef.current = true;
+          onEndingSuggested(reason, endingType);
+        }
+      }
+    }
+  };
 
   // Deduplicate segments by ID to ensure we don't have duplicates in localStorage
   useEffect(() => {
@@ -376,6 +497,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
         onNarrativeGenerated(newSegment);
       }
       
+      // Check for ending indicators
+      await checkForEndingIndicators(newSegment);
+      
       // Generate choices if enabled - always generate for initial narrative
       if (generateChoices) {
         
@@ -480,6 +604,9 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       if (onNarrativeGenerated) {
         onNarrativeGenerated(newSegment);
       }
+      
+      // Check for ending indicators
+      await checkForEndingIndicators(newSegment);
       
       // Generate choices if enabled
       if (generateChoices) {

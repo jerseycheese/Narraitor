@@ -27,7 +27,6 @@ export const TV_MOVIE_UNIVERSES = [
   'Twin Peaks',
   'Stranger Things',
   'Deadwood',
-  'The Witcher',
   'The Walking Dead',
   'Black Mirror',
   'The Matrix',
