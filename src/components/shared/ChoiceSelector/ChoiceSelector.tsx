@@ -31,6 +31,21 @@ interface ChoiceSelectorProps {
 }
 
 /**
+ * Get icon for choice alignment
+ */
+const getAlignmentIcon = (alignment?: ChoiceAlignment): string => {
+  switch (alignment) {
+    case 'lawful':
+      return '⚖️'; // Scales of justice for lawful
+    case 'chaotic':
+      return '🔥'; // Fire for chaotic/unpredictable
+    case 'neutral':
+    default:
+      return ''; // No icon for neutral
+  }
+};
+
+/**
  * Get CSS classes for alignment-based styling
  */
 const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
@@ -67,9 +82,9 @@ const getDecisionWeightStyling = (weight?: DecisionWeight) => {
       };
     case 'major':
       return {
-        container: 'border-4 border-gray-500 bg-gray-500/10',
-        dot: 'bg-gray-600',
-        label: 'text-gray-800'
+        container: 'border-4 border-yellow-500 bg-yellow-100/20',
+        dot: 'bg-yellow-600',
+        label: 'text-yellow-800'
       };
     case 'minor':
     default:
@@ -274,10 +289,18 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             aria-checked={option.isSelected}
             role="radio"
           >
-            {option.isSelected ? '➤ ' : ''}{option.text}
-            {showHints && option.hint && (
-              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
-            )}
+            <span className="flex items-start gap-2">
+              {option.isSelected && <span>➤</span>}
+              {!option.isSelected && getAlignmentIcon(option.alignment) && (
+                <span className="text-lg leading-none">{getAlignmentIcon(option.alignment)}</span>
+              )}
+              <span className="flex-1">
+                {option.text}
+                {showHints && option.hint && (
+                  <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
+                )}
+              </span>
+            </span>
           </button>
         ))}
       </div>

@@ -32,7 +32,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-4', 'border-gray-500', 'bg-gray-500/10');
+    expect(container).toHaveClass('border-4', 'border-yellow-500', 'bg-yellow-100/20');
   });
 
 
@@ -40,7 +40,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-4', 'border-gray-500', 'bg-gray-500/10');
+    expect(container).toHaveClass('border-4', 'border-yellow-500', 'bg-yellow-100/20');
   });
 
   it('works without context summary', () => {

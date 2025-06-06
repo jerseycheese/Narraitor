@@ -215,9 +215,14 @@ export default function DecisionPointsTestPage() {
             <div className="p-4 bg-purple-50 border border-purple-200 rounded">
               <h3 className="font-semibold mb-2">Visual Cues</h3>
               <ul className="text-sm text-gray-700 space-y-1">
-                <li>• Decision weight: Border thickness (2px/4px/6px) + critical uses bright red</li>
-                <li>• Critical decisions: Bright red border (red-600) for maximum urgency</li>
-                <li>• Choice alignment: Muted colors (blue-300/red-300/gray-200)</li>
+                <li>• Decision weight: Border thickness (2px/4px/6px) + color coding</li>
+                <li>• Minor: Gray border (2px) - routine decisions</li>
+                <li>• Major: Yellow border (4px) - important decisions</li>
+                <li>• Critical: Bright red border (6px) - urgent/high-stakes decisions</li>
+                <li>• Choice alignment: Icons + muted colors</li>
+                <li>• Lawful choices: ⚖️ icon + blue background</li>
+                <li>• Chaotic choices: 🔥 icon + red background</li>
+                <li>• Neutral choices: No icon + gray background</li>
                 <li>• Clear visual separation from narrative text</li>
                 <li>• Responsive design for all screen sizes</li>
               </ul>
