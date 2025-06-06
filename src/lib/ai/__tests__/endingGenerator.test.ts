@@ -19,9 +19,17 @@ jest.mock('../../../state/journalStore', () => ({
 }));
 
 import { endingGenerator } from '../endingGenerator';
-import { geminiClient } from '../geminiClient';
 import { contextManager } from '../contextManager';
 import { promptTemplateManager } from '../../promptTemplates/promptTemplateManager';
+
+// Mock createDefaultGeminiClient to return our mocked client
+const mockGeminiClient = {
+  generateContent: jest.fn()
+};
+
+jest.mock('../defaultGeminiClient', () => ({
+  createDefaultGeminiClient: () => mockGeminiClient
+}));
 import type { 
   EndingGenerationRequest,
   NarrativeSegment 
@@ -216,7 +224,6 @@ describe('endingGenerator', () => {
       // Set up the mocks with clear return values
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ content: mockPrompt });
@@ -263,7 +270,6 @@ describe('endingGenerator', () => {
 
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate bittersweet ending...' });
@@ -320,8 +326,6 @@ describe('endingGenerator', () => {
 
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
-      
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate ending...' });
       mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
@@ -350,7 +354,6 @@ describe('endingGenerator', () => {
 
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Base prompt' });
@@ -367,7 +370,7 @@ describe('endingGenerator', () => {
 
       await endingGenerator.generateEnding(mockRequest);
 
-      expect(geminiClient.generateContent).toHaveBeenCalled();
+      expect(mockGeminiClient.generateContent).toHaveBeenCalled();
     });
 
     it('should generate appropriate endings for each ending type', async () => {
@@ -395,7 +398,6 @@ describe('endingGenerator', () => {
 
         const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
         const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-        const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
         
         mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
         mockPromptTemplateManager.getTemplate.mockReturnValue({ content: `Generate ${type} ending...` });
@@ -432,7 +434,6 @@ describe('endingGenerator', () => {
 
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
-      const mockGeminiClient = geminiClient as jest.Mocked<typeof geminiClient>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
       mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate ending...' });

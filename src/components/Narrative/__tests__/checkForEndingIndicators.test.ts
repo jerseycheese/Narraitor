@@ -268,6 +268,9 @@ describe('Pure AI Ending Detection', () => {
       // Mock AI failure
       mockGenerateContent.mockRejectedValueOnce(new Error('AI service unavailable'));
 
+      // Suppress console.error for this test since it's expected
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
       const existingSegments = [
         createSegment('1', 'Story begins.'),
         createSegment('2', 'Story continues.'),
@@ -281,6 +284,9 @@ describe('Pure AI Ending Detection', () => {
       expect(mockGenerateContent).toHaveBeenCalled();
       // Should NOT suggest ending when AI fails (pure AI approach)
       expect(mockOnEndingSuggested).not.toHaveBeenCalled();
+      
+      // Restore console.error
+      consoleSpy.mockRestore();
     });
 
     it('should handle malformed AI response gracefully', async () => {
@@ -288,6 +294,9 @@ describe('Pure AI Ending Detection', () => {
       mockGenerateContent.mockResolvedValueOnce({
         content: 'Invalid JSON response from AI'
       });
+
+      // Suppress console.error for this test since it's expected
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const existingSegments = [
         createSegment('1', 'Story begins.'),
@@ -302,6 +311,9 @@ describe('Pure AI Ending Detection', () => {
       expect(mockGenerateContent).toHaveBeenCalled();
       // Should NOT suggest ending when JSON parsing fails
       expect(mockOnEndingSuggested).not.toHaveBeenCalled();
+      
+      // Restore console.error
+      consoleSpy.mockRestore();
     });
   });
 
