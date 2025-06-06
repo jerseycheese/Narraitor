@@ -95,119 +95,138 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   }, [sessionId, getSessionSegments]);
 
   /**
-   * Check narrative content for ending indicators and suggest ending if appropriate
+   * Pure AI-based ending detection - analyzes narrative context for natural conclusions
+   * 
+   * This function uses Google Gemini AI to analyze narrative segments and determine
+   * if the story has reached a natural conclusion point. Unlike traditional rule-based
+   * systems, this implementation relies entirely on AI understanding of story structure,
+   * character arcs, and emotional satisfaction.
+   * 
+   * Key Features:
+   * - NO keyword matching or pattern recognition
+   * - Context-aware analysis (recent + broader story context)
+   * - Confidence-based filtering (only medium/high confidence suggestions)
+   * - Multiple ending type classification
+   * - Graceful error handling with no fallback mechanisms
+   * 
+   * @param newSegment - The newly created narrative segment to analyze
+   * 
+   * Behavior:
+   * - Requires at least 3 total segments before analysis begins
+   * - Analyzes last 5 segments for recent context
+   * - Includes earlier story summary for longer narratives (10+ segments)
+   * - Only triggers onEndingSuggested for medium/high confidence AI responses
+   * - Handles AI failures silently (pure AI approach - no fallback)
+   * - Supports markdown-wrapped JSON responses from AI
+   * 
+   * AI Response Format:
+   * {
+   *   "suggestEnding": true/false,
+   *   "confidence": "high" | "medium" | "low", 
+   *   "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
+   *   "reason": "Clear explanation of why this is/isn't a good ending point"
+   * }
+   * 
+   * Error Handling:
+   * - AI service failures: Silent failure, no ending suggestion
+   * - JSON parsing errors: Silent failure, no ending suggestion  
+   * - Network issues: Silent failure, no ending suggestion
+   * - Low confidence responses: Filtered out, no ending suggestion
+   * 
+   * @see {@link /dev/ai-ending-detection} Test harness for manual verification
+   * @see {@link docs/features/ai-ending-detection.md} Complete documentation
    */
   const checkForEndingIndicators = async (newSegment: NarrativeSegment) => {
     // Don't suggest multiple times
     if (endingSuggestedRef.current || !onEndingSuggested) return;
     
-    // Get all segments including the new one
+    // Skip if we don't have enough narrative context (less than 3 segments)
     const allSegments = [...segments, newSegment];
+    if (allSegments.length < 3) return;
     
-    // Analyze the narrative for ending indicators
-    const recentContent = allSegments.slice(-5).map(s => s.content.toLowerCase()).join(' ');
-    
-    // Check for completion indicators
-    const completionIndicators = [
-      'quest complete', 'mission accomplished', 'journey ends', 'story concludes',
-      'returned home', 'peace restored', 'evil defeated', 'finally over',
-      'quest fulfilled', 'destiny fulfilled', 'adventure ends', 'chapter closes',
-      'task complete', 'objective achieved', 'goal reached', 'victory achieved'
-    ];
-    
-    const hasCompletionIndicator = completionIndicators.some(indicator => 
-      recentContent.includes(indicator)
-    );
-    
-    // Check for conclusive narrative patterns
-    const conclusivePatterns = [
-      /the (hero|protagonist|adventurer) returned/,
-      /peace (was|has been) restored/,
-      /evil (was|has been) (defeated|vanquished)/,
-      /journey (came|comes) to an end/,
-      /quest (was|is) (complete|fulfilled)/,
-      /finally found peace/,
-      /new chapter begins/,
-      /sun (rose|rises) on a new day/
-    ];
-    
-    const hasConclusivePattern = conclusivePatterns.some(pattern => 
-      pattern.test(recentContent)
-    );
-    
-    // Check for character arc completion
-    const characterArcIndicators = [
-      'found what they were looking for',
-      'learned the true meaning',
-      'discovered their purpose',
-      'became who they were meant to be',
-      'transformation complete'
-    ];
-    
-    const hasCharacterArcCompletion = characterArcIndicators.some(indicator =>
-      recentContent.includes(indicator)
-    );
-    
-    // Determine ending type and reason
-    let shouldSuggestEnding = false;
-    let endingType: import('@/types/narrative.types').EndingType = 'story-complete';
-    let reason = '';
-    
-    if (hasCompletionIndicator || hasConclusivePattern) {
-      shouldSuggestEnding = true;
-      endingType = 'story-complete';
-      reason = 'Your main quest appears to be complete. The narrative has reached a natural conclusion.';
-    } else if (hasCharacterArcCompletion) {
-      shouldSuggestEnding = true;
-      endingType = 'character-retirement';
-      reason = 'Your character\'s personal journey seems complete. They have achieved their growth and transformation.';
-    } else if (allSegments.length > 20) {
-      // Check for session length
-      shouldSuggestEnding = true;
-      endingType = 'session-limit';
-      reason = 'You\'ve had quite an adventure! This might be a good place to conclude your story.';
-    }
-    
-    // Use AI to confirm ending suggestion if we have indicators
-    if (shouldSuggestEnding && !endingSuggestedRef.current) {
+    try {
+      const client = createDefaultGeminiClient();
+      
+      // Get recent narrative context (last 5 segments for analysis)
+      const recentSegments = allSegments.slice(-5);
+      const narrativeContext = recentSegments.map((segment, index) => 
+        `Segment ${index + 1}: ${segment.content}`
+      ).join('\n\n');
+      
+      // Get broader story context (all segments but condensed)
+      const fullStoryContext = allSegments.length > 10 
+        ? `Earlier story: ${allSegments.slice(0, -5).map(s => s.content).join(' ').substring(0, 500)}...\n\n`
+        : '';
+      
+      const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
+
+${fullStoryContext}Recent narrative developments:
+${narrativeContext}
+
+Analyze this story for natural ending points. Consider:
+
+STORY STRUCTURE:
+- Has the central conflict been resolved or reached climax?
+- Are character arcs showing completion or fulfillment?
+- Is there a sense of narrative closure or resolution?
+- Does the story feel like it has reached a satisfying conclusion?
+
+EMOTIONAL SATISFACTION:
+- Would ending here feel fulfilling to the reader?
+- Are loose threads tied up or at a natural pause?
+- Is there dramatic or emotional resolution?
+
+DO NOT:
+- Look for specific keywords or phrases
+- Use pattern matching
+- Apply rigid rules
+- Suggest ending just because of story length
+
+Respond with JSON format:
+{
+  "suggestEnding": true/false,
+  "confidence": "high" | "medium" | "low",
+  "endingType": "story-complete" | "character-retirement" | "session-limit" | "none",
+  "reason": "Clear explanation of why this is/isn't a good ending point"
+}`;
+
+      const response = await client.generateContent(analysisPrompt);
+      
       try {
-        const client = createDefaultGeminiClient();
-        const analysisPrompt = `Analyze this narrative to determine if it's reaching a natural conclusion:
-
-Recent narrative:
-${recentContent}
-
-Is this story reaching a natural ending point? Consider:
-- Has the main conflict been resolved?
-- Has the character achieved their goal?
-- Is there a sense of closure or completion?
-- Are there strong indicators this is ending?
-
-Respond with JSON: { "suggestEnding": true/false, "confidence": "high/medium/low", "reason": "brief explanation" }`;
-
-        const response = await client.generateContent(analysisPrompt);
+        // Extract JSON from response, handling markdown code blocks
+        let jsonContent = response.content;
         
-        try {
-          const analysis = JSON.parse(response.content);
-          
-          if (analysis.suggestEnding && (analysis.confidence === 'high' || analysis.confidence === 'medium')) {
-            endingSuggestedRef.current = true;
-            onEndingSuggested(analysis.reason || reason, endingType);
-          }
-        } catch {
-          // If AI analysis fails, use our rule-based detection
-          if (hasCompletionIndicator || hasConclusivePattern || hasCharacterArcCompletion) {
-            endingSuggestedRef.current = true;
-            onEndingSuggested(reason, endingType);
-          }
+        // Remove markdown code blocks if present
+        if (jsonContent.includes('```json')) {
+          jsonContent = jsonContent.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+        } else if (jsonContent.includes('```')) {
+          jsonContent = jsonContent.replace(/```\s*/g, '');
         }
-      } catch {
-        // Fallback to rule-based detection if AI fails
-        if (hasCompletionIndicator || hasConclusivePattern || hasCharacterArcCompletion) {
+        
+        // Trim whitespace
+        jsonContent = jsonContent.trim();
+        
+        const analysis = JSON.parse(jsonContent);
+        
+        // Only suggest ending if AI has medium or high confidence
+        if (analysis.suggestEnding && ['high', 'medium'].includes(analysis.confidence)) {
           endingSuggestedRef.current = true;
-          onEndingSuggested(reason, endingType);
+          
+          // Determine ending type based on AI analysis or default to story-complete
+          const endingType = ['story-complete', 'character-retirement', 'session-limit'].includes(analysis.endingType) 
+            ? analysis.endingType 
+            : 'story-complete';
+          
+          onEndingSuggested(analysis.reason, endingType);
         }
+      } catch (parseError) {
+        console.error('Failed to parse AI ending analysis:', parseError);
+        // If JSON parsing fails, do not suggest ending
+        // Pure AI approach means no fallback to rules
       }
+    } catch (error) {
+      console.error('Failed to analyze ending indicators with AI:', error);
+      // Pure AI approach means no fallback - if AI fails, no ending suggestion
     }
   };
 
