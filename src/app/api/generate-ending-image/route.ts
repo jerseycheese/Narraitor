@@ -7,6 +7,13 @@ import Logger from '@/lib/utils/logger';
 
 const logger = new Logger('EndingImageAPI');
 
+// Constants for prompt generation limits
+const MAX_RECENT_SEGMENTS = 3;
+const MAX_CONTEXT_CHARS = 200;
+const MAX_EPILOGUE_CHARS = 300;
+const MAX_LEGACY_CHARS = 200;
+const MAX_IMPACT_CHARS = 200;
+
 interface GenerateEndingImageRequest {
   ending: StoryEnding;
   world?: World;
@@ -79,7 +86,7 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
   // Include brief narrative context if available
   let narrativeContext = '';
   if (recentNarrative && recentNarrative.length > 0) {
-    const recentEvents = recentNarrative.slice(-3).join(' ').substring(0, 200);
+    const recentEvents = recentNarrative.slice(-MAX_RECENT_SEGMENTS).join(' ').substring(0, MAX_CONTEXT_CHARS);
     narrativeContext = `Recent story context: ${recentEvents}...`;
   }
   
@@ -92,9 +99,9 @@ ${styleGuidance}
 ${narrativeContext}
 
 Story Ending Context:
-- Epilogue: ${ending.epilogue.substring(0, 300)}...
-- Character Legacy: ${ending.characterLegacy.substring(0, 200)}...
-- World Impact: ${ending.worldImpact.substring(0, 200)}...
+- Epilogue: ${ending.epilogue.substring(0, MAX_EPILOGUE_CHARS)}...
+- Character Legacy: ${ending.characterLegacy.substring(0, MAX_LEGACY_CHARS)}...
+- World Impact: ${ending.worldImpact.substring(0, MAX_IMPACT_CHARS)}...
 
 Requirements:
 - Ultra-high quality, 4K resolution concept art
