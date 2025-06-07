@@ -8,47 +8,44 @@ export default function ShadcnTestPage() {
       <h1 className="text-3xl font-bold mb-8">shadcn/ui Integration Test</h1>
       
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Button Variants</h2>
-        <div className="flex gap-4 flex-wrap">
-          <Button>Default</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="destructive">Destructive</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="link">Link</Button>
-        </div>
-      </section>
+        <h2 className="text-2xl font-semibold">Button Component Showcase</h2>
+        
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-medium mb-2">Variants</h3>
+            <div className="flex gap-4 flex-wrap">
+              <Button>Default</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="destructive">Destructive</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="link">Link</Button>
+            </div>
+          </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Button Sizes</h2>
-        <div className="flex gap-4 items-center flex-wrap">
-          <Button size="sm">Small</Button>
-          <Button size="default">Default</Button>
-          <Button size="lg">Large</Button>
-          <Button size="icon">⚙️</Button>
-        </div>
-      </section>
+          <div>
+            <h3 className="text-lg font-medium mb-2">Sizes</h3>
+            <div className="flex gap-4 items-center flex-wrap">
+              <Button size="sm">Small</Button>
+              <Button size="default">Default</Button>
+              <Button size="lg">Large</Button>
+              <Button size="icon">⚙️</Button>
+            </div>
+          </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Button States</h2>
-        <div className="flex gap-4 flex-wrap">
-          <Button>Normal</Button>
-          <Button disabled>Disabled</Button>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Buttons with Icons</h2>
-        <div className="flex gap-4 flex-wrap">
-          <Button>
-            ⚙️ Settings
-          </Button>
-          <Button variant="outline">
-            📊 Analytics
-          </Button>
-          <Button variant="destructive">
-            🗑️ Delete
-          </Button>
+          <div>
+            <h3 className="text-lg font-medium mb-2">States & Examples</h3>
+            <div className="flex gap-4 flex-wrap">
+              <Button>Normal</Button>
+              <Button disabled>Disabled</Button>
+              <Button variant="outline">
+                📊 With Icon
+              </Button>
+              <Button variant="destructive">
+                🗑️ Delete
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 

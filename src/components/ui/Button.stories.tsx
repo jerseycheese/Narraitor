@@ -35,86 +35,35 @@ export const Default: Story = {
   },
 }
 
-export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-    children: 'Secondary',
-  },
+export const Variants: Story = {
+  render: () => (
+    <div className="flex gap-4 flex-wrap">
+      <Button>Default</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  ),
 }
 
-export const Destructive: Story = {
-  args: {
-    variant: 'destructive',
-    children: 'Destructive',
-  },
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex gap-4 items-center">
+      <Button size="sm">Small</Button>
+      <Button>Default</Button>
+      <Button size="lg">Large</Button>
+      <Button size="icon">⚙️</Button>
+    </div>
+  ),
 }
 
-export const Outline: Story = {
-  args: {
-    variant: 'outline',
-    children: 'Outline',
-  },
-}
-
-export const Ghost: Story = {
-  args: {
-    variant: 'ghost',
-    children: 'Ghost',
-  },
-}
-
-export const Link: Story = {
-  args: {
-    variant: 'link',
-    children: 'Link',
-  },
-}
-
-export const Small: Story = {
-  args: {
-    size: 'sm',
-    children: 'Small',
-  },
-}
-
-export const Large: Story = {
-  args: {
-    size: 'lg',
-    children: 'Large',
-  },
-}
-
-export const Icon: Story = {
-  args: {
-    size: 'icon',
-    children: '⚙️',
-  },
-}
-
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-    children: 'Disabled',
-  },
-}
-
-export const WithIcon: Story = {
-  args: {
-    children: (
-      <>
-        ⚙️ Settings
-      </>
-    ),
-  },
-}
-
-export const Loading: Story = {
-  args: {
-    disabled: true,
-    children: (
-      <>
-        ⏳ Loading...
-      </>
-    ),
-  },
+export const States: Story = {
+  render: () => (
+    <div className="flex gap-4">
+      <Button>Normal</Button>
+      <Button disabled>Disabled</Button>
+    </div>
+  ),
 }
