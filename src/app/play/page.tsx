@@ -16,6 +16,7 @@ export default function PlayPage() {
   const [error, setError] = useState<string | null>(null);
   
   const currentWorldId = useWorldStore(state => state.currentWorldId);
+  const currentWorld = useWorldStore(state => state.worlds[currentWorldId || '']);
   const currentCharacterId = useCharacterStore(state => state.currentCharacterId);
   const initializeSession = useSessionStore(state => state.initializeSession);
   const currentSessionId = useSessionStore(state => state.id);
@@ -95,8 +96,11 @@ export default function PlayPage() {
     );
   }
 
+  const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
+  const pageDescription = currentWorld?.theme;
+
   return (
-    <PageLayout title="" maxWidth="7xl" className="pb-0">
+    <PageLayout title={pageTitle} description={pageDescription} maxWidth="7xl" className="pb-0">
       <GameSession worldId={currentWorldId!} />
     </PageLayout>
   );

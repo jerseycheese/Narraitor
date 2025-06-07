@@ -21,6 +21,12 @@ export interface PageLayoutProps {
  * Provides a standardized page structure with title, optional description,
  * action buttons, and responsive content area with configurable max width.
  * 
+ * DESIGN CONSISTENCY:
+ * - All pages using PageLayout automatically get consistent background color
+ * - Background color is defined globally in globals.css for `main:not(.ending-screen)`
+ * - Default max width is 7xl to match navigation width patterns
+ * - Responsive padding matches navigation: px-4 sm:px-6 lg:px-8
+ * 
  * @param props - The page layout configuration
  * @returns A formatted page layout with header and content sections
  * 
@@ -63,8 +69,12 @@ export function PageLayout({
     '7xl': 'max-w-7xl'
   };
 
+  // Merge custom className with default page styling
+  // Note: The main background color is set in globals.css via `main:not(.ending-screen)`
+  const mainClasses = `min-h-screen ${className}`;
+
   return (
-    <main className={`min-h-screen ${className}`}>
+    <main className={mainClasses}>
       <div className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8`}>
         <header className="mb-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">

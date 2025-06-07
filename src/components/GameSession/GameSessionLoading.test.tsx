@@ -8,7 +8,7 @@ describe('GameSessionLoading', () => {
 
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-    expect(screen.getByText('Loading game session...')).toBeInTheDocument();
+    expect(screen.getByText('Loading your game...')).toBeInTheDocument();
   });
 
   test('renders custom loading message when provided', () => {

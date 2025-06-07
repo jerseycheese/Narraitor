@@ -1,6 +1,7 @@
 import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -18,12 +19,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   if (isLoading) {
     return (
       <div className="p-8 snap-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent dark:border-blue-400 dark:border-r-transparent">
-            <span className="sr-only">Loading...</span>
-          </div>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">Generating narrative...</p>
-        </div>
+        <LoadingState message="Writing your story..." />
       </div>
     );
   }
@@ -118,6 +114,11 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     // Skip parsing if content is empty or not a string
     if (!content || typeof content !== 'string') {
       return content || '';
+    }
+    
+    // If content is suspiciously short and looks like metadata, return a fallback message
+    if (content.trim().length < 20 && (content.includes('scene') || content.includes('Starting Location'))) {
+      return 'The story is beginning... (Content generation in progress)';
     }
     
     // Check if content starts with ```json

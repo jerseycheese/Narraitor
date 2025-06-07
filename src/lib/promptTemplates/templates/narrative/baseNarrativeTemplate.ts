@@ -11,9 +11,9 @@ export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line 
     generationParameters
   } = context;
 
-  const length = generationParameters?.desiredLength || 'medium';
+  const length = generationParameters?.desiredLength || 'short';
   const lengthGuide: Record<string, string> = {
-    short: '2-3 sentences',
+    short: '4-6 sentences (1 paragraph)',
     medium: '1-2 paragraphs',
     long: '3-4 paragraphs'
   };

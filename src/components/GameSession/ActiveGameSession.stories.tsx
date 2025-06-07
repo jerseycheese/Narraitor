@@ -269,10 +269,12 @@ const mockDecision: Decision = {
   id: 'decision-1',
   prompt: 'What will you do?',
   options: [
-    { id: 'choice-1', text: 'Enter the dungeon', hint: 'Face whatever dangers lie within' },
-    { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth' },
-    { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information' },
+    { id: 'choice-1', text: 'Enter the dungeon', hint: 'Face whatever dangers lie within', alignment: 'chaotic' },
+    { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth', alignment: 'neutral' },
+    { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information', alignment: 'lawful' },
   ],
+  decisionWeight: 'major',
+  contextSummary: 'Standing before the ancient dungeon entrance, you must decide your next move.',
 };
 
 /**
@@ -395,5 +397,39 @@ export const WithCharacter: Story = {
       return <Story />;
     },
   ],
+};
+
+/**
+ * Loading state while ending is being generated
+ */
+export const EndingGenerationLoading: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+    existingSegments: mockSegments,
+  },
+  decorators: [
+    (Story) => {
+      // Set up narrative store with generating ending state
+      useNarrativeStore.setState({
+        ...useNarrativeStore.getState(),
+        isGeneratingEnding: true,
+        currentEnding: null,
+      });
+      
+      populateNarrativeStore(mockSegments, [mockDecision]);
+      
+      return <Story />;
+    },
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the loading state displayed while the AI writes the story ending.',
+      },
+    },
+  },
 };
 

@@ -318,21 +318,26 @@ Respond with JSON format:
     }
     setIsGeneratingChoices(true);
     
+    // Use recent segments for context - get from fresh data
+    const recentSegments = currentSegments.slice(-5);
+    
     // Create fallback choices upfront - we'll use these immediately if something fails
     const fallbackId = `decision-fallback-${Date.now()}`;
     const fallbackDecision: Decision = {
       id: fallbackId,
       prompt: "What will you do?",
       options: [
-        { id: `option-${fallbackId}-1`, text: "Investigate further" },
-        { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-        { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-      ]
+        { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+        { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+        { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+      ],
+      decisionWeight: 'minor',
+      contextSummary: recentSegments.length > 0 ? 
+        `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${recentSegments[recentSegments.length - 1]?.content?.substring(0, 100) || 'Making a decision'}...` :
+        'Making a decision in an unknown location.'
     };
     
     try {
-      // Use recent segments for context - get from fresh data
-      const recentSegments = currentSegments.slice(-5);
       
       // Create narrative context for choice generation
       const narrativeContext: NarrativeContext = {
@@ -418,10 +423,12 @@ Respond with JSON format:
             id: fallbackId,
             prompt: "What will you do now?",
             options: [
-              { id: `option-${fallbackId}-1`, text: "Investigate the situation" },
-              { id: `option-${fallbackId}-2`, text: "Speak with someone nearby" },
-              { id: `option-${fallbackId}-3`, text: "Move to a different area" }
-            ]
+              { id: `option-${fallbackId}-1`, text: "Investigate the situation", alignment: 'neutral' },
+              { id: `option-${fallbackId}-2`, text: "Speak with someone nearby", alignment: 'lawful' },
+              { id: `option-${fallbackId}-3`, text: "Move to a different area", alignment: 'neutral' }
+            ],
+            decisionWeight: 'minor',
+            contextSummary: 'Error occurred during choice generation.'
           };
           
           // Add to store and get the actual stored ID
@@ -584,7 +591,8 @@ Respond with JSON format:
         },
         generationParameters: {
           segmentType: 'scene',
-          includedTopics: [choiceText]
+          includedTopics: [choiceText],
+          desiredLength: 'short'
         }
       });
       

@@ -26,18 +26,23 @@ const decisionWithHints: Decision = {
       id: 'opt-1',
       text: 'Pick the lock',
       hint: 'Requires Lockpicking skill',
+      alignment: 'neutral',
     },
     {
       id: 'opt-2',
       text: 'Force the door open',
       hint: 'Requires high Strength',
+      alignment: 'chaotic',
     },
     {
       id: 'opt-3',
       text: 'Look for another way',
       hint: 'Safe but time-consuming',
+      alignment: 'lawful',
     },
   ],
+  decisionWeight: 'minor',
+  contextSummary: 'A locked door blocks your path forward.',
 };
 
 export const BasicChoices: Story = {
@@ -91,7 +96,9 @@ const createAlignedDecision = (): Decision => ({
       alignment: 'chaotic',
       hint: 'Wildly unexpected action that completely changes the situation'
     }
-  ]
+  ],
+  decisionWeight: 'major',
+  contextSummary: 'Armed bandits block your path, forcing a decision that could determine your fate.',
 });
 
 export const AlignedChoices: Story = {
@@ -117,5 +124,74 @@ export const AlignedChoicesWithCustomInput: Story = {
   },
 };
 
-// Removed MixedAlignment story - redundant with AlignedChoices
+// === DECISION WEIGHT STORIES ===
+
+export const MinorDecision: Story = {
+  args: {
+    decision: {
+      id: 'minor-decision',
+      prompt: 'What will you have for breakfast?',
+      options: [
+        { id: 'toast', text: 'Toast with jam', alignment: 'neutral' },
+        { id: 'cereal', text: 'Bowl of cereal', alignment: 'neutral' },
+        { id: 'skip', text: 'Skip breakfast', alignment: 'chaotic' },
+      ],
+      decisionWeight: 'minor',
+      contextSummary: 'A simple morning choice with little consequence.',
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Minor decisions have subtle styling with minimal visual prominence.',
+      },
+    },
+  },
+};
+
+export const MajorDecision: Story = {
+  args: {
+    decision: {
+      id: 'major-decision',
+      prompt: 'The dragon offers you a deal. How do you respond?',
+      options: [
+        { id: 'accept', text: 'Accept the dragon\'s terms', alignment: 'lawful' },
+        { id: 'negotiate', text: 'Try to negotiate better terms', alignment: 'neutral' },
+        { id: 'refuse', text: 'Refuse and stand your ground', alignment: 'chaotic' },
+      ],
+      decisionWeight: 'major',
+      contextSummary: 'A significant choice that will shape your relationship with the ancient dragon.',
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Major decisions have amber borders and enhanced visual prominence to indicate importance.',
+      },
+    },
+  },
+};
+
+export const CriticalDecision: Story = {
+  args: {
+    decision: {
+      id: 'critical-decision',
+      prompt: 'The kingdom\'s fate hangs in the balance. What is your final choice?',
+      options: [
+        { id: 'sacrifice', text: 'Sacrifice yourself to save the kingdom', alignment: 'lawful' },
+        { id: 'bargain', text: 'Attempt a desperate bargain with fate', alignment: 'neutral' },
+        { id: 'seize', text: 'Seize power and rule through force', alignment: 'chaotic' },
+      ],
+      decisionWeight: 'critical',
+      contextSummary: 'The climactic moment where your choice will determine the fate of thousands.',
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Critical decisions have red borders, shadows, and maximum visual prominence for life-changing moments.',
+      },
+    },
+  },
+};
 

@@ -76,20 +76,20 @@ const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   switch (weight) {
     case 'critical':
       return {
-        container: 'border-6 border-red-600 bg-red-100/20',
+        container: 'border-4 border-red-500 bg-red-50/50 shadow-lg shadow-red-200',
         dot: 'bg-red-600',
         label: 'text-red-800'
       };
     case 'major':
       return {
-        container: 'border-4 border-yellow-500 bg-yellow-100/20',
-        dot: 'bg-yellow-600',
-        label: 'text-yellow-800'
+        container: 'border-2 border-amber-400 bg-amber-50/60 shadow-md shadow-amber-200',
+        dot: 'bg-amber-600',
+        label: 'text-amber-800'
       };
     case 'minor':
     default:
       return {
-        container: 'border-2 border-gray-500 bg-gray-500/5',
+        container: 'border-0 bg-gray-500/5',
         dot: 'bg-gray-600',
         label: 'text-gray-800'
       };
@@ -173,7 +173,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   }, [customInputText, onCustomSubmit]);
 
   // Handle Enter key in textarea
-  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleCustomSubmit();
@@ -204,11 +204,12 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Get decision weight styling
   const decisionWeight = isDecisionMode ? decision.decisionWeight : undefined;
   const weightStyling = getDecisionWeightStyling(decisionWeight);
+  
 
   return (
     <div 
       data-testid="choice-selector" 
-      className={`choice-selector mt-6 p-4 border-solid rounded-lg ${weightStyling.container} ${className}`}
+      className={`choice-selector p-4 rounded-lg ${weightStyling.container} ${className}`}
       role="group"
       aria-labelledby="choices-heading"
     >
@@ -240,7 +241,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             ref={inputRef}
             value={customInputText}
             onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder={customInputPlaceholder}
             disabled={isDisabled}
             aria-label="Custom response input"
@@ -292,7 +293,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             <span className="flex items-start gap-2">
               {option.isSelected && <span>➤</span>}
               {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                <span className="text-lg leading-none">{getAlignmentIcon(option.alignment)}</span>
+                <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
               )}
               <span className="flex-1">
                 {option.text}
