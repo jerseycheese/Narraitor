@@ -118,9 +118,7 @@ describe('ActiveGameSession', () => {
   it('renders correctly with all required props', () => {
     render(<ActiveGameSession {...mockProps} />);
     
-    // Check that world info is displayed
-    expect(screen.getByText('Test World')).toBeInTheDocument();
-    expect(screen.getByText('fantasy')).toBeInTheDocument();
+    // World info is no longer displayed in the header (removed duplicate display)
     
     // Check that narrative components are rendered
     expect(screen.getByTestId('mock-narrative-history-manager')).toBeInTheDocument();

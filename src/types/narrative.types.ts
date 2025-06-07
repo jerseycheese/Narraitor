@@ -18,6 +18,11 @@ export interface NarrativeSegment extends TimestampedEntity {
 }
 
 /**
+ * Decision weight types for visual prominence
+ */
+export type DecisionWeight = 'minor' | 'major' | 'critical';
+
+/**
  * Represents a decision point in the narrative
  */
 export interface Decision {
@@ -26,6 +31,10 @@ export interface Decision {
   options: DecisionOption[];
   selectedOptionId?: EntityID;
   consequences?: Consequence[];
+  // Enhanced fields for better decision presentation
+  contextSummary?: string;
+  decisionWeight?: DecisionWeight;
+  narrativeSegmentId?: EntityID;
 }
 
 /**

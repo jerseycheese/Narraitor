@@ -27,7 +27,19 @@ Create an engaging opening scene that:
 3. Follows ${genre} genre conventions
 4. Hooks the reader with intrigue or action
 5. Establishes the initial setting and situation
-6. Is approximately 2-3 paragraphs long
+6. Is engaging and substantial - exactly 1 paragraph of 4-6 sentences that vividly establishes the scene
+
+${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
+
+CRITICAL REALISM CONSTRAINTS:
+- This is a completely realistic, mundane setting with NO supernatural elements
+- NO magical, mystical, fantasy, psychic, or otherworldly phenomena whatsoever
+- NO special powers, reality-shifting, destiny, or metaphysical concepts
+- Focus on real human drama, realistic challenges, and authentic period details
+- Use only technology, situations, and social dynamics that actually existed in the time period
+- Any tension should come from realistic human conflict, not supernatural forces
+- All sounds and effects must have normal, realistic explanations
+` : ''}
 
 CRITICAL INSTRUCTIONS:
 1. Write the narrative in SECOND PERSON perspective (using "you" instead of character names or "they")
@@ -48,14 +60,16 @@ SENSORY WRITING GUIDELINES:
 - Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
 - Use fresh, varied sensory language to avoid clichéd phrases
 
-Response Format:
+Response Format (CRITICAL - must be valid JSON):
 {
-  "content": "The opening narrative text goes here...",
+  "content": "WRITE THE FULL NARRATIVE CONTENT HERE - this must be 4-6 complete sentences that tell an engaging story, NOT just metadata or short phrases",
   "type": "scene",
   "metadata": {
     "mood": "mysterious",
     "location": "Starting location",
     "tags": ["opening", "introduction"]
   }
-}`;
+}
+
+IMPORTANT: The "content" field must contain the actual story narrative, not just type information or location names.`;
 };

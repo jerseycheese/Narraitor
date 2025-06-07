@@ -379,8 +379,8 @@ export const TestDataGeneratorSection: React.FC = () => {
           // 100% original characters for "based on" worlds - inspired by but not from that universe
           characterType = 'original';
         } else {
-          // No reference - 50/50 mix for variety
-          characterType = Math.random() < 0.5 ? 'known' : 'original';
+          // No reference - 100% original characters for original worlds
+          characterType = 'original';
         }
         
         console.log(`[DevTools] Generating ${characterType} character for ${currentWorld.relationship || 'no reference'} world`);

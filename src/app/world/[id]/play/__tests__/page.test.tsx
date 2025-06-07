@@ -32,7 +32,7 @@ describe('Play Page', () => {
     render(<PlayPage />);
     
     // Assert - should show loading message
-    expect(screen.getByText('Loading game session...')).toBeInTheDocument();
+    expect(screen.getByText('Creating your game...')).toBeInTheDocument();
     expect(screen.queryByTestId('mock-game-session')).not.toBeInTheDocument();
   });
 

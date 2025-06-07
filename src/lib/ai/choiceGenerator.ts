@@ -43,7 +43,7 @@ export class ChoiceGenerator {
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
-      const decision = this.parseChoiceResponse(response.content);
+      const decision = this.parseChoiceResponse(response.content, narrativeContext);
       
       // Ensure we have the minimum number of options
       if (decision.options.length < minOptions) {
@@ -73,26 +73,83 @@ export class ChoiceGenerator {
   /**
    * Parse the AI response into a structured Decision object
    */
-  private parseChoiceResponse(content: string): Decision {
+  private parseChoiceResponse(content: string, narrativeContext: NarrativeContext): Decision {
     // Create a new decision ID
     const decisionId = generateUniqueId('decision');
     
     try {
-      // Extract the decision prompt
+      // Clean the content by removing the decision weight line to prevent it from appearing in UI
+      const cleanedContent = content.replace(/Decision Weight:?\s*\[?[^\]\n]+\]?\s*\n?/i, '');
+      
+      // Extract the decision weight before cleaning
+      let decisionWeight: 'minor' | 'major' | 'critical' = 'minor';
+      const weightMatch = content.match(/Decision Weight:?\s*\[?([^\]\n]+)\]?/i);
+      
+      
+      if (weightMatch && weightMatch[1]) {
+        const weightText = weightMatch[1].trim().toLowerCase();
+        if (weightText === 'major') {
+          decisionWeight = 'major';
+        } else if (weightText === 'critical') {
+          decisionWeight = 'critical';
+        }
+      } else {
+        // If AI didn't provide weight, make a reasonable guess based on story progress
+        const segmentCount = narrativeContext.previousSegments?.length || 0;
+        
+        // For debugging - force more variety in decision weights
+        const randomValue = Math.random();
+        if (segmentCount >= 2) {
+          // After the first couple segments, start mixing weights for testing
+          if (randomValue > 0.7) {
+            decisionWeight = 'major';
+          } else if (randomValue > 0.9) {
+            decisionWeight = 'critical';
+          }
+        } else if (segmentCount > 8) {
+          // Later in story - more likely to be major decisions
+          decisionWeight = Math.random() > 0.5 ? 'major' : 'minor';
+        } else if (segmentCount > 3) {
+          // Mid story - mix of minor and major
+          decisionWeight = Math.random() > 0.7 ? 'major' : 'minor';
+        }
+      }
+      
+      
+      // Extract the AI-generated context summary
+      let contextSummary = '';
+      const contextMatch = cleanedContent.match(/Context Summary:?\s*([^\n]+)/i);
+      if (contextMatch && contextMatch[1]) {
+        contextSummary = contextMatch[1].trim();
+      }
+      
+      // Extract the decision prompt from cleaned content
       let prompt = '';
-      const promptMatch = content.match(/Decision:?\s*([^\n]+)/i);
+      // First try to capture everything after "Decision:" until "Options:" or end
+      const promptMatch = cleanedContent.match(/Decision:?\s*([\s\S]+?)(?=\n\s*Options:|$)/i);
       if (promptMatch && promptMatch[1]) {
         prompt = promptMatch[1].trim();
       } else {
-        // Fallback if no prompt found
-        prompt = 'What will you do?';
+        // Try alternative patterns
+        const altMatch1 = cleanedContent.match(/Decision:?\s*([\s\S]+?)(?=\n\s*\d+\.|$)/i);
+        if (altMatch1 && altMatch1[1]) {
+          prompt = altMatch1[1].trim();
+        } else {
+          const simpleMatch = cleanedContent.match(/Decision:?\s*([^\n]+)/i);
+          if (simpleMatch && simpleMatch[1]) {
+            prompt = simpleMatch[1].trim();
+          } else {
+            // Fallback if no prompt found
+            prompt = 'What will you do?';
+          }
+        }
       }
       
-      // Extract options with alignment tags
+      // Extract options with alignment tags from cleaned content
       const options: DecisionOption[] = [];
       
       // First, try to match all numbered options and parse alignment if present
-      const numberedMatches = content.matchAll(/^\s*\d+\.\s*(.+)$/gm);
+      const numberedMatches = cleanedContent.matchAll(/^\s*\d+\.\s*(.+)$/gm);
       for (const match of numberedMatches) {
         if (match[1] && match[1].trim()) {
           const fullText = match[1].trim();
@@ -130,7 +187,7 @@ export class ChoiceGenerator {
       
       // If no numbered options found, try bullet points
       if (options.length === 0) {
-        const bulletMatches = content.matchAll(/^\s*[-*]\s*(.+)$/gm);
+        const bulletMatches = cleanedContent.matchAll(/^\s*[-*]\s*(.+)$/gm);
         for (const match of bulletMatches) {
           if (match[1] && match[1].trim()) {
             options.push({
@@ -142,12 +199,17 @@ export class ChoiceGenerator {
         }
       }
       
-      // Create decision object
-      return {
+      // Create decision object with enhanced context (decisionWeight already extracted above)
+      const decision = {
         id: decisionId,
         prompt,
-        options: options.length > 0 ? options : this.createDefaultOptions()
+        options: options.length > 0 ? options : this.createDefaultOptions(),
+        decisionWeight,
+        contextSummary: contextSummary || this.createFallbackContextSummary(narrativeContext)
       };
+      
+      
+      return decision;
     } catch (error) {
       console.error('Error parsing choice response:', error);
       
@@ -218,7 +280,9 @@ export class ChoiceGenerator {
     return {
       id: generateUniqueId('decision'),
       prompt,
-      options
+      options,
+      decisionWeight: 'minor', // Fallback choices are typically minor
+      contextSummary: this.createFallbackContextSummary(narrativeContext)
     };
   }
 
@@ -274,5 +338,14 @@ export class ChoiceGenerator {
       narrativeContext,
       characterIds
     };
+  }
+
+
+  /**
+   * Create a fallback context summary when AI doesn't provide one
+   */
+  private createFallbackContextSummary(narrativeContext: NarrativeContext): string {
+    const location = narrativeContext.currentLocation || 'an unknown location';
+    return `A decision point at ${location}.`;
   }
 }

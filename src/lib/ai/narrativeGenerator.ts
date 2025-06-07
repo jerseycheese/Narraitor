@@ -264,10 +264,12 @@ export class NarrativeGenerator {
         id: fallbackId,
         prompt: "What will you do next?",
         options: [
-          { id: `option-${fallbackId}-1`, text: "Investigate further" },
-          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-          { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-        ]
+          { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+          { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+        ],
+        decisionWeight: 'minor',
+        contextSummary: `In ${narrativeContext.currentLocation || 'an unknown location'}, ${narrativeContext.currentSituation || 'making a decision'}.`
       };
     }
   }

@@ -39,7 +39,19 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 1-2 paragraphs long
+6. Is approximately 4-6 sentences long (1 focused paragraph)
+
+${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
+
+CRITICAL REALISM CONSTRAINTS:
+- This is a completely realistic, mundane setting with NO supernatural elements
+- NO magical, mystical, fantasy, psychic, or otherworldly phenomena whatsoever
+- NO special powers, reality-shifting, destiny, or metaphysical concepts
+- Focus on real human drama, realistic challenges, and authentic period details
+- Use only technology, situations, and social dynamics that actually existed in the time period
+- Any tension should come from realistic human conflict, not supernatural forces
+- All sounds and effects must have normal, realistic explanations
+` : ''}
 
 CRITICAL INSTRUCTIONS:
 1. Write in SECOND PERSON perspective (using "you")

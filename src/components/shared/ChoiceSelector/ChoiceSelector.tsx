@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Decision, ChoiceAlignment } from '@/types/narrative.types';
+import { Decision, ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -31,6 +31,21 @@ interface ChoiceSelectorProps {
 }
 
 /**
+ * Get icon for choice alignment
+ */
+const getAlignmentIcon = (alignment?: ChoiceAlignment): string => {
+  switch (alignment) {
+    case 'lawful':
+      return '⚖️'; // Scales of justice for lawful
+    case 'chaotic':
+      return '🔥'; // Fire for chaotic/unpredictable
+    case 'neutral':
+    default:
+      return ''; // No icon for neutral
+  }
+};
+
+/**
  * Get CSS classes for alignment-based styling
  */
 const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
@@ -51,6 +66,34 @@ const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean):
   const hover = isDisabled ? '' : hoverClasses[alignmentKey];
   
   return `${base} ${hover}`;
+};
+
+/**
+ * Get styling for decision weight using border thickness and strategic colors
+ * Critical decisions use bright red, while choice alignments use muted red
+ */
+const getDecisionWeightStyling = (weight?: DecisionWeight) => {
+  switch (weight) {
+    case 'critical':
+      return {
+        container: 'border-4 border-red-500 bg-red-50/50 shadow-lg shadow-red-200',
+        dot: 'bg-red-600',
+        label: 'text-red-800'
+      };
+    case 'major':
+      return {
+        container: 'border-2 border-amber-400 bg-amber-50/60 shadow-md shadow-amber-200',
+        dot: 'bg-amber-600',
+        label: 'text-amber-800'
+      };
+    case 'minor':
+    default:
+      return {
+        container: 'border-0 bg-gray-500/5',
+        dot: 'bg-gray-600',
+        label: 'text-gray-800'
+      };
+  }
 };
 
 /**
@@ -130,7 +173,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   }, [customInputText, onCustomSubmit]);
 
   // Handle Enter key in textarea
-  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleCustomSubmit();
@@ -158,13 +201,33 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     return null;
   }
 
+  // Get decision weight styling
+  const decisionWeight = isDecisionMode ? decision.decisionWeight : undefined;
+  const weightStyling = getDecisionWeightStyling(decisionWeight);
+  
+
   return (
     <div 
       data-testid="choice-selector" 
-      className={`choice-selector mt-6 ${className}`}
+      className={`choice-selector p-4 rounded-lg ${weightStyling.container} ${className}`}
+      role="group"
+      aria-labelledby="choices-heading"
     >
+
+      {/* Context Summary */}
+      {isDecisionMode && decision.contextSummary && (
+        <div 
+          data-testid="context-summary"
+          className="mb-4 p-3 bg-white/50 rounded border border-gray-200"
+        >
+          <p className="text-sm text-gray-600 italic">
+            {decision.contextSummary}
+          </p>
+        </div>
+      )}
+      
       <h3 
-        className="text-lg font-semibold mb-2" 
+        className="text-lg font-bold mb-4 text-gray-900" 
         id="choices-heading"
       >
         {displayPrompt}
@@ -178,7 +241,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             ref={inputRef}
             value={customInputText}
             onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder={customInputPlaceholder}
             disabled={isDisabled}
             aria-label="Custom response input"
@@ -227,10 +290,18 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             aria-checked={option.isSelected}
             role="radio"
           >
-            {option.isSelected ? '➤ ' : ''}{option.text}
-            {showHints && option.hint && (
-              <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
-            )}
+            <span className="flex items-start gap-2">
+              {option.isSelected && <span>➤</span>}
+              {!option.isSelected && getAlignmentIcon(option.alignment) && (
+                <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
+              )}
+              <span className="flex-1">
+                {option.text}
+                {showHints && option.hint && (
+                  <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
+                )}
+              </span>
+            </span>
           </button>
         ))}
       </div>

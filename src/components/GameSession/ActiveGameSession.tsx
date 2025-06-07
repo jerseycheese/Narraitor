@@ -14,6 +14,7 @@ import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -119,10 +120,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           // No segments at all - normal case for new session
           // No existing segments found, will generate initial scene
           setInitialized(true);
+          setIsGenerating(false);
         }
       } catch {
         // Error setting up narrative, continue with initialization
         setInitialized(true);
+        setIsGenerating(false);
       }
     };
     
@@ -160,10 +163,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             id: fallbackId,
             prompt: "What will you do?",
             options: [
-              { id: `option-${fallbackId}-1`, text: "Investigate further" },
-              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-              { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-            ]
+              { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+              { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+            ],
+            decisionWeight: 'minor',
+            contextSummary: 'Waiting for player action (timeout fallback).'
           };
           
           setCurrentDecision(fallbackDecision);
@@ -257,6 +262,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       prompt: decision.prompt,
       options: [...decision.options],
       selectedOptionId: decision.selectedOptionId,
+      decisionWeight: decision.decisionWeight,
+      contextSummary: decision.contextSummary,
     };
     
     // Update the current decision state with the copy
@@ -333,17 +340,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   if (currentEnding) {
     return <EndingScreen />;
   }
+  
+  // If generating ending, show loading state
+  if (isGeneratingEnding) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingState message="Writing your story's ending..." />
+      </div>
+    );
+  }
 
   return (
-    <div data-testid="game-session-active" className="p-4" role="region" aria-label="Game session">
-      {world && (
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold">{world.name}</h1>
-          <p className="text-gray-600 mb-3">{world.theme}</p>
-          <p className="text-blue-600 mt-2" aria-live="polite">Status: {status}</p>
-        </div>
-      )}
-      
+    <div data-testid="game-session-active" role="region" aria-label="Game session">
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
@@ -352,40 +360,36 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
       
       {/* Two-column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:grid-rows-[max-content]">
         {/* Story Column */}
-        <div className="order-1">
-          <div className="p-4 bg-gray-100 rounded">
-            <h2 className="text-xl font-bold mb-2">Story</h2>
-            {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
-            <NarrativeHistoryManager
-              key={`display-${controllerKey}`}
+        <div className="lg:row-span-1 lg:self-stretch">
+          {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
+          <NarrativeHistoryManager
+            key={`display-${controllerKey}`}
+            sessionId={sessionId}
+          />
+          
+          {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
+          
+          {/* Hidden controller just to generate content - always include it but hide from view */}
+          <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
+            <NarrativeController
+              key={`generator-${controllerKey}`}
+              worldId={worldId}
               sessionId={sessionId}
-              className="mb-4"
+              characterId={characterId || undefined}
+              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
+              choiceId={localSelectedChoiceId || selectedChoiceId}
+              onNarrativeGenerated={handleNarrativeGenerated}
+              onChoicesGenerated={handleChoicesGenerated}
+              onEndingSuggested={handleEndingSuggested}
+              generateChoices={true}
             />
-            
-            {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
-            
-            {/* Hidden controller just to generate content - always include it but hide from view */}
-            <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
-              <NarrativeController
-                key={`generator-${controllerKey}`}
-                worldId={worldId}
-                sessionId={sessionId}
-                characterId={characterId || undefined}
-                triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
-                choiceId={localSelectedChoiceId || selectedChoiceId}
-                onNarrativeGenerated={handleNarrativeGenerated}
-                onChoicesGenerated={handleChoicesGenerated}
-                onEndingSuggested={handleEndingSuggested}
-                generateChoices={true}
-              />
-            </div>
           </div>
         </div>
 
         {/* Choices Column */}
-        <div className="order-2 lg:order-2">
+        <div className="lg:row-span-1 lg:self-stretch">
           {/* Show AI-generated choices, loading state, or fallback */}
           {currentDecision ? (
             <div className="player-choices-container">
@@ -399,14 +403,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : isGeneratingChoices ? (
             <div className="player-choices-container">
-              <div className="p-4 border rounded bg-gray-50">
-                <div className="flex items-center space-x-2">
-                  <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent">
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Generating your choices...</p>
-                </div>
-              </div>
+              <LoadingState message="Thinking up some options..." />
             </div>
           ) : choices && choices.length > 0 ? (
             <div className="player-choices-container">
@@ -437,10 +434,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                         id: fallbackId,
                         prompt: "What will you do?",
                         options: [
-                          { id: `option-${fallbackId}-1`, text: "Investigate further" },
-                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-                          { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-                        ]
+                          { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+                          { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+                        ],
+                        decisionWeight: 'minor',
+                        contextSummary: 'Manual fallback choices created.'
                       };
                       
                       // Save to store for future reference
@@ -523,7 +522,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         onConfirm={handleConfirmEndStory}
         onClose={() => setShowEndConfirmation(false)}
         title="End Story"
-        description="Are you sure you want to end your story? This will generate a final ending based on your current progress and cannot be undone."
+        description="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
         itemName=""
         confirmButtonText="End Story"
         cancelButtonText="Cancel"

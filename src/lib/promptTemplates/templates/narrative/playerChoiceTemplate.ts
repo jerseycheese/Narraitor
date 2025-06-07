@@ -53,7 +53,16 @@ Based on the ENTIRE narrative context (both beginning and end if provided), crea
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
+DECISION WEIGHT ANALYSIS:
+Carefully evaluate the narrative situation and determine the significance of this decision:
+- MINOR: Routine choices with limited consequences (casual conversations, basic exploration, everyday interactions)
+- MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
+- CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
+
+Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+
 FORMAT:
+Decision Weight: [MINOR/MAJOR/CRITICAL]
 Decision: What will you do?
 
 Options:
@@ -61,7 +70,7 @@ Options:
 2. [Second choice - different approach to the situation]
 3. [Third choice - alternative path considering story context]
 
-Keep your response EXACTLY in this format. Only include the Decision and Options sections.`;
+Keep your response EXACTLY in this format. Include the Decision Weight line, then Decision and Options sections.`;
 };
 
 export default playerChoiceTemplate;
