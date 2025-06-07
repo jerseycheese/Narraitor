@@ -32,7 +32,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-4', 'border-yellow-500', 'bg-yellow-100/20');
+    expect(container).toHaveClass('border-2', 'border-amber-400', 'bg-amber-50/60');
   });
 
 
@@ -40,7 +40,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={mockDecisionWithContext} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-4', 'border-yellow-500', 'bg-yellow-100/20');
+    expect(container).toHaveClass('border-2', 'border-amber-400', 'bg-amber-50/60');
   });
 
   it('works without context summary', () => {
@@ -65,7 +65,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={criticalDecision} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-6', 'border-red-600', 'bg-red-100/20');
+    expect(container).toHaveClass('border-4', 'border-red-500', 'bg-red-50/50');
   });
 
   it('applies minor decision weight styling', () => {
@@ -77,7 +77,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={minorDecision} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-2', 'border-gray-500', 'bg-gray-500/5');
+    expect(container).toHaveClass('border-0', 'bg-gray-500/5');
   });
 
   it('defaults to minor weight when not specified', () => {
@@ -89,7 +89,7 @@ describe('ChoiceSelector Context Display', () => {
     render(<ChoiceSelector decision={decisionWithoutWeight} onSelect={mockOnSelect} />);
     
     const container = screen.getByTestId('choice-selector');
-    expect(container).toHaveClass('border-2', 'border-gray-500', 'bg-gray-500/5');
+    expect(container).toHaveClass('border-0', 'bg-gray-500/5');
   });
 
   it('maintains accessibility with enhanced styling', () => {
