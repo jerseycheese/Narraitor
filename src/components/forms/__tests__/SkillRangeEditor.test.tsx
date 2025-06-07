@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SkillRangeEditor from '../SkillRangeEditor';
 import { WorldSkill } from '@/types/world.types';
 import { 
-  SKILL_MIN_VALUE, 
-  SKILL_MAX_VALUE
+  MIN_SKILL_VALUE as SKILL_MIN_VALUE, 
+  MAX_SKILL_VALUE as SKILL_MAX_VALUE
 } from '@/lib/constants/skillLevelDescriptions';
 
 describe('SkillRangeEditor', () => {
