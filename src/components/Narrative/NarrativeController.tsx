@@ -332,9 +332,7 @@ Respond with JSON format:
         { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
       ],
       decisionWeight: 'minor',
-      contextSummary: recentSegments.length > 0 ? 
-        `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${recentSegments[recentSegments.length - 1]?.content?.substring(0, 100) || 'Making a decision'}...` :
-        'Making a decision in an unknown location.'
+      contextSummary: generateContextSummary(recentSegments)
     };
     
     try {
