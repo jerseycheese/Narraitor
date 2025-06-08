@@ -30,6 +30,39 @@ const styleOverrides = `
     --radius: 0.5rem;
   }
 
+  /* Force Storybook to use CSS variables for buttons */
+  .bg-destructive {
+    background-color: hsl(var(--destructive)) !important;
+  }
+  
+  .text-destructive-foreground {
+    color: hsl(var(--destructive-foreground)) !important;
+  }
+  
+  .bg-primary {
+    background-color: hsl(var(--primary)) !important;
+  }
+  
+  .text-primary-foreground {
+    color: hsl(var(--primary-foreground)) !important;
+  }
+  
+  .bg-secondary {
+    background-color: hsl(var(--secondary)) !important;
+  }
+  
+  .text-secondary-foreground {
+    color: hsl(var(--secondary-foreground)) !important;
+  }
+  
+  .hover\\:bg-destructive\\/90:hover {
+    background-color: hsl(var(--destructive) / 0.9) !important;
+  }
+  
+  .hover\\:bg-primary\\/90:hover {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+
   /* Force proper colors in Storybook */
   body.sb-show-main {
     color: #171717 !important;
