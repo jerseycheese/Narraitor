@@ -1,0 +1,15 @@
+/**
+ * Storybook-specific styling
+ * Minimal overrides for proper display in Storybook environment
+ */
+
+/* Ensure consistent light theme in Storybook */
+body.sb-show-main {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
+#storybook-root {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
