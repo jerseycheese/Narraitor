@@ -13,7 +13,7 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 
 ## 2. Current Development Status
 
-### 2.1 MVP Development Phase (6-8 Weeks)
+### 2.1 MVP Development Phase
 - Requirements documentation complete with refined scope boundaries
 - Core system design and architecture defined
 - Development roadmap and MVP implementation plan established

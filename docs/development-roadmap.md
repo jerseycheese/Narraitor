@@ -9,11 +9,11 @@ updated: 2025-01-16
 # Narraitor Development Roadmap
 
 ## Overview
-This roadmap outlines the development phases for the Narraitor project, with a streamlined 6-8 week MVP approach focused on delivering a complete narrative experience.
+This roadmap outlines the development phases for the Narraitor project, with a streamlined MVP approach focused on delivering a complete narrative experience.
 
-## Phase 1: Core Framework (MVP) - 6-8 Weeks
+## Phase 1: Core Framework (MVP)
 
-### Week 1-2: Foundation & Core Systems
+### Foundation & Core Systems
 **Focus**: Navigation improvements, Character UI completion, Journal UI setup
 
 #### Navigation System (Epic #493)
@@ -44,7 +44,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 - [ ] Set up journal entry creation hooks
 - [ ] Add responsive journal layout (#280)
 
-### Week 3-4: Core Gameplay Loop
+### Core Gameplay Loop
 **Focus**: Narrative polish and journal integration
 
 #### Narrative Engine Enhancement
@@ -62,7 +62,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 - [ ] Create entry formatting system
 - [ ] Test journal persistence
 
-### Week 5-6: Polish & Launch Preparation
+### Polish & Launch Preparation
 **Focus**: UI polish, testing, and launch setup
 
 #### UI/UX Polish
@@ -80,7 +80,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 - [ ] Configure analytics
 - [ ] Prepare support channels
 
-### Week 7-8: Beta Testing & Launch
+### Beta Testing & Launch
 **Focus**: Testing with friends and public launch
 
 #### Beta Testing
@@ -145,7 +145,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 
 ## Success Metrics
 
-### MVP Success (Week 8)
+### MVP Success
 1. **Initial**: Friends testing and having fun
 2. **Growth**: Users paying for the experience
 3. **Scale**: Efficient platform scaling
@@ -209,14 +209,14 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 
 ## Timeline Summary
 
-**Weeks 1-2**: Foundation (Navigation, Character UI, Journal UI)  
-**Weeks 3-4**: Core Loop (Narrative, Journal integration)  
-**Weeks 5-6**: Polish (Testing, Launch prep)  
-**Weeks 7-8**: Launch (Beta, Public release)  
+**Phase 1**: Foundation (Navigation, Character UI, Journal UI)  
+**Phase 2**: Core Loop (Narrative, Journal integration)  
+**Phase 3**: Polish (Testing, Launch prep)  
+**Phase 4**: Launch (Beta, Public release)  
 
 **Post-MVP**: Based on user feedback and metrics
 
 ---
 
 **Last Updated**: January 16, 2025  
-**Next Review**: End of Week 2 (Progress check)
+**Next Review**: End of Phase 1 (Progress check)
