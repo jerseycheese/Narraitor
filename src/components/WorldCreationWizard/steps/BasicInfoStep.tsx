@@ -30,7 +30,7 @@ const GENRE_OPTIONS = [
 ];
 
 // Wrapper component to handle form watching
-function BasicInfoFormContent({ worldData, onUpdate }: { worldData: Partial<World>, onUpdate?: (updates: Partial<World>) => void }) {
+function BasicInfoFormContent({ onUpdate }: { onUpdate?: (updates: Partial<World>) => void }) {
   const form = useFormContext();
   const watchedValues = form.watch();
 
@@ -157,7 +157,6 @@ function BasicInfoFormContent({ worldData, onUpdate }: { worldData: Partial<Worl
 
 export default function BasicInfoStep({
   worldData,
-  errors = {},
   onUpdate,
 }: BasicInfoStepProps) {
   return (
@@ -170,7 +169,7 @@ export default function BasicInfoStep({
           data={worldData}
           defaultValues={worldData}
         >
-          <BasicInfoFormContent worldData={worldData} onUpdate={onUpdate} />
+          <BasicInfoFormContent onUpdate={onUpdate} />
         </WizardForm>
       </WizardFormSection>
     </div>
