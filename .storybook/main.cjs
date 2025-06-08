@@ -13,7 +13,36 @@ const config = {
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-a11y',
-    '@storybook/addon-styling-webpack'
+    {
+      name: '@storybook/addon-styling-webpack',
+      options: {
+        rules: [
+          {
+            test: /\.css$/,
+            sideEffects: true,
+            use: [
+              require.resolve('style-loader'),
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  importLoaders: 1,
+                },
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  postcssOptions: {
+                    plugins: [
+                      require('@tailwindcss/postcss'),
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    }
   ],
   framework: {
     name: '@storybook/nextjs',
