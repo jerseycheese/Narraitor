@@ -4,8 +4,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { characterStore } from '../../../state/characterStore';
-import { worldStore } from '../../../state/worldStore';
+import { useCharacterStore } from '../../../state/characterStore';
+import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 // Removed AI client imports - using API routes instead
 

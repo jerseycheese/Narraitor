@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
