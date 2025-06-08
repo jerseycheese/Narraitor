@@ -1,3 +1,12 @@
+---
+title: "Character Creation Wizard Implementation Plan"
+type: implementation
+category: character
+tags: [character, wizard, implementation, github-115]
+created: 2025-05-22
+updated: 2025-06-08
+---
+
 # Character Creation Wizard Implementation Plan
 
 **Issue**: #115 - Create new character for enhanced player experience  

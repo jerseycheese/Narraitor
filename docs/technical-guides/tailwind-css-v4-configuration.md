@@ -1,3 +1,12 @@
+---
+title: "Tailwind CSS v4 Configuration Guide"
+type: guide
+category: styling
+tags: [tailwind, css, configuration, styling]
+created: 2025-05-16
+updated: 2025-06-08
+---
+
 # Tailwind CSS v4 Configuration Guide
 
 This guide documents the configuration setup for Tailwind CSS v4 in the Narraitor project.

@@ -1,3 +1,12 @@
+---
+title: "World Editing Feature"
+type: feature
+category: world
+tags: [world, editing, modification, ui]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # World Editing Feature
 
 ## Overview

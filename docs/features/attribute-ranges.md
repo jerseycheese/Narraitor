@@ -1,3 +1,12 @@
+---
+title: "Character Attribute Ranges"
+type: feature
+category: character
+tags: [character, attributes, ranges, configuration]
+created: 2025-05-20
+updated: 2025-06-08
+---
+
 # Character Attribute Ranges
 
 This document describes how character attributes are defined and configured within the Narraitor system.

@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation Integration Guide"
+type: guide
+category: character
+tags: [portrait, integration, guide, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation Integration Guide
 
 This guide explains how to integrate portrait generation into your components and features.

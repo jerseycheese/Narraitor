@@ -1,3 +1,12 @@
+---
+title: "App Router Migration"
+type: architecture
+category: migration
+tags: [nextjs, app-router, migration]
+created: 2025-05-14
+updated: 2025-06-08
+---
+
 # App Router Migration
 
 ## Overview

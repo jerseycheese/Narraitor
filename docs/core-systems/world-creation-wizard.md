@@ -1,3 +1,12 @@
+---
+title: "World Creation Wizard Documentation"
+type: architecture
+category: world
+tags: [world, wizard, creation, ai]
+created: 2025-05-15
+updated: 2025-06-08
+---
+
 # World Creation Wizard Documentation
 
 ## Overview

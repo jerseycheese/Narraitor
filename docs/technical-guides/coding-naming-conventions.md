@@ -1,3 +1,12 @@
+---
+title: "Component Naming Conventions"
+type: guide
+category: coding-standards
+tags: [coding, naming, conventions, standards]
+created: 2025-04-30
+updated: 2025-06-08
+---
+
 # Component Naming Conventions
 
 This document outlines the naming conventions for components in the Narraitor project.

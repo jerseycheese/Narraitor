@@ -1,3 +1,12 @@
+---
+title: "State Store Implementation Guide"
+type: guide
+category: state-management
+tags: [state, zustand, stores, implementation]
+created: 2025-05-13
+updated: 2025-06-08
+---
+
 # State Store Implementation Guide
 
 This guide provides detailed information about the Zustand store implementations in the Narraitor project.

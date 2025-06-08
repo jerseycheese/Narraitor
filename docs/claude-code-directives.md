@@ -1,3 +1,12 @@
+---
+title: "Claude Code Command Directives"
+type: guide
+category: development
+tags: [claude, automation, directives]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Claude Code Command Directives
 
 This document describes the directives used in Claude Code command files to control execution behavior.

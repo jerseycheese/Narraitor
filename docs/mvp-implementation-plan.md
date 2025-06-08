@@ -3,7 +3,7 @@ title: MVP Implementation Plan
 aliases: [Implementation Strategy, MVP Strategy]
 tags: [narraitor, implementation, planning]
 created: 2025-04-29
-updated: 2025-05-13
+updated: 2025-06-08
 ---
 
 # Narraitor MVP Implementation Plan
@@ -20,11 +20,22 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 5. Include a journal system for tracking game history and player decisions
 6. Ensure robust state persistence between sessions using IndexedDB
 7. Deliver a clean, maintainable codebase following best practices and TDD principles
-8. Incorporate error recovery and graceful failure handling
+8. Launch with basic payment integration for sustainable growth
 
 ## Core Systems Scope
 
+### Navigation System (MVP)
+**GitHub Issues**: Epic #493, #432 (completed), #509, #510, #511, #512
+- ✅ Fix world switcher dropdown behavior (#432 - completed)
+- [ ] Improve mobile navigation experience (#509)
+- [ ] Add comprehensive keyboard navigation support (#510)
+- [ ] Implement navigation state persistence (#511)
+- [ ] Add loading states for navigation transitions (#512)
+- [ ] Improve breadcrumb navigation for deep routes
+- [ ] Create consistent navigation patterns
+
 ### World Configuration System (MVP)
+**GitHub Issues**: #379 (epic), #303, #384
 - AI-assisted world creation from freeform descriptions:
   - User provides a description of their fictional world
   - AI analyzes description and suggests attributes and skills
@@ -39,41 +50,59 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Basic error handling and validation for world configurations
 
 ### Character System (MVP)
-- 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
-- Point-buy attribute allocation respecting world-defined limits
-- Skill selection and rating (up to 8 skills per character)
-- Text-based character description and background
-- Character listing with filtering by world
-- Basic character editing functionality
-- Character deletion with confirmation
-- Basic inventory management
-- Basic derived statistics
-- Character creation progress recovery
-- Character validation and error handling
+**GitHub Issues**: Epic #312, #256 (completed), #305, #285, #286, #287
+- ✅ 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
+- ✅ Point-buy attribute allocation respecting world-defined limits
+- ✅ Skill selection and rating (up to 8 skills per character)
+- ✅ Text-based character description and background
+- ✅ Character listing with filtering by world
+- ✅ Character viewing interface (#256 - completed)
+- [ ] Character editing functionality (#305)
+- ✅ Character deletion with confirmation
+- [ ] Define character attributes (#285)
+- [ ] Build character skills (#286)
+- [ ] Link skills to attributes (#287)
+- ✅ Character creation progress recovery
+- ✅ Character validation and error handling
 
 ### Narrative Engine (MVP)
-- Narrative generation using Google Gemini API
-- Player choice system with 3-4 options per decision point
-- Context management retaining 5-10 narrative segments
-- History tracking for narrative segments and player decisions
-- Scene transitions with location/setting changes
-- Error recovery with retries and fallback content
-- Prompt construction optimized for token efficiency
-- World-appropriate tone and content generation
-- Proper text formatting with paragraphs and dialogue
-- Retry mechanisms for failed AI generation
-- Fallback content for service unavailability
+**GitHub Issues**: Epic #379, #462 (completed), #248
+- ✅ Narrative generation using Google Gemini API
+- ✅ Narrative ending system (#462 - completed)
+- [ ] Player choice system with clear decision points (#248)
+- ✅ Context management retaining 5-10 narrative segments
+- ✅ History tracking for narrative segments and player decisions
+- [ ] Scene transitions with location/setting changes
+- ✅ Error recovery with retries and fallback content
+- ✅ Prompt construction optimized for token efficiency
+- ✅ World-appropriate tone and content generation
+- ✅ Proper text formatting with paragraphs and dialogue
+- ✅ Retry mechanisms for failed AI generation
+- [ ] Fallback content for service unavailability
 
 ### Journal System (MVP)
-- Automatic entry creation for narrative events, decisions, discoveries, and character encounters
-- Entry categorization by four primary types
-- Chronological journal view with entry detail display
-- Mobile and desktop responsive design
-- Integration with game session UI
-- Proper formatting for journal entries
+**GitHub Issues**: Epic #494, #278, #280, #281
+- **Backend (Complete)**: 
+  - Journal store implementation ✅
+  - Entry CRUD operations ✅
+  - Entry type categorization ✅
+  - Read/unread state management ✅
+  - Test coverage ✅
+- **UI Components**:
+  - [ ] Collapsible journal panel for gameplay view (#278)
+  - [ ] Journal list component with chronological display
+  - [ ] Entry detail view with formatted content
+  - [ ] Responsive journal layout (#280)
+  - [ ] Session grouping UI
+  - Entry type filtering (post-MVP)
+  - New/unread indicators (post-MVP)
+- **Integration**:
+  - [ ] Automatic entry creation from narrative events
+  - [ ] Store journal entries permanently (#281)
+  - [ ] Mobile and desktop responsive design
+  - [ ] Proper formatting for journal entries
 
 ### State Management (MVP) ✅
-- ~~React Context + useReducer pattern for all domains~~
 - **Zustand stores for all domain state management** ✅
 - TypeScript-based type safety throughout ✅
 - All 7 stores implemented with full CRUD operations ✅
@@ -81,15 +110,13 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Loading state management ✅
 - Reset functionality for all stores ✅
 - Component hooks for clean state access ✅
-- IndexedDB persistence with auto-save - **Next Phase (#340)**
-- Campaign management (create, list, load, delete) - **Next Phase**
-- Safe resume functionality for interrupted sessions - **Next Phase**
+- ✅ IndexedDB persistence with auto-save (#340 - completed)
 
 ### Game Session UI (MVP)
 - Responsive narrative display with markdown formatting
 - Choice presentation with 3-4 options as cards or buttons
 - Character summary panel showing relevant attributes and skills
-- Journal access button with unread indicator
+- Journal access with collapsible panel
 - Loading indicator during AI generation
 - Auto-saving with save time display
 - World-appropriate styling (fonts, colors, decorative elements)
@@ -108,124 +135,95 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Context optimization for token efficiency
 - Fallback content when service unavailable
 - Response parsing and normalization
-- Content safety filters
+- Basic content safety filters
 - Response formatting for display
 - User-friendly error messages
 
+### Launch Preparation (MVP)
+**GitHub Issues**: Epic #495
+- **Marketing & Documentation**:
+  - Simple marketing landing page
+  - Getting started guide
+  - World creation tutorial
+  - Basic user documentation
+- **Payment Integration**:
+  - Payment provider setup (generic: Stripe/Paddle)
+  - Basic subscription tiers
+  - Payment flow integration
+  - Customer portal access
+- **Analytics & Support**:
+  - Privacy-focused analytics setup
+  - Error tracking implementation
+  - Basic support channel
+  - Feedback collection system
+
 ## Implementation Phases
 
-### Phase 1: Project Setup and Infrastructure ✅
-- Initialize Next.js 14 project with TypeScript ✅
-- Configure ESLint, Prettier, and EditorConfig ✅
-- Set up Jest and React Testing Library ✅
-- Configure Storybook for component development ✅
-- Create domain-driven project structure ✅
-- **Set up state management architecture** ✅
-- Implement IndexedDB persistence layer - **Next Phase (#340)**
-- Create core UI components library - **In Progress**
-- Build error boundary system - **In Progress**
-- Set up development diagnostics - **In Progress**
+### Phase 1: Foundation & Core Systems
+**Focus**: Navigation, Character completion, Journal setup
 
-### Phase 2: World Configuration System
-- **World store implementation** ✅
-- **World CRUD operations** ✅
-- **Attribute and skill management** ✅
-- **World settings management** ✅
-- **Test coverage for world store** ✅
-- Create world creation form for freeform descriptions
-- Build world description analyzer using Google Gemini
-- Implement attribute and skill suggestion system
-- Create user interface for reviewing and editing AI suggestions
-- Develop template world system as fallback option
-- Build world selection interface
-- Implement world editor interface
-- Create world theme system with 5 presets
-- Build validation and error handling
+- **Navigation Improvements**
+  - Fix world switcher dropdown behavior (#432)
+  - Improve breadcrumb navigation
+  - Mobile navigation improvements
+  - Consistent navigation patterns
+  
+- **Character System Completion**
+  - Character viewing interface (#256)
+  - Character editing capabilities (#305)
+  - Character-world associations
+  - UI/UX polish
+  
+- **Journal System UI Setup**
+  - Create journal UI components
+  - Collapsible journal view implementation
+  - Journal entry creation hooks
+  - IndexedDB persistence (#340)
 
-### Phase 3: Character System
-- **Character store implementation** ✅
-- **Character CRUD operations** ✅
-- **Character attribute management** ✅
-- **Character skill management** ✅
-- **Test coverage for character store** ✅
-- Create 4-step character creation wizard
-- Develop attribute allocation interface with validation
-- Build skill selection interface with attribute linking
-- Create character listing with filtering and sorting
-- Implement character detail view
-- Add basic character editing functionality
-- Implement character deletion with confirmation
-- **Basic inventory management** ✅ (via inventory store)
-- Create basic derived statistics calculation
-- Build character creation progress recovery
+### Phase 2: Core Gameplay Loop
+**Focus**: Complete narrative experience and journal integration
 
-### Phase 4: AI Service Integration
-- Implement Google Gemini API client
-- Create prompt template system for different use cases
-- Develop response parsing and normalization
-- Implement error handling and retry logic
-- Add token optimization for context management
-- Create fallback systems for service failures
-- Build configuration interface for API settings
-- Implement content safety filters
-- Create response formatting system
+- **Narrative Engine Polish**
+  - Narrative ending system (#462)
+  - Scene transitions
+  - Fallback content system
+  - Decision presentation (#248)
+  
+- **Journal System Implementation**
+  - Enable journal during gameplay (#278)
+  - Responsive journal layout (#280)
+  - Permanent storage (#281)
+  - Session grouping and organization
 
-### Phase 5: Narrative Engine
-- **Narrative store implementation** ✅
-- **Narrative segment CRUD operations** ✅
-- **Session-based segment organization** ✅
-- **Test coverage for narrative store** ✅
-- Create narrative context management system
-- Develop player choice interface components
-- Build narrative history tracking
-- Implement scene transition logic
-- Create narrative text display component
-- Add decision relevance tracking
-- Develop error recovery mechanisms
-- Implement fallback narrative content
-- Build text formatting system
-- Create retry mechanism for failed generation
+### Phase 3: Polish & Preparation
+**Focus**: Testing, performance, and launch prep
 
-### Phase 6: Journal System
-- **Journal store implementation** ✅
-- **Journal entry CRUD operations** ✅
-- **Entry type categorization** ✅
-- **Read/unread state management** ✅
-- **Test coverage for journal store** ✅
-- Create automatic entry creation system
-- Build journal list view component
-- Develop journal entry detail component
-- Build mobile-responsive journal interface
-- Create journal entry formatting
+- **UI/UX Polish**
+  - Responsive design improvements
+  - Performance optimization
+  - Loading states and error handling
+  - Cross-browser testing
+  
+- **Launch Preparation**
+  - Marketing landing page
+  - User documentation
+  - Analytics setup
+  - Payment integration preparation
 
-### Phase 7: Game Session Integration
-- **Session store implementation** ✅
-- **Session CRUD operations** ✅
-- **Active session management** ✅
-- **Test coverage for session store** ✅
-- Create game session container component
-- Integrate narrative display with AI service
-- Connect player choices to narrative progression
-- Implement character summary panel
-- Add journal access functionality
-- Create loading and error states
-- Develop session controls (save, exit)
-- Add world theme integration for UI components
-- Build session recovery interface
-- Add save indicators and confirmation
+### Phase 4: Beta & Launch
+**Focus**: Testing with friends, iterate, and launch
 
-### Phase 8: Testing and Refinement
-- **Complete unit test coverage for all stores** ✅
-- **Integration tests for cross-store operations** ✅
-- Add integration tests for UI components
-- Implement end-to-end tests for critical flows
-- Address performance bottlenecks
-- Improve error handling and recovery
-- Enhance accessibility features
-- Fix identified bugs and issues
-- Test error recovery paths
-- Validate session restoration
-- Final documentation updates
+- **Beta Testing Phase**
+  - Friends & family testing
+  - Feedback gathering and iteration
+  - Critical bug fixes
+  - Performance monitoring
+  
+- **Launch Activities**
+  - Payment system activation
+  - Public launch announcement
+  - User onboarding monitoring
+  - Quick issue response
 
 ## Development Approach
 
@@ -254,7 +252,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 4. Create selector functions for derived data ✅
 5. Build custom hooks for component access ✅
 6. Add state validation and integrity checks ✅
-7. Add persistence layer with proper error handling - **Next Phase (#340)**
+7. Add persistence layer with proper error handling (#340)
 
 ### AI Integration
 1. Create modular AI service with specialized generators
@@ -282,8 +280,8 @@ flowchart TD
 
 1. **Framework**: Next.js 14+ with App Router
 2. **Language**: TypeScript with strict typing
-3. **State Management**: ~~React Context + useReducer pattern~~ **Zustand stores** ✅
-4. **Persistence**: IndexedDB via idb library - **Next Phase**
+3. **State Management**: Zustand stores ✅
+4. **Persistence**: IndexedDB via idb library
 5. **UI Framework**: Tailwind CSS with world theming
 6. **Testing**: Jest + React Testing Library + Playwright
 7. **AI Integration**: Google Gemini API
@@ -308,36 +306,42 @@ flowchart TD
 
 ### In Progress 🔄
 - Core UI component library
-- Error boundary implementation
-- Development diagnostics
+- Navigation improvements
+- IndexedDB persistence layer (#340)
+- Character viewing/editing UI
+- Journal UI components
 
 ### Next Up 📋
-- IndexedDB persistence layer (#340)
 - World creation UI components
-- Character creation wizard
 - AI service integration
 - Narrative display components
+- Launch preparation tasks
 
 ## Updated Timeline
 
-- **Week 1-2**: ~~Project setup and state management~~ ✅
-- **Week 3-4**: World and Character UI components
-- **Week 5-6**: AI service integration
-- **Week 7-8**: Narrative engine and Journal UI
-- **Week 9-10**: Game session integration
-- **Week 11-12**: Testing, polish, and deployment
+- **Phase 1**: Navigation fixes, Character UI completion, Journal UI setup
+- **Phase 2**: Narrative engine polish, Journal integration
+- **Phase 3**: Polish, testing, launch preparation
+- **Phase 4**: Beta testing and public launch
+
+## Success Metrics
+
+1. **Initial Success**: Friends testing and having fun
+2. **Growth Success**: Users willing to pay for the experience
+3. **Scale Success**: Efficient platform scaling with growing user base
 
 ## Current Blockers
 
-None - Issue #340 (IndexedDB persistence) is now unblocked and ready for implementation.
+None - Project is on track for streamlined MVP delivery.
 
 ## Recent Changes
 
-1. **State Management Migration**: Successfully migrated from proposed Context/useReducer pattern to Zustand stores
-2. **Documentation Update**: Updated all state management documentation to reflect Zustand implementation
-3. **Test Coverage**: Added comprehensive test coverage for all stores
-4. **Issue Tracking**: Updated GitHub issues to reflect completion of #339
+1. **Timeline Compression**: Streamlined timeline by focusing on core features
+2. **Navigation Epic**: Added dedicated epic for navigation improvements
+3. **Journal in MVP**: Moved journal system from post-MVP to MVP with UI implementation
+4. **Launch Preparation**: Added new epic for marketing and payment setup
+5. **Gamification Deferred**: Moved all gamification features to post-MVP
 
 ## Conclusion
 
-The MVP implementation is progressing well with the state management foundation now complete. The Zustand-based architecture provides a solid foundation for the UI components and features to be built on top. With all stores implemented and tested, the project is ready to move forward with the persistence layer and UI implementation phases.
+The MVP implementation has been streamlined to focus on delivering a complete, polished narrative experience. With the state management foundation complete and a clear focus on core features, the project is well-positioned for rapid development and successful launch.

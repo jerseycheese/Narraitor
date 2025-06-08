@@ -1,3 +1,12 @@
+---
+title: "MVP Type Simplification Summary"
+type: architecture
+category: types
+tags: [mvp, types, simplification, typescript]
+created: 2025-05-13
+updated: 2025-06-08
+---
+
 # MVP Type Simplification Summary
 
 This document summarizes the changes made to simplify the type system for MVP scope.

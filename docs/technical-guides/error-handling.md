@@ -1,3 +1,12 @@
+---
+title: "Error Handling Guide"
+type: guide
+category: technical
+tags: [error-handling, patterns, best-practices]
+created: 2025-05-13
+updated: 2025-06-08
+---
+
 # Error Handling Guide
 
 This guide outlines the error handling patterns used in the Narraitor project.
