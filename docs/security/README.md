@@ -1,3 +1,12 @@
+---
+title: "Security Documentation"
+type: security
+category: security
+tags: [security, api-keys, rate-limiting]
+created: 2025-06-01
+updated: 2025-06-08
+---
+
 # Security Documentation
 
 This directory contains comprehensive security documentation for the Narraitor application, covering API key protection, rate limiting, and security testing procedures.

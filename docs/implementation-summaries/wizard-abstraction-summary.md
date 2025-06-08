@@ -1,3 +1,12 @@
+---
+title: "Wizard Abstraction Summary"
+type: implementation
+category: components
+tags: [wizard, abstraction, components]
+created: 2025-05-23
+updated: 2025-06-08
+---
+
 # Wizard Abstraction Summary
 
 ## What Has Been Abstracted

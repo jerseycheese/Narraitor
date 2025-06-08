@@ -1,3 +1,12 @@
+---
+title: "Custom Player Input Feature"
+type: feature
+category: player-interaction
+tags: [player-input, choices, interaction]
+created: 2025-05-31
+updated: 2025-06-08
+---
+
 # Custom Player Input Feature
 
 ## Overview

@@ -1,3 +1,12 @@
+---
+title: "AI World Suggestions - User Guide"
+type: feature
+category: world-creation
+tags: [ai, world, suggestions, creation]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # AI World Suggestions - User Guide
 
 ## What are AI World Suggestions?
