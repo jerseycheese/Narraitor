@@ -12,35 +12,7 @@ const config = {
   ],
   addons: [
     '@storybook/addon-essentials',
-    '@storybook/addon-a11y',
-    {
-      name: '@storybook/addon-styling-webpack',
-      options: {
-        rules: [
-          {
-            test: /\.css$/,
-            sideEffects: true,
-            use: [
-              require.resolve('style-loader'),
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  importLoaders: 1,
-                },
-              },
-              {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                  postcssOptions: {
-                    config: path.resolve(__dirname, '../postcss.config.mjs'),
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    }
+    '@storybook/addon-a11y'
   ],
   framework: {
     name: '@storybook/nextjs',
