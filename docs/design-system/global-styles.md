@@ -1,3 +1,12 @@
+---
+title: "Narraitor Global Styles"
+type: design-system
+category: styling
+tags: [global-styles, css, design-system, theming]
+created: 2025-05-17
+updated: 2025-06-08
+---
+
 # Narraitor Global Styles
 
 This document explains the global styling system implemented for the Narraitor application. The system provides a wireframe-like foundation for MVP development while setting up an extensible structure for future theming.

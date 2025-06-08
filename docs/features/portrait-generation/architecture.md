@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation Architecture"
+type: architecture
+category: character
+tags: [portrait, architecture, character, ai]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation Architecture
 
 ## System Overview
