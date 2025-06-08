@@ -2,7 +2,7 @@
  * Simplified Storybook Preview Configuration
  * Without dark mode support
  */
-import './tailwind.css';
+import '../src/app/globals.css';
 import './storybook.css';
 
 const preview = {

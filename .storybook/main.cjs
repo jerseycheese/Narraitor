@@ -29,34 +29,14 @@ const config = {
       '@': path.resolve(__dirname, '../src')
     };
 
-    // Find CSS rules and configure PostCSS for Tailwind v4
-    const rules = config.module.rules;
-    
-    // Process all CSS-related rules
-    rules.forEach((rule) => {
-      if (rule.test && rule.test.toString().includes('css')) {
-        if (rule.use && Array.isArray(rule.use)) {
-          rule.use.forEach((loader, index) => {
-            if (loader && typeof loader === 'object' && loader.loader) {
-              // Configure PostCSS loader
-              if (loader.loader.includes('postcss-loader')) {
-                rule.use[index] = {
-                  ...loader,
-                  options: {
-                    ...loader.options,
-                    postcssOptions: {
-                      plugins: {
-                        '@tailwindcss/postcss': {},
-                      },
-                    },
-                  },
-                };
-              }
-            }
-          });
-        }
-      }
-    });
+    // Debug: Log webpack rules to understand CSS processing
+    console.log('Webpack CSS rules:', JSON.stringify(
+      config.module.rules.filter(rule => 
+        rule.test && rule.test.toString().includes('css')
+      ), 
+      null, 
+      2
+    ));
 
     return config;
   }
