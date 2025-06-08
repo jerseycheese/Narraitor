@@ -1,3 +1,12 @@
+---
+title: "Choice Alignment System"
+type: feature
+category: narrative
+tags: [choice, alignment, narrative, personality]
+created: 2025-06-01
+updated: 2025-06-08
+---
+
 # Choice Alignment System
 
 ## Overview

@@ -1,3 +1,12 @@
+---
+title: "GitHub CSV Synchronization Guide"
+type: guide
+category: development
+tags: [github, csv, synchronization, workflow]
+created: 2025-05-09
+updated: 2025-06-08
+---
+
 # GitHub CSV Synchronization Guide
 
 This guide provides step-by-step instructions for using the GitHub issue and CSV synchronization scripts for the Narraitor project.

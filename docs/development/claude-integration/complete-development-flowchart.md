@@ -1,3 +1,12 @@
+---
+title: "Complete Narraitor Development Workflow"
+type: flowchart
+category: claude-integration
+tags: [workflow, flowchart, development, claude]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Complete Narraitor Development Workflow
 
 ## End-to-End Development Process with Claude App & Claude Code Integration
