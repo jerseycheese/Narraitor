@@ -3,6 +3,7 @@
  * Without dark mode support
  */
 import '../src/app/globals.css';
+import './tailwind-essential.css';
 import './storybook.css';
 
 const preview = {
