@@ -26,7 +26,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 - [ ] Create consistent navigation patterns
 
 #### Character System UI
-- [ ] Complete character viewing interface (#256)
+- [x] Complete character viewing interface (#256 - completed)
 - [ ] Add character editing capabilities (#305)
 - [ ] Fix character-world associations
 - [ ] Polish character UI/UX

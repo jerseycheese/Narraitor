@@ -25,14 +25,14 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 ## Core Systems Scope
 
 ### Navigation System (MVP)
-**GitHub Issues**: Epic #493, #432 (world switcher - completed), #509, #510, #511, #512
+**GitHub Issues**: Epic #493, #432 (completed), #509, #510, #511, #512
 - ✅ Fix world switcher dropdown behavior (#432 - completed)
-- Improve mobile navigation experience (#509)
-- Add comprehensive keyboard navigation support (#510)
-- Implement navigation state persistence (#511)
-- Add loading states for navigation transitions (#512)
-- Improve breadcrumb navigation for deep routes
-- Create consistent navigation patterns across all pages
+- [ ] Improve mobile navigation experience (#509)
+- [ ] Add comprehensive keyboard navigation support (#510)
+- [ ] Implement navigation state persistence (#511)
+- [ ] Add loading states for navigation transitions (#512)
+- [ ] Improve breadcrumb navigation for deep routes
+- [ ] Create consistent navigation patterns
 
 ### World Configuration System (MVP)
 **GitHub Issues**: #379 (epic), #303, #384
@@ -50,35 +50,35 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Basic error handling and validation for world configurations
 
 ### Character System (MVP)
-**GitHub Issues**: #312 (epic), #256, #305, #285, #286, #287
-- 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
-- Point-buy attribute allocation respecting world-defined limits
-- Skill selection and rating (up to 8 skills per character)
-- Text-based character description and background
-- Character listing with filtering by world
-- Character viewing interface (#256)
-- Character editing functionality (#305)
-- Character deletion with confirmation
-- Define character attributes (#285)
-- Build character skills (#286)
-- Link skills to attributes (#287)
-- Character creation progress recovery
-- Character validation and error handling
+**GitHub Issues**: Epic #312, #256 (completed), #305, #285, #286, #287
+- ✅ 4-step character creation wizard (Basic Info, Attributes, Skills, Background)
+- ✅ Point-buy attribute allocation respecting world-defined limits
+- ✅ Skill selection and rating (up to 8 skills per character)
+- ✅ Text-based character description and background
+- ✅ Character listing with filtering by world
+- ✅ Character viewing interface (#256 - completed)
+- [ ] Character editing functionality (#305)
+- ✅ Character deletion with confirmation
+- [ ] Define character attributes (#285)
+- [ ] Build character skills (#286)
+- [ ] Link skills to attributes (#287)
+- ✅ Character creation progress recovery
+- ✅ Character validation and error handling
 
 ### Narrative Engine (MVP)
-**GitHub Issues**: #379 (epic), #462, #248
-- Narrative generation using Google Gemini API
-- Narrative ending system (#462)
-- Player choice system with clear decision points (#248)
-- Context management retaining 5-10 narrative segments
-- History tracking for narrative segments and player decisions
-- Scene transitions with location/setting changes
-- Error recovery with retries and fallback content
-- Prompt construction optimized for token efficiency
-- World-appropriate tone and content generation
-- Proper text formatting with paragraphs and dialogue
-- Retry mechanisms for failed AI generation
-- Fallback content for service unavailability
+**GitHub Issues**: Epic #379, #462 (completed), #248
+- ✅ Narrative generation using Google Gemini API
+- ✅ Narrative ending system (#462 - completed)
+- [ ] Player choice system with clear decision points (#248)
+- ✅ Context management retaining 5-10 narrative segments
+- ✅ History tracking for narrative segments and player decisions
+- [ ] Scene transitions with location/setting changes
+- ✅ Error recovery with retries and fallback content
+- ✅ Prompt construction optimized for token efficiency
+- ✅ World-appropriate tone and content generation
+- ✅ Proper text formatting with paragraphs and dialogue
+- ✅ Retry mechanisms for failed AI generation
+- [ ] Fallback content for service unavailability
 
 ### Journal System (MVP)
 **GitHub Issues**: Epic #494, #278, #280, #281
@@ -88,19 +88,19 @@ This document outlines the implementation strategy for the Minimum Viable Produc
   - Entry type categorization ✅
   - Read/unread state management ✅
   - Test coverage ✅
-- **UI Components (Week 2-3)**:
-  - Collapsible journal panel for gameplay view (#278)
-  - Journal list component with chronological display
-  - Entry detail view with formatted content
-  - Responsive journal layout (#280)
-  - Session grouping UI
+- **UI Components**:
+  - [ ] Collapsible journal panel for gameplay view (#278)
+  - [ ] Journal list component with chronological display
+  - [ ] Entry detail view with formatted content
+  - [ ] Responsive journal layout (#280)
+  - [ ] Session grouping UI
   - Entry type filtering (post-MVP)
   - New/unread indicators (post-MVP)
 - **Integration**:
-  - Automatic entry creation from narrative events
-  - Store journal entries permanently (#281)
-  - Mobile and desktop responsive design
-  - Proper formatting for journal entries
+  - [ ] Automatic entry creation from narrative events
+  - [ ] Store journal entries permanently (#281)
+  - [ ] Mobile and desktop responsive design
+  - [ ] Proper formatting for journal entries
 
 ### State Management (MVP) ✅
 - **Zustand stores for all domain state management** ✅
@@ -110,7 +110,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Loading state management ✅
 - Reset functionality for all stores ✅
 - Component hooks for clean state access ✅
-- IndexedDB persistence with auto-save (#340) - **In Progress**
+- ✅ IndexedDB persistence with auto-save (#340 - completed)
 
 ### Game Session UI (MVP)
 - Responsive narrative display with markdown formatting
