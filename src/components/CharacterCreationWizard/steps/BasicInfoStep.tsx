@@ -1,62 +1,117 @@
-import React from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
-import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
-import { World } from '@/types/world.types';
-
-interface CharacterWizardData {
-  characterData: {
-    name: string;
-    description: string;
-    background?: {
-      physicalDescription?: string;
-      [key: string]: unknown;
-    };
-    [key: string]: unknown;
-  };
-  validation: {
-    [stepNumber: number]: {
-      valid: boolean;
-      touched: boolean;
-      errors: string[];
-    };
-  };
-}
+import { WizardForm } from '@/components/shared/wizard/components/WizardForm';
+import {
+  WizardFormField,
+  WizardInput,
+  WizardTextarea,
+  WizardFormSection,
+} from '@/components/shared/wizard/components/WizardFormComponents';
+import { useFormContext } from 'react-hook-form';
 
 interface BasicInfoStepProps {
-  data: CharacterWizardData;
-  onUpdate: (updates: Record<string, unknown>) => void;
+  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig?: World;
+  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
+
+// Inner component that has access to form context
+interface FormContentProps {
+  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onValidation: (valid: boolean, errors: string[], touched?: boolean) => void;
+}
+
+const FormContent: React.FC<FormContentProps> = ({ onUpdate, onValidation }) => {
+  const { watch } = useFormContext();
+  const previousValues = useRef<Record<string, any>>({}); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+  
+  // Debounced update to prevent infinite loops
+  const debouncedUpdate = useCallback((fieldName: string, value: any, isUserInput = false) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    // Only update if value actually changed
+    if (previousValues.current[fieldName] !== value) {
+      previousValues.current[fieldName] = value;
+      onUpdate({ [fieldName]: value });
+      
+      // Mark field as touched if this is user input
+      if (isUserInput) {
+        setTouchedFields(prev => ({ ...prev, [fieldName]: true }));
+      }
+      
+      // Validate the name field
+      if (fieldName === 'name') {
+        const errors: string[] = [];
+        const nameValue = value || '';
+        if (!nameValue.trim()) {
+          errors.push('Name is required');
+        } else if (nameValue.length < 3) {
+          errors.push('Name must be at least 3 characters');
+        }
+        // Only show validation if field has been touched or we have a value
+        const shouldShowValidation = touchedFields[fieldName] || (isUserInput && value);
+        onValidation(errors.length === 0, errors, shouldShowValidation);
+      }
+    }
+  }, [onUpdate, onValidation, touchedFields]);
+  
+  // Watch for form changes
+  useEffect(() => {
+    const subscription = watch((value, { name: fieldName }) => {
+      // Only update if a specific field changed
+      if (fieldName && value[fieldName] !== undefined) {
+        // If the field has content, consider it touched
+        const isUserInput = value[fieldName] && value[fieldName].length > 0;
+        debouncedUpdate(fieldName, value[fieldName], isUserInput);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, debouncedUpdate]);
+
+  return (
+    <>
+      <WizardFormField
+        name="name"
+        label="Character Name"
+        required
+        description="Choose a unique name for your character (3-50 characters)"
+      >
+        <WizardInput
+          placeholder="Enter character name"
+          maxLength={50}
+        />
+      </WizardFormField>
+
+      <WizardFormField
+        name="description"
+        label="Description"
+        description="Describe your character's role and background"
+      >
+        <WizardTextarea
+          placeholder="Describe your character's role and background"
+          rows={3}
+        />
+      </WizardFormField>
+
+      <WizardFormField
+        name="physicalDescription"
+        label="Physical Description"
+        description="This will be used to generate your character's portrait"
+      >
+        <WizardTextarea
+          placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
+          rows={3}
+        />
+      </WizardFormField>
+    </>
+  );
+};
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   data,
   onUpdate,
+  onValidation,
 }) => {
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onUpdate({ name: e.target.value });
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({ description: e.target.value });
-  };
-
-  const handlePhysicalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onUpdate({ 
-      background: {
-        ...data.characterData.background,
-        physicalDescription: e.target.value
-      }
-    });
-  };
-
-
-  const handleBlur = () => {
-    // Validation will be triggered by parent component
-  };
-
-  const validation = data.validation[0];
-  const showErrors = validation?.touched && !validation?.valid;
 
   return (
     <WizardFormSection
@@ -70,66 +125,20 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         </div>
 
         {/* Form fields */}
-        <div className="flex-1 space-y-4">
-          <div className={wizardStyles.form.group}>
-            <label htmlFor="character-name" className={wizardStyles.form.label}>
-              Character Name
-            </label>
-            <input
-              id="character-name"
-              type="text"
-              value={data.characterData.name}
-              onChange={handleNameChange}
-              onBlur={handleBlur}
-              maxLength={50}
-              className={wizardStyles.form.input}
-              placeholder="Enter character name"
+        <div className="flex-1">
+          <WizardForm
+            data={data.characterData}
+          >
+            <FormContent 
+              onUpdate={onUpdate} 
+              onValidation={onValidation}
             />
-            {showErrors && validation.errors.map((error: string, index: number) => (
-              <p key={index} className={wizardStyles.form.error}>
-                {error}
-              </p>
-            ))}
-          </div>
-
-          <div className={wizardStyles.form.group}>
-            <label htmlFor="character-description" className={wizardStyles.form.label}>
-              Description
-            </label>
-            <textarea
-              id="character-description"
-              value={data.characterData.description}
-              onChange={handleDescriptionChange}
-              onBlur={handleBlur}
-              rows={3}
-              className={wizardStyles.form.textarea}
-              placeholder="Describe your character's role and background"
-            />
-          </div>
-
-          <div className={wizardStyles.form.group}>
-            <label htmlFor="physical-description" className={wizardStyles.form.label}>
-              Physical Description
-            </label>
-            <textarea
-              id="physical-description"
-              value={data.characterData.background?.physicalDescription || ''}
-              onChange={handlePhysicalDescriptionChange}
-              onBlur={handleBlur}
-              rows={3}
-              className={wizardStyles.form.textarea}
-              placeholder="Describe your character's appearance (e.g., tall and muscular, silver hair, blue eyes, wears leather armor)"
-            />
-            <p className="mt-1 text-sm text-gray-500">
-              This will be used to generate your character&apos;s portrait. Tip: Add &quot;looks like [actor name]&quot; to generate a portrait resembling a specific person.
-            </p>
-          </div>
-
+          </WizardForm>
         </div>
       </div>
 
       <div className="bg-blue-50 p-4 rounded">
-        <p className={wizardStyles.form.helpText}>
+        <p className="text-gray-500 text-sm mt-1">
           Choose a unique name for your character. The name should be between 3 and 50 characters 
           and must be unique within this world.
         </p>

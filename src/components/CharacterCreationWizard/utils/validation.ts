@@ -1,4 +1,4 @@
-import { useCharacterStore } from '@/state/characterStore';
+import { characterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 
 interface ValidationResult {
@@ -20,7 +20,7 @@ export const validateCharacterName = (name: string, worldId: EntityID): Validati
     }
     
     // Check uniqueness within world
-    const state = useCharacterStore.getState();
+    const state = characterStore.getState?.() || characterStore();
     const characters = state.characters || {};
     const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
     if (existingCharacters.some(c => c.name === name)) {
@@ -81,8 +81,13 @@ export const validateBackground = (background: {
     errors.push('Character history must be at least 50 characters');
   }
   
-  if (!background.personality || background.personality.length < 20) {
-    errors.push('Personality description must be at least 20 characters');
+  if (!background.personality || background.personality.length < 30) {
+    errors.push('Personality description must be at least 30 characters');
+  }
+  
+  // Motivation is optional, but if provided must be at least 10 characters
+  if (background.motivation && background.motivation.length > 0 && background.motivation.length < 10) {
+    errors.push('Motivation must be at least 10 characters');
   }
   
   return {

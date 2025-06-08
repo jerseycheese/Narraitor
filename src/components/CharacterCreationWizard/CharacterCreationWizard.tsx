@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { worldStore } from '@/state/worldStore';
+import { characterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
@@ -92,8 +92,8 @@ const steps = [
 
 export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId, initialStep = 0 }) => {
   const router = useRouter();
-  const { worlds } = useWorldStore();
-  const { createCharacter } = useCharacterStore();
+  const { worlds } = worldStore();
+  const { createCharacter } = characterStore();
   const world = worlds[worldId];
   
   
@@ -159,17 +159,25 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     };
   });
 
-  // Update auto-save data when state changes
-  useEffect(() => {
-    setData(state);
-  }, [state, setData]);
+  // Track if we've loaded data to prevent loops
+  const [hasLoadedData, setHasLoadedData] = useState(false);
 
-  // Check if data was loaded after initial render
+  // Update auto-save data when state changes (but not during initial load)
   useEffect(() => {
-    if (data && state.characterData.name === '') {
-      setState(data);
+    if (hasLoadedData) {
+      setData(state);
     }
-  }, [data, state.characterData.name]);
+  }, [state, setData, hasLoadedData]);
+
+  // Check if data was loaded after initial render (only run once)
+  useEffect(() => {
+    if (data && !hasLoadedData && state.characterData.name === '') {
+      setState(data);
+      setHasLoadedData(true);
+    } else if (!hasLoadedData) {
+      setHasLoadedData(true);
+    }
+  }, [data, hasLoadedData, state.characterData.name]);
 
   const validateStep = useCallback((step: number): { valid: boolean; errors: string[] } => {
     switch (step) {
@@ -291,14 +299,21 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     });
   }, [worldId]);
 
-  const handleValidation = useCallback((valid: boolean, errors: string[]) => {
-    setState(prev => ({
-      ...prev,
-      validation: {
-        ...prev.validation,
-        [prev.currentStep]: { valid, errors, touched: true },
-      },
-    }));
+  const handleValidation = useCallback((valid: boolean, errors: string[], shouldTouch = true) => {
+    setState(prev => {
+      const currentValidation = prev.validation[prev.currentStep];
+      return {
+        ...prev,
+        validation: {
+          ...prev.validation,
+          [prev.currentStep]: { 
+            valid, 
+            errors, 
+            touched: shouldTouch ? true : (currentValidation?.touched || false)
+          },
+        },
+      };
+    });
   }, []);
 
   const handleCreate = useCallback(() => {
@@ -321,7 +336,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     // Create character
     const characterId = createCharacter({
       name: state.characterData.name,
-      description: state.characterData.background.history,
       worldId,
       level: 1,
       attributes: state.characterData.attributes.map(attr => {
@@ -355,7 +369,6 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
         fears: [],
         physicalDescription: state.characterData.background.physicalDescription || '',
-        relationships: [],
       },
       portrait: state.characterData.portrait || {
         type: 'placeholder',
@@ -363,29 +376,23 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
       isPlayer: true,
       status: {
-        health: 100,
-        maxHealth: 100,
-        conditions: [],
-      },
-      inventory: {
-        characterId: '', // Will be set by the store
-        items: [],
-        capacity: 20,
-        categories: []
+        hp: 100,
+        mp: 50,
+        stamina: 100,
       },
     });
 
     // Set as current character
-    useCharacterStore.getState().setCurrentCharacter(characterId);
+    characterStore.getState().setCurrentCharacter(characterId);
     
     // Verify the character was set as current
-    const currentCharacterId = useCharacterStore.getState().currentCharacterId;
+    const currentCharacterId = characterStore.getState().currentCharacterId;
     
     if (currentCharacterId !== characterId) {
       console.error('[CharacterCreationWizard] Failed to set current character!', {
         expectedId: characterId,
         actualId: currentCharacterId,
-        charactersInStore: Object.keys(useCharacterStore.getState().characters)
+        charactersInStore: Object.keys(characterStore.getState().characters)
       });
     }
     // Clear auto-save

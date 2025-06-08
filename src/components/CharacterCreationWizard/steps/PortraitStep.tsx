@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { CharacterPortrait } from '../../CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
-// Removed direct AI client imports - using API routes instead
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
 import { LoadingState } from '../../ui/LoadingState';
@@ -34,6 +33,35 @@ interface PortraitStepProps {
   worldConfig: Partial<World>;
 }
 
+// Simple prompt generation function for portrait API
+function generatePortraitPrompt(character: Character, worldTheme?: string): string {
+  const parts: string[] = [];
+  
+  // Character name and basic description
+  parts.push(`Portrait of ${character.name}`);
+  
+  // Physical description if available
+  if (character.background.physicalDescription) {
+    parts.push(character.background.physicalDescription);
+  }
+  
+  // Personality traits for expression
+  if (character.background.personality) {
+    const traits = character.background.personality.split(' ').slice(0, 3).join(' ');
+    parts.push(`expressing ${traits}`);
+  }
+  
+  // World theme setting
+  if (worldTheme) {
+    parts.push(`${worldTheme} setting`);
+  }
+  
+  // Style instructions
+  parts.push('medium portrait shot', 'photorealistic quality', 'high resolution');
+  
+  return parts.join(', ');
+}
+
 export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +82,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     setError(null);
 
     try {
-      // Create a character object for the API
+      // Create a character object for prompt generation with local overrides
       const characterForGeneration: Character = {
         id: 'temp',
         name: data.characterData.name,
@@ -86,25 +114,31 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         updatedAt: new Date().toISOString()
       };
 
-      // Use the portrait generation API route
+      // Generate a simple prompt for portrait generation
+      const prompt = generatePortraitPrompt(characterForGeneration, worldConfig.theme);
+
+      // Call the server-side API endpoint
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          character: characterForGeneration,
-          world: worldConfig,
-          customDescription: localPhysicalDescription
-        }),
+        body: JSON.stringify({ prompt }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate portrait');
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const { portrait: generatedPortrait } = await response.json();
+      const result = await response.json();
+
+      const generatedPortrait: CharacterPortraitType = {
+        type: 'ai-generated',
+        url: result.image,
+        generatedAt: new Date().toISOString(),
+        prompt: result.prompt
+      };
 
       onUpdate({
         portrait: generatedPortrait

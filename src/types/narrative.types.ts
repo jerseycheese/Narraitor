@@ -43,6 +43,11 @@ export interface Decision {
 export type ChoiceAlignment = 'lawful' | 'chaotic' | 'neutral';
 
 /**
+ * Decision weight types for narrative significance
+ */
+export type DecisionWeight = 'minor' | 'major' | 'critical';
+
+/**
  * Represents an option within a decision
  */
 export interface DecisionOption {

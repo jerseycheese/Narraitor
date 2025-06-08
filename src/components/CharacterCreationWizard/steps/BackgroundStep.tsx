@@ -11,42 +11,69 @@ interface BackgroundStepProps {
 export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   data,
   onUpdate,
+  onValidation,
 }) => {
+  const validateBackground = (backgroundData: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const errors: string[] = [];
+    
+    if (!backgroundData.history || backgroundData.history.length < 50) {
+      errors.push('Character history must be at least 50 characters');
+    }
+    
+    if (!backgroundData.personality || backgroundData.personality.length < 30) {
+      errors.push('Personality description must be at least 30 characters');
+    }
+    
+    if (!backgroundData.motivation || backgroundData.motivation.length < 10) {
+      errors.push('Motivation must be at least 10 characters');
+    }
+    
+    onValidation(errors.length === 0, errors);
+  };
+
   const handleHistoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedBackground = {
+      ...data.characterData.background,
+      history: e.target.value,
+    };
     onUpdate({
-      background: {
-        ...data.characterData.background,
-        history: e.target.value,
-      },
+      background: updatedBackground,
     });
+    validateBackground(updatedBackground);
   };
 
   const handlePersonalityChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const updatedBackground = {
+      ...data.characterData.background,
+      personality: e.target.value,
+    };
     onUpdate({
-      background: {
-        ...data.characterData.background,
-        personality: e.target.value,
-      },
+      background: updatedBackground,
     });
+    validateBackground(updatedBackground);
   };
 
   const handleMotivationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedBackground = {
+      ...data.characterData.background,
+      motivation: e.target.value,
+    };
     onUpdate({
-      background: {
-        ...data.characterData.background,
-        motivation: e.target.value,
-      },
+      background: updatedBackground,
     });
+    validateBackground(updatedBackground);
   };
 
   const handleGoalsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const goals = e.target.value.split('\n').filter(goal => goal.trim());
+    const updatedBackground = {
+      ...data.characterData.background,
+      goals,
+    };
     onUpdate({
-      background: {
-        ...data.characterData.background,
-        goals,
-      },
+      background: updatedBackground,
     });
+    validateBackground(updatedBackground);
   };
 
   const validation = data.validation[3];
