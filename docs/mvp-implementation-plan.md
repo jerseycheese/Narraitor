@@ -25,14 +25,14 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 ## Core Systems Scope
 
 ### Navigation System (MVP)
-**GitHub Issues**: #432 (world switcher), NEW epic for navigation improvements
-- Fix world switcher dropdown behavior
+**GitHub Issues**: Epic #493, #432 (world switcher - completed), #509, #510, #511, #512
+- ✅ Fix world switcher dropdown behavior (#432 - completed)
+- Improve mobile navigation experience (#509)
+- Add comprehensive keyboard navigation support (#510)
+- Implement navigation state persistence (#511)
+- Add loading states for navigation transitions (#512)
 - Improve breadcrumb navigation for deep routes
-- Add mobile navigation improvements
-- Create consistent navigation patterns
-- Add keyboard navigation support
-- Navigation state persistence
-- Loading states for navigation transitions
+- Create consistent navigation patterns across all pages
 
 ### World Configuration System (MVP)
 **GitHub Issues**: #379 (epic), #303, #384
@@ -81,7 +81,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - Fallback content for service unavailability
 
 ### Journal System (MVP)
-**GitHub Issues**: #278, #280, #281, NEW epic for journal system
+**GitHub Issues**: Epic #494, #278, #280, #281
 - **Backend (Complete)**: 
   - Journal store implementation ✅
   - Entry CRUD operations ✅
@@ -140,7 +140,7 @@ This document outlines the implementation strategy for the Minimum Viable Produc
 - User-friendly error messages
 
 ### Launch Preparation (MVP)
-**GitHub Issues**: NEW epic for launch preparation
+**GitHub Issues**: Epic #495
 - **Marketing & Documentation (Week 5-6)**:
   - Simple marketing landing page
   - Getting started guide

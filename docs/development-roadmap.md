@@ -16,12 +16,14 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 ### Week 1-2: Foundation & Core Systems
 **Focus**: Navigation improvements, Character UI completion, Journal UI setup
 
-#### Navigation System (NEW EPIC)
-- [ ] Fix world switcher dropdown behavior (#432)
+#### Navigation System (Epic #493)
+- [x] Fix world switcher dropdown behavior (#432 - completed)
+- [ ] Improve mobile navigation experience (#509)
+- [ ] Add comprehensive keyboard navigation support (#510)
+- [ ] Implement navigation state persistence (#511)
+- [ ] Add loading states for navigation transitions (#512)
 - [ ] Improve breadcrumb navigation for deep routes
-- [ ] Add mobile navigation improvements
 - [ ] Create consistent navigation patterns
-- [ ] Add keyboard navigation support
 
 #### Character System UI
 - [ ] Complete character viewing interface (#256)
@@ -32,7 +34,7 @@ This roadmap outlines the development phases for the Narraitor project, with a s
 - [ ] Build character skills interface (#286)
 - [ ] Link skills to attributes (#287)
 
-#### Journal System UI (NEW EPIC)
+#### Journal System UI (Epic #494)
 - [ ] Create journal UI components
   - [ ] JournalPanel.tsx - Collapsible panel
   - [ ] JournalList.tsx - Entry list view
