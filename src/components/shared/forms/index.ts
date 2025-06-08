@@ -6,8 +6,8 @@
  */
 
 // Re-export shadcn/ui wizard form components with generic names
+export { WizardForm as Form } from '../wizard/components/WizardForm';
 export {
-  WizardForm as Form,
   WizardFormField as FormField,
   WizardInput as Input,
   WizardTextarea as Textarea,

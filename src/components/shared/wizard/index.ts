@@ -6,8 +6,8 @@ export { WizardStep } from './WizardStep';
 export { wizardStyles } from './styles/wizardStyles';
 
 // Export shadcn/ui form components
+export { WizardForm } from './components/WizardForm';
 export {
-  WizardForm,
   WizardFormField,
   WizardInput,
   WizardTextarea,

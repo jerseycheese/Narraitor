@@ -16,10 +16,11 @@ import {
 import { 
   wizardStyles,
   WizardFormSection,
-  WizardFormGroup,
-  WizardTextField,
-  WizardTextArea,
-  WizardSelect
+  WizardFormField,
+  WizardInput,
+  WizardTextarea,
+  WizardSelect,
+  WizardForm
 } from '@/components/shared/wizard';
 
 interface SkillReviewStepProps {
@@ -230,55 +231,69 @@ export default function SkillReviewStep({
               <div 
                 key={`skill-expanded-${index}`}
                 className="mt-4 pl-7">
-                <WizardFormGroup label="Name">
-                  <WizardTextField
-                    value={suggestion.name}
-                    onChange={(value) => handleModifySkill(index, 'name', value)}
-                    testId={`skill-name-input-${index}`}
-                  />
-                </WizardFormGroup>
-                
-                <WizardFormGroup label="Description">
-                  <WizardTextArea
-                    value={suggestion.description}
-                    onChange={(value) => handleModifySkill(index, 'description', value)}
-                    rows={2}
-                    testId={`skill-description-textarea-${index}`}
-                  />
-                </WizardFormGroup>
-                
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <WizardFormGroup label="Learning Curve">
-                      <WizardSelect
-                        value={suggestion.difficulty}
-                        onChange={(value) => handleModifySkill(index, 'difficulty', value)}
-                        options={SKILL_DIFFICULTIES.map(difficulty => ({
-                          value: difficulty.value,
-                          label: difficulty.label
-                        }))}
-                        testId={`skill-difficulty-select-${index}`}
-                      />
-                    </WizardFormGroup>
-                  </div>
+                <WizardForm data={suggestion}>
+                  <WizardFormField
+                    name="name"
+                    label="Name"
+                  >
+                    <WizardInput
+                      value={suggestion.name}
+                      onChange={(e) => handleModifySkill(index, 'name', e.target.value)}
+                      data-testid={`skill-name-input-${index}`}
+                    />
+                  </WizardFormField>
                   
-                  <div className="flex-1">
-                    <WizardFormGroup label="Linked Attribute">
-                      <WizardSelect
-                        value={suggestion.linkedAttributeName || ''}
-                        onChange={(value) => handleModifySkill(index, 'linkedAttributeName', value)}
-                        options={[
-                          { value: '', label: 'None' },
-                          ...(worldData.attributes?.map((attr) => ({
-                            value: attr.name,
-                            label: attr.name
-                          })) || [])
-                        ]}
-                        testId={`skill-attribute-select-${index}`}
-                      />
-                    </WizardFormGroup>
+                  <WizardFormField
+                    name="description"
+                    label="Description"
+                  >
+                    <WizardTextarea
+                      value={suggestion.description}
+                      onChange={(e) => handleModifySkill(index, 'description', e.target.value)}
+                      rows={2}
+                      data-testid={`skill-description-textarea-${index}`}
+                    />
+                  </WizardFormField>
+                
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <WizardFormField
+                        name="difficulty"
+                        label="Learning Curve"
+                      >
+                        <WizardSelect
+                          value={suggestion.difficulty}
+                          onChange={(e) => handleModifySkill(index, 'difficulty', e.target.value)}
+                          options={SKILL_DIFFICULTIES.map(difficulty => ({
+                            value: difficulty.value,
+                            label: difficulty.label
+                          }))}
+                          data-testid={`skill-difficulty-select-${index}`}
+                        />
+                      </WizardFormField>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <WizardFormField
+                        name="linkedAttributeName"
+                        label="Linked Attribute"
+                      >
+                        <WizardSelect
+                          value={suggestion.linkedAttributeName || ''}
+                          onChange={(e) => handleModifySkill(index, 'linkedAttributeName', e.target.value)}
+                          options={[
+                            { value: '', label: 'None' },
+                            ...(worldData.attributes?.map((attr) => ({
+                              value: attr.name,
+                              label: attr.name
+                            })) || [])
+                          ]}
+                          data-testid={`skill-attribute-select-${index}`}
+                        />
+                      </WizardFormField>
+                    </div>
                   </div>
-                </div>
+                </WizardForm>
                 
                 {/* Default Value Range Editor */}
                 <div className="mt-4">

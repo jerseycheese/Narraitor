@@ -3,10 +3,11 @@
 import React from 'react';
 import { World } from '@/types/world.types';
 import { 
-  WizardFormGroup,
-  WizardTextArea,
-  WizardFormSection
+  WizardFormSection,
+  WizardFormField,
+  WizardTextarea
 } from '@/components/shared/wizard';
+import { WizardForm } from '@/components/shared/wizard';
 
 interface DescriptionStepProps {
   worldData: Partial<World>;
@@ -31,24 +32,31 @@ export default function DescriptionStep({
         title="Describe Your World"
         description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects. This will help us suggest appropriate attributes and skills."
       >
-        <WizardFormGroup label="Full Description" error={errors.description} required>
-          <WizardTextArea
-            value={worldData.description || ''}
-            onChange={(value) => {
-              if (value.length <= MAX_DESCRIPTION_LENGTH) {
-                onUpdate({ ...worldData, description: value });
-              }
-            }}
-            placeholder="Describe your world in detail..."
-            rows={12}
-            error={errors.description}
-            disabled={isProcessing}
-            testId="world-full-description"
-          />
+        <WizardForm data={worldData}>
+          <WizardFormField
+            name="description"
+            label="Full Description"
+            description="Provide a detailed description of your world. Include information about the setting, tone, major themes, and any unique aspects."
+            required
+          >
+            <WizardTextarea
+              value={worldData.description || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value.length <= MAX_DESCRIPTION_LENGTH) {
+                  onUpdate({ ...worldData, description: value });
+                }
+              }}
+              placeholder="Describe your world in detail..."
+              rows={12}
+              disabled={isProcessing}
+              data-testid="world-full-description"
+            />
+          </WizardFormField>
           <div className="text-right text-sm mt-1" data-testid="description-char-count">
             {descriptionLength} / {MAX_DESCRIPTION_LENGTH} characters
           </div>
-        </WizardFormGroup>
+        </WizardForm>
       </WizardFormSection>
 
       {errors.ai && (
