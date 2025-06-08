@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation System Documentation"
+type: feature
+category: character
+tags: [portrait, generation, ai, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation System Documentation
 
 The portrait generation system allows Narraitor to create AI-generated character portraits using Google's Gemini API. This feature enhances the character creation experience by providing visual representations of characters based on their descriptions and attributes.

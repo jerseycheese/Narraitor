@@ -1,3 +1,12 @@
+---
+title: "AI Choice Generation Integration Examples"
+type: example
+category: ai
+tags: [ai, choice, integration, examples]
+created: 2025-05-21
+updated: 2025-06-08
+---
+
 # AI Choice Generation Integration Examples
 
 This document provides complete code examples for integrating AI choice generation into different parts of the Narraitor application.

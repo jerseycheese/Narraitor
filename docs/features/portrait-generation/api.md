@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation API Documentation"
+type: api
+category: character
+tags: [portrait, api, generation, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation API Documentation
 
 ## Endpoint Overview
