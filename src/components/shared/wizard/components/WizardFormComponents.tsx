@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/classNames';
 
-interface WizardFormFieldProps {
+export interface WizardFormFieldProps {
   name: string;
   label: string;
   description?: string;
@@ -66,7 +66,7 @@ export const WizardFormField: React.FC<WizardFormFieldProps> = ({
   );
 };
 
-interface WizardInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface WizardInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
@@ -91,7 +91,7 @@ export const WizardInput: React.FC<WizardInputProps> = ({
   );
 };
 
-interface WizardTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface WizardTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   error?: string;
 }
 
@@ -117,7 +117,7 @@ export const WizardTextarea: React.FC<WizardTextareaProps> = ({
   );
 };
 
-interface WizardSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface WizardSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
   error?: string;
@@ -156,7 +156,7 @@ export const WizardSelect: React.FC<WizardSelectProps> = ({
   );
 };
 
-interface WizardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface WizardButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'cancel';
   size?: 'sm' | 'default' | 'lg';
 }
@@ -197,7 +197,7 @@ export const WizardButton: React.FC<WizardButtonProps> = ({
 /**
  * WizardFormSection provides consistent section layout for forms
  */
-interface WizardFormSectionProps {
+export interface WizardFormSectionProps {
   title?: string;
   description?: string;
   children: React.ReactNode;

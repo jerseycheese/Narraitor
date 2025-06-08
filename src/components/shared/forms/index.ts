@@ -5,18 +5,16 @@
  * These components provide consistent styling and behavior for all forms.
  */
 
-// Re-export wizard form components with generic names
+// Re-export shadcn/ui wizard form components with generic names
 export {
-  WizardTextField as TextField,
-  WizardTextArea as TextArea,
+  WizardForm as Form,
+  WizardFormField as FormField,
+  WizardInput as Input,
+  WizardTextarea as Textarea,
   WizardSelect as Select,
-  WizardFormGroup as FormGroup,
+  WizardButton as Button,
   WizardFormSection as FormSection,
-  WizardFieldError as FormError,
-} from '../wizard/components/FormComponents';
-
-// Export original names for backward compatibility
-export * from '../wizard/components/FormComponents';
+} from '../wizard/components/WizardFormComponents';
 
 // Additional form utilities
 export interface FormFieldProps {

@@ -5,15 +5,26 @@ export { WizardNavigation } from './WizardNavigation';
 export { WizardStep } from './WizardStep';
 export { wizardStyles } from './styles/wizardStyles';
 
-// Export form components
+// Export shadcn/ui form components
 export {
-  WizardFormGroup,
-  WizardTextField,
-  WizardTextArea,
+  WizardForm,
+  WizardFormField,
+  WizardInput,
+  WizardTextarea,
   WizardSelect,
-  WizardFieldError,
+  WizardButton,
   WizardFormSection,
-} from './components/FormComponents';
+} from './components/WizardFormComponents';
+
+// Export component types
+export type {
+  WizardFormFieldProps,
+  WizardInputProps,
+  WizardTextareaProps,
+  WizardSelectProps,
+  WizardButtonProps,
+  WizardFormSectionProps,
+} from './components/WizardFormComponents';
 
 // Export UI components
 export { ToggleButton } from './components/ToggleButton';
