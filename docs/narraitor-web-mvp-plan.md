@@ -1,4 +1,13 @@
-# Narraitor Web-First MVP Plan (6-8 Weeks)
+---
+title: "Narraitor Web-First MVP Plan"
+type: planning
+category: roadmap
+tags: [mvp, web, planning, roadmap]
+created: 2025-06-05
+updated: 2025-06-08
+---
+
+# Narraitor Web-First MVP Plan
 
 > **Document Version**: 1.0  
 > **Created**: January 2025  

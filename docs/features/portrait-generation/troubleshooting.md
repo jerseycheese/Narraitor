@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation Troubleshooting Guide"
+type: troubleshooting
+category: character
+tags: [portrait, troubleshooting, debugging, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation Troubleshooting Guide
 
 This guide helps resolve common issues with the portrait generation system.

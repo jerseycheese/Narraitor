@@ -1,3 +1,12 @@
+---
+title: "Security Testing Guide - API Keys Protection"
+type: security
+category: testing
+tags: [security, testing, api-keys, guide]
+created: 2025-06-01
+updated: 2025-06-08
+---
+
 # Security Testing Guide - API Keys Protection
 
 This guide shows you how to verify that the API keys are now secure and not exposed to the browser.

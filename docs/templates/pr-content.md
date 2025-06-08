@@ -1,3 +1,12 @@
+---
+title: "Pull Request Template"
+type: template
+category: process
+tags: [pr, template, github, process]
+created: 2025-05-21
+updated: 2025-06-08
+---
+
 # Pull Request Template
 
 ## Description

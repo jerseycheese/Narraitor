@@ -1,3 +1,12 @@
+---
+title: "Shared Wizard Component System"
+type: architecture
+category: components
+tags: [wizard, components, shared, reusable]
+created: 2025-05-24
+updated: 2025-06-08
+---
+
 # Shared Wizard Component System
 
 ## Overview
