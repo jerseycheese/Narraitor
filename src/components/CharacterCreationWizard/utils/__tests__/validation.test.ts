@@ -1,5 +1,5 @@
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '../validation';
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 // Mock characterStore
 jest.mock('@/state/characterStore');
@@ -19,8 +19,8 @@ describe('Character Creation Validation', () => {
           },
         })),
       };
-      (characterStore as unknown as jest.Mock).mockReturnValue(mockStore);
-      (characterStore as unknown as { getState: typeof mockStore.getState }).getState = mockStore.getState;
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockStore);
+      (useCharacterStore as unknown as { getState: typeof mockStore.getState }).getState = mockStore.getState;
     });
 
     it('returns error when name is empty', () => {
@@ -123,7 +123,7 @@ describe('Character Creation Validation', () => {
   describe('validateBackground', () => {
     const mockBackground = {
       history: 'A long and detailed history about the character that meets the minimum length requirement.',
-      personality: 'A cheerful and brave soul',
+      personality: 'A cheerful and brave soul with determination and wisdom',
       goals: ['Become a hero', 'Save the world'],
       motivation: 'To protect the innocent',
     };
@@ -139,7 +139,7 @@ describe('Character Creation Validation', () => {
       const shortPersonality = { ...mockBackground, personality: 'Short' };
       const result = validateBackground(shortPersonality);
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Personality description must be at least 20 characters');
+      expect(result.errors).toContain('Personality description must be at least 30 characters');
     });
 
     it('validates successfully with valid background', () => {

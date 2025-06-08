@@ -4,8 +4,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { characterStore } from '../../../state/characterStore';
-import { worldStore } from '../../../state/worldStore';
+import { useCharacterStore } from '../../../state/characterStore';
+import { useWorldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 // Removed AI client imports - using API routes instead
 
@@ -32,8 +32,8 @@ jest.mock('next/navigation', () => ({
   })
 }));
 
-const mockCharacterStore = characterStore as jest.MockedFunction<typeof characterStore>;
-const mockWorldStore = worldStore as jest.MockedFunction<typeof worldStore>;
+const mockCharacterStore = useCharacterStore as jest.MockedFunction<typeof useCharacterStore>;
+const mockWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
 
 describe('PortraitStep Component', () => {
   const mockData = {
@@ -92,11 +92,8 @@ describe('PortraitStep Component', () => {
     mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({
-        portrait: {
-          type: 'ai-generated',
-          url: 'data:image/png;base64,mockimage',
-          generatedAt: new Date().toISOString()
-        }
+        image: 'data:image/png;base64,mockimage',
+        prompt: 'Portrait of Elara Moonshadow, Wise and mysterious, High Fantasy setting, medium portrait shot, photorealistic quality, high resolution'
       })
     });
 
@@ -120,7 +117,9 @@ describe('PortraitStep Component', () => {
       expect(mockOnUpdate).toHaveBeenCalledWith({
         portrait: expect.objectContaining({
           type: 'ai-generated',
-          url: 'data:image/png;base64,mockimage'
+          url: 'data:image/png;base64,mockimage',
+          prompt: expect.any(String),
+          generatedAt: expect.any(String)
         })
       });
     });
@@ -198,14 +197,14 @@ describe('Character Creation Wizard with Portrait Integration', () => {
       getState: jest.fn(() => ({
         setCurrentCharacter: jest.fn()
       }))
-    } as unknown as ReturnType<typeof characterStore>);
+    } as unknown as ReturnType<typeof useCharacterStore>);
 
     mockWorldStore.mockReturnValue({
       worlds: { 'world-1': mockWorld },
       currentWorldId: 'world-1',
       error: null,
       loading: false
-    } as unknown as ReturnType<typeof worldStore>);
+    } as unknown as ReturnType<typeof useWorldStore>);
   });
 
   it('should include portrait step in wizard', () => {

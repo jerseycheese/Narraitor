@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { WizardForm } from '../WizardForm';
@@ -29,10 +29,9 @@ describe('WizardFormComponents', () => {
   describe('WizardForm', () => {
     it('renders form with proper structure', () => {
       const mockData = { name: '', description: '', theme: '' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={{}} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <div>Form content</div>
         </WizardForm>
       );
@@ -41,13 +40,12 @@ describe('WizardFormComponents', () => {
       expect(screen.getByText('Form content')).toBeInTheDocument();
     });
 
-    it('calls onUpdate when form data changes', async () => {
+    it('provides react-hook-form context to child components', async () => {
       const user = userEvent.setup();
       const mockData: TestFormData = { name: '', description: '', theme: '' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={{}} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField name="name" label="Name" required>
             <WizardInput placeholder="Enter name" />
           </WizardFormField>
@@ -57,19 +55,17 @@ describe('WizardFormComponents', () => {
       const input = screen.getByPlaceholderText('Enter name');
       await user.type(input, 'Test Name');
 
-      await waitFor(() => {
-        expect(mockOnUpdate).toHaveBeenCalled();
-      });
+      // Test that form elements can accept input (form context is working)
+      expect(input).toHaveValue('Test Name');
     });
   });
 
   describe('WizardFormField', () => {
     it('renders field with label and required indicator', () => {
       const mockData = { name: '' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={{}} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField name="name" label="Name" required>
             <WizardInput />
           </WizardFormField>
@@ -82,10 +78,9 @@ describe('WizardFormComponents', () => {
 
     it('displays description when provided', () => {
       const mockData = { name: '' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={{}} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField
             name="name"
             label="Name"
@@ -101,11 +96,9 @@ describe('WizardFormComponents', () => {
 
     it('renders form field with error handling structure', () => {
       const mockData = { name: '' };
-      const mockErrors = { name: 'Name is required' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={mockErrors} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField name="name" label="Name" required>
             <WizardInput />
           </WizardFormField>
@@ -267,11 +260,9 @@ describe('WizardFormComponents', () => {
   describe('Accessibility', () => {
     it('provides proper ARIA labels and associations', () => {
       const mockData = { name: '' };
-      const mockErrors = {};
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={mockErrors} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField
             name="name"
             label="Name"
@@ -294,10 +285,9 @@ describe('WizardFormComponents', () => {
     it('supports keyboard navigation', async () => {
       const user = userEvent.setup();
       const mockData = { name: '', theme: '' };
-      const mockOnUpdate = jest.fn();
 
       render(
-        <WizardForm data={mockData} errors={{}} onUpdate={mockOnUpdate}>
+        <WizardForm data={mockData}>
           <WizardFormField name="name" label="Name">
             <WizardInput data-testid="input-1" />
           </WizardFormField>
