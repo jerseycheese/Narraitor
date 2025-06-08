@@ -13,6 +13,11 @@ const meta = {
     nextjs: {
       appDirectory: true,
     },
+    docs: {
+      description: {
+        component: 'A card component for displaying character information with action buttons.',
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {

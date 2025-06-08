@@ -3,13 +3,12 @@ import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils/cn';
 
 // Constants
 const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
 const MODAL_CONTENT_CLASSES = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto';
-const BUTTON_BASE_CLASSES = 'px-3 py-1 rounded text-sm font-medium transition-colors';
-const BUTTON_ENABLED_CLASSES = 'bg-green-600 text-white hover:bg-green-700';
-const BUTTON_DISABLED_CLASSES = 'bg-gray-300 text-gray-500 cursor-not-allowed';
 
 /**
  * Props for the WorldAttributesForm component
@@ -139,12 +138,11 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Attributes</h2>
         <div className="flex flex-col items-end">
-          <button
+          <Button
             onClick={() => setShowCreateModal(true)}
             disabled={isLimitReached}
-            className={`${BUTTON_BASE_CLASSES} ${
-              isLimitReached ? BUTTON_DISABLED_CLASSES : BUTTON_ENABLED_CLASSES
-            }`}
+            variant="default"
+            size="sm"
             aria-label={
               isLimitReached 
                 ? `Cannot add more attributes. Maximum of ${maxAttributes} reached.` 
@@ -152,7 +150,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
             }
           >
             Add Attribute
-          </button>
+          </Button>
           {isLimitReached && (
             <p className="text-xs text-gray-500 mt-1">
               Maximum {maxAttributes} attributes reached
@@ -170,18 +168,21 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">{attribute.name}</h3>
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={() => setEditingAttribute(attribute.id)}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    variant="ghost"
+                    size="sm"
                   >
                     Edit
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleDeleteClick(attribute)}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
                   >
                     Delete
-                  </button>
+                  </Button>
                 </div>
               </div>
               
