@@ -2,11 +2,8 @@
  * Simplified Storybook Preview Configuration
  * Without dark mode support
  */
-import '../src/app/globals.css';
+import './tailwind.css';
 import './storybook.css';
-
-// Debug: Log to verify the preview is loading
-console.log('Storybook preview.js loaded - CSS should be imported');
 
 const preview = {
   parameters: {
