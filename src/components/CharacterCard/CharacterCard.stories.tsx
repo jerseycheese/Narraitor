@@ -6,7 +6,7 @@ import { useCharacterStore } from '@/state/characterStore';
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
 const meta = {
-  title: 'Narraitor/Character/Cards/CharacterCard',
+  title: 'Narraitor/Character/Display/CharacterCard',
   component: CharacterCard,
   parameters: {
     layout: 'centered',

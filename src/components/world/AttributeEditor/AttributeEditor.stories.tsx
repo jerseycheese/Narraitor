@@ -4,7 +4,7 @@ import { EntityID } from '@/types/common.types';
 import { action } from '@storybook/addon-actions';
 
 const meta = {
-  title: 'Narraitor/World/Edit/AttributeEditor',
+  title: 'Narraitor/World/Forms/AttributeEditor',
   component: AttributeEditor,
   parameters: {
     layout: 'centered',

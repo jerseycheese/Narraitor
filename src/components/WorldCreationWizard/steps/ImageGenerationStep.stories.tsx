@@ -3,7 +3,7 @@ import ImageGenerationStep from './ImageGenerationStep';
 import { World } from '@/types/world.types';
 
 const meta: Meta<typeof ImageGenerationStep> = {
-  title: 'Narraitor/World/Creation/Steps/ImageGenerationStep',
+  title: 'Narraitor/World/Creation/ImageGenerationStep',
   component: ImageGenerationStep,
   parameters: {
     layout: 'centered',

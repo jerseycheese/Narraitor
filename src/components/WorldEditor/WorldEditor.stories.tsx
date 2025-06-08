@@ -63,7 +63,7 @@ const mockWorld: World = {
 // We'll mock the worldStore in the decorators instead
 
 const meta: Meta<typeof WorldEditor> = {
-  title: 'Narraitor/World/Edit/WorldEditor',
+  title: 'Narraitor/World/Forms/WorldEditor',
   component: WorldEditor,
   parameters: {
     layout: 'fullscreen',

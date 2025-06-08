@@ -3,7 +3,7 @@ import { SkillsStep } from './SkillsStep';
 import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof SkillsStep> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 3 Skills',
+  title: 'Narraitor/Character/Creation/SkillsStep',
   component: SkillsStep,
   parameters: {
     layout: 'centered',

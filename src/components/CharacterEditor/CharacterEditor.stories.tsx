@@ -6,7 +6,7 @@ import { LoadingState as LoadingStateComponent } from '@/components/ui/LoadingSt
 import { PageError } from '@/components/ui/ErrorDisplay';
 
 const meta = {
-  title: 'Narraitor/Character/CharacterEditor',
+  title: 'Narraitor/Character/Forms/CharacterEditor',
   component: CharacterEditor,
   parameters: {
     layout: 'fullscreen',

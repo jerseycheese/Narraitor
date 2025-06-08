@@ -5,7 +5,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { World } from '@/types/world.types';
 
 const meta: Meta<typeof CharacterCreationWizard> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard',
+  title: 'Narraitor/Character/Creation/Wizard',
   component: CharacterCreationWizard,
   parameters: {
     layout: 'fullscreen',

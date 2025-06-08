@@ -3,7 +3,7 @@ import { GameStartWizard } from './GameStartWizard';
 import { createWizardMockState } from './GameStartWizard.stories.helpers';
 
 const meta: Meta<typeof GameStartWizard> = {
-  title: 'Narraitor/Game/Start/GameStartWizard',
+  title: 'Narraitor/Game/Startup/GameStartWizard',
   component: GameStartWizard,
   parameters: {
     layout: 'fullscreen',

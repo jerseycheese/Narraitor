@@ -9,7 +9,7 @@ import {
 } from './WizardFormComponents';
 
 const meta: Meta<typeof WizardForm> = {
-  title: 'Narraitor/Patterns/Forms/WizardFormComponents',
+  title: 'Narraitor/Shared/Patterns/WizardFormComponents',
   component: WizardForm,
   parameters: {
     layout: 'centered',

@@ -5,7 +5,7 @@ import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
-  title: 'Narraitor/Narrative/Control/NarrativeController',
+  title: 'Narraitor/Narrative/Generation/NarrativeController',
   component: NarrativeController,
   parameters: {
     layout: 'centered',

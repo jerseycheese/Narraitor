@@ -3,7 +3,7 @@ import { BasicInfoStep } from './BasicInfoStep';
 import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof BasicInfoStep> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 1 BasicInfo',
+  title: 'Narraitor/Character/Creation/BasicInfoStep',
   component: BasicInfoStep,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import { BackgroundStep } from './BackgroundStep';
 import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof BackgroundStep> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 4 Background',
+  title: 'Narraitor/Character/Creation/BackgroundStep',
   component: BackgroundStep,
   parameters: {
     layout: 'centered',

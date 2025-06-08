@@ -5,7 +5,7 @@ import { PortraitStep } from './PortraitStep';
 import { WizardContainer, WizardProgress } from '@/components/shared/wizard';
 
 const meta: Meta<typeof PortraitStep> = {
-  title: 'Narraitor/Character/Creation/CharacterCreationWizard/Step 5 Portrait',
+  title: 'Narraitor/Character/Creation/PortraitStep',
   component: PortraitStep,
   parameters: {
     layout: 'centered',

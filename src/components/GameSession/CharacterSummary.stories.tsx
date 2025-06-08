@@ -23,7 +23,7 @@ interface Character {
 }
 
 const meta = {
-  title: 'Narraitor/Game/CharacterSummary',
+  title: 'Narraitor/Game/Session/CharacterSummary',
   component: CharacterSummary,
   parameters: {
     layout: 'centered',

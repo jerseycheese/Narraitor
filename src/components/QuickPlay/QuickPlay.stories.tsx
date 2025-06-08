@@ -3,7 +3,7 @@ import { QuickPlay } from './QuickPlay';
 import { createMockStoreState } from './QuickPlay.stories.helpers';
 
 const meta: Meta<typeof QuickPlay> = {
-  title: 'Narraitor/Game/Start/QuickPlay',
+  title: 'Narraitor/Game/Startup/QuickPlay',
   component: QuickPlay,
   parameters: {
     layout: 'centered',

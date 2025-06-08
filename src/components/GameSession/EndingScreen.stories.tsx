@@ -8,7 +8,7 @@ import { useWorldStore } from '../../state/worldStore';
 import type { StoryEnding } from '../../types/narrative.types';
 
 const meta: Meta<typeof EndingScreen> = {
-  title: 'Narraitor/Game/EndingScreen',
+  title: 'Narraitor/Game/States/EndingScreen',
   component: EndingScreen,
   parameters: {
     layout: 'fullscreen',
