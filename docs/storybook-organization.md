@@ -1,3 +1,12 @@
+---
+title: "Storybook Organization Guide"
+type: guide
+category: development
+tags: [storybook, organization, components]
+created: 2025-05-24
+updated: 2025-06-08
+---
+
 # Storybook Organization Guide
 
 ## Overview

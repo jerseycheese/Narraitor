@@ -1,3 +1,12 @@
+---
+title: "Requirements Management Workflow"
+type: workflow
+category: process
+tags: [requirements, workflow, github-sync]
+created: 2025-05-08
+updated: 2025-06-08
+---
+
 # Requirements Management Workflow
 
 ## Overview
