@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
@@ -92,8 +92,8 @@ const steps = [
 
 export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = ({ worldId, initialStep = 0 }) => {
   const router = useRouter();
-  const { worlds } = worldStore();
-  const { createCharacter } = characterStore();
+  const { worlds } = useWorldStore();
+  const { createCharacter } = useCharacterStore();
   const world = worlds[worldId];
   
   
@@ -333,9 +333,13 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       }
     }
 
+    // Generate character ID for inventory
+    const tempCharacterId = generateUniqueId('char');
+    
     // Create character
     const characterId = createCharacter({
       name: state.characterData.name,
+      description: state.characterData.description,
       worldId,
       level: 1,
       attributes: state.characterData.attributes.map(attr => {
@@ -369,6 +373,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
         fears: [],
         physicalDescription: state.characterData.background.physicalDescription || '',
+        relationships: [],
       },
       portrait: state.characterData.portrait || {
         type: 'placeholder',
@@ -376,23 +381,29 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       },
       isPlayer: true,
       status: {
-        hp: 100,
-        mp: 50,
-        stamina: 100,
+        health: 100,
+        maxHealth: 100,
+        conditions: [],
+      },
+      inventory: {
+        characterId: tempCharacterId,
+        items: [],
+        capacity: 20,
+        categories: [],
       },
     });
 
     // Set as current character
-    characterStore.getState().setCurrentCharacter(characterId);
+    useCharacterStore.getState().setCurrentCharacter(characterId);
     
     // Verify the character was set as current
-    const currentCharacterId = characterStore.getState().currentCharacterId;
+    const currentCharacterId = useCharacterStore.getState().currentCharacterId;
     
     if (currentCharacterId !== characterId) {
       console.error('[CharacterCreationWizard] Failed to set current character!', {
         expectedId: characterId,
         actualId: currentCharacterId,
-        charactersInStore: Object.keys(characterStore.getState().characters)
+        charactersInStore: Object.keys(useCharacterStore.getState().characters)
       });
     }
     // Clear auto-save

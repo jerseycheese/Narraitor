@@ -2,12 +2,12 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 
 export default function CharacterCreatePage() {
   const router = useRouter();
-  const currentWorldId = worldStore((state) => state.currentWorldId);
+  const currentWorldId = useWorldStore((state) => state.currentWorldId);
   
   // Clear any existing auto-save data when starting a new character
   useEffect(() => {
