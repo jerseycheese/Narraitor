@@ -1,3 +1,12 @@
+---
+title: "Claude App and Claude Code Integration Guide"
+type: guide
+category: claude-integration
+tags: [claude-app, claude-code, integration, workflow]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Claude App and Claude Code Integration Guide
 
 ## Overview

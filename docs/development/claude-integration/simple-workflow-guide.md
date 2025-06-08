@@ -1,3 +1,12 @@
+---
+title: "Simple Guide: From GitHub Issue to Implementation"
+type: guide
+category: claude-integration
+tags: [github, workflow, claude-app, claude-code]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Simple Guide: From GitHub Issue to Implementation
 
 This guide provides a straightforward workflow for implementing GitHub issues using Claude App for planning and Claude Code for implementation.

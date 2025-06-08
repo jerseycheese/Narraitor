@@ -1,3 +1,12 @@
+---
+title: "MCP GitHub Tools Usage Guide"
+type: guide
+category: claude-integration
+tags: [mcp, github, tools, api]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # MCP GitHub Tools Usage Guide
 
 ## Overview

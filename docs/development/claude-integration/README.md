@@ -1,3 +1,12 @@
+---
+title: "Claude Integration Documentation"
+type: overview
+category: claude-integration
+tags: [claude, integration, workflow, development]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Claude Integration Documentation
 
 This directory contains comprehensive documentation for integrating Claude App and Claude Code into the Narraitor development workflow.

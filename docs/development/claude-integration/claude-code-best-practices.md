@@ -1,3 +1,12 @@
+---
+title: "Claude Code Best Practices Guide for Narraitor"
+type: guide
+category: claude-integration
+tags: [claude-code, best-practices, development, workflow]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Claude Code Best Practices Guide for Narraitor
 
 ## Overview

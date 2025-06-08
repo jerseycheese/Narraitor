@@ -1,3 +1,12 @@
+---
+title: "Three-Stage Verification Framework Guide"
+type: guide
+category: claude-integration
+tags: [verification, testing, quality-assurance, framework]
+created: 2025-05-18
+updated: 2025-06-08
+---
+
 # Three-Stage Verification Framework Guide
 
 ## Overview
