@@ -27,8 +27,8 @@ const FormContent: React.FC<FormContentProps> = ({ onUpdate, onValidation }) => 
   const previousValues = useRef<Record<string, any>>({}); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
   
-  // Debounced update to prevent infinite loops
-  const debouncedUpdate = useCallback((fieldName: string, value: any, isUserInput = false) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+  // Handle form field updates with validation
+  const handleFieldUpdate = useCallback((fieldName: string, value: any, isUserInput = false) => { // eslint-disable-line @typescript-eslint/no-explicit-any
     // Only update if value actually changed
     if (previousValues.current[fieldName] !== value) {
       previousValues.current[fieldName] = value;
@@ -62,11 +62,11 @@ const FormContent: React.FC<FormContentProps> = ({ onUpdate, onValidation }) => 
       if (fieldName && value[fieldName] !== undefined) {
         // If the field has content, consider it touched
         const isUserInput = value[fieldName] && value[fieldName].length > 0;
-        debouncedUpdate(fieldName, value[fieldName], isUserInput);
+        handleFieldUpdate(fieldName, value[fieldName], isUserInput);
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch, debouncedUpdate]);
+  }, [watch, handleFieldUpdate]);
 
   return (
     <>

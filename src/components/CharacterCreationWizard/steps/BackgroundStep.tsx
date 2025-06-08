@@ -1,5 +1,6 @@
 import React from 'react';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { validateBackground } from '../utils/validation';
 
 interface BackgroundStepProps {
   data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -13,22 +14,9 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
   onUpdate,
   onValidation,
 }) => {
-  const validateBackground = (backgroundData: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const errors: string[] = [];
-    
-    if (!backgroundData.history || backgroundData.history.length < 50) {
-      errors.push('Character history must be at least 50 characters');
-    }
-    
-    if (!backgroundData.personality || backgroundData.personality.length < 30) {
-      errors.push('Personality description must be at least 30 characters');
-    }
-    
-    if (!backgroundData.motivation || backgroundData.motivation.length < 10) {
-      errors.push('Motivation must be at least 10 characters');
-    }
-    
-    onValidation(errors.length === 0, errors);
+  const handleValidation = (backgroundData: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const { valid, errors } = validateBackground(backgroundData);
+    onValidation(valid, errors);
   };
 
   const handleHistoryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -39,7 +27,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     onUpdate({
       background: updatedBackground,
     });
-    validateBackground(updatedBackground);
+    handleValidation(updatedBackground);
   };
 
   const handlePersonalityChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,7 +38,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     onUpdate({
       background: updatedBackground,
     });
-    validateBackground(updatedBackground);
+    handleValidation(updatedBackground);
   };
 
   const handleMotivationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +49,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     onUpdate({
       background: updatedBackground,
     });
-    validateBackground(updatedBackground);
+    handleValidation(updatedBackground);
   };
 
   const handleGoalsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,7 +61,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     onUpdate({
       background: updatedBackground,
     });
-    validateBackground(updatedBackground);
+    handleValidation(updatedBackground);
   };
 
   const validation = data.validation[3];
