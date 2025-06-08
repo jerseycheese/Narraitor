@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 
+// Constants
+const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+const MODAL_CONTENT_CLASSES = 'bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto';
+const BUTTON_BASE_CLASSES = 'px-3 py-1 rounded text-sm font-medium transition-colors';
+const BUTTON_ENABLED_CLASSES = 'bg-green-600 text-white hover:bg-green-700';
+const BUTTON_DISABLED_CLASSES = 'bg-gray-300 text-gray-500 cursor-not-allowed';
+
+/**
+ * Props for the WorldAttributesForm component
+ */
 interface WorldAttributesFormProps {
+  /** Array of world attributes to display and manage */
   attributes: WorldAttribute[];
+  /** Optional array of skills that may be linked to attributes */
   skills?: WorldSkill[];
+  /** ID of the world these attributes belong to */
   worldId: string;
+  /** Maximum number of attributes allowed for this world */
   maxAttributes: number;
+  /** Callback fired when attributes are modified */
   onChange: (attributes: WorldAttribute[]) => void;
 }
 
+/**
+ * WorldAttributesForm - Component for managing world attributes with CRUD operations
+ * 
+ * Features:
+ * - Add, edit, and delete world attributes
+ * - Enforces maxAttributes limit with user feedback
+ * - Modal-based attribute editor
+ * - Dependency warning for linked skills
+ * - Accessible UI with proper ARIA labels
+ * 
+ * @param props - Component props
+ * @returns JSX element representing the attributes management form
+ */
 const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({ 
   attributes, 
   skills = [],
@@ -19,22 +47,31 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   maxAttributes,
   onChange 
 }) => {
+  // Component state
   const [editingAttribute, setEditingAttribute] = useState<EntityID | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [attributeToDelete, setAttributeToDelete] = useState<WorldAttribute | null>(null);
   
-  // Check if attribute limit is reached
-  const isLimitReached = attributes.length >= maxAttributes;
+  // Computed values
+  const isLimitReached = useMemo(() => 
+    attributes.length >= maxAttributes, 
+    [attributes.length, maxAttributes]
+  );
   
-  // Handle creating a new attribute
-  const handleCreateAttribute = (newAttribute: WorldAttribute) => {
+  // Event handlers
+  /**
+   * Handles creating a new attribute and closing the modal
+   */
+  const handleCreateAttribute = useCallback((newAttribute: WorldAttribute) => {
     onChange([...attributes, { ...newAttribute, worldId }]);
     setShowCreateModal(false);
-  };
+  }, [attributes, worldId, onChange]);
   
-  // Handle updating an existing attribute
-  const handleSaveAttribute = (updatedAttribute: WorldAttribute) => {
+  /**
+   * Handles updating an existing attribute and closing the editor
+   */
+  const handleSaveAttribute = useCallback((updatedAttribute: WorldAttribute) => {
     const index = attributes.findIndex(attr => attr.id === updatedAttribute.id);
     if (index !== -1) {
       const updatedAttributes = [...attributes];
@@ -42,35 +79,60 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       onChange(updatedAttributes);
     }
     setEditingAttribute(null);
-  };
+  }, [attributes, worldId, onChange]);
   
-  // Handle deleting an attribute
-  const handleDeleteAttribute = (attributeId: EntityID) => {
+  /**
+   * Handles deleting an attribute by ID
+   */
+  const handleDeleteAttribute = useCallback((attributeId: EntityID) => {
     const updatedAttributes = attributes.filter(attr => attr.id !== attributeId);
     onChange(updatedAttributes);
     setEditingAttribute(null);
-  };
+  }, [attributes, onChange]);
   
-  // Handle delete button click
-  const handleDeleteClick = (attribute: WorldAttribute) => {
+  /**
+   * Initiates delete process by showing confirmation dialog
+   */
+  const handleDeleteClick = useCallback((attribute: WorldAttribute) => {
     setAttributeToDelete(attribute);
     setShowDeleteDialog(true);
-  };
+  }, []);
   
-  // Get skills linked to an attribute
-  const getLinkedSkills = (attributeId: EntityID) => {
+  /**
+   * Gets skills that are linked to a specific attribute
+   */
+  const getLinkedSkills = useCallback((attributeId: EntityID): WorldSkill[] => {
     return skills.filter(skill => skill.linkedAttributeId === attributeId);
-  };
+  }, [skills]);
   
-  // Handle delete confirmation
-  const handleDeleteConfirm = () => {
+  /**
+   * Confirms deletion and cleans up dialog state
+   */
+  const handleDeleteConfirm = useCallback(() => {
     if (attributeToDelete) {
       handleDeleteAttribute(attributeToDelete.id);
     }
     setShowDeleteDialog(false);
     setAttributeToDelete(null);
-  };
+  }, [attributeToDelete, handleDeleteAttribute]);
   
+  /**
+   * Generates the description text for the delete confirmation dialog
+   */
+  const deleteDescription = useMemo(() => {
+    if (!attributeToDelete) {
+      return "Are you sure you want to delete this attribute? This action cannot be undone.";
+    }
+    
+    const linkedSkills = getLinkedSkills(attributeToDelete.id);
+    if (linkedSkills.length === 0) {
+      return "Are you sure you want to delete this attribute? This action cannot be undone.";
+    }
+    
+    const skillNames = linkedSkills.map(s => s.name).join(', ');
+    const skillText = linkedSkills.length > 1 ? 's' : '';
+    return `WARNING: This attribute is linked to ${linkedSkills.length} skill${skillText}: ${skillNames}. Deleting this attribute will affect these skills. This action cannot be undone.`;
+  }, [attributeToDelete, getLinkedSkills]);
   
   return (
     <section className="p-4 bg-white rounded shadow">
@@ -80,12 +142,14 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
           <button
             onClick={() => setShowCreateModal(true)}
             disabled={isLimitReached}
-            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-              isLimitReached
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-green-600 text-white hover:bg-green-700'
+            className={`${BUTTON_BASE_CLASSES} ${
+              isLimitReached ? BUTTON_DISABLED_CLASSES : BUTTON_ENABLED_CLASSES
             }`}
-            aria-label={isLimitReached ? `Cannot add more attributes. Maximum of ${maxAttributes} reached.` : 'Add new attribute'}
+            aria-label={
+              isLimitReached 
+                ? `Cannot add more attributes. Maximum of ${maxAttributes} reached.` 
+                : 'Add new attribute'
+            }
           >
             Add Attribute
           </button>
@@ -141,8 +205,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="create-attribute-title">
+          <div className={MODAL_CONTENT_CLASSES}>
             <AttributeEditor
               worldId={worldId as EntityID}
               mode="create"
@@ -158,8 +222,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       
       {/* Edit Modal */}
       {editingAttribute && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="edit-attribute-title">
+          <div className={MODAL_CONTENT_CLASSES}>
             <AttributeEditor
               worldId={worldId as EntityID}
               mode="edit"
@@ -183,16 +247,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Attribute"
-        description={(() => {
-          if (!attributeToDelete) return "Are you sure you want to delete this attribute? This action cannot be undone.";
-          
-          const linkedSkills = getLinkedSkills(attributeToDelete.id);
-          if (linkedSkills.length === 0) {
-            return "Are you sure you want to delete this attribute? This action cannot be undone.";
-          }
-          
-          return `WARNING: This attribute is linked to ${linkedSkills.length} skill${linkedSkills.length > 1 ? 's' : ''}: ${linkedSkills.map(s => s.name).join(', ')}. Deleting this attribute will affect these skills. This action cannot be undone.`;
-        })()}
+        description={deleteDescription}
         itemName={attributeToDelete?.name || 'this attribute'}
         confirmButtonText="Delete Attribute"
         cancelButtonText="Cancel"
@@ -200,5 +255,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     </section>
   );
 };
+
+// Set display name for debugging
+WorldAttributesForm.displayName = 'WorldAttributesForm';
 
 export default WorldAttributesForm;

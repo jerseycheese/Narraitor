@@ -108,6 +108,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         attributes={world.attributes} 
         skills={world.skills}
         worldId={worldId} 
+        maxAttributes={world.settings.maxAttributes}
         onChange={(attributes) => handleWorldChange({ attributes })} 
       />
       
