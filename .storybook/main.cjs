@@ -32,9 +32,7 @@ const config = {
                 loader: require.resolve('postcss-loader'),
                 options: {
                   postcssOptions: {
-                    plugins: [
-                      require('@tailwindcss/postcss'),
-                    ],
+                    config: path.resolve(__dirname, '../postcss.config.mjs'),
                   },
                 },
               },
