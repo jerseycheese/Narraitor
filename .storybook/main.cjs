@@ -29,30 +29,34 @@ const config = {
       '@': path.resolve(__dirname, '../src')
     };
 
-    // Find and configure PostCSS loader for Tailwind v4
+    // Find CSS rules and configure PostCSS for Tailwind v4
     const rules = config.module.rules;
     
-    // Look for CSS rule
-    const cssRule = rules.find(rule => 
-      rule.test && rule.test.toString().includes('css')
-    );
-    
-    if (cssRule && cssRule.use) {
-      // Find PostCSS loader and ensure it uses our config
-      cssRule.use.forEach((loader, index) => {
-        if (loader && typeof loader === 'object' && loader.loader && loader.loader.includes('postcss-loader')) {
-          cssRule.use[index] = {
-            ...loader,
-            options: {
-              ...loader.options,
-              postcssOptions: {
-                config: path.resolve(__dirname, '../postcss.config.mjs'),
-              },
-            },
-          };
+    // Process all CSS-related rules
+    rules.forEach((rule) => {
+      if (rule.test && rule.test.toString().includes('css')) {
+        if (rule.use && Array.isArray(rule.use)) {
+          rule.use.forEach((loader, index) => {
+            if (loader && typeof loader === 'object' && loader.loader) {
+              // Configure PostCSS loader
+              if (loader.loader.includes('postcss-loader')) {
+                rule.use[index] = {
+                  ...loader,
+                  options: {
+                    ...loader.options,
+                    postcssOptions: {
+                      plugins: {
+                        '@tailwindcss/postcss': {},
+                      },
+                    },
+                  },
+                };
+              }
+            }
+          });
         }
-      });
-    }
+      }
+    });
 
     return config;
   }
