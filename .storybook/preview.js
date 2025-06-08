@@ -5,6 +5,9 @@
 import '../src/app/globals.css';
 import './storybook.css';
 
+// Debug: Log to verify the preview is loading
+console.log('Storybook preview.js loaded - CSS should be imported');
+
 const preview = {
   parameters: {
     actions: { argTypesRegex: "^on[A-Z].*" },

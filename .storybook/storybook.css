@@ -3,6 +3,34 @@
  * Minimal overrides for proper display in Storybook environment
  */
 
+/* DEBUG: Test if CSS is loading at all */
+body {
+  border: 3px solid red !important;
+}
+
+/* Temporary: Add CSS variables directly to test */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --border: 240 5.9% 90%;
+  --radius: 0.5rem;
+}
+
+/* Force button styles directly */
+.bg-destructive {
+  background-color: hsl(0 84.2% 60.2%) !important;
+}
+
+.text-destructive-foreground {
+  color: hsl(210 40% 98%) !important;
+}
+
 /* Ensure consistent light theme in Storybook */
 body.sb-show-main {
   color: #171717 !important;
