@@ -22,12 +22,35 @@ const config = {
   },
   staticDirs: ['../public'],
   
-  // Configure webpack for proper path resolution
+  // Configure webpack for proper path resolution and PostCSS
   webpackFinal: async (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, '../src')
     };
+
+    // Find CSS rule and configure PostCSS to process @import "tailwindcss"
+    const cssRule = config.module.rules.find(rule => 
+      rule.test && rule.test.toString().includes('css')
+    );
+
+    if (cssRule && cssRule.use) {
+      cssRule.use.forEach((loader, index) => {
+        if (loader && loader.loader && loader.loader.includes('postcss-loader')) {
+          cssRule.use[index] = {
+            ...loader,
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require('@tailwindcss/postcss')(),
+                ],
+              },
+            },
+          };
+        }
+      });
+    }
+
     return config;
   }
 };

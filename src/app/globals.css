@@ -1,27 +1,3 @@
-/* DEBUG: Test if globals.css is loading */
-body {
-  border: 3px solid green !important;
-}
-
-/* DEBUG: Test if CSS variables are working */
-.test-css-variables {
-  background-color: hsl(var(--destructive)) !important;
-  color: hsl(var(--destructive-foreground)) !important;
-  padding: 10px !important;
-  margin: 10px !important;
-}
-
-/* DEBUG: Test if Tailwind classes are generated */
-.test-tailwind-classes {
-  background: orange !important;
-  padding: 20px !important;
-}
-
-/* Check if these Tailwind classes exist */
-.bg-destructive { background: red !important; }
-.text-destructive-foreground { color: white !important; }
-.flex { display: flex !important; }
-.gap-4 { gap: 1rem !important; }
 
 @import "tailwindcss";
 
