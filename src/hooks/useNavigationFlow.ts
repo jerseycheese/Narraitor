@@ -1,7 +1,7 @@
 import { usePathname } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 export interface NextStep {
   label: string;
@@ -23,9 +23,9 @@ export type FlowStep = 'world' | 'character' | 'ready' | 'playing';
 
 export function useNavigationFlow() {
   const pathname = usePathname();
-  const { currentWorldId, worlds } = worldStore();
-  const { characters } = characterStore();
-  const { savedSessions } = sessionStore();
+  const { currentWorldId, worlds } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { savedSessions } = useSessionStore();
 
   const getNextStep = (): NextStep | null => {
     // Already playing

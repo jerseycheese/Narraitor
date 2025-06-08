@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import TemplateSelector from '@/components/world/TemplateSelector';
 import { templates } from '@/lib/templates/worldTemplates';
 import { applyWorldTemplate } from '@/lib/templates/templateLoader';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import Link from 'next/link';
 
 export default function TemplateSelectorPage() {
@@ -16,13 +16,13 @@ export default function TemplateSelectorPage() {
   // Initialize worldCount safely
   useEffect(() => {
     try {
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       const count = state.worlds ? Object.keys(state.worlds).length : 0;
       setWorldCount(count);
       
       // Subscribe to store changes
-      const unsubscribe = worldStore.subscribe(() => {
-        const newState = worldStore.getState();
+      const unsubscribe = useWorldStore.subscribe(() => {
+        const newState = useWorldStore.getState();
         const newCount = newState.worlds ? Object.keys(newState.worlds).length : 0;
         setWorldCount(newCount);
       });

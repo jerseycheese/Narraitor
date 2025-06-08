@@ -63,8 +63,7 @@ Claude Workflow Scripts Usage:
    claude-transition to-app ID FILE      # Transition from Code to App
    claude-transition gates ID            # Show gates for a task
 
-Documentation is available at:
-$PROJECT_ROOT/docs/development/claude-integration/workflow-scripts.md
+Documentation is available in the private workflow documentation repository.
 EOF
 
 # Done!

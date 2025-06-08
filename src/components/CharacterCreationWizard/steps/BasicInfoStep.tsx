@@ -1,12 +1,32 @@
 import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { World } from '@/types/world.types';
+
+interface CharacterWizardData {
+  characterData: {
+    name: string;
+    description: string;
+    background?: {
+      physicalDescription?: string;
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  validation: {
+    [stepNumber: number]: {
+      valid: boolean;
+      touched: boolean;
+      errors: string[];
+    };
+  };
+}
 
 interface BasicInfoStepProps {
-  data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onUpdate: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  data: CharacterWizardData;
+  onUpdate: (updates: Record<string, unknown>) => void;
   onValidation: (valid: boolean, errors: string[]) => void;
-  worldConfig: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  worldConfig?: World;
 }
 
 export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({

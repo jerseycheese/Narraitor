@@ -3,12 +3,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import ActiveGameSession from './ActiveGameSession';
 import { World } from '@/types/world.types';
 import { NarrativeSegment, Decision } from '@/types/narrative.types';
-import { narrativeStore } from '@/state/narrativeStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 const meta: Meta<typeof ActiveGameSession> = {
-  title: 'Narraitor/Game/Session/ActiveGameSession',
+  title: 'Narraitor/Game/ActiveGameSession',
   component: ActiveGameSession,
   parameters: {
     layout: 'padded',
@@ -51,14 +51,14 @@ const meta: Meta<typeof ActiveGameSession> = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      narrativeStore.setState({
+      useNarrativeStore.setState({
         segments: {},
         decisions: {},
         error: null,
         loading: false,
       });
       
-      sessionStore.setState({
+      useSessionStore.setState({
         id: null,
         status: 'initializing',
         currentSceneId: null,
@@ -69,7 +69,7 @@ const meta: Meta<typeof ActiveGameSession> = {
         savedSessions: {},
       });
       
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {},
         currentCharacterId: null,
         error: null,
@@ -115,7 +115,7 @@ const populateNarrativeStore = (
     sessionDecisions['session-123'].push(dec.id);
   });
   
-  narrativeStore.setState({
+  useNarrativeStore.setState({
     segments: segmentMap,
     sessionSegments,
     decisions: decisionMap,
@@ -269,10 +269,12 @@ const mockDecision: Decision = {
   id: 'decision-1',
   prompt: 'What will you do?',
   options: [
-    { id: 'choice-1', text: 'Enter the dungeon', hint: 'Face whatever dangers lie within' },
-    { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth' },
-    { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information' },
+    { id: 'choice-1', text: 'Enter the dungeon', hint: 'Face whatever dangers lie within', alignment: 'chaotic' },
+    { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth', alignment: 'neutral' },
+    { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information', alignment: 'lawful' },
   ],
+  decisionWeight: 'major',
+  contextSummary: 'Standing before the ancient dungeon entrance, you must decide your next move.',
 };
 
 /**
@@ -314,7 +316,7 @@ export const LoadingNarrative: Story = {
   decorators: [
     (Story) => {
       // Set loading state in narrative store
-      narrativeStore.setState({
+      useNarrativeStore.setState({
         loading: true,
       });
       
@@ -341,8 +343,8 @@ export const ErrorState: Story = {
   decorators: [
     (Story) => {
       // Set error state
-      narrativeStore.setState({
-        ...narrativeStore.getState(),
+      useNarrativeStore.setState({
+        ...useNarrativeStore.getState(),
         error: 'Failed to generate narrative: API request timeout',
       });
       
@@ -378,15 +380,15 @@ export const WithCharacter: Story = {
     (Story) => {
       // Set up character in stores
       // Set up character in store
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {
-          ...characterStore.getState().characters,
+          ...useCharacterStore.getState().characters,
           'char-123': mockCharacter,
         },
         currentCharacterId: 'char-123',
       });
       
-      sessionStore.setState({
+      useSessionStore.setState({
         characterId: 'char-123',
       });
       
@@ -395,5 +397,39 @@ export const WithCharacter: Story = {
       return <Story />;
     },
   ],
+};
+
+/**
+ * Loading state while ending is being generated
+ */
+export const EndingGenerationLoading: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+    existingSegments: mockSegments,
+  },
+  decorators: [
+    (Story) => {
+      // Set up narrative store with generating ending state
+      useNarrativeStore.setState({
+        ...useNarrativeStore.getState(),
+        isGeneratingEnding: true,
+        currentEnding: null,
+      });
+      
+      populateNarrativeStore(mockSegments, [mockDecision]);
+      
+      return <Story />;
+    },
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the loading state displayed while the AI writes the story ending.',
+      },
+    },
+  },
 };
 

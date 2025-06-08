@@ -2,22 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import GameSession from '@/components/GameSession/GameSession';
 import { LoadingPulse } from '@/components/ui/LoadingState';
 import { SectionError } from '@/components/ui/ErrorDisplay';
+import { PageLayout } from '@/components/shared/PageLayout';
 
 export default function PlayPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const currentWorldId = worldStore(state => state.currentWorldId);
-  const currentCharacterId = characterStore(state => state.currentCharacterId);
-  const initializeSession = sessionStore(state => state.initializeSession);
-  const currentSessionId = sessionStore(state => state.id);
+  const currentWorldId = useWorldStore(state => state.currentWorldId);
+  const currentWorld = useWorldStore(state => state.worlds[currentWorldId || '']);
+  const currentCharacterId = useCharacterStore(state => state.currentCharacterId);
+  const initializeSession = useSessionStore(state => state.initializeSession);
+  const currentSessionId = useSessionStore(state => state.id);
   useEffect(() => {
     const setupSession = async () => {
       try {
@@ -58,49 +60,48 @@ export default function PlayPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="max-w-4xl mx-auto">
-          <SectionError
-            title="Failed to Start Game"
-            message={error}
-            severity="error"
-          />
-          <div className="mt-4 flex gap-4">
-            <button
-              onClick={() => router.push('/worlds')}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Select World
-            </button>
-            <button
-              onClick={() => router.push('/characters')}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            >
-              Select Character
-            </button>
-          </div>
+      <PageLayout title="Game Session Error" maxWidth="4xl">
+        <SectionError
+          title="Failed to Start Game"
+          message={error}
+          severity="error"
+        />
+        <div className="mt-4 flex gap-4">
+          <button
+            onClick={() => router.push('/worlds')}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Select World
+          </button>
+          <button
+            onClick={() => router.push('/characters')}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Select Character
+          </button>
         </div>
-      </main>
+      </PageLayout>
     );
   }
 
   if (!currentSessionId) {
     return (
-      <main className="min-h-screen p-8">
-        <div className="max-w-4xl mx-auto">
-          <SectionError
-            title="No Active Session"
-            message="Unable to create or resume a game session."
-            severity="warning"
-          />
-        </div>
-      </main>
+      <PageLayout title="No Active Session" maxWidth="4xl">
+        <SectionError
+          title="No Active Session"
+          message="Unable to create or resume a game session."
+          severity="warning"
+        />
+      </PageLayout>
     );
   }
 
+  const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
+  const pageDescription = currentWorld?.theme;
+
   return (
-    <main className="min-h-screen">
+    <PageLayout title={pageTitle} description={pageDescription} maxWidth="7xl" className="pb-0">
       <GameSession worldId={currentWorldId!} />
-    </main>
+    </PageLayout>
   );
 }

@@ -55,7 +55,7 @@ describe('NarrativeDisplay', () => {
   it('handles loading state', () => {
     render(<NarrativeDisplay segment={null} isLoading={true} />);
     
-    expect(screen.getByText(/Generating narrative/i)).toBeInTheDocument();
+    expect(screen.getByText(/Writing your story/i)).toBeInTheDocument();
   });
 
   it('handles error state', () => {

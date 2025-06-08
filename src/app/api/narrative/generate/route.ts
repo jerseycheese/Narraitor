@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
           temperature: requestData.config?.temperature || 0.7,
           topP: 1.0,
           topK: 40,
-          maxOutputTokens: requestData.config?.maxTokens || 2048
+          maxOutputTokens: requestData.config?.maxTokens || 1024
         },
         safetySettings: [
           { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_NONE' },

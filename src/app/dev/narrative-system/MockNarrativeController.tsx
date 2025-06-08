@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
 
 interface MockNarrativeControllerProps {
@@ -31,7 +31,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
   useEffect(() => {
     console.log(`[MockNarrativeController] Initializing for session ${sessionId}`);
     
-    const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
+    const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
     console.log(`[MockNarrativeController] Found ${existingSegments.length} existing segments`);
     
     // Check for initial scenes to avoid duplication
@@ -109,7 +109,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       
       // Check for existing initial scene before adding
       if (isInitial) {
-        const checkSegments = narrativeStore.getState().getSessionSegments(sessionId);
+        const checkSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
         const hasExistingInitialScene = checkSegments.some(segment => 
           segment.type === 'scene' && segment.metadata?.location === 'Frontier Town'
         );
@@ -122,7 +122,7 @@ export const MockNarrativeController: React.FC<MockNarrativeControllerProps> = (
       
       // Add to store
       console.log(`[MockNarrativeController] Adding segment to store: ${newSegment.id}`);
-      narrativeStore.getState().addSegment(sessionId, {
+      useNarrativeStore.getState().addSegment(sessionId, {
         content: newSegment.content,
         type: newSegment.type,
         worldId: newSegment.worldId,

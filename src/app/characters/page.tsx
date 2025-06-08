@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -109,8 +109,8 @@ async function generateCharacterPortrait(
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = characterStore();
-  const { worlds, currentWorldId } = worldStore();
+  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = useCharacterStore();
+  const { worlds, currentWorldId } = useWorldStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
   const [generateError, setGenerateError] = useState<string | null>(null);

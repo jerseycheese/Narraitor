@@ -3,9 +3,9 @@
 import React from 'react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 // Use the store's Character type since it's more complete
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
-type StoreCharacter = ReturnType<typeof characterStore.getState>['characters'][string];
+type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
 
 interface CharacterHeaderProps {
@@ -22,7 +22,7 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
         size="xlarge"
       />
       <div className="flex-1">
-        <h1 className="text-3xl font-bold mb-2">{character.name}</h1>
+        <h2 className="text-3xl font-bold mb-2">{character.name}</h2>
         <p className="text-gray-600 mb-4">Level {character.level}</p>
         {character.background.personality && (
           <p className="text-gray-700 mb-4 italic">

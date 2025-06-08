@@ -55,16 +55,18 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           )}
         </div>
 
-        {/* Portrait Section */}
-        <div className="flex-shrink-0">
-          <Link href={`/characters/${character.id}`}>
-            <CharacterPortrait
-              portrait={character.portrait || { type: 'placeholder', url: null }}
-              characterName={character.name}
-              size="large"
-            />
-          </Link>
-        </div>
+        {/* Portrait Section - only show if portrait exists */}
+        {character.portrait && (
+          <div className="flex-shrink-0">
+            <Link href={`/characters/${character.id}`}>
+              <CharacterPortrait
+                portrait={character.portrait}
+                characterName={character.name}
+                size="large"
+              />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

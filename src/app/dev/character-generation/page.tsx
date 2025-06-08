@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { generateCharacter, type GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 
 export default function CharacterGenerationTestPage() {
@@ -13,8 +13,8 @@ export default function CharacterGenerationTestPage() {
   const [generatedCharacter, setGeneratedCharacter] = useState<GeneratedCharacterData | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { worlds } = worldStore();
-  const { characters } = characterStore();
+  const { worlds } = useWorldStore();
+  const { characters } = useCharacterStore();
   
   const handleGenerate = async () => {
     if (!selectedWorldId) {
@@ -52,7 +52,7 @@ export default function CharacterGenerationTestPage() {
     
     const world = worlds[selectedWorldId];
     
-    characterStore.getState().createCharacter({
+    useCharacterStore.getState().createCharacter({
       name: generatedCharacter.name,
       description: generatedCharacter.background.description || '',
       worldId: selectedWorldId,

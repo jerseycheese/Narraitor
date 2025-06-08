@@ -10,12 +10,17 @@ export interface NarrativeSegment extends TimestampedEntity {
   worldId?: EntityID;
   sessionId?: EntityID;
   content: string;
-  type: 'scene' | 'dialogue' | 'action' | 'transition';
+  type: 'scene' | 'dialogue' | 'action' | 'transition' | 'ending';
   characterIds?: EntityID[];
   decisions?: Decision[];
   metadata: NarrativeMetadata;
   timestamp: Date;
 }
+
+/**
+ * Decision weight types for visual prominence
+ */
+export type DecisionWeight = 'minor' | 'major' | 'critical';
 
 /**
  * Represents a decision point in the narrative
@@ -26,6 +31,10 @@ export interface Decision {
   options: DecisionOption[];
   selectedOptionId?: EntityID;
   consequences?: Consequence[];
+  // Enhanced fields for better decision presentation
+  contextSummary?: string;
+  decisionWeight?: DecisionWeight;
+  narrativeSegmentId?: EntityID;
 }
 
 /**
@@ -77,6 +86,10 @@ export interface NarrativeMetadata {
   tags: string[];
   location?: string;
   characterIds?: EntityID[];
+  // Ending-specific metadata
+  endingId?: string;
+  endingData?: StoryEnding;
+  tone?: EndingTone;
 }
 
 /**
@@ -141,6 +154,64 @@ export interface NarrativeGenerationResult {
     outcome?: string;
     tags?: string[];
   }>;
+  tokenUsage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+}
+
+/**
+ * Types of story endings
+ */
+export type EndingType = 'player-choice' | 'story-complete' | 'session-limit' | 'character-retirement';
+
+/**
+ * Emotional tone of story endings
+ */
+export type EndingTone = 'triumphant' | 'bittersweet' | 'mysterious' | 'tragic' | 'hopeful';
+
+/**
+ * Represents a complete story ending with narrative closure
+ */
+export interface StoryEnding extends TimestampedEntity {
+  id: EntityID;
+  sessionId: EntityID;
+  characterId: EntityID;
+  worldId: EntityID;
+  type: EndingType;
+  tone: EndingTone;
+  epilogue: string;
+  characterLegacy: string;
+  worldImpact: string;
+  timestamp: Date;
+  journalSummary?: string;
+  achievements?: string[];
+  playTime?: number;
+}
+
+/**
+ * Request to generate a story ending
+ */
+export interface EndingGenerationRequest {
+  sessionId: EntityID;
+  characterId: EntityID;
+  worldId: EntityID;
+  endingType: EndingType;
+  desiredTone?: EndingTone;
+  customPrompt?: string;
+}
+
+/**
+ * Result of ending generation
+ */
+export interface EndingGenerationResult {
+  epilogue: string;
+  characterLegacy: string;
+  worldImpact: string;
+  tone: EndingTone;
+  achievements: string[];
+  playTime?: number;
   tokenUsage?: {
     promptTokens: number;
     completionTokens: number;

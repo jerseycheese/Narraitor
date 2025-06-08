@@ -1,16 +1,16 @@
-import { worldStore, characterStore, inventoryStore } from '../../index';
+import { useWorldStore, useCharacterStore, useInventoryStore } from '../../index';
 
 describe('Store Integration', () => {
   beforeEach(() => {
-    worldStore.getState().reset();
-    characterStore.getState().reset();
-    inventoryStore.getState().reset();
+    useWorldStore.getState().reset();
+    useCharacterStore.getState().reset();
+    useInventoryStore.getState().reset();
   });
 
   describe('cross-store references', () => {
     test('should maintain referential integrity between worlds and characters', () => {
       // Create a world
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
         theme: 'fantasy',
         attributes: [],
@@ -24,7 +24,7 @@ describe('Store Integration', () => {
       });
 
       // Create a character in that world
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
         worldId: worldId,
         attributes: [],
@@ -38,7 +38,7 @@ describe('Store Integration', () => {
       });
 
       // Create inventory for the character
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Sword',
         category: 'weapon',
         quantity: 1,
@@ -48,17 +48,17 @@ describe('Store Integration', () => {
       });
 
       // Verify relationships
-      const character = characterStore.getState().characters[characterId];
+      const character = useCharacterStore.getState().characters[characterId];
       expect(character.worldId).toBe(worldId);
 
-      const items = inventoryStore.getState().getCharacterItems(characterId);
+      const items = useInventoryStore.getState().getCharacterItems(characterId);
       expect(items).toHaveLength(1);
       expect(items[0].characterId).toBe(characterId);
     });
 
     test('should handle cascading deletes appropriately', () => {
       // Create world and character
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'World to Delete',
         theme: 'fantasy',
         attributes: [],
@@ -71,7 +71,7 @@ describe('Store Integration', () => {
         }
       });
 
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Character to Orphan',
         worldId: worldId,
         attributes: [],
@@ -85,16 +85,16 @@ describe('Store Integration', () => {
       });
 
       // Delete the world
-      worldStore.getState().deleteWorld(worldId);
+      useWorldStore.getState().deleteWorld(worldId);
 
       // Character should still exist but be orphaned
-      const character = characterStore.getState().characters[characterId];
+      const character = useCharacterStore.getState().characters[characterId];
       expect(character).toBeDefined();
       expect(character.worldId).toBe(worldId); // Still references deleted world
     });
 
     test('should handle character deletion with inventory', () => {
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
         theme: 'fantasy',
         attributes: [],
@@ -107,7 +107,7 @@ describe('Store Integration', () => {
         }
       });
 
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Character with Items',
         worldId: worldId,
         attributes: [],
@@ -121,7 +121,7 @@ describe('Store Integration', () => {
       });
 
       // Add items to character
-      const itemId1 = inventoryStore.getState().addItem(characterId, {
+      const itemId1 = useInventoryStore.getState().addItem(characterId, {
         name: 'Item 1',
         category: 'misc',
         quantity: 1,
@@ -130,7 +130,7 @@ describe('Store Integration', () => {
         equipped: false
       });
 
-      const itemId2 = inventoryStore.getState().addItem(characterId, {
+      const itemId2 = useInventoryStore.getState().addItem(characterId, {
         name: 'Item 2',
         category: 'misc',
         quantity: 1,
@@ -140,14 +140,14 @@ describe('Store Integration', () => {
       });
 
       // Delete the character
-      characterStore.getState().deleteCharacter(characterId);
+      useCharacterStore.getState().deleteCharacter(characterId);
 
       // Character should be deleted
-      expect(characterStore.getState().characters[characterId]).toBeUndefined();
+      expect(useCharacterStore.getState().characters[characterId]).toBeUndefined();
 
       // Items should still exist but be orphaned
-      const item1 = inventoryStore.getState().items[itemId1];
-      const item2 = inventoryStore.getState().items[itemId2];
+      const item1 = useInventoryStore.getState().items[itemId1];
+      const item2 = useInventoryStore.getState().items[itemId2];
       expect(item1).toBeDefined();
       expect(item2).toBeDefined();
       expect(item1.characterId).toBe(characterId); // Still references deleted character
@@ -158,7 +158,7 @@ describe('Store Integration', () => {
   describe('world-character-inventory chain', () => {
     test('should create complete game setup', () => {
       // Create a fantasy world
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Fantasy Realm',
         theme: 'fantasy',
         attributes: [
@@ -200,7 +200,7 @@ describe('Store Integration', () => {
       });
 
       // Create a character in that world
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Hero',
         worldId: worldId,
         attributes: [
@@ -229,7 +229,7 @@ describe('Store Integration', () => {
       });
 
       // Give the character some equipment
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Longsword',
         category: 'weapon',
         quantity: 1,
@@ -238,7 +238,7 @@ describe('Store Integration', () => {
         equipped: true
       });
 
-      inventoryStore.getState().addItem(characterId, {
+      useInventoryStore.getState().addItem(characterId, {
         name: 'Health Potion',
         category: 'consumable',
         quantity: 3,
@@ -248,9 +248,9 @@ describe('Store Integration', () => {
       });
 
       // Verify complete setup
-      const world = worldStore.getState().worlds[worldId];
-      const character = characterStore.getState().characters[characterId];
-      const items = inventoryStore.getState().getCharacterItems(characterId);
+      const world = useWorldStore.getState().worlds[worldId];
+      const character = useCharacterStore.getState().characters[characterId];
+      const items = useInventoryStore.getState().getCharacterItems(characterId);
 
       expect(world).toBeDefined();
       expect(character).toBeDefined();
@@ -264,12 +264,12 @@ describe('Store Integration', () => {
       expect(character.skills).toHaveLength(1);
 
       // Verify inventory
-      const equippedItems = inventoryStore.getState().getEquippedItems(characterId);
+      const equippedItems = useInventoryStore.getState().getEquippedItems(characterId);
       expect(equippedItems).toHaveLength(1);
       expect(equippedItems[0].name).toBe('Longsword');
 
       // Verify total weight calculation
-      const totalWeight = inventoryStore.getState().calculateTotalWeight(characterId);
+      const totalWeight = useInventoryStore.getState().calculateTotalWeight(characterId);
       expect(totalWeight).toBe(6.5); // Sword: 5, Potions: 3 * 0.5 = 1.5
     });
   });
@@ -277,34 +277,34 @@ describe('Store Integration', () => {
   describe('error propagation', () => {
     test('should handle errors across stores independently', () => {
       // Set errors in different stores
-      worldStore.getState().setError('World error');
-      characterStore.getState().setError('Character error');
-      inventoryStore.getState().setError('Inventory error');
+      useWorldStore.getState().setError('World error');
+      useCharacterStore.getState().setError('Character error');
+      useInventoryStore.getState().setError('Inventory error');
 
       // Each store should maintain its own error state
-      expect(worldStore.getState().error).toBe('World error');
-      expect(characterStore.getState().error).toBe('Character error');
-      expect(inventoryStore.getState().error).toBe('Inventory error');
+      expect(useWorldStore.getState().error).toBe('World error');
+      expect(useCharacterStore.getState().error).toBe('Character error');
+      expect(useInventoryStore.getState().error).toBe('Inventory error');
 
       // Clearing one store's error shouldn't affect others
-      worldStore.getState().clearError();
-      expect(worldStore.getState().error).toBeNull();
-      expect(characterStore.getState().error).toBe('Character error');
-      expect(inventoryStore.getState().error).toBe('Inventory error');
+      useWorldStore.getState().clearError();
+      expect(useWorldStore.getState().error).toBeNull();
+      expect(useCharacterStore.getState().error).toBe('Character error');
+      expect(useInventoryStore.getState().error).toBe('Inventory error');
     });
   });
 
   describe('loading states', () => {
     test('should handle loading states independently', () => {
       // Set loading states
-      worldStore.getState().setLoading(true);
-      characterStore.getState().setLoading(false);
-      inventoryStore.getState().setLoading(true);
+      useWorldStore.getState().setLoading(true);
+      useCharacterStore.getState().setLoading(false);
+      useInventoryStore.getState().setLoading(true);
 
       // Each store should maintain its own loading state
-      expect(worldStore.getState().loading).toBe(true);
-      expect(characterStore.getState().loading).toBe(false);
-      expect(inventoryStore.getState().loading).toBe(true);
+      expect(useWorldStore.getState().loading).toBe(true);
+      expect(useCharacterStore.getState().loading).toBe(false);
+      expect(useInventoryStore.getState().loading).toBe(true);
     });
   });
 });

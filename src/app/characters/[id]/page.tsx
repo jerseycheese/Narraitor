@@ -2,21 +2,22 @@
 
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { NotFoundState } from '@/components/shared/NotFoundState';
 import { BackNavigation } from '@/components/shared/BackNavigation';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CharacterHeader } from '@/components/characters/CharacterHeader';
 import { CharacterDetailsDisplay } from '@/components/characters/CharacterDetailsDisplay';
+import { PageLayout } from '@/components/shared/PageLayout';
 
 export default function CharacterViewPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
-  const { characters, setCurrentCharacter, deleteCharacter } = characterStore();
-  const { worlds } = worldStore();
+  const { characters, setCurrentCharacter, deleteCharacter } = useCharacterStore();
+  const { worlds } = useWorldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const character = characters[characterId];
@@ -61,18 +62,16 @@ export default function CharacterViewPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <BackNavigation href="/characters" label="Back to Characters" />
-        </div>
+    <PageLayout title={character.name} description={`${character.level ? `Level ${character.level} • ` : ''}${world.name}`}>
+      <div className="mb-6 -mt-8">
+        <BackNavigation href="/characters" label="Back to Characters" />
+      </div>
 
-        <ActionButtonGroup actions={actionButtons} className="mb-6" />
+      <ActionButtonGroup actions={actionButtons} className="mb-6" />
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <CharacterHeader character={character} world={world} />
-          <CharacterDetailsDisplay character={character} world={world} />
-        </div>
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <CharacterHeader character={character} world={world} />
+        <CharacterDetailsDisplay character={character} world={world} />
       </div>
       
       {/* Delete Confirmation Dialog */}
@@ -86,6 +85,6 @@ export default function CharacterViewPage() {
         confirmButtonText="Delete"
         cancelButtonText="Cancel"
       />
-    </div>
+    </PageLayout>
   );
 }

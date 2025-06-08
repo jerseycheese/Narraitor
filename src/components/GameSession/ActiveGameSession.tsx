@@ -5,12 +5,16 @@ import { World } from '@/types/world.types';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistoryManager';
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
-import { narrativeStore } from '@/state/narrativeStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import CharacterSummary from './CharacterSummary';
+import { EndingScreen } from './EndingScreen';
+import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
+import type { EndingType } from '@/types/narrative.types';
+import { LoadingState } from '@/components/ui/LoadingState';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -49,13 +53,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
+  // Ending suggestion state
+  const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
+  const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
+  const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
+  
+  // Manual end story confirmation
+  const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
+  
   // Get character ID from session store
-  const characterId = sessionStore(state => state.characterId);
+  const characterId = useSessionStore(state => state.characterId);
   
   // Get character details
-  const character = characterStore(state => 
+  const character = useCharacterStore(state => 
     state.characters[characterId || '']
   );
+  
+  // Get narrative store for ending functionality
+  const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
@@ -73,13 +88,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     const setupNarrative = async () => {
       try {
         // Dynamically import the narrativeStore to avoid circular dependencies
-        const { narrativeStore } = await import('@/state/narrativeStore');
+        const { useNarrativeStore } = await import('@/state/narrativeStore');
         
         // Only proceed if still mounted
         if (!isMounted) return;
         
         // Check if we already have segments for this session
-        const existingSegments = narrativeStore.getState().getSessionSegments(sessionId);
+        const existingSegments = useNarrativeStore.getState().getSessionSegments(sessionId);
         const hasInitialScene = existingSegments.some(seg => 
           seg.type === 'scene' && 
           (seg.metadata?.location === 'Starting Location' || 
@@ -87,7 +102,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         );
         
         // Check for existing decisions in the store
-        const existingDecisions = narrativeStore.getState().getSessionDecisions(sessionId);
+        const existingDecisions = useNarrativeStore.getState().getSessionDecisions(sessionId);
         
         // If we have existing decisions, use the latest one
         if (existingDecisions.length > 0) {
@@ -105,10 +120,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           // No segments at all - normal case for new session
           // No existing segments found, will generate initial scene
           setInitialized(true);
+          setIsGenerating(false);
         }
       } catch {
         // Error setting up narrative, continue with initialization
         setInitialized(true);
+        setIsGenerating(false);
       }
     };
     
@@ -146,10 +163,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             id: fallbackId,
             prompt: "What will you do?",
             options: [
-              { id: `option-${fallbackId}-1`, text: "Investigate further" },
-              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-              { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-            ]
+              { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+              { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+            ],
+            decisionWeight: 'minor',
+            contextSummary: 'Waiting for player action (timeout fallback).'
           };
           
           setCurrentDecision(fallbackDecision);
@@ -164,6 +183,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
 
   const handleChoiceSelected = (choiceId: string) => {
+    // Check if session has ended - if so, prevent further generation
+    if (isSessionEnded(sessionId)) {
+      return;
+    }
+    
     // Player choice was selected
     setIsGenerating(true);
     setIsGeneratingChoices(true); // Start generating new choices
@@ -172,7 +196,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // If we have a current decision, update its selected option
     if (currentDecision) {
-      narrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
+      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
     }
     
     // Clear current decision to prevent showing stale choices during generation
@@ -182,6 +206,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
 
   const handleCustomSubmit = (customText: string) => {
+    // Check if session has ended - if so, prevent further generation
+    if (isSessionEnded(sessionId)) {
+      return;
+    }
+    
     // Handle custom player input
     const customChoiceId = generateUniqueId('custom');
     
@@ -195,7 +224,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       };
       
       // Update the decision in the store with the new custom option and select it
-      narrativeStore.getState().updateDecision(currentDecision.id, {
+      useNarrativeStore.getState().updateDecision(currentDecision.id, {
         options: [...currentDecision.options, customOption],
         selectedOptionId: customChoiceId
       });
@@ -233,6 +262,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       prompt: decision.prompt,
       options: [...decision.options],
       selectedOptionId: decision.selectedOptionId,
+      decisionWeight: decision.decisionWeight,
+      contextSummary: decision.contextSummary,
     };
     
     // Update the current decision state with the copy
@@ -248,20 +279,79 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }));
     
     // Update session store with AI-generated choices
-    sessionStore.getState().setPlayerChoices(playerChoices);
+    useSessionStore.getState().setPlayerChoices(playerChoices);
   };
   
+  // Handle ending story functionality with confirmation
+  const handleEndStory = async () => {
+    if (!characterId || !world) return;
+    
+    try {
+      await generateEnding('player-choice', {
+        sessionId,
+        characterId,
+        worldId: world.id
+      });
+    } catch (error) {
+      console.error('Failed to generate ending:', error);
+    }
+  };
+  
+  // Handle ending suggestion from AI
+  const handleEndingSuggested = (reason: string, endingType: EndingType) => {
+    setEndingSuggestionReason(reason);
+    setSuggestedEndingType(endingType);
+    setShowEndingSuggestion(true);
+  };
+  
+  // Accept AI ending suggestion
+  const handleAcceptEndingSuggestion = async () => {
+    setShowEndingSuggestion(false);
+    if (!characterId || !world) return;
+    
+    try {
+      await generateEnding(suggestedEndingType, {
+        sessionId,
+        characterId,
+        worldId: world.id
+      });
+    } catch (error) {
+      console.error('Failed to generate ending:', error);
+    }
+  };
+  
+  // Reject AI ending suggestion
+  const handleRejectEndingSuggestion = () => {
+    setShowEndingSuggestion(false);
+  };
+  
+  // Handle manual end story button click
+  const handleEndStoryClick = () => {
+    setShowEndConfirmation(true);
+  };
+  
+  // Confirm manual end story
+  const handleConfirmEndStory = () => {
+    setShowEndConfirmation(false);
+    handleEndStory();
+  };
+
+  // If we have an ending, show the ending screen instead
+  if (currentEnding) {
+    return <EndingScreen />;
+  }
+  
+  // If generating ending, show loading state
+  if (isGeneratingEnding) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingState message="Writing your story's ending..." />
+      </div>
+    );
+  }
 
   return (
-    <div data-testid="game-session-active" className="p-4" role="region" aria-label="Game session">
-      {world && (
-        <div className="mb-4">
-          <h1 className="text-2xl font-bold">{world.name}</h1>
-          <p className="text-gray-600 mb-3">{world.theme}</p>
-          <p className="text-blue-600 mt-2" aria-live="polite">Status: {status}</p>
-        </div>
-      )}
-      
+    <div data-testid="game-session-active" role="region" aria-label="Game session">
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
@@ -270,39 +360,36 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
       
       {/* Two-column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:grid-rows-[max-content]">
         {/* Story Column */}
-        <div className="order-1">
-          <div className="p-4 bg-gray-100 rounded">
-            <h2 className="text-xl font-bold mb-2">Story</h2>
-            {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
-            <NarrativeHistoryManager
-              key={`display-${controllerKey}`}
+        <div className="lg:row-span-1 lg:self-stretch">
+          {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
+          <NarrativeHistoryManager
+            key={`display-${controllerKey}`}
+            sessionId={sessionId}
+          />
+          
+          {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
+          
+          {/* Hidden controller just to generate content - always include it but hide from view */}
+          <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
+            <NarrativeController
+              key={`generator-${controllerKey}`}
+              worldId={worldId}
               sessionId={sessionId}
-              className="mb-4"
+              characterId={characterId || undefined}
+              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
+              choiceId={localSelectedChoiceId || selectedChoiceId}
+              onNarrativeGenerated={handleNarrativeGenerated}
+              onChoicesGenerated={handleChoicesGenerated}
+              onEndingSuggested={handleEndingSuggested}
+              generateChoices={true}
             />
-            
-            {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
-            
-            {/* Hidden controller just to generate content - always include it but hide from view */}
-            <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
-              <NarrativeController
-                key={`generator-${controllerKey}`}
-                worldId={worldId}
-                sessionId={sessionId}
-                characterId={characterId || undefined}
-                triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
-                choiceId={localSelectedChoiceId || selectedChoiceId}
-                onNarrativeGenerated={handleNarrativeGenerated}
-                onChoicesGenerated={handleChoicesGenerated}
-                generateChoices={true}
-              />
-            </div>
           </div>
         </div>
 
         {/* Choices Column */}
-        <div className="order-2 lg:order-2">
+        <div className="lg:row-span-1 lg:self-stretch">
           {/* Show AI-generated choices, loading state, or fallback */}
           {currentDecision ? (
             <div className="player-choices-container">
@@ -311,19 +398,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
               />
             </div>
           ) : isGeneratingChoices ? (
             <div className="player-choices-container">
-              <div className="p-4 border rounded bg-gray-50">
-                <div className="flex items-center space-x-2">
-                  <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent">
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Generating your choices...</p>
-                </div>
-              </div>
+              <LoadingState message="Thinking up some options..." />
             </div>
           ) : choices && choices.length > 0 ? (
             <div className="player-choices-container">
@@ -332,7 +412,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
               />
             </div>
           ) : (
@@ -343,7 +423,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                   className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
                   onClick={() => {
                     // Try to get latest decision from narrative store
-                    const latestDecision = narrativeStore.getState().getLatestDecision(sessionId);
+                    const latestDecision = useNarrativeStore.getState().getLatestDecision(sessionId);
                     if (latestDecision) {
                       setCurrentDecision(latestDecision);
                     } else {
@@ -354,14 +434,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                         id: fallbackId,
                         prompt: "What will you do?",
                         options: [
-                          { id: `option-${fallbackId}-1`, text: "Investigate further" },
-                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters" },
-                          { id: `option-${fallbackId}-3`, text: "Move to a new location" }
-                        ]
+                          { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+                          { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+                        ],
+                        decisionWeight: 'minor',
+                        contextSummary: 'Manual fallback choices created.'
                       };
                       
                       // Save to store for future reference
-                      narrativeStore.getState().addDecision(sessionId, {
+                      useNarrativeStore.getState().addDecision(sessionId, {
                         prompt: fallbackDecision.prompt,
                         options: fallbackDecision.options
                       });
@@ -375,7 +457,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                         text: option.text,
                         isSelected: false
                       }));
-                      sessionStore.getState().setPlayerChoices(playerChoices);
+                      useSessionStore.getState().setPlayerChoices(playerChoices);
                     }
                   }}
                 >
@@ -394,14 +476,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
             onClick={() => {
               // Save current session and clear narrative
-              sessionStore.getState().endSession();
-              narrativeStore.getState().clearSessionSegments(sessionId);
+              useSessionStore.getState().endSession();
+              useNarrativeStore.getState().clearSessionSegments(sessionId);
               
               // Reload the page to start fresh
               window.location.reload();
             }}
           >
             Start New Session
+          </button>
+          <button
+            data-testid="game-session-end-story"
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
+            onClick={handleEndStoryClick}
+            disabled={isGeneratingEnding || isSessionEnded(sessionId)}
+            title="End your story with an AI-generated epilogue"
+          >
+            {isGeneratingEnding ? 'Generating...' : 'End Story'}
           </button>
           <button
             data-testid="game-session-end"
@@ -412,6 +503,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           </button>
         </div>
       )}
+
+      {/* Ending Suggestion Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={showEndingSuggestion}
+        onConfirm={handleAcceptEndingSuggestion}
+        onClose={handleRejectEndingSuggestion}
+        title="Story Ending Suggested"
+        description="The AI has detected that your story might be ready to conclude."
+        itemName={endingSuggestionReason}
+        confirmButtonText="Generate Ending"
+        cancelButtonText="Continue Playing"
+      />
+
+      {/* Manual End Story Confirmation */}
+      <DeleteConfirmationDialog
+        isOpen={showEndConfirmation}
+        onConfirm={handleConfirmEndStory}
+        onClose={() => setShowEndConfirmation(false)}
+        title="End Story"
+        description="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
+        itemName=""
+        confirmButtonText="End Story"
+        cancelButtonText="Cancel"
+      />
     </div>
   );
 };

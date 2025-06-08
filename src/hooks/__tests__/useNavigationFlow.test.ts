@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { useNavigationFlow } from '../useNavigationFlow';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { usePathname } from 'next/navigation';
 
 // Mock stores
@@ -19,14 +19,14 @@ describe('useNavigationFlow', () => {
   describe('getNextStep', () => {
     it('should return world creation when no worlds exist', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: null,
         worlds: {},
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -42,16 +42,16 @@ describe('useNavigationFlow', () => {
 
     it('should return world selection when worlds exist but none selected', () => {
       (usePathname as jest.Mock).mockReturnValue('/worlds');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: null,
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -67,16 +67,16 @@ describe('useNavigationFlow', () => {
 
     it('should return character selection when world is selected but no character', () => {
       (usePathname as jest.Mock).mockReturnValue('/world/world-1');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -92,18 +92,18 @@ describe('useNavigationFlow', () => {
 
     it('should return character selection when characters exist for world', () => {
       (usePathname as jest.Mock).mockReturnValue('/world/world-1');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -119,18 +119,18 @@ describe('useNavigationFlow', () => {
 
     it('should return start playing when on character page', () => {
       (usePathname as jest.Mock).mockReturnValue('/characters/char-1');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -147,18 +147,18 @@ describe('useNavigationFlow', () => {
 
     it('should return null when already playing', () => {
       (usePathname as jest.Mock).mockReturnValue('/play');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
       });
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -171,7 +171,7 @@ describe('useNavigationFlow', () => {
   describe('canQuickStart', () => {
     it('should return true when saved session exists', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': {
             id: 'session-1',
@@ -181,12 +181,12 @@ describe('useNavigationFlow', () => {
           },
         },
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Test Character' },
         },
@@ -199,7 +199,7 @@ describe('useNavigationFlow', () => {
 
     it('should return false when no saved sessions', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -210,7 +210,7 @@ describe('useNavigationFlow', () => {
 
     it('should return false when saved session references deleted world', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': {
             id: 'session-1',
@@ -219,7 +219,7 @@ describe('useNavigationFlow', () => {
           },
         },
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},
       });
 
@@ -247,19 +247,19 @@ describe('useNavigationFlow', () => {
       };
 
       (usePathname as jest.Mock).mockReturnValue('/');
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': olderSession,
           'session-2': recentSession,
         },
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {
           'world-1': { id: 'world-1', name: 'Test World 1' },
           'world-2': { id: 'world-2', name: 'Test World 2' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1', name: 'Character 1' },
           'char-2': { id: 'char-2', worldId: 'world-2', name: 'Character 2' },
@@ -279,7 +279,7 @@ describe('useNavigationFlow', () => {
 
     it('should return null when no valid sessions', () => {
       (usePathname as jest.Mock).mockReturnValue('/');
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
 
@@ -292,7 +292,7 @@ describe('useNavigationFlow', () => {
   describe('getCurrentFlowStep', () => {
     it('should return world when on world selection', () => {
       (usePathname as jest.Mock).mockReturnValue('/worlds');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: null,
         worlds: {},
       });
@@ -304,7 +304,7 @@ describe('useNavigationFlow', () => {
 
     it('should return character when on character selection', () => {
       (usePathname as jest.Mock).mockReturnValue('/characters');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1' },
@@ -318,13 +318,13 @@ describe('useNavigationFlow', () => {
 
     it('should return ready when character is selected', () => {
       (usePathname as jest.Mock).mockReturnValue('/characters/char-1');
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         currentWorldId: 'world-1',
         worlds: {
           'world-1': { id: 'world-1' },
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': { id: 'char-1', worldId: 'world-1' },
         },

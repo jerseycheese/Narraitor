@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import WorldEditor from '../WorldEditor';
 
 // Mock Next.js router
@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock worldStore
 jest.mock('@/state/worldStore', () => ({
-  worldStore: {
+  useWorldStore: {
     getState: jest.fn(),
   },
 }));
@@ -113,7 +113,7 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (worldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: {
         'world-123': mockWorld,
       },
@@ -195,7 +195,7 @@ describe('WorldEditor - MVP Level Tests', () => {
 
   // Test error handling when world not found
   test('shows error when world is not found', async () => {
-    (worldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: {},
       updateWorld: mockUpdateWorld,
     });

@@ -51,7 +51,7 @@ const initialState = {
 };
 
 // World Store implementation with persistence
-export const worldStore = create<WorldStore>()(
+export const useWorldStore = create<WorldStore>()(
   persist(
     (set) => ({
       ...initialState,
@@ -330,13 +330,20 @@ export const worldStore = create<WorldStore>()(
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),
 
-      // Fetch worlds action (placeholder implementation)
+      // Fetch worlds action - loads from persisted state
       fetchWorlds: async () => {
         set({ loading: true, error: null });
-        // Simulate fetching data
-        await new Promise(resolve => setTimeout(resolve, 500));
-        // TODO: Implement actual data fetching logic
-        set({ loading: false });
+        try {
+          // In this architecture, worlds are automatically loaded from IndexedDB
+          // via Zustand persistence, so we just need to ensure the state is ready
+          await new Promise(resolve => setTimeout(resolve, 100));
+          set({ loading: false });
+        } catch (error) {
+          set({ 
+            loading: false, 
+            error: error instanceof Error ? error.message : 'Failed to fetch worlds'
+          });
+        }
       },
     }),
     {
@@ -349,10 +356,10 @@ export const worldStore = create<WorldStore>()(
       // - Add field transformations for new/changed fields
       // - Add state structure upgrades between versions
       // - Add validation of migrated data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-      migrate: (persistedState: any, version: number) => {
-        // Simple migration for MVP - just return the state
-        return persistedState;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      migrate: (persistedState: unknown, version: number) => {
+        // Simple migration for MVP - just return the state as WorldState
+        return persistedState as WorldStore;
       }
     }
   )

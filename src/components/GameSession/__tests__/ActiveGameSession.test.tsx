@@ -17,17 +17,27 @@ jest.mock('@/components/Narrative/NarrativeHistoryManager', () => ({
   ))
 }));
 
+// Mock DeleteConfirmationDialog
+jest.mock('@/components/DeleteConfirmationDialog/DeleteConfirmationDialog', () => {
+  return jest.fn(({ isOpen, title, children }) => 
+    isOpen ? <div data-testid="mock-confirmation-dialog">{title} {children}</div> : null
+  );
+});
+
 // Mock the narrativeStore
 jest.mock('@/state/narrativeStore', () => ({
-  narrativeStore: {
-    getState: jest.fn().mockReturnValue({
-      addDecision: jest.fn(),
-      selectDecisionOption: jest.fn(),
-      getSessionSegments: jest.fn().mockReturnValue([]),
-      getSessionDecisions: jest.fn().mockReturnValue([]),
-      clearSessionSegments: jest.fn()
-    })
-  }
+  useNarrativeStore: jest.fn(() => ({
+    currentEnding: null,
+    isGeneratingEnding: false,
+    generateEnding: jest.fn(),
+    addDecision: jest.fn(),
+    selectDecisionOption: jest.fn(),
+    getSessionSegments: jest.fn().mockReturnValue([]),
+    getSessionDecisions: jest.fn().mockReturnValue([]),
+    clearSessionSegments: jest.fn(),
+    isSessionEnded: jest.fn().mockReturnValue(false), // Add session locking support
+    markSessionEnded: jest.fn()
+  }))
 }));
 
 // Mock generateUniqueId
@@ -37,7 +47,7 @@ jest.mock('@/lib/utils/generateId', () => ({
 
 // Mock sessionStore
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: jest.fn(() => ({
+  useSessionStore: jest.fn(() => ({
     id: 'test-session',
     worldId: 'test-world',
     characterId: 'test-character',
@@ -47,7 +57,7 @@ jest.mock('@/state/sessionStore', () => ({
 
 // Mock characterStore
 jest.mock('@/state/characterStore', () => ({
-  characterStore: jest.fn((selector) => {
+  useCharacterStore: jest.fn((selector) => {
     const state = {
       characters: {
         'test-character': {
@@ -108,9 +118,7 @@ describe('ActiveGameSession', () => {
   it('renders correctly with all required props', () => {
     render(<ActiveGameSession {...mockProps} />);
     
-    // Check that world info is displayed
-    expect(screen.getByText('Test World')).toBeInTheDocument();
-    expect(screen.getByText('fantasy')).toBeInTheDocument();
+    // World info is no longer displayed in the header (removed duplicate display)
     
     // Check that narrative components are rendered
     expect(screen.getByTestId('mock-narrative-history-manager')).toBeInTheDocument();

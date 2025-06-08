@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { sessionStore } from '@/state/sessionStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { WorldSelectionStep } from './steps/WorldSelectionStep';
 import { CharacterSelectionStep } from './steps/CharacterSelectionStep';
 import { GameReadyStep } from './steps/GameReadyStep';
@@ -21,7 +21,7 @@ export function GameStartWizard({
   onCancel
 }: GameStartWizardProps) {
   const router = useRouter();
-  const { initializeSession } = sessionStore();
+  const { initializeSession } = useSessionStore();
 
   // Determine initial step based on props
   const getInitialStep = (): WizardStep => {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateWorld, type GeneratedWorldData } from '@/lib/ai/worldGenerator';
 
 export default function WorldGenerationTestPage() {
@@ -11,7 +11,7 @@ export default function WorldGenerationTestPage() {
   const [generatedWorld, setGeneratedWorld] = useState<GeneratedWorldData | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { worlds } = worldStore();
+  const { worlds, createWorld } = useWorldStore();
   
   const handleGenerate = async () => {
     if (!worldReference.trim()) {
@@ -42,7 +42,7 @@ export default function WorldGenerationTestPage() {
   const handleCreateWorld = () => {
     if (!generatedWorld) return;
     
-    worldStore.getState().createWorld({
+    createWorld({
       name: generatedWorld.name,
       theme: generatedWorld.theme,
       description: generatedWorld.description,
@@ -70,7 +70,6 @@ export default function WorldGenerationTestPage() {
     'Harry Potter',
     'Game of Thrones',
     'Cyberpunk 2077',
-    'The Witcher',
     'Ancient Rome',
     'Victorian England',
     'Wild West',

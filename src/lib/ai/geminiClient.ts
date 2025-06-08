@@ -90,3 +90,11 @@ export class GeminiClient implements AIClient {
     }
   }
 }
+
+// Create default client instance
+export const geminiClient = new GeminiClient({
+  apiKey: process.env.GEMINI_API_KEY || '',
+  modelName: 'gemini-1.5-pro',
+  maxRetries: 3,
+  timeout: 30000 // 30 seconds
+});

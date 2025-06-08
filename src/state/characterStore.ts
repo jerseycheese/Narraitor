@@ -109,7 +109,7 @@ const initialState = {
 };
 
 // Character Store implementation with persistence
-export const characterStore = create<CharacterStore>()(
+export const useCharacterStore = create<CharacterStore>()(
   persist(
     (set) => ({
       ...initialState,
@@ -331,10 +331,10 @@ export const characterStore = create<CharacterStore>()(
       // - Add field transformations for new/changed fields
       // - Add state structure upgrades between versions
       // - Add validation of migrated data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-      migrate: (persistedState: any, version: number) => {
-        // Simple migration for MVP - just return the state
-        return persistedState;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      migrate: (persistedState: unknown, version: number) => {
+        // Simple migration for MVP - just return the state as CharacterState
+        return persistedState as CharacterStore;
       }
     }
   )

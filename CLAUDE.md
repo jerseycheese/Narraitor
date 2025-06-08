@@ -11,6 +11,8 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Jest and React Testing Library for testing
 - Google Gemini for AI integration (secure server-side implementation)
 - IndexedDB for client-side persistence
+- Tailwind CSS v4 for styling
+- shadcn/ui for accessible component library
 
 ## Security Architecture
 - **API Key Protection**: All API keys stored server-side only (`GEMINI_API_KEY`)
@@ -91,7 +93,6 @@ All implementations must go through the Three-Stage Verification process:
    - End-to-end flow verification
 
 This verification process is MANDATORY - the workflow will not proceed until verification is complete.
-See `/docs/development/claude-integration/three-stage-verification.md` for detailed guidelines.
 
 ## Testing Principles
 - Focus on testing WHAT the feature does, not HOW it does it
@@ -212,7 +213,7 @@ This script will:
 3. Generate JavaScript code for creating the PR with the MCP GitHub tool
 4. Always target the `develop` branch
 
-See `/docs/development/claude-integration/mcp-github-usage.md` for complete MCP GitHub tool documentation.
+See the MCP GitHub tool documentation for complete usage details.
 
 ## Domain Boundaries
 - World: World configuration, templates, attributes
@@ -273,6 +274,24 @@ interface StoreInterface {
 
 Stores include: `worldStore`, `characterStore`, `narrativeStore`, `journalStore`, `inventoryStore`, `sessionStore`, `aiContextStore`
 
+## UI Component System (shadcn/ui)
+The project uses shadcn/ui for accessible, themeable components:
+- **Foundation**: Tailwind CSS v4 with CSS variables for theming
+- **Components**: Located in `/src/components/ui/` directory
+- **Utilities**: `cn()` helper in `/src/lib/utils/cn.ts` for className merging
+- **Storybook**: All UI components follow `Narraitor/UI/[Component]` naming
+- **Documentation**: See `/docs/ui/shadcn-integration-guide.md` for setup details
+- **Test Page**: Visit `/dev/shadcn-test` to see component showcase
+
+### Using shadcn/ui Components
+```tsx
+import { Button } from '@/components/ui/button'
+
+// Available variants: default, secondary, destructive, outline, ghost, link
+// Available sizes: default, sm, lg, icon
+<Button variant="outline" size="lg">Click me</Button>
+```
+
 ## Claude Code Commands
 We've created several custom Claude Code slash commands:
 - `/project:do-issue [issue-number]`: Complete workflow for implementing an issue
@@ -302,7 +321,7 @@ For smoothly transitioning between planning in Claude App and implementation in 
    - Implement in Claude Code using `/project:do-issue [issue-number]`
    - Verify and complete following the guided process
 
-See `/docs/development/claude-integration/simple-workflow-guide.md` for detailed instructions.
+Use the custom Claude Code commands for guided development workflows.
 
 ## Development Test Harnesses
 Available at `/dev/*` routes:

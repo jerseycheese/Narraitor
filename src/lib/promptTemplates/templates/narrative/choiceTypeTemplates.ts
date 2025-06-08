@@ -67,7 +67,17 @@ REQUIREMENTS:
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
-FORMAT (REQUIRED - include alignment tags):
+DECISION WEIGHT ANALYSIS:
+Carefully evaluate the narrative situation and determine the significance of this decision:
+- MINOR: Routine choices with limited consequences (casual conversations, basic exploration, everyday interactions)
+- MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
+- CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
+
+Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+
+FORMAT (REQUIRED - include alignment tags, decision weight, and context summary):
+Decision Weight: [MINOR/MAJOR/CRITICAL]
+Context Summary: [Write a brief 1-sentence summary that captures WHY this decision matters - focus on the stakes, immediate tension, or key relationships at play. Do NOT retell the story. Examples: "Tension builds as you must choose how to respond to the merchant's accusation." "A critical moment where your response could determine if the alliance forms." "The stranger's offer seems too good to be true."]
 Decision: What will you do?
 
 Options:
@@ -76,7 +86,7 @@ Options:
 3. [NEUTRAL] [Third choice - different practical approach]
 4. [CHAOTIC] [Fourth choice - WILDLY UNEXPECTED action that could completely change the situation - be creative and dramatic!]
 
-Keep your response EXACTLY in this format. Only include the Decision and Options sections with alignment tags.`;
+Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary line, then Decision and Options sections with alignment tags.`;
 };
 
 export default alignedChoiceTemplate;

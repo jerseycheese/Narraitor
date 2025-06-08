@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import CharacterEditor from './CharacterEditor';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { LoadingState as LoadingStateComponent } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
 
@@ -19,12 +19,12 @@ const meta = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      characterStore.getState().reset();
-      worldStore.getState().reset();
+      useCharacterStore.getState().reset();
+      useWorldStore.getState().reset();
       
       // Set up test world
       const testWorldId = 'test-world-id';
-      worldStore.getState().createWorld({
+      useWorldStore.getState().createWorld({
         name: 'Test World',
         theme: 'Fantasy',
         description: 'A fantasy world for testing',
@@ -99,11 +99,11 @@ export const NewCharacter: Story = {
   decorators: [
     (Story) => {
       // Create a test character
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
       
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
         description: 'A brave adventurer who started their journey in a small village',
         worldId: worldId,
@@ -155,11 +155,11 @@ export const WithPortrait: Story = {
   decorators: [
     (Story) => {
       // Create a test character with portrait
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
       
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Hero with Portrait',
         description: 'A legendary warrior from the northern kingdoms',
         worldId: worldId,

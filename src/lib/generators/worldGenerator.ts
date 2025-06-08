@@ -27,7 +27,6 @@ export const TV_MOVIE_UNIVERSES = [
   'Twin Peaks',
   'Stranger Things',
   'Deadwood',
-  'The Witcher',
   'The Walking Dead',
   'Black Mirror',
   'The Matrix',
@@ -60,12 +59,29 @@ async function generateWithAI(options: WorldGenerationOptions): Promise<Generate
     // Completely original world
     prompt = `Generate a complete world configuration for a text-based RPG with a completely original setting.
 
-IMPORTANT: Create a COMPLETELY ORIGINAL world from your imagination. Do not base it on any existing fictional universe, TV show, movie, or book. The world should have:
-- Unique name, geography, and history
-- Original cultures, societies, and conflicts
-- Creative magic systems, technology, or supernatural elements
-- Fresh themes and concepts not directly borrowed from existing media
-- Interesting locations and environments that feel new and engaging`
+IMPORTANT: Create a world based on the suggested name and setting context. Analyze the suggested name for time period and setting clues:
+
+FOR REALISTIC SETTINGS (anything mentioning years like "1970s", "1980s", "1990s", or real-world jobs like "Diner Cook", "Office Worker", "Taxi Driver"):
+- ABSOLUTELY NO magical, supernatural, fantasy, or sci-fi elements
+- ABSOLUTELY NO reality-shifting, destiny, nexus points, or metaphysical concepts  
+- ABSOLUTELY NO special powers, mystical properties, or otherworldly elements
+- This must be a completely mundane, realistic setting that could actually exist
+- Focus on real human drama, workplace challenges, period-appropriate technology
+- Example: A 1970s diner should have real 1970s equipment, real food, real customers, real workplace issues
+
+FOR FANTASY SETTINGS (mentioning magic, dragons, wizards, etc.):
+- Use Fantasy theme with appropriate magical elements
+
+FOR SCI-FI SETTINGS (mentioning space, future, cyber, etc.):
+- Use Sci-Fi theme with appropriate technological elements
+
+CRITICAL: Match the theme to what the name actually suggests. If someone says "1970s Diner Cook" they want a realistic 1970s diner, NOT a magical diner.
+
+The world should have:
+- Name, geography, and history appropriate to the suggested setting
+- Completely realistic elements for historical/modern settings
+- Period-appropriate technology and social context
+- Real-world challenges and conflicts, not supernatural ones`
   } else {
     // World with reference (inspired by or set within)
     const reference = options.reference!;
@@ -138,19 +154,8 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "theme": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The genre/setting (choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other)'}",
-  "description": "A 2-3 sentence description of the world and its unique features${options.relationship === 'set_in' && options.reference && (options.reference.toLowerCase().includes('office') || options.reference.toLowerCase().includes('comedy') || options.reference.toLowerCase().includes('drama')) ? '. CRITICAL: Use realistic, mundane language. Avoid flowery or fantastical descriptions. This should sound like a real place that could exist today.' : ''}`;
-  
-  if (options.reference) {
-    const isSetIn = options.relationship === 'set_in';
-    prompt += isSetIn 
-      ? `. MUST be a realistic location that could actually exist in the ${options.reference} universe without adding any fantasy or supernatural elements that don't exist in the original."`
-      : `. MUST mention that this world is inspired by ${options.reference}."`;
-  } else {
-    prompt += `. MUST be completely original with no references to existing media."`;
-  }
-  
-  prompt += `,
+  "theme": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the theme to what the name actually indicates.'}",
+  "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {
       "name": "Attribute Name",
@@ -181,7 +186,11 @@ Generate 6-10 skills that would be relevant in this world.`;
       prompt += `\nMake the world interesting and playable while capturing the essence of ${options.reference}.`;
     }
   } else {
-    prompt += `\nMake the world interesting and playable with completely original concepts.`;
+    prompt += `\nFOR REALISTIC SETTINGS (years like '1970s' or jobs like 'Diner Cook'): Attributes and skills must be completely realistic - things like Cooking, Customer Service, Physical Stamina, Communication, etc. NO magical, supernatural, or fantasy elements.
+    
+FOR FANTASY/SCI-FI SETTINGS: Use appropriate magical or technological elements.
+
+Make the world interesting and playable with concepts appropriate to the setting type.`;
   }
 
   prompt += `\n\nIMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;

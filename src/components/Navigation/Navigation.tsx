@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { Breadcrumbs } from './Breadcrumbs';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
@@ -31,8 +31,8 @@ import { LogoIcon, LogoText } from '@/components/ui/Logo';
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentWorldId, worlds, setCurrentWorld } = worldStore();
-  const { characters } = characterStore();
+  const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
+  const { characters } = useCharacterStore();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   

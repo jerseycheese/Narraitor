@@ -184,3 +184,6 @@ export class PromptTemplateManager {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }
+
+// Export singleton instance
+export const promptTemplateManager = new PromptTemplateManager();

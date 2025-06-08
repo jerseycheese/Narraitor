@@ -58,21 +58,21 @@ const mockSessionStoreState = {
 
 // Mock the stores
 jest.mock('@/state/worldStore', () => ({
-  worldStore: Object.assign(
+  useWorldStore: Object.assign(
     jest.fn(() => mockWorldStoreState),
     { getState: jest.fn(() => mockWorldStoreState) }
   )
 }));
 
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: Object.assign(
+  useSessionStore: Object.assign(
     jest.fn(() => mockSessionStoreState),
     { getState: jest.fn(() => mockSessionStoreState) }
   )
 }));
 
 jest.mock('@/state/characterStore', () => ({
-  characterStore: Object.assign(
+  useCharacterStore: Object.assign(
     jest.fn(() => mockCharacterStoreState),
     { getState: jest.fn(() => mockCharacterStoreState) }
   )
@@ -200,11 +200,13 @@ describe('useGameSessionState', () => {
       _stores: mockStoresWithoutCharacter
     }));
 
-    // Handle retry
+    // The hook should calculate that there are no characters available
+    // When handleRetry is called, it should detect this and set an error
     act(() => {
       result.current.handleRetry();
     });
 
+    // Check that an error was set
     expect(result.current.error).toBeTruthy();
     expect(result.current.error?.message).toBe('Please create a character for this world before starting the game');
     expect(mockSessionStoreState.initializeSession).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
-import { worldStore } from '../../worldStore';
-import { characterStore } from '../../characterStore';
+import { useWorldStore } from '../../worldStore';
+import { useCharacterStore } from '../../characterStore';
 
 // Mock the module with our mock adapter
 jest.mock('../../../lib/storage/indexedDBAdapter', () => {
@@ -99,17 +99,17 @@ describe('MVP IndexedDB Persistence', () => {
   });
 
   describe('Store Persistence', () => {
-    test('worldStore should have persist middleware configured', () => {
+    test('useWorldStore should have persist middleware configured', () => {
       // Check that the store is configured with persistence
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       expect(state).toBeDefined();
       expect(state.worlds).toBeDefined();
       expect(state.currentWorldId).toBeDefined();
     });
 
-    test('characterStore should have persist middleware configured', () => {
+    test('useCharacterStore should have persist middleware configured', () => {
       // Check that the store is configured with persistence
-      const state = characterStore.getState();
+      const state = useCharacterStore.getState();
       expect(state).toBeDefined();
       expect(state.characters).toBeDefined();
       expect(state.currentCharacterId).toBeDefined();

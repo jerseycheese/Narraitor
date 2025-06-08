@@ -3,9 +3,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
@@ -21,8 +21,8 @@ interface GameSessionProps {
   disableAutoResume?: boolean; // For testing/dev harnesses
   // Optional testing props
   _stores?: {
-    worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
+    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
+    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
   };
   _router?: {
     push: (url: string) => void;
@@ -96,7 +96,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     }
     
     // Check if there's existing narrative data for this world that we can resume
-    const narrativeState = narrativeStore.getState();
+    const narrativeState = useNarrativeStore.getState();
     const existingSessions = Object.keys(narrativeState.sessionSegments);
     
     // Look for existing sessions that have segments for this world
@@ -126,20 +126,20 @@ const GameSession: React.FC<GameSessionProps> = ({
     if (!stableSessionId) return;
     
     // Only clear segments if this is a brand new session (not resuming existing)
-    const narrativeState = narrativeStore.getState();
+    const narrativeState = useNarrativeStore.getState();
     const existingSegments = narrativeState.sessionSegments[stableSessionId] || [];
     const isNewSession = existingSegments.length === 0;
     
     if (isNewSession) {
       // New session - clearing any stale segments
-      narrativeStore.getState().clearSessionSegments(stableSessionId);
+      useNarrativeStore.getState().clearSessionSegments(stableSessionId);
     } else {
       // Resuming existing session with segments
     }
     
     // Update the session store
-    if (sessionStore.getState().setSessionId) {
-      sessionStore.getState().setSessionId(stableSessionId);
+    if (useSessionStore.getState().setSessionId) {
+      useSessionStore.getState().setSessionId(stableSessionId);
     }
   }, [stableSessionId]);
   
@@ -213,14 +213,14 @@ const GameSession: React.FC<GameSessionProps> = ({
     
     return () => {
       // Save the session when component unmounts (navigating away)
-      const currentState = sessionStore.getState();
+      const currentState = useSessionStore.getState();
       if (currentState.status === 'active' && currentState.id) {
         // Don't reset the session, just save it
-        sessionStore.getState().endSession();
+        useSessionStore.getState().endSession();
         
         // Update the narrative count after saving
-        const narrativeCount = narrativeStore.getState().getSessionSegments(currentState.id).length;
-        sessionStore.getState().updateSavedSessionNarrativeCount(currentState.id, narrativeCount);
+        const narrativeCount = useNarrativeStore.getState().getSessionSegments(currentState.id).length;
+        useSessionStore.getState().updateSavedSessionNarrativeCount(currentState.id, narrativeCount);
       }
       
       // Only call onSessionEnd if the session is actually ending (status is 'ended')

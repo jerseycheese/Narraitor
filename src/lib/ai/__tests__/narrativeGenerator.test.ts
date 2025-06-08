@@ -1,12 +1,12 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
 import { GeminiClient } from '../geminiClient';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 jest.mock('../geminiClient');
 jest.mock('../../promptTemplates/narrativeTemplateManager');
 jest.mock('@/state/worldStore', () => ({
-  worldStore: {
+  useWorldStore: {
     getState: jest.fn()
   }
 }));
@@ -48,7 +48,7 @@ describe('NarrativeGenerator', () => {
     (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(mockTemplate);
     
     // Mock world store
-    (worldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: { 'world-123': mockWorld },
       currentWorldId: 'world-123'
     });
