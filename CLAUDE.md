@@ -93,7 +93,6 @@ All implementations must go through the Three-Stage Verification process:
    - End-to-end flow verification
 
 This verification process is MANDATORY - the workflow will not proceed until verification is complete.
-See `/docs/development/claude-integration/three-stage-verification.md` for detailed guidelines.
 
 ## Testing Principles
 - Focus on testing WHAT the feature does, not HOW it does it
@@ -214,7 +213,7 @@ This script will:
 3. Generate JavaScript code for creating the PR with the MCP GitHub tool
 4. Always target the `develop` branch
 
-See `/docs/development/claude-integration/mcp-github-usage.md` for complete MCP GitHub tool documentation.
+See the MCP GitHub tool documentation for complete usage details.
 
 ## Domain Boundaries
 - World: World configuration, templates, attributes
@@ -322,7 +321,7 @@ For smoothly transitioning between planning in Claude App and implementation in 
    - Implement in Claude Code using `/project:do-issue [issue-number]`
    - Verify and complete following the guided process
 
-See `/docs/development/claude-integration/simple-workflow-guide.md` for detailed instructions.
+Use the custom Claude Code commands for guided development workflows.
 
 ## Development Test Harnesses
 Available at `/dev/*` routes:
