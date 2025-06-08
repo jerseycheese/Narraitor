@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { worldStore } from '@/state/worldStore';
+import { characterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 

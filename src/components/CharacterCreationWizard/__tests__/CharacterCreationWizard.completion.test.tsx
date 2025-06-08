@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { useCharacterStore } from '@/state/characterStore';
+import { characterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation

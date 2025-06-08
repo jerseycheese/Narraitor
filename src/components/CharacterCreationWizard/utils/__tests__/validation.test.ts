@@ -1,5 +1,5 @@
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '../validation';
-import { useCharacterStore } from '@/state/characterStore';
+import { characterStore } from '@/state/characterStore';
 
 // Mock characterStore
 jest.mock('@/state/characterStore');
