@@ -1,3 +1,12 @@
+---
+title: "AI Service Integration API"
+type: guide
+category: technical
+tags: [ai, api, gemini, integration]
+created: 2025-05-12
+updated: 2025-06-08
+---
+
 # AI Service Integration API
 
 ## Overview

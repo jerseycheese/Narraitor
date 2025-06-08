@@ -1,3 +1,12 @@
+---
+title: "Narrative Generation System"
+type: architecture
+category: narrative
+tags: [narrative, ai, generation]
+created: 2025-05-20
+updated: 2025-06-08
+---
+
 # Narrative Generation System
 
 The Narrative Generation System is a core component of Narraitor that provides AI-powered, dynamically generated narrative content that adapts to the world's theme, player choices, and game context.
