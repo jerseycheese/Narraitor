@@ -14,18 +14,11 @@ updated: 2025-04-28
 ## Core Workflows
 - 🧪 [[testing-workflow|Testing]]
 - 📋 [[user-story-workflow|User Story Management]]
-- 🔧 [[claude-app-prompt-templates#component-refactoring|Refactoring Guide]]
 
 ## TDD with KISS Principles
 - 🧠 [[tdd-with-kiss|Test-Driven Development with KISS]] - Recommended workflow
 - 💡 [[kiss-principles-react|KISS Principles for React]] - Simplicity guidelines
 
-## AI-Assisted Development
-- 🤖 [[claude-app-workflow|Claude App Workflow]] - Primary development workflow
-
-### Claude App Tools
-- 🔄 [[claude-app-workflow-handoffs|Handoff Templates]]
-- 📝 [[claude-app-prompt-templates|Prompt Templates]]
 
 ## Development Workflow Diagram
 

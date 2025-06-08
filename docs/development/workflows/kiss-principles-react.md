@@ -360,4 +360,3 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
 
 ## Related Documents
 - [[tdd-with-kiss|Test-Driven Development with KISS]]
-- [[claude-app-workflow|Claude App Development Workflow]]
