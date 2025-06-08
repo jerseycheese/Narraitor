@@ -8,6 +8,7 @@ interface WorldAttributesFormProps {
   attributes: WorldAttribute[];
   skills?: WorldSkill[];
   worldId: string;
+  maxAttributes: number;
   onChange: (attributes: WorldAttribute[]) => void;
 }
 
@@ -15,12 +16,17 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   attributes, 
   skills = [],
   worldId, 
+  maxAttributes,
   onChange 
 }) => {
   const [editingAttribute, setEditingAttribute] = useState<EntityID | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [attributeToDelete, setAttributeToDelete] = useState<WorldAttribute | null>(null);
+  
+  // Check if attribute limit is reached
+  const isLimitReached = attributes.length >= maxAttributes;
+  
   // Handle creating a new attribute
   const handleCreateAttribute = (newAttribute: WorldAttribute) => {
     onChange([...attributes, { ...newAttribute, worldId }]);
@@ -70,12 +76,25 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     <section className="p-4 bg-white rounded shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Attributes</h2>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-        >
-          Add Attribute
-        </button>
+        <div className="flex flex-col items-end">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            disabled={isLimitReached}
+            className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+              isLimitReached
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+            aria-label={isLimitReached ? `Cannot add more attributes. Maximum of ${maxAttributes} reached.` : 'Add new attribute'}
+          >
+            Add Attribute
+          </button>
+          {isLimitReached && (
+            <p className="text-xs text-gray-500 mt-1">
+              Maximum {maxAttributes} attributes reached
+            </p>
+          )}
+        </div>
       </div>
       
       {attributes.length === 0 ? (
@@ -131,6 +150,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
               onCancel={() => setShowCreateModal(false)}
               existingAttributes={attributes}
               existingSkills={skills}
+              maxAttributes={maxAttributes}
             />
           </div>
         </div>

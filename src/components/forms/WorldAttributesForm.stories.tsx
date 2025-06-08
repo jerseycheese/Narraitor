@@ -50,6 +50,7 @@ export const Default: Story = {
   args: {
     attributes: mockAttributes,
     worldId: 'world-123',
+    maxAttributes: 6,
   },
 };
 
@@ -57,6 +58,7 @@ export const Empty: Story = {
   args: {
     attributes: [],
     worldId: 'world-123',
+    maxAttributes: 6,
   },
 };
 
@@ -86,5 +88,22 @@ export const CompleteExample: Story = {
       },
     ],
     worldId: 'world-123',
+    maxAttributes: 6,
+  },
+};
+
+// Stories for maxAttributes limit
+export const LimitReached: Story = {
+  args: {
+    attributes: mockAttributes,
+    worldId: 'world-123',
+    maxAttributes: 2,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the disabled state when the maximum number of attributes (2) has been reached.',
+      },
+    },
   },
 };

@@ -135,3 +135,131 @@ describe.skip('WorldAttributesForm - MVP Level Tests (Legacy - Interface Changed
     expect(screen.getByText('Attributes')).toBeInTheDocument();
   });
 });
+
+describe('WorldAttributesForm - MaxAttributes Limit Tests', () => {
+  const mockAttributes: WorldAttribute[] = [
+    {
+      id: 'attr-1',
+      worldId: 'world-123',
+      name: 'Strength',
+      description: 'Physical power',
+      baseValue: 10,
+      minValue: 1,
+      maxValue: 20,
+    },
+    {
+      id: 'attr-2',
+      worldId: 'world-123',
+      name: 'Intelligence',
+      description: 'Mental acuity',
+      baseValue: 10,
+      minValue: 1,
+      maxValue: 20,
+    },
+  ];
+
+  const mockOnChange = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('disables Add Attribute button when limit is reached', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={2}
+        onChange={mockOnChange} 
+      />
+    );
+
+    const addButton = screen.getByRole('button', { name: /cannot add more attributes/i });
+    expect(addButton).toBeDisabled();
+  });
+
+  test('enables Add Attribute button when under limit', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={5}
+        onChange={mockOnChange} 
+      />
+    );
+
+    const addButton = screen.getByRole('button', { name: /add new attribute/i });
+    expect(addButton).not.toBeDisabled();
+  });
+
+  test('shows limit reached message when at maximum', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={2}
+        onChange={mockOnChange} 
+      />
+    );
+
+    expect(screen.getByText('Maximum 2 attributes reached')).toBeInTheDocument();
+  });
+
+  test('does not show limit message when under maximum', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={5}
+        onChange={mockOnChange} 
+      />
+    );
+
+    expect(screen.queryByText(/maximum.*reached/i)).not.toBeInTheDocument();
+  });
+
+  test('has correct aria-label when limit is reached', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={2}
+        onChange={mockOnChange} 
+      />
+    );
+
+    const addButton = screen.getByRole('button', { name: /cannot add more attributes/i });
+    expect(addButton).toHaveAttribute('aria-label', 'Cannot add more attributes. Maximum of 2 reached.');
+  });
+
+  test('has correct aria-label when under limit', () => {
+    render(
+      <WorldAttributesForm 
+        attributes={mockAttributes} 
+        worldId="world-123" 
+        maxAttributes={5}
+        onChange={mockOnChange} 
+      />
+    );
+
+    const addButton = screen.getByRole('button', { name: /add new attribute/i });
+    expect(addButton).toHaveAttribute('aria-label', 'Add new attribute');
+  });
+
+  test('allows adding attribute when exactly one under limit', () => {
+    const oneAttribute = [mockAttributes[0]];
+    
+    render(
+      <WorldAttributesForm 
+        attributes={oneAttribute} 
+        worldId="world-123" 
+        maxAttributes={2}
+        onChange={mockOnChange} 
+      />
+    );
+
+    const addButton = screen.getByRole('button', { name: /add new attribute/i });
+    expect(addButton).not.toBeDisabled();
+    expect(screen.queryByText(/maximum.*reached/i)).not.toBeInTheDocument();
+  });
+});
