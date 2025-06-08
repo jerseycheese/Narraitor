@@ -37,13 +37,16 @@ export const Default: Story = {
 
 export const Variants: Story = {
   render: () => (
-    <div className="flex gap-4 flex-wrap">
-      <Button>Default</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="destructive">Destructive</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="link">Link</Button>
+    <div>
+      <div className="test-css-variables">CSS Variables Test</div>
+      <div className="flex gap-4 flex-wrap">
+        <Button>Default</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="destructive">Destructive</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="link">Link</Button>
+      </div>
     </div>
   ),
 }

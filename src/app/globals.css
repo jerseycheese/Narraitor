@@ -3,6 +3,14 @@ body {
   border: 3px solid green !important;
 }
 
+/* DEBUG: Test if CSS variables are working */
+.test-css-variables {
+  background-color: hsl(var(--destructive)) !important;
+  color: hsl(var(--destructive-foreground)) !important;
+  padding: 10px !important;
+  margin: 10px !important;
+}
+
 @import "tailwindcss";
 
 /* shadcn/ui CSS Variables */
