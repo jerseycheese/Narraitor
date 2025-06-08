@@ -3,7 +3,7 @@ title: Narraitor Development Roadmap
 aliases: [Roadmap, Implementation Plan]
 tags: [narraitor, documentation, planning, roadmap]
 created: 2025-04-27
-updated: 2025-01-16
+updated: 2025-06-08
 ---
 
 # Narraitor Development Roadmap

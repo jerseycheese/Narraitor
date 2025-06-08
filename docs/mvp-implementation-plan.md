@@ -3,7 +3,7 @@ title: MVP Implementation Plan
 aliases: [Implementation Strategy, MVP Strategy]
 tags: [narraitor, implementation, planning]
 created: 2025-04-29
-updated: 2025-01-16
+updated: 2025-06-08
 ---
 
 # Narraitor MVP Implementation Plan
