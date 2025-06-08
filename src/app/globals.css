@@ -11,6 +11,18 @@ body {
   margin: 10px !important;
 }
 
+/* DEBUG: Test if Tailwind classes are generated */
+.test-tailwind-classes {
+  background: orange !important;
+  padding: 20px !important;
+}
+
+/* Check if these Tailwind classes exist */
+.bg-destructive { background: red !important; }
+.text-destructive-foreground { color: white !important; }
+.flex { display: flex !important; }
+.gap-4 { gap: 1rem !important; }
+
 @import "tailwindcss";
 
 /* shadcn/ui CSS Variables */
