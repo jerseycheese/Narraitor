@@ -177,9 +177,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                   </Button>
                   <Button
                     onClick={() => handleDeleteClick(attribute)}
-                    variant="ghost"
+                    variant="destructive"
                     size="sm"
-                    className="text-destructive hover:text-destructive"
                   >
                     Delete
                   </Button>
