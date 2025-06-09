@@ -1,71 +1,66 @@
 import { useCharacterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
-
-interface ValidationResult {
-  valid: boolean;
-  errors: string[];
-}
+import { 
+  validateName, 
+  validateText, 
+  validatePointDistribution, 
+  validateSelectionCount,
+  ValidationResult 
+} from '@/lib/utils/validationUtils';
 
 export const validateCharacterName = (name: string, worldId: EntityID): ValidationResult => {
-  const errors: string[] = [];
-  
-  if (!name || name.trim() === '') {
-    errors.push('Name is required');
-  } else {
-    if (name.length < 3) {
-      errors.push('Name must be at least 3 characters');
-    }
-    if (name.length > 50) {
-      errors.push('Name must be less than 50 characters');
-    }
-    
-    // Check uniqueness within world
-    const state = useCharacterStore.getState();
-    const characters = state.characters || {};
-    const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
-    if (existingCharacters.some(c => c.name === name)) {
-      errors.push('A character with this name already exists in this world');
-    }
+  // Use shared validation for basic name rules
+  const basicValidation = validateName(name);
+  if (!basicValidation.valid) {
+    return basicValidation;
   }
   
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
+  // Check uniqueness within world
+  const state = useCharacterStore.getState();
+  const characters = state.characters || {};
+  const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
+  if (existingCharacters.some(c => c.name === name)) {
+    return {
+      valid: false,
+      errors: ['A character with this name already exists in this world']
+    };
+  }
+  
+  return { valid: true, errors: [] };
 };
 
 export const validateAttributes = (
   attributes: Array<{ value: number }>,
   totalPoints: number
 ): ValidationResult => {
-  const errors: string[] = [];
-  
-  const pointsSpent = attributes.reduce((sum, attr) => sum + attr.value, 0);
-  if (pointsSpent !== totalPoints) {
-    errors.push(`Must spend exactly ${totalPoints} points (${pointsSpent} spent)`);
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
+  const values = attributes.map(attr => attr.value);
+  return validatePointDistribution(values, totalPoints);
 };
 
 export const validateSkills = (
   skills: Array<{ isSelected: boolean }>
 ): ValidationResult => {
-  const errors: string[] = [];
+  const selections = skills.map(skill => skill.isSelected);
+  const result = validateSelectionCount(selections, {
+    minSelections: 1,
+    maxSelections: 8,
+    fieldName: 'skills'
+  });
   
-  const selectedSkills = skills.filter(s => s.isSelected);
-  if (selectedSkills.length === 0) {
-    errors.push('Select at least one skill');
-  } else if (selectedSkills.length > 8) {
-    errors.push('Maximum 8 skills allowed');
-  }
+  // Update error messages to match existing test expectations
+  const updatedErrors = result.errors.map(error => {
+    if (error === 'Select at least 1 skills') {
+      return 'Select at least one skill';
+    }
+    if (error === 'Maximum 8 skills allowed') {
+      return 'Maximum 8 skills allowed';
+    }
+    return error;
+  });
   
   return {
-    valid: errors.length === 0,
-    errors,
+    valid: result.valid,
+    errors: updatedErrors
   };
 };
 
@@ -75,18 +70,20 @@ export const validateBackground = (background: {
   goals: string[];
   motivation: string;
 }): ValidationResult => {
-  const errors: string[] = [];
+  const historyValidation = validateText(background.history, {
+    minLength: 50,
+    fieldName: 'Character history'
+  });
   
-  if (!background.history || background.history.length < 50) {
-    errors.push('Character history must be at least 50 characters');
-  }
+  const personalityValidation = validateText(background.personality, {
+    minLength: 20,
+    fieldName: 'Personality description'
+  });
   
-  if (!background.personality || background.personality.length < 20) {
-    errors.push('Personality description must be at least 20 characters');
-  }
+  const allErrors = [...historyValidation.errors, ...personalityValidation.errors];
   
   return {
-    valid: errors.length === 0,
-    errors,
+    valid: allErrors.length === 0,
+    errors: allErrors,
   };
 };
