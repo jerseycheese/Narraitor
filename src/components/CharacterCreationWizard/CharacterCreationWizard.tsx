@@ -1,10 +1,13 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
+import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
+import { useAttributePointPool, useSkillPointPool } from '@/hooks/usePointPoolManager';
+import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { 
   WizardContainer, 
   WizardProgress, 
@@ -23,66 +26,44 @@ interface CharacterCreationWizardProps {
   initialStep?: number;
 }
 
-interface CharacterCreationState {
-  currentStep: number;
+interface CharacterCreationData {
   worldId: EntityID;
-  characterData: {
+  name: string;
+  description: string;
+  portraitPlaceholder: string;
+  portrait?: {
+    type: 'ai-generated' | 'placeholder';
+    url: string | null;
+    generatedAt?: string;
+    prompt?: string;
+  };
+  attributes: Array<{
+    attributeId: EntityID;
     name: string;
-    description: string;
-    portraitPlaceholder: string;
-    portrait?: {
-      type: 'ai-generated' | 'placeholder';
-      url: string | null;
-      generatedAt?: string;
-      prompt?: string;
-    };
-    attributes: Array<{
-      attributeId: EntityID;
-      name: string;
-      description?: string;
-      value: number;
-      minValue: number;
-      maxValue: number;
-    }>;
-    skills: Array<{
-      skillId: EntityID;
-      name: string;
-      level: number;
-      linkedAttributeId?: EntityID;
-      isSelected: boolean;
-    }>;
-    background: {
-      history: string;
-      personality: string;
-      physicalDescription?: string;
-      goals: string[];
-      motivation: string;
-      isKnownFigure?: boolean;
-      knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
-    };
-  };
-  validation: {
-    [stepNumber: number]: {
-      valid: boolean;
-      errors: string[];
-      touched: boolean;
-    };
-  };
-  pointPools: {
-    attributes: {
-      total: number;
-      spent: number;
-      remaining: number;
-    };
-    skills: {
-      total: number;
-      spent: number;
-      remaining: number;
-    };
+    description?: string;
+    value: number;
+    minValue: number;
+    maxValue: number;
+  }>;
+  skills: Array<{
+    skillId: EntityID;
+    name: string;
+    level: number;
+    linkedAttributeId?: EntityID;
+    isSelected: boolean;
+  }>;
+  background: {
+    history: string;
+    personality: string;
+    physicalDescription?: string;
+    goals: string[];
+    motivation: string;
+    isKnownFigure?: boolean;
+    knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
   };
 }
 
-const steps = [
+const steps: WizardStepType[] = [
   { id: 'basic-info', label: 'Basic Info' },
   { id: 'attributes', label: 'Attributes' },
   { id: 'skills', label: 'Skills' },
@@ -96,235 +77,178 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { createCharacter } = useCharacterStore();
   const world = worlds[worldId];
   
-  
   const { data, setData, handleFieldBlur, clearAutoSave } = useCharacterCreationAutoSave(worldId);
   
-  // Initialize state from auto-save or defaults
-  const [state, setState] = useState<CharacterCreationState>(() => {
-    // Don't access sessionStorage during initial render to avoid hydration issues
-    // The auto-save hook will handle this
-    
-    if (data) {
-      return data;
+  // Initialize character data from auto-save or defaults
+  const initialCharacterData: CharacterCreationData = useMemo(() => {
+    if (data?.characterData) {
+      return {
+        ...(data.characterData as CharacterCreationData),
+        worldId, // Ensure worldId is correct
+      };
     }
     
-    // Initialize with world attributes and skills
     return {
-      currentStep: initialStep,
       worldId,
-      characterData: {
-        name: '',
-        description: '',
-        portraitPlaceholder: '',
-        portrait: {
-          type: 'placeholder',
-          url: null
-        },
-        attributes: world?.attributes.map(attr => ({
-          attributeId: attr.id,
-          name: attr.name,
-          description: attr.description,
-          value: attr.minValue,
-          minValue: attr.minValue,
-          maxValue: attr.maxValue,
-        })) || [],
-        skills: world?.skills.map(skill => ({
-          skillId: skill.id,
-          name: skill.name,
-          description: skill.description,
-          level: skill.minValue,
-          linkedAttributeId: skill.linkedAttributeId,
-          isSelected: false,
-        })) || [],
-        background: {
-          history: '',
-          personality: '',
-          goals: [],
-          motivation: '',
-        },
+      name: '',
+      description: '',
+      portraitPlaceholder: '',
+      portrait: {
+        type: 'placeholder',
+        url: null
       },
-      validation: {},
-      pointPools: {
-        attributes: {
-          total: world?.settings.attributePointPool || 0,
-          spent: world?.attributes?.reduce((sum, attr) => sum + (attr.minValue || 0), 0) || 0,
-          remaining: (world?.settings.attributePointPool || 0) - (world?.attributes?.reduce((sum, attr) => sum + (attr.minValue || 0), 0) || 0),
-        },
-        skills: {
-          total: world?.settings.skillPointPool || 0,
-          spent: 0,
-          remaining: world?.settings.skillPointPool || 0,
-        },
+      attributes: world?.attributes.map(attr => ({
+        attributeId: attr.id,
+        name: attr.name,
+        description: attr.description,
+        value: attr.minValue,
+        minValue: attr.minValue,
+        maxValue: attr.maxValue,
+      })) || [],
+      skills: world?.skills.map(skill => ({
+        skillId: skill.id,
+        name: skill.name,
+        description: skill.description,
+        level: skill.minValue,
+        linkedAttributeId: skill.linkedAttributeId,
+        isSelected: false,
+      })) || [],
+      background: {
+        history: '',
+        personality: '',
+        goals: [],
+        motivation: '',
       },
     };
+  }, [data, worldId, world]);
+
+  // Create step validators
+  const stepValidators = useMemo((): Record<number, WizardStepValidator<CharacterCreationData>> => {
+    return {
+      0: createWizardValidator<CharacterCreationData>()
+        .field('name')
+        .required('Character name is required')
+        .minLength(2, 'Character name must be at least 2 characters')
+        .custom((name) => {
+          const result = validateCharacterName(name, worldId);
+          return result.valid;
+        }, 'A character with this name already exists in this world')
+        .build(),
+      1: createWizardValidator<CharacterCreationData>()
+        .customValidation((data) => {
+          const result = validateAttributes(data.attributes, world?.settings.attributePointPool || 0);
+          return { ...result, touched: true };
+        })
+        .build(),
+      2: createWizardValidator<CharacterCreationData>()
+        .customValidation((data) => {
+          const result = validateSkills(data.skills);
+          return { ...result, touched: true };
+        })
+        .build(),
+      3: createWizardValidator<CharacterCreationData>()
+        .customValidation((data) => {
+          const result = validateBackground(data.background);
+          return { ...result, touched: true };
+        })
+        .build(),
+      4: createWizardValidator<CharacterCreationData>().build(), // Portrait is optional
+    };
+  }, [worldId, world]);
+
+  // Wizard state management
+  const wizard = useWizardState<CharacterCreationData>({
+    initialData: initialCharacterData,
+    initialStep: data?.currentStep || initialStep,
+    steps,
+    onStepValidation: (stepIndex, data) => {
+      const validator = stepValidators[stepIndex];
+      return validator ? validator.validate(data) : { valid: true, errors: [], touched: true };
+    },
   });
 
-  // Update auto-save data when state changes
+  // Point pool managers
+  const attributePool = useAttributePointPool({
+    totalPoints: world?.settings.attributePointPool || 0,
+    items: wizard.state.data.attributes.map(attr => ({
+      id: attr.attributeId,
+      value: attr.value,
+      minValue: attr.minValue,
+      maxValue: attr.maxValue,
+    })),
+  });
+
+  const skillPool = useSkillPointPool({
+    totalPoints: world?.settings.skillPointPool || 0,
+    skills: wizard.state.data.skills.map(skill => {
+      const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
+      return {
+        id: skill.skillId,
+        value: skill.level,
+        minValue: worldSkill?.minValue || 1,
+        maxValue: worldSkill?.maxValue || 10,
+        isSelected: skill.isSelected,
+      };
+    }),
+  });
+
+  // Auto-save data when wizard state changes
   useEffect(() => {
-    setData(state);
-  }, [state, setData]);
-
-  // Check if data was loaded after initial render
-  useEffect(() => {
-    if (data && state.characterData.name === '') {
-      setState(data);
-    }
-  }, [data, state.characterData.name]);
-
-  const validateStep = useCallback((step: number): { valid: boolean; errors: string[] } => {
-    switch (step) {
-      case 0:
-        return validateCharacterName(state.characterData.name, worldId);
-      case 1:
-        return validateAttributes(state.characterData.attributes, state.pointPools.attributes.total);
-      case 2:
-        return validateSkills(state.characterData.skills);
-      case 3:
-        return validateBackground(state.characterData.background);
-      case 4:
-        // Portrait is optional, always valid
-        return { valid: true, errors: [] };
-      default:
-        return { valid: true, errors: [] };
-    }
-  }, [state, worldId]);
-
-  const handleNext = useCallback(() => {
-    const validation = validateStep(state.currentStep);
-    
-    setState(prev => ({
-      ...prev,
-      validation: {
-        ...prev.validation,
-        [state.currentStep]: { ...validation, touched: true },
+    setData({ 
+      characterData: wizard.state.data,
+      currentStep: wizard.state.currentStep,
+      worldId: wizard.state.data.worldId,
+      validation: wizard.state.validation,
+      pointPools: {
+        attributes: attributePool.pool,
+        skills: skillPool.pool,
       },
-    }));
-    
-    if (!validation.valid) {
-      return;
-    }
-    
-    setState(prev => ({
-      ...prev,
-      currentStep: prev.currentStep + 1,
-    }));
-  }, [state.currentStep, validateStep]);
-
-  const handleBack = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      currentStep: prev.currentStep - 1,
-    }));
-  }, []);
-
-  const handleCancel = useCallback(() => {
-    router.push('/characters');
-  }, [router]);
-
-  const handleUpdate = useCallback((updates: Partial<CharacterCreationState['characterData']>) => {
-    setState(prev => {
-      const newState = {
-        ...prev,
-        characterData: {
-          ...prev.characterData,
-          ...updates,
-        },
-      };
-
-      // Update point pools if attributes changed
-      if (updates.attributes) {
-        const spent = updates.attributes.reduce((sum, attr) => sum + attr.value, 0);
-        newState.pointPools = {
-          ...prev.pointPools,
-          attributes: {
-            ...prev.pointPools.attributes,
-            spent,
-            remaining: prev.pointPools.attributes.total - spent,
-          },
-        };
-      }
-
-      // Update skill points if skills changed
-      if (updates.skills) {
-        const selectedSkills = updates.skills.filter(s => s.isSelected);
-        const spent = selectedSkills.reduce((sum, skill) => sum + skill.level, 0);
-        newState.pointPools = {
-          ...prev.pointPools,
-          skills: {
-            ...prev.pointPools.skills,
-            spent,
-            remaining: prev.pointPools.skills.total - spent,
-          },
-        };
-      }
-
-      // Revalidate current step after updates
-      let validation: { valid: boolean; errors: string[] } = { valid: true, errors: [] };
-      switch (prev.currentStep) {
-        case 0:
-          validation = validateCharacterName(newState.characterData.name, worldId);
-          break;
-        case 1:
-          validation = validateAttributes(newState.characterData.attributes, newState.pointPools.attributes.total);
-          break;
-        case 2:
-          validation = validateSkills(newState.characterData.skills);
-          break;
-        case 3:
-          validation = validateBackground(newState.characterData.background);
-          break;
-        case 4:
-          // Portrait is optional
-          validation = { valid: true, errors: [] };
-          break;
-      }
-      
-      newState.validation = {
-        ...prev.validation,
-        [prev.currentStep]: { 
-          ...validation, 
-          touched: prev.validation[prev.currentStep]?.touched || false 
-        },
-      };
-
-      return newState;
     });
-  }, [worldId]);
+  }, [wizard.state.data, wizard.state.currentStep, wizard.state.validation, attributePool.pool, skillPool.pool, setData]);
 
-  const handleValidation = useCallback((valid: boolean, errors: string[]) => {
-    setState(prev => ({
-      ...prev,
-      validation: {
-        ...prev.validation,
-        [prev.currentStep]: { valid, errors, touched: true },
-      },
-    }));
-  }, []);
+  // Navigation handlers
+  const handleNext = () => {
+    wizard.goNext();
+  };
 
-  const handleCreate = useCallback(() => {
+  const handleBack = () => {
+    wizard.goBack();
+  };
+
+  const handleCancel = () => {
+    router.push('/characters');
+  };
+
+  const handleUpdate = (updates: Partial<CharacterCreationData>) => {
+    wizard.updateData(updates);
+  };
+
+  const handleValidation = (valid: boolean, errors: string[]) => {
+    wizard.setValidation(wizard.state.currentStep, { valid, errors, touched: true });
+  };
+
+  const handleCreate = () => {
     // Validate all steps
-    for (let i = 0; i < 5; i++) {
-      const validation = validateStep(i);
-      if (!validation.valid) {
-        setState(prev => ({
-          ...prev,
-          currentStep: i,
-          validation: {
-            ...prev.validation,
-            [i]: { ...validation, touched: true },
-          },
-        }));
-        return;
+    for (let i = 0; i < steps.length; i++) {
+      const validator = stepValidators[i];
+      if (validator) {
+        const validation = validator.validate(wizard.state.data);
+        if (!validation.valid) {
+          wizard.goToStep(i);
+          wizard.setValidation(i, validation);
+          return;
+        }
       }
     }
 
     // Create character
+    const data = wizard.state.data;
     const characterId = createCharacter({
-      name: state.characterData.name,
-      description: state.characterData.background.history,
+      name: data.name,
+      description: data.background.history,
       worldId,
       level: 1,
-      attributes: state.characterData.attributes.map(attr => {
+      attributes: data.attributes.map(attr => {
         const worldAttr = world?.attributes.find(wa => wa.id === attr.attributeId);
         return {
           id: generateUniqueId('attr'),
@@ -336,7 +260,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           category: worldAttr?.category
         };
       }),
-      skills: state.characterData.skills
+      skills: data.skills
         .filter(skill => skill.isSelected)
         .map(skill => {
           const worldSkill = world?.skills.find(ws => ws.id === skill.skillId);
@@ -350,14 +274,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
           };
         }),
       background: {
-        history: state.characterData.background.history,
-        personality: state.characterData.background.personality,
-        goals: state.characterData.background.motivation ? [state.characterData.background.motivation] : [],
+        history: data.background.history,
+        personality: data.background.personality,
+        goals: data.background.motivation ? [data.background.motivation] : [],
         fears: [],
-        physicalDescription: state.characterData.background.physicalDescription || '',
+        physicalDescription: data.background.physicalDescription || '',
         relationships: [],
       },
-      portrait: state.characterData.portrait || {
+      portrait: data.portrait || {
         type: 'placeholder',
         url: null
       },
@@ -393,7 +317,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
     // Navigate to game session with the world
     router.push(`/world/${worldId}/play`);
-  }, [state, worldId, createCharacter, clearAutoSave, router, validateStep, world?.attributes, world?.skills]);
+  };
 
   if (!world) {
     return (
@@ -410,14 +334,25 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   }
 
   const renderStep = () => {
+    // Create legacy data structure for existing step components
+    const legacyData = {
+      characterData: wizard.state.data as Record<string, unknown> & CharacterCreationData,
+      worldId: wizard.state.data.worldId,
+      pointPools: { 
+        attributes: attributePool.pool, 
+        skills: skillPool.pool 
+      },
+      validation: wizard.state.validation
+    };
+
     const props = {
-      data: state,
+      data: legacyData,
       onUpdate: handleUpdate,
       onValidation: handleValidation,
       worldConfig: world,
     };
 
-    switch (state.currentStep) {
+    switch (wizard.state.currentStep) {
       case 0:
         return <BasicInfoStep {...props} />;
       case 1:
@@ -433,7 +368,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     }
   };
 
-  const currentValidation = state.validation[state.currentStep];
+  const currentValidation = wizard.state.validation[wizard.state.currentStep];
   const hasErrors = currentValidation?.touched && !currentValidation?.valid;
   const error = hasErrors ? currentValidation.errors.join(', ') : undefined;
 
@@ -442,7 +377,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       <div onBlur={handleFieldBlur}>
         <WizardProgress 
           steps={steps} 
-          currentStep={state.currentStep} 
+          currentStep={wizard.state.currentStep} 
         />
         
         <WizardStep error={error}>
@@ -451,10 +386,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         
         <WizardNavigation
           onCancel={handleCancel}
-          onBack={state.currentStep > 0 ? handleBack : undefined}
-          onNext={state.currentStep < steps.length - 1 ? handleNext : undefined}
-          onComplete={state.currentStep === steps.length - 1 ? handleCreate : undefined}
-          currentStep={state.currentStep}
+          onBack={wizard.canGoBack ? handleBack : undefined}
+          onNext={wizard.canGoNext ? handleNext : undefined}
+          onComplete={wizard.isLastStep ? handleCreate : undefined}
+          currentStep={wizard.state.currentStep}
           totalSteps={steps.length}
           completeLabel="Create Character"
           disabled={hasErrors}

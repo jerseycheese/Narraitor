@@ -36,7 +36,7 @@ export default function CreateWorldPage() {
       <WorldCreationWizard 
         onComplete={handleComplete}
         onCancel={handleCancel}
-        initialData={generatedData ? { worldData: generatedData } : undefined}
+        initialData={generatedData || undefined}
         initialStep={generatedData ? 5 : 0} // Skip to final step if we have generated data
       />
     </main>

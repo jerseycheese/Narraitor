@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSessionStore } from '@/state/sessionStore';
+import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
+import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { WorldSelectionStep } from './steps/WorldSelectionStep';
 import { CharacterSelectionStep } from './steps/CharacterSelectionStep';
 import { GameReadyStep } from './steps/GameReadyStep';
@@ -13,7 +15,17 @@ export interface GameStartWizardProps {
   onCancel?: () => void;
 }
 
-type WizardStep = 'world' | 'character' | 'ready';
+interface GameStartData {
+  selectedWorldId: string | null;
+  selectedCharacterId: string | null;
+  isStarting: boolean;
+}
+
+const gameStartSteps: WizardStepType[] = [
+  { id: 'world', label: 'Select World' },
+  { id: 'character', label: 'Select Character' },
+  { id: 'ready', label: 'Ready to Play' }
+];
 
 export function GameStartWizard({
   initialWorldId,
@@ -24,62 +36,84 @@ export function GameStartWizard({
   const { initializeSession } = useSessionStore();
 
   // Determine initial step based on props
-  const getInitialStep = (): WizardStep => {
-    if (initialWorldId && initialCharacterId) return 'ready';
-    if (initialWorldId) return 'character';
-    return 'world';
+  const getInitialStep = (): number => {
+    if (initialWorldId && initialCharacterId) return 2; // ready
+    if (initialWorldId) return 1; // character
+    return 0; // world
   };
 
-  const [currentStep, setCurrentStep] = useState<WizardStep>(getInitialStep());
-  const [selectedWorldId, setSelectedWorldId] = useState<string | null>(initialWorldId || null);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(initialCharacterId || null);
-  const [isStarting, setIsStarting] = useState(false);
+  // Initialize game start data
+  const initialGameData: GameStartData = useMemo(() => ({
+    selectedWorldId: initialWorldId || null,
+    selectedCharacterId: initialCharacterId || null,
+    isStarting: false,
+  }), [initialWorldId, initialCharacterId]);
 
-  const handleWorldSelect = (worldId: string) => {
-    setSelectedWorldId(worldId);
-    setCurrentStep('character');
-  };
+  // Create step validators
+  const stepValidators = useMemo((): Record<number, WizardStepValidator<GameStartData>> => {
+    return {
+      0: createWizardValidator<GameStartData>()
+        .customValidation((data) => ({
+          valid: !!data.selectedWorldId,
+          errors: data.selectedWorldId ? [] : ['Please select a world'],
+          touched: true,
+        }))
+        .build(),
+      1: createWizardValidator<GameStartData>()
+        .customValidation((data) => ({
+          valid: !!data.selectedCharacterId,
+          errors: data.selectedCharacterId ? [] : ['Please select a character'],
+          touched: true,
+        }))
+        .build(),
+      2: createWizardValidator<GameStartData>().build(), // Ready step is always valid
+    };
+  }, []);
 
-  const handleCharacterSelect = (characterId: string) => {
-    setSelectedCharacterId(characterId);
-    setCurrentStep('ready');
-  };
+  // Wizard state management
+  const wizard = useWizardState<GameStartData>({
+    initialData: initialGameData,
+    initialStep: getInitialStep(),
+    steps: gameStartSteps,
+    onStepValidation: (stepIndex, data) => {
+      const validator = stepValidators[stepIndex];
+      return validator ? validator.validate(data) : { valid: true, errors: [], touched: true };
+    },
+  });
 
-  const handleStartGame = async () => {
-    if (!selectedWorldId || !selectedCharacterId) return;
+  const handleWorldSelect = useCallback((worldId: string) => {
+    wizard.updateData({ selectedWorldId: worldId });
+    wizard.goNext();
+  }, [wizard]);
 
-    setIsStarting(true);
-    initializeSession(selectedWorldId, selectedCharacterId, () => {
+  const handleCharacterSelect = useCallback((characterId: string) => {
+    wizard.updateData({ selectedCharacterId: characterId });
+    wizard.goNext();
+  }, [wizard]);
+
+  const handleStartGame = useCallback(async () => {
+    const data = wizard.state.data;
+    if (!data.selectedWorldId || !data.selectedCharacterId) return;
+
+    wizard.updateData({ isStarting: true });
+    initializeSession(data.selectedWorldId, data.selectedCharacterId, () => {
       router.push('/play');
     });
-  };
+  }, [wizard, initializeSession, router]);
 
-  const handleBack = () => {
-    if (currentStep === 'character') {
-      setCurrentStep('world');
-      setSelectedCharacterId(null);
-    } else if (currentStep === 'ready') {
-      setCurrentStep('character');
+  const handleBack = useCallback(() => {
+    // Clear relevant data when going back
+    if (wizard.state.currentStep === 1) {
+      // Going back from character selection to world selection, clear character selection
+      wizard.updateData({ selectedCharacterId: null });
+    } else if (wizard.state.currentStep === 2) {
+      // Going back from game ready to character selection, no need to clear anything
+      // The character selection should remain
     }
-  };
+    wizard.goBack();
+  }, [wizard]);
 
-  const getStepNumber = () => {
-    switch (currentStep) {
-      case 'world': return 1;
-      case 'character': return 2;
-      case 'ready': return 3;
-      default: return 1;
-    }
-  };
-
-  const getStepLabel = () => {
-    switch (currentStep) {
-      case 'world': return 'Select World';
-      case 'character': return 'Select Character';
-      case 'ready': return 'Ready to Play';
-      default: return '';
-    }
-  };
+  const currentStepConfig = gameStartSteps[wizard.state.currentStep] || gameStartSteps[0];
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -99,40 +133,40 @@ export function GameStartWizard({
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-600">
-            Step {getStepNumber()} of 3: {getStepLabel()}
+            Step {wizard.state.currentStep + 1} of {gameStartSteps.length}: {currentStepConfig.label}
           </span>
         </div>
         <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div 
             className="h-full bg-blue-600 transition-all duration-300"
-            style={{ width: `${(getStepNumber() / 3) * 100}%` }}
+            style={{ width: `${((wizard.state.currentStep + 1) / gameStartSteps.length) * 100}%` }}
           />
         </div>
       </div>
 
       {/* Step Content */}
       <div className="bg-white rounded-lg shadow-lg p-6">
-        {currentStep === 'world' && (
+        {wizard.state.currentStep === 0 && (
           <WorldSelectionStep 
             onNext={handleWorldSelect}
           />
         )}
         
-        {currentStep === 'character' && selectedWorldId && (
+        {wizard.state.currentStep === 1 && wizard.state.data.selectedWorldId && (
           <CharacterSelectionStep 
-            worldId={selectedWorldId}
+            worldId={wizard.state.data.selectedWorldId}
             onNext={handleCharacterSelect}
             onBack={handleBack}
           />
         )}
         
-        {currentStep === 'ready' && selectedWorldId && selectedCharacterId && (
+        {wizard.state.currentStep === 2 && wizard.state.data.selectedWorldId && wizard.state.data.selectedCharacterId && (
           <GameReadyStep
-            worldId={selectedWorldId}
-            characterId={selectedCharacterId}
+            worldId={wizard.state.data.selectedWorldId}
+            characterId={wizard.state.data.selectedCharacterId}
             onStart={handleStartGame}
             onBack={handleBack}
-            isStarting={isStarting}
+            isStarting={wizard.state.data.isStarting}
           />
         )}
       </div>

@@ -46,13 +46,11 @@ export const BasicInfoStep: Story = {
   args: {
     initialStep: 1,
     initialData: {
-      worldData: {
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 20,
-          skillPointPool: 20
-        }
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
       },
       selectedTemplateId: "fantasy"
     }
@@ -71,15 +69,13 @@ export const DescriptionStep: Story = {
   args: {
     initialStep: 2,
     initialData: {
-      worldData: {
-        name: 'Fantasy Kingdom',
-        theme: 'fantasy',
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 20,
-          skillPointPool: 20
-        }
+      name: 'Fantasy Kingdom',
+      theme: 'fantasy',
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
       }
     }
   },
@@ -97,16 +93,14 @@ export const AttributeReviewStep: Story = {
   args: {
     initialStep: 3,
     initialData: {
-      worldData: {
-        name: 'Fantasy Kingdom',
-        theme: 'fantasy',
-        description: 'A magical world filled with wizards and warriors',
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 20,
-          skillPointPool: 20
-        }
+      name: 'Fantasy Kingdom',
+      theme: 'fantasy',
+      description: 'A magical world filled with wizards and warriors',
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
       },
       aiSuggestions: {
         attributes: [
@@ -135,20 +129,18 @@ export const SkillReviewStep: Story = {
   args: {
     initialStep: 4,
     initialData: {
-      worldData: {
-        name: 'Fantasy Kingdom',
-        theme: 'fantasy',
-        description: 'A magical world filled with wizards and warriors',
-        attributes: [
-          { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
-          { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
-        ],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 20,
-          skillPointPool: 20
-        }
+      name: 'Fantasy Kingdom',
+      theme: 'fantasy',
+      description: 'A magical world filled with wizards and warriors',
+      attributes: [
+        { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
+        { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
+      ],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
       },
       aiSuggestions: {
         attributes: [],
@@ -184,24 +176,22 @@ export const FinalizeStep: Story = {
   args: {
     initialStep: 5,
     initialData: {
-      worldData: {
-        name: 'Fantasy Kingdom',
-        theme: 'fantasy',
-        description: 'A magical world filled with wizards and warriors, ancient forests, and towering castles',
-        attributes: [
-          { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
-          { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
-        ],
-        skills: [
-          { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
-          { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
-        ],
-        settings: {
-          maxAttributes: 10,
-          maxSkills: 10,
-          attributePointPool: 20,
-          skillPointPool: 20
-        }
+      name: 'Fantasy Kingdom',
+      theme: 'fantasy',
+      description: 'A magical world filled with wizards and warriors, ancient forests, and towering castles',
+      attributes: [
+        { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
+        { id: 'attr2', worldId: '', name: 'Intelligence', description: 'Mental acuity', baseValue: 5, minValue: 1, maxValue: 10 },
+      ],
+      skills: [
+        { id: 'skill1', worldId: '', name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
+        { id: 'skill2', worldId: '', name: 'Magic', description: 'Spellcasting prowess', difficulty: 'hard' as SkillDifficulty, baseValue: 5, minValue: 1, maxValue: 10 },
+      ],
+      settings: {
+        maxAttributes: 10,
+        maxSkills: 10,
+        attributePointPool: 20,
+        skillPointPool: 20
       }
     }
   },
