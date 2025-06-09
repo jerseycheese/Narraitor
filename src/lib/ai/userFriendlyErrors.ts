@@ -1,68 +1,53 @@
 // src/lib/ai/userFriendlyErrors.ts
 
-import { isRetryableError } from './errors';
+import { 
+  getUserFriendlyError as getUserFriendlyErrorUtil,
+  UserFriendlyError 
+} from '@/lib/utils/errorUtils';
 
-export interface UserFriendlyError {
-  title: string;
-  message: string;
-  actionLabel?: string;
-  retryable: boolean;
-}
+// Re-export the shared utilities with AI-specific customization
+export type { UserFriendlyError } from '@/lib/utils/errorUtils';
 
 /**
- * Maps technical errors to user-friendly messages
+ * Maps technical errors to user-friendly messages with AI-specific context
  * @param error - The error to map
  * @returns User-friendly error object
  */
 export function getUserFriendlyError(error: Error): UserFriendlyError {
+  const baseError = getUserFriendlyErrorUtil(error);
+  
+  // Add AI-specific context to certain error messages
   const message = error.message.toLowerCase();
-
-  // Network errors
+  
   if (message.includes('network')) {
     return {
-      title: 'Connection Problem',
-      message: 'Unable to connect to the AI service. Please check your internet connection.',
-      actionLabel: 'Try Again',
-      retryable: true
+      ...baseError,
+      message: 'Unable to connect to the AI service. Please check your internet connection.'
     };
   }
-
-  // Timeout errors
+  
   if (message.includes('timeout')) {
     return {
-      title: 'Request Timed Out', 
-      message: 'The AI service is taking too long to respond. Please try again.',
-      actionLabel: 'Try Again',
-      retryable: true
+      ...baseError,
+      message: 'The AI service is taking too long to respond. Please try again.'
     };
   }
-
-  // Rate limit errors
+  
   if (message.includes('429') || message.includes('rate limit')) {
     return {
-      title: 'Too Many Requests',
-      message: 'You have made too many requests. Please wait a moment before trying again.',
-      actionLabel: 'Try Again Later',
-      retryable: true
+      ...baseError,
+      message: 'You have made too many requests. Please wait a moment before trying again.'
     };
   }
-
-  // Authentication errors
+  
   if (message.includes('401') || message.includes('unauthorized')) {
     return {
-      title: 'Authentication Error',
-      message: 'Unable to authenticate with the AI service. Please check your API key.',
-      retryable: false
+      ...baseError,
+      message: 'Unable to authenticate with the AI service. Please check your API key.'
     };
   }
-
-  // Default for unknown errors
-  return {
-    title: 'Something Went Wrong',
-    message: 'An unexpected error occurred. Please try again.',
-    actionLabel: 'Try Again',
-    retryable: isRetryableError(error)
-  };
+  
+  return baseError;
 }
 
 /**
@@ -72,6 +57,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
  * @returns User-friendly error message string
  */
 export function userFriendlyError(error: Error): string {
-  const friendlyError = getUserFriendlyError(error);
-  return friendlyError.message;
+  return getUserFriendlyError(error).message;
 }
+
+// Note: isRetryableError is not re-exported here to avoid naming conflicts with utils module
+// Components should import isRetryableError from '@/lib/utils' instead
