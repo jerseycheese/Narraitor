@@ -2,7 +2,12 @@ import { useCharacterStore } from '../characterStore';
 
 describe('useCharacterStore', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     useCharacterStore.getState().reset();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('initialization', () => {

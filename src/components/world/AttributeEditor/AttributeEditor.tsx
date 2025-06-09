@@ -13,6 +13,7 @@ export interface AttributeEditorProps {
   onCancel: () => void;
   existingAttributes?: WorldAttribute[];
   existingSkills?: WorldSkill[];
+  /** Maximum number of attributes allowed in create mode. When specified, prevents creation beyond this limit */
   maxAttributes?: number;
 }
 

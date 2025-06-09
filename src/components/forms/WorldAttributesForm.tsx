@@ -4,7 +4,6 @@ import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils/cn';
 
 // Constants
 const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
