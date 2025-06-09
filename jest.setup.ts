@@ -1,6 +1,9 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
+// Setup enhanced test utilities
+import { setupTestEnvironment } from '@/lib/test-utils/setup';
+
 // DIAGNOSTIC: Log environment variable
 if (process.env.DEBUG_JEST_SETUP === 'true') {
   console.log('[jest.setup.ts] GEMINI_API_KEY before setting:', process.env.GEMINI_API_KEY ? '***MASKED***' : 'NOT SET');
@@ -63,3 +66,6 @@ Object.defineProperty(global.self, 'crypto', {
   writable: true, // Allow further modifications if needed by other tests
   configurable: true,
 });
+
+// Initialize enhanced test environment
+setupTestEnvironment();

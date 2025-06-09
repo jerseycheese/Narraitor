@@ -1,12 +1,14 @@
 /**
- * Test Setup Utilities
+ * Enhanced Test Setup Utilities
  * 
  * Common test setup functions to reduce duplication across test files.
- * Provides consistent mocking and setup patterns.
+ * Provides consistent mocking and setup patterns, enhanced with custom matchers
+ * and comprehensive test environment configuration.
  */
 
 import { render, RenderOptions } from '@testing-library/react';
 import { ReactElement } from 'react';
+import { setupCustomMatchers } from './assertions';
 
 /**
  * Sets up a mock Next.js router
@@ -113,9 +115,12 @@ export function renderWithProviders(
 }
 
 /**
- * Sets up common test environment
+ * Sets up common test environment with enhanced features
  */
 export function setupTestEnvironment() {
+  // Setup custom Jest matchers
+  setupCustomMatchers();
+  
   // Clear all mocks
   jest.clearAllMocks();
   
@@ -139,6 +144,51 @@ export function setupTestEnvironment() {
   afterAll(() => {
     console.error = originalError;
     console.warn = originalWarn;
+  });
+
+  // Global mock for ResizeObserver (common in UI tests)
+  global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+
+  // Global mock for IntersectionObserver
+  global.IntersectionObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
+
+  // Mock matchMedia for responsive design tests (only in jsdom environment)
+  if (typeof window !== 'undefined') {
+    Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(), // deprecated
+      removeListener: jest.fn(), // deprecated
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+    });
+  }
+
+  // Mock crypto.randomUUID for ID generation with proper UUID format
+  Object.defineProperty(global, 'crypto', {
+    value: {
+      randomUUID: jest.fn(() => {
+        // Generate a proper UUID v4 format for tests
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }),
+    },
   });
   
   return {
