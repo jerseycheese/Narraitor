@@ -243,8 +243,17 @@ export const useSessionStore = create<SessionStore>()(
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
-  version: 1,
-  // Only persist saved sessions, not active session state
-  partialize: (state) => ({ savedSessions: state.savedSessions }),
+  version: 2,
+  // Persist active session state to maintain continuity across browser refreshes
+  partialize: (state) => ({ 
+    savedSessions: state.savedSessions,
+    // Persist active session state
+    id: state.id,
+    characterId: state.characterId,
+    worldId: state.worldId,
+    status: state.status,
+    currentSceneId: state.currentSceneId,
+    playerChoices: state.playerChoices
+  }),
 }
 ));

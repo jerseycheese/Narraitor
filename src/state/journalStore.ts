@@ -10,9 +10,11 @@
  */
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { createIndexedDBStorage } from './persistence';
 
 /**
  * Journal store interface with state and actions
@@ -50,13 +52,15 @@ const initialState = {
 };
 
 // Journal Store implementation
-export const useJournalStore = create<JournalStore>()((set, get) => ({
+export const useJournalStore = create<JournalStore>()(
+  persist(
+    (set, get) => ({
   ...initialState,
 
   // Add entry
   addEntry: (sessionId, entryData) => {
-    if (!entryData.title || entryData.title.trim() === '') {
-      throw new Error('Entry title is required');
+    if (!entryData.content || entryData.content.trim() === '') {
+      throw new Error('Entry content is required');
     }
 
     const entryId = generateUniqueId('entry');
@@ -172,4 +176,15 @@ export const useJournalStore = create<JournalStore>()((set, get) => ({
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
-}));
+}),
+{
+  name: 'narraitor-journal-store',
+  storage: createIndexedDBStorage(),
+  version: 1,
+  // Persist journal entries and session mappings
+  partialize: (state) => ({
+    entries: state.entries,
+    sessionEntries: state.sessionEntries,
+  }),
+}
+));

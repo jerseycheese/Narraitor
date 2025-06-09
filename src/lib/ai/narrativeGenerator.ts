@@ -175,18 +175,122 @@ export class NarrativeGenerator {
   }
 
   private formatResponse(response: { content?: string; tokenUsage?: number }, segmentType: string): NarrativeGenerationResult {
-    // For mock client, generate metadata if not present
-    const mood = this.getMoodForGenre(this.getWorldGenre());
-    const location = this.getLocationForGenre(this.getWorldGenre());
+    let actualContent = response.content || '';
+    let extractedMetadata: { location?: string; mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral'; tags?: string[]; characterIds?: string[] } = {};
+    
+    // Try to parse JSON response if present
+    if (actualContent.includes('```json') || actualContent.startsWith('{') || actualContent.includes('"content":')) {
+      try {
+        let jsonStr = actualContent.trim();
+        
+        // Handle markdown code blocks
+        if (jsonStr.includes('```json')) {
+          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
+        } else if (jsonStr.includes('```')) {
+          jsonStr = jsonStr.replace(/```\s*/, '').replace(/\s*```/, '');
+        }
+        
+        // Clean up any surrounding text that might interfere
+        jsonStr = jsonStr.trim();
+        
+        // Find JSON object boundaries if there's surrounding text
+        const jsonStart = jsonStr.indexOf('{');
+        const jsonEnd = jsonStr.lastIndexOf('}');
+        if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+          jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
+        } else if (jsonStart !== -1) {
+          // Handle incomplete JSON by extracting content field directly
+          const contentMatch = jsonStr.match(/"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/);
+          if (contentMatch && contentMatch[1]) {
+            actualContent = contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+            console.log('Extracted content from incomplete JSON:', actualContent.substring(0, 100) + '...');
+            // Skip JSON.parse and continue with extracted content
+          } else {
+            throw new Error('Incomplete JSON without extractable content');
+          }
+        } else {
+          throw new Error('No JSON structure found');
+        }
+        
+        // Only parse if we have a complete JSON structure
+        if (jsonEnd !== -1) {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            actualContent = parsed.content;
+            console.log('Successfully extracted content from JSON response:', actualContent.substring(0, 100) + '...');
+          }
+          if (parsed.metadata) {
+            extractedMetadata = {
+              location: parsed.metadata.location,
+              mood: this.validateMood(parsed.metadata.mood),
+              tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
+              characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : []
+            };
+            console.log('Successfully extracted metadata from JSON response:', extractedMetadata);
+          }
+        }
+      } catch (parseError) {
+        console.warn('Could not parse AI JSON response, attempting regex extraction:', parseError);
+        console.warn('Raw content that failed to parse:', actualContent.substring(0, 200) + '...');
+        
+        // Try regex extraction as fallback for malformed JSON
+        try {
+          // Look for content field - handle malformed JSON with unescaped quotes
+          // Find content field and extract everything until the next field or end
+          const contentStartMatch = actualContent.match(/"content"\s*:\s*"(.+?)"\s*,\s*"/);
+          if (contentStartMatch && contentStartMatch[1]) {
+            actualContent = contentStartMatch[1]
+              .replace(/\\"/g, '"')
+              .replace(/\\n/g, '\n')
+              .replace(/\\\\/g, '\\');
+            console.log('Successfully extracted content via regex (method 1):', actualContent.substring(0, 100) + '...');
+          } else {
+            // Try alternative extraction: find content field and extract until next JSON field
+            const altContentMatch = actualContent.match(/"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/);
+            if (altContentMatch && altContentMatch[1]) {
+              actualContent = altContentMatch[1];
+              console.log('Successfully extracted content via regex (method 2):', actualContent.substring(0, 100) + '...');
+            } else {
+              // Final attempt: extract everything between "content": " and the next field pattern
+              const finalContentMatch = actualContent.match(/"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/);
+              if (finalContentMatch && finalContentMatch[1]) {
+                actualContent = finalContentMatch[1];
+                console.log('Successfully extracted content via regex (method 3):', actualContent.substring(0, 100) + '...');
+              }
+            }
+          }
+          
+          // Try to extract location from metadata
+          const locationMatch = actualContent.match(/"location"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+          if (locationMatch && locationMatch[1]) {
+            extractedMetadata.location = locationMatch[1].replace(/\\"/g, '"');
+            console.log('Successfully extracted location via regex:', extractedMetadata.location);
+          }
+          
+          // Try to extract mood
+          const moodMatch = actualContent.match(/"mood"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+          if (moodMatch && moodMatch[1]) {
+            extractedMetadata.mood = this.validateMood(moodMatch[1]);
+            console.log('Successfully extracted mood via regex:', extractedMetadata.mood);
+          }
+        } catch (regexError) {
+          console.warn('Regex extraction also failed:', regexError);
+        }
+      }
+    }
+    
+    // Use extracted metadata or fall back to generated metadata
+    const fallbackMood = this.getMoodForGenre(this.getWorldGenre());
+    const fallbackLocation = this.getLocationForGenre(this.getWorldGenre());
     
     return {
-      content: response.content || '',
+      content: actualContent,
       segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
-        characterIds: [],
-        location: location,
-        mood: mood,
-        tags: [this.getWorldGenre() || 'fantasy', 'narrative']
+        characterIds: extractedMetadata.characterIds || [],
+        location: extractedMetadata.location || fallbackLocation,
+        mood: extractedMetadata.mood || fallbackMood,
+        tags: extractedMetadata.tags || [this.getWorldGenre() || 'fantasy', 'narrative']
       },
       tokenUsage: response.tokenUsage && typeof response.tokenUsage === 'object' 
         ? response.tokenUsage 
@@ -204,6 +308,11 @@ export class NarrativeGenerator {
     } catch {
       return null;
     }
+  }
+  
+  private validateMood(mood?: string): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' | undefined {
+    const validMoods = ['neutral', 'tense', 'mysterious', 'relaxed', 'action', 'emotional'];
+    return validMoods.includes(mood || '') ? mood as 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' : undefined;
   }
   
   private getMoodForGenre(genre?: string | null): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' {

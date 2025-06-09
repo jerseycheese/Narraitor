@@ -16,10 +16,6 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
-import { useJournalStore } from '@/state/journalStore';
-// Temporarily commenting out new components for TDD verification
-// import { AccessButton } from '@/components/ui/AccessButton';
-// import { BookOpen } from 'lucide-react';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -80,9 +76,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
-  
-  // Get journal store for auto-creating entries
-  const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
@@ -155,151 +148,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     };
   }, [sessionId, worldId, controllerKey]);
 
-  // Helper function to generate AI summary for journal entries
-  const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
-    try {
-      const response = await fetch('/api/narrative/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          type,
-          location,
-          decisionWeight,
-          instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.summary && data.entryType && data.significance) {
-          return {
-            summary: data.summary,
-            entryType: data.entryType,
-            significance: data.significance
-          };
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
-    }
-    
-    // Return fallback values using decision weight for significance
-    const fallbackSignificance = decisionWeight || 'minor';
-    return {
-      summary: createFallbackSummary(content),
-      entryType: 'character_event',
-      significance: fallbackSignificance
-    };
-  };
-
-  // Fallback summary method when AI fails
-  const createFallbackSummary = (content: string): string => {
-    // Extract first sentence and clean it up
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
-    if (sentences.length > 0) {
-      let summary = sentences[0].trim();
-      // Convert from second person to past tense if needed
-      summary = summary.replace(/^You\s+/, '').replace(/\byou\b/g, 'the character');
-      // Keep it concise - max 60 characters
-      return summary.length > 60 ? summary.substring(0, 57) + '...' : summary + '.';
-    }
-    return 'Something happened in the adventure.';
-  };
-
-  // Helper function to create journal entries from narrative segments
-  const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
-    if (!characterId) return;
-    
-    
-    // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
-    let cleanContent = segment.content;
-    let actualLocation = segment.metadata?.location;
-    
-    // Fallback: handle any remaining JSON-formatted content that wasn't parsed by the generator
-    if (segment.content.includes('```json') || segment.content.startsWith('{')) {
-      try {
-        let jsonStr = segment.content;
-        if (jsonStr.includes('```json')) {
-          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
-        }
-        
-        const parsed = JSON.parse(jsonStr);
-        if (parsed.content) {
-          cleanContent = parsed.content;
-        }
-        if (parsed.metadata?.location && !actualLocation) {
-          actualLocation = parsed.metadata.location;
-          // Update segment metadata if it wasn't already set by the generator
-          segment.metadata = { ...segment.metadata, ...parsed.metadata };
-        }
-      } catch (parseError) {
-        console.warn('Could not parse JSON content, using original:', parseError);
-      }
-    }
-    
-    // Generate AI summary, type, and significance for journal entry (async)
-    generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
-      try {
-        addEntry(sessionId, {
-          worldId: worldId,
-          characterId: characterId,
-          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event' | 'relationship_change',
-          title: '', // No title needed - content is sufficient
-          content: aiResult.summary,
-          significance: aiResult.significance as 'minor' | 'major' | 'critical',
-          isRead: false, // Read status no longer used but kept for type compatibility
-          relatedEntities: [],
-          metadata: {
-            tags: [segment.type],
-            automaticEntry: true,
-            narrativeSegmentId: segment.id
-          },
-          updatedAt: new Date().toISOString()
-        });
-      } catch (error) {
-        console.warn('Failed to create journal entry from narrative segment:', error);
-      }
-    }).catch(error => {
-      console.warn('Failed to generate journal summary, using fallback:', error);
-      // Use fallback if AI completely fails
-      try {
-        const fallbackSignificance = relatedDecisionWeight || 'minor';
-        addEntry(sessionId, {
-          worldId: worldId,
-          characterId: characterId,
-          type: 'character_event',
-          title: '', // No title needed
-          content: createFallbackSummary(cleanContent),
-          significance: fallbackSignificance,
-          isRead: false, // Read status no longer used but kept for type compatibility
-          relatedEntities: [],
-          metadata: {
-            tags: [segment.type],
-            automaticEntry: true,
-            narrativeSegmentId: segment.id
-          },
-          updatedAt: new Date().toISOString()
-        });
-      } catch (fallbackError) {
-        console.warn('Failed to create fallback journal entry:', fallbackError);
-      }
-    });
-  };
-
-  const handleNarrativeGenerated = (segment: NarrativeSegment) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleNarrativeGenerated = (_: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
     setShouldTriggerGeneration(false); // Reset trigger
     // Start generating choices
     setIsGeneratingChoices(true);
-    
-    // Auto-create journal entry for significant narrative events
-    if (characterId && segment.content) {
-      // Use the current decision weight to determine journal significance
-      const decisionWeight = currentDecision?.decisionWeight;
-      createJournalEntryFromSegment(segment, decisionWeight);
-    }
     
     // Set a fallback timer to ensure choices eventually appear
     // Use a ref to track this timeout so we can clear it if AI choices arrive
@@ -504,7 +359,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          <CharacterSummary character={character} />
+          <div className="flex justify-between items-start gap-4">
+            <div className="flex-1">
+              <CharacterSummary character={character} />
+            </div>
+            {/* Journal Access Button - Issue #278: AC1 */}
+            <button
+              data-testid="journal-access-button"
+              onClick={() => setShowJournalModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              aria-label="Open journal to view your adventure entries"
+              title="View your journal entries"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span className="hidden sm:inline">Journal</span>
+            </button>
+          </div>
         </div>
       )}
       
@@ -566,72 +438,92 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : (
             <div className="player-choices-container">
-              <ChoiceSelector
-                choices={[]} // No predefined choices
-                prompt="What will you do?"
-                onSelect={handleChoiceSelected}
-                onCustomSubmit={handleCustomSubmit}
-                enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
-              />
+              <div className="p-4 border rounded bg-gray-50">
+                <p className="text-sm text-gray-600 mb-2">No choices available.</p>
+                <button 
+                  className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                  onClick={() => {
+                    // Try to get latest decision from narrative store
+                    const latestDecision = useNarrativeStore.getState().getLatestDecision(sessionId);
+                    if (latestDecision) {
+                      setCurrentDecision(latestDecision);
+                    } else {
+                      
+                      // Create fallback choices manually
+                      const fallbackId = `decision-fallback-${Date.now()}`;
+                      const fallbackDecision: Decision = {
+                        id: fallbackId,
+                        prompt: "What will you do?",
+                        options: [
+                          { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+                          { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+                        ],
+                        decisionWeight: 'minor',
+                        contextSummary: 'Manual fallback choices created.'
+                      };
+                      
+                      // Save to store for future reference
+                      useNarrativeStore.getState().addDecision(sessionId, {
+                        prompt: fallbackDecision.prompt,
+                        options: fallbackDecision.options
+                      });
+                      
+                      // Update state
+                      setCurrentDecision(fallbackDecision);
+                      
+                      // Also update session store
+                      const playerChoices = fallbackDecision.options.map(option => ({
+                        id: option.id,
+                        text: option.text,
+                        isSelected: false
+                      }));
+                      useSessionStore.getState().setPlayerChoices(playerChoices);
+                    }
+                  }}
+                >
+                  Generate Fallback Choices
+                </button>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between items-center">
-        {/* Journal Access Button - Issue #278: AC1 */}
-        {character && (
+      {onEnd && (
+        <div className="mt-6 flex justify-end gap-2">
           <button
-            data-testid="journal-access-button"
-            onClick={() => setShowJournalModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            aria-label="Open journal to view your adventure entries"
-            title="View your journal entries"
+            data-testid="game-session-new"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
+            onClick={() => {
+              // Save current session and clear narrative
+              useSessionStore.getState().endSession();
+              useNarrativeStore.getState().clearSessionSegments(sessionId);
+              
+              // Reload the page to start fresh
+              window.location.reload();
+            }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <span>Journal</span>
+            Start New Session
           </button>
-        )}
-
-        {/* Session Control Buttons */}
-        {onEnd && (
-          <div className="flex gap-2">
-            <button
-              data-testid="game-session-new"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
-              onClick={() => {
-                // Save current session and clear narrative
-                useSessionStore.getState().endSession();
-                useNarrativeStore.getState().clearSessionSegments(sessionId);
-                
-                // Reload the page to start fresh
-                window.location.reload();
-              }}
-            >
-              Start New Session
-            </button>
-            <button
-              data-testid="game-session-end-story"
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
-              onClick={handleEndStoryClick}
-              disabled={isGeneratingEnding || isSessionEnded(sessionId)}
-              title="End your story with an AI-generated epilogue"
-            >
-              {isGeneratingEnding ? 'Generating...' : 'End Story'}
-            </button>
-            <button
-              data-testid="game-session-end"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
-              onClick={onEnd}
-            >
-              End Session
-            </button>
-          </div>
-        )}
-      </div>
+          <button
+            data-testid="game-session-end-story"
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
+            onClick={handleEndStoryClick}
+            disabled={isGeneratingEnding || isSessionEnded(sessionId)}
+            title="End your story with an AI-generated epilogue"
+          >
+            {isGeneratingEnding ? 'Generating...' : 'End Story'}
+          </button>
+          <button
+            data-testid="game-session-end"
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+            onClick={onEnd}
+          >
+            End Session
+          </button>
+        </div>
+      )}
 
       {/* Ending Suggestion Dialog */}
       <DeleteConfirmationDialog
