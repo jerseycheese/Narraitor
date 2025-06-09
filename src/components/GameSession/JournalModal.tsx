@@ -3,6 +3,7 @@
 import React from 'react';
 import { useJournalStore } from '@/state/journalStore';
 import { EntityID } from '@/types/common.types';
+import { EntityBadge } from '@/components/shared/cards/EntityBadge';
 
 interface JournalModalProps {
   isOpen: boolean;
@@ -21,7 +22,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   onClose,
   sessionId,
 }) => {
-  const { getSessionEntries, markAsRead } = useJournalStore();
+  const { getSessionEntries } = useJournalStore();
   
   // AC4: Don't render if not open
   if (!isOpen) return null;
@@ -67,28 +68,26 @@ export const JournalModal: React.FC<JournalModalProps> = ({
               {entries.map(entry => (
                 <div 
                   key={entry.id} 
-                  className="border-b pb-4 cursor-pointer hover:bg-gray-50 p-2 rounded"
-                  onClick={() => {
-                    // Mark as read when clicked
-                    markAsRead(entry.id);
-                  }}
+                  className="border-b pb-4 p-2 rounded"
                 >
-                  <div className="flex items-start gap-2">
-                    {!entry.isRead && (
-                      <span 
-                        className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"
-                        aria-label="Unread"
-                        title="Unread"
-                      ></span>
-                    )}
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{entry.title}</h4>
-                      <p className="text-gray-700">{entry.content}</p>
-                      <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
-                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">{entry.significance}</span>
-                        <span>•</span>
-                        <span>{entry.type.replace('_', ' ')}</span>
-                      </div>
+                  <div>
+                    <p className="text-gray-700">{entry.content}</p>
+                    <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                      <EntityBadge 
+                        text={entry.significance}
+                        variant={
+                          entry.significance === 'critical' ? 'danger' :
+                          entry.significance === 'major' ? 'warning' : 
+                          'secondary'
+                        }
+                        size="sm"
+                      />
+                      <span>•</span>
+                      <EntityBadge 
+                        text={entry.type.replace('_', ' ')}
+                        variant="info"
+                        size="sm"
+                      />
                     </div>
                   </div>
                 </div>

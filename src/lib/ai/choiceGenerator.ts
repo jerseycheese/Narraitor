@@ -97,22 +97,29 @@ export class ChoiceGenerator {
         // If AI didn't provide weight, make a reasonable guess based on story progress
         const segmentCount = narrativeContext.previousSegments?.length || 0;
         
-        // For debugging - force more variety in decision weights
+        // Realistic decision weight distribution
         const randomValue = Math.random();
-        if (segmentCount >= 2) {
-          // After the first couple segments, start mixing weights for testing
-          if (randomValue > 0.7) {
-            decisionWeight = 'major';
-          } else if (randomValue > 0.9) {
+        if (segmentCount > 12) {
+          // Late story - higher chance of critical decisions
+          if (randomValue > 0.85) {
             decisionWeight = 'critical';
+          } else if (randomValue > 0.6) {
+            decisionWeight = 'major';
           }
         } else if (segmentCount > 8) {
-          // Later in story - more likely to be major decisions
-          decisionWeight = Math.random() > 0.5 ? 'major' : 'minor';
-        } else if (segmentCount > 3) {
-          // Mid story - mix of minor and major
-          decisionWeight = Math.random() > 0.7 ? 'major' : 'minor';
+          // Mid-late story - some major decisions
+          if (randomValue > 0.9) {
+            decisionWeight = 'critical';
+          } else if (randomValue > 0.75) {
+            decisionWeight = 'major';
+          }
+        } else if (segmentCount > 4) {
+          // Mid story - occasional major decisions
+          if (randomValue > 0.85) {
+            decisionWeight = 'major';
+          }
         }
+        // Early story (segmentCount <= 4) stays as 'minor' by default
       }
       
       
@@ -125,24 +132,18 @@ export class ChoiceGenerator {
       
       // Extract the decision prompt from cleaned content
       let prompt = '';
-      // First try to capture everything after "Decision:" until "Options:" or end
-      const promptMatch = cleanedContent.match(/Decision:?\s*([\s\S]+?)(?=\n\s*Options:|$)/i);
+      // Look for "Decision:" at the start of a line, followed by the prompt
+      const promptMatch = cleanedContent.match(/^Decision:?\s*(.+)$/im);
       if (promptMatch && promptMatch[1]) {
         prompt = promptMatch[1].trim();
-      } else {
-        // Try alternative patterns
-        const altMatch1 = cleanedContent.match(/Decision:?\s*([\s\S]+?)(?=\n\s*\d+\.|$)/i);
-        if (altMatch1 && altMatch1[1]) {
-          prompt = altMatch1[1].trim();
-        } else {
-          const simpleMatch = cleanedContent.match(/Decision:?\s*([^\n]+)/i);
-          if (simpleMatch && simpleMatch[1]) {
-            prompt = simpleMatch[1].trim();
-          } else {
-            // Fallback if no prompt found
-            prompt = 'What will you do?';
-          }
+        
+        // If prompt is empty or too short, use fallback
+        if (!prompt || prompt.length < 3) {
+          prompt = 'What will you do?';
         }
+      } else {
+        // Fallback if no prompt found
+        prompt = 'What will you do?';
       }
       
       // Extract options with alignment tags from cleaned content

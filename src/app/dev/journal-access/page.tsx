@@ -122,10 +122,10 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'character_event',
-        title: 'Started work shift',
+        title: '',
         content: 'Started work shift at the video store.',
         significance: 'minor',
-        isRead: false,
+        isRead: false, // Read status no longer used
         relatedEntities: [],
         metadata: { tags: ['opening', 'introduction'], automaticEntry: true },
         updatedAt: new Date().toISOString()
@@ -134,10 +134,10 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'world_event',
-        title: 'Marco appeared after...',
+        title: '',
         content: 'Marco appeared after dealing with an angry customer.',
         significance: 'minor',
-        isRead: true,
+        isRead: true, // Read status no longer used
         relatedEntities: [],
         metadata: { tags: ['dialogue', 'employee'], automaticEntry: true },
         updatedAt: new Date().toISOString()
@@ -146,10 +146,10 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'discovery',
-        title: 'A customer entered...',
-        content: 'A customer entered while browsing movies.',
-        significance: 'major',
-        isRead: false,
+        title: '',
+        content: 'Made a life-changing decision about the future.',
+        significance: 'critical',
+        isRead: false, // Read status no longer used
         relatedEntities: [],
         metadata: { tags: ['browsing', 'selection'], automaticEntry: true },
         updatedAt: new Date().toISOString()

@@ -8,7 +8,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 
 const meta: Meta<typeof ActiveGameSession> = {
-  title: 'Narraitor/Game/ActiveGameSession',
+  title: 'Narraitor/GameSession/ActiveGameSession',
   component: ActiveGameSession,
   parameters: {
     layout: 'padded',
@@ -50,22 +50,26 @@ const meta: Meta<typeof ActiveGameSession> = {
   },
   decorators: [
     (Story) => {
-      // Reset stores before each story
+      // Reset stores before each story and clear any endings to prevent endscreen display
       useNarrativeStore.setState({
         segments: {},
+        sessionSegments: {},
         decisions: {},
+        sessionDecisions: {},
+        currentEnding: null,
+        isGeneratingEnding: false,
         error: null,
         loading: false,
       });
       
       useSessionStore.setState({
-        id: null,
-        status: 'initializing',
+        id: 'session-123',
+        status: 'active',
         currentSceneId: null,
         playerChoices: [],
         error: null,
-        worldId: null,
-        characterId: null,
+        worldId: 'world-123',
+        characterId: 'char-123',
         savedSessions: {},
       });
       
@@ -273,14 +277,14 @@ const mockDecision: Decision = {
     { id: 'choice-2', text: 'Set up camp', hint: 'Rest and prepare before venturing forth', alignment: 'neutral' },
     { id: 'choice-3', text: 'Return to town', hint: 'Gather more supplies and information', alignment: 'lawful' },
   ],
-  decisionWeight: 'major',
+  decisionWeight: 'minor',
   contextSummary: 'Standing before the ancient dungeon entrance, you must decide your next move.',
 };
 
 /**
- * Component with pre-populated narrative segments
+ * Complete active gameplay with character - shows journal button
  */
-export const WithExistingSegments: Story = {
+export const ActiveGameplay: Story = {
   args: {
     worldId: 'world-123',
     sessionId: 'session-123',
@@ -295,103 +299,12 @@ export const WithExistingSegments: Story = {
   },
   decorators: [
     (Story) => {
-      // Pre-populate narrative store
-      populateNarrativeStore(mockSegments, [mockDecision]);
-      
-      return <Story />;
-    },
-  ],
-};
-
-/**
- * Loading state while generating narrative
- */
-export const LoadingNarrative: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-  },
-  decorators: [
-    (Story) => {
-      // Set loading state in narrative store
-      useNarrativeStore.setState({
-        loading: true,
-      });
-      
-      return (
-        <div>
-          <p className="text-sm text-gray-600 mb-4">Generating narrative...</p>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
- * Error state for narrative generation failure
- */
-export const ErrorState: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-  },
-  decorators: [
-    (Story) => {
-      // Set error state
-      useNarrativeStore.setState({
-        ...useNarrativeStore.getState(),
-        error: 'Failed to generate narrative: API request timeout',
-      });
-      
-      return (
-        <div>
-          <div className="bg-red-50 border border-red-200 rounded p-4 mb-4">
-            <p className="text-red-800">Failed to generate narrative. Please try again.</p>
-          </div>
-          <Story />
-        </div>
-      );
-    },
-  ],
-};
-
-/**
- * Component with a selected character
- */
-export const WithCharacter: Story = {
-  args: {
-    worldId: 'world-123',
-    sessionId: 'session-123',
-    world: mockWorld,
-    status: 'active',
-    existingSegments: mockSegments,
-    choices: mockDecision.options.map(opt => ({
-      id: opt.id,
-      text: opt.text,
-      isSelected: false,
-    })),
-  },
-  decorators: [
-    (Story) => {
-      // Set up character in stores
-      // Set up character in store
+      // Set up character and narrative
       useCharacterStore.setState({
-        characters: {
-          ...useCharacterStore.getState().characters,
-          'char-123': mockCharacter,
-        },
+        characters: { 'char-123': mockCharacter },
         currentCharacterId: 'char-123',
       });
-      
-      useSessionStore.setState({
-        characterId: 'char-123',
-      });
-      
+      useSessionStore.setState({ characterId: 'char-123' });
       populateNarrativeStore(mockSegments, [mockDecision]);
       
       return <Story />;
@@ -399,27 +312,28 @@ export const WithCharacter: Story = {
   ],
 };
 
+
 /**
- * Loading state while ending is being generated
+ * No predefined choices - custom input only
  */
-export const EndingGenerationLoading: Story = {
+export const NoChoicesAvailable: Story = {
   args: {
     worldId: 'world-123',
     sessionId: 'session-123',
     world: mockWorld,
     status: 'active',
     existingSegments: mockSegments,
+    choices: [], // No predefined choices
   },
   decorators: [
     (Story) => {
-      // Set up narrative store with generating ending state
-      useNarrativeStore.setState({
-        ...useNarrativeStore.getState(),
-        isGeneratingEnding: true,
-        currentEnding: null,
+      // Character assigned - should show journal button and custom input
+      useCharacterStore.setState({
+        characters: { 'char-123': mockCharacter },
+        currentCharacterId: 'char-123',
       });
-      
-      populateNarrativeStore(mockSegments, [mockDecision]);
+      useSessionStore.setState({ characterId: 'char-123' });
+      populateNarrativeStore(mockSegments, []); // No decisions
       
       return <Story />;
     },
@@ -427,7 +341,49 @@ export const EndingGenerationLoading: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows the loading state displayed while the AI writes the story ending.',
+        story: 'Shows custom input when no predefined choices are available. Players can still type custom responses. Journal button should appear.',
+      },
+    },
+  },
+};
+
+/**
+ * Major decision with critical choice styling
+ */
+export const MajorDecision: Story = {
+  args: {
+    worldId: 'world-123',
+    sessionId: 'session-123',
+    world: mockWorld,
+    status: 'active',
+    existingSegments: mockSegments,
+  },
+  decorators: [
+    (Story) => {
+      // Set up character and major decision
+      useCharacterStore.setState({
+        characters: { 'char-123': mockCharacter },
+        currentCharacterId: 'char-123',
+      });
+      useSessionStore.setState({ characterId: 'char-123' });
+      
+      // Create a major decision to test decision weight styling
+      const majorDecision = {
+        ...mockDecision,
+        decisionWeight: 'major' as const,
+        prompt: 'A critical moment has arrived. What will you do?',
+        contextSummary: 'The fate of the kingdom hangs in the balance.',
+      };
+      
+      populateNarrativeStore(mockSegments, [majorDecision]);
+      
+      return <Story />;
+    },
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows a major decision with yellow border styling. Tests decision weight visual indicators.',
       },
     },
   },

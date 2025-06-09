@@ -4,7 +4,7 @@ import { useJournalStore } from '@/state/journalStore';
 import { JournalEntry } from '@/types/journal.types';
 
 const meta: Meta<typeof JournalModal> = {
-  title: 'Narraitor/GameSession/JournalModal',
+  title: 'Narraitor/GameSession/Journal/JournalModal',
   component: JournalModal,
   parameters: {
     layout: 'fullscreen',
@@ -48,9 +48,9 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'character_event',
-    title: 'Met the Village Elder',
-    content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy. He mentioned that the old temple holds secrets about the missing artifacts.',
-    significance: 'major',
+    title: '', // No title needed - content is sufficient
+    content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy and missing artifacts.',
+    significance: 'critical',
     isRead: false,
     relatedEntities: [
       { type: 'character', id: 'elder-thorne', name: 'Elder Thorne' },
@@ -67,10 +67,10 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'discovery',
-    title: 'Found Hidden Passage',
-    content: 'Discovered a concealed entrance behind the waterfall. The passage seems to lead deeper into the mountain.',
-    significance: 'minor',
-    isRead: true,
+    title: '', // No title needed
+    content: 'Discovered a concealed entrance behind the waterfall leading into the mountain.',
+    significance: 'major',
+    isRead: false,
     relatedEntities: [
       { type: 'location', id: 'waterfall', name: 'Crystal Waterfall' },
       { type: 'location', id: 'passage', name: 'Hidden Passage' }
@@ -86,8 +86,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'combat',
-    title: 'Bandit Encounter',
-    content: 'Fought off a group of bandits on the mountain path. Managed to defeat them without serious injury, but they mentioned working for someone called "The Shadow".',
+    title: '', // No title needed
+    content: 'Defeated bandits who mentioned working for someone called "The Shadow".',
     significance: 'minor',
     isRead: false,
     relatedEntities: [
@@ -105,10 +105,10 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'relationship_change',
-    title: 'Gained Trust of Merchant',
-    content: 'Helped Maya the merchant recover her stolen goods. She now offers better prices and valuable information about the local area.',
+    title: '', // No title needed
+    content: 'Helped Maya the merchant recover stolen goods and gained her trust.',
     significance: 'minor',
-    isRead: true,
+    isRead: false,
     relatedEntities: [
       { type: 'character', id: 'maya', name: 'Maya the Merchant' }
     ],
@@ -122,10 +122,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
 ];
 
 // Story decorator to populate journal store with mock data
-const withMockJournal = (entries: typeof mockEntries) => {
+const withMockJournal = (entries: typeof mockEntries, sessionId: string = 'session-1') => {
   const MockJournalDecorator = (Story: React.ComponentType) => {
-    const sessionId = 'session-1';
-    
     // Clear and populate journal store
     const { addEntry, reset } = useJournalStore.getState();
     reset();
@@ -167,7 +165,7 @@ export const SingleEntry: Story = {
     worldId: 'world-1',
     characterId: 'char-1'
   },
-  decorators: [withMockJournal([mockEntries[0]])],
+  decorators: [withMockJournal([mockEntries[0]], 'session-single')],
 };
 
 export const ManyEntries: Story = {
@@ -179,20 +177,30 @@ export const ManyEntries: Story = {
   },
   decorators: [withMockJournal([
     ...mockEntries,
-    ...mockEntries.map((entry, i) => ({
-      ...entry,
-      title: `${entry.title} (Copy ${i + 1})`,
-      content: `${entry.content} This is an additional entry to test scrolling behavior.`
-    }))
-  ])],
+    {
+      worldId: 'world-1',
+      characterId: 'char-1',
+      type: 'achievement',
+      title: '',
+      content: 'Completed the first major quest objective.',
+      significance: 'critical',
+      isRead: false,
+      relatedEntities: [],
+      metadata: { tags: ['quest', 'achievement'], automaticEntry: true },
+      updatedAt: '2023-01-01T00:00:00Z'
+    },
+    {
+      worldId: 'world-1',
+      characterId: 'char-1',
+      type: 'world_event',
+      title: '',
+      content: 'The ancient magic began to stir throughout the land.',
+      significance: 'major',
+      isRead: false,
+      relatedEntities: [],
+      metadata: { tags: ['magic', 'world'], automaticEntry: true },
+      updatedAt: '2023-01-01T00:00:00Z'
+    }
+  ], 'session-many')],
 };
 
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    sessionId: 'session-1',
-    worldId: 'world-1',
-    characterId: 'char-1'
-  },
-  decorators: [withMockJournal(mockEntries)],
-};

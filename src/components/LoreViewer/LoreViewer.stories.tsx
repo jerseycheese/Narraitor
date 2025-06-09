@@ -8,7 +8,7 @@ import { useLoreStore } from '../../state/loreStore';
 import { useEffect } from 'react';
 
 const meta: Meta<typeof LoreViewer> = {
-  title: 'Narraitor/Journal/Display/LoreViewer',
+  title: 'Narraitor/Lore/LoreViewer',
   component: LoreViewer,
   parameters: {
     layout: 'padded',

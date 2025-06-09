@@ -40,11 +40,24 @@ ENTRY TYPES (established taxonomy - choose based on narrative segment type and c
 - "achievement": Completing objectives, major accomplishments, victories, resolving situations (maps to: ending segments, major quest completions)
 - "relationship_change": Changes in relationships with other characters (maps to: dialogue segments with relationship impact)
 
-SIGNIFICANCE LEVELS (should align with decision weight):
+SIGNIFICANCE LEVELS (must align with decision weight):
 - "minor": Routine tasks, small mistakes, basic interactions (corresponds to minor decision weight)
-- "major": Plot developments, conflicts, discoveries, important events (corresponds to major/critical decision weight)
+- "major": Plot developments, conflicts, discoveries, important events (corresponds to major decision weight)  
+- "critical": Life-changing decisions, story climax, major consequences, pivotal moments (corresponds to critical decision weight)
 
 EXAMPLES:
+{
+  "summary": "Chose to sacrifice myself to save the village.",
+  "entryType": "character_event",
+  "significance": "critical"
+}
+
+{
+  "summary": "Discovered the truth about my father's death.",
+  "entryType": "discovery", 
+  "significance": "critical"
+}
+
 {
   "summary": "Found a hidden passage behind the bookshelf.",
   "entryType": "discovery",
@@ -123,7 +136,7 @@ Response (JSON only):`;
       }
       
       // Validate significance
-      const validSignificance = ['minor', 'major'];
+      const validSignificance = ['minor', 'major', 'critical'];
       if (!validSignificance.includes(parsed.significance)) {
         parsed.significance = 'minor'; // Default fallback
       }
@@ -151,10 +164,18 @@ Response (JSON only):`;
         summary += '.';
       }
       
+      // Use decision weight as significance fallback instead of hardcoding 'minor'
+      let fallbackSignificance: 'minor' | 'major' | 'critical' = 'minor';
+      if (decisionWeight === 'critical') {
+        fallbackSignificance = 'critical';
+      } else if (decisionWeight === 'major') {
+        fallbackSignificance = 'major';
+      }
+      
       return NextResponse.json({
         summary,
         entryType: 'character_event',
-        significance: 'minor'
+        significance: fallbackSignificance
       });
     }
 

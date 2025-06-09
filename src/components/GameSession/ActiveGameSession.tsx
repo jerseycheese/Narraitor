@@ -184,11 +184,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       console.warn('Failed to generate AI summary for journal entry:', error);
     }
     
-    // Return fallback values
+    // Return fallback values using decision weight for significance
+    const fallbackSignificance = decisionWeight || 'minor';
     return {
       summary: createFallbackSummary(content),
       entryType: 'character_event',
-      significance: 'minor'
+      significance: fallbackSignificance
     };
   };
 
@@ -239,67 +240,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Generate AI summary, type, and significance for journal entry (async)
     generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
-      // Create title based on AI-determined type and content
-      let title = '';
-      switch (aiResult.entryType) {
-        case 'discovery':
-          title = actualLocation ? `Discovery at ${actualLocation}` : 'Discovery';
-          break;
-        case 'character_event':
-          title = 'Character Event';
-          break;
-        case 'achievement':
-          title = 'Achievement';
-          break;
-        case 'world_event':
-          title = 'World Event';
-          break;
-        case 'relationship_change':
-          title = 'Relationship Change';
-          break;
-        default:
-          title = 'Story Event';
-      }
-      
-      // Extract a more meaningful title from the summary if it's generic
-      if (title === 'Story Event' || title === 'Character Event' || title === 'Discovery' || title === 'World Event' || title === 'Relationship Change') {
-        const summaryWords = aiResult.summary.split(' ');
-        if (summaryWords.length >= 3) {
-          // Create title from key words, avoiding repetitive patterns
-          let keyWords = summaryWords.filter((word, index) => {
-            // Skip common starting words and focus on the action/object
-            const skipWords = ['I', 'The', 'A', 'An', 'Someone', 'Something'];
-            if (index === 0 && skipWords.includes(word)) return false;
-            return word.length > 2; // Skip short words like "to", "at", "of"
-          });
-          
-          if (keyWords.length === 0) {
-            keyWords = summaryWords.slice(1, 4); // Fallback: skip first word, take next 3
-          }
-          
-          // Take first 2-3 meaningful words
-          title = keyWords.slice(0, 3).join(' ');
-          if (title.length > 25) {
-            title = keyWords.slice(0, 2).join(' ');
-          }
-          
-          // Capitalize and add ellipsis if needed
-          title = title.charAt(0).toUpperCase() + title.slice(1);
-          if (aiResult.summary.length > title.length + 10) {
-            title += '...';
-          }
-        }
-      }
-      
       try {
         addEntry(sessionId, {
           worldId: worldId,
           characterId: characterId,
-          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event',
-          title: title,
+          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event' | 'relationship_change',
+          title: '', // No title needed - content is sufficient
           content: aiResult.summary,
-          significance: aiResult.significance as 'minor' | 'major',
-          isRead: false, // New entries start as unread
+          significance: aiResult.significance as 'minor' | 'major' | 'critical',
+          isRead: false, // Read status no longer used but kept for type compatibility
           relatedEntities: [],
           metadata: {
             tags: [segment.type],
@@ -315,14 +264,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       console.warn('Failed to generate journal summary, using fallback:', error);
       // Use fallback if AI completely fails
       try {
+        const fallbackSignificance = relatedDecisionWeight || 'minor';
         addEntry(sessionId, {
           worldId: worldId,
           characterId: characterId,
           type: 'character_event',
-          title: 'Story Event',
+          title: '', // No title needed
           content: createFallbackSummary(cleanContent),
-          significance: 'minor',
-          isRead: false,
+          significance: fallbackSignificance,
+          isRead: false, // Read status no longer used but kept for type compatibility
           relatedEntities: [],
           metadata: {
             tags: [segment.type],
@@ -554,24 +504,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          <div className="flex justify-between items-start gap-4">
-            <div className="flex-1">
-              <CharacterSummary character={character} />
-            </div>
-            {/* Journal Access Button - Issue #278: AC1 */}
-            <button
-              data-testid="journal-access-button"
-              onClick={() => setShowJournalModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              aria-label="Open journal to view your adventure entries"
-              title="View your journal entries"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              <span className="hidden sm:inline">Journal</span>
-            </button>
-          </div>
+          <CharacterSummary character={character} />
         </div>
       )}
       
@@ -633,92 +566,72 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : (
             <div className="player-choices-container">
-              <div className="p-4 border rounded bg-gray-50">
-                <p className="text-sm text-gray-600 mb-2">No choices available.</p>
-                <button 
-                  className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-                  onClick={() => {
-                    // Try to get latest decision from narrative store
-                    const latestDecision = useNarrativeStore.getState().getLatestDecision(sessionId);
-                    if (latestDecision) {
-                      setCurrentDecision(latestDecision);
-                    } else {
-                      
-                      // Create fallback choices manually
-                      const fallbackId = `decision-fallback-${Date.now()}`;
-                      const fallbackDecision: Decision = {
-                        id: fallbackId,
-                        prompt: "What will you do?",
-                        options: [
-                          { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
-                          { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
-                          { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
-                        ],
-                        decisionWeight: 'minor',
-                        contextSummary: 'Manual fallback choices created.'
-                      };
-                      
-                      // Save to store for future reference
-                      useNarrativeStore.getState().addDecision(sessionId, {
-                        prompt: fallbackDecision.prompt,
-                        options: fallbackDecision.options
-                      });
-                      
-                      // Update state
-                      setCurrentDecision(fallbackDecision);
-                      
-                      // Also update session store
-                      const playerChoices = fallbackDecision.options.map(option => ({
-                        id: option.id,
-                        text: option.text,
-                        isSelected: false
-                      }));
-                      useSessionStore.getState().setPlayerChoices(playerChoices);
-                    }
-                  }}
-                >
-                  Generate Fallback Choices
-                </button>
-              </div>
+              <ChoiceSelector
+                choices={[]} // No predefined choices
+                prompt="What will you do?"
+                onSelect={handleChoiceSelected}
+                onCustomSubmit={handleCustomSubmit}
+                enableCustomInput={true}
+                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+              />
             </div>
           )}
         </div>
       </div>
 
-      {onEnd && (
-        <div className="mt-6 flex justify-end gap-2">
+      <div className="mt-6 flex justify-between items-center">
+        {/* Journal Access Button - Issue #278: AC1 */}
+        {character && (
           <button
-            data-testid="game-session-new"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
-            onClick={() => {
-              // Save current session and clear narrative
-              useSessionStore.getState().endSession();
-              useNarrativeStore.getState().clearSessionSegments(sessionId);
-              
-              // Reload the page to start fresh
-              window.location.reload();
-            }}
+            data-testid="journal-access-button"
+            onClick={() => setShowJournalModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            aria-label="Open journal to view your adventure entries"
+            title="View your journal entries"
           >
-            Start New Session
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Journal</span>
           </button>
-          <button
-            data-testid="game-session-end-story"
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
-            onClick={handleEndStoryClick}
-            disabled={isGeneratingEnding || isSessionEnded(sessionId)}
-            title="End your story with an AI-generated epilogue"
-          >
-            {isGeneratingEnding ? 'Generating...' : 'End Story'}
-          </button>
-          <button
-            data-testid="game-session-end"
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
-            onClick={onEnd}
-          >
-            End Session
-          </button>
-        </div>
-      )}
+        )}
+
+        {/* Session Control Buttons */}
+        {onEnd && (
+          <div className="flex gap-2">
+            <button
+              data-testid="game-session-new"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
+              onClick={() => {
+                // Save current session and clear narrative
+                useSessionStore.getState().endSession();
+                useNarrativeStore.getState().clearSessionSegments(sessionId);
+                
+                // Reload the page to start fresh
+                window.location.reload();
+              }}
+            >
+              Start New Session
+            </button>
+            <button
+              data-testid="game-session-end-story"
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
+              onClick={handleEndStoryClick}
+              disabled={isGeneratingEnding || isSessionEnded(sessionId)}
+              title="End your story with an AI-generated epilogue"
+            >
+              {isGeneratingEnding ? 'Generating...' : 'End Story'}
+            </button>
+            <button
+              data-testid="game-session-end"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+              onClick={onEnd}
+            >
+              End Session
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Ending Suggestion Dialog */}
       <DeleteConfirmationDialog

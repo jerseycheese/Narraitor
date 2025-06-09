@@ -25,7 +25,7 @@ describe('JournalModal', () => {
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'character_event',
-    title: 'Met the Village Elder',
+    title: '',
     content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy.',
     significance: 'major',
     isRead: false,
@@ -45,7 +45,6 @@ describe('JournalModal', () => {
     it('renders when isOpen is true', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -69,7 +68,6 @@ describe('JournalModal', () => {
     it('does not render when isOpen is false', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -93,7 +91,6 @@ describe('JournalModal', () => {
       const mockOnClose = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -120,7 +117,6 @@ describe('JournalModal', () => {
       const mockOnClose = jest.fn();
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -148,7 +144,6 @@ describe('JournalModal', () => {
     it('displays empty state when no entries exist', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -172,7 +167,6 @@ describe('JournalModal', () => {
     it('displays journal entries when they exist', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -190,43 +184,15 @@ describe('JournalModal', () => {
       render(<JournalModal {...defaultProps} />);
       
       expect(screen.getByText('Character Events')).toBeInTheDocument();
-      expect(screen.getByText('Met the Village Elder')).toBeInTheDocument();
       expect(screen.getByText('Had a meaningful conversation with Elder Thorne about the ancient prophecy.')).toBeInTheDocument();
     });
 
-    it('marks entries as read when clicked', () => {
-      const mockMarkAsRead = jest.fn();
-      mockUseJournalStore.mockReturnValue({
-        getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
-        markAsRead: mockMarkAsRead,
-        addEntry: jest.fn(),
-        updateEntry: jest.fn(),
-        deleteEntry: jest.fn(),
-        getEntriesByType: jest.fn(),
-        reset: jest.fn(),
-        setError: jest.fn(),
-        clearError: jest.fn(),
-        setLoading: jest.fn(),
-        entries: {},
-        sessionEntries: {},
-        error: null,
-        loading: false
-      });
-
-      render(<JournalModal {...defaultProps} />);
-      
-      const entryElement = screen.getByText('Met the Village Elder').closest('div');
-      fireEvent.click(entryElement!);
-      
-      expect(mockMarkAsRead).toHaveBeenCalledWith('entry-1');
-    });
   });
 
   describe('Accessibility', () => {
     it('has proper ARIA attributes', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -251,7 +217,6 @@ describe('JournalModal', () => {
     it('has accessible close button', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
@@ -274,34 +239,10 @@ describe('JournalModal', () => {
   });
 
   describe('Entry Display', () => {
-    it('shows unread indicator for unread entries', () => {
-      mockUseJournalStore.mockReturnValue({
-        getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
-        markAsRead: jest.fn(),
-        addEntry: jest.fn(),
-        updateEntry: jest.fn(),
-        deleteEntry: jest.fn(),
-        getEntriesByType: jest.fn(),
-        reset: jest.fn(),
-        setError: jest.fn(),
-        clearError: jest.fn(),
-        setLoading: jest.fn(),
-        entries: {},
-        sessionEntries: {},
-        error: null,
-        loading: false
-      });
-
-      render(<JournalModal {...defaultProps} />);
-      
-      const unreadIndicator = screen.getByLabelText('Unread');
-      expect(unreadIndicator).toBeInTheDocument();
-    });
 
     it('shows significance badge correctly', () => {
       mockUseJournalStore.mockReturnValue({
         getSessionEntries: jest.fn().mockReturnValue([mockJournalEntry]),
-        markAsRead: jest.fn(),
         addEntry: jest.fn(),
         updateEntry: jest.fn(),
         deleteEntry: jest.fn(),
