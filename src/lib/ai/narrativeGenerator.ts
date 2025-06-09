@@ -198,21 +198,36 @@ export class NarrativeGenerator {
         const jsonEnd = jsonStr.lastIndexOf('}');
         if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
           jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
+        } else if (jsonStart !== -1) {
+          // Handle incomplete JSON by extracting content field directly
+          const contentMatch = jsonStr.match(/"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/);
+          if (contentMatch && contentMatch[1]) {
+            actualContent = contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
+            console.log('Extracted content from incomplete JSON:', actualContent.substring(0, 100) + '...');
+            // Skip JSON.parse and continue with extracted content
+          } else {
+            throw new Error('Incomplete JSON without extractable content');
+          }
+        } else {
+          throw new Error('No JSON structure found');
         }
         
-        const parsed = JSON.parse(jsonStr);
-        if (parsed.content) {
-          actualContent = parsed.content;
-          console.log('Successfully extracted content from JSON response:', actualContent.substring(0, 100) + '...');
-        }
-        if (parsed.metadata) {
-          extractedMetadata = {
-            location: parsed.metadata.location,
-            mood: this.validateMood(parsed.metadata.mood),
-            tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
-            characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : []
-          };
-          console.log('Successfully extracted metadata from JSON response:', extractedMetadata);
+        // Only parse if we have a complete JSON structure
+        if (jsonEnd !== -1) {
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            actualContent = parsed.content;
+            console.log('Successfully extracted content from JSON response:', actualContent.substring(0, 100) + '...');
+          }
+          if (parsed.metadata) {
+            extractedMetadata = {
+              location: parsed.metadata.location,
+              mood: this.validateMood(parsed.metadata.mood),
+              tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
+              characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : []
+            };
+            console.log('Successfully extracted metadata from JSON response:', extractedMetadata);
+          }
         }
       } catch (parseError) {
         console.warn('Could not parse AI JSON response, attempting regex extraction:', parseError);
