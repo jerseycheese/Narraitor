@@ -156,7 +156,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }, [sessionId, worldId, controllerKey]);
 
   // Helper function to generate AI summary for journal entries
-  const generateJournalSummary = async (content: string, type: string, location?: string): Promise<string> => {
+  const generateJournalSummary = async (content: string, type: string, location?: string): Promise<{summary: string, entryType: string, significance: string}> => {
     try {
       const response = await fetch('/api/narrative/summarize', {
         method: 'POST',
@@ -171,13 +171,24 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       
       if (response.ok) {
         const data = await response.json();
-        return data.summary || createFallbackSummary(content);
+        if (data.summary && data.entryType && data.significance) {
+          return {
+            summary: data.summary,
+            entryType: data.entryType,
+            significance: data.significance
+          };
+        }
       }
     } catch (error) {
       console.warn('Failed to generate AI summary for journal entry:', error);
     }
     
-    return createFallbackSummary(content);
+    // Return fallback values
+    return {
+      summary: createFallbackSummary(content),
+      entryType: 'character_event',
+      significance: 'minor'
+    };
   };
 
   // Fallback summary method when AI fails
@@ -198,53 +209,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const createJournalEntryFromSegment = (segment: NarrativeSegment) => {
     if (!characterId) return;
     
-    // Determine journal entry type based on segment type and content
-    let entryType: 'character_event' | 'discovery' | 'achievement' | 'world_event' = 'character_event';
-    let significance: 'minor' | 'major' = 'minor';
-    let title = '';
-    
-    // Analyze segment to determine appropriate journal entry details
-    switch (segment.type) {
-      case 'scene':
-        entryType = segment.metadata?.location ? 'discovery' : 'character_event';
-        title = segment.metadata?.location ? `Arrived at ${segment.metadata.location}` : 'New Scene';
-        significance = 'minor';
-        break;
-      case 'action':
-        entryType = 'character_event';
-        title = 'Character Action';
-        significance = 'minor';
-        break;
-      case 'dialogue':
-        entryType = 'character_event';
-        title = 'Conversation';
-        significance = 'minor';
-        break;
-      case 'transition':
-        entryType = 'character_event';
-        title = 'Story Transition';
-        significance = 'minor';
-        break;
-      case 'ending':
-        entryType = 'achievement';
-        title = 'Story Conclusion';
-        significance = 'major';
-        break;
-      default:
-        entryType = 'character_event';
-        title = 'Story Event';
-        significance = 'minor';
-    }
-    
-    // Extract a meaningful title from content if we have a generic one
-    if (title === 'New Scene' || title === 'Story Event') {
-      const contentWords = segment.content.split(' ');
-      if (contentWords.length >= 5) {
-        // Create title from first few words, max 6 words
-        title = contentWords.slice(0, 6).join(' ');
-        if (contentWords.length > 6) title += '...';
-      }
-    }
     
     // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
     let cleanContent = segment.content;
@@ -272,21 +236,47 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       }
     }
     
-    // Update title if we have a location
-    if (actualLocation && segment.type === 'scene') {
-      title = `Arrived at ${actualLocation}`;
-    }
-    
-    // Helper function to create the actual journal entry
-    const createJournalEntry = (content: string) => {
+    // Generate AI summary, type, and significance for journal entry (async)
+    generateJournalSummary(cleanContent, segment.type, actualLocation).then(aiResult => {
+      // Create title based on AI-determined type and content
+      let title = '';
+      switch (aiResult.entryType) {
+        case 'discovery':
+          title = actualLocation ? `Discovery at ${actualLocation}` : 'Discovery';
+          break;
+        case 'character_event':
+          title = 'Character Event';
+          break;
+        case 'achievement':
+          title = 'Achievement';
+          break;
+        case 'world_event':
+          title = 'World Event';
+          break;
+        default:
+          title = 'Story Event';
+      }
+      
+      // Extract a more meaningful title from the summary if it's generic
+      if (title === 'Story Event' || title === 'Character Event' || title === 'Discovery') {
+        const summaryWords = aiResult.summary.split(' ');
+        if (summaryWords.length >= 3) {
+          // Create title from first few words of summary, max 4 words
+          title = summaryWords.slice(0, 4).join(' ');
+          if (summaryWords.length > 4) title += '...';
+          // Capitalize first letter
+          title = title.charAt(0).toUpperCase() + title.slice(1);
+        }
+      }
+      
       try {
         addEntry(sessionId, {
           worldId: worldId,
           characterId: characterId,
-          type: entryType,
+          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event',
           title: title,
-          content: content,
-          significance: significance,
+          content: aiResult.summary,
+          significance: aiResult.significance as 'minor' | 'major',
           isRead: false, // New entries start as unread
           relatedEntities: [],
           metadata: {
@@ -299,17 +289,29 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       } catch (error) {
         console.warn('Failed to create journal entry from narrative segment:', error);
       }
-    };
-    
-    // Generate AI summary for journal entry (async)
-    generateJournalSummary(cleanContent, segment.type, actualLocation).then(journalContent => {
-      // Create the journal entry with AI-generated summary
-      createJournalEntry(journalContent);
     }).catch(error => {
       console.warn('Failed to generate journal summary, using fallback:', error);
-      // Use fallback summary if AI fails
-      const fallbackContent = createFallbackSummary(cleanContent);
-      createJournalEntry(fallbackContent);
+      // Use fallback if AI completely fails
+      try {
+        addEntry(sessionId, {
+          worldId: worldId,
+          characterId: characterId,
+          type: 'character_event',
+          title: 'Story Event',
+          content: createFallbackSummary(cleanContent),
+          significance: 'minor',
+          isRead: false,
+          relatedEntities: [],
+          metadata: {
+            tags: [segment.type],
+            automaticEntry: true,
+            narrativeSegmentId: segment.id
+          },
+          updatedAt: new Date().toISOString()
+        });
+      } catch (fallbackError) {
+        console.warn('Failed to create fallback journal entry:', fallbackError);
+      }
     });
   };
 
