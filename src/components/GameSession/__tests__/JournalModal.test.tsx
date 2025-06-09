@@ -183,7 +183,7 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByText('Character Events')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'character event' })).toBeInTheDocument();
       expect(screen.getByText('Had a meaningful conversation with Elder Thorne about the ancient prophecy.')).toBeInTheDocument();
     });
 

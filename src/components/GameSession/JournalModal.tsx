@@ -9,8 +9,6 @@ interface JournalModalProps {
   isOpen: boolean;
   onClose: () => void;
   sessionId: EntityID;
-  worldId: EntityID;
-  characterId: EntityID;
 }
 
 /**
@@ -64,32 +62,41 @@ export const JournalModal: React.FC<JournalModalProps> = ({
             </div>
           ) : (
             <div>
-              <h3 className="font-semibold mb-4">Character Events</h3>
-              {entries.map(entry => (
-                <div 
-                  key={entry.id} 
-                  className="border-b pb-4 p-2 rounded"
-                >
-                  <div>
-                    <p className="text-gray-700">{entry.content}</p>
-                    <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
-                      <EntityBadge 
-                        text={entry.significance}
-                        variant={
-                          entry.significance === 'critical' ? 'danger' :
-                          entry.significance === 'major' ? 'warning' : 
-                          'secondary'
-                        }
-                        size="sm"
-                      />
-                      <span>•</span>
-                      <EntityBadge 
-                        text={entry.type.replace('_', ' ')}
-                        variant="info"
-                        size="sm"
-                      />
+              {Object.entries(
+                entries.reduce((groups, entry) => {
+                  (groups[entry.type] = groups[entry.type] || []).push(entry);
+                  return groups;
+                }, {} as Record<string, typeof entries>)
+              ).map(([type, groupedEntries]) => (
+                <div key={type} className="mb-6">
+                  <h3 className="font-semibold mb-4">{type.replace('_', ' ')}</h3>
+                  {groupedEntries.map(entry => (
+                    <div 
+                      key={entry.id} 
+                      className="border-b pb-4 p-2 rounded"
+                    >
+                      <div>
+                        <p className="text-gray-700">{entry.content}</p>
+                        <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                          <EntityBadge 
+                            text={entry.significance}
+                            variant={
+                              entry.significance === 'critical' ? 'danger' :
+                              entry.significance === 'major' ? 'warning' : 
+                              'secondary'
+                            }
+                            size="sm"
+                          />
+                          <span>•</span>
+                          <EntityBadge 
+                            text={entry.type.replace('_', ' ')}
+                            variant="info"
+                            size="sm"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               ))}
             </div>

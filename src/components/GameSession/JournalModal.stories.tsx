@@ -27,14 +27,6 @@ const meta: Meta<typeof JournalModal> = {
     sessionId: {
       control: 'text',
       description: 'Current game session ID'
-    },
-    worldId: {
-      control: 'text', 
-      description: 'Current world ID'
-    },
-    characterId: {
-      control: 'text',
-      description: 'Current character ID'
     }
   },
 };
@@ -141,9 +133,7 @@ const withMockJournal = (entries: typeof mockEntries, sessionId: string = 'sessi
 export const Default: Story = {
   args: {
     isOpen: true,
-    sessionId: 'session-1',
-    worldId: 'world-1',
-    characterId: 'char-1'
+    sessionId: 'session-1'
   },
   decorators: [withMockJournal(mockEntries)],
 };
@@ -151,9 +141,7 @@ export const Default: Story = {
 export const EmptyJournal: Story = {
   args: {
     isOpen: true,
-    sessionId: 'empty-session',
-    worldId: 'world-1',
-    characterId: 'char-1'
+    sessionId: 'empty-session'
   },
   decorators: [withMockJournal([])],
 };
@@ -161,9 +149,7 @@ export const EmptyJournal: Story = {
 export const SingleEntry: Story = {
   args: {
     isOpen: true,
-    sessionId: 'session-single',
-    worldId: 'world-1',
-    characterId: 'char-1'
+    sessionId: 'session-single'
   },
   decorators: [withMockJournal([mockEntries[0]], 'session-single')],
 };
@@ -171,9 +157,7 @@ export const SingleEntry: Story = {
 export const ManyEntries: Story = {
   args: {
     isOpen: true,
-    sessionId: 'session-many',
-    worldId: 'world-1',
-    characterId: 'char-1'
+    sessionId: 'session-many'
   },
   decorators: [withMockJournal([
     ...mockEntries,

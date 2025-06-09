@@ -554,8 +554,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         isOpen={showJournalModal}
         onClose={() => setShowJournalModal(false)}
         sessionId={sessionId}
-        worldId={worldId}
-        characterId={characterId || ''}
       />
     </div>
   );
