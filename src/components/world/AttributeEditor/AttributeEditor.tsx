@@ -13,6 +13,8 @@ export interface AttributeEditorProps {
   onCancel: () => void;
   existingAttributes?: WorldAttribute[];
   existingSkills?: WorldSkill[];
+  /** Maximum number of attributes allowed in create mode. When specified, prevents creation beyond this limit */
+  maxAttributes?: number;
 }
 
 export function AttributeEditor({
@@ -24,6 +26,7 @@ export function AttributeEditor({
   onCancel,
   existingAttributes = [],
   existingSkills = [],
+  maxAttributes,
 }: AttributeEditorProps) {
   const linkedSkills = existingSkills;
 
@@ -86,6 +89,11 @@ export function AttributeEditor({
     if (formData.minValue !== undefined && formData.maxValue !== undefined && 
         formData.minValue >= formData.maxValue) {
       validationErrors.push('Maximum value must be greater than minimum value');
+    }
+    
+    // Check maxAttributes limit in create mode
+    if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
+      validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
     }
 
     if (validationErrors.length > 0) {

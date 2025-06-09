@@ -341,5 +341,35 @@ describe('AttributeEditor', () => {
       });
       expect(mockOnSave).not.toHaveBeenCalled();
     });
+
+    it('prevents creation when maxAttributes limit is reached', async () => {
+      const twoAttributes: WorldAttribute[] = [
+        mockAttribute,
+        { ...mockAttribute, id: 'attr-2' as EntityID, name: 'Intelligence' }
+      ];
+
+      render(
+        <AttributeEditor
+          worldId={mockWorldId}
+          mode="create"
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+          existingAttributes={twoAttributes}
+          existingSkills={[]}
+          maxAttributes={2}
+        />
+      );
+
+      fireEvent.change(screen.getByLabelText(/attribute name/i), {
+        target: { value: 'New Attribute' },
+      });
+
+      fireEvent.click(screen.getByText(/create attribute/i));
+
+      await waitFor(() => {
+        expect(screen.getByText(/cannot create more attributes.*maximum of 2/i)).toBeInTheDocument();
+      });
+      expect(mockOnSave).not.toHaveBeenCalled();
+    });
   });
 });

@@ -3,21 +3,7 @@
  * Without dark mode support
  */
 import '../src/app/globals.css';
-
-// Force color styles for Storybook
-const styleOverrides = `
-  /* Force proper colors in Storybook */
-  body.sb-show-main {
-    color: #171717 !important;
-    background-color: #ffffff !important;
-  }
-    
-  /* For all text inside stories */
-  #storybook-root {
-    color: #171717 !important;
-    background-color: #ffffff !important;
-  }
-`;
+import './storybook.css';
 
 const preview = {
   parameters: {
@@ -53,15 +39,6 @@ const preview = {
       },
     },
   },
-  // Add style tag to force colors
-  decorators: [
-    (Story) => (
-      <>
-        <style>{styleOverrides}</style>
-        <Story />
-      </>
-    ),
-  ],
 };
 
 export default preview;

@@ -11,11 +11,14 @@ const config = {
     '../src/**/*.mdx'
   ],
   addons: [
-    '@storybook/addon-essentials'
+    '@storybook/addon-essentials',
+    '@storybook/addon-a11y'
   ],
   framework: {
     name: '@storybook/nextjs',
-    options: {}
+    options: {
+      nextConfigPath: path.resolve(__dirname, '../next.config.ts'),
+    }
   },
   staticDirs: ['../public'],
   

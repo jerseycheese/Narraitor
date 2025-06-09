@@ -18,15 +18,19 @@ Handles basic information editing:
 ```
 
 ### WorldAttributesForm
-Manages attribute lists:
-- Add/remove attributes
+Manages attribute lists with limit enforcement:
+- Add/remove attributes with maxAttributes limit
 - Edit attribute properties
 - Category management
+- Dependency warnings for linked skills
+- Accessible UI with proper ARIA labels
 
 ```tsx
 <WorldAttributesForm 
   attributes={attributes} 
+  skills={skills}
   worldId={worldId}
+  maxAttributes={world.settings.maxAttributes}
   onChange={(newAttributes) => handleAttributesChange(newAttributes)} 
 />
 ```

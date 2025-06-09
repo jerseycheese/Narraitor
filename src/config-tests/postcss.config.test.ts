@@ -2,20 +2,18 @@ import fs from 'fs';
 import path from 'path';
 
 describe('PostCSS Configuration', () => {
-  test('postcss.config.mjs has correct Tailwind CSS v4 structure', () => {
+  test('postcss.config.mjs has correct Tailwind CSS v3 structure', () => {
     const filePath = path.resolve(process.cwd(), 'postcss.config.mjs');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     
-    // Tailwind CSS v4 uses simplified plugin structure
-    expect(fileContent).toContain('@tailwindcss/postcss');
+    // Tailwind CSS v3 uses traditional plugin structure
+    expect(fileContent).toContain('tailwindcss: {}');
+    expect(fileContent).toContain('autoprefixer: {}');
     expect(fileContent).toContain('export default');
     expect(fileContent).toContain('plugins:');
     
-    // Should NOT contain postcss-nested in v4 configuration
-    expect(fileContent).not.toContain('postcss-nested');
-    
-    // Autoprefixer is not required in Tailwind v4
-    // expect(fileContent).toContain('autoprefixer');
+    // Should NOT contain v4 syntax while using v3
+    expect(fileContent).not.toContain('@tailwindcss/postcss');
   });
   
   test('postcss.config.mjs has valid syntax', () => {
