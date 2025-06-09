@@ -7,6 +7,7 @@ describe('useCharacterStore', () => {
   });
 
   afterEach(() => {
+    jest.clearAllTimers();
     jest.useRealTimers();
   });
 
