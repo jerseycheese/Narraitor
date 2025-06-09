@@ -24,17 +24,19 @@ CONTEXT:
 - Location: ${location || 'Unknown'}
 
 REQUIREMENTS:
-- 1-2 sentences maximum
-- Past tense from player's perspective ("I did X" not "You did X")
-- Focus on key actions, discoveries, or story events
-- Be specific about what happened
+- 1 sentence maximum, 2 only if absolutely necessary
+- Past tense from player's perspective (first or third person: "I did X" or "Someone got shot")
+- Focus on key actions, discoveries, or story events only
+- Be specific but concise about what happened
+- Avoid sensory details (smells, sounds, textures, etc.)
 - Avoid generic descriptions
 
 EXAMPLES:
-Good: "I discovered a hidden passage behind the bookshelf that led to an underground chamber."
-Good: "I convinced the tavern keeper to give me information about the missing merchant."
-Bad: "I explored the area and found something interesting."
-Bad: "An event occurred at the location."
+Good: "Found a hidden passage behind the bookshelf."
+Good: "The tavern keeper revealed information about the missing merchant."
+Good: "Someone got shot during the confrontation."
+Bad: "I explored the dimly lit area, hearing strange echoes, and discovered something interesting that smelled musty."
+Bad: "An event occurred at the location with various atmospheric details."
 
 Summary:`;
 

@@ -165,7 +165,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           content,
           type,
           location,
-          instructions: 'Create a 1-2 sentence journal entry summary of what the player experienced. Focus on key actions, discoveries, or events. Write in past tense from the player\'s perspective.'
+          instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
         })
       });
       
@@ -187,10 +187,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     if (sentences.length > 0) {
       let summary = sentences[0].trim();
       // Convert from second person to past tense if needed
-      summary = summary.replace(/^You\s+/, 'I ').replace(/\byou\b/g, 'I');
-      return summary.length > 100 ? summary.substring(0, 97) + '...' : summary + '.';
+      summary = summary.replace(/^You\s+/, '').replace(/\byou\b/g, 'the character');
+      // Keep it concise - max 60 characters
+      return summary.length > 60 ? summary.substring(0, 57) + '...' : summary + '.';
     }
-    return 'An event occurred in the adventure.';
+    return 'Something happened in the adventure.';
   };
 
   // Helper function to create journal entries from narrative segments
