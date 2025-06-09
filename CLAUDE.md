@@ -33,6 +33,16 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Write comprehensive tests for critical paths
 - Review and refactor code regularly
 
+## CRITICAL: NO EMOJIS POLICY
+**ABSOLUTELY NO EMOJIS** in any files, documentation, code, comments, commit messages, or communication.
+- NEVER use emojis in any written content
+- NEVER use emojis in documentation files
+- NEVER use emojis in code comments
+- NEVER use emojis in commit messages
+- NEVER use emojis in PR descriptions
+- This is a strict policy with NO exceptions
+- Professional, clean text only - emojis are completely forbidden
+
 ## Claude Code Security & Directives
 - Commands can include special directives at the top of the file:
   ```

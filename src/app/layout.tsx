@@ -3,7 +3,6 @@ import "./globals.css";
 import { DevToolsProvider, DevToolsPanel } from "@/components/devtools";
 import { DevMockState } from "@/components/devtools/DevMockState";
 import { Navigation } from "@/components/Navigation";
-
 export const metadata: Metadata = {
   title: "Narraitor",
   description: "A narrative-driven RPG framework using AI",

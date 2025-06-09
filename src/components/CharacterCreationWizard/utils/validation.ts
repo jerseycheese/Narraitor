@@ -1,5 +1,6 @@
 import { useCharacterStore } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
+import { validateCharacterName as unifiedValidateCharacterName } from '@/lib/utils/validation';
 
 interface ValidationResult {
   valid: boolean;
@@ -7,31 +8,14 @@ interface ValidationResult {
 }
 
 export const validateCharacterName = (name: string, worldId: EntityID): ValidationResult => {
-  const errors: string[] = [];
+  // Get existing character names for uniqueness check
+  const state = useCharacterStore.getState();
+  const characters = state.characters || {};
+  const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
+  const existingNames = existingCharacters.map(c => c.name);
   
-  if (!name || name.trim() === '') {
-    errors.push('Name is required');
-  } else {
-    if (name.length < 3) {
-      errors.push('Name must be at least 3 characters');
-    }
-    if (name.length > 50) {
-      errors.push('Name must be less than 50 characters');
-    }
-    
-    // Check uniqueness within world
-    const state = useCharacterStore.getState();
-    const characters = state.characters || {};
-    const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
-    if (existingCharacters.some(c => c.name === name)) {
-      errors.push('A character with this name already exists in this world');
-    }
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
+  // Use the unified validation system
+  return unifiedValidateCharacterName(name, existingNames);
 };
 
 export const validateAttributes = (
@@ -39,7 +23,6 @@ export const validateAttributes = (
   totalPoints: number
 ): ValidationResult => {
   const errors: string[] = [];
-  
   const pointsSpent = attributes.reduce((sum, attr) => sum + attr.value, 0);
   if (pointsSpent !== totalPoints) {
     errors.push(`Must spend exactly ${totalPoints} points (${pointsSpent} spent)`);
@@ -55,8 +38,8 @@ export const validateSkills = (
   skills: Array<{ isSelected: boolean }>
 ): ValidationResult => {
   const errors: string[] = [];
-  
   const selectedSkills = skills.filter(s => s.isSelected);
+  
   if (selectedSkills.length === 0) {
     errors.push('Select at least one skill');
   } else if (selectedSkills.length > 8) {

@@ -46,6 +46,8 @@ export function validateAttributeDeletion(
 
 /**
  * Validates attribute data for creation or update
+ * Now uses the unified validation system
+ * @deprecated Use validateAttributeData from @/lib/utils/validation for new code
  */
 export function validateAttributeData(
   attribute: Partial<WorldAttribute>,

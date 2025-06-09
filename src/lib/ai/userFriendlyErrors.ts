@@ -1,7 +1,8 @@
 // src/lib/ai/userFriendlyErrors.ts
 
-import { isRetryableError } from './errors';
+import { getUserFriendlyError as getUnifiedUserFriendlyError, userFriendlyError as unifiedUserFriendlyError } from '@/lib/utils/errorHandling';
 
+// Re-export the unified interface for backward compatibility
 export interface UserFriendlyError {
   title: string;
   message: string;
@@ -11,67 +12,32 @@ export interface UserFriendlyError {
 
 /**
  * Maps technical errors to user-friendly messages
+ * Now uses the unified error handling system
  * @param error - The error to map
  * @returns User-friendly error object
+ * @deprecated Use processError from @/lib/utils/errorHandling for new code
  */
 export function getUserFriendlyError(error: Error): UserFriendlyError {
-  const message = error.message.toLowerCase();
-
-  // Network errors
-  if (message.includes('network')) {
-    return {
-      title: 'Connection Problem',
-      message: 'Unable to connect to the AI service. Please check your internet connection.',
-      actionLabel: 'Try Again',
-      retryable: true
-    };
-  }
-
-  // Timeout errors
-  if (message.includes('timeout')) {
-    return {
-      title: 'Request Timed Out', 
-      message: 'The AI service is taking too long to respond. Please try again.',
-      actionLabel: 'Try Again',
-      retryable: true
-    };
-  }
-
-  // Rate limit errors
-  if (message.includes('429') || message.includes('rate limit')) {
-    return {
-      title: 'Too Many Requests',
-      message: 'You have made too many requests. Please wait a moment before trying again.',
-      actionLabel: 'Try Again Later',
-      retryable: true
-    };
-  }
-
-  // Authentication errors
-  if (message.includes('401') || message.includes('unauthorized')) {
-    return {
-      title: 'Authentication Error',
-      message: 'Unable to authenticate with the AI service. Please check your API key.',
-      retryable: false
-    };
-  }
-
-  // Default for unknown errors
+  // Use the unified error handling system
+  const unifiedResult = getUnifiedUserFriendlyError(error);
+  
+  // Convert to legacy format for backward compatibility
   return {
-    title: 'Something Went Wrong',
-    message: 'An unexpected error occurred. Please try again.',
-    actionLabel: 'Try Again',
-    retryable: isRetryableError(error)
+    title: unifiedResult.title,
+    message: unifiedResult.message,
+    actionLabel: unifiedResult.actionLabel,
+    retryable: unifiedResult.retryable
   };
 }
 
 /**
  * Simple function that returns just the user-friendly message
- * Used by components that just need the error message text
+ * Now uses the unified error handling system
  * @param error - The error to map
  * @returns User-friendly error message string
+ * @deprecated Use userFriendlyError from @/lib/utils/errorHandling for new code
  */
 export function userFriendlyError(error: Error): string {
-  const friendlyError = getUserFriendlyError(error);
-  return friendlyError.message;
+  // Use the unified error handling system
+  return unifiedUserFriendlyError(error);
 }
