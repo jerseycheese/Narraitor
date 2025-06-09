@@ -156,7 +156,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }, [sessionId, worldId, controllerKey]);
 
   // Helper function to generate AI summary for journal entries
-  const generateJournalSummary = async (content: string, type: string, location?: string): Promise<{summary: string, entryType: string, significance: string}> => {
+  const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
     try {
       const response = await fetch('/api/narrative/summarize', {
         method: 'POST',
@@ -165,6 +165,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           content,
           type,
           location,
+          decisionWeight,
           instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
         })
       });
@@ -206,7 +207,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
 
   // Helper function to create journal entries from narrative segments
-  const createJournalEntryFromSegment = (segment: NarrativeSegment) => {
+  const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
     if (!characterId) return;
     
     
@@ -237,7 +238,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }
     
     // Generate AI summary, type, and significance for journal entry (async)
-    generateJournalSummary(cleanContent, segment.type, actualLocation).then(aiResult => {
+    generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
       // Create title based on AI-determined type and content
       let title = '';
       switch (aiResult.entryType) {
@@ -253,19 +254,40 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         case 'world_event':
           title = 'World Event';
           break;
+        case 'relationship_change':
+          title = 'Relationship Change';
+          break;
         default:
           title = 'Story Event';
       }
       
       // Extract a more meaningful title from the summary if it's generic
-      if (title === 'Story Event' || title === 'Character Event' || title === 'Discovery') {
+      if (title === 'Story Event' || title === 'Character Event' || title === 'Discovery' || title === 'World Event' || title === 'Relationship Change') {
         const summaryWords = aiResult.summary.split(' ');
         if (summaryWords.length >= 3) {
-          // Create title from first few words of summary, max 4 words
-          title = summaryWords.slice(0, 4).join(' ');
-          if (summaryWords.length > 4) title += '...';
-          // Capitalize first letter
+          // Create title from key words, avoiding repetitive patterns
+          let keyWords = summaryWords.filter((word, index) => {
+            // Skip common starting words and focus on the action/object
+            const skipWords = ['I', 'The', 'A', 'An', 'Someone', 'Something'];
+            if (index === 0 && skipWords.includes(word)) return false;
+            return word.length > 2; // Skip short words like "to", "at", "of"
+          });
+          
+          if (keyWords.length === 0) {
+            keyWords = summaryWords.slice(1, 4); // Fallback: skip first word, take next 3
+          }
+          
+          // Take first 2-3 meaningful words
+          title = keyWords.slice(0, 3).join(' ');
+          if (title.length > 25) {
+            title = keyWords.slice(0, 2).join(' ');
+          }
+          
+          // Capitalize and add ellipsis if needed
           title = title.charAt(0).toUpperCase() + title.slice(1);
+          if (aiResult.summary.length > title.length + 10) {
+            title += '...';
+          }
         }
       }
       
@@ -324,7 +346,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Auto-create journal entry for significant narrative events
     if (characterId && segment.content) {
-      createJournalEntryFromSegment(segment);
+      // Use the current decision weight to determine journal significance
+      const decisionWeight = currentDecision?.decisionWeight;
+      createJournalEntryFromSegment(segment, decisionWeight);
     }
     
     // Set a fallback timer to ensure choices eventually appear

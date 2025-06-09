@@ -3,7 +3,7 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const { content, type, location, instructions } = await request.json();
+    const { content, type, location, instructions, decisionWeight } = await request.json();
 
     if (!content) {
       return NextResponse.json(
@@ -20,8 +20,9 @@ NARRATIVE CONTENT TO SUMMARIZE:
 ${content}
 
 CONTEXT:
-- Type: ${type}
+- Narrative Segment Type: ${type} (scene/dialogue/action/transition/ending)
 - Location: ${location || 'Unknown'}
+- Decision Weight: ${decisionWeight || 'Unknown'} (minor=routine choice, major=important choice, critical=game-changing choice)
 
 REQUIREMENTS:
 - Provide a JSON response with summary, entryType, and significance
@@ -32,15 +33,16 @@ REQUIREMENTS:
 - Avoid sensory details (smells, sounds, textures, etc.)
 - Avoid generic descriptions
 
-ENTRY TYPES:
-- "discovery": Finding items, locations, secrets, information
-- "character_event": Conversations, meetings, interactions with people
-- "achievement": Completing quests, major accomplishments, victories
-- "world_event": Environmental changes, events happening around the character
+ENTRY TYPES (established taxonomy - choose based on narrative segment type and content):
+- "character_event": Personal actions, conversations, interactions, decisions by the player character (maps to: dialogue, action segments where player acts)
+- "world_event": Environmental changes, other people's actions, events the character witnesses but doesn't directly cause (maps to: scene, action segments where others act)
+- "discovery": Finding items, locations, secrets, learning information (maps to: scene segments with new locations/items)
+- "achievement": Completing objectives, major accomplishments, victories, resolving situations (maps to: ending segments, major quest completions)
+- "relationship_change": Changes in relationships with other characters (maps to: dialogue segments with relationship impact)
 
-SIGNIFICANCE LEVELS:
-- "minor": Routine events, small conversations, basic exploration
-- "major": Important discoveries, key conversations, significant achievements, plot-critical events
+SIGNIFICANCE LEVELS (should align with decision weight):
+- "minor": Routine tasks, small mistakes, basic interactions (corresponds to minor decision weight)
+- "major": Plot developments, conflicts, discoveries, important events (corresponds to major/critical decision weight)
 
 EXAMPLES:
 {
@@ -50,20 +52,38 @@ EXAMPLES:
 }
 
 {
-  "summary": "The tavern keeper revealed information about the missing merchant.",
+  "summary": "Confronted the manager about working conditions.",
   "entryType": "character_event", 
   "significance": "major"
 }
 
 {
-  "summary": "Someone got shot during the confrontation.",
+  "summary": "Gained Sam's respect through excellent cooking.",
+  "entryType": "relationship_change",
+  "significance": "major"
+}
+
+{
+  "summary": "The kitchen caught fire during rush hour.",
   "entryType": "world_event",
   "significance": "major"
 }
 
 {
-  "summary": "Bought supplies from the general store.",
-  "entryType": "discovery",
+  "summary": "Completed the dinner rush successfully.",
+  "entryType": "achievement",
+  "significance": "major"
+}
+
+{
+  "summary": "Filled the fryer with oil as ordered.",
+  "entryType": "character_event",
+  "significance": "minor"
+}
+
+{
+  "summary": "Sam criticized the cooking technique.",
+  "entryType": "world_event",
   "significance": "minor"
 }
 
@@ -97,7 +117,7 @@ Response (JSON only):`;
       }
       
       // Validate entryType
-      const validTypes = ['discovery', 'character_event', 'achievement', 'world_event'];
+      const validTypes = ['discovery', 'character_event', 'achievement', 'world_event', 'relationship_change'];
       if (!validTypes.includes(parsed.entryType)) {
         parsed.entryType = 'character_event'; // Default fallback
       }
