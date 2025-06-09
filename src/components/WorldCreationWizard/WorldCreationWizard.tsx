@@ -50,6 +50,8 @@ export default function WorldCreationWizard({
   const createWorld = useWorldStore((state) => state.createWorld);
   
   // Initialize world creation data
+  // Note: initialData spread at the end takes precedence over defaults,
+  // allowing external components to override any default values
   const initialWorldData: WorldCreationData = useMemo(() => ({
     settings: {
       maxAttributes: 10,
@@ -60,6 +62,7 @@ export default function WorldCreationWizard({
     aiSuggestions: initialData?.aiSuggestions,
     selectedTemplateId: initialData?.selectedTemplateId || null,
     createOwnWorld: initialData?.createOwnWorld || false,
+    // Spread initialData last to ensure external overrides take precedence
     ...initialData,
   }), [initialData]);
 

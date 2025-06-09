@@ -75,8 +75,11 @@ export function useWizardState<TData = unknown>({
   const canGoBack = !isFirstStep;
 
   // Check if current step is valid
+  // Handle edge cases: missing validation object, untouched state, and invalid state
   const currentStepValidation = state.validation[state.currentStep];
-  const isCurrentStepValid = !currentStepValidation || currentStepValidation.valid;
+  const isCurrentStepValid = !currentStepValidation || 
+                           (!currentStepValidation.touched && !currentStepValidation.errors.length) ||
+                           (currentStepValidation.touched && currentStepValidation.valid);
   const canGoNext = !isLastStep && isCurrentStepValid && !state.isProcessing;
 
   // Actions

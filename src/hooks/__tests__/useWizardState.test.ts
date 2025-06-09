@@ -263,4 +263,40 @@ describe('useWizardState', () => {
     expect(result.current.state.validation).toEqual({});
     expect(result.current.state.errors).toEqual({});
   });
+
+  it('should handle validation edge cases correctly', () => {
+    const { result } = renderHook(() =>
+      useWizardState({
+        initialData,
+        steps: testSteps,
+      })
+    );
+
+    // Test case 1: Missing validation object should allow navigation
+    expect(result.current.canGoNext).toBe(true);
+
+    // Test case 2: Untouched validation with no errors should allow navigation
+    act(() => {
+      result.current.setValidation(0, { valid: false, errors: [], touched: false });
+    });
+    expect(result.current.canGoNext).toBe(true);
+
+    // Test case 3: Touched validation with errors should prevent navigation
+    act(() => {
+      result.current.setValidation(0, { valid: false, errors: ['Error'], touched: true });
+    });
+    expect(result.current.canGoNext).toBe(false);
+
+    // Test case 4: Touched validation that is valid should allow navigation
+    act(() => {
+      result.current.setValidation(0, { valid: true, errors: [], touched: true });
+    });
+    expect(result.current.canGoNext).toBe(true);
+
+    // Test case 5: Processing state should prevent navigation even if valid
+    act(() => {
+      result.current.setProcessing(true);
+    });
+    expect(result.current.canGoNext).toBe(false);
+  });
 });
