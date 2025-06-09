@@ -121,7 +121,7 @@ export function validateSelectionCount(
   if (selectedCount < minSelections) {
     errors.push(`Select at least ${minSelections} ${fieldName}`);
   }
-  if (selectedCount > maxSelections) {
+  if (maxSelections !== Infinity && selectedCount > maxSelections) {
     errors.push(`Maximum ${maxSelections} ${fieldName} allowed`);
   }
 

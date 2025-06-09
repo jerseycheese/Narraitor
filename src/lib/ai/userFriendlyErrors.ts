@@ -60,5 +60,5 @@ export function userFriendlyError(error: Error): string {
   return getUserFriendlyError(error).message;
 }
 
-// Re-export for backward compatibility (avoid exporting to prevent naming conflict with utils)
-// Components can import isRetryableError from '@/lib/utils' instead
+// Note: isRetryableError is not re-exported here to avoid naming conflicts with utils module
+// Components should import isRetryableError from '@/lib/utils' instead

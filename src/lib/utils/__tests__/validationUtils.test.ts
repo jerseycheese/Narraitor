@@ -75,6 +75,15 @@ describe('validationUtils', () => {
         valid: false,
         errors: ['Select at least 1 skills']
       });
+      
+      expect(validateSelectionCount([true, true, true, true, true], {
+        minSelections: 1,
+        maxSelections: 3,
+        fieldName: 'skills'
+      })).toEqual({
+        valid: false,
+        errors: ['Maximum 3 skills allowed']
+      });
     });
   });
 });
