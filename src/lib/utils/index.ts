@@ -7,9 +7,9 @@ export { cn, clsx } from './classNames';
 export { 
   isRetryableError, 
   getUserFriendlyError, 
-  userFriendlyErrorMessage,
-  type UserFriendlyError 
+  userFriendlyErrorMessage
 } from './errorUtils';
+export type { UserFriendlyError } from './errorUtils';
 
 // Validation utilities
 export {

@@ -1,14 +1,12 @@
 // src/lib/ai/userFriendlyErrors.ts
 
 import { 
-  isRetryableError as isRetryableErrorUtil, 
   getUserFriendlyError as getUserFriendlyErrorUtil,
-  userFriendlyErrorMessage,
   UserFriendlyError 
 } from '@/lib/utils/errorUtils';
 
 // Re-export the shared utilities with AI-specific customization
-export { UserFriendlyError } from '@/lib/utils/errorUtils';
+export type { UserFriendlyError } from '@/lib/utils/errorUtils';
 
 /**
  * Maps technical errors to user-friendly messages with AI-specific context
@@ -62,5 +60,5 @@ export function userFriendlyError(error: Error): string {
   return getUserFriendlyError(error).message;
 }
 
-// Re-export for backward compatibility
-export const isRetryableError = isRetryableErrorUtil;
+// Re-export for backward compatibility (avoid exporting to prevent naming conflict with utils)
+// Components can import isRetryableError from '@/lib/utils' instead
