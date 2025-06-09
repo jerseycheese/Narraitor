@@ -60,7 +60,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       tags: ['prophecy', 'elder', 'temple'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-1'
-    }
+    },
+    updatedAt: '2023-01-01T00:00:00Z'
   },
   {
     worldId: 'world-1',
@@ -78,7 +79,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       tags: ['exploration', 'secret'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-2'
-    }
+    },
+    updatedAt: '2023-01-01T00:00:00Z'
   },
   {
     worldId: 'world-1',
@@ -96,7 +98,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       tags: ['combat', 'bandits', 'shadow'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-3'
-    }
+    },
+    updatedAt: '2023-01-01T00:00:00Z'
   },
   {
     worldId: 'world-1',
@@ -113,23 +116,28 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       tags: ['merchant', 'trust', 'trade'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-4'
-    }
+    },
+    updatedAt: '2023-01-01T00:00:00Z'
   }
 ];
 
 // Story decorator to populate journal store with mock data
-const withMockJournal = (entries: typeof mockEntries) => (Story: any) => {
-  const sessionId = 'session-1';
-  
-  // Clear and populate journal store
-  const { addEntry, reset } = useJournalStore.getState();
-  reset();
-  
-  entries.forEach(entry => {
-    addEntry(sessionId, entry);
-  });
+const withMockJournal = (entries: typeof mockEntries) => {
+  const MockJournalDecorator = (Story: React.ComponentType) => {
+    const sessionId = 'session-1';
+    
+    // Clear and populate journal store
+    const { addEntry, reset } = useJournalStore.getState();
+    reset();
+    
+    entries.forEach(entry => {
+      addEntry(sessionId, entry);
+    });
 
-  return <Story />;
+    return <Story />;
+  };
+  
+  return MockJournalDecorator;
 };
 
 export const Default: Story = {

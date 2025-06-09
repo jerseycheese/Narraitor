@@ -175,18 +175,46 @@ export class NarrativeGenerator {
   }
 
   private formatResponse(response: { content?: string; tokenUsage?: number }, segmentType: string): NarrativeGenerationResult {
-    // For mock client, generate metadata if not present
-    const mood = this.getMoodForGenre(this.getWorldGenre());
-    const location = this.getLocationForGenre(this.getWorldGenre());
+    let actualContent = response.content || '';
+    let extractedMetadata: { location?: string; mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral'; tags?: string[]; characterIds?: string[] } = {};
+    
+    // Try to parse JSON response if present
+    if (actualContent.includes('```json') || actualContent.startsWith('{')) {
+      try {
+        let jsonStr = actualContent;
+        if (jsonStr.includes('```json')) {
+          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
+        }
+        
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.content) {
+          actualContent = parsed.content;
+        }
+        if (parsed.metadata) {
+          extractedMetadata = {
+            location: parsed.metadata.location,
+            mood: this.validateMood(parsed.metadata.mood),
+            tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
+            characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : []
+          };
+        }
+      } catch (parseError) {
+        console.warn('Could not parse AI JSON response, using fallback metadata:', parseError);
+      }
+    }
+    
+    // Use extracted metadata or fall back to generated metadata
+    const fallbackMood = this.getMoodForGenre(this.getWorldGenre());
+    const fallbackLocation = this.getLocationForGenre(this.getWorldGenre());
     
     return {
-      content: response.content || '',
+      content: actualContent,
       segmentType: segmentType as 'scene' | 'dialogue' | 'action' | 'transition',
       metadata: {
-        characterIds: [],
-        location: location,
-        mood: mood,
-        tags: [this.getWorldGenre() || 'fantasy', 'narrative']
+        characterIds: extractedMetadata.characterIds || [],
+        location: extractedMetadata.location || fallbackLocation,
+        mood: extractedMetadata.mood || fallbackMood,
+        tags: extractedMetadata.tags || [this.getWorldGenre() || 'fantasy', 'narrative']
       },
       tokenUsage: response.tokenUsage && typeof response.tokenUsage === 'object' 
         ? response.tokenUsage 
@@ -204,6 +232,11 @@ export class NarrativeGenerator {
     } catch {
       return null;
     }
+  }
+  
+  private validateMood(mood?: string): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' | undefined {
+    const validMoods = ['neutral', 'tense', 'mysterious', 'relaxed', 'action', 'emotional'];
+    return validMoods.includes(mood || '') ? mood as 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' : undefined;
   }
   
   private getMoodForGenre(genre?: string | null): 'neutral' | 'tense' | 'mysterious' | 'relaxed' | 'action' | 'emotional' {

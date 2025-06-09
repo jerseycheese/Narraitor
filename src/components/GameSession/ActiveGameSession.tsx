@@ -16,6 +16,10 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
+import { useJournalStore } from '@/state/journalStore';
+// Temporarily commenting out new components for TDD verification
+// import { AccessButton } from '@/components/ui/AccessButton';
+// import { BookOpen } from 'lucide-react';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -76,6 +80,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  
+  // Get journal store for auto-creating entries
+  const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
@@ -148,13 +155,174 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     };
   }, [sessionId, worldId, controllerKey]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleNarrativeGenerated = (_: NarrativeSegment) => {
+  // Helper function to generate AI summary for journal entries
+  const generateJournalSummary = async (content: string, type: string, location?: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/narrative/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          type,
+          location,
+          instructions: 'Create a 1-2 sentence journal entry summary of what the player experienced. Focus on key actions, discoveries, or events. Write in past tense from the player\'s perspective.'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.summary || createFallbackSummary(content);
+      }
+    } catch (error) {
+      console.warn('Failed to generate AI summary for journal entry:', error);
+    }
+    
+    return createFallbackSummary(content);
+  };
+
+  // Fallback summary method when AI fails
+  const createFallbackSummary = (content: string): string => {
+    // Extract first sentence and clean it up
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    if (sentences.length > 0) {
+      let summary = sentences[0].trim();
+      // Convert from second person to past tense if needed
+      summary = summary.replace(/^You\s+/, 'I ').replace(/\byou\b/g, 'I');
+      return summary.length > 100 ? summary.substring(0, 97) + '...' : summary + '.';
+    }
+    return 'An event occurred in the adventure.';
+  };
+
+  // Helper function to create journal entries from narrative segments
+  const createJournalEntryFromSegment = (segment: NarrativeSegment) => {
+    if (!characterId) return;
+    
+    // Determine journal entry type based on segment type and content
+    let entryType: 'character_event' | 'discovery' | 'achievement' | 'world_event' = 'character_event';
+    let significance: 'minor' | 'major' = 'minor';
+    let title = '';
+    
+    // Analyze segment to determine appropriate journal entry details
+    switch (segment.type) {
+      case 'scene':
+        entryType = segment.metadata?.location ? 'discovery' : 'character_event';
+        title = segment.metadata?.location ? `Arrived at ${segment.metadata.location}` : 'New Scene';
+        significance = 'minor';
+        break;
+      case 'action':
+        entryType = 'character_event';
+        title = 'Character Action';
+        significance = 'minor';
+        break;
+      case 'dialogue':
+        entryType = 'character_event';
+        title = 'Conversation';
+        significance = 'minor';
+        break;
+      case 'transition':
+        entryType = 'character_event';
+        title = 'Story Transition';
+        significance = 'minor';
+        break;
+      case 'ending':
+        entryType = 'achievement';
+        title = 'Story Conclusion';
+        significance = 'major';
+        break;
+      default:
+        entryType = 'character_event';
+        title = 'Story Event';
+        significance = 'minor';
+    }
+    
+    // Extract a meaningful title from content if we have a generic one
+    if (title === 'New Scene' || title === 'Story Event') {
+      const contentWords = segment.content.split(' ');
+      if (contentWords.length >= 5) {
+        // Create title from first few words, max 6 words
+        title = contentWords.slice(0, 6).join(' ');
+        if (contentWords.length > 6) title += '...';
+      }
+    }
+    
+    // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
+    let cleanContent = segment.content;
+    let actualLocation = segment.metadata?.location;
+    
+    // Fallback: handle any remaining JSON-formatted content that wasn't parsed by the generator
+    if (segment.content.includes('```json') || segment.content.startsWith('{')) {
+      try {
+        let jsonStr = segment.content;
+        if (jsonStr.includes('```json')) {
+          jsonStr = jsonStr.replace(/```json\s*/, '').replace(/\s*```/, '');
+        }
+        
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.content) {
+          cleanContent = parsed.content;
+        }
+        if (parsed.metadata?.location && !actualLocation) {
+          actualLocation = parsed.metadata.location;
+          // Update segment metadata if it wasn't already set by the generator
+          segment.metadata = { ...segment.metadata, ...parsed.metadata };
+        }
+      } catch (parseError) {
+        console.warn('Could not parse JSON content, using original:', parseError);
+      }
+    }
+    
+    // Update title if we have a location
+    if (actualLocation && segment.type === 'scene') {
+      title = `Arrived at ${actualLocation}`;
+    }
+    
+    // Helper function to create the actual journal entry
+    const createJournalEntry = (content: string) => {
+      try {
+        addEntry(sessionId, {
+          worldId: worldId,
+          characterId: characterId,
+          type: entryType,
+          title: title,
+          content: content,
+          significance: significance,
+          isRead: false, // New entries start as unread
+          relatedEntities: [],
+          metadata: {
+            tags: [segment.type],
+            automaticEntry: true,
+            narrativeSegmentId: segment.id
+          },
+          updatedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.warn('Failed to create journal entry from narrative segment:', error);
+      }
+    };
+    
+    // Generate AI summary for journal entry (async)
+    generateJournalSummary(cleanContent, segment.type, actualLocation).then(journalContent => {
+      // Create the journal entry with AI-generated summary
+      createJournalEntry(journalContent);
+    }).catch(error => {
+      console.warn('Failed to generate journal summary, using fallback:', error);
+      // Use fallback summary if AI fails
+      const fallbackContent = createFallbackSummary(cleanContent);
+      createJournalEntry(fallbackContent);
+    });
+  };
+
+  const handleNarrativeGenerated = (segment: NarrativeSegment) => {
     // Narrative segment was successfully generated
     setIsGenerating(false);
     setShouldTriggerGeneration(false); // Reset trigger
     // Start generating choices
     setIsGeneratingChoices(true);
+    
+    // Auto-create journal entry for significant narrative events
+    if (characterId && segment.content) {
+      createJournalEntryFromSegment(segment);
+    }
     
     // Set a fallback timer to ensure choices eventually appear
     // Use a ref to track this timeout so we can clear it if AI choices arrive

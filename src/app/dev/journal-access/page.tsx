@@ -5,6 +5,7 @@ import ActiveGameSession from '@/components/GameSession/ActiveGameSession';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useJournalStore } from '@/state/journalStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import { JournalEntry } from '@/types/journal.types';
 
 /**
@@ -25,6 +26,19 @@ export default function JournalAccessTestPage() {
 
   // Setup stores
   React.useEffect(() => {
+    // Clear any existing ending state from narrative store
+    useNarrativeStore.getState().clearEnding();
+    
+    // Clear the "ended sessions" record for our test session to ensure it's not marked as ended
+    useNarrativeStore.setState((state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { 'test-session-1': removed, ...remainingEndedSessions } = state.endedSessions;
+      return {
+        ...state,
+        endedSessions: remainingEndedSessions
+      };
+    });
+    
     if (hasCharacter) {
       useSessionStore.setState({
         characterId: 'test-char-1',
@@ -42,9 +56,35 @@ export default function JournalAccessTestPage() {
           'test-char-1': {
             id: 'test-char-1',
             name: 'Test Adventurer',
+            description: 'A brave explorer testing journal access functionality',
             worldId: 'test-world-1',
-            background: 'A brave explorer testing journal access',
-            createdAt: new Date().toISOString()
+            level: 1,
+            isPlayer: true,
+            attributes: [],
+            skills: [],
+            background: {
+              history: 'A brave explorer testing journal access',
+              personality: 'Curious and methodical',
+              goals: ['Master the journal system'],
+              fears: ['Missing important story details'],
+              physicalDescription: 'A determined adventurer with keen eyes',
+              relationships: [],
+              isKnownFigure: false
+            },
+            inventory: {
+              characterId: 'test-char-1',
+              items: [],
+              capacity: 10,
+              categories: []
+            },
+            status: {
+              health: 100,
+              maxHealth: 100,
+              conditions: [],
+              location: 'Test Area'
+            },
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           }
         },
         currentCharacterId: 'test-char-1',
@@ -81,35 +121,38 @@ export default function JournalAccessTestPage() {
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
-        type: 'character_event',
-        title: 'Started Testing',
-        content: 'Began testing the journal access functionality in the test harness.',
-        significance: 'major',
+        type: 'discovery',
+        title: 'Arrived at Rewind Oasis Video Store',
+        content: 'I started my shift at the video store, organizing DVD stacks while Marco dealt with an angry customer on the phone.',
+        significance: 'minor',
         isRead: false,
         relatedEntities: [],
-        metadata: { tags: ['testing'], automaticEntry: true }
+        metadata: { tags: ['opening', 'introduction'], automaticEntry: true },
+        updatedAt: new Date().toISOString()
+      },
+      {
+        worldId: 'test-world-1',
+        characterId: 'test-char-1',
+        type: 'character_event',
+        title: 'Conversation with Marco',
+        content: 'I joked around with Wayne\'s World references until Marco appeared, still frustrated from his phone call but showing some amusement.',
+        significance: 'minor',
+        isRead: true,
+        relatedEntities: [],
+        metadata: { tags: ['dialogue', 'employee'], automaticEntry: true },
+        updatedAt: new Date().toISOString()
       },
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'discovery',
-        title: 'Found Test Environment',
-        content: 'Discovered this wonderful test harness for journal functionality.',
+        title: 'Found Comedy Section',
+        content: 'I browsed the comedy aisle, deciding between Wayne\'s World and the more obscure "So I Married an Axe Murderer" when a customer entered.',
         significance: 'minor',
-        isRead: true,
-        relatedEntities: [],
-        metadata: { tags: ['discovery'], automaticEntry: true }
-      },
-      {
-        worldId: 'test-world-1',
-        characterId: 'test-char-1',
-        type: 'achievement',
-        title: 'Passed All Tests',
-        content: 'Successfully verified all acceptance criteria for issue #278.',
-        significance: 'major',
         isRead: false,
         relatedEntities: [],
-        metadata: { tags: ['success'], automaticEntry: true }
+        metadata: { tags: ['browsing', 'selection'], automaticEntry: true },
+        updatedAt: new Date().toISOString()
       }
     ];
 
@@ -126,7 +169,7 @@ export default function JournalAccessTestPage() {
           📖 Journal Access Test Harness - Issue #278
         </h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Character Toggle */}
           <div className="space-y-2">
             <h3 className="font-semibold text-gray-700">Character Presence</h3>
@@ -146,7 +189,7 @@ export default function JournalAccessTestPage() {
             <h3 className="font-semibold text-gray-700">Game Status</h3>
             <select
               value={gameStatus}
-              onChange={(e) => setGameStatus(e.target.value as any)}
+              onChange={(e) => setGameStatus(e.target.value as 'active' | 'paused' | 'ended')}
               className="w-full p-2 border rounded"
             >
               <option value="active">Active (AC3: available at any point)</option>
@@ -167,6 +210,23 @@ export default function JournalAccessTestPage() {
               className="w-full"
             />
             <span className="text-sm text-gray-600">{entryCount} entries</span>
+          </div>
+          
+          {/* Journal Controls */}
+          <div className="space-y-2">
+            <h3 className="font-semibold text-gray-700">Journal Debug</h3>
+            <button
+              onClick={() => {
+                // Clear existing journal entries for this session
+                useJournalStore.getState().reset();
+                // Force re-creation with proper content
+                setEntryCount(0);
+                setTimeout(() => setEntryCount(2), 100);
+              }}
+              className="w-full px-3 py-2 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
+            >
+              Clear & Regenerate Journal
+            </button>
           </div>
         </div>
 
@@ -216,7 +276,7 @@ export default function JournalAccessTestPage() {
               <h4 className="font-medium text-gray-800 mb-2">Expected Behavior:</h4>
               <ul className="space-y-1 text-gray-600">
                 <li>• Journal button appears only with character</li>
-                <li>• Modal opens with role="dialog" and aria-modal="true"</li>
+                <li>• Modal opens with role=&quot;dialog&quot; and aria-modal=&quot;true&quot;</li>
                 <li>• Journal entries display correctly</li>
                 <li>• Close button works (multiple ways: X, backdrop, Escape)</li>
                 <li>• Game session remains intact throughout</li>

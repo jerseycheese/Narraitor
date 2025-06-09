@@ -61,9 +61,33 @@ const meta: Meta<typeof ActiveGameSession> = {
           'char-1': {
             id: 'char-1',
             name: 'Aria Nightwind',
+            description: 'A skilled ranger from the northern forests',
             worldId: 'world-1',
-            background: 'A skilled ranger from the northern forests',
-            createdAt: '2023-01-01T00:00:00Z'
+            level: 3,
+            isPlayer: true,
+            attributes: [],
+            skills: [],
+            background: {
+              history: 'A skilled ranger from the northern forests',
+              personality: 'Stoic and observant',
+              goals: ['Protect the wilderness'],
+              fears: ['Forest fires'],
+              relationships: []
+            },
+            inventory: {
+              characterId: 'char-1',
+              items: [],
+              capacity: 15,
+              categories: []
+            },
+            status: {
+              health: 85,
+              maxHealth: 100,
+              conditions: [],
+              location: 'Northern Outpost'
+            },
+            createdAt: '2023-01-01T00:00:00Z',
+            updatedAt: '2023-01-01T00:00:00Z'
           }
         },
         currentCharacterId: 'char-1',
@@ -98,7 +122,8 @@ const mockJournalEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[]
     significance: 'major',
     isRead: false,
     relatedEntities: [],
-    metadata: { tags: ['quest'], automaticEntry: true }
+    metadata: { tags: ['quest'], automaticEntry: true },
+    updatedAt: '2023-01-01T00:00:00Z'
   },
   {
     worldId: 'world-1',
@@ -109,19 +134,24 @@ const mockJournalEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[]
     significance: 'minor',
     isRead: true,
     relatedEntities: [],
-    metadata: { tags: ['mystery'], automaticEntry: true }
+    metadata: { tags: ['mystery'], automaticEntry: true },
+    updatedAt: '2023-01-01T00:00:00Z'
   }
 ];
 
 // Decorator to add journal entries
-const withJournalEntries = (entries: typeof mockJournalEntries) => (Story: any) => {
-  const sessionId = 'session-1';
-  const { addEntry, reset } = useJournalStore.getState();
+const withJournalEntries = (entries: typeof mockJournalEntries) => {
+  const JournalEntriesDecorator = (Story: React.ComponentType) => {
+    const sessionId = 'session-1';
+    const { addEntry, reset } = useJournalStore.getState();
+    
+    reset();
+    entries.forEach(entry => addEntry(sessionId, entry));
+    
+    return <Story />;
+  };
   
-  reset();
-  entries.forEach(entry => addEntry(sessionId, entry));
-  
-  return <Story />;
+  return JournalEntriesDecorator;
 };
 
 export const WithJournalAccess: Story = {

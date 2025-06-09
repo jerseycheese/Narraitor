@@ -21,7 +21,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
   onClose,
   sessionId,
 }) => {
-  const { getSessionEntries } = useJournalStore();
+  const { getSessionEntries, markAsRead } = useJournalStore();
   
   // AC4: Don't render if not open
   if (!isOpen) return null;
@@ -34,7 +34,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
     <div 
       role="dialog" 
       aria-modal="true" 
-      aria-labelledby="journal-title"
+      aria-labelledby="journal-modal-title"
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={onClose}
     >
@@ -44,10 +44,10 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 id="journal-title" className="text-xl font-bold">Game Journal</h2>
+          <h2 id="journal-modal-title" className="text-xl font-bold">Game Journal</h2>
           <button
             onClick={onClose}
-            aria-label="Close journal modal"
+            aria-label="Close journal"
             className="text-gray-500 hover:text-gray-700 text-xl"
           >
             ×
@@ -57,17 +57,43 @@ export const JournalModal: React.FC<JournalModalProps> = ({
         {/* Content */}
         <div className="space-y-4">
           {entries.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">No journal entries yet</p>
+            <div className="text-center py-8 space-y-2">
+              <p className="text-gray-500">Your journal is empty</p>
+              <p className="text-gray-400 text-sm">Entries will appear here as your story unfolds</p>
+            </div>
           ) : (
-            entries.map(entry => (
-              <div key={entry.id} className="border-b pb-4">
-                <h3 className="font-semibold">{entry.title}</h3>
-                <p className="text-gray-700">{entry.content}</p>
-                <div className="text-sm text-gray-500 mt-2">
-                  {entry.type} • {entry.significance}
+            <div>
+              <h3 className="font-semibold mb-4">Character Events</h3>
+              {entries.map(entry => (
+                <div 
+                  key={entry.id} 
+                  className="border-b pb-4 cursor-pointer hover:bg-gray-50 p-2 rounded"
+                  onClick={() => {
+                    // Mark as read when clicked
+                    markAsRead(entry.id);
+                  }}
+                >
+                  <div className="flex items-start gap-2">
+                    {!entry.isRead && (
+                      <span 
+                        className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"
+                        aria-label="Unread"
+                        title="Unread"
+                      ></span>
+                    )}
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{entry.title}</h4>
+                      <p className="text-gray-700">{entry.content}</p>
+                      <div className="text-sm text-gray-500 mt-2 flex items-center gap-2">
+                        <span className="px-2 py-1 bg-gray-100 rounded text-xs">{entry.significance}</span>
+                        <span>•</span>
+                        <span>{entry.type.replace('_', ' ')}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
