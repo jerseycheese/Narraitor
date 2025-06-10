@@ -33,7 +33,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
   }
 
   return (
-    <div>
+    <div data-testid="world-selection-step">
       <h3 className="text-xl font-semibold text-gray-900 mb-6">
         Choose Your World
       </h3>
