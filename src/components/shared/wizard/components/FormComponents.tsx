@@ -1,5 +1,8 @@
 import React from 'react';
 import { wizardStyles } from '../styles/wizardStyles';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface WizardFormGroupProps {
   label: string;
@@ -15,14 +18,14 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
   children 
 }) => {
   return (
-    <div className={wizardStyles.form.group}>
-      <label className={wizardStyles.form.label}>
+    <div className="space-y-2">
+      <Label>
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
+      </Label>
       {children}
       {error && (
-        <p className={wizardStyles.form.error}>{error}</p>
+        <p className="text-red-600 text-sm">{error}</p>
       )}
     </div>
   );
@@ -52,7 +55,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
   testId,
 }) => {
   return (
-    <input
+    <Input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -61,7 +64,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
       disabled={disabled}
       autoFocus={autoFocus}
       maxLength={maxLength}
-      className={`${wizardStyles.form.input} ${error ? wizardStyles.form.inputError : ''}`}
+      className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
       data-testid={testId}
     />
   );
@@ -91,7 +94,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
   testId,
 }) => {
   return (
-    <textarea
+    <Textarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
@@ -99,7 +102,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
       disabled={disabled}
       rows={rows}
       maxLength={maxLength}
-      className={`${wizardStyles.form.textarea} ${error ? wizardStyles.form.inputError : ''}`}
+      className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
       data-testid={testId}
     />
   );
@@ -155,7 +158,7 @@ export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({ error }) => 
   if (!error) return null;
   
   return (
-    <p className={wizardStyles.form.error}>{error}</p>
+    <p className="text-red-600 text-sm">{error}</p>
   );
 };
 

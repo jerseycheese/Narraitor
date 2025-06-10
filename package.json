@@ -23,6 +23,7 @@
     "@google/genai": "^0.13.0",
     "@google/generative-ai": "^0.24.1",
     "@octokit/rest": "^21.1.1",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "build": "^0.1.4",
     "class-variance-authority": "^0.7.1",

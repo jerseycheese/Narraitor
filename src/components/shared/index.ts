@@ -10,5 +10,8 @@ export { ActionButtonGroup } from './ActionButtonGroup';
 export { SectionWrapper } from './SectionWrapper';
 export { PageLayout } from './PageLayout';
 export type { PageLayoutProps } from './PageLayout';
+export { LoadingOverlay } from './LoadingOverlay';
+export type { LoadingOverlayProps } from './LoadingOverlay';
+export { NavigationLoadingProvider, useNavigationLoadingContext } from './NavigationLoadingProvider';
 export * from './wizard';
 export * from './cards';

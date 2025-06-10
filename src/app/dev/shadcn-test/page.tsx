@@ -1,6 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
 
 export default function ShadcnTestPage() {
   return (
@@ -45,6 +48,53 @@ export default function ShadcnTestPage() {
                 🗑️ Delete
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Input Component Showcase</h2>
+        <div className="bg-blue-50 p-4 rounded-lg mb-4">
+          <p className="text-sm text-blue-800 font-medium mb-2">
+            📋 Tab Navigation Test Instructions:
+          </p>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>• Press Tab key to navigate forward between inputs</li>
+            <li>• Press Shift+Tab to navigate backwards</li>
+            <li>• Focused inputs should show a blue ring around them</li>
+            <li>• Disabled inputs should be skipped automatically</li>
+          </ul>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="test-input">Test Input (Tab Stop 1)</Label>
+            <Input id="test-input" placeholder="Enter some text..." />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="test-email">Email Input (Tab Stop 2)</Label>
+            <Input id="test-email" type="email" placeholder="Enter email..." />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="test-number">Number Input (Tab Stop 3)</Label>
+            <Input id="test-number" type="number" placeholder="Enter number..." />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="test-textarea">Textarea (Tab Stop 4)</Label>
+            <Textarea id="test-textarea" placeholder="Enter description..." rows={4} />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="another-input">Another Input (Tab Stop 5)</Label>
+            <Input id="another-input" placeholder="Tab should work here too..." />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="disabled-input">Disabled Input (Should be skipped)</Label>
+            <Input id="disabled-input" disabled placeholder="This is disabled" value="Cannot edit" />
           </div>
         </div>
       </section>
