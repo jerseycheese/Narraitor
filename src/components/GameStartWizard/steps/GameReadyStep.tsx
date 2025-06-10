@@ -26,7 +26,7 @@ export function GameReadyStep({
   const character = characters[characterId];
 
   return (
-    <div className="text-center py-8">
+    <div data-testid="game-ready-step" className="text-center py-8">
       <h3 className="text-2xl font-bold text-gray-900 mb-6">
         Ready to Begin Your Story!
       </h3>

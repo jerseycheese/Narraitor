@@ -50,7 +50,7 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
   }
 
   return (
-    <div>
+    <div data-testid="character-selection-step">
       <h3 className="text-xl font-semibold text-gray-900 mb-2">
         Choose Your Character
       </h3>
