@@ -107,14 +107,13 @@ The GameSession includes a fully integrated journal system that:
 ### Core Journal Features
 - **Persistent Storage**: Journal entries persist across browser sessions using IndexedDB
 - **Automatic Entry Creation**: AI-generated journal entries from narrative events
-- **Modal Interface**: Accessible journal modal with proper ARIA attributes
+- **Modal Interface**: Accessible journal modal with proper ARIA attributes, including full keyboard navigation and screen reader support
 - **Entry Organization**: Entries grouped by type with significance indicators
 - **Session Integration**: Journal access available during active gameplay
 
 ### Technical Implementation
 - **Zustand Persistence**: Uses `journalStore` with IndexedDB adapter
 - **AI Summarization**: Automatic journal entry generation from narrative segments
-- **Accessibility**: Full keyboard navigation and screen reader support
 - **Performance**: Fast loading with synchronous data access
 
 ### Usage
