@@ -42,7 +42,7 @@ export interface WorldAttribute extends NamedEntity {
  */
 export interface WorldSkill extends NamedEntity {
   worldId: EntityID;
-  linkedAttributeId?: EntityID;
+  attributeIds?: EntityID[];
   difficulty: SkillDifficulty;
   category?: string;
   baseValue: number;

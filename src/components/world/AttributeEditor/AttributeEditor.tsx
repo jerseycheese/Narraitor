@@ -124,7 +124,7 @@ export function AttributeEditor({
     if (!attributeId) return;
 
     // Check for linked skills
-    const skillsLinked = linkedSkills.filter(skill => skill.linkedAttributeId === attributeId);
+    const skillsLinked = linkedSkills.filter(skill => skill.attributeIds?.includes(attributeId));
     if (skillsLinked.length > 0) {
       setDeleteWarnings([
         `This attribute is linked to ${skillsLinked.length} skill${skillsLinked.length > 1 ? 's' : ''}`,
