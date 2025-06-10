@@ -321,7 +321,8 @@ describe('Journal Persistence Between Gameplay Sessions', () => {
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Verify data exists and persists
-      const entries = getSessionEntries('session-1');
+      const freshStore = useJournalStore.getState();
+      const entries = freshStore.getSessionEntries('session-1');
       expect(entries).toHaveLength(1);
       expect(entries[0].id).toBe(entryId);
       expect(entries[0].content).toBe('Important story event');
