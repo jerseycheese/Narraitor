@@ -179,6 +179,7 @@ export function Navigation() {
               
               {currentWorld && (
                 <button 
+                  type="button"
                   onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
                   className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
@@ -191,6 +192,7 @@ export function Navigation() {
               )}
               {!currentWorld && Object.keys(worlds).length === 0 && (
                 <button 
+                  type="button"
                   onClick={() => navigateWithLoading('/world/create', 'Setting up world creation...')}
                   className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
@@ -213,6 +215,7 @@ export function Navigation() {
               </div>
               {currentWorld && (
                 <button 
+                  type="button"
                   onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
                   className="text-indigo-400 hover:text-indigo-300"
                 >

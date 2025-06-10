@@ -24,10 +24,11 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
       <h2 className="text-xl font-bold mb-4">Basic Information</h2>
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label>
+          <Label htmlFor="character-name">
             Character Name
           </Label>
           <Input
+            id="character-name"
             type="text"
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
@@ -35,10 +36,11 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label>
+          <Label htmlFor="character-level">
             Level
           </Label>
           <select
+            id="character-level"
             value={level}
             onChange={(e) => onLevelChange(parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -50,10 +52,11 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label>
+          <Label htmlFor="character-type">
             Character Type
           </Label>
           <select
+            id="character-type"
             value={isPlayer ? 'player' : 'npc'}
             onChange={(e) => onPlayerTypeChange(e.target.value === 'player')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

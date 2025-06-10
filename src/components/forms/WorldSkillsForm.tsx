@@ -89,10 +89,11 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>
+                  <Label htmlFor={`skill-name-${index}`}>
                     Name
                   </Label>
                   <Input
+                    id={`skill-name-${index}`}
                     type="text"
                     value={skill.name}
                     onChange={(e) => handleUpdateSkill(index, { name: e.target.value })}
@@ -100,10 +101,11 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>
+                  <Label htmlFor={`skill-category-${index}`}>
                     Category
                   </Label>
                   <Input
+                    id={`skill-category-${index}`}
                     type="text"
                     value={skill.category || ''}
                     onChange={(e) => handleUpdateSkill(index, { category: e.target.value })}
@@ -111,10 +113,11 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>
+                  <Label htmlFor={`skill-description-${index}`}>
                     Description
                   </Label>
                   <Textarea
+                    id={`skill-description-${index}`}
                     value={skill.description}
                     onChange={(e) => handleUpdateSkill(index, { description: e.target.value })}
                     rows={2}
@@ -123,10 +126,11 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>
+                    <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
                     </Label>
                     <select
+                      id={`skill-difficulty-${index}`}
                       value={skill.difficulty}
                       onChange={(e) => handleUpdateSkill(index, { 
                         difficulty: e.target.value as SkillDifficulty
@@ -142,10 +146,11 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>
+                    <Label htmlFor={`skill-linked-attribute-${index}`}>
                       Linked Attribute
                     </Label>
                     <select
+                      id={`skill-linked-attribute-${index}`}
                       value={skill.linkedAttributeId || ''}
                       onChange={(e) => handleUpdateSkill(index, { 
                         linkedAttributeId: e.target.value || undefined 

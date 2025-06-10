@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { LoadingState, LoadingVariant } from '@/components/ui/LoadingState/LoadingState';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -48,13 +48,42 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   onCancel,
   className,
 }) => {
-  // Handle keyboard events
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Handle keyboard events and focus trapping
   useEffect(() => {
-    if (!isVisible || !onCancel) return;
+    if (!isVisible) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && onCancel) {
         onCancel();
+      }
+      
+      // Simple focus trap - keep focus within the dialog
+      if (event.key === 'Tab') {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        
+        const focusableElements = dialog.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        
+        if (focusableElements.length === 0) return;
+        
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+        
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            event.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
 
@@ -69,6 +98,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="loading-overlay-title"
