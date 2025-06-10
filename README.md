@@ -18,9 +18,10 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 - **Ending Generation**: AI-powered story conclusions with multiple ending types and visual feedback
 - **Journal System**: Comprehensive tracking of gameplay events, decisions, and narrative progression
 - **State Persistence**: Reliable session management using IndexedDB for seamless gameplay continuation
+- **Navigation Loading System**: Comprehensive loading states with debounced indicators, accessibility support, and graceful error handling
 - **Visual Theming**: Dynamic styling and presentation based on world settings and narrative context
 - **Template Worlds**: Pre-configured worlds (Western, Sitcom, Adventure) for quick start gameplay
-- **Accessibility**: Screen reader support, keyboard navigation, and semantic HTML structure
+- **Accessibility**: Screen reader support, keyboard navigation, semantic HTML structure, and focus management
 
 ## Getting Started
 
