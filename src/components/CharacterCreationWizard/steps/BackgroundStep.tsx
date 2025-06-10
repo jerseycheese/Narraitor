@@ -1,5 +1,8 @@
 import React from 'react';
-import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { WizardFormSection } from '@/components/shared/wizard';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface BackgroundStepProps {
   data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -65,76 +68,72 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         </p>
       </div>
 
-      <div className={wizardStyles.form.group}>
-        <label htmlFor="character-history" className={wizardStyles.form.label}>
+      <div className="space-y-2">
+        <Label htmlFor="character-history">
           Character History
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id="character-history"
           value={data.characterData.background.history}
           onChange={handleHistoryChange}
           rows={6}
-          className={wizardStyles.form.textarea}
           placeholder="Describe your character's background and history... (minimum 50 characters)"
         />
-        <p className={wizardStyles.form.helpText}>
+        <p className="text-gray-500 text-sm mt-1">
           {data.characterData.background.history.length} / 50 characters minimum
         </p>
       </div>
 
-      <div className={wizardStyles.form.group}>
-        <label htmlFor="character-personality" className={wizardStyles.form.label}>
+      <div className="space-y-2">
+        <Label htmlFor="character-personality">
           Personality
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id="character-personality"
           value={data.characterData.background.personality}
           onChange={handlePersonalityChange}
           rows={4}
-          className={wizardStyles.form.textarea}
           placeholder="Describe your character's personality traits... (minimum 30 characters)"
         />
-        <p className={wizardStyles.form.helpText}>
+        <p className="text-gray-500 text-sm mt-1">
           {data.characterData.background.personality.length} / 30 characters minimum
         </p>
       </div>
 
-      <div className={wizardStyles.form.group}>
-        <label htmlFor="character-motivation" className={wizardStyles.form.label}>
+      <div className="space-y-2">
+        <Label htmlFor="character-motivation">
           Motivation
-        </label>
-        <input
+        </Label>
+        <Input
           id="character-motivation"
           type="text"
           value={data.characterData.background.motivation}
           onChange={handleMotivationChange}
-          className={wizardStyles.form.input}
           placeholder="What drives your character? (minimum 10 characters)"
         />
-        <p className={wizardStyles.form.helpText}>
+        <p className="text-gray-500 text-sm mt-1">
           {data.characterData.background.motivation.length} / 10 characters minimum
         </p>
       </div>
 
-      <div className={wizardStyles.form.group}>
-        <label htmlFor="character-goals" className={wizardStyles.form.label}>
+      <div className="space-y-2">
+        <Label htmlFor="character-goals">
           Goals (Optional)
-        </label>
-        <textarea
+        </Label>
+        <Textarea
           id="character-goals"
           value={data.characterData.background.goals.join('\n')}
           onChange={handleGoalsChange}
           rows={3}
-          className={wizardStyles.form.textarea}
           placeholder="Enter your character's goals, one per line"
         />
       </div>
 
       {/* Validation errors */}
       {showErrors && (
-        <div className={wizardStyles.errorContainer}>
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           {validation.errors.map((error: string, index: number) => (
-            <p key={index} className={wizardStyles.form.error}>
+            <p key={index} className="text-red-600 text-sm mt-1">
               {error}
             </p>
           ))}

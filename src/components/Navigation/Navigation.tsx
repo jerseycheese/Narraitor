@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { Breadcrumbs } from './Breadcrumbs';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
@@ -30,9 +31,9 @@ import { LogoIcon, LogoText } from '@/components/ui/Logo';
  */
 export function Navigation() {
   const pathname = usePathname();
-  const router = useRouter();
   const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
   const { characters } = useCharacterStore();
+  const { navigateWithLoading } = useNavigationLoadingContext();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
@@ -61,8 +62,9 @@ export function Navigation() {
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
     setShowWorldSwitcher(false);
-    // Navigate to the selected world's view page
-    router.push(`/world/${worldId}`);
+    // Navigate to the selected world's view page with loading state
+    const worldName = worlds[worldId]?.name || 'world';
+    navigateWithLoading(`/world/${worldId}`, `Loading ${worldName}...`);
   };
   
   // Don't show navigation on dev pages
@@ -176,8 +178,8 @@ export function Navigation() {
               )}
               
               {currentWorld && (
-                <Link 
-                  href={`/world/${currentWorld.id}/play`}
+                <button 
+                  onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
                   className="hidden sm:inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,15 +187,15 @@ export function Navigation() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Play
-                </Link>
+                </button>
               )}
               {!currentWorld && Object.keys(worlds).length === 0 && (
-                <Link 
-                  href="/world/create" 
+                <button 
+                  onClick={() => navigateWithLoading('/world/create', 'Setting up world creation...')}
                   className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
                 >
                   Create Your First World
-                </Link>
+                </button>
               )}
             </div>
           </div>
@@ -210,9 +212,12 @@ export function Navigation() {
                 </Link>
               </div>
               {currentWorld && (
-                <Link href={`/world/${currentWorld.id}/play`} className="text-indigo-400 hover:text-indigo-300">
+                <button 
+                  onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
+                  className="text-indigo-400 hover:text-indigo-300"
+                >
                   ▶ Play
-                </Link>
+                </button>
               )}
             </div>
           </div>

@@ -141,49 +141,7 @@
     cursor: pointer;
   }
   
-  /* Form element defaults */
-  label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-gray-700);
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  textarea,
-  select {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-gray-300);
-    border-radius: 0.375rem;
-    box-shadow: var(--shadow-sm);
-  }
-  
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="number"]:focus,
-  textarea:focus,
-  select:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 1px var(--color-blue-500);
-    border-color: var(--color-blue-500);
-  }
-  
-  /* Form spacing */
-  label + input,
-  label + textarea,
-  label + select {
-    margin-top: 0.5rem;
-  }
-  
-  form > div + div {
-    margin-top: 1rem;
-  }
+  /* Form element defaults removed - using shadcn/ui components */
 }
 
 /* Space utilities - explicit rules for Tailwind v4 */

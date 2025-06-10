@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -192,9 +192,10 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
     }),
   });
 
-  // Auto-save data when wizard state changes
-  useEffect(() => {
-    setData({ 
+  // Navigation handlers
+  const handleNext = () => {
+    // Manual save before navigation (avoid useEffect with setData)
+    const newData = { 
       characterData: wizard.state.data,
       currentStep: wizard.state.currentStep,
       worldId: wizard.state.data.worldId,
@@ -203,15 +204,24 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         attributes: attributePool.pool,
         skills: skillPool.pool,
       },
-    });
-  }, [wizard.state.data, wizard.state.currentStep, wizard.state.validation, attributePool.pool, skillPool.pool, setData]);
-
-  // Navigation handlers
-  const handleNext = () => {
+    };
+    setData(newData);
     wizard.goNext();
   };
 
   const handleBack = () => {
+    // Manual save before navigation (avoid useEffect with setData)
+    const newData = { 
+      characterData: wizard.state.data,
+      currentStep: wizard.state.currentStep,
+      worldId: wizard.state.data.worldId,
+      validation: wizard.state.validation,
+      pointPools: {
+        attributes: attributePool.pool,
+        skills: skillPool.pool,
+      },
+    };
+    setData(newData);
     wizard.goBack();
   };
 

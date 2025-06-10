@@ -1,4 +1,6 @@
 import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface BasicInfoFormProps {
   name: string;
@@ -21,22 +23,21 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Basic Information</h2>
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Character Name
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Level
-          </label>
+          </Label>
           <select
             value={level}
             onChange={(e) => onLevelChange(parseInt(e.target.value))}
@@ -48,10 +49,10 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           </select>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Character Type
-          </label>
+          </Label>
           <select
             value={isPlayer ? 'player' : 'npc'}
             onChange={(e) => onPlayerTypeChange(e.target.value === 'player')}

@@ -12,6 +12,9 @@ import {
   SkillDifficulty
 } from '@/lib/constants/skillDifficultyLevels';
 import SkillRangeEditor from './SkillRangeEditor';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface WorldSkillsFormProps {
   skills: WorldSkill[];
@@ -85,47 +88,44 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="space-y-2">
+                  <Label>
                     Name
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={skill.name}
                     onChange={(e) => handleUpdateSkill(index, { name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="space-y-2">
+                  <Label>
                     Category
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     value={skill.category || ''}
                     onChange={(e) => handleUpdateSkill(index, { category: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="space-y-2">
+                  <Label>
                     Description
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     value={skill.description}
                     onChange={(e) => handleUpdateSkill(index, { description: e.target.value })}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="space-y-2">
+                    <Label>
                       Difficulty
-                    </label>
+                    </Label>
                     <select
                       value={skill.difficulty}
                       onChange={(e) => handleUpdateSkill(index, { 
@@ -141,10 +141,10 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     </select>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="space-y-2">
+                    <Label>
                       Linked Attribute
-                    </label>
+                    </Label>
                     <select
                       value={skill.linkedAttributeId || ''}
                       onChange={(e) => handleUpdateSkill(index, { 

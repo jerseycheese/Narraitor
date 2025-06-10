@@ -1,4 +1,6 @@
 import React from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface Background {
   history: string;
@@ -28,41 +30,38 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-bold mb-4">Background</h2>
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             History
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             value={background.history || ''}
             onChange={(e) => handleChange('history', e.target.value)}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Describe your character's history and background..."
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Personality
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             value={background.personality || ''}
             onChange={(e) => handleChange('personality', e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Describe your character's personality traits..."
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Goals & Motivations
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             value={background.goals?.join('\n') || ''}
             onChange={(e) => handleChange('goals', e.target.value.split('\n').filter(g => g.trim()))}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="List your character's goals and motivations (one per line)"
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -70,15 +69,14 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
           </p>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Fears
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             value={background.fears?.join('\n') || ''}
             onChange={(e) => handleChange('fears', e.target.value.split('\n').filter(f => f.trim()))}
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="What does your character fear? (one per line)"
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -86,15 +84,14 @@ export const BackgroundForm: React.FC<BackgroundFormProps> = ({
           </p>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label>
             Physical Description
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             value={background.physicalDescription || ''}
             onChange={(e) => handleChange('physicalDescription', e.target.value)}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Describe your character's appearance, distinctive features, clothing style..."
           />
           <p className="text-xs text-gray-500 mt-1">
