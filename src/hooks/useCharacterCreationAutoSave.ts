@@ -26,7 +26,6 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
       // Debounce the save operation to prevent excessive writes
       saveTimeoutRef.current = setTimeout(() => {
         sessionStorage.setItem(saveKey, JSON.stringify(data));
-        console.log(`[AutoSave] Saved character creation data for world ${worldId}`);
       }, 300); // 300ms debounce
     }
   }, [data, saveKey, worldId]);
@@ -54,7 +53,6 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          console.log(`[AutoSave] Loaded character creation data for world ${worldId}:`, parsed);
           setDataInternal(parsed);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
@@ -62,7 +60,6 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
         }
       } else {
-        console.log(`[AutoSave] No saved data found for key: ${saveKey}`);
         hasLoadedRef.current = true; // Mark as loaded even if no data found
       }
     };
