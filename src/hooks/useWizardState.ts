@@ -113,16 +113,30 @@ export function useWizardState<TData = unknown>({
   }, [onStepValidation, onDataChange]);
 
   const goNext = useCallback(() => {
-    if (!canGoNext) return;
-
     setState(prev => {
+      // Re-validate current step with current data before navigating
+      let currentStepValid = true;
+      if (onStepValidation) {
+        const validation = onStepValidation(prev.currentStep, prev.data);
+        currentStepValid = validation.valid;
+      }
+      
+      // Only proceed if current step is valid and not processing
+      if (!currentStepValid || prev.isProcessing) {
+        return prev;
+      }
+      
       const nextStep = Math.min(prev.currentStep + 1, steps.length - 1);
+      if (nextStep === prev.currentStep) {
+        return prev; // Already at last step
+      }
+      
       return {
         ...prev,
         currentStep: nextStep,
       };
     });
-  }, [canGoNext, steps.length]);
+  }, [onStepValidation, steps.length]);
 
   const goBack = useCallback(() => {
     if (!canGoBack) return;
