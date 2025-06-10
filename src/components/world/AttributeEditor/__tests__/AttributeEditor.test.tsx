@@ -27,7 +27,7 @@ describe('AttributeEditor', () => {
     worldId: mockWorldId,
     name: 'Athletics',
     description: 'Physical activities',
-    linkedAttributeId: mockAttributeId,
+    attributeIds: [mockAttributeId],
     difficulty: 'medium',
     minValue: 1,
     maxValue: 10,

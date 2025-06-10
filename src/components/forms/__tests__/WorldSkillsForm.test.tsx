@@ -22,7 +22,7 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
       worldId: 'world-123',
       name: 'Athletics',
       description: 'Physical prowess',
-      linkedAttributeId: 'attr-1',
+      attributeIds: ['attr-1'],
       difficulty: 'medium',
       baseValue: 5,
       minValue: 1,
@@ -95,8 +95,8 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
     expect(mockOnChange).toHaveBeenCalledWith([]);
   });
 
-  // Test linking skill to attribute
-  test('allows linking skill to attribute', () => {
+  // Test linking skill to multiple attributes
+  test('allows linking skill to multiple attributes', () => {
     render(
       <WorldSkillsForm 
         skills={mockSkills}
@@ -106,16 +106,14 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
       />
     );
 
-    // Find the select by the label
-    const linkedAttributeLabel = screen.getByText('Linked Attribute');
-    const linkedAttributeSelect = linkedAttributeLabel.parentElement?.querySelector('select');
+    // Find the checkbox for the attribute (Strength is already linked)
+    const strengthCheckbox = screen.getByRole('checkbox', { name: /strength/i });
     
-    if (linkedAttributeSelect) {
-      fireEvent.change(linkedAttributeSelect, { target: { value: '' } });
-    }
+    // Uncheck it to remove the link
+    fireEvent.click(strengthCheckbox);
 
     expect(mockOnChange).toHaveBeenCalledWith([
-      { ...mockSkills[0], linkedAttributeId: undefined },
+      { ...mockSkills[0], attributeIds: [] },
     ]);
   });
 
