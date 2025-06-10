@@ -3,18 +3,16 @@ title: Journal System Requirements
 aliases: [Game History Requirements]
 tags: [narraitor, requirements, journal-system]
 created: 2025-04-29
-updated: 2025-05-26
+updated: 2025-06-10
 ---
 
-> **⚠️ POST-MVP SYSTEM**
+> **✅ ACTIVE SYSTEM**
 > 
-> **Status**: Implementation complete but deprioritized to post-MVP
+> **Status**: Implementation complete and active in production
 > 
-> **Reason**: To focus on core narrative experience for the MVP release
+> **Updated**: June 2025
 > 
-> **Date**: May 2025
-> 
-> This system is fully functional and tested but will not be exposed in the UI until post-MVP phase.
+> This system provides persistent storage of journal entries across gameplay sessions with automatic entry creation from narrative events.
 
 # Journal System Requirements
 
