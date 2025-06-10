@@ -295,7 +295,7 @@ export default function SkillReviewStep({
                         minValue: SKILL_MIN_VALUE,
                         maxValue: SKILL_MAX_VALUE,
                         category: suggestion.category,
-                        linkedAttributeId: worldData.skills.find(skill => skill.name === suggestion.name)?.linkedAttributeId
+                        attributeIds: worldData.skills.find(skill => skill.name === suggestion.name)?.attributeIds || []
                       }}
                       onChange={(updates) => {
                         // Find the skill in the worldData and update it

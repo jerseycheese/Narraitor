@@ -1,423 +1,274 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SkillEditor } from './SkillEditor';
-import { EntityID } from '@/types/common.types';
-import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { action } from '@storybook/addon-actions';
+import { SkillEditor } from './SkillEditor';
+import { WorldAttribute, WorldSkill } from '@/types/world.types';
+// SkillDifficulty type used in WorldSkill interface
 
-const meta = {
+const mockAttributes: WorldAttribute[] = [
+  {
+    id: 'attr-1',
+    name: 'Strength',
+    description: 'Physical power and muscle',
+    worldId: 'world-1',
+    baseValue: 8,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'attr-2',
+    name: 'Intelligence',
+    description: 'Mental capacity and reasoning',
+    worldId: 'world-1',
+    baseValue: 7,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'attr-3',
+    name: 'Dexterity',
+    description: 'Agility and hand-eye coordination',
+    worldId: 'world-1',
+    baseValue: 6,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'attr-4',
+    name: 'Charisma',
+    description: 'Social skills and leadership',
+    worldId: 'world-1',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
+  },
+];
+
+const mockSkills: WorldSkill[] = [
+  {
+    id: 'skill-1',
+    name: 'Swordsmanship',
+    description: 'Combat with bladed weapons',
+    worldId: 'world-1',
+    attributeIds: ['attr-1', 'attr-3'],
+    difficulty: 'medium',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'skill-2',
+    name: 'Diplomacy',
+    description: 'Negotiation and persuasion',
+    worldId: 'world-1',
+    attributeIds: ['attr-2', 'attr-4'],
+    difficulty: 'hard',
+    baseValue: 4,
+    minValue: 1,
+    maxValue: 10,
+  },
+];
+
+const meta: Meta<typeof SkillEditor> = {
   title: 'Narraitor/World/SkillEditor',
   component: SkillEditor,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: `
-        SkillEditor component for creating and editing skills with multiple attribute connections.
-        
-        Key features:
-        - Multi-attribute linking via checkboxes
-        - Skill difficulty selection
-        - Range and value validation
-        - Delete confirmation with warnings
-        - Maximum skill limit enforcement (12 skills)
-        `,
+        component: 'A component for creating and editing skills with multi-attribute linking capabilities.',
       },
     },
   },
-  tags: ['autodocs'],
+  args: {
+    worldId: 'world-1',
+    existingAttributes: mockAttributes,
+    existingSkills: mockSkills,
+    onSave: action('onSave'),
+    onCancel: action('onCancel'),
+    onDelete: action('onDelete'),
+  },
   argTypes: {
     mode: {
-      control: 'radio',
+      control: 'select',
       options: ['create', 'edit'],
     },
+    maxSkills: {
+      control: 'number',
+    },
   },
-  decorators: [
-    (Story) => (
-      <div className="w-full max-w-4xl mx-auto p-4">
-        <Story />
-      </div>
-    ),
-  ],
-} satisfies Meta<typeof SkillEditor>;
+  tags: ['autodocs'],
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
-// Mock data
-const mockWorldId = 'world-123' as EntityID;
-const mockSkillId = 'skill-456' as EntityID;
-
-const mockAttributes: WorldAttribute[] = [
-  {
-    id: 'attr-1' as EntityID,
-    worldId: mockWorldId,
-    name: 'Strength',
-    description: 'Physical power and endurance',
-    baseValue: 10,
-    minValue: 1,
-    maxValue: 20,
-  },
-  {
-    id: 'attr-2' as EntityID,
-    worldId: mockWorldId,
-    name: 'Intelligence',
-    description: 'Mental acuity and problem-solving ability',
-    baseValue: 12,
-    minValue: 1,
-    maxValue: 20,
-  },
-  {
-    id: 'attr-3' as EntityID,
-    worldId: mockWorldId,
-    name: 'Dexterity',
-    description: 'Agility and reflexes',
-    baseValue: 14,
-    minValue: 1,
-    maxValue: 20,
-  },
-  {
-    id: 'attr-4' as EntityID,
-    worldId: mockWorldId,
-    name: 'Charisma',
-    description: 'Force of personality and social skills',
-    baseValue: 8,
-    minValue: 1,
-    maxValue: 20,
-  },
-];
-
-const mockExistingSkills: WorldSkill[] = [
-  {
-    id: 'existing-skill-1' as EntityID,
-    worldId: mockWorldId,
-    name: 'Athletics',
-    description: 'Physical prowess and endurance activities',
-    attributeIds: ['attr-1', 'attr-3'], // Strength + Dexterity
-    difficulty: 'medium',
-    category: 'Physical',
-    baseValue: 3,
-    minValue: 1,
-    maxValue: 5,
-  },
-  {
-    id: 'existing-skill-2' as EntityID,
-    worldId: mockWorldId,
-    name: 'Persuasion',
-    description: 'Convincing others through charm and reasoning',
-    attributeIds: ['attr-4'], // Charisma only
-    difficulty: 'easy',
-    category: 'Social',
-    baseValue: 2,
-    minValue: 1,
-    maxValue: 5,
-  },
-];
+type Story = StoryObj<typeof SkillEditor>;
 
 export const CreateMode: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: mockExistingSkills,
+  },
+};
+
+export const CreateModeWithMaxSkills: Story = {
+  args: {
+    mode: 'create',
+    maxSkills: 12,
   },
   parameters: {
     docs: {
       description: {
-        story: 'Create mode allows users to create a new skill with multiple attribute connections.'
-      }
-    }
-  }
+        story: 'Shows the skill editor in create mode with a maximum skill limit enforced.',
+      },
+    },
+  },
+};
+
+export const CreateModeAtMaxLimit: Story = {
+  args: {
+    mode: 'create',
+    maxSkills: 2, // Same as number of existing skills
+    existingSkills: mockSkills,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the skill editor when the maximum number of skills has been reached.',
+      },
+    },
+  },
 };
 
 export const EditMode: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'edit',
-    skillId: mockSkillId,
-    onSave: action('onSave'),
-    onDelete: action('onDelete'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: [
-      ...mockExistingSkills,
-      {
-        id: mockSkillId,
-        worldId: mockWorldId,
-        name: 'Investigation',
-        description: 'Finding clues and solving mysteries through careful observation and deduction',
-        attributeIds: ['attr-2', 'attr-3'], // Intelligence + Dexterity
-        difficulty: 'hard',
-        category: 'Mental',
-        baseValue: 4,
-        minValue: 1,
-        maxValue: 5,
-      },
-    ],
+    skillId: 'skill-1',
   },
   parameters: {
     docs: {
       description: {
-        story: 'Edit mode allows users to modify existing skills, including changing attribute connections.'
-      }
-    }
-  }
+        story: 'Shows the skill editor in edit mode with existing skill data loaded.',
+      },
+    },
+  },
 };
 
-export const EditWithManyAttributes: Story = {
+export const EditModeWithDeleteHandler: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'edit',
-    skillId: mockSkillId,
-    onSave: action('onSave'),
+    skillId: 'skill-1',
     onDelete: action('onDelete'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: [
-      ...mockExistingSkills,
-      {
-        id: mockSkillId,
-        worldId: mockWorldId,
-        name: 'Leadership',
-        description: 'Inspiring and guiding others in challenging situations',
-        attributeIds: ['attr-1', 'attr-2', 'attr-4'], // Strength + Intelligence + Charisma
-        difficulty: 'hard',
-        category: 'Social',
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
-      },
-    ],
   },
   parameters: {
     docs: {
       description: {
-        story: 'Skills can be linked to multiple attributes, showing how complex abilities combine different aspects.'
-      }
-    }
-  }
+        story: 'Shows the skill editor in edit mode with delete functionality enabled.',
+      },
+    },
+  },
 };
 
 export const NoAttributes: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
     existingAttributes: [],
-    existingSkills: [],
   },
   parameters: {
     docs: {
       description: {
-        story: 'When no attributes exist, the skill editor shows a helpful message.'
-      }
-    }
-  }
+        story: 'Shows the skill editor when no attributes are available for linking.',
+      },
+    },
+  },
 };
 
-export const NearSkillLimit: Story = {
+export const SingleAttribute: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: Array(11).fill(null).map((_, i) => ({
-      id: `skill-${i}` as EntityID,
-      worldId: mockWorldId,
-      name: `Skill ${i + 1}`,
-      description: `Description for skill ${i + 1}`,
-      attributeIds: [mockAttributes[i % mockAttributes.length].id],
-      difficulty: 'medium' as const,
-      category: 'Test',
-      baseValue: 2,
-      minValue: 1,
-      maxValue: 5,
-    })),
+    existingAttributes: [mockAttributes[0]],
   },
   parameters: {
     docs: {
       description: {
-        story: 'Creating the 12th skill (maximum allowed) - should still work.'
-      }
-    }
-  }
+        story: 'Shows the skill editor with only one attribute available for linking.',
+      },
+    },
+  },
 };
 
-export const AtSkillLimit: Story = {
+export const ManyAttributes: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: Array(12).fill(null).map((_, i) => ({
-      id: `skill-${i}` as EntityID,
-      worldId: mockWorldId,
-      name: `Skill ${i + 1}`,
-      description: `Description for skill ${i + 1}`,
-      attributeIds: [mockAttributes[i % mockAttributes.length].id],
-      difficulty: 'medium' as const,
-      category: 'Test',
-      baseValue: 2,
-      minValue: 1,
-      maxValue: 5,
-    })),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Attempting to create a 13th skill should show validation error about the limit.'
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    // Auto-fill and try to save to trigger the validation error
-    const canvas = canvasElement;
-    const nameInput = canvas.querySelector('#skill-name') as HTMLInputElement;
-    const saveButton = canvas.querySelector('button[type="button"]') as HTMLButtonElement;
-    
-    if (nameInput && saveButton) {
-      nameInput.value = 'Too Many Skills';
-      nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      setTimeout(() => {
-        saveButton.click();
-      }, 500);
-    }
-  },
-};
-
-export const DeleteConfirmation: Story = {
-  args: {
-    worldId: mockWorldId,
-    mode: 'edit',
-    skillId: mockSkillId,
-    onSave: action('onSave'),
-    onDelete: action('onDelete'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: [
-      ...mockExistingSkills,
+    existingAttributes: [
+      ...mockAttributes,
       {
-        id: mockSkillId,
-        worldId: mockWorldId,
-        name: 'Dangerous Skill',
-        description: 'A skill that will be deleted',
-        attributeIds: ['attr-1', 'attr-2', 'attr-3'], // Linked to multiple attributes
-        difficulty: 'hard',
-        category: 'Test',
-        baseValue: 5,
+        id: 'attr-5',
+        name: 'Constitution',
+        description: 'Physical endurance and health',
+        worldId: 'world-1',
+        baseValue: 6,
         minValue: 1,
-        maxValue: 5,
+        maxValue: 10,
+      },
+      {
+        id: 'attr-6',
+        name: 'Wisdom',
+        description: 'Intuition and insight',
+        worldId: 'world-1',
+        baseValue: 7,
+        minValue: 1,
+        maxValue: 10,
       },
     ],
   },
   parameters: {
     docs: {
       description: {
-        story: 'Delete confirmation dialog shows warnings when skill is linked to multiple attributes.'
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    // Automatically open delete confirmation dialog
-    const deleteButton = canvasElement.querySelector('button[aria-label*="delete"]') as HTMLButtonElement;
-    if (deleteButton) {
-      setTimeout(() => deleteButton.click(), 500);
-    }
+        story: 'Shows the skill editor with many attributes available for testing scrolling and selection.',
+      },
+    },
   },
 };
 
-export const ValidationErrors: Story = {
+export const EditComplexSkill: Story = {
   args: {
-    worldId: mockWorldId,
-    mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: mockExistingSkills,
+    mode: 'edit',
+    skillId: 'skill-complex',
+    existingSkills: [
+      ...mockSkills,
+      {
+        id: 'skill-complex',
+        name: 'Battle Tactics',
+        description: 'Advanced military strategy and battlefield coordination requiring multiple mental and social skills',
+        worldId: 'world-1',
+        attributeIds: ['attr-2', 'attr-4'], // Intelligence + Charisma
+        difficulty: 'hard',
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 10,
+      },
+    ],
   },
   parameters: {
     docs: {
       description: {
-        story: 'Validation errors are shown when trying to save invalid data.'
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    // Auto-trigger validation errors
-    const canvas = canvasElement;
-    const minInput = canvas.querySelector('#min-value') as HTMLInputElement;
-    const maxInput = canvas.querySelector('#max-value') as HTMLInputElement;
-    const saveButton = Array.from(canvas.querySelectorAll('button'))
-      .find(btn => btn.textContent?.includes('Create')) as HTMLButtonElement;
-    
-    if (minInput && maxInput && saveButton) {
-      // Set invalid range (min >= max)
-      minInput.value = '5';
-      minInput.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      maxInput.value = '3';
-      maxInput.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      setTimeout(() => {
-        saveButton.click();
-      }, 500);
-    }
+        story: 'Shows editing a complex skill with multiple attributes and a long description.',
+      },
+    },
   },
 };
 
-export const DuplicateNameValidation: Story = {
+export const ValidationExample: Story = {
   args: {
-    worldId: mockWorldId,
     mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: mockExistingSkills,
   },
   parameters: {
     docs: {
       description: {
-        story: 'Validation prevents creating skills with duplicate names.'
-      }
-    }
+        story: 'Use this story to test validation by submitting empty forms or duplicate names.',
+      },
+    },
   },
-  play: async ({ canvasElement }) => {
-    // Auto-fill with duplicate name and try to save
-    const canvas = canvasElement;
-    const nameInput = canvas.querySelector('#skill-name') as HTMLInputElement;
-    const saveButton = Array.from(canvas.querySelectorAll('button'))
-      .find(btn => btn.textContent?.includes('Create')) as HTMLButtonElement;
-    
-    if (nameInput && saveButton) {
-      nameInput.value = 'Athletics'; // Duplicate of existing skill
-      nameInput.dispatchEvent(new Event('input', { bubbles: true }));
-      
-      setTimeout(() => {
-        saveButton.click();
-      }, 500);
-    }
+  play: async () => {
+    // This story is primarily for manual validation testing
+    // Users can interact with it to see validation errors
   },
-};
-
-export const InteractiveDemo: Story = {
-  args: {
-    worldId: mockWorldId,
-    mode: 'create',
-    onSave: action('onSave'),
-    onCancel: action('onCancel'),
-    existingAttributes: mockAttributes,
-    existingSkills: mockExistingSkills,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Interactive demo for testing all functionality. Try creating a skill with multiple attributes!'
-      }
-    }
-  }
 };

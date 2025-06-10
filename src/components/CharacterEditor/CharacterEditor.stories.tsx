@@ -55,7 +55,7 @@ const meta = {
             description: 'Skill with bladed weapons',
             worldId: testWorldId,
             difficulty: 'medium' as const,
-            linkedAttributeId: 'attr1',
+            attributeIds: ['attr1'],
             baseValue: 5,
             minValue: 0,
             maxValue: 10
@@ -66,7 +66,7 @@ const meta = {
             description: 'Arcane knowledge',
             worldId: testWorldId,
             difficulty: 'hard' as const,
-            linkedAttributeId: 'attr2',
+            attributeIds: ['attr2'],
             baseValue: 3,
             minValue: 0,
             maxValue: 10

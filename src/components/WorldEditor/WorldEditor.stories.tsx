@@ -44,12 +44,11 @@ const mockWorld: World = {
       worldId: 'world-123',
       name: 'Athletics',
       description: 'Physical prowess',
-      linkedAttributeId: 'attr-1',
+      attributeIds: ['attr-1'],
       difficulty: 'medium' as SkillDifficulty,
       baseValue: 5,
       minValue: 1,
       maxValue: 10,
-      category: 'Physical',
     },
   ],
   settings: {

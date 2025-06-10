@@ -69,11 +69,12 @@ interface WorldSkill extends NamedEntity {
 
 ## Validation Rules
 
-- **Name**: Required, must be unique within the world
-- **Attribute Links**: Optional, can link to 0 or more attributes
+- **Name**: Required (1-100 characters), must be unique within the world
+- **Description**: Required (1-500 characters)
+- **Attribute Links**: At least one attribute must be selected
 - **Value Ranges**: minValue must be less than maxValue
 - **Base Value**: Must be between minValue and maxValue
-- **Skill Limit**: Maximum 12 skills per world
+- **Skill Limit**: Configurable maximum skills per world (default: 12)
 
 ## Testing
 

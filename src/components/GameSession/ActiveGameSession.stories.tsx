@@ -163,12 +163,11 @@ const mockWorld: World = {
       worldId: 'world-123',
       name: 'Swordsmanship',
       description: 'Mastery of blade weapons',
-      linkedAttributeId: 'attr-1',
+      attributeIds: ['attr-1'],
       difficulty: 'medium',
       baseValue: 5,
       minValue: 1,
       maxValue: 10,
-      category: 'Combat',
     },
   ],
   settings: {

@@ -26,7 +26,7 @@ export function validateAttributeDeletion(
 
   // Find all skills linked to this attribute
   const linkedSkills = Object.values(world.skills).filter(
-    (skill) => skill.linkedAttributeId === attributeId
+    (skill) => skill.attributeIds?.includes(attributeId)
   );
 
   if (linkedSkills.length > 0) {

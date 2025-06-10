@@ -2,17 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+// SkillDifficulty type used in WorldSkill interface
+import { DEFAULT_SKILL_DIFFICULTY } from '@/lib/constants/skillDifficultyLevels';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
-import {
-  SKILL_DIFFICULTIES,
-  DEFAULT_SKILL_DIFFICULTY,
-  SkillDifficulty
-} from '@/lib/constants/skillDifficultyLevels';
-import { 
-  MIN_SKILL_VALUE, 
-  MAX_SKILL_VALUE, 
-  SKILL_DEFAULT_VALUE 
-} from '@/lib/constants/skillLevelDescriptions';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 export interface SkillEditorProps {
   worldId: EntityID;
@@ -22,7 +18,8 @@ export interface SkillEditorProps {
   onDelete?: (skillId: EntityID) => void;
   onCancel: () => void;
   existingSkills?: WorldSkill[];
-  existingAttributes?: WorldAttribute[];
+  existingAttributes: WorldAttribute[];
+  maxSkills?: number;
 }
 
 export function SkillEditor({
@@ -33,365 +30,271 @@ export function SkillEditor({
   onDelete,
   onCancel,
   existingSkills = [],
-  existingAttributes = [],
+  existingAttributes,
+  maxSkills,
 }: SkillEditorProps) {
   const [formData, setFormData] = useState<Partial<WorldSkill>>({
     name: '',
     description: '',
-    category: '',
-    difficulty: DEFAULT_SKILL_DIFFICULTY,
     attributeIds: [],
-    baseValue: SKILL_DEFAULT_VALUE,
-    minValue: MIN_SKILL_VALUE,
-    maxValue: MAX_SKILL_VALUE,
+    difficulty: DEFAULT_SKILL_DIFFICULTY,
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
   });
-
   const [errors, setErrors] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteWarnings, setDeleteWarnings] = useState<string[]>([]);
 
   // Load existing skill data in edit mode
   useEffect(() => {
     if (mode === 'edit' && skillId) {
-      const skill = existingSkills.find(s => s.id === skillId);
-      if (skill) {
+      const existingSkill = existingSkills.find(skill => skill.id === skillId);
+      if (existingSkill) {
         setFormData({
-          id: skill.id,
-          name: skill.name,
-          description: skill.description,
-          category: skill.category,
-          difficulty: skill.difficulty,
-          attributeIds: [...skill.attributeIds],
-          baseValue: skill.baseValue,
-          minValue: skill.minValue,
-          maxValue: skill.maxValue,
+          ...existingSkill,
+          attributeIds: existingSkill.attributeIds || [],
         });
       }
     }
   }, [mode, skillId, existingSkills]);
 
-  const handleChange = (field: keyof WorldSkill, value: string | number | SkillDifficulty) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: field === 'minValue' || field === 'maxValue' || field === 'baseValue' 
-        ? Number(value) 
-        : value,
-    }));
-    
-    // Clear errors when user starts typing
+  // Clear errors when form data changes
+  useEffect(() => {
     if (errors.length > 0) {
-      setErrors([]);
+      const newErrors = validateForm();
+      setErrors(newErrors);
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.name, formData.description, formData.attributeIds, errors.length, existingSkills, mode, skillId]);
 
-  const handleAttributeToggle = (attributeId: EntityID) => {
-    setFormData((prev) => {
-      const currentAttributeIds = prev.attributeIds || [];
-      const isSelected = currentAttributeIds.includes(attributeId);
-      
-      return {
-        ...prev,
-        attributeIds: isSelected
-          ? currentAttributeIds.filter(id => id !== attributeId)
-          : [...currentAttributeIds, attributeId],
-      };
-    });
-
-    // Clear errors when user makes changes
-    if (errors.length > 0) {
-      setErrors([]);
-    }
-  };
-
-  const handleSave = () => {
+  const validateForm = (): string[] => {
     const validationErrors: string[] = [];
-    
-    // Basic validation
-    if (!formData.name?.trim()) {
+    const trimmedName = formData.name?.trim() || '';
+    const trimmedDescription = formData.description?.trim() || '';
+
+    // Required field validation
+    if (!trimmedName) {
       validationErrors.push('Skill name is required');
     }
-    
-    // Check for duplicate names (excluding current skill in edit mode)
-    const isDuplicate = existingSkills.some(
-      skill => skill.name.toLowerCase() === formData.name?.toLowerCase() && skill.id !== skillId
-    );
-    if (isDuplicate) {
-      validationErrors.push('A skill with this name already exists');
-    }
-    
-    // Range validation
-    if (formData.minValue !== undefined && formData.maxValue !== undefined && 
-        formData.minValue >= formData.maxValue) {
-      validationErrors.push('Maximum value must be greater than minimum value');
+
+    if (!trimmedDescription) {
+      validationErrors.push('Description is required');
     }
 
-    // Base value validation
-    if (formData.baseValue !== undefined && formData.minValue !== undefined && formData.maxValue !== undefined) {
-      if (formData.baseValue < formData.minValue || formData.baseValue > formData.maxValue) {
-        validationErrors.push('Base value must be between minimum and maximum values');
+    // Length validation
+    if (trimmedName.length > 100) {
+      validationErrors.push('Skill name must be 100 characters or less');
+    }
+
+    if (trimmedDescription.length > 500) {
+      validationErrors.push('Description must be 500 characters or less');
+    }
+
+    // Duplicate name validation (only for create mode or different skill in edit mode)
+    if (trimmedName) {
+      const isDuplicate = existingSkills.some(skill => 
+        skill.name.toLowerCase() === trimmedName.toLowerCase() && 
+        (mode === 'create' || skill.id !== skillId)
+      );
+      if (isDuplicate) {
+        validationErrors.push(`Skill name "${trimmedName}" already exists`);
       }
     }
 
-    // Skills limit validation (12 maximum)
-    if (mode === 'create' && existingSkills.length >= 12) {
-      validationErrors.push('Cannot create more than 12 skills per world');
+    // Attribute selection validation
+    if (!formData.attributeIds || formData.attributeIds.length === 0) {
+      validationErrors.push('At least one attribute must be selected');
     }
 
+    return validationErrors;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
       return;
     }
 
-    const minVal = formData.minValue ?? MIN_SKILL_VALUE;
-    const maxVal = formData.maxValue ?? MAX_SKILL_VALUE;
-    const baseVal = formData.baseValue ?? SKILL_DEFAULT_VALUE;
-    
-    const skill: WorldSkill = {
-      id: mode === 'edit' && skillId ? skillId : generateUniqueId('skill'),
-      worldId: worldId,
-      name: formData.name?.trim() || '',
-      description: formData.description?.trim() || '',
-      category: formData.category?.trim(),
-      difficulty: formData.difficulty || DEFAULT_SKILL_DIFFICULTY,
+    const trimmedName = formData.name?.trim() || '';
+    const trimmedDescription = formData.description?.trim() || '';
+
+    const skillData: WorldSkill = {
+      id: mode === 'edit' ? skillId! : generateUniqueId(),
+      name: trimmedName,
+      description: trimmedDescription,
+      worldId,
       attributeIds: formData.attributeIds || [],
-      baseValue: baseVal,
-      minValue: minVal,
-      maxValue: maxVal,
+      difficulty: formData.difficulty || DEFAULT_SKILL_DIFFICULTY,
+      baseValue: formData.baseValue || 5,
+      minValue: formData.minValue || 1,
+      maxValue: formData.maxValue || 10,
     };
 
-    onSave(skill);
+    onSave(skillData);
   };
 
-  const handleDeleteClick = () => {
-    if (!skillId) return;
-
-    // Check for linked attributes
-    const linkedAttributeCount = formData.attributeIds?.length || 0;
-    if (linkedAttributeCount > 0) {
-      setDeleteWarnings([
-        `This skill is linked to ${linkedAttributeCount} attribute${linkedAttributeCount > 1 ? 's' : ''}`,
-        'Deleting this skill will remove these connections'
-      ]);
+  const handleAttributeToggle = (attributeId: EntityID) => {
+    const currentAttributeIds = formData.attributeIds || [];
+    const isSelected = currentAttributeIds.includes(attributeId);
+    
+    let newAttributeIds: EntityID[];
+    if (isSelected) {
+      newAttributeIds = currentAttributeIds.filter(id => id !== attributeId);
+    } else {
+      newAttributeIds = [...currentAttributeIds, attributeId];
     }
-    setShowDeleteDialog(true);
+    
+    setFormData(prev => ({
+      ...prev,
+      attributeIds: newAttributeIds,
+    }));
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDelete = () => {
     if (onDelete && skillId) {
       onDelete(skillId);
     }
-    setShowDeleteDialog(false);
   };
 
-  return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">
-        {mode === 'create' ? 'Create New Skill' : 'Edit Skill'}
-      </h2>
+  // Check if we're at the maximum number of skills
+  const isAtMaxSkills = maxSkills !== undefined && existingSkills.length >= maxSkills;
+  const canCreateSkill = mode === 'edit' || !isAtMaxSkills;
 
-      <div className="space-y-4">
-        {/* Basic Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          {mode === 'create' ? 'Create New Skill' : 'Edit Skill'}
+        </h2>
+      </div>
+
+      {mode === 'create' && isAtMaxSkills && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-sm text-yellow-700">
+            Maximum number of skills ({maxSkills}) reached. You cannot create more skills for this world.
+          </p>
+        </div>
+      )}
+
+      {errors.length > 0 && (
+        <div className="space-y-2">
+          {errors.map((error, index) => (
+            <div key={index} className="text-sm text-red-600" role="alert">
+              {error}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} role="form" className="space-y-6">
+        <div className="space-y-4">
           <div>
-            <label htmlFor="skill-name" className="block text-sm font-medium mb-1">
-              Skill Name
-            </label>
-            <input
+            <Label htmlFor="skill-name">Skill Name</Label>
+            <Input
               id="skill-name"
               type="text"
               value={formData.name || ''}
-              onChange={(e) => handleChange('name', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Investigation, Athletics"
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Enter skill name"
+              disabled={!canCreateSkill}
+              className="mt-1"
             />
           </div>
 
           <div>
-            <label htmlFor="skill-category" className="block text-sm font-medium mb-1">
-              Category
-            </label>
-            <input
-              id="skill-category"
-              type="text"
-              value={formData.category || ''}
-              onChange={(e) => handleChange('category', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g., Mental, Physical, Social"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="skill-description" className="block text-sm font-medium mb-1">
-            Description
-          </label>
-          <textarea
-            id="skill-description"
-            value={formData.description || ''}
-            onChange={(e) => handleChange('description', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[80px]"
-            placeholder="Describe what this skill represents and how it's used"
-          />
-        </div>
-
-        {/* Difficulty and Values */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label htmlFor="skill-difficulty" className="block text-sm font-medium mb-1">
-              Difficulty
-            </label>
-            <select
-              id="skill-difficulty"
-              value={formData.difficulty || DEFAULT_SKILL_DIFFICULTY}
-              onChange={(e) => handleChange('difficulty', e.target.value as SkillDifficulty)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {SKILL_DIFFICULTIES.map(diff => (
-                <option key={diff.value} value={diff.value}>
-                  {diff.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="min-value" className="block text-sm font-medium mb-1">
-              Minimum Value
-            </label>
-            <input
-              id="min-value"
-              type="number"
-              value={formData.minValue ?? MIN_SKILL_VALUE}
-              onChange={(e) => handleChange('minValue', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="1"
-              max="10"
+            <Label htmlFor="skill-description">Description</Label>
+            <Textarea
+              id="skill-description"
+              value={formData.description || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Describe what this skill represents"
+              disabled={!canCreateSkill}
+              rows={3}
+              className="mt-1"
             />
           </div>
 
           <div>
-            <label htmlFor="max-value" className="block text-sm font-medium mb-1">
-              Maximum Value
-            </label>
-            <input
-              id="max-value"
-              type="number"
-              value={formData.maxValue ?? MAX_SKILL_VALUE}
-              onChange={(e) => handleChange('maxValue', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="1"
-              max="10"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="base-value" className="block text-sm font-medium mb-1">
-              Base Value
-            </label>
-            <input
-              id="base-value"
-              type="number"
-              value={formData.baseValue ?? SKILL_DEFAULT_VALUE}
-              onChange={(e) => handleChange('baseValue', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min={formData.minValue ?? MIN_SKILL_VALUE}
-              max={formData.maxValue ?? MAX_SKILL_VALUE}
-            />
-          </div>
-        </div>
-
-        {/* Linked Attributes */}
-        <div>
-          <h3 className="text-md font-medium mb-3">Linked Attributes</h3>
-          {existingAttributes.length === 0 ? (
-            <p className="text-gray-500 italic">No attributes available. Create attributes first.</p>
-          ) : (
+            <Label className="text-base font-medium">Linked Attributes</Label>
+            <p className="text-sm text-gray-600 mb-3">
+              Select one or more attributes this skill is based on
+            </p>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600 mb-3">
-                Select one or more attributes that this skill is based on. Skills can use multiple attributes.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {existingAttributes.map(attribute => (
-                  <label
-                    key={attribute.id}
-                    className="flex items-start space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+              {existingAttributes.map((attribute) => (
+                <div key={attribute.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`attribute-${attribute.id}`}
+                    checked={formData.attributeIds?.includes(attribute.id) || false}
+                    onChange={() => handleAttributeToggle(attribute.id)}
+                    disabled={!canCreateSkill}
+                    className="rounded border-gray-300 focus:ring-blue-500"
+                  />
+                  <Label 
+                    htmlFor={`attribute-${attribute.id}`}
+                    className="text-sm font-normal cursor-pointer"
                   >
-                    <input
-                      type="checkbox"
-                      checked={formData.attributeIds?.includes(attribute.id) || false}
-                      onChange={() => handleAttributeToggle(attribute.id)}
-                      className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{attribute.name}</div>
-                      <div className="text-sm text-gray-500">{attribute.description}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
+                    {attribute.name}
+                  </Label>
+                  {attribute.description && (
+                    <span className="text-xs text-gray-500">
+                      - {attribute.description}
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
-          )}
+            {existingAttributes.length === 0 && (
+              <p className="text-sm text-gray-500 italic">
+                No attributes available. Create attributes first to link skills.
+              </p>
+            )}
+          </div>
         </div>
 
-        {errors.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
-            {errors.map((error, index) => (
-              <p key={index} className="text-sm text-red-600">
-                {error}
-              </p>
-            ))}
+        <div className="flex justify-between pt-6 border-t">
+          <div className="flex space-x-3">
+            <Button
+              type="submit"
+              disabled={!canCreateSkill}
+              variant="default"
+            >
+              {mode === 'create' ? 'Create Skill' : 'Save Changes'}
+            </Button>
+            <Button
+              type="button"
+              onClick={onCancel}
+              variant="outline"
+            >
+              Cancel
+            </Button>
           </div>
-        )}
-      </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center pt-4 border-t">
-        <div className="flex gap-2">
           {mode === 'edit' && onDelete && (
-            <button
-              onClick={handleDeleteClick}
-              className="px-4 py-3 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 font-medium transition-colors"
-              aria-label="Delete skill"
+            <Button
+              type="button"
+              onClick={() => setShowDeleteDialog(true)}
+              variant="destructive"
+              size="sm"
             >
               Delete Skill
-            </button>
+            </Button>
           )}
         </div>
+      </form>
 
-        <div className="flex gap-2">
-          <button
-            onClick={onCancel}
-            className="px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-          >
-            {mode === 'create' ? 'Create Skill' : 'Save Changes'}
-          </button>
-        </div>
-      </div>
-
-      {/* Delete Confirmation Dialog */}
-      {showDeleteDialog && (
-        <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Skill"
-          description={
-            deleteWarnings.length > 0 
-              ? deleteWarnings.join('. ') + '. This action cannot be undone.'
-              : 'This action cannot be undone.'
-          }
-          itemName={formData.name || 'this skill'}
-          confirmButtonText="Delete Skill"
-          cancelButtonText="Cancel"
-          isDeleting={false}
-        />
-      )}
+      <DeleteConfirmationDialog
+        isOpen={showDeleteDialog}
+        title="Delete Skill"
+        description="Are you sure you want to delete this skill?"
+        itemName={formData.name || 'this skill'}
+        onConfirm={handleDelete}
+        onClose={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }
