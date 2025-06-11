@@ -44,10 +44,10 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     name: skill.name,
     description: skill.description,
     worldId,
-    // Convert linkedAttributes array to linkedAttributeId
+    // Convert linkedAttributes array to attributeIds array
     // For now, just use the first attribute in the list if available
-    linkedAttributeId: skill.linkedAttributes?.length > 0 
-      ? attributes.find(a => a.name === skill.linkedAttributes[0])?.id 
+    attributeIds: skill.linkedAttributes?.length > 0 
+      ? [attributes.find(a => a.name === skill.linkedAttributes[0])?.id].filter(Boolean) as string[]
       : undefined,
     difficulty: 'medium', // Default difficulty level
     baseValue: 5, // Default middle value

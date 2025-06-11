@@ -85,8 +85,8 @@ export default function SkillReviewStep({
           baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
           minValue: SKILL_MIN_VALUE, // Fixed value
           maxValue: SKILL_MAX_VALUE, // Fixed value
-          linkedAttributeId: s.linkedAttributeName ? 
-            worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+          attributeIds: s.linkedAttributeName ? 
+            [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
             undefined,
         }));
       
@@ -122,8 +122,8 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        linkedAttributeId: s.linkedAttributeName ? 
-          worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+        attributeIds: s.linkedAttributeName ? 
+          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
           undefined,
       }));
     
@@ -149,8 +149,8 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        linkedAttributeId: s.linkedAttributeName ? 
-          worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+        attributeIds: s.linkedAttributeName ? 
+          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
           undefined,
       }));
     
@@ -295,7 +295,7 @@ export default function SkillReviewStep({
                         minValue: SKILL_MIN_VALUE,
                         maxValue: SKILL_MAX_VALUE,
                         category: suggestion.category,
-                        linkedAttributeId: worldData.skills.find(skill => skill.name === suggestion.name)?.linkedAttributeId
+                        attributeIds: worldData.skills.find(skill => skill.name === suggestion.name)?.attributeIds || []
                       }}
                       onChange={(updates) => {
                         // Find the skill in the worldData and update it

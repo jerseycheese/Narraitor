@@ -42,7 +42,7 @@ export default function AttributeEditorTestPage() {
       worldId: 'world-test' as EntityID,
       name: 'Athletics',
       description: 'Physical activities and sports',
-      linkedAttributeId: 'attr-1' as EntityID,
+      attributeIds: ['attr-1'] as EntityID[],
       difficulty: 'medium',
       minValue: 1,
       maxValue: 10,
@@ -53,7 +53,7 @@ export default function AttributeEditorTestPage() {
       worldId: 'world-test' as EntityID,
       name: 'Investigation',
       description: 'Finding clues and solving mysteries',
-      linkedAttributeId: 'attr-2' as EntityID,
+      attributeIds: ['attr-2'] as EntityID[],
       difficulty: 'hard',
       minValue: 1,
       maxValue: 10,
@@ -64,7 +64,7 @@ export default function AttributeEditorTestPage() {
       worldId: 'world-test' as EntityID,
       name: 'Acrobatics',
       description: 'Nimble movements and balance',
-      linkedAttributeId: 'attr-3' as EntityID,
+      attributeIds: ['attr-3'] as EntityID[],
       difficulty: 'easy',
       minValue: 1,
       maxValue: 10,
@@ -121,14 +121,14 @@ export default function AttributeEditorTestPage() {
                 <div className="mt-2 text-sm text-gray-500">
                   Range: {attribute.minValue} - {attribute.maxValue}
                 </div>
-                {skills.some(skill => skill.linkedAttributeId === attribute.id) && (
+                {skills.some(skill => skill.attributeIds?.includes(attribute.id)) && (
                   <div className="mt-2">
                     <span className="text-sm font-medium text-yellow-600">
                       Linked Skills: 
                     </span>
                     <span className="text-sm text-gray-600 ml-1">
                       {skills
-                        .filter(skill => skill.linkedAttributeId === attribute.id)
+                        .filter(skill => skill.attributeIds?.includes(attribute.id))
                         .map(skill => skill.name)
                         .join(', ')}
                     </span>

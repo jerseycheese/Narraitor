@@ -100,7 +100,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
    * Gets skills that are linked to a specific attribute
    */
   const getLinkedSkills = useCallback((attributeId: EntityID): WorldSkill[] => {
-    return skills.filter(skill => skill.linkedAttributeId === attributeId);
+    return skills.filter(skill => skill.attributeIds?.includes(attributeId));
   }, [skills]);
   
   /**

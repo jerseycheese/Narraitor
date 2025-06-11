@@ -26,9 +26,9 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
                   <p className="text-gray-600 text-sm mb-2">{skill.description}</p>
                 )}
                 <div className="flex gap-4 text-sm text-gray-500">
-                  {skill.linkedAttributeId && (
+                  {skill.attributeIds?.[0] && (
                     <span>
-                      Linked to: {attributes.find(a => a.id === skill.linkedAttributeId)?.name || 'Unknown'}
+                      Linked to: {attributes.find(a => a.id === skill.attributeIds?.[0])?.name || 'Unknown'}
                     </span>
                   )}
                   {skill.difficulty && (

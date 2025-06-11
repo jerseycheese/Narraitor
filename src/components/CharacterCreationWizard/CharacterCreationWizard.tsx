@@ -110,7 +110,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         name: skill.name,
         description: skill.description,
         level: skill.minValue,
-        linkedAttributeId: skill.linkedAttributeId,
+        linkedAttributeId: skill.attributeIds?.[0], // Map from new attributeIds array to legacy linkedAttributeId for wizard compatibility
         isSelected: false,
       })) || [],
       background: {

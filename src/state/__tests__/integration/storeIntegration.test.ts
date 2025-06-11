@@ -186,7 +186,7 @@ describe('Store Integration', () => {
             id: 'sword-1',
             name: 'Swordsmanship',
             worldId: 'placeholder',
-            linkedAttributeId: 'str-1',
+            attributeIds: ['str-1'],
             difficulty: 'medium',
             category: 'Combat'
           }

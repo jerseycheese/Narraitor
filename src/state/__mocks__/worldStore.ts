@@ -174,7 +174,7 @@ const mockAddSkill = jest.fn((worldId: string, skill: Partial<WorldSkill>) => {
     description: skill.description || '',
     difficulty: skill.difficulty || 'medium',
     category: skill.category,
-    linkedAttributeId: skill.linkedAttributeId,
+    attributeIds: skill.attributeIds,
     baseValue: skill.baseValue || 5,
     minValue: skill.minValue || 1,
     maxValue: skill.maxValue || 10

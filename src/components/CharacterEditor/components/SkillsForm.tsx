@@ -69,9 +69,12 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
               </div>
               <div className="text-xs text-gray-400 mt-1">
                 Range: {minValue} - {maxValue}
-                {worldSkill?.linkedAttributeId && (
+                {worldSkill?.attributeIds && worldSkill.attributeIds.length > 0 && (
                   <span className="ml-2">
-                    • Linked to: {world.attributes.find(a => a.id === worldSkill.linkedAttributeId)?.name || 'Unknown'}
+                    • Linked to: {worldSkill.attributeIds
+                      .map(id => world.attributes.find(a => a.id === id)?.name)
+                      .filter(Boolean)
+                      .join(', ') || 'Unknown'}
                   </span>
                 )}
               </div>

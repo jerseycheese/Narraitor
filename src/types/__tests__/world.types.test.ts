@@ -66,20 +66,20 @@ describe('World Types', () => {
         name: 'Gunslinging',
         description: 'Proficiency with firearms',
         difficulty: 'medium',
-        linkedAttributeId: 'attr-1',
+        attributeIds: ['attr-1'],
         baseValue: 5,
         minValue: 1,
         maxValue: 10
       };
 
       expect(skill.difficulty).toBe('medium');
-      expect(skill.linkedAttributeId).toBe('attr-1');
+      expect(skill.attributeIds).toEqual(['attr-1']);
       expect(skill.baseValue).toBe(5);
       expect(skill.minValue).toBe(1);
       expect(skill.maxValue).toBe(10);
     });
 
-    test('should allow skill without linkedAttributeId', () => {
+    test('should allow skill without attributeIds', () => {
       const skill: WorldSkill = {
         id: 'skill-2',
         worldId: 'world-1',
@@ -91,7 +91,7 @@ describe('World Types', () => {
         maxValue: 10
       };
 
-      expect(skill.linkedAttributeId).toBeUndefined();
+      expect(skill.attributeIds).toBeUndefined();
       expect(skill.baseValue).toBe(3);
     });
   });

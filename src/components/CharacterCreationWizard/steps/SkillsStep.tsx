@@ -73,6 +73,16 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                 {skill.description && (
                   <p className="text-sm text-gray-600 mt-1">{skill.description}</p>
                 )}
+                {/* Show linked attributes */}
+                {skill.attributeIds && skill.attributeIds.length > 0 && (
+                  <div className="mt-2">
+                    <span className="text-xs font-medium text-blue-600">
+                      Linked to: {skill.attributeIds.map((attrId: string) => 
+                        data.attributes.find((attr: any) => attr.id === attrId)?.name || 'Unknown' // eslint-disable-line @typescript-eslint/no-explicit-any
+                      ).join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
               <ToggleButton
                 isActive={skill.isSelected}

@@ -78,12 +78,11 @@ export function createMockWorldSkill(overrides: Partial<WorldSkill> = {}): World
     worldId: 'world-test-1',
     name: 'Athletics',
     description: 'Physical prowess and agility',
-    linkedAttributeId: 'attr-1',
+    attributeIds: ['attr-1'],
     difficulty: 'medium',
     baseValue: 5,
     minValue: 1,
     maxValue: 10,
-    category: 'Physical',
     ...overrides,
   };
 }
