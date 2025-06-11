@@ -106,7 +106,7 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to fight in battle',
         difficulty: 'medium' as const,
         category: 'Combat',
-        linkedAttributeId: 'attr-1',
+        attributeIds: ['attr-1'],
       }],
     };
 
@@ -140,7 +140,7 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to fight in battle',
         difficulty: 'medium' as const,
         category: 'Combat',
-        linkedAttributeId: 'attr-1',
+        attributeIds: ['attr-1'],
       }],
     };
 
@@ -171,7 +171,7 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to fight in battle',
         difficulty: 'medium' as const,
         category: 'Combat',
-        linkedAttributeId: 'attr-1',
+        attributeIds: ['attr-1'],
       }],
     };
 
@@ -207,7 +207,7 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to fight in battle',
         difficulty: 'medium' as const,
         category: 'Combat',
-        linkedAttributeId: 'attr-1',
+        attributeIds: ['attr-1'],
       }],
     };
 
@@ -226,7 +226,7 @@ describe.skip('SkillReviewStep', () => {
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         skills: expect.arrayContaining([
-          expect.objectContaining({ linkedAttributeId: 'attr-1' })
+          expect.objectContaining({ attributeIds: ['attr-1'] })
         ])
       })
     );
@@ -260,7 +260,7 @@ describe.skip('SkillReviewStep', () => {
           description: 'Ability to fight in battle',
           difficulty: 'medium' as const,
           category: 'Combat',
-          linkedAttributeId: 'attr-1',
+          attributeIds: ['attr-1'],
         },
         {
           id: 'skill-2',
@@ -376,7 +376,7 @@ describe.skip('SkillReviewStep', () => {
           description: 'Ability to fight in battle',
           difficulty: 'medium' as const,
           category: 'Combat',
-          linkedAttributeId: 'attr-1',
+          attributeIds: ['attr-1'],
         },
         {
           id: 'skill-3',
@@ -385,7 +385,7 @@ describe.skip('SkillReviewStep', () => {
           description: 'Ability to cast spells',
           difficulty: 'hard' as const,
           category: 'Mage',
-          linkedAttributeId: 'attr-2',
+          attributeIds: ['attr-2'],
         },
       ],
     };

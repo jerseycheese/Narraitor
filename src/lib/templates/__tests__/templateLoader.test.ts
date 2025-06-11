@@ -92,10 +92,10 @@ describe('Template Loader', () => {
     // Check that skills have a difficulty property
     expect(world.skills[0].difficulty).toBe('medium');
     
-    // The linkedAttributeId might be undefined initially since it depends on matching attribute names
-    // Just verify it's the correct type (string or undefined)
-    expect(typeof world.skills[0].linkedAttributeId === 'string' || 
-           typeof world.skills[0].linkedAttributeId === 'undefined').toBeTruthy();
+    // The attributeIds might be undefined initially since it depends on matching attribute names
+    // Just verify it's the correct type (array or undefined)
+    expect(Array.isArray(world.skills[0].attributeIds) || 
+           typeof world.skills[0].attributeIds === 'undefined').toBeTruthy();
   });
 
   test('applyWorldTemplate accepts a template ID string', () => {

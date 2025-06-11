@@ -85,8 +85,8 @@ export default function SkillReviewStep({
           baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
           minValue: SKILL_MIN_VALUE, // Fixed value
           maxValue: SKILL_MAX_VALUE, // Fixed value
-          linkedAttributeId: s.linkedAttributeName ? 
-            worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+          attributeIds: s.linkedAttributeName ? 
+            [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
             undefined,
         }));
       
@@ -122,8 +122,8 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        linkedAttributeId: s.linkedAttributeName ? 
-          worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+        attributeIds: s.linkedAttributeName ? 
+          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
           undefined,
       }));
     
@@ -149,8 +149,8 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        linkedAttributeId: s.linkedAttributeName ? 
-          worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id : 
+        attributeIds: s.linkedAttributeName ? 
+          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
           undefined,
       }));
     
