@@ -22,6 +22,35 @@ export interface SkillEditorProps {
   maxSkills?: number;
 }
 
+/**
+ * SkillEditor - Create and edit skills with multi-attribute linking capabilities
+ * 
+ * This component implements Issue #286: Multi-attribute skill linking system.
+ * Skills can now be linked to multiple attributes using a checkbox interface
+ * instead of the previous single-attribute dropdown.
+ * 
+ * Features:
+ * - Create/Edit mode support
+ * - Multi-attribute selection via checkboxes
+ * - Form validation with user-friendly error messages
+ * - Delete confirmation dialog
+ * - Duplicate name prevention
+ * - Skill count limits enforcement
+ * 
+ * Data Format:
+ * - Uses `attributeIds: EntityID[]` for multi-attribute linking
+ * - Replaces deprecated `linkedAttributeId: EntityID` single-attribute format
+ * 
+ * @param worldId - ID of the world this skill belongs to
+ * @param mode - 'create' for new skills, 'edit' for existing skills
+ * @param skillId - Required when mode is 'edit'
+ * @param onSave - Callback when skill is saved successfully
+ * @param onDelete - Optional callback when skill is deleted
+ * @param onCancel - Callback when operation is cancelled
+ * @param existingSkills - Array of existing skills for validation
+ * @param existingAttributes - Array of attributes available for linking
+ * @param maxSkills - Optional limit on total number of skills
+ */
 export function SkillEditor({
   worldId,
   mode,

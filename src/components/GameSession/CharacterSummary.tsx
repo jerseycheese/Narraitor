@@ -38,7 +38,15 @@ interface CharacterSummaryProps {
 
 /**
  * CharacterSummary displays essential character information during gameplay
- * Shows name, description, background, level, and portrait
+ * 
+ * Features:
+ * - Character name, level, background, and portrait
+ * - Two-column layout: Attributes (left) and Skills (right) on desktop
+ * - Responsive design: Single column stack on mobile
+ * - Multi-attribute skill linking: Shows which attributes each skill uses
+ * - Real-time attribute values and skill levels
+ * 
+ * Issue #286: Supports multi-attribute skill system with attributeIds array
  */
 const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
   const worldStore = useWorldStore();

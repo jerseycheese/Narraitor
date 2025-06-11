@@ -117,7 +117,7 @@ interface CharacterCreationState {
       skillId: EntityID;
       name: string;
       level: number;
-      linkedAttributeId?: EntityID;
+      attributeIds?: EntityID[]; // Issue #286: Multi-attribute support
       isSelected: boolean;
     }>;
     background: {

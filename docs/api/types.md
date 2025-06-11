@@ -103,15 +103,19 @@ interface WorldAttribute extends NamedEntity {
 ```typescript
 interface WorldSkill extends NamedEntity {
   worldId: EntityID;
-  linkedAttributeId?: EntityID;
+  attributeIds?: EntityID[]; // Issue #286: Multi-attribute linking
   difficulty: 'easy' | 'medium' | 'hard';
   category?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 ```
 
 **Properties:**
-- `linkedAttributeId`: Optional attribute that affects this skill
+- `attributeIds`: Array of attribute IDs that affect this skill (Issue #286: Multi-attribute linking)
 - `difficulty`: Learning difficulty affecting XP requirements
+- `baseValue`, `minValue`, `maxValue`: Skill value constraints
 
 ### WorldSettings
 
