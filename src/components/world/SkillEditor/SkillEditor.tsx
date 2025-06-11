@@ -25,7 +25,7 @@ export interface SkillEditorProps {
 /**
  * SkillEditor - Create and edit skills with multi-attribute linking capabilities
  * 
- * This component implements Issue #286: Multi-attribute skill linking system.
+ * This component implements the multi-attribute skill linking system.
  * Skills can now be linked to multiple attributes using a checkbox interface
  * instead of the previous single-attribute dropdown.
  * 

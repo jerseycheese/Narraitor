@@ -46,7 +46,7 @@ interface CharacterSummaryProps {
  * - Multi-attribute skill linking: Shows which attributes each skill uses
  * - Real-time attribute values and skill levels
  * 
- * Issue #286: Supports multi-attribute skill system with attributeIds array
+ * Supports multi-attribute skill system with attributeIds array
  */
 const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
   const worldStore = useWorldStore();
