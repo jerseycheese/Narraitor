@@ -34,6 +34,20 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     removeFromHistory 
   } = useNavigationStore();
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowRecentPages(false);
+      }
+    };
+    
+    if (showRecentPages) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showRecentPages]);
+
   // Don't show if recent pages are disabled in preferences
   if (!preferences.showRecentPages) {
     return null;
@@ -48,20 +62,6 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
   if (recentPages.length === 0) {
     return null;
   }
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowRecentPages(false);
-      }
-    };
-    
-    if (showRecentPages) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showRecentPages]);
 
   const handleNavigateToPage = (path: string, title?: string) => {
     setShowRecentPages(false);
