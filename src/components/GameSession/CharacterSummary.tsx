@@ -1,26 +1,29 @@
 import React from 'react';
 import Link from 'next/link';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { useWorldStore } from '@/state/worldStore';
 
-// Character type as used in characterStore
+// Use the character type from the store rather than types/character.types
 interface Character {
   id: string;
   name: string;
-  worldId: string;
   level: number;
-  background: {
-    history: string;
-    personality: string;
-    goals: string[];
-    fears: string[];
-    physicalDescription?: string;
+  worldId: string;
+  background?: {
+    history?: string;
   };
+  skills?: Array<{
+    id: string;
+    name: string;
+    level: number;
+    worldSkillId?: string;
+  }>;
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
+    generatedAt?: string;
+    prompt?: string;
   };
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CharacterSummaryProps {
@@ -32,6 +35,9 @@ interface CharacterSummaryProps {
  * Shows name, description, background, level, and portrait
  */
 const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
+  const worldStore = useWorldStore();
+  const world = worldStore.worlds[character.worldId];
+
   return (
     <div 
       data-testid="character-summary" 
@@ -51,7 +57,44 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
           
           {character.background?.history && (
-            <p className="text-gray-700 mb-2">{character.background.history}</p>
+            <p className="text-gray-700 mb-3">{character.background.history}</p>
+          )}
+
+          {/* Skills Section */}
+          {character.skills && character.skills.length > 0 && world && (
+            <div className="mt-3">
+              <h3 className="text-sm font-medium text-gray-800 mb-2">Skills</h3>
+              <div className="space-y-1">
+                {character.skills.map(skill => {
+                    const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
+                    if (!worldSkill) {
+                      // Fallback if no world skill found, just show the skill name from character
+                      return (
+                        <div key={skill.id} className="text-sm">
+                          <span className="font-medium text-gray-700">{skill.name}</span>
+                          <span className="text-gray-500 ml-1">(Level {skill.level})</span>
+                        </div>
+                      );
+                    }
+                    
+                    const linkedAttributes = worldSkill.attributeIds?.map(attrId => 
+                      world.attributes.find(attr => attr.id === attrId)?.name
+                    ).filter(Boolean) || [];
+
+                    return (
+                      <div key={skill.id} className="text-sm">
+                        <span className="font-medium text-gray-700">{worldSkill.name}</span>
+                        <span className="text-gray-500 ml-1">(Level {skill.level})</span>
+                        {linkedAttributes.length > 0 && (
+                          <div className="text-xs text-blue-600 ml-2">
+                            Linked to: {linkedAttributes.join(', ')}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
           )}
         </div>
 

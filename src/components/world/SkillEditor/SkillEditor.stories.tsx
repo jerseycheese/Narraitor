@@ -108,125 +108,13 @@ export const CreateMode: Story = {
   },
 };
 
-export const CreateModeWithMaxSkills: Story = {
-  args: {
-    mode: 'create',
-    maxSkills: 12,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor in create mode with a maximum skill limit enforced.',
-      },
-    },
-  },
-};
-
-export const CreateModeAtMaxLimit: Story = {
-  args: {
-    mode: 'create',
-    maxSkills: 2, // Same as number of existing skills
-    existingSkills: mockSkills,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor when the maximum number of skills has been reached.',
-      },
-    },
-  },
-};
-
 export const EditMode: Story = {
   args: {
     mode: 'edit',
     skillId: 'skill-1',
   },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor in edit mode with existing skill data loaded.',
-      },
-    },
-  },
 };
 
-export const EditModeWithDeleteHandler: Story = {
-  args: {
-    mode: 'edit',
-    skillId: 'skill-1',
-    onDelete: action('onDelete'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor in edit mode with delete functionality enabled.',
-      },
-    },
-  },
-};
-
-export const NoAttributes: Story = {
-  args: {
-    mode: 'create',
-    existingAttributes: [],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor when no attributes are available for linking.',
-      },
-    },
-  },
-};
-
-export const SingleAttribute: Story = {
-  args: {
-    mode: 'create',
-    existingAttributes: [mockAttributes[0]],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor with only one attribute available for linking.',
-      },
-    },
-  },
-};
-
-export const ManyAttributes: Story = {
-  args: {
-    mode: 'create',
-    existingAttributes: [
-      ...mockAttributes,
-      {
-        id: 'attr-5',
-        name: 'Constitution',
-        description: 'Physical endurance and health',
-        worldId: 'world-1',
-        baseValue: 6,
-        minValue: 1,
-        maxValue: 10,
-      },
-      {
-        id: 'attr-6',
-        name: 'Wisdom',
-        description: 'Intuition and insight',
-        worldId: 'world-1',
-        baseValue: 7,
-        minValue: 1,
-        maxValue: 10,
-      },
-    ],
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows the skill editor with many attributes available for testing scrolling and selection.',
-      },
-    },
-  },
-};
 
 export const EditComplexSkill: Story = {
   args: {
@@ -237,9 +125,9 @@ export const EditComplexSkill: Story = {
       {
         id: 'skill-complex',
         name: 'Battle Tactics',
-        description: 'Advanced military strategy and battlefield coordination requiring multiple mental and social skills',
+        description: 'Advanced military strategy and battlefield coordination',
         worldId: 'world-1',
-        attributeIds: ['attr-2', 'attr-4'], // Intelligence + Charisma
+        attributeIds: ['attr-2', 'attr-4'],
         difficulty: 'hard',
         baseValue: 3,
         minValue: 1,
@@ -247,28 +135,5 @@ export const EditComplexSkill: Story = {
       },
     ],
   },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows editing a complex skill with multiple attributes and a long description.',
-      },
-    },
-  },
 };
 
-export const ValidationExample: Story = {
-  args: {
-    mode: 'create',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Use this story to test validation by submitting empty forms or duplicate names.',
-      },
-    },
-  },
-  play: async () => {
-    // This story is primarily for manual validation testing
-    // Users can interact with it to see validation errors
-  },
-};
