@@ -1,0 +1,53 @@
+version: '3.8'
+
+# Docker Compose for Narraitor YOLO Mode
+# Usage: ISSUE_NUMBER=501 docker-compose -f docker-compose.yolo.yml up
+
+services:
+  claude-yolo:
+    build:
+      context: .
+      dockerfile: .claude/docker/Dockerfile.yolo
+    container_name: claude-yolo-${ISSUE_NUMBER:-000}
+    volumes:
+      # Mount the specific worktree
+      - ${WORKTREE_PATH:-./}:/app
+      # Mount Claude config as read-only
+      - ~/.claude:/home/claude/.claude:ro
+      # Mount git config
+      - ~/.gitconfig:/home/claude/.gitconfig:ro
+      # Mount SSH keys for git operations (read-only)
+      - ~/.ssh:/home/claude/.ssh:ro
+    environment:
+      # Pass through API keys if needed for local mocks
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-mock}
+      - NODE_ENV=development
+      - ISSUE_NUMBER=${ISSUE_NUMBER:-000}
+      # Claude Code specific
+      - CLAUDE_SKIP_PERMISSIONS=true
+    # CRITICAL: No network access for safety
+    network_mode: none
+    # Ensure container stops after Claude completes
+    stdin_open: true
+    tty: true
+    command: |
+      sh -c "
+        echo '🚀 Starting YOLO mode for issue #${ISSUE_NUMBER}' &&
+        cd /app &&
+        claude --dangerously-skip-permissions /project:do-issue-auto-noverify ${ISSUE_NUMBER}
+      "
+
+  # Optional: Local API mock service
+  # Uncomment if you need to mock external APIs
+  # api-mock:
+  #   image: node:20-alpine
+  #   volumes:
+  #     - ./.claude/mocks:/app
+  #   working_dir: /app
+  #   command: node api-mock-server.js
+  #   networks:
+  #     - yolo-internal
+
+# networks:
+#   yolo-internal:
+#     internal: true  # No external connectivity

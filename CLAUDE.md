@@ -61,6 +61,7 @@ These scripts are pre-approved in `.claude/settings.local.json` and can be used 
 ## Intelligent Branch Handling
 - Helper script `./scripts/claude-branch.sh` manages branches to avoid permission prompts
 - Script is pre-approved in `.claude/settings.local.json`
+- Always pulls latest changes from the remote branch before creating new branches
 - In interactive mode (`do-issue`), the script offers options:
   1. Use the existing branch (continue previous work)
   2. Delete and recreate the branch (clean start)

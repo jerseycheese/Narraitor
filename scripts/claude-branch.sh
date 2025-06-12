@@ -23,6 +23,7 @@ if git show-ref --verify --quiet refs/heads/$branch_name; then
     # Auto mode: Delete and recreate
     echo "Auto mode: Deleting and recreating the branch for a clean start..."
     git checkout develop 2>/dev/null || git checkout main # Try develop first, fall back to main
+    git pull origin $(git rev-parse --abbrev-ref HEAD) # Pull latest changes from remote
     git branch -D $branch_name
     git checkout -b $branch_name
   else
@@ -42,6 +43,7 @@ if git show-ref --verify --quiet refs/heads/$branch_name; then
       2)
         echo "Deleting and recreating the branch..."
         git checkout develop 2>/dev/null || git checkout main # Try develop first, fall back to main
+        git pull origin $(git rev-parse --abbrev-ref HEAD) # Pull latest changes from remote
         git branch -D $branch_name
         git checkout -b $branch_name
         ;;
