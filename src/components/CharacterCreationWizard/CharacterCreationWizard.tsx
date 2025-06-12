@@ -48,8 +48,10 @@ interface CharacterCreationData {
   skills: Array<{
     skillId: EntityID;
     name: string;
+    description?: string;
     level: number;
-    linkedAttributeId?: EntityID;
+    attributeIds?: EntityID[]; // Multi-attribute support
+    linkedAttributeId?: EntityID; // Legacy support
     isSelected: boolean;
   }>;
   background: {
@@ -110,7 +112,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
         name: skill.name,
         description: skill.description,
         level: skill.minValue,
-        linkedAttributeId: skill.attributeIds?.[0], // Map from new attributeIds array to legacy linkedAttributeId for wizard compatibility
+        attributeIds: skill.attributeIds || [], // Preserve full multi-attribute support
+        linkedAttributeId: skill.attributeIds?.[0], // Keep legacy field for backward compatibility
         isSelected: false,
       })) || [],
       background: {

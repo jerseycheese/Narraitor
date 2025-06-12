@@ -141,8 +141,8 @@ export default function WorldCreationWizard({
     
     try {
       wizard.setProcessing(true);
-      const { analyzeWorldDescription } = await import('@/lib/ai/worldAnalyzer');
-      const suggestions = await analyzeWorldDescription(wizard.state.data.description);
+      const { analyzeWorldDescriptionClient } = await import('@/lib/ai/worldAnalyzerClient');
+      const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
       wizard.updateData({ aiSuggestions: suggestions });
       wizard.setProcessing(false);
     } catch (error) {
