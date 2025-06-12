@@ -30,7 +30,8 @@ export interface SkillSuggestion {
   description: string;
   difficulty: SkillDifficulty;
   category?: string;
-  linkedAttributeName?: string;
+  linkedAttributeName?: string; // Legacy support for backward compatibility
+  attributeIds?: string[]; // New multi-attribute support
   accepted: boolean;
   baseValue: number;
   minValue: number;

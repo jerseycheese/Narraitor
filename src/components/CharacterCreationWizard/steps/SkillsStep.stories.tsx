@@ -41,7 +41,12 @@ const defaultData = {
   characterData: {
     name: 'Elara Moonshadow',
     description: 'A skilled mage from the northern kingdoms',
-    attributes: [],
+    attributes: [
+      { id: 'strength', name: 'Strength', value: 8 },
+      { id: 'intelligence', name: 'Intelligence', value: 10 },
+      { id: 'dexterity', name: 'Dexterity', value: 7 },
+      { id: 'charisma', name: 'Charisma', value: 6 },
+    ],
     skills: [
       {
         skillId: 'magic',
@@ -88,7 +93,15 @@ const defaultData = {
         name: 'Diplomacy',
         description: 'The art of negotiation and persuasion',
         level: 1,
-        attributeIds: ['intelligence'],
+        attributeIds: ['intelligence', 'charisma'],
+        isSelected: false,
+      },
+      {
+        skillId: 'combat',
+        name: 'Combat',
+        description: 'Physical fighting and weapon mastery',
+        level: 1,
+        attributeIds: ['strength', 'dexterity'],
         isSelected: false,
       },
     ],
@@ -111,7 +124,12 @@ const mockWorldConfig = {
   name: 'Test World',
   description: 'A test world',
   theme: 'fantasy',
-  attributes: [],
+  attributes: [
+    { id: 'strength', name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5 },
+    { id: 'intelligence', name: 'Intelligence', description: 'Mental acuity', minValue: 1, maxValue: 10, baseValue: 5 },
+    { id: 'dexterity', name: 'Dexterity', description: 'Agility and coordination', minValue: 1, maxValue: 10, baseValue: 5 },
+    { id: 'charisma', name: 'Charisma', description: 'Social influence', minValue: 1, maxValue: 10, baseValue: 5 },
+  ],
   skills: [
     {
       id: 'magic',
@@ -157,7 +175,15 @@ const mockWorldConfig = {
       id: 'diplomacy',
       name: 'Diplomacy',
       description: 'The art of negotiation and persuasion',
-      attributeIds: ['intelligence'],
+      attributeIds: ['intelligence', 'charisma'],
+      minValue: 0,
+      maxValue: 10,
+    },
+    {
+      id: 'combat',
+      name: 'Combat',
+      description: 'Physical fighting and weapon mastery',
+      attributeIds: ['strength', 'dexterity'],
       minValue: 0,
       maxValue: 10,
     },
@@ -189,11 +215,12 @@ export const WithSelection: Story = {
         ...defaultData.characterData,
         skills: [
           { ...defaultData.characterData.skills[0], isSelected: true }, // Magic
-          { ...defaultData.characterData.skills[1], isSelected: false },
-          { ...defaultData.characterData.skills[2], isSelected: false },
+          { ...defaultData.characterData.skills[1], isSelected: false }, // Swordplay
+          { ...defaultData.characterData.skills[2], isSelected: false }, // Archery
           { ...defaultData.characterData.skills[3], isSelected: true }, // Stealth
           { ...defaultData.characterData.skills[4], isSelected: true }, // Herbalism
-          { ...defaultData.characterData.skills[5], isSelected: false },
+          { ...defaultData.characterData.skills[5], isSelected: true }, // Diplomacy (multi-attribute)
+          { ...defaultData.characterData.skills[6], isSelected: false }, // Combat (multi-attribute)
         ],
       },
     },
@@ -222,7 +249,7 @@ export const MaxSelection: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows the maximum of 8 skills selected (in this case, all 6 available skills).',
+        story: 'Shows the maximum of 8 skills selected (in this case, all 7 available skills including multi-attribute skills).',
       },
     },
   },
