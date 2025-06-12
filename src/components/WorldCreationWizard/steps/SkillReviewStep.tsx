@@ -21,6 +21,7 @@ import {
   WizardTextArea,
   WizardSelect
 } from '@/components/shared/wizard';
+import { Checkbox } from '@/components/ui';
 
 interface SkillReviewStepProps {
   worldData: Partial<World>;
@@ -122,9 +123,10 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        attributeIds: s.linkedAttributeName ? 
-          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
-          undefined,
+        attributeIds: s.attributeIds || 
+          (s.linkedAttributeName ? 
+            [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
+            []),
       }));
     
     // Update parent state
@@ -149,9 +151,10 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE, // Default to middle value
         minValue: SKILL_MIN_VALUE, // Fixed value
         maxValue: SKILL_MAX_VALUE, // Fixed value
-        attributeIds: s.linkedAttributeName ? 
-          [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
-          undefined,
+        attributeIds: s.attributeIds || 
+          (s.linkedAttributeName ? 
+            [worldData.attributes?.find(attr => attr.name === s.linkedAttributeName)?.id].filter(Boolean) as string[] : 
+            []),
       }));
     
     onUpdate({ ...worldData, skills: acceptedSkills });
@@ -263,19 +266,64 @@ export default function SkillReviewStep({
                   </div>
                   
                   <div className="flex-1">
-                    <WizardFormGroup label="Linked Attribute">
-                      <WizardSelect
-                        value={suggestion.linkedAttributeName || ''}
-                        onChange={(value) => handleModifySkill(index, 'linkedAttributeName', value)}
-                        options={[
-                          { value: '', label: 'None' },
-                          ...(worldData.attributes?.map((attr) => ({
-                            value: attr.name,
-                            label: attr.name
-                          })) || [])
-                        ]}
-                        testId={`skill-attribute-select-${index}`}
-                      />
+                    <WizardFormGroup label="Linked Attributes">
+                      <div className="space-y-2">
+                        {worldData.attributes?.map((attr) => {
+                          const isSelected = suggestion.attributeIds?.includes(attr.id) || 
+                                           (suggestion.linkedAttributeName === attr.name && !suggestion.attributeIds);
+                          return (
+                            <Checkbox
+                              key={attr.id}
+                              label={attr.name}
+                              checked={isSelected}
+                              onChange={(e) => {
+                                const currentAttributeIds = suggestion.attributeIds || 
+                                  (suggestion.linkedAttributeName ? 
+                                    [worldData.attributes?.find(a => a.name === suggestion.linkedAttributeName)?.id].filter(Boolean) as string[] : 
+                                    []);
+                                
+                                let newAttributeIds: string[];
+                                if (e.target.checked) {
+                                  newAttributeIds = [...currentAttributeIds, attr.id];
+                                } else {
+                                  newAttributeIds = currentAttributeIds.filter(id => id !== attr.id);
+                                }
+                                
+                                // Update the suggestion with new attributeIds
+                                const updatedSuggestions = [...localSuggestions];
+                                updatedSuggestions[index] = {
+                                  ...updatedSuggestions[index],
+                                  attributeIds: newAttributeIds,
+                                  linkedAttributeName: undefined // Clear legacy field
+                                };
+                                setLocalSuggestions(updatedSuggestions);
+                                
+                                // Update parent state
+                                const acceptedSkills = updatedSuggestions
+                                  .filter(s => s.accepted)
+                                  .map(s => ({
+                                    id: generateUniqueId('skill'),
+                                    worldId: '',
+                                    name: s.name,
+                                    description: s.description,
+                                    difficulty: s.difficulty,
+                                    category: s.category,
+                                    baseValue: SKILL_DEFAULT_VALUE,
+                                    minValue: SKILL_MIN_VALUE,
+                                    maxValue: SKILL_MAX_VALUE,
+                                    attributeIds: s.attributeIds || [],
+                                  }));
+                                
+                                onUpdate({ ...worldData, skills: acceptedSkills });
+                              }}
+                              data-testid={`skill-attribute-checkbox-${index}-${attr.id}`}
+                            />
+                          );
+                        })}
+                        {(!worldData.attributes || worldData.attributes.length === 0) && (
+                          <p className="text-sm text-gray-500">No attributes available</p>
+                        )}
+                      </div>
                     </WizardFormGroup>
                   </div>
                 </div>
