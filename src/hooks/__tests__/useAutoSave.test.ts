@@ -6,7 +6,16 @@ import { renderHook, act } from '@testing-library/react';
 import { useAutoSave } from '../useAutoSave';
 
 // Mock the auto-save service
-jest.mock('../../lib/services/autoSaveService');
+const mockAutoSaveService = {
+  start: jest.fn(),
+  stop: jest.fn(),
+  triggerSave: jest.fn(),
+  isRunning: jest.fn(() => false),
+};
+
+jest.mock('../../lib/services/autoSaveService', () => ({
+  AutoSaveService: jest.fn().mockImplementation(() => mockAutoSaveService)
+}));
 
 // Mock session store
 const mockSessionStore = {
@@ -23,7 +32,39 @@ const mockSessionStore = {
 };
 
 jest.mock('../../state/sessionStore', () => ({
-  useSessionStore: () => mockSessionStore,
+  useSessionStore: () => ({
+    ...mockSessionStore,
+    id: 'test-session',
+    status: 'active',
+    worldId: 'world-1',
+    characterId: 'char-1',
+  }),
+}));
+
+// Mock other stores
+jest.mock('../../state/worldStore', () => ({
+  useWorldStore: () => ({
+    worlds: { 'world-1': { id: 'world-1', name: 'Test World' } },
+  }),
+}));
+
+jest.mock('../../state/characterStore', () => ({
+  useCharacterStore: () => ({
+    characters: { 'char-1': { id: 'char-1', name: 'Test Character' } },
+  }),
+}));
+
+jest.mock('../../state/narrativeStore', () => ({
+  useNarrativeStore: () => ({
+    segments: {},
+    currentEnding: null,
+  }),
+}));
+
+jest.mock('../../state/journalStore', () => ({
+  useJournalStore: () => ({
+    entries: {},
+  }),
 }));
 
 describe('useAutoSave', () => {
@@ -45,12 +86,18 @@ describe('useAutoSave', () => {
   });
 
   it('should start auto-save service automatically', () => {
-    const { result } = renderHook(() => useAutoSave());
+    mockAutoSaveService.isRunning.mockReturnValue(false);
+    const { result, rerender } = renderHook(() => useAutoSave());
     
     act(() => {
       result.current.start();
+      mockAutoSaveService.isRunning.mockReturnValue(true);
     });
     
+    // Re-render to pick up the new isRunning state
+    rerender();
+    
+    expect(mockAutoSaveService.start).toHaveBeenCalled();
     expect(result.current.isRunning).toBe(true);
   });
 

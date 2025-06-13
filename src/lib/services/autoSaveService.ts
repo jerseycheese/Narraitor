@@ -12,8 +12,13 @@ export type GameState = {
   session: { id: string; status: string };
   world?: { id: string; name: string };
   character?: unknown;
-  narrative?: unknown;
-  journal?: unknown;
+  narrative?: {
+    entries: unknown[];
+    currentEntry?: unknown;
+  };
+  journal?: {
+    entries: unknown[];
+  };
 };
 
 export type StateProvider = () => Promise<GameState>;
@@ -250,9 +255,12 @@ export class AutoSaveService {
     
     if (this.options.onError) {
       // Enhance error with user-friendly information
-      const enhancedError = new Error(userFriendlyError.message);
-      (enhancedError as any).retryable = userFriendlyError.retryable;
-      (enhancedError as any).userFriendlyError = userFriendlyError;
+      const enhancedError = new Error(userFriendlyError.message) as Error & {
+        retryable: boolean;
+        userFriendlyError: typeof userFriendlyError;
+      };
+      enhancedError.retryable = userFriendlyError.retryable;
+      enhancedError.userFriendlyError = userFriendlyError;
       
       this.options.onError(enhancedError);
     }

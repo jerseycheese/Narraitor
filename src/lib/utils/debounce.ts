@@ -3,6 +3,7 @@
  * Prevents excessive function calls by delaying execution
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DebouncedFunction<T extends (...args: any[]) => any> = {
   (...args: Parameters<T>): Promise<ReturnType<T>>;
   cancel: () => void;
@@ -15,6 +16,7 @@ export type DebouncedFunction<T extends (...args: any[]) => any> = {
  * @param delay The delay in milliseconds
  * @returns A debounced function with cancel and flush methods
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
@@ -22,6 +24,7 @@ export function debounce<T extends (...args: any[]) => any>(
   let timeoutId: NodeJS.Timeout | null = null;
   let lastArgs: Parameters<T> | null = null;
   let lastResolve: ((value: ReturnType<T>) => void) | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let lastReject: ((reason?: any) => void) | null = null;
 
   const debouncedFn = (...args: Parameters<T>): Promise<ReturnType<T>> => {
@@ -98,6 +101,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * @param interval The minimum interval between calls in milliseconds
  * @returns A throttled function
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   interval: number
@@ -133,14 +137,17 @@ export function throttle<T extends (...args: any[]) => any>(
  * @param deps Dependency array for the callback
  * @returns A stable debounced callback
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useDebounce<T extends (...args: any[]) => any>(
   callback: T,
   delay: number,
   deps: React.DependencyList = []
 ): DebouncedFunction<T> {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require('react');
   
   return React.useMemo(() => {
     return debounce(callback, delay);
-  }, [delay, ...deps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [delay, callback, ...deps]);
 }

@@ -29,11 +29,11 @@ export const useAutoSave = () => {
         id: sessionStore.id || 'unknown',
         status: sessionStore.status,
       },
-      world: sessionStore.worldId ? worldStore.entities[sessionStore.worldId] : undefined,
-      character: sessionStore.characterId ? characterStore.entities[sessionStore.characterId] : undefined,
+      world: sessionStore.worldId ? worldStore.worlds[sessionStore.worldId] : undefined,
+      character: sessionStore.characterId ? characterStore.characters[sessionStore.characterId] : undefined,
       narrative: {
-        entries: Object.values(narrativeStore.entries || {}),
-        currentEntry: narrativeStore.currentEntry,
+        entries: Object.values(narrativeStore.segments || {}),
+        currentEntry: narrativeStore.currentEnding,
       },
       journal: {
         entries: Object.values(journalStore.entries || {}),
@@ -50,7 +50,9 @@ export const useAutoSave = () => {
         },
         onError: (error) => {
           // Use enhanced error information if available
-          const enhancedError = error as any;
+          const enhancedError = error as Error & { 
+            userFriendlyError?: { message: string } 
+          };
           const errorMessage = enhancedError.userFriendlyError?.message || error.message;
           sessionStore.updateAutoSaveStatus('error', errorMessage);
         },
@@ -108,7 +110,7 @@ export const useAutoSave = () => {
       sessionStore.updateAutoSaveStatus('saving');
       try {
         await autoSaveServiceRef.current.triggerSave('manual');
-      } catch (error) {
+      } catch {
         // Error will be handled by the service's onError callback
       }
     }
