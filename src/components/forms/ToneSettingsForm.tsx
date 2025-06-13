@@ -14,6 +14,12 @@ import {
   LANGUAGE_COMPLEXITY_DESCRIPTIONS,
   DEFAULT_TONE_SETTINGS
 } from '@/types/tone-settings.types';
+import { 
+  descriptionsToSelectOptions, 
+  createFormUpdater, 
+  normalizeOptionalString,
+  validateToneSettings 
+} from '@/lib/utils';
 
 export interface ToneSettingsFormProps {
   toneSettings?: ToneSettings;
@@ -28,32 +34,19 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   onSave,
   showSaveButton = false
 }) => {
-  const handleContentRatingChange = (value: ContentRating) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      contentRating: value
-    });
-  };
+  // Create form updater utilities
+  const formUpdater = createFormUpdater(toneSettings, onToneSettingsChange);
+  
+  // Convert description objects to select options
+  const contentRatingOptions = descriptionsToSelectOptions(CONTENT_RATING_DESCRIPTIONS);
+  const narrativeStyleOptions = descriptionsToSelectOptions(NARRATIVE_STYLE_DESCRIPTIONS);
+  const languageComplexityOptions = descriptionsToSelectOptions(LANGUAGE_COMPLEXITY_DESCRIPTIONS);
 
-  const handleNarrativeStyleChange = (value: NarrativeStyle) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      narrativeStyle: value
-    });
-  };
-
-  const handleLanguageComplexityChange = (value: LanguageComplexity) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      languageComplexity: value
-    });
-  };
+  // Validation state
+  const validationResult = validateToneSettings(toneSettings);
 
   const handleCustomInstructionsChange = (value: string) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      customInstructions: value || undefined
-    });
+    formUpdater.updateField('customInstructions', normalizeOptionalString(value));
   };
 
   return (
@@ -70,17 +63,17 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           <Label htmlFor="content-rating">Content Rating</Label>
           <Select
             value={toneSettings.contentRating}
-            onValueChange={handleContentRatingChange}
+            onValueChange={(value) => formUpdater.updateField('contentRating', value as ContentRating)}
           >
             <SelectTrigger id="content-rating">
               <SelectValue placeholder="Select content rating" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(CONTENT_RATING_DESCRIPTIONS).map(([rating, description]) => (
-                <SelectItem key={rating} value={rating}>
+              {contentRatingOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
                   <div className="flex flex-col">
-                    <span className="font-medium">{rating}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
+                    <span className="font-medium">{option.label}</span>
+                    <span className="text-sm text-muted-foreground">{option.description}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -93,17 +86,17 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           <Label htmlFor="narrative-style">Narrative Style</Label>
           <Select
             value={toneSettings.narrativeStyle}
-            onValueChange={handleNarrativeStyleChange}
+            onValueChange={(value) => formUpdater.updateField('narrativeStyle', value as NarrativeStyle)}
           >
             <SelectTrigger id="narrative-style">
               <SelectValue placeholder="Select narrative style" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(NARRATIVE_STYLE_DESCRIPTIONS).map(([style, description]) => (
-                <SelectItem key={style} value={style}>
+              {narrativeStyleOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
                   <div className="flex flex-col">
-                    <span className="font-medium capitalize">{style.replace('-', ' ')}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
+                    <span className="font-medium">{option.label}</span>
+                    <span className="text-sm text-muted-foreground">{option.description}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -116,17 +109,17 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           <Label htmlFor="language-complexity">Language Complexity</Label>
           <Select
             value={toneSettings.languageComplexity}
-            onValueChange={handleLanguageComplexityChange}
+            onValueChange={(value) => formUpdater.updateField('languageComplexity', value as LanguageComplexity)}
           >
             <SelectTrigger id="language-complexity">
               <SelectValue placeholder="Select language complexity" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(LANGUAGE_COMPLEXITY_DESCRIPTIONS).map(([complexity, description]) => (
-                <SelectItem key={complexity} value={complexity}>
+              {languageComplexityOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
                   <div className="flex flex-col">
-                    <span className="font-medium capitalize">{complexity}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
+                    <span className="font-medium">{option.label}</span>
+                    <span className="text-sm text-muted-foreground">{option.description}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -146,9 +139,26 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           />
         </div>
 
+        {/* Validation Errors */}
+        {!validationResult.valid && (
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-sm text-destructive font-medium mb-1">Please fix the following issues:</p>
+            <ul className="text-sm text-destructive space-y-1">
+              {validationResult.errors.map((error, index) => (
+                <li key={index}>• {error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {showSaveButton && onSave && (
           <div className="flex justify-end">
-            <Button onClick={onSave}>Save Tone Settings</Button>
+            <Button 
+              onClick={onSave}
+              disabled={!validationResult.valid}
+            >
+              Save Tone Settings
+            </Button>
           </div>
         )}
       </CardContent>
