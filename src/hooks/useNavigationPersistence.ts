@@ -37,38 +37,6 @@ export function useNavigationPersistence() {
     preferences,
   } = useNavigationStore();
 
-  /**
-   * Initialize navigation persistence on first load
-   */
-  const initializePersistence = useCallback(() => {
-    logger.debug('Initializing navigation persistence for path:', pathname);
-    
-    initializeNavigation(pathname);
-    
-    // Sync flow step with current navigation state
-    const currentFlowStep = getCurrentFlowStep();
-    setCurrentFlowStep(currentFlowStep);
-    
-  }, [pathname, initializeNavigation, getCurrentFlowStep, setCurrentFlowStep]);
-
-  /**
-   * Update navigation state when pathname changes
-   */
-  const handlePathChange = useCallback(() => {
-    if (!isHydrated) return;
-    
-    logger.debug('Path changed to:', pathname);
-    
-    // Extract title from document if available (for better history)
-    const title = typeof document !== 'undefined' ? document.title : undefined;
-    
-    setCurrentPath(pathname, title);
-    
-    // Update flow step
-    const currentFlowStep = getCurrentFlowStep();
-    setCurrentFlowStep(currentFlowStep);
-    
-  }, [pathname, isHydrated, setCurrentPath, getCurrentFlowStep, setCurrentFlowStep]);
 
   /**
    * Navigate with persistence
@@ -101,15 +69,38 @@ export function useNavigationPersistence() {
     
   }, [pathname, isHydrated, getCurrentFlowStep, setCurrentFlowStep]);
 
-  // Initialize on mount
+  // Initialize on mount (only once)
   useEffect(() => {
-    initializePersistence();
-  }, [initializePersistence]);
+    logger.debug('Initializing navigation persistence for path:', pathname);
+    
+    // Use setTimeout to ensure initialization happens after render
+    const timer = setTimeout(() => {
+      initializeNavigation(pathname);
+      
+      // Sync flow step with current navigation state
+      const currentFlowStep = getCurrentFlowStep();
+      setCurrentFlowStep(currentFlowStep);
+    }, 0);
 
-  // Track path changes
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once
+
+  // Track path changes (only when pathname actually changes)
   useEffect(() => {
-    handlePathChange();
-  }, [handlePathChange]);
+    if (!isHydrated) return;
+    
+    logger.debug('Path changed to:', pathname);
+    
+    // Extract title from document if available (for better history)
+    const title = typeof document !== 'undefined' ? document.title : undefined;
+    
+    setCurrentPath(pathname, title);
+    
+    // Update flow step
+    const currentFlowStep = getCurrentFlowStep();
+    setCurrentFlowStep(currentFlowStep);
+  }, [pathname, isHydrated, setCurrentPath, getCurrentFlowStep, setCurrentFlowStep]); // Include all dependencies
 
   // Handle browser navigation events
   useEffect(() => {

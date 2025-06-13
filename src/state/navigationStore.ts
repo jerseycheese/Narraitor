@@ -218,13 +218,18 @@ export const useNavigationStore = create<NavigationState>()(
       setCurrentPath: (path: string, title?: string, params?: Record<string, string>) => {
         logger.debug('Setting current path:', path, { title, params });
         
-        // Save to sessionStorage for browser refresh recovery
-        sessionStorageHelpers.setCurrentPath(path);
-        
         set(state => {
+          // Prevent unnecessary re-renders when setting the same path
+          // This is crucial for avoiding infinite loops in navigation persistence
+          if (path === state.currentPath) {
+            return state;
+          }
+          
+          // Save to sessionStorage for browser refresh recovery
+          sessionStorageHelpers.setCurrentPath(path);
+          
           // Add to history if this is a new path
-          const shouldAddToHistory = path !== state.currentPath && 
-                                   state.preferences.showRecentPages;
+          const shouldAddToHistory = state.preferences.showRecentPages;
           
           const newHistory = shouldAddToHistory 
             ? [
@@ -320,17 +325,32 @@ export const useNavigationStore = create<NavigationState>()(
 
       closeAllModals: () => {
         logger.debug('Closing all modals');
-        set({ modals: {} });
+        set((state) => {
+          // Performance optimization: only update state if there are actually modals to close
+          // This prevents unnecessary re-renders when no modals are open
+          if (Object.keys(state.modals).length === 0) {
+            return state;
+          }
+          return { modals: {} };
+        });
       },
 
       // Flow state management
       setCurrentFlowStep: (step: NavigationState['currentFlowStep']) => {
         logger.debug('Setting current flow step:', step);
         
-        // Save to localStorage for persistence across sessions
-        localStorageHelpers.setFlowState(step);
-        
-        set({ currentFlowStep: step });
+        set(state => {
+          // Prevent unnecessary re-renders when setting the same flow step
+          // This is essential for navigation persistence stability
+          if (step === state.currentFlowStep) {
+            return state;
+          }
+          
+          // Save to localStorage for persistence across sessions
+          localStorageHelpers.setFlowState(step);
+          
+          return { currentFlowStep: step };
+        });
       },
 
       // Breadcrumb management
@@ -384,20 +404,34 @@ export const useNavigationStore = create<NavigationState>()(
       initializeNavigation: (currentPath: string) => {
         logger.debug('Initializing navigation for path:', currentPath);
         
-        const state = get();
-        
-        if (!state.isHydrated) {
-          // First, try to hydrate from session storage
-          state.hydrateFromSession();
-        }
-        
-        // If we still don't have a current path, set it
-        if (!state.currentPath) {
-          state.setCurrentPath(currentPath);
-        }
-        
-        // Close any lingering modals on initialization
-        state.closeAllModals();
+        set(state => {
+          // Atomic initialization: hydrate from storage and set current path in one operation
+          // This prevents multiple re-renders during the initialization process
+          if (!state.isHydrated) {
+            const sessionPath = sessionStorageHelpers.getCurrentPath();
+            const sessionBreadcrumbs = sessionStorageHelpers.getBreadcrumbs();
+            const flowState = localStorageHelpers.getFlowState();
+            
+            logger.debug('Hydrating during initialization:', { sessionPath, sessionBreadcrumbs, flowState });
+            
+            // Update state with hydrated values and ensure initialization completes
+            return {
+              ...state,
+              currentPath: sessionPath || currentPath,
+              breadcrumbs: sessionBreadcrumbs.length > 0 ? sessionBreadcrumbs : state.breadcrumbs,
+              currentFlowStep: (flowState as NavigationState['currentFlowStep']) || state.currentFlowStep,
+              isHydrated: true,
+              modals: {}, // Clear any lingering modals
+            };
+          }
+          
+          // Already hydrated, just ensure current path is set
+          return {
+            ...state,
+            currentPath: state.currentPath || currentPath,
+            modals: {}, // Clear any lingering modals
+          };
+        });
         
         logger.debug('Navigation initialized');
       },

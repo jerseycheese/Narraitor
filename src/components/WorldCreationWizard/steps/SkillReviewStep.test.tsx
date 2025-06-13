@@ -12,8 +12,11 @@ const mockSuggestions: SkillSuggestion[] = [
     description: 'Ability to fight in battle',
     difficulty: 'medium',
     category: 'Combat',
-    linkedAttributeName: 'Strength',
+    linkedAttributeNames: ['Strength'],
     accepted: false,
+    baseValue: 3,
+    minValue: 1,
+    maxValue: 5,
   },
 ];
 
@@ -43,7 +46,7 @@ const defaultWorldData: Partial<World> = {
   skills: [],
 };
 
-describe.skip('SkillReviewStep', () => {
+describe('SkillReviewStep', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -97,22 +100,9 @@ describe.skip('SkillReviewStep', () => {
       accepted: i === 0,
     }));
 
-    const worldDataWithSelection = {
-      ...defaultWorldData,
-      skills: [{
-        id: 'skill-1',
-        worldId: '',
-        name: 'Combat',
-        description: 'Ability to fight in battle',
-        difficulty: 'medium' as const,
-        category: 'Combat',
-        attributeIds: ['attr-1'],
-      }],
-    };
-
     render(
       <SkillReviewStep
-        worldData={worldDataWithSelection}
+        worldData={defaultWorldData}
         suggestions={suggestionsWithSelection}
         errors={{}}
         onUpdate={mockOnUpdate}
@@ -122,7 +112,7 @@ describe.skip('SkillReviewStep', () => {
     expect(screen.getByTestId('skill-name-input-0')).toBeInTheDocument();
     expect(screen.getByTestId('skill-description-textarea-0')).toBeInTheDocument();
     expect(screen.getByTestId('skill-difficulty-select-0')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-attribute-select-0')).toBeInTheDocument();
+    expect(screen.getByTestId('skill-attributes-0')).toBeInTheDocument();
   });
 
   test('displays Learning Curve instead of Difficulty', () => {
@@ -198,35 +188,25 @@ describe.skip('SkillReviewStep', () => {
       accepted: i === 0,
     }));
 
-    const worldDataWithSelection = {
-      ...defaultWorldData,
-      skills: [{
-        id: 'skill-1',
-        worldId: '',
-        name: 'Combat',
-        description: 'Ability to fight in battle',
-        difficulty: 'medium' as const,
-        category: 'Combat',
-        attributeIds: ['attr-1'],
-      }],
-    };
-
     render(
       <SkillReviewStep
-        worldData={worldDataWithSelection}
+        worldData={defaultWorldData}
         suggestions={suggestionsWithSelection}
         errors={{}}
         onUpdate={mockOnUpdate}
       />
     );
 
-    const attributeSelect = screen.getByTestId('skill-attribute-select-0');
-    fireEvent.change(attributeSelect, { target: { value: 'Strength' } });
+    // Click Intelligence checkbox to add it to the skill
+    const intelligenceCheckbox = screen.getByTestId('skill-0-attribute-Intelligence-checkbox');
+    fireEvent.click(intelligenceCheckbox);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         skills: expect.arrayContaining([
-          expect.objectContaining({ attributeIds: ['attr-1'] })
+          expect.objectContaining({ 
+            attributeIds: expect.arrayContaining(['attr-1', 'attr-2']) // Both Strength and Intelligence
+          })
         ])
       })
     );
@@ -240,8 +220,11 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to move unseen',
         difficulty: 'hard' as const,
         category: 'Rogue',
-        linkedAttributeName: 'Agility',
+        linkedAttributeNames: ['Agility'],
         accepted: true,
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
       },
     ];
 
@@ -282,7 +265,7 @@ describe.skip('SkillReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Selected skills: 2 / 12');
+    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
   });
 
   test('validates maximum 12 skills limit', () => {
@@ -316,7 +299,7 @@ describe.skip('SkillReviewStep', () => {
     );
 
     // Check that the count is correctly displayed
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Selected skills: 13 / 12');
+    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 13 / 12');
     
     // Should show error state when over limit
     const error = screen.queryByText(/too many skills selected/i);
@@ -355,14 +338,14 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to move unseen',
         difficulty: 'hard' as const,
         category: 'Rogue',
-        linkedAttributeName: 'Agility',
+        linkedAttributeNames: ['Agility'],
       },
       {
         name: 'Magic',
         description: 'Ability to cast spells',
         difficulty: 'hard' as const,
         category: 'Mage',
-        linkedAttributeName: 'Intelligence',
+        linkedAttributeNames: ['Intelligence'],
       },
     ];
 
@@ -436,16 +419,22 @@ describe.skip('SkillReviewStep', () => {
         description: 'Ability to move unseen',
         difficulty: 'hard' as const,
         category: 'Rogue',
-        linkedAttributeName: 'Agility',
+        linkedAttributeNames: ['Agility'],
         accepted: true,
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
       },
       {
         name: 'Magic',
         description: 'Ability to cast spells',
         difficulty: 'hard' as const,
         category: 'Mage',
-        linkedAttributeName: 'Intelligence',
+        linkedAttributeNames: ['Intelligence'],
         accepted: true,
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
       },
     ];
 
@@ -458,9 +447,261 @@ describe.skip('SkillReviewStep', () => {
       />
     );
 
-    // Check that categories are displayed
+    // Check that skill names are displayed (categories aren't shown separately in the current UI)
     expect(screen.getByText('Combat')).toBeInTheDocument();
-    expect(screen.getByText('Rogue')).toBeInTheDocument();
-    expect(screen.getByText('Mage')).toBeInTheDocument();
+    expect(screen.getByText('Stealth')).toBeInTheDocument();
+    expect(screen.getByText('Magic')).toBeInTheDocument();
+  });
+
+  // Custom Skills Tests
+  describe('Custom Skills', () => {
+    test('displays Add Custom Skill button', () => {
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByTestId('add-custom-skill-button')).toBeInTheDocument();
+      expect(screen.getByText('+ Add Custom Skill')).toBeInTheDocument();
+    });
+
+    test('shows custom skills section with empty state message', () => {
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByText('Custom Skills')).toBeInTheDocument();
+      expect(screen.getByText('No custom skills yet')).toBeInTheDocument();
+      expect(screen.getByText(/skill slot.* available for custom skills/)).toBeInTheDocument();
+    });
+
+    test('opens SkillEditor when Add Custom Skill is clicked', () => {
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      const addButton = screen.getByTestId('add-custom-skill-button');
+      fireEvent.click(addButton);
+
+      expect(screen.getByTestId('custom-skill-editor')).toBeInTheDocument();
+    });
+
+    test('disables Add Custom Skill button when at maximum skills', () => {
+      // Create suggestions that are all accepted to reach the maximum
+      const maxSuggestions = Array.from({ length: 12 }, (_, i) => ({
+        name: `Skill ${i}`,
+        description: `Description ${i}`,
+        difficulty: 'medium' as const,
+        category: 'General',
+        linkedAttributeNames: ['Strength'],
+        accepted: true,
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={maxSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      const addButton = screen.getByTestId('add-custom-skill-button');
+      expect(addButton).toBeDisabled();
+    });
+
+    test('includes custom skills in skill count', () => {
+      // Test by providing world data that includes both AI suggestions and custom skills
+      const worldDataWithCustomSkills = {
+        ...defaultWorldData,
+        skills: [
+          // AI suggestion skill (matches mockSuggestions[0])
+          {
+            id: 'skill-1',
+            worldId: '',
+            name: 'Combat',
+            description: 'Ability to fight in battle',
+            difficulty: 'medium' as const,
+            category: 'Combat',
+            attributeIds: ['attr-1'],
+            baseValue: 3,
+            minValue: 1,
+            maxValue: 5,
+          },
+          // Custom skill (not in suggestions)
+          {
+            id: 'skill-custom-1',
+            worldId: '',
+            name: 'Custom Magic',
+            description: 'A unique magical ability',
+            difficulty: 'hard' as const,
+            category: 'Magic',
+            attributeIds: ['attr-2'],
+            baseValue: 4,
+            minValue: 1,
+            maxValue: 5,
+          },
+        ],
+      };
+
+      render(
+        <SkillReviewStep
+          worldData={worldDataWithCustomSkills}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Should show count of 2: 1 AI suggestion + 1 custom skill
+      expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
+    });
+
+    test('updates skill count summary to show maximum reached message', () => {
+      // Create suggestions that are all accepted to reach the maximum
+      const maxSuggestions = Array.from({ length: 12 }, (_, i) => ({
+        name: `Skill ${i}`,
+        description: `Description ${i}`,
+        difficulty: 'medium' as const,
+        category: 'General',
+        linkedAttributeNames: ['Strength'],
+        accepted: true,
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={maxSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      expect(screen.getByText('Skills Selected: 12 / 12')).toBeInTheDocument();
+      expect(screen.getByText('(Maximum reached)')).toBeInTheDocument();
+    });
+  });
+
+  // Multi-Attribute Support Tests
+  describe('Multi-Attribute Support', () => {
+    test('supports multi-attribute skill linking with linkedAttributeNames', () => {
+      const multiAttributeSuggestions: SkillSuggestion[] = [
+        {
+          name: 'Athletics',
+          description: 'Physical prowess and endurance',
+          difficulty: 'medium',
+          category: 'Physical',
+          linkedAttributeNames: ['Strength', 'Intelligence'], // Multi-attribute skill
+          accepted: false,
+          baseValue: 3,
+          minValue: 1,
+          maxValue: 5,
+        },
+      ];
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={multiAttributeSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Check that the skill is displayed
+      expect(screen.getByText('Athletics')).toBeInTheDocument();
+      
+      // Check that multi-attribute linking is shown in header
+      expect(screen.getByText('Linked: Strength, Intelligence')).toBeInTheDocument();
+    });
+
+    test('allows toggling individual attributes in multi-attribute skills', () => {
+      const multiAttributeSuggestions: SkillSuggestion[] = [
+        {
+          name: 'Athletics',
+          description: 'Physical prowess and endurance',
+          difficulty: 'medium',
+          category: 'Physical',
+          linkedAttributeNames: ['Strength'], // Start with one attribute
+          accepted: true,
+          baseValue: 3,
+          minValue: 1,
+          maxValue: 5,
+        },
+      ];
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={multiAttributeSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Details are shown by default for the first skill (index 0)
+      // Find the attributes section
+      const attributesSection = screen.getByTestId('skill-attributes-0');
+      expect(attributesSection).toBeInTheDocument();
+
+      // Check that Strength checkbox is checked and Intelligence is not
+      const strengthCheckbox = screen.getByTestId('skill-0-attribute-Strength-checkbox');
+      const intelligenceCheckbox = screen.getByTestId('skill-0-attribute-Intelligence-checkbox');
+      
+      expect(strengthCheckbox).toBeChecked();
+      expect(intelligenceCheckbox).not.toBeChecked();
+
+      // Click to add Intelligence
+      fireEvent.click(intelligenceCheckbox);
+
+      // Verify onUpdate was called with both attributes
+      expect(mockOnUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skills: expect.arrayContaining([
+            expect.objectContaining({ 
+              attributeIds: expect.arrayContaining(['attr-1', 'attr-2']) // Both attribute IDs
+            })
+          ])
+        })
+      );
+    });
+
+    test('displays attributes checkboxes instead of dropdown', () => {
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Check that we have checkboxes for attributes, not a dropdown
+      expect(screen.getByTestId('skill-0-attribute-Strength-checkbox')).toBeInTheDocument();
+      expect(screen.getByTestId('skill-0-attribute-Intelligence-checkbox')).toBeInTheDocument();
+      
+      // Check that the old dropdown is not present
+      expect(screen.queryByTestId('skill-attribute-select-0')).not.toBeInTheDocument();
+    });
   });
 });

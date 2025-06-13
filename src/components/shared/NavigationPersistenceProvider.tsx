@@ -27,13 +27,36 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
   const [isInitialized, setIsInitialized] = useState(false);
   const { isHydrated } = useNavigationPersistence();
 
-  // Initialize navigation persistence
+  /**
+   * Initialize navigation persistence once hydration is complete
+   * 
+   * This effect ensures we only mark initialization as complete after
+   * the navigation store has been properly hydrated from storage.
+   */
   useEffect(() => {
     if (isHydrated && !isInitialized) {
       logger.debug('Navigation persistence initialized');
       setIsInitialized(true);
     }
   }, [isHydrated, isInitialized]);
+
+  /**
+   * Safety timeout to prevent stuck loading states
+   * 
+   * If initialization doesn't complete within 3 seconds (due to storage
+   * issues, network problems, etc.), force initialization to prevent
+   * the app from being stuck in a loading state indefinitely.
+   */
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isInitialized) {
+        logger.warn('Navigation initialization timed out, forcing initialization');
+        setIsInitialized(true);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [isInitialized]);
 
   // Show loading state until navigation is fully hydrated
   // This prevents flash of incorrect navigation state

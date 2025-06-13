@@ -1,5 +1,5 @@
 // WizardState.ts
-import { World } from '@/types/world.types';
+import { World, WorldSkill } from '@/types/world.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 export interface WizardState {
@@ -9,6 +9,7 @@ export interface WizardState {
     attributes: AttributeSuggestion[];
     skills: SkillSuggestion[];
   };
+  customSkills?: WorldSkill[]; // New: Track user-created skills separately
   errors: Record<string, string>;
   isProcessing: boolean;
   selectedTemplateId?: string | null;
@@ -30,8 +31,7 @@ export interface SkillSuggestion {
   description: string;
   difficulty: SkillDifficulty;
   category?: string;
-  linkedAttributeName?: string; // Legacy support for backward compatibility
-  attributeIds?: string[]; // New multi-attribute support
+  linkedAttributeNames?: string[]; // Support for multiple attributes
   accepted: boolean;
   baseValue: number;
   minValue: number;

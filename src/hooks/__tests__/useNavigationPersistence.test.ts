@@ -59,6 +59,9 @@ describe('useNavigationPersistence', () => {
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
+    
+    // Use fake timers for setTimeout testing
+    jest.useFakeTimers();
 
     // Mock useRouter
     (useRouter as jest.Mock).mockReturnValue({
@@ -98,9 +101,19 @@ describe('useNavigationPersistence', () => {
     mockGetCurrentFlowStep.mockReturnValue('character');
   });
 
+  afterEach(() => {
+    // Restore real timers
+    jest.useRealTimers();
+  });
+
   describe('initialization', () => {
     test('should initialize navigation persistence on mount', () => {
       renderHook(() => useNavigationPersistence());
+
+      // Fast-forward timers to trigger setTimeout
+      act(() => {
+        jest.runAllTimers();
+      });
 
       expect(mockInitializeNavigation).toHaveBeenCalledWith('/test-path');
       expect(mockSetCurrentFlowStep).toHaveBeenCalledWith('character');
@@ -134,6 +147,11 @@ describe('useNavigationPersistence', () => {
       mockUseNavigationStore.getState.mockReturnValue(notHydratedState);
 
       renderHook(() => useNavigationPersistence());
+
+      // Fast-forward timers to trigger setTimeout
+      act(() => {
+        jest.runAllTimers();
+      });
 
       // Should still initialize
       expect(mockInitializeNavigation).toHaveBeenCalledWith('/test-path');

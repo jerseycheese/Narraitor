@@ -18,7 +18,7 @@ export interface AttributeSuggestion extends AISuggestionBase {
 
 export interface SkillSuggestion extends AISuggestionBase {
   difficulty: SkillDifficulty;
-  linkedAttributeName?: string;
+  linkedAttributeNames?: string[];
   baseValue: number;
   minValue: number;
   maxValue: number;

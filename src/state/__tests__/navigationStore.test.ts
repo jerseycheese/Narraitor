@@ -303,6 +303,10 @@ describe('navigationStore', () => {
     test('should clear flow state when set to null', () => {
       const { setCurrentFlowStep } = useNavigationStore.getState();
       
+      // First set to a non-null value
+      setCurrentFlowStep('world');
+      
+      // Then clear it
       setCurrentFlowStep(null);
       
       const state = useNavigationStore.getState();
@@ -389,6 +393,10 @@ describe('navigationStore', () => {
 
     test('should initialize navigation', () => {
       const { initializeNavigation } = useNavigationStore.getState();
+      
+      // Clear any previous mock implementations
+      mockSessionStorage.getItem.mockReturnValue(null);
+      mockLocalStorage.getItem.mockReturnValue(null);
       
       // Set up some initial state to test cleanup
       useNavigationStore.setState({
