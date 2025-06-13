@@ -20,7 +20,7 @@ interface AISkill {
   description: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   category?: string;
-  linkedAttributeName?: string;
+  linkedAttributeNames?: string[];
 }
 
 interface AIAnalysisResponse {
@@ -80,7 +80,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
             "description": "Skill with bladed weapons",
             "difficulty": "medium",
             "category": "Combat",
-            "linkedAttributeName": "Strength"
+            "linkedAttributeNames": ["Strength"]
           }
         ]
       }
@@ -147,7 +147,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       description: skill.description,
       difficulty: skill.difficulty || 'medium',
       category: skill.category,
-      linkedAttributeName: skill.linkedAttributeName,
+      linkedAttributeNames: skill.linkedAttributeNames,
       accepted: false, // Default to not accepted, user must explicitly select
       baseValue: 5, // Default value
       minValue: 1, // Fixed min for MVP
@@ -168,18 +168,18 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
         { name: 'Constitution', description: 'Health and stamina', minValue: 1, maxValue: 10, baseValue: 6, category: 'Physical', accepted: false },
       ],
       skills: [
-        { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeName: 'Agility', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeName: 'Constitution', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeName: 'Intelligence', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeName: 'Strength', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
-        { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeName: 'Charisma', accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Combat', description: 'Ability to fight effectively', difficulty: 'medium', category: 'Combat', linkedAttributeNames: ['Strength'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Stealth', description: 'Moving unseen and unheard', difficulty: 'hard', category: 'Physical', linkedAttributeNames: ['Agility'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Perception', description: 'Noticing details and dangers', difficulty: 'easy', category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Persuasion', description: 'Convincing others to agree', difficulty: 'medium', category: 'Social', linkedAttributeNames: ['Charisma'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Investigation', description: 'Finding clues and solving mysteries', difficulty: 'medium', category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Athletics', description: 'Running, jumping, and climbing', difficulty: 'easy', category: 'Physical', linkedAttributeNames: ['Strength'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Medicine', description: 'Healing wounds and treating ailments', difficulty: 'hard', category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Survival', description: 'Finding food and shelter in the wild', difficulty: 'medium', category: 'Physical', linkedAttributeNames: ['Constitution'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Arcana', description: 'Understanding magical theory and practice', difficulty: 'hard', category: 'Mental', linkedAttributeNames: ['Intelligence'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Deception', description: 'Lying and misleading others', difficulty: 'medium', category: 'Social', linkedAttributeNames: ['Charisma'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Intimidation', description: 'Frightening or coercing others', difficulty: 'medium', category: 'Social', linkedAttributeNames: ['Strength'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
+        { name: 'Performance', description: 'Entertainment and artistic expression', difficulty: 'easy', category: 'Social', linkedAttributeNames: ['Charisma'], accepted: false, baseValue: 5, minValue: 1, maxValue: 10 },
       ],
     };
   }

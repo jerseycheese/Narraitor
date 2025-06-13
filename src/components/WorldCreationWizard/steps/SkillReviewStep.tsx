@@ -104,8 +104,7 @@ export default function SkillReviewStep({
       const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
       
       // Initialize with multi-attribute support
-      const initialAttributeNames = suggestion.linkedAttributeNames || 
-        (suggestion.linkedAttributeName ? [suggestion.linkedAttributeName] : []);
+      const initialAttributeNames = suggestion.linkedAttributeNames || [];
       
       return {
         ...suggestion,
@@ -131,8 +130,7 @@ export default function SkillReviewStep({
         const accepted = true;
         
         // Initialize with multi-attribute support
-        const initialAttributeNames = suggestion.linkedAttributeNames || 
-          (suggestion.linkedAttributeName ? [suggestion.linkedAttributeName] : []);
+        const initialAttributeNames = suggestion.linkedAttributeNames || [];
         
         return {
           ...suggestion,
@@ -157,7 +155,7 @@ export default function SkillReviewStep({
           baseValue: SKILL_DEFAULT_VALUE,
           minValue: SKILL_MIN_VALUE,
           maxValue: SKILL_MAX_VALUE,
-          attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+          attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
         }));
       
       // Only update if we don't already have skills or if the count is different
@@ -192,7 +190,7 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE,
         minValue: SKILL_MIN_VALUE,
         maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
       }));
     
     const allSkills = [...acceptedAISkills, ...customSkills];
@@ -217,7 +215,7 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE,
         minValue: SKILL_MIN_VALUE,
         maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
       }));
     
     const allSkills = [...acceptedAISkills, ...customSkills];
@@ -257,7 +255,7 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE,
         minValue: SKILL_MIN_VALUE,
         maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
       }));
     
     const allSkills = [...acceptedAISkills, ...customSkills];
@@ -298,7 +296,7 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE,
         minValue: SKILL_MIN_VALUE,
         maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
       }));
     
     const allSkills = [...acceptedAISkills, ...updatedCustomSkills];
@@ -327,7 +325,7 @@ export default function SkillReviewStep({
         baseValue: SKILL_DEFAULT_VALUE,
         minValue: SKILL_MIN_VALUE,
         maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || (s.linkedAttributeName ? [s.linkedAttributeName] : [])),
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
       }));
     
     const allSkills = [...acceptedAISkills, ...updatedCustomSkills];
