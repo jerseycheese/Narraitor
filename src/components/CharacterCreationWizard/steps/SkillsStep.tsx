@@ -15,6 +15,7 @@ interface SkillsStepProps {
 export const SkillsStep: React.FC<SkillsStepProps> = ({
   data,
   onUpdate,
+  worldConfig,
 }) => {
   const selectedSkills = data.characterData.skills.filter((skill: any) => skill.isSelected); // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -74,12 +75,15 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                   <p className="text-sm text-gray-600 mt-1">{skill.description}</p>
                 )}
                 {/* Show linked attributes */}
-                {skill.attributeIds && skill.attributeIds.length > 0 && (
+                {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
                   <div className="mt-2">
                     <span className="text-xs font-medium text-blue-600">
-                      Linked to: {skill.attributeIds.map((attrId: string) => 
-                        data.attributes.find((attr: any) => attr.id === attrId)?.name || 'Unknown' // eslint-disable-line @typescript-eslint/no-explicit-any
-                      ).join(', ')}
+                      Linked to: {skill.attributeIds
+                        .map((attrId: string) => 
+                          worldConfig.attributes?.find((attr: any) => attr.id === attrId)?.name || 'Unknown' // eslint-disable-line @typescript-eslint/no-explicit-any
+                        )
+                        .filter((name: string) => name !== 'Unknown') // Filter out unknown attributes
+                        .join(', ') || 'Unknown attributes'}
                     </span>
                   </div>
                 )}
