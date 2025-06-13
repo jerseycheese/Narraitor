@@ -79,7 +79,7 @@
     "puppeteer": "^24.10.0",
     "storybook": "^8.6.12",
     "tailwindcss": "^3.4.17",
-    "ts-jest": "^29.3.2",
+    "ts-jest": "^29.4.0",
     "typescript": "^5"
   },
   "eslintConfig": {
