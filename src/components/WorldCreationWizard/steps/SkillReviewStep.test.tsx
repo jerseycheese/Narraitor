@@ -528,10 +528,50 @@ describe('SkillReviewStep', () => {
     });
 
     test('includes custom skills in skill count', () => {
-      // This test would need to be implemented with state management
-      // Since we can't easily test React state changes without complex setup,
-      // we'll rely on integration testing for this behavior
-      expect(true).toBe(true); // Placeholder for now
+      // Test by providing world data that includes both AI suggestions and custom skills
+      const worldDataWithCustomSkills = {
+        ...defaultWorldData,
+        skills: [
+          // AI suggestion skill (matches mockSuggestions[0])
+          {
+            id: 'skill-1',
+            worldId: '',
+            name: 'Combat',
+            description: 'Ability to fight in battle',
+            difficulty: 'medium' as const,
+            category: 'Combat',
+            attributeIds: ['attr-1'],
+            baseValue: 3,
+            minValue: 1,
+            maxValue: 5,
+          },
+          // Custom skill (not in suggestions)
+          {
+            id: 'skill-custom-1',
+            worldId: '',
+            name: 'Custom Magic',
+            description: 'A unique magical ability',
+            difficulty: 'hard' as const,
+            category: 'Magic',
+            attributeIds: ['attr-2'],
+            baseValue: 4,
+            minValue: 1,
+            maxValue: 5,
+          },
+        ],
+      };
+
+      render(
+        <SkillReviewStep
+          worldData={worldDataWithCustomSkills}
+          suggestions={mockSuggestions}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Should show count of 2: 1 AI suggestion + 1 custom skill
+      expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
     });
 
     test('updates skill count summary to show maximum reached message', () => {
