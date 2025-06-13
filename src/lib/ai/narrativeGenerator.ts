@@ -14,6 +14,7 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
+import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -30,6 +31,29 @@ export class NarrativeGenerator {
     return prompt + loreContext;
   }
 
+  /**
+   * Enhances a prompt with tone settings for consistent narrative style
+   */
+  private enhancePromptWithToneSettings(prompt: string, world: World): string {
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
+    const toneInstructions = `
+
+TONE SETTINGS:
+Content Rating: ${toneSettings.contentRating}
+Narrative Style: ${toneSettings.narrativeStyle}
+Language Complexity: ${toneSettings.languageComplexity}
+${toneSettings.customInstructions ? `Custom Instructions: ${toneSettings.customInstructions}` : ''}
+
+IMPORTANT: Ensure the generated content strictly adheres to these tone settings:
+- Content must be appropriate for the ${toneSettings.contentRating} rating
+- Maintain a ${toneSettings.narrativeStyle} narrative style throughout
+- Use ${toneSettings.languageComplexity} language complexity
+${toneSettings.customInstructions ? `- Follow these custom instructions: ${toneSettings.customInstructions}` : ''}`;
+
+    return prompt + toneInstructions;
+  }
+
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -38,10 +62,11 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
       
-      // Add lore context to prompt
-      const enhancedPrompt = this.enhancePromptWithLore(prompt, request.worldId);
+      // Add tone settings and lore context to prompt
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
+      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, request.worldId);
 
-      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       
       // Extract structured lore from generated narrative
       if (response.content) {
@@ -75,23 +100,27 @@ export class NarrativeGenerator {
       const playerCharacterId = characterIds[0]; // First character is the player
       const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
       
+      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+      
       const context = {
         worldName: world.name,
         worldDescription: world.description,
         genre: world.theme,
-        tone: 'default',
+        tone: toneSettings.narrativeStyle,
         attributes: world.attributes,
         characterIds,
         playerCharacterName: playerCharacter?.name,
-        playerCharacterBackground: playerCharacter?.background
+        playerCharacterBackground: playerCharacter?.background,
+        toneSettings: toneSettings
       };
 
       const prompt = template(context);
       
-      // Add lore context to initial scene
-      const enhancedPrompt = this.enhancePromptWithLore(prompt, worldId);
+      // Add tone settings and lore context to initial scene
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
+      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, worldId);
       
-      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       
       // Extract structured lore from initial scene
       if (response.content) {
@@ -159,18 +188,21 @@ export class NarrativeGenerator {
     const playerCharacterId = request.characterIds?.[0]; // First character is the player
     const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
     
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
     return {
       worldName: world.name,
       worldDescription: world.description,
       genre: world.theme,
-      tone: 'default',
+      tone: toneSettings.narrativeStyle,
       attributes: world.attributes,
       characterIds: request.characterIds,
       playerCharacterName: playerCharacter?.name,
       playerCharacterBackground: playerCharacter?.background,
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
-      generationParameters: request.generationParameters
+      generationParameters: request.generationParameters,
+      toneSettings: toneSettings
     };
   }
 
