@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useNavigationPersistence } from '../useNavigationPersistence';
 import { useNavigationStore } from '@/state/navigationStore';
