@@ -354,10 +354,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Clear current decision to prevent showing stale choices during generation
     setCurrentDecision(null);
     
-    // Trigger auto-save after player choice
-    autoSave.triggerSave('player-choice');
-    
     onChoiceSelected(choiceId);
+    
+    // Trigger auto-save after player choice to ensure all state updates are applied
+    autoSave.triggerSave('player-choice');
   };
 
   const handleCustomSubmit = (customText: string) => {

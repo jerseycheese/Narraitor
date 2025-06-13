@@ -3,6 +3,8 @@
  * Prevents excessive function calls by delaying execution
  */
 
+import React from 'react';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DebouncedFunction<T extends (...args: any[]) => any> = {
   (...args: Parameters<T>): Promise<ReturnType<T>>;
@@ -143,9 +145,6 @@ export function useDebounce<T extends (...args: any[]) => any>(
   delay: number,
   deps: React.DependencyList = []
 ): DebouncedFunction<T> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require('react');
-  
   return React.useMemo(() => {
     return debounce(callback, delay);
     // eslint-disable-next-line react-hooks/exhaustive-deps
