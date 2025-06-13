@@ -19,3 +19,9 @@ export {
   validateSelectionCount,
   type ValidationResult
 } from './validationUtils';
+
+// Tone settings utilities
+export { descriptionsToSelectOptions, createEnumChecker, getEnumValues, isValidEnumValue } from './enumHelpers';
+export type { SelectOptionWithDescription } from './enumHelpers';
+export { createFormUpdater, normalizeOptionalString, createDebouncedHandler, createFieldProps } from './formHelpers';
+export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';
