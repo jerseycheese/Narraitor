@@ -151,33 +151,36 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
               key={`${entry.path}-${entry.timestamp}`}
               className="group relative"
             >
-              <button
-                onClick={() => handleNavigateToPage(entry.path, entry.title)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center justify-between"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900 truncate">
-                    {formatPageTitle(entry)}
+              <div className="flex items-center">
+                <button
+                  onClick={() => handleNavigateToPage(entry.path, entry.title)}
+                  className="flex-1 text-left px-4 py-3 hover:bg-gray-100 transition-colors"
+                  aria-label={`Navigate to ${formatPageTitle(entry)}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-900 truncate">
+                      {formatPageTitle(entry)}
+                    </div>
+                    <div className="text-sm text-gray-500 truncate">
+                      {formatPathDisplay(entry.path)}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {formatTimestamp(entry.timestamp)}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {formatPathDisplay(entry.path)}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {formatTimestamp(entry.timestamp)}
-                  </div>
-                </div>
+                </button>
                 
-                {/* Remove button */}
+                {/* Remove button - now a sibling, not nested */}
                 <button
                   onClick={(e) => handleRemoveFromHistory(entry.path, e)}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all ml-2"
-                  aria-label="Remove from history"
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all mr-4"
+                  aria-label={`Remove ${formatPageTitle(entry)} from history`}
                 >
                   <svg className="w-4 h-4 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-              </button>
+              </div>
               
               {index < recentPages.length - 1 && (
                 <div className="border-b border-gray-100 mx-4" />
