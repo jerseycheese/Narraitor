@@ -7,6 +7,8 @@ A multi-step wizard component for creating game worlds in the Narraitor RPG fram
 - **Multi-step navigation** with progress tracking
 - **Form validation** at each step
 - **AI-powered analysis** of world descriptions to suggest appropriate attributes and skills
+- **Custom skill creation** with inline SkillEditor integration
+- **Multi-attribute skill linking** with checkbox-based selection
 - **Fallback handling** for AI service failures
 - **State persistence** between wizard steps
 - **Responsive design** for various screen sizes
@@ -31,7 +33,7 @@ import WorldCreationWizard from '@/components/WorldCreationWizard';
 1. **Basic Information** - Name, brief description, and genre selection
 2. **World Description** - Detailed description for AI analysis
 3. **Attribute Review** - Review and customize AI-suggested attributes
-4. **Skill Review** - Review and customize AI-suggested skills  
+4. **Skill Review** - Review and customize AI-suggested skills, add custom skills with multi-attribute linking
 5. **Finalize** - Review all settings and create the world
 
 ## Props
@@ -54,6 +56,7 @@ The wizard uses the `WizardState` interface to track:
 - Current step
 - World data being created
 - AI suggestions for attributes and skills
+- Custom skills created by the user
 - Validation errors
 - Processing state for async operations
 
@@ -63,7 +66,7 @@ Each step includes validation:
 - **Basic Info**: Name (3+ chars) and description (10+ chars) required
 - **Description**: Detailed description (50-3000 chars) required
 - **Attributes**: Max 6 attributes can be selected
-- **Skills**: Max 12 skills can be selected
+- **Skills**: Max 12 skills can be selected (includes both AI suggestions and custom skills)
 
 ### Error Handling
 
