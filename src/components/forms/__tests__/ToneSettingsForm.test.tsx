@@ -4,6 +4,23 @@ import userEvent from '@testing-library/user-event';
 import { ToneSettingsForm } from '../ToneSettingsForm';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 
+// Mock the validation utility
+jest.mock('@/lib/utils', () => ({
+  ...jest.requireActual('@/lib/utils'),
+  validateToneSettings: jest.fn(() => ({ valid: true, errors: [] })),
+  descriptionsToSelectOptions: jest.fn((descriptions) => 
+    Object.entries(descriptions).map(([value, description]) => ({
+      value,
+      label: value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      description
+    }))
+  ),
+  createFormUpdater: jest.fn((state, onChange) => ({
+    updateField: (field, value) => onChange({ ...state, [field]: value }),
+  })),
+  normalizeOptionalString: jest.fn((value) => value.trim() === '' ? undefined : value.trim()),
+}));
+
 const mockOnToneSettingsChange = jest.fn();
 const mockOnSave = jest.fn();
 
@@ -191,5 +208,46 @@ describe('ToneSettingsForm', () => {
 
     const customInstructionsTextarea = screen.getByLabelText('Custom Instructions (Optional)');
     expect(customInstructionsTextarea).toHaveValue('');
+  });
+
+  test('displays validation errors when form is invalid', () => {
+    const { validateToneSettings } = require('@/lib/utils');
+    validateToneSettings.mockReturnValue({
+      valid: false,
+      errors: ['Content Rating is required', 'Narrative Style must be valid']
+    });
+
+    render(
+      <ToneSettingsForm
+        toneSettings={DEFAULT_TONE_SETTINGS}
+        onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
+      />
+    );
+
+    expect(screen.getByText('Please fix the following issues:')).toBeInTheDocument();
+    expect(screen.getByText('• Content Rating is required')).toBeInTheDocument();
+    expect(screen.getByText('• Narrative Style must be valid')).toBeInTheDocument();
+  });
+
+  test('disables save button when validation fails', () => {
+    const { validateToneSettings } = require('@/lib/utils');
+    validateToneSettings.mockReturnValue({
+      valid: false,
+      errors: ['Content Rating is required']
+    });
+
+    render(
+      <ToneSettingsForm
+        toneSettings={DEFAULT_TONE_SETTINGS}
+        onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
+      />
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
+    expect(saveButton).toBeDisabled();
   });
 });
