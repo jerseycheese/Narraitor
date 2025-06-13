@@ -18,6 +18,8 @@ import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { useJournalStore } from '@/state/journalStore';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -83,6 +85,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
+  
+  // Auto-save functionality
+  const autoSave = useAutoSave();
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -349,6 +354,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Clear current decision to prevent showing stale choices during generation
     setCurrentDecision(null);
     
+    // Trigger auto-save after player choice
+    autoSave.triggerSave('player-choice');
+    
     onChoiceSelected(choiceId);
   };
 
@@ -502,7 +510,22 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          <CharacterSummary character={character} />
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <CharacterSummary character={character} />
+            </div>
+            {/* Auto-save indicator */}
+            <div className="ml-4">
+              <SaveIndicator
+                status={autoSave.status}
+                lastSaveTime={autoSave.lastSaveTime}
+                errorMessage={autoSave.errorMessage}
+                totalSaves={autoSave.totalSaves}
+                onManualSave={autoSave.triggerSave}
+                className="text-sm"
+              />
+            </div>
+          </div>
         </div>
       )}
       

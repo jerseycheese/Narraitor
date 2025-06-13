@@ -6,3 +6,4 @@ export type { NavigationLoadingState, UseNavigationLoadingReturn } from './useNa
 export { useNavigationPersistence } from './useNavigationPersistence';
 export { usePointPoolManager } from './usePointPoolManager';
 export { useWizardState } from './useWizardState';
+export { useAutoSave } from './useAutoSave';
