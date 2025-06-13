@@ -73,11 +73,16 @@ export function useNavigationPersistence() {
   useEffect(() => {
     logger.debug('Initializing navigation persistence for path:', pathname);
     
-    initializeNavigation(pathname);
-    
-    // Sync flow step with current navigation state
-    const currentFlowStep = getCurrentFlowStep();
-    setCurrentFlowStep(currentFlowStep);
+    // Use setTimeout to ensure initialization happens after render
+    const timer = setTimeout(() => {
+      initializeNavigation(pathname);
+      
+      // Sync flow step with current navigation state
+      const currentFlowStep = getCurrentFlowStep();
+      setCurrentFlowStep(currentFlowStep);
+    }, 0);
+
+    return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once
 

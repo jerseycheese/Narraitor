@@ -265,7 +265,7 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Selected skills: 2 / 12');
+    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
   });
 
   test('validates maximum 12 skills limit', () => {
@@ -299,7 +299,7 @@ describe('SkillReviewStep', () => {
     );
 
     // Check that the count is correctly displayed
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Selected skills: 13 / 12');
+    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 13 / 12');
     
     // Should show error state when over limit
     const error = screen.queryByText(/too many skills selected/i);
@@ -480,8 +480,8 @@ describe('SkillReviewStep', () => {
       );
 
       expect(screen.getByText('Custom Skills')).toBeInTheDocument();
-      expect(screen.getByText('No custom skills created yet.')).toBeInTheDocument();
-      expect(screen.getByText('Use the button above to add skills unique to your world.')).toBeInTheDocument();
+      expect(screen.getByText('No custom skills yet')).toBeInTheDocument();
+      expect(screen.getByText(/skill slot.* available for custom skills/)).toBeInTheDocument();
     });
 
     test('opens SkillEditor when Add Custom Skill is clicked', () => {
@@ -557,7 +557,7 @@ describe('SkillReviewStep', () => {
         />
       );
 
-      expect(screen.getByText('Selected skills: 12 / 12')).toBeInTheDocument();
+      expect(screen.getByText('Skills Selected: 12 / 12')).toBeInTheDocument();
       expect(screen.getByText('(Maximum reached)')).toBeInTheDocument();
     });
   });

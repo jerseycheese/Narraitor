@@ -6,6 +6,7 @@ import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 import { SkillEditor } from '@/components/world/SkillEditor';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   MIN_SKILL_VALUE as SKILL_MIN_VALUE, 
   MAX_SKILL_VALUE as SKILL_MAX_VALUE, 
@@ -305,7 +306,7 @@ export default function SkillReviewStep({
     <div data-testid="skill-review-step">
       <WizardFormSection
         title="Review Skills"
-        description="Based on your description, we've suggested these skills. You can accept, modify, or reject each one. Select up to 12 skills for your world."
+        description="We've suggested skills for your world. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
       >
 
       <div className="space-y-4">
@@ -341,7 +342,6 @@ export default function SkillReviewStep({
               </div>
               
               <div className="flex items-center gap-2">
-                {/* Add a details toggle button */}
                 <button 
                   type="button" 
                   className="text-sm text-blue-600 hover:underline focus:outline-none"
@@ -355,7 +355,7 @@ export default function SkillReviewStep({
                     setLocalSuggestions(newSuggestions);
                   }}
                 >
-                  {suggestion.showDetails ? 'Hide details' : 'Show details'}
+                  {suggestion.showDetails ? 'Hide details' : 'Customize'}
                 </button>
                 <button
                   type="button"
@@ -416,25 +416,18 @@ export default function SkillReviewStep({
                       <div className="space-y-2" data-testid={`skill-attributes-${index}`}>
                         {worldData.attributes && worldData.attributes.length > 0 ? (
                           worldData.attributes.map((attribute) => (
-                            <div key={attribute.id} className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
+                            <div key={attribute.id} className="space-y-1">
+                              <Checkbox
                                 id={`skill-${index}-attribute-${attribute.id}`}
                                 checked={suggestion.selectedAttributeNames?.includes(attribute.name) || false}
                                 onChange={() => handleAttributeToggle(index, attribute.name)}
-                                className="rounded border-gray-300 focus:ring-blue-500"
+                                label={attribute.name}
                                 data-testid={`skill-${index}-attribute-${attribute.name}-checkbox`}
                               />
-                              <label 
-                                htmlFor={`skill-${index}-attribute-${attribute.id}`}
-                                className="text-sm font-normal cursor-pointer"
-                              >
-                                {attribute.name}
-                              </label>
                               {attribute.description && (
-                                <span className="text-xs text-gray-500">
-                                  - {attribute.description}
-                                </span>
+                                <div className="ml-6 text-xs text-gray-500">
+                                  {attribute.description}
+                                </div>
                               )}
                             </div>
                           ))
@@ -497,7 +490,12 @@ export default function SkillReviewStep({
         {/* Custom Skills Section */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Custom Skills</h3>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Custom Skills</h3>
+              <p className="text-sm text-gray-600">
+                Create your own unique skills for this world ({acceptedCount}/12 slots used)
+              </p>
+            </div>
             <button
               type="button"
               onClick={handleAddCustomSkill}
@@ -510,9 +508,14 @@ export default function SkillReviewStep({
           </div>
           
           {customSkills.length === 0 && !isCreatingCustomSkill ? (
-            <div className="text-center py-6 text-gray-500">
-              <p className="text-sm">No custom skills created yet.</p>
-              <p className="text-xs">Use the button above to add skills unique to your world.</p>
+            <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+              <p className="text-sm text-gray-600 mb-2">No custom skills yet</p>
+              <p className="text-xs text-gray-500">
+                {acceptedCount < 12 
+                  ? `You have ${12 - acceptedCount} skill slot${12 - acceptedCount !== 1 ? 's' : ''} available for custom skills`
+                  : 'Remove some suggested skills to add custom ones'
+                }
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -589,13 +592,31 @@ export default function SkillReviewStep({
         </div>
       </div>
 
-      <div className="mt-4" data-testid="skill-count-summary">
-        Selected skills: {acceptedCount} / 12
-        {acceptedCount >= 12 && (
-          <span className="text-xs text-amber-600 ml-2">
-            (Maximum reached)
-          </span>
-        )}
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200" data-testid="skill-count-summary">
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-sm font-medium text-blue-900">
+              Skills Selected: {acceptedCount} / 12
+            </span>
+            {acceptedCount >= 12 && (
+              <span className="text-xs text-amber-600 ml-2">
+                (Maximum reached)
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-blue-700">
+            {acceptedCount < 12 
+              ? `${12 - acceptedCount} slot${12 - acceptedCount !== 1 ? 's' : ''} available`
+              : 'All slots filled'
+            }
+          </div>
+        </div>
+        <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+          <div 
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+            style={{ width: `${(acceptedCount / 12) * 100}%` }}
+          ></div>
+        </div>
       </div>
       </WizardFormSection>
 

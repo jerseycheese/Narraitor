@@ -35,6 +35,18 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
     }
   }, [isHydrated, isInitialized]);
 
+  // Safety timeout: automatically initialize after 3 seconds to prevent stuck states
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isInitialized) {
+        logger.warn('Navigation initialization timed out, forcing initialization');
+        setIsInitialized(true);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [isInitialized]);
+
   // Show loading state until navigation is fully hydrated
   // This prevents flash of incorrect navigation state
   if (!isInitialized) {
