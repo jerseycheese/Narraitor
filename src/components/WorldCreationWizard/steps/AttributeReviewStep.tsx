@@ -31,6 +31,31 @@ export default function AttributeReviewStep({
   const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>([]);
   const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
   const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
+
+  /**
+   * Helper function to merge accepted AI attributes with custom attributes
+   * 
+   * This centralizes the merge logic to ensure consistency across all handlers
+   * and reduces code duplication.
+   * 
+   * @param acceptedSuggestions - AI-generated attribute suggestions that are accepted
+   * @param customAttributesList - Custom attributes to merge (defaults to current state)
+   * @returns Combined array of accepted AI attributes and custom attributes
+   */
+  const mergeAllAttributes = (acceptedSuggestions: AttributeSuggestion[], customAttributesList = customAttributes): WorldAttribute[] => {
+    const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(s => ({
+      id: generateUniqueId('attribute'),
+      worldId: '',
+      name: s.name,
+      description: s.description,
+      baseValue: s.baseValue,
+      minValue: s.minValue,
+      maxValue: s.maxValue,
+      category: s.category,
+    }));
+    
+    return [...acceptedAttributes, ...customAttributesList];
+  };
   // Initialize state based on existing selections
   const [localSuggestions, setLocalSuggestions] = useState(() => {
     // If we have existing attributes in worldData, match them to suggestions
@@ -107,21 +132,8 @@ export default function AttributeReviewStep({
     setLocalSuggestions(updatedSuggestions);
     
     // Convert to WorldAttribute objects for the store
-    const acceptedAttributes = updatedSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('attr'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        baseValue: s.baseValue,
-        minValue: s.minValue,
-        maxValue: s.maxValue,
-        category: s.category,
-      }));
-    
-    // Include custom attributes
-    const allAttributes = [...acceptedAttributes, ...customAttributes];
+    const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
+    const allAttributes = mergeAllAttributes(acceptedSuggestions);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
@@ -131,20 +143,8 @@ export default function AttributeReviewStep({
     setLocalSuggestions(updatedSuggestions);
     
     // Re-calculate accepted attributes
-    const acceptedAttributes: WorldAttribute[] = updatedSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('attr'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        baseValue: s.baseValue,
-        minValue: s.minValue,
-        maxValue: s.maxValue,
-        category: s.category,
-      }));
-    
-    const allAttributes = [...acceptedAttributes, ...customAttributes];
+    const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
+    const allAttributes = mergeAllAttributes(acceptedSuggestions);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
@@ -173,20 +173,8 @@ export default function AttributeReviewStep({
     setEditingCustomAttributeId(null);
     
     // Recalculate world attributes
-    const acceptedAIAttributes: WorldAttribute[] = localSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('attr'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        baseValue: s.baseValue,
-        minValue: s.minValue,
-        maxValue: s.maxValue,
-        category: s.category,
-      }));
-    
-    const allAttributes = [...acceptedAIAttributes, ...updatedCustomAttributes];
+    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
+    const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
@@ -200,20 +188,8 @@ export default function AttributeReviewStep({
     setCustomAttributes(updatedCustomAttributes);
     
     // Recalculate world attributes
-    const acceptedAIAttributes: WorldAttribute[] = localSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('attr'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        baseValue: s.baseValue,
-        minValue: s.minValue,
-        maxValue: s.maxValue,
-        category: s.category,
-      }));
-    
-    const allAttributes = [...acceptedAIAttributes, ...updatedCustomAttributes];
+    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
+    const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
