@@ -522,6 +522,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 errorMessage={autoSave.errorMessage}
                 totalSaves={autoSave.totalSaves}
                 onManualSave={autoSave.triggerSave}
+                onRetryError={autoSave.retry}
+                retryable={true}
+                compact={false}
                 className="text-sm"
               />
             </div>

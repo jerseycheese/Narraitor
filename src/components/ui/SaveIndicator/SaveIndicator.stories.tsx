@@ -80,6 +80,8 @@ export const Error: Story = {
     status: 'error',
     errorMessage: 'Failed to save game state',
     totalSaves: 8,
+    retryable: true,
+    onRetryError: action('retry-error'),
   },
 };
 
@@ -105,6 +107,28 @@ export const LongErrorMessage: Story = {
     status: 'error',
     errorMessage: 'Network error: Unable to connect to the server. Please check your internet connection and try again.',
     totalSaves: 15,
+    onManualSave: action('manual-save-triggered'),
+    retryable: true,
+    onRetryError: action('retry-error'),
+  },
+};
+
+export const CompactMode: Story = {
+  args: {
+    status: 'saved',
+    lastSaveTime: new Date().toISOString(),
+    totalSaves: 7,
+    compact: true,
+    onManualSave: action('manual-save-triggered'),
+  },
+};
+
+export const NonRetryableError: Story = {
+  args: {
+    status: 'error',
+    errorMessage: 'Authentication failed. Please check your credentials.',
+    totalSaves: 3,
+    retryable: false,
     onManualSave: action('manual-save-triggered'),
   },
 };

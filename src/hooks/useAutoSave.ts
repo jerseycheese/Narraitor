@@ -49,7 +49,10 @@ export const useAutoSave = () => {
           sessionStore.recordAutoSave(result.timestamp.toISOString());
         },
         onError: (error) => {
-          sessionStore.updateAutoSaveStatus('error', error.message);
+          // Use enhanced error information if available
+          const enhancedError = error as any;
+          const errorMessage = enhancedError.userFriendlyError?.message || error.message;
+          sessionStore.updateAutoSaveStatus('error', errorMessage);
         },
       });
     }
@@ -100,6 +103,17 @@ export const useAutoSave = () => {
     }
   }, [sessionStore]);
 
+  const retry = useCallback(async () => {
+    if (autoSaveServiceRef.current && sessionStore.autoSave.status === 'error') {
+      sessionStore.updateAutoSaveStatus('saving');
+      try {
+        await autoSaveServiceRef.current.triggerSave('manual');
+      } catch (error) {
+        // Error will be handled by the service's onError callback
+      }
+    }
+  }, [sessionStore]);
+
   return {
     // State
     isEnabled: sessionStore.autoSave.enabled,
@@ -114,5 +128,6 @@ export const useAutoSave = () => {
     stop,
     triggerSave,
     setEnabled,
+    retry,
   };
 };

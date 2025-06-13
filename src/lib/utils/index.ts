@@ -19,3 +19,7 @@ export {
   validateSelectionCount,
   type ValidationResult
 } from './validationUtils';
+
+// Debounce utilities
+export { debounce, throttle, useDebounce } from './debounce';
+export type { DebouncedFunction } from './debounce';
