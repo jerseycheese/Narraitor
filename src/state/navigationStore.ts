@@ -219,7 +219,8 @@ export const useNavigationStore = create<NavigationState>()(
         logger.debug('Setting current path:', path, { title, params });
         
         set(state => {
-          // Don't update if path is the same
+          // Prevent unnecessary re-renders when setting the same path
+          // This is crucial for avoiding infinite loops in navigation persistence
           if (path === state.currentPath) {
             return state;
           }
@@ -325,7 +326,8 @@ export const useNavigationStore = create<NavigationState>()(
       closeAllModals: () => {
         logger.debug('Closing all modals');
         set((state) => {
-          // Only update if there are actually modals to close
+          // Performance optimization: only update state if there are actually modals to close
+          // This prevents unnecessary re-renders when no modals are open
           if (Object.keys(state.modals).length === 0) {
             return state;
           }
@@ -338,7 +340,8 @@ export const useNavigationStore = create<NavigationState>()(
         logger.debug('Setting current flow step:', step);
         
         set(state => {
-          // Don't update if step is the same
+          // Prevent unnecessary re-renders when setting the same flow step
+          // This is essential for navigation persistence stability
           if (step === state.currentFlowStep) {
             return state;
           }
@@ -402,7 +405,8 @@ export const useNavigationStore = create<NavigationState>()(
         logger.debug('Initializing navigation for path:', currentPath);
         
         set(state => {
-          // If not already hydrated, hydrate from session storage
+          // Atomic initialization: hydrate from storage and set current path in one operation
+          // This prevents multiple re-renders during the initialization process
           if (!state.isHydrated) {
             const sessionPath = sessionStorageHelpers.getCurrentPath();
             const sessionBreadcrumbs = sessionStorageHelpers.getBreadcrumbs();

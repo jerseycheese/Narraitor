@@ -29,20 +29,54 @@ interface ExtendedSkillSuggestion extends SkillSuggestion {
   selectedAttributeNames?: string[];
 }
 
+/**
+ * Props for the SkillReviewStep component
+ */
 interface SkillReviewStepProps {
+  /** Current world data being created */
   worldData: Partial<World>;
+  /** AI-generated skill suggestions to review */
   suggestions: SkillSuggestion[];
+  /** Validation errors for the form */
   errors: Record<string, string>;
+  /** Callback to update world data */
   onUpdate: (updates: Partial<World>) => void;
 }
 
+/**
+ * SkillReviewStep - World Creation Wizard step for reviewing and customizing skills
+ * 
+ * This component allows users to:
+ * - Review AI-generated skill suggestions
+ * - Accept/reject suggested skills
+ * - Customize skill properties (name, description, difficulty, linked attributes)
+ * - Create custom skills from scratch
+ * - Manage multi-attribute skill linking
+ * 
+ * Key features:
+ * - Up to 12 skills total (suggested + custom)
+ * - Multi-attribute linking support for complex skills
+ * - Real-time validation and progress tracking
+ * - Intuitive UX with "Customize" buttons and progress indicators
+ * 
+ * @param props - Component props
+ * @returns JSX element for the skill review step
+ */
 export default function SkillReviewStep({
   worldData,
   suggestions,
   errors,
   onUpdate,
 }: SkillReviewStepProps) {
-  // Helper function to convert attribute names to IDs
+  /**
+   * Helper function to convert attribute names to IDs for skill linking
+   * 
+   * This is necessary because the UI works with human-readable attribute names,
+   * but the data model requires attribute IDs for proper relational linking.
+   * 
+   * @param attributeNames - Array of attribute names to convert
+   * @returns Array of corresponding attribute IDs
+   */
   const convertAttributeNamesToIds = (attributeNames: string[]): string[] => {
     return attributeNames
       .map(name => worldData.attributes?.find(attr => attr.name === name)?.id)
@@ -54,9 +88,15 @@ export default function SkillReviewStep({
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
 
-  // Initialize state based on existing selections - always accept all by default
+  /**
+   * Initialize local suggestions state with all skills accepted by default
+   * 
+   * This provides a better UX by starting with all AI suggestions selected,
+   * allowing users to deselect what they don't want rather than having to
+   * manually select everything they do want.
+   */
   const [localSuggestions, setLocalSuggestions] = useState<ExtendedSkillSuggestion[]>(() => {
-    // Start with all suggestions accepted by default
+    // Start with all suggestions accepted by default for better UX
     return suggestions.map((suggestion, index) => {
       // If we have existing skills in worldData, match them to suggestions
       // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
