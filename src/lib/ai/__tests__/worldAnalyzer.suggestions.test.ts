@@ -44,14 +44,14 @@ describe('worldAnalyzer - AI Suggestions', () => {
               description: 'Ability to cast magical spells',
               difficulty: 'hard',
               category: 'Magic',
-              linkedAttributeName: 'Arcane Power'
+              linkedAttributeNames: ['Arcane Power']
             },
             {
               name: 'Dragon Riding',
               description: 'Skill in commanding and riding dragons',
               difficulty: 'hard',
               category: 'Physical',
-              linkedAttributeName: 'Dragon Affinity'
+              linkedAttributeNames: ['Dragon Affinity']
             }
           ]
         })
@@ -85,7 +85,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
         description: 'Ability to cast magical spells',
         difficulty: 'hard',
         category: 'Magic',
-        linkedAttributeName: 'Arcane Power',
+        linkedAttributeNames: ['Arcane Power'],
         accepted: false,
         baseValue: expect.any(Number),
         minValue: expect.any(Number),

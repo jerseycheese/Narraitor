@@ -87,7 +87,7 @@ export default function SkillReviewStep({
    * Helper function to merge accepted AI skills with custom skills
    * 
    * This centralizes the merge logic to ensure consistency across all handlers
-   * and reduces code duplication.
+   * and reduces code duplication. Uses stable IDs to prevent unnecessary re-renders.
    * 
    * @param acceptedSuggestions - AI-generated skill suggestions that are accepted
    * @param customSkillsList - Custom skills to merge (defaults to current state)
@@ -96,24 +96,35 @@ export default function SkillReviewStep({
   const mergeAllSkills = (acceptedSuggestions: ExtendedSkillSuggestion[], customSkillsList = customSkills): WorldSkill[] => {
     const acceptedAISkills: WorldSkill[] = acceptedSuggestions
       .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
+      .map(s => {
+        // Use stable ID based on skill name to prevent unnecessary re-renders
+        const existingSkill = worldData.skills?.find(skill => skill.name === s.name);
+        return {
+          id: existingSkill?.id || generateUniqueId('skill'),
+          worldId: '',
+          name: s.name,
+          description: s.description,
+          difficulty: s.difficulty,
+          category: s.category,
+          baseValue: SKILL_DEFAULT_VALUE,
+          minValue: SKILL_MIN_VALUE,
+          maxValue: SKILL_MAX_VALUE,
+          attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
+        };
+      });
     
     return [...acceptedAISkills, ...customSkillsList];
   };
 
-  // Custom skill management state
-  const [customSkills, setCustomSkills] = useState<WorldSkill[]>([]);
+  // Custom skill management state - initialize from existing world data when editing
+  const [customSkills, setCustomSkills] = useState<WorldSkill[]>(() => {
+    // When editing, identify existing custom skills (those not in AI suggestions)
+    if (worldData.skills && worldData.skills.length > 0) {
+      const suggestionNames = new Set(suggestions.map(s => s.name));
+      return worldData.skills.filter(skill => !suggestionNames.has(skill.name));
+    }
+    return [];
+  });
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
 

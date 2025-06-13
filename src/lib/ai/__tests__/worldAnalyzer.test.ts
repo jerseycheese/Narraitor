@@ -56,7 +56,7 @@ describe('worldAnalyzer', () => {
             description: 'Skill with bladed weapons',
             difficulty: 'medium',
             category: 'Combat',
-            linkedAttributeName: 'Strength',
+            linkedAttributeNames: ['Strength'],
           },
         ],
       }),
@@ -102,8 +102,11 @@ describe('worldAnalyzer', () => {
       description: 'Skill with bladed weapons',
       difficulty: 'medium',
       category: 'Combat',
-      linkedAttributeName: 'Strength',
+      linkedAttributeNames: ['Strength'],
       accepted: false,
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
     }));
   });
 

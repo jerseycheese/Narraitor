@@ -27,8 +27,15 @@ export default function AttributeReviewStep({
   errors,
   onUpdate,
 }: AttributeReviewStepProps) {
-  // Custom attribute management state
-  const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>([]);
+  // Custom attribute management state - initialize from existing world data when editing
+  const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(() => {
+    // When editing, identify existing custom attributes (those not in AI suggestions)
+    if (worldData.attributes && worldData.attributes.length > 0) {
+      const suggestionNames = new Set(suggestions.map(s => s.name));
+      return worldData.attributes.filter(attr => !suggestionNames.has(attr.name));
+    }
+    return [];
+  });
   const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
   const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
 
@@ -36,23 +43,27 @@ export default function AttributeReviewStep({
    * Helper function to merge accepted AI attributes with custom attributes
    * 
    * This centralizes the merge logic to ensure consistency across all handlers
-   * and reduces code duplication.
+   * and reduces code duplication. Uses stable IDs to prevent unnecessary re-renders.
    * 
    * @param acceptedSuggestions - AI-generated attribute suggestions that are accepted
    * @param customAttributesList - Custom attributes to merge (defaults to current state)
    * @returns Combined array of accepted AI attributes and custom attributes
    */
   const mergeAllAttributes = (acceptedSuggestions: AttributeSuggestion[], customAttributesList = customAttributes): WorldAttribute[] => {
-    const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(s => ({
-      id: generateUniqueId('attribute'),
-      worldId: '',
-      name: s.name,
-      description: s.description,
-      baseValue: s.baseValue,
-      minValue: s.minValue,
-      maxValue: s.maxValue,
-      category: s.category,
-    }));
+    const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(s => {
+      // Use stable ID based on attribute name to prevent unnecessary re-renders
+      const existingAttribute = worldData.attributes?.find(attr => attr.name === s.name);
+      return {
+        id: existingAttribute?.id || generateUniqueId('attribute'),
+        worldId: '',
+        name: s.name,
+        description: s.description,
+        baseValue: s.baseValue,
+        minValue: s.minValue,
+        maxValue: s.maxValue,
+        category: s.category,
+      };
+    });
     
     return [...acceptedAttributes, ...customAttributesList];
   };
