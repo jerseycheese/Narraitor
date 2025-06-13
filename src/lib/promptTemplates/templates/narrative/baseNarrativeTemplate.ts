@@ -8,7 +8,8 @@ export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line 
     tone,
     attributes,
     narrativeContext,
-    generationParameters
+    generationParameters,
+    toneSettings
   } = context;
 
   const length = generationParameters?.desiredLength || 'medium';
