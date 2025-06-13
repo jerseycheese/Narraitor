@@ -83,6 +83,35 @@ export default function SkillReviewStep({
       .filter(Boolean) as string[];
   };
 
+  /**
+   * Helper function to merge accepted AI skills with custom skills
+   * 
+   * This centralizes the merge logic to ensure consistency across all handlers
+   * and reduces code duplication.
+   * 
+   * @param acceptedSuggestions - AI-generated skill suggestions that are accepted
+   * @param customSkillsList - Custom skills to merge (defaults to current state)
+   * @returns Combined array of accepted AI skills and custom skills
+   */
+  const mergeAllSkills = (acceptedSuggestions: ExtendedSkillSuggestion[], customSkillsList = customSkills): WorldSkill[] => {
+    const acceptedAISkills: WorldSkill[] = acceptedSuggestions
+      .filter(s => s.accepted)
+      .map(s => ({
+        id: generateUniqueId('skill'),
+        worldId: '',
+        name: s.name,
+        description: s.description,
+        difficulty: s.difficulty,
+        category: s.category,
+        baseValue: SKILL_DEFAULT_VALUE,
+        minValue: SKILL_MIN_VALUE,
+        maxValue: SKILL_MAX_VALUE,
+        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
+      }));
+    
+    return [...acceptedAISkills, ...customSkillsList];
+  };
+
   // Custom skill management state
   const [customSkills, setCustomSkills] = useState<WorldSkill[]>([]);
   const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
@@ -178,22 +207,7 @@ export default function SkillReviewStep({
     setLocalSuggestions(updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const acceptedAISkills: WorldSkill[] = updatedSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
-    
-    const allSkills = [...acceptedAISkills, ...customSkills];
+    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
@@ -203,22 +217,7 @@ export default function SkillReviewStep({
     setLocalSuggestions(updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const acceptedAISkills: WorldSkill[] = updatedSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
-    
-    const allSkills = [...acceptedAISkills, ...customSkills];
+    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
@@ -243,22 +242,7 @@ export default function SkillReviewStep({
     setLocalSuggestions(updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const acceptedAISkills: WorldSkill[] = updatedSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
-    
-    const allSkills = [...acceptedAISkills, ...customSkills];
+    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
@@ -284,22 +268,7 @@ export default function SkillReviewStep({
     setEditingCustomSkillId(null);
     
     // Recalculate world skills
-    const acceptedAISkills: WorldSkill[] = localSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
-    
-    const allSkills = [...acceptedAISkills, ...updatedCustomSkills];
+    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
@@ -313,22 +282,7 @@ export default function SkillReviewStep({
     setCustomSkills(updatedCustomSkills);
     
     // Recalculate world skills
-    const acceptedAISkills: WorldSkill[] = localSuggestions
-      .filter(s => s.accepted)
-      .map(s => ({
-        id: generateUniqueId('skill'),
-        worldId: '',
-        name: s.name,
-        description: s.description,
-        difficulty: s.difficulty,
-        category: s.category,
-        baseValue: SKILL_DEFAULT_VALUE,
-        minValue: SKILL_MIN_VALUE,
-        maxValue: SKILL_MAX_VALUE,
-        attributeIds: convertAttributeNamesToIds(s.selectedAttributeNames || s.linkedAttributeNames || []),
-      }));
-    
-    const allSkills = [...acceptedAISkills, ...updatedCustomSkills];
+    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
