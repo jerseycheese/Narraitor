@@ -320,7 +320,13 @@ export const useNavigationStore = create<NavigationState>()(
 
       closeAllModals: () => {
         logger.debug('Closing all modals');
-        set({ modals: {} });
+        set((state) => {
+          // Only update if there are actually modals to close
+          if (Object.keys(state.modals).length === 0) {
+            return state;
+          }
+          return { modals: {} };
+        });
       },
 
       // Flow state management
