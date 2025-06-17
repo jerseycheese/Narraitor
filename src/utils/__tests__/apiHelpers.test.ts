@@ -22,10 +22,9 @@ describe('getSafetySettingsFromPrompt', () => {
     const prompt = `
       Generate a story about adventure.
       
-      TONE SETTINGS:
-      Content Rating: G
-      Narrative Style: Serious
-      Language Complexity: Simple
+      G-RATED CONTENT GUIDELINES:
+      - NO violence, weapons, fighting, or physical harm
+      - Focus on wholesome adventure and friendship
     `;
     
     const safetySettings = getSafetySettingsFromPrompt(prompt);
@@ -40,10 +39,9 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('returns BLOCK_ONLY_HIGH for PG-rated content', () => {
     const prompt = `
-      TONE SETTINGS:
-      Content Rating: PG
-      Narrative Style: Serious
-      Language Complexity: Simple
+      PG-RATED CONTENT GUIDELINES:
+      - Mild fantasy violence only
+      - Gentle themes of conflict and resolution
     `;
     
     const safetySettings = getSafetySettingsFromPrompt(prompt);
@@ -58,10 +56,9 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('returns BLOCK_ONLY_HIGH for PG-13 content', () => {
     const prompt = `
-      TONE SETTINGS:
-      Content Rating: PG-13
-      Narrative Style: Serious
-      Language Complexity: Simple
+      PG-13-RATED CONTENT GUIDELINES:
+      - Moderate fantasy violence with some detail
+      - Themes of loss and sacrifice
     `;
     
     const safetySettings = getSafetySettingsFromPrompt(prompt);
@@ -76,10 +73,9 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('returns BLOCK_ONLY_HIGH for R-rated content', () => {
     const prompt = `
-      TONE SETTINGS:
-      Content Rating: R
-      Narrative Style: Serious
-      Language Complexity: Simple
+      R-RATED CONTENT GUIDELINES:
+      - Realistic violence with consequences
+      - Strong language and mature themes
     `;
     
     const safetySettings = getSafetySettingsFromPrompt(prompt);
@@ -107,10 +103,9 @@ describe('getSafetySettingsFromPrompt', () => {
 
   it('is case insensitive when matching content ratings', () => {
     const prompt = `
-      TONE SETTINGS:
-      Content Rating: g
-      Narrative Style: Serious
-      Language Complexity: Simple
+      g-rated content guidelines:
+      - NO violence, weapons, fighting, or physical harm
+      - Focus on wholesome adventure and friendship
     `;
     
     const safetySettings = getSafetySettingsFromPrompt(prompt);

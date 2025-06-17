@@ -39,12 +39,31 @@ export class NarrativeGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
+    console.log('🎨 TONE SETTINGS DEBUG [NarrativeGenerator]:', {
+      worldId: world.id,
+      worldName: world.name,
+      toneSettings: {
+        contentRating: toneSettings.contentRating,
+        narrativeStyle: toneSettings.narrativeStyle,
+        languageComplexity: toneSettings.languageComplexity,
+        customInstructions: toneSettings.customInstructions || '(none)',
+        usingDefaults: !world.toneSettings
+      }
+    });
+    
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
       toneSettings.narrativeStyle,
       toneSettings.languageComplexity,
       toneSettings.customInstructions
     );
+
+    console.log('🎯 TONE INSTRUCTIONS APPLIED:', {
+      instructionLength: detailedInstructions.length,
+      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
+      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
+      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`)
+    });
 
     return prompt + detailedInstructions;
   }

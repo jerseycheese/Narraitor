@@ -350,6 +350,18 @@ export class ChoiceGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
+    console.log('🎮 TONE SETTINGS DEBUG [ChoiceGenerator]:', {
+      worldId: world.id,
+      worldName: world.name,
+      toneSettings: {
+        contentRating: toneSettings.contentRating,
+        narrativeStyle: toneSettings.narrativeStyle,
+        languageComplexity: toneSettings.languageComplexity,
+        customInstructions: toneSettings.customInstructions || '(none)',
+        usingDefaults: !world.toneSettings
+      }
+    });
+    
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
       toneSettings.narrativeStyle,
@@ -366,6 +378,14 @@ CHOICE GENERATION FOCUS:
 - Use the specified language complexity in all choice text
 - Ensure choices are appropriate and align with the tone settings
 - Present options that respect the content boundaries while maintaining agency`;
+
+    console.log('🎯 CHOICE TONE INSTRUCTIONS APPLIED:', {
+      instructionLength: detailedInstructions.length + choiceSpecificGuidance.length,
+      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
+      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
+      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`),
+      hasChoiceSpecificGuidance: true
+    });
 
     return prompt + detailedInstructions + choiceSpecificGuidance;
   }
