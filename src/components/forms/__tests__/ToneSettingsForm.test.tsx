@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToneSettingsForm } from '../ToneSettingsForm';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
@@ -181,5 +181,28 @@ describe('ToneSettingsForm', () => {
 
     const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
     expect(saveButton).toBeDisabled();
+  });
+
+  test('calls onSave when save button is clicked in valid state', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
+      valid: true,
+      errors: []
+    });
+
+    render(
+      <ToneSettingsForm
+        toneSettings={DEFAULT_TONE_SETTINGS}
+        onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
+      />
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
+    expect(saveButton).not.toBeDisabled();
+    
+    fireEvent.click(saveButton);
+    expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 });
