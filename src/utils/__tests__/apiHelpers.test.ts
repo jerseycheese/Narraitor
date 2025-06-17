@@ -101,6 +101,23 @@ describe('getSafetySettingsFromPrompt', () => {
     ]);
   });
 
+  it('returns BLOCK_ONLY_HIGH for NC-17 content', () => {
+    const prompt = `
+      NC-17-RATED CONTENT GUIDELINES:
+      - Intense, realistic scenarios with serious consequences
+      - Strong language and complex mature themes
+    `;
+    
+    const safetySettings = getSafetySettingsFromPrompt(prompt);
+    
+    expect(safetySettings).toEqual([
+      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+    ]);
+  });
+
   it('is case insensitive when matching content ratings', () => {
     const prompt = `
       g-rated content guidelines:
