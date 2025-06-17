@@ -109,6 +109,23 @@ describe('evaluateSkillCheck', () => {
       const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
       expect(result).toBe(true);
     });
+
+    it('should round attribute bonus correctly (test .5 rounding)', () => {
+      // Create character with attribute value that results in .5 bonus to test Math.round behavior
+      const characterWithRoundingCase: Partial<Character> = {
+        ...mockCharacter,
+        attributes: [{ attributeId: 'strength', value: 15 }], // 15 * 0.1 = 1.5 → rounds to 2
+        skills: [{ skillId: 'athletics', level: 7, experience: 0, isActive: true }]
+      };
+
+      const skillCheck: SkillCheck = {
+        skillId: 'athletics',
+        difficulty: 9 // 7 skill + 2 rounded bonus = 9
+      };
+
+      const result = evaluateSkillCheck(characterWithRoundingCase as Character, skillCheck, mockWorldSkills);
+      expect(result).toBe(true);
+    });
   });
 
   describe('missing skills handling', () => {
@@ -122,7 +139,7 @@ describe('evaluateSkillCheck', () => {
       expect(result).toBe(false);
     });
 
-    it('should return false for skills without linked attributes', () => {
+    it('should work for skills without linked attributes (using base skill only)', () => {
       const skillWithoutAttribute: WorldSkill = {
         id: 'unlinked-skill',
         name: 'Unlinked Skill',
