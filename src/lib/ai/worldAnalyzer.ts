@@ -29,13 +29,18 @@ interface AIAnalysisResponse {
 }
 
 export async function analyzeWorldDescription(description: string): Promise<WorldAnalysisResult> {
-  console.log('analyzeWorldDescription called with:', description.substring(0, 50) + '...');
+  console.log('analyzeWorldDescription called with:', description.substring(0, 100) + '...');
   
   try {
     const config = getAIConfig();
-    console.log('Using AI config:', { modelName: config.modelName, timeout: config.timeout });
+    console.log('Using AI config:', { 
+      modelName: config.modelName, 
+      timeout: config.timeout,
+      hasApiKey: !!config.geminiApiKey 
+    });
     
     if (!config.geminiApiKey) {
+      console.error('API key is not configured - check GEMINI_API_KEY environment variable');
       throw new Error('API key is not configured');
     }
     
@@ -100,8 +105,10 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     // Add a small delay to ensure loading overlay appears
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    console.log('Making AI request...');
     const response = await client.generateContent(prompt);
-    console.log('Response received:', response);
+    console.log('Response received, length:', response.content.length);
+    console.log('Response content preview:', response.content.substring(0, 200) + '...');
     
     // Parse the JSON response
     let analysis: AIAnalysisResponse;

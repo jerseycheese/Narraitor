@@ -141,24 +141,41 @@ export default function WorldCreationWizard({
   }, [wizard.state.validation, wizard.state.currentStep]);
 
   const generateAISuggestions = useCallback(async () => {
-    if (!wizard.state.data.description) return;
+    if (!wizard.state.data.description) {
+      console.log('No description provided for AI analysis');
+      return;
+    }
+    
+    console.log('Starting AI suggestion generation for description:', wizard.state.data.description.substring(0, 100) + '...');
     
     try {
       wizard.setProcessing(true);
+      console.log('Calling analyzeWorldDescriptionClient...');
       const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
+      console.log('AI suggestions received:', {
+        attributeCount: suggestions.attributes.length,
+        skillCount: suggestions.skills.length,
+        firstAttribute: suggestions.attributes[0]?.name
+      });
+      
       wizard.updateData({ 
         aiSuggestions: suggestions,
         aiSuggestionsGenerated: true
       });
       wizard.setProcessing(false);
+      console.log('AI suggestions successfully applied to wizard state');
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      console.error('Error generating AI suggestions:', error);
+      console.log('Falling back to default suggestions due to error');
+      
       // Use default suggestions as fallback
+      const defaultSuggestions = getDefaultSuggestions();
       wizard.updateData({ 
-        aiSuggestions: getDefaultSuggestions(),
+        aiSuggestions: defaultSuggestions,
         aiSuggestionsGenerated: false // Mark as failed so it can be retried
       });
       wizard.setProcessing(false);
+      console.log('Default suggestions applied as fallback');
     }
   }, [wizard]);
 
