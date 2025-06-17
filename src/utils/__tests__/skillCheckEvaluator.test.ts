@@ -1,23 +1,46 @@
-// src/utils/__tests__/skillCheckEvaluator.test.ts
+/**
+ * @fileoverview Tests for Skill Check Evaluator
+ * 
+ * Comprehensive test suite covering:
+ * - Basic skill check evaluation (pass/fail scenarios)
+ * - Attribute bonus calculations and edge cases
+ * - Missing skill handling and error conditions
+ * - Skill lookup by ID and name
+ * - Edge cases and boundary conditions
+ * 
+ * @author Generated with Claude Code
+ */
 
 import { evaluateSkillCheck } from '../skillCheckEvaluator';
 import { Character, CharacterSkill, CharacterAttribute } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
 import { SkillCheck } from '../skillCheckEvaluator';
 
-// Mock character data for testing
+// ============================================================================
+// TEST DATA SETUP
+// ============================================================================
+
+/**
+ * Mock character attributes for testing various attribute bonus scenarios
+ */
 const mockCharacterAttributes: CharacterAttribute[] = [
   { attributeId: 'strength', value: 20 },
   { attributeId: 'dexterity', value: 15 },
   { attributeId: 'intelligence', value: 18 }
 ];
 
+/**
+ * Mock character skills for testing skill evaluation logic
+ */
 const mockCharacterSkills: CharacterSkill[] = [
   { skillId: 'athletics', level: 8, experience: 0, isActive: true },
   { skillId: 'stealth', level: 5, experience: 0, isActive: true },
   { skillId: 'investigation', level: 12, experience: 0, isActive: true }
 ];
 
+/**
+ * Complete mock character with attributes and skills for comprehensive testing
+ */
 const mockCharacter: Partial<Character> = {
   id: 'test-character',
   name: 'Test Character',
@@ -25,6 +48,9 @@ const mockCharacter: Partial<Character> = {
   skills: mockCharacterSkills
 };
 
+/**
+ * Mock world skills with different attribute links and difficulties for testing
+ */
 const mockWorldSkills: WorldSkill[] = [
   {
     id: 'athletics',
@@ -63,6 +89,10 @@ const mockWorldSkills: WorldSkill[] = [
     maxValue: 20
   }
 ];
+
+// ============================================================================
+// TEST SUITES
+// ============================================================================
 
 describe('evaluateSkillCheck', () => {
   describe('basic skill check evaluation', () => {
