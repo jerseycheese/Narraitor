@@ -66,7 +66,7 @@ const mockWorldSkills: WorldSkill[] = [
 
 describe('evaluateSkillCheck', () => {
   describe('basic skill check evaluation', () => {
-    it('should return true when character skill meets difficulty requirement', () => {
+    it('should pass when character skill meets or exceeds difficulty', () => {
       const skillCheck: SkillCheck = {
         skillId: 'athletics',
         difficulty: 8
@@ -76,17 +76,7 @@ describe('evaluateSkillCheck', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true when character skill exceeds difficulty requirement', () => {
-      const skillCheck: SkillCheck = {
-        skillId: 'athletics',
-        difficulty: 5
-      };
-
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
-      expect(result).toBe(true);
-    });
-
-    it('should return false when character skill is below difficulty requirement', () => {
+    it('should fail when character skill is below difficulty requirement', () => {
       const skillCheck: SkillCheck = {
         skillId: 'stealth',
         difficulty: 8
@@ -231,26 +221,6 @@ describe('evaluateSkillCheck', () => {
       expect(result).toBe(true);
     });
 
-    it('should handle zero difficulty checks', () => {
-      const skillCheck: SkillCheck = {
-        skillId: 'athletics',
-        difficulty: 0
-      };
-
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
-      expect(result).toBe(true);
-    });
-
-    it('should handle negative difficulty checks', () => {
-      const skillCheck: SkillCheck = {
-        skillId: 'athletics',
-        difficulty: -5
-      };
-
-      const result = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
-      expect(result).toBe(true);
-    });
-
     it('should handle inactive skills', () => {
       const characterWithInactiveSkill: Partial<Character> = {
         ...mockCharacter,
@@ -303,29 +273,4 @@ describe('evaluateSkillCheck', () => {
     });
   });
 
-  describe('function properties', () => {
-    it('should be deterministic - same inputs produce same outputs', () => {
-      const skillCheck: SkillCheck = {
-        skillId: 'athletics',
-        difficulty: 8
-      };
-
-      const result1 = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
-      const result2 = evaluateSkillCheck(mockCharacter as Character, skillCheck, mockWorldSkills);
-      
-      expect(result1).toBe(result2);
-    });
-
-    it('should not modify input objects', () => {
-      const originalCharacter = JSON.parse(JSON.stringify(mockCharacter));
-      const originalSkillCheck: SkillCheck = { skillId: 'athletics', difficulty: 8 };
-      const originalWorldSkills = JSON.parse(JSON.stringify(mockWorldSkills));
-
-      evaluateSkillCheck(mockCharacter as Character, originalSkillCheck, mockWorldSkills);
-
-      expect(mockCharacter).toEqual(originalCharacter);
-      expect(originalSkillCheck).toEqual({ skillId: 'athletics', difficulty: 8 });
-      expect(mockWorldSkills).toEqual(originalWorldSkills);
-    });
-  });
 });

@@ -1,4 +1,12 @@
 // src/utils/skillCheckEvaluator.ts
+//
+// MANUAL VERIFICATION STEPS:
+// 1. Create a test character with Athletics skill level 8, Strength attribute 20
+// 2. Test basic skill check: evaluateSkillCheck(character, {skillId: 'athletics', difficulty: 8}, worldSkills) → should return true
+// 3. Test with attribute bonus: evaluateSkillCheck(character, {skillId: 'athletics', difficulty: 10}, worldSkills) → should return true (8 + 2 bonus = 10)
+// 4. Test failure: evaluateSkillCheck(character, {skillId: 'athletics', difficulty: 12}, worldSkills) → should return false
+// 5. Test skill name lookup: evaluateSkillCheck(character, {skillName: 'Athletics', difficulty: 8}, worldSkills) → should return true
+// 6. Test missing skill: evaluateSkillCheck(character, {skillId: 'nonexistent', difficulty: 1}, worldSkills) → should return false
 
 import { Character } from '@/types/character.types';
 import { WorldSkill } from '@/types/world.types';
