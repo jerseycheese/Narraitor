@@ -95,6 +95,88 @@ export function createRateLimitHeaders(clientIP: string): Record<string, string>
 }
 
 /**
+ * Extract tone settings from prompt and return appropriate safety settings
+ */
+export function getSafetySettingsFromPrompt(prompt: string): Array<{
+  category: string;
+  threshold: string;
+}> {
+  // Look for tone settings in the prompt - handle both simple ratings (G, PG, R) and compound ratings (PG-13, NC-17)
+  const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
+  const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
+
+  console.log('🔒 API SAFETY SETTINGS DEBUG:', {
+    promptLength: prompt.length,
+    foundContentRating: contentRating || '(none detected)',
+    extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+    rawMatch: contentRatingMatch?.[0] || '(no match)'
+  });
+
+  // Map content ratings to safety thresholds
+  switch (contentRating) {
+    case 'g':
+      // G-rated: Block medium and above content
+      const gSettings = [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+      ];
+      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: 'G', threshold: 'BLOCK_MEDIUM_AND_ABOVE', settingsApplied: '4 categories' });
+      return gSettings;
+    case 'pg':
+    case 'pg-13':
+      // PG/PG-13: Block only high content
+      const pgSettings = [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+      ];
+      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      return pgSettings;
+    case 'r':
+    case 'nc-17':
+      // R/NC-17: Allow most content but block extreme
+      const rSettings = [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+      ];
+      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      return rSettings;
+    default:
+      // Default: Medium filtering for safety
+      const defaultSettings = [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+      ];
+      
+      console.log('🔒 APPLIED SAFETY SETTINGS:', {
+        contentRating: contentRating || 'default',
+        threshold: contentRating ? getThresholdForRating(contentRating) : 'BLOCK_MEDIUM_AND_ABOVE',
+        settingsApplied: defaultSettings.length + ' categories'
+      });
+      
+      return defaultSettings;
+  }
+}
+
+function getThresholdForRating(rating: string): string {
+  switch (rating) {
+    case 'g': return 'BLOCK_MEDIUM_AND_ABOVE';
+    case 'pg':
+    case 'pg-13':
+    case 'r':
+    case 'nc-17': return 'BLOCK_ONLY_HIGH';
+    default: return 'BLOCK_MEDIUM_AND_ABOVE';
+  }
+}
+
+/**
  * Make secure request to Gemini API using header authentication
  * Includes AbortController for timeout handling
  */

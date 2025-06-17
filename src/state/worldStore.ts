@@ -4,6 +4,7 @@ import { World, WorldAttribute, WorldSkill, WorldSettings } from '../types/world
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 
 /**
  * World store interface with state and actions
@@ -34,6 +35,9 @@ export interface WorldStore {
   
   // Settings management
   updateSettings: (worldId: EntityID, settings: Partial<WorldSettings>) => void;
+  
+  // Tone settings management
+  updateToneSettings: (worldId: EntityID, toneSettings: Partial<ToneSettings>) => void;
   
   // State management
   reset: () => void;
@@ -312,6 +316,32 @@ export const useWorldStore = create<WorldStore>()(
             ...world.settings,
             ...settings,
           },
+          updatedAt: new Date().toISOString(),
+        };
+
+        return {
+          worlds: {
+            ...state.worlds,
+            [worldId]: updatedWorld,
+          },
+          error: null,
+        };
+      }),
+
+      // Update tone settings
+      updateToneSettings: (worldId, toneSettings) => set((state) => {
+        const world = state.worlds[worldId];
+        if (!world) {
+          return { error: 'World not found' };
+        }
+
+        const currentToneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+        const updatedWorld: World = {
+          ...world,
+          toneSettings: {
+            ...currentToneSettings,
+            ...toneSettings,
+          } as ToneSettings,
           updatedAt: new Date().toISOString(),
         };
 

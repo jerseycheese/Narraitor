@@ -19,3 +19,13 @@ export {
   validateSelectionCount,
   type ValidationResult
 } from './validationUtils';
+
+// Debounce utilities
+export { debounce, throttle, useDebounce } from './debounce';
+export type { DebouncedFunction } from './debounce';
+
+// Tone settings utilities
+export { descriptionsToSelectOptions, createEnumChecker, getEnumValues, isValidEnumValue } from './enumHelpers';
+export type { SelectOptionWithDescription } from './enumHelpers';
+export { createFormUpdater, createFieldProps } from './formHelpers';
+export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';

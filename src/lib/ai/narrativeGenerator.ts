@@ -14,6 +14,9 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { getDetailedToneInstructions } from './toneSettingsGuidance';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -30,6 +33,41 @@ export class NarrativeGenerator {
     return prompt + loreContext;
   }
 
+  /**
+   * Enhances a prompt with detailed tone settings for consistent narrative style
+   */
+  private enhancePromptWithToneSettings(prompt: string, world: World): string {
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
+    console.log('🎨 TONE SETTINGS DEBUG [NarrativeGenerator]:', {
+      worldId: world.id,
+      worldName: world.name,
+      toneSettings: {
+        contentRating: toneSettings.contentRating,
+        narrativeStyle: toneSettings.narrativeStyle,
+        languageComplexity: toneSettings.languageComplexity,
+        customInstructions: toneSettings.customInstructions || '(none)',
+        usingDefaults: !world.toneSettings
+      }
+    });
+    
+    const detailedInstructions = getDetailedToneInstructions(
+      toneSettings.contentRating,
+      toneSettings.narrativeStyle,
+      toneSettings.languageComplexity,
+      toneSettings.customInstructions
+    );
+
+    console.log('🎯 TONE INSTRUCTIONS APPLIED:', {
+      instructionLength: detailedInstructions.length,
+      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
+      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
+      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`)
+    });
+
+    return prompt + detailedInstructions;
+  }
+
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -38,10 +76,11 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
       
-      // Add lore context to prompt
-      const enhancedPrompt = this.enhancePromptWithLore(prompt, request.worldId);
+      // Add tone settings and lore context to prompt
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
+      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, request.worldId);
 
-      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       
       // Extract structured lore from generated narrative
       if (response.content) {
@@ -75,23 +114,27 @@ export class NarrativeGenerator {
       const playerCharacterId = characterIds[0]; // First character is the player
       const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
       
+      const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+      
       const context = {
         worldName: world.name,
         worldDescription: world.description,
         genre: world.theme,
-        tone: 'default',
+        tone: toneSettings.narrativeStyle,
         attributes: world.attributes,
         characterIds,
         playerCharacterName: playerCharacter?.name,
-        playerCharacterBackground: playerCharacter?.background
+        playerCharacterBackground: playerCharacter?.background,
+        toneSettings: toneSettings
       };
 
       const prompt = template(context);
       
-      // Add lore context to initial scene
-      const enhancedPrompt = this.enhancePromptWithLore(prompt, worldId);
+      // Add tone settings and lore context to initial scene
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
+      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, worldId);
       
-      const response = await this.geminiClient.generateContent(enhancedPrompt);
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       
       // Extract structured lore from initial scene
       if (response.content) {
@@ -159,18 +202,21 @@ export class NarrativeGenerator {
     const playerCharacterId = request.characterIds?.[0]; // First character is the player
     const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
     
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
     return {
       worldName: world.name,
       worldDescription: world.description,
       genre: world.theme,
-      tone: 'default',
+      tone: toneSettings.narrativeStyle,
       attributes: world.attributes,
       characterIds: request.characterIds,
       playerCharacterName: playerCharacter?.name,
       playerCharacterBackground: playerCharacter?.background,
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
-      generationParameters: request.generationParameters
+      generationParameters: request.generationParameters,
+      toneSettings: toneSettings
     };
   }
 

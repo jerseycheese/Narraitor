@@ -27,6 +27,7 @@ jest.mock('@/components/DeleteConfirmationDialog/DeleteConfirmationDialog', () =
 // Mock the narrativeStore
 jest.mock('@/state/narrativeStore', () => ({
   useNarrativeStore: jest.fn(() => ({
+    segments: {},
     currentEnding: null,
     isGeneratingEnding: false,
     generateEnding: jest.fn(),
@@ -51,7 +52,36 @@ jest.mock('@/state/sessionStore', () => ({
     id: 'test-session',
     worldId: 'test-world',
     characterId: 'test-character',
-    status: 'active'
+    status: 'active',
+    autoSave: {
+      enabled: true,
+      status: 'idle',
+      lastSaveTime: null,
+      errorMessage: null,
+      totalSaves: 0,
+    },
+    updateAutoSaveStatus: jest.fn(),
+    recordAutoSave: jest.fn(),
+    setAutoSaveEnabled: jest.fn(),
+  }))
+}));
+
+// Mock worldStore  
+jest.mock('@/state/worldStore', () => ({
+  useWorldStore: jest.fn(() => ({
+    worlds: {
+      'test-world': {
+        id: 'test-world',
+        name: 'Test World'
+      }
+    }
+  }))
+}));
+
+// Mock journalStore
+jest.mock('@/state/journalStore', () => ({
+  useJournalStore: jest.fn(() => ({
+    entries: {}
   }))
 }));
 

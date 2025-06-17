@@ -7,6 +7,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { Breadcrumbs } from './Breadcrumbs';
+import { RecentPagesDropdown } from './RecentPagesDropdown';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 
 /**
@@ -109,6 +110,9 @@ export function Navigation() {
             
             {/* Right side - Quick actions and current context */}
             <div className="flex items-center gap-2 sm:gap-4">
+              {/* Recent Pages Dropdown */}
+              <RecentPagesDropdown />
+              
               {/* World Switcher Dropdown */}
               {Object.keys(worlds).length > 0 && (
                 <div className="relative" ref={dropdownRef}>

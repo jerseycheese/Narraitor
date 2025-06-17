@@ -12,14 +12,14 @@ import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
-import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
+import { StoryEndingDialog } from '@/components/StoryEndingDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { useJournalStore } from '@/state/journalStore';
-// Temporarily commenting out new components for TDD verification
-// import { AccessButton } from '@/components/ui/AccessButton';
-// import { BookOpen } from 'lucide-react';
+import { useAutoSave } from '@/hooks/useAutoSave';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -85,6 +85,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const { addEntry } = useJournalStore();
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
+  
+  // Auto-save functionality
+  const autoSave = useAutoSave();
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -352,6 +355,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setCurrentDecision(null);
     
     onChoiceSelected(choiceId);
+    
+    // Trigger auto-save after player choice to ensure all state updates are applied
+    autoSave.triggerSave('player-choice');
   };
 
   const handleCustomSubmit = (customText: string) => {
@@ -504,7 +510,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          <CharacterSummary character={character} />
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <CharacterSummary character={character} />
+            </div>
+            {/* Auto-save indicator */}
+            <div className="ml-4">
+              <SaveIndicator
+                status={autoSave.status}
+                lastSaveTime={autoSave.lastSaveTime}
+                errorMessage={autoSave.errorMessage}
+                totalSaves={autoSave.totalSaves}
+                onManualSave={autoSave.triggerSave}
+                onRetryError={autoSave.retry}
+                retryable={true}
+                compact={false}
+                className="text-sm"
+              />
+            </div>
+          </div>
         </div>
       )}
       
@@ -634,27 +658,37 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       </div>
 
       {/* Ending Suggestion Dialog */}
-      <DeleteConfirmationDialog
+      <StoryEndingDialog
         isOpen={showEndingSuggestion}
-        onConfirm={handleAcceptEndingSuggestion}
         onClose={handleRejectEndingSuggestion}
+        onContinue={handleAcceptEndingSuggestion}
         title="Story Ending Suggested"
-        description="The AI has detected that your story might be ready to conclude."
-        itemName={endingSuggestionReason}
-        confirmButtonText="Generate Ending"
-        cancelButtonText="Continue Playing"
+        content={
+          <div className="space-y-3">
+            <p>The AI has detected that your story might be ready to conclude based on natural story progression.</p>
+            {endingSuggestionReason && (
+              <p className="text-sm text-gray-600 italic">
+                Reason: {endingSuggestionReason}
+              </p>
+            )}
+            <p>Would you like to generate an ending now, or continue your adventure?</p>
+          </div>
+        }
+        endingType="default"
+        continueText="Generate Ending"
+        closeText="Continue Playing"
       />
 
       {/* Manual End Story Confirmation */}
-      <DeleteConfirmationDialog
+      <ConfirmationDialog
         isOpen={showEndConfirmation}
         onConfirm={handleConfirmEndStory}
         onClose={() => setShowEndConfirmation(false)}
         title="End Story"
-        description="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
-        itemName=""
-        confirmButtonText="End Story"
-        cancelButtonText="Cancel"
+        message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
+        variant="warning"
+        confirmText="End Story"
+        cancelText="Cancel"
       />
 
       {/* Journal Modal - Issue #278: AC2,AC4,AC5 */}

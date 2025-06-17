@@ -11,4 +11,5 @@ export { useJournalStore } from './journalStore';
 export { useSessionStore } from './sessionStore';
 export { aiContextStore } from './aiContextStore';
 export { useLoreStore } from './loreStore';
+export { useNavigationStore } from './navigationStore';
 export { persistConfig } from './persistence';

@@ -56,7 +56,7 @@ describe('worldAnalyzer', () => {
             description: 'Skill with bladed weapons',
             difficulty: 'medium',
             category: 'Combat',
-            linkedAttributeName: 'Strength',
+            linkedAttributeNames: ['Strength'],
           },
         ],
       }),
@@ -77,7 +77,7 @@ describe('worldAnalyzer', () => {
       minValue: 1,
       maxValue: 10,
       category: 'Supernatural',
-      accepted: false,
+      accepted: true,
     }));
     expect(result.attributes[1]).toEqual(expect.objectContaining({
       name: 'Medieval',
@@ -85,7 +85,7 @@ describe('worldAnalyzer', () => {
       minValue: 1,
       maxValue: 10,
       category: 'Setting',
-      accepted: false,
+      accepted: true,
     }));
     expect(result.attributes[2]).toEqual(expect.objectContaining({
       name: 'Dragons',
@@ -93,7 +93,7 @@ describe('worldAnalyzer', () => {
       minValue: 1,
       maxValue: 10,
       category: 'Creatures',
-      accepted: false,
+      accepted: true,
     }));
 
     expect(result.skills).toHaveLength(1);
@@ -102,8 +102,11 @@ describe('worldAnalyzer', () => {
       description: 'Skill with bladed weapons',
       difficulty: 'medium',
       category: 'Combat',
-      linkedAttributeName: 'Strength',
-      accepted: false,
+      linkedAttributeNames: ['Strength'],
+      accepted: true,
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
     }));
   });
 
@@ -160,10 +163,10 @@ describe('worldAnalyzer', () => {
     // Should have default values filled in
     expect(result.attributes[0].minValue).toBe(1);
     expect(result.attributes[0].maxValue).toBe(10);
-    expect(result.attributes[0].accepted).toBe(false);
+    expect(result.attributes[0].accepted).toBe(true);
 
     expect(result.skills[0].difficulty).toBe('medium');
-    expect(result.skills[0].accepted).toBe(false);
+    expect(result.skills[0].accepted).toBe(true);
   });
 
   test('handles network errors gracefully', async () => {

@@ -12,6 +12,7 @@ import { ErrorDisplay } from '../ui/ErrorDisplay';
 import { PageLayout } from '../shared/PageLayout';
 import { SectionWrapper } from '../shared/SectionWrapper';
 import { CardActionGroup, type CardAction } from '../shared/cards/CardActionGroup';
+import { AchievementDialog } from '@/components/AchievementDialog';
 import Image from 'next/image';
 
 /**
@@ -37,6 +38,26 @@ export function EndingScreen() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
+
+  // State for achievement dialog
+  const [selectedAchievement, setSelectedAchievement] = useState<{
+    title: string;
+    description: string;
+    originalText: string;
+  } | null>(null);
+
+  // Handle achievement click to show detailed dialog
+  const handleAchievementClick = (achievement: string) => {
+    const colonIndex = achievement.indexOf(':');
+    const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
+    const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : 'Achievement unlocked during your adventure.';
+    
+    setSelectedAchievement({
+      title,
+      description,
+      originalText: achievement,
+    });
+  };
 
   const generateEndingImage = useCallback(async () => {
     if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
@@ -305,16 +326,18 @@ export function EndingScreen() {
                       const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : '';
                       
                       return (
-                        <div 
+                        <button
                           key={index}
-                          className="flex items-start space-x-2 text-gray-800"
+                          onClick={() => handleAchievementClick(achievement)}
+                          className="flex items-start space-x-2 text-gray-800 w-full text-left p-2 rounded-lg hover:bg-yellow-50 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                          aria-label={`View details for achievement: ${title}`}
                         >
                           <span className="text-yellow-500 mt-0.5">★</span>
                           <div>
                             <span className="font-bold">{title}</span>
                             {description && <span>: {description}</span>}
                           </div>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -340,6 +363,20 @@ export function EndingScreen() {
           </SectionWrapper>
         </div>
       </PageLayout>
+
+      {/* Achievement Detail Dialog */}
+      {selectedAchievement && (
+        <AchievementDialog
+          isOpen={!!selectedAchievement}
+          onClose={() => setSelectedAchievement(null)}
+          title="Achievement Unlocked!"
+          description={selectedAchievement.description}
+          achievement={selectedAchievement.title}
+          type="milestone"
+          icon="🏆"
+          buttonText="Continue"
+        />
+      )}
     </>
   );
 }

@@ -28,6 +28,14 @@ const initialState = {
     lastPlayed: string;
     narrativeCount: number;
   }>,
+  // Auto-save state
+  autoSave: {
+    enabled: true,
+    lastSaveTime: null,
+    status: 'idle' as const,
+    errorMessage: null,
+    totalSaves: 0,
+  },
 };
 
 /**
@@ -239,6 +247,41 @@ export const useSessionStore = create<SessionStore>()(
       return state;
     });
   },
+
+  // Auto-save methods
+  setAutoSaveEnabled: (enabled: boolean) => {
+    logger.debug('Setting auto-save enabled:', enabled);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        enabled
+      }
+    }));
+  },
+
+  updateAutoSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error', errorMessage?: string) => {
+    logger.debug('Updating auto-save status:', status, errorMessage);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        status,
+        errorMessage: errorMessage || null
+      }
+    }));
+  },
+
+  recordAutoSave: (timestamp: string) => {
+    logger.debug('Recording auto-save at:', timestamp);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        lastSaveTime: timestamp,
+        status: 'saved' as const,
+        totalSaves: state.autoSave.totalSaves + 1,
+        errorMessage: null
+      }
+    }));
+  },
 }),
 {
   name: 'narraitor-session-store',
@@ -253,7 +296,9 @@ export const useSessionStore = create<SessionStore>()(
     worldId: state.worldId,
     status: state.status,
     currentSceneId: state.currentSceneId,
-    playerChoices: state.playerChoices
+    playerChoices: state.playerChoices,
+    // Persist auto-save state
+    autoSave: state.autoSave
   }),
 }
 ));
