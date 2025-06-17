@@ -16,6 +16,7 @@ import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { getDetailedToneInstructions } from './toneSettingsGuidance';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -33,26 +34,19 @@ export class NarrativeGenerator {
   }
 
   /**
-   * Enhances a prompt with tone settings for consistent narrative style
+   * Enhances a prompt with detailed tone settings for consistent narrative style
    */
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    const toneInstructions = `
+    const detailedInstructions = getDetailedToneInstructions(
+      toneSettings.contentRating,
+      toneSettings.narrativeStyle,
+      toneSettings.languageComplexity,
+      toneSettings.customInstructions
+    );
 
-TONE SETTINGS:
-Content Rating: ${toneSettings.contentRating}
-Narrative Style: ${toneSettings.narrativeStyle}
-Language Complexity: ${toneSettings.languageComplexity}
-${toneSettings.customInstructions ? `Custom Instructions: ${toneSettings.customInstructions}` : ''}
-
-IMPORTANT: Ensure the generated content strictly adheres to these tone settings:
-- Content must be appropriate for the ${toneSettings.contentRating} rating
-- Maintain a ${toneSettings.narrativeStyle} narrative style throughout
-- Use ${toneSettings.languageComplexity} language complexity
-${toneSettings.customInstructions ? `- Follow these custom instructions: ${toneSettings.customInstructions}` : ''}`;
-
-    return prompt + toneInstructions;
+    return prompt + detailedInstructions;
   }
 
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {

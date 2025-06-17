@@ -5,6 +5,7 @@ import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/t
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { getDetailedToneInstructions } from './toneSettingsGuidance';
 
 /**
  * Parameters for choice generation
@@ -344,27 +345,29 @@ export class ChoiceGenerator {
   }
 
   /**
-   * Enhances a prompt with tone settings for consistent choice generation
+   * Enhances a prompt with detailed tone settings for consistent choice generation
    */
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    const toneInstructions = `
+    const detailedInstructions = getDetailedToneInstructions(
+      toneSettings.contentRating,
+      toneSettings.narrativeStyle,
+      toneSettings.languageComplexity,
+      toneSettings.customInstructions
+    );
 
-TONE SETTINGS:
-Content Rating: ${toneSettings.contentRating}
-Narrative Style: ${toneSettings.narrativeStyle}
-Language Complexity: ${toneSettings.languageComplexity}
-${toneSettings.customInstructions ? `Custom Instructions: ${toneSettings.customInstructions}` : ''}
+    // Add specific guidance for choice generation
+    const choiceSpecificGuidance = `
 
-IMPORTANT: Ensure all generated player choices strictly adhere to these tone settings:
-- All choice options must be appropriate for the ${toneSettings.contentRating} rating
-- Maintain a ${toneSettings.narrativeStyle} narrative style in choice descriptions
-- Use ${toneSettings.languageComplexity} language complexity in all choice text
-- Avoid any content that violates the specified content rating
-${toneSettings.customInstructions ? `- Follow these custom instructions: ${toneSettings.customInstructions}` : ''}`;
+CHOICE GENERATION FOCUS:
+- ALL player choice options must strictly follow the content rating guidelines
+- Choice descriptions should match the specified narrative style
+- Use the specified language complexity in all choice text
+- Ensure choices are appropriate and align with the tone settings
+- Present options that respect the content boundaries while maintaining agency`;
 
-    return prompt + toneInstructions;
+    return prompt + detailedInstructions + choiceSpecificGuidance;
   }
 
 
