@@ -118,7 +118,7 @@ export function evaluateSkillCheck(
   // Step 4: Calculate total skill value (base + attribute bonus)
   let totalSkillValue = characterSkill.level;
   
-  if (worldSkill.attributeIds?.length > 0) {
+  if (worldSkill.attributeIds?.length && worldSkill.attributeIds.length > 0) {
     // Use primary attribute for bonus calculation (MVP: first attribute)
     const primaryAttributeId = worldSkill.attributeIds[0];
     const linkedAttribute = character.attributes.find(attr => 
