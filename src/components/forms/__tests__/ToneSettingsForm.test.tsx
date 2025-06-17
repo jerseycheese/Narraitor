@@ -18,7 +18,6 @@ jest.mock('@/lib/utils', () => ({
   createFormUpdater: jest.fn((state, onChange) => ({
     updateField: (field, value) => onChange({ ...state, [field]: value }),
   })),
-  normalizeOptionalString: jest.fn((value) => value.trim() === '' ? undefined : value.trim()),
 }));
 
 const mockOnToneSettingsChange = jest.fn();

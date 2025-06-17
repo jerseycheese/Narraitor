@@ -53,28 +53,6 @@ export function createFormUpdater<T>(
 }
 
 /**
- * Utility for handling optional string fields (converts empty strings to undefined)
- */
-export function normalizeOptionalString(value: string): string | undefined {
-  return value.trim() === '' ? undefined : value.trim();
-}
-
-/**
- * Debounced form handler for expensive operations
- */
-export function createDebouncedHandler<T extends unknown[]>(
-  handler: (...args: T) => void,
-  delay: number = 300
-): (...args: T) => void {
-  let timeoutId: NodeJS.Timeout;
-  
-  return (...args: T) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => handler(...args), delay);
-  };
-}
-
-/**
  * Creates a type-safe form field props generator
  */
 export function createFieldProps<T, K extends keyof T>(

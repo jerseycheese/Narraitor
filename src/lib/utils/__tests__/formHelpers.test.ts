@@ -1,7 +1,5 @@
 import { 
   createFormUpdater, 
-  normalizeOptionalString, 
-  createDebouncedHandler, 
   createFieldProps 
 } from '../formHelpers';
 
@@ -60,60 +58,6 @@ describe('formHelpers', () => {
       
       updater.reset(resetState);
       expect(mockOnChange).toHaveBeenCalledWith(resetState);
-    });
-  });
-
-  describe('normalizeOptionalString', () => {
-    test('returns undefined for empty strings', () => {
-      expect(normalizeOptionalString('')).toBeUndefined();
-      expect(normalizeOptionalString('   ')).toBeUndefined();
-      expect(normalizeOptionalString('\t\n')).toBeUndefined();
-    });
-
-    test('trims and returns non-empty strings', () => {
-      expect(normalizeOptionalString('  hello  ')).toBe('hello');
-      expect(normalizeOptionalString('world')).toBe('world');
-      expect(normalizeOptionalString(' test string ')).toBe('test string');
-    });
-  });
-
-  describe('createDebouncedHandler', () => {
-    jest.useFakeTimers();
-
-    test('debounces function calls', () => {
-      const mockHandler = jest.fn();
-      const debouncedHandler = createDebouncedHandler(mockHandler, 100);
-
-      debouncedHandler('arg1', 'arg2');
-      debouncedHandler('arg3', 'arg4');
-      debouncedHandler('arg5', 'arg6');
-
-      // Should not call immediately
-      expect(mockHandler).not.toHaveBeenCalled();
-
-      // Fast-forward time
-      jest.advanceTimersByTime(100);
-
-      // Should call only once with the last arguments
-      expect(mockHandler).toHaveBeenCalledTimes(1);
-      expect(mockHandler).toHaveBeenCalledWith('arg5', 'arg6');
-    });
-
-    test('uses default delay of 300ms', () => {
-      const mockHandler = jest.fn();
-      const debouncedHandler = createDebouncedHandler(mockHandler);
-
-      debouncedHandler('test');
-      
-      jest.advanceTimersByTime(299);
-      expect(mockHandler).not.toHaveBeenCalled();
-      
-      jest.advanceTimersByTime(1);
-      expect(mockHandler).toHaveBeenCalledWith('test');
-    });
-
-    afterEach(() => {
-      jest.clearAllTimers();
     });
   });
 

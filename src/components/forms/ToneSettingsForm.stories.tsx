@@ -49,18 +49,6 @@ export const Default: Story = {
   }
 };
 
-export const WithCustomSettings: Story = {
-  args: {
-    toneSettings: {
-      contentRating: 'PG-13',
-      narrativeStyle: 'dramatic',
-      languageComplexity: 'advanced',
-      customInstructions: 'Focus on character development and emotional depth. Avoid graphic violence.'
-    },
-    showSaveButton: true
-  }
-};
-
 export const MatureContent: Story = {
   args: {
     toneSettings: {
@@ -89,29 +77,5 @@ export const WithoutSaveButton: Story = {
   args: {
     toneSettings: DEFAULT_TONE_SETTINGS,
     showSaveButton: false
-  }
-};
-
-export const ActionPacked: Story = {
-  args: {
-    toneSettings: {
-      contentRating: 'PG-13',
-      narrativeStyle: 'action-packed',
-      languageComplexity: 'moderate',
-      customInstructions: 'Include exciting sequences and fast-paced dialogue.'
-    },
-    showSaveButton: true
-  }
-};
-
-export const Mysterious: Story = {
-  args: {
-    toneSettings: {
-      contentRating: 'PG',
-      narrativeStyle: 'mysterious',
-      languageComplexity: 'advanced',
-      customInstructions: 'Build suspense and include hidden clues throughout the narrative.'
-    },
-    showSaveButton: true
   }
 };

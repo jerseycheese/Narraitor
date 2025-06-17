@@ -121,7 +121,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       
       <WorldSettingsForm 
         settings={world.settings} 
+        toneSettings={world.toneSettings}
         onChange={(settings) => handleWorldChange({ settings })} 
+        onToneSettingsChange={(toneSettings) => handleWorldChange({ toneSettings })}
       />
       
       <div className="flex justify-end space-x-4 pt-4 border-t">

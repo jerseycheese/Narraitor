@@ -216,7 +216,7 @@ export default function AttributeReviewStep({
         description="We've suggested attributes for your world. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
       >
 
-      <div className="space-y-4">
+      <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">No attribute suggestions available</p>

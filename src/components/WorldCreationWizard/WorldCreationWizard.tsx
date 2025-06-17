@@ -4,6 +4,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { 
@@ -29,6 +30,7 @@ interface WorldCreationData extends Partial<World> {
     attributes: AttributeSuggestion[];
     skills: SkillSuggestion[];
   };
+  aiSuggestionsGenerated?: boolean;
   selectedTemplateId?: string | null;
   createOwnWorld?: boolean;
 }
@@ -60,6 +62,7 @@ export default function WorldCreationWizard({
       skillPointPool: 20
     },
     aiSuggestions: initialData?.aiSuggestions,
+    aiSuggestionsGenerated: initialData?.aiSuggestionsGenerated || false,
     selectedTemplateId: initialData?.selectedTemplateId || null,
     createOwnWorld: initialData?.createOwnWorld || false,
     // Spread initialData last to ensure external overrides take precedence
@@ -143,12 +146,18 @@ export default function WorldCreationWizard({
       wizard.setProcessing(true);
       const { analyzeWorldDescriptionClient } = await import('@/lib/ai/worldAnalyzerClient');
       const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
-      wizard.updateData({ aiSuggestions: suggestions });
+      wizard.updateData({ 
+        aiSuggestions: suggestions,
+        aiSuggestionsGenerated: true
+      });
       wizard.setProcessing(false);
     } catch (error) {
       console.error('Error generating suggestions:', error);
       // Use default suggestions as fallback
-      wizard.updateData({ aiSuggestions: getDefaultSuggestions() });
+      wizard.updateData({ 
+        aiSuggestions: getDefaultSuggestions(),
+        aiSuggestionsGenerated: false // Mark as failed so it can be retried
+      });
       wizard.setProcessing(false);
     }
   }, [wizard]);
@@ -160,7 +169,7 @@ export default function WorldCreationWizard({
     }
     
     // Special handling for step 2 (Description step) when creating own world
-    if (wizard.state.currentStep === 2 && wizard.state.data.createOwnWorld && !wizard.state.data.aiSuggestions) {
+    if (wizard.state.currentStep === 2 && wizard.state.data.createOwnWorld && !wizard.state.data.aiSuggestionsGenerated) {
       await generateAISuggestions();
     }
     
@@ -203,6 +212,7 @@ export default function WorldCreationWizard({
         attributes: data.attributes || [],
         skills: data.skills || [],
         settings: data.settings!,
+        toneSettings: data.toneSettings || DEFAULT_TONE_SETTINGS,
         image: data.image, // Include any image if already generated
       });
       

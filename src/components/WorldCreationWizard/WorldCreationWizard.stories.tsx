@@ -9,7 +9,7 @@ const meta: Meta<typeof WorldCreationWizard> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Multi-step wizard for creating new worlds with AI-assisted attribute and skill suggestions'
+        component: 'Six-step wizard for creating new worlds with AI-assisted attribute and skill suggestions. Includes integrated tone settings in the Basic Information step for streamlined world configuration.'
       }
     },
     nextjs: {

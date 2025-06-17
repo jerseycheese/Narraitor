@@ -13,24 +13,25 @@ import {
   DEFAULT_TONE_SETTINGS
 } from '@/types/tone-settings.types';
 import { 
-  descriptionsToSelectOptions, 
-  createFormUpdater, 
-  normalizeOptionalString,
+  descriptionsToSelectOptions,
   validateToneSettings 
 } from '@/lib/utils';
+import { createFormUpdater } from '@/lib/utils/formHelpers';
 
 export interface ToneSettingsFormProps {
   toneSettings?: ToneSettings;
   onToneSettingsChange: (toneSettings: ToneSettings) => void;
   onSave?: () => void;
   showSaveButton?: boolean;
+  showHeader?: boolean;
 }
 
 export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   toneSettings = DEFAULT_TONE_SETTINGS,
   onToneSettingsChange,
   onSave,
-  showSaveButton = false
+  showSaveButton = false,
+  showHeader = true
 }) => {
   // Create form updater utilities
   const formUpdater = createFormUpdater(toneSettings, onToneSettingsChange);
@@ -44,17 +45,19 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   const validationResult = validateToneSettings(toneSettings);
 
   const handleCustomInstructionsChange = (value: string) => {
-    formUpdater.updateField('customInstructions', normalizeOptionalString(value));
+    formUpdater.updateField('customInstructions', value === '' ? undefined : value);
   };
 
   return (
     <div className="p-6 bg-white rounded-lg border shadow-sm">
-      <div className="mb-6">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
-        <p className="text-sm text-gray-600">
-          Configure the narrative style, content rating, and language complexity for generated content.
-        </p>
-      </div>
+      {showHeader && (
+        <div className="mb-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
+          <p className="text-sm text-gray-600">
+            Configure the narrative style, content rating, and language complexity for generated content.
+          </p>
+        </div>
+      )}
       <div className="space-y-6">
         {/* Content Rating */}
         <div className="space-y-2">
