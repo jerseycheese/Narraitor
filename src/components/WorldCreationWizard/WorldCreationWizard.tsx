@@ -22,6 +22,7 @@ import FinalizeStep from './steps/FinalizeStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 
 export type { AttributeSuggestion, SkillSuggestion };
 
@@ -144,7 +145,6 @@ export default function WorldCreationWizard({
     
     try {
       wizard.setProcessing(true);
-      const { analyzeWorldDescriptionClient } = await import('@/lib/ai/worldAnalyzerClient');
       const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
       wizard.updateData({ 
         aiSuggestions: suggestions,

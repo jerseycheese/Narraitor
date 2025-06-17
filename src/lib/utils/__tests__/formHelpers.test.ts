@@ -1,6 +1,5 @@
 import { 
-  createFormUpdater, 
-  createFieldProps 
+  createFormUpdater
 } from '../formHelpers';
 
 describe('formHelpers', () => {
