@@ -148,8 +148,8 @@ export default function SkillReviewStep({
       
       return {
         ...suggestion,
-        // Always default to true (accepted) - only set to false if explicitly rejected before
-        accepted: true,
+        // Use the suggestion's accepted value, defaulting to true if not specified
+        accepted: suggestion.accepted !== undefined ? suggestion.accepted : true,
         showDetails: index === 0, // Show details only for the first one
         selectedAttributeNames: initialAttributeNames
       };
@@ -166,8 +166,8 @@ export default function SkillReviewStep({
         // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-        // ALWAYS default to accepted (true) for better UX
-        const accepted = true;
+        // Use the suggestion's accepted value, defaulting to true if not specified
+        const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
         
         // Initialize with multi-attribute support
         const initialAttributeNames = suggestion.linkedAttributeNames || [];
@@ -200,7 +200,17 @@ export default function SkillReviewStep({
       
       // Only update if we don't already have skills or if the count is different
       if (!worldData.skills || worldData.skills.length !== acceptedSkills.length) {
+        console.log('[SkillReviewStep] Auto-applying accepted AI suggestions:', {
+          suggestionsCount: suggestions.length,
+          acceptedCount: acceptedSkills.length,
+          worldDataSkillsCount: worldData.skills?.length || 0
+        });
         onUpdate({ ...worldData, skills: acceptedSkills });
+      } else {
+        console.log('[SkillReviewStep] Skipping auto-apply - skills already match:', {
+          existingCount: worldData.skills.length,
+          acceptedCount: acceptedSkills.length
+        });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -312,7 +322,7 @@ export default function SkillReviewStep({
         description="We've suggested skills for your world. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
       >
 
-      <div className="space-y-4">
+      <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">No skill suggestions available</p>

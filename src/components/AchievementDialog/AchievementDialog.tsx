@@ -80,19 +80,18 @@ export function AchievementDialog({
         aria-labelledby="achievement-title"
         aria-describedby="achievement-description"
       >
+        <DialogTitle
+          id="achievement-title"
+          className="text-2xl font-bold text-center"
+        >
+          {title || "Achievement Unlocked"}
+        </DialogTitle>
         <DialogHeader className="space-y-4">
           {icon && (
             <div className="flex justify-center text-4xl mb-2">
               {icon}
             </div>
           )}
-          
-          <DialogTitle
-            id="achievement-title"
-            className="text-2xl font-bold text-center"
-          >
-            {title}
-          </DialogTitle>
           
           <DialogDescription
             id="achievement-description"

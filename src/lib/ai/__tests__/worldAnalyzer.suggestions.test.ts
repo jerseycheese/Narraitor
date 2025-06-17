@@ -74,7 +74,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
         minValue: 1,
         maxValue: 10,
         category: 'Magical',
-        accepted: false,
+        accepted: true,
         baseValue: expect.any(Number)
       }));
 
@@ -86,7 +86,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
         difficulty: 'hard',
         category: 'Magic',
         linkedAttributeNames: ['Arcane Power'],
-        accepted: false,
+        accepted: true,
         baseValue: expect.any(Number),
         minValue: expect.any(Number),
         maxValue: expect.any(Number)
@@ -168,7 +168,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
       expect(result.skills.length).toBeGreaterThan(0);
     });
 
-    it('should set accepted property to false for all suggestions', async () => {
+    it('should set accepted property to true for all suggestions', async () => {
       const worldDescription = 'A steampunk world';
       const mockAIResponse = {
         content: JSON.stringify({
@@ -185,12 +185,12 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       const result = await analyzeWorldDescription(worldDescription);
 
-      // All suggestions should have accepted: false
+      // All suggestions should have accepted: true for better UX
       result.attributes.forEach(attr => {
-        expect(attr.accepted).toBe(false);
+        expect(attr.accepted).toBe(true);
       });
       result.skills.forEach(skill => {
-        expect(skill.accepted).toBe(false);
+        expect(skill.accepted).toBe(true);
       });
     });
   });

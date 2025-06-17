@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { World } from '@/types/world.types';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { ToneSettingsForm } from '@/components/forms/ToneSettingsForm';
 import { 
   WizardFormGroup,
   WizardTextField,
   WizardTextArea,
   WizardSelect,
-  WizardFormSection
+  WizardFormSection,
+  wizardStyles
 } from '@/components/shared/wizard';
 
 interface BasicInfoStepProps {
@@ -36,9 +39,15 @@ export default function BasicInfoStep({
 
   return (
     <div data-testid="basic-info-step">
+      {/* Main step header */}
+      <div className="mb-8">
+        <h2 className={wizardStyles.step.title}>Basic Information</h2>
+        <p className={wizardStyles.step.description}>Let&apos;s start with some basic information about your world and configure how stories will be told.</p>
+      </div>
+
       <WizardFormSection
-        title="Basic Information"
-        description="Let's start with some basic information about your world."
+        title="World Details"
+        description="Essential information about your world."
       >
         <WizardFormGroup label="World Name" error={combinedErrors.name} required>
           <WizardTextField
@@ -71,7 +80,7 @@ export default function BasicInfoStep({
         </WizardFormGroup>
 
         <WizardFormGroup label="World Type" error={combinedErrors.relationship}>
-          <div className="space-y-4">
+          <div className="space-y-4 my-4">
             <div className="flex items-start space-x-3">
               <input
                 type="radio"
@@ -153,6 +162,18 @@ export default function BasicInfoStep({
             </div>
           </WizardFormGroup>
         )}
+      </WizardFormSection>
+
+      <WizardFormSection
+        title="Narrative Settings"
+        description="Configure how stories will be told in your world."
+      >
+        <ToneSettingsForm
+          toneSettings={worldData.toneSettings || DEFAULT_TONE_SETTINGS}
+          onToneSettingsChange={(toneSettings) => onUpdate({ ...worldData, toneSettings })}
+          showSaveButton={false}
+          showHeader={false}
+        />
       </WizardFormSection>
     </div>
   );

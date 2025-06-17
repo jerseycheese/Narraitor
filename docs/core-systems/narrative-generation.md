@@ -81,7 +81,7 @@ The narrative generation system adapts content based on the world's properties:
    - Western worlds start in "Frontier Town"
    - Fantasy worlds start in "Enchanted Forest"
    - Sci-Fi worlds start in "Space Station"
-3. **Tone Matching**: Narrative tone matches the world description
+3. **Tone Settings Integration**: Comprehensive tone control through content rating, narrative style, and language complexity
 4. **Attribute Integration**: World attributes influence content and narrative possibilities
 
 ### Prompt Template System
@@ -91,6 +91,17 @@ The system uses different templates for different narrative needs:
 1. **Initial Scene Template**: Generates the opening scene for a game session
 2. **Scene Template**: Creates standard narrative scenes
 3. **Transition Template**: Handles transitions between different narrative states
+
+### Tone Settings System
+
+The narrative generation system respects user-defined tone settings for consistent content:
+
+1. **Content Rating Enforcement**: Supports G, PG, PG-13, R, and NC-17 ratings with appropriate content filtering
+2. **Narrative Style Options**: Nine styles including serious, humorous, dramatic, mysterious, action-packed, and more
+3. **Language Complexity Control**: Four levels from simple to literary with specific vocabulary and sentence structure guidance
+4. **Custom Instructions**: Additional user-defined tone requirements
+5. **AI Safety Integration**: Dynamic safety thresholds based on content rating
+6. **Debug Logging**: Comprehensive logging for tone settings verification
 
 ### Narrative Perspective
 

@@ -142,8 +142,23 @@ async function generateWithAI(options: CharacterGenerationOptions): Promise<Gene
     worldName: world.name,
     worldReference: world.reference,
     worldRelationship: world.relationship,
-    theme: world.theme
+    theme: world.theme,
+    attributesCount: world.attributes?.length || 0,
+    skillsCount: world.skills?.length || 0,
+    attributes: world.attributes?.map(a => ({ id: a.id, name: a.name })) || [],
+    skills: world.skills?.map(s => ({ id: s.id, name: s.name })) || []
   });
+
+  // Check if world has attributes and skills
+  if (!world.attributes || world.attributes.length === 0) {
+    logger.error('CharacterGenerator', 'World has no attributes defined. Cannot generate character.');
+    throw new Error('Cannot generate character: World has no attributes defined');
+  }
+
+  if (!world.skills || world.skills.length === 0) {
+    logger.error('CharacterGenerator', 'World has no skills defined. Cannot generate character.');
+    throw new Error('Cannot generate character: World has no skills defined');
+  }
   
   try {
     const prompt = `
@@ -154,8 +169,8 @@ ${world.description ? `\nWorld Context: ${world.description}` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
 ${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}
 
-World Attributes: ${world.attributes.map(a => `${a.name} (${a.minValue}-${a.maxValue})`).join(', ')}
-World Skills: ${world.skills.map(s => s.name).join(', ')}
+World Attributes: ${world.attributes?.map(a => `${a.name} (${a.minValue}-${a.maxValue})`).join(', ') || 'None defined'}
+World Skills: ${world.skills?.map(s => s.name).join(', ') || 'None defined'}
 
 Create a character that:
 ${generationType === 'specific' && suggestedName ? 
@@ -175,10 +190,10 @@ ${generationType === 'specific' && suggestedName ?
 Think about this character's strengths and weaknesses, then assign appropriate attribute and skill values.
 
 For attributes, consider:
-${world.attributes.map(a => `- ${a.name} (${a.minValue}-${a.maxValue}): How strong is this character in this area?`).join('\n')}
+${world.attributes?.map(a => `- ${a.name} (${a.minValue}-${a.maxValue}): How strong is this character in this area?`).join('\n') || '- No attributes defined for this world'}
 
 For skills, consider:
-${world.skills.map(s => `- ${s.name} (1-10): What is their experience level?`).join('\n')}
+${world.skills?.map(s => `- ${s.name} (1-10): What is their experience level?`).join('\n') || '- No skills defined for this world'}
 
 Generate a character and return ONLY a valid JSON object:
 
@@ -192,11 +207,11 @@ Generate a character and return ONLY a valid JSON object:
     "fears": ["List 2-3 specific fears or anxieties this character has"],
     "physicalDescription": "Their appearance including age, race/ethnicity, height, build, hair, eyes, and typical clothing"
   },
-  "attributes": [${world.attributes.map((a) => `
-    {"id": "${a.id}", "value": REPLACE_WITH_NUMBER_${a.minValue}_TO_${a.maxValue}}`).join(',')}
+  "attributes": [${world.attributes?.map((a) => `
+    {"id": "${a.id}", "value": REPLACE_WITH_NUMBER_${a.minValue}_TO_${a.maxValue}}`).join(',') || ''}
   ],
-  "skills": [${world.skills.map((s) => `
-    {"id": "${s.id}", "level": REPLACE_WITH_NUMBER_1_TO_10}`).join(',')}
+  "skills": [${world.skills?.map((s) => `
+    {"id": "${s.id}", "level": REPLACE_WITH_NUMBER_1_TO_10}`).join(',') || ''}
   ]
 }
 

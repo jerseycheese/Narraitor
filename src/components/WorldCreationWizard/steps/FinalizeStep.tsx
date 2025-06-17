@@ -109,7 +109,7 @@ export default function FinalizeStep({
         description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
       >
 
-      <div className="space-y-6">
+      <div className="space-y-6 my-4">
         <div>
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
           <div className="space-y-3">

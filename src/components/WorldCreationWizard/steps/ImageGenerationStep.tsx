@@ -86,7 +86,7 @@ export default function ImageGenerationStep({
         title="Generate World Image"
         description="Create a visual representation of your world. This image will be displayed on your world card and as a hero image on the world details page."
       >
-        <div className="space-y-6">
+        <div className="space-y-6 my-4">
           {/* Preview Area */}
           <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
             {isGenerating ? (

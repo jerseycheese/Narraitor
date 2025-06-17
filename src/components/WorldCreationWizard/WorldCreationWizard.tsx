@@ -4,6 +4,7 @@ import React, { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { useWizardState, WizardStep as WizardStepType } from '@/hooks/useWizardState';
 import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardValidation';
 import { 
@@ -21,6 +22,7 @@ import FinalizeStep from './steps/FinalizeStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 
 export type { AttributeSuggestion, SkillSuggestion };
 
@@ -29,6 +31,7 @@ interface WorldCreationData extends Partial<World> {
     attributes: AttributeSuggestion[];
     skills: SkillSuggestion[];
   };
+  aiSuggestionsGenerated?: boolean;
   selectedTemplateId?: string | null;
   createOwnWorld?: boolean;
 }
@@ -60,6 +63,7 @@ export default function WorldCreationWizard({
       skillPointPool: 20
     },
     aiSuggestions: initialData?.aiSuggestions,
+    aiSuggestionsGenerated: initialData?.aiSuggestionsGenerated || false,
     selectedTemplateId: initialData?.selectedTemplateId || null,
     createOwnWorld: initialData?.createOwnWorld || false,
     // Spread initialData last to ensure external overrides take precedence
@@ -137,19 +141,41 @@ export default function WorldCreationWizard({
   }, [wizard.state.validation, wizard.state.currentStep]);
 
   const generateAISuggestions = useCallback(async () => {
-    if (!wizard.state.data.description) return;
+    if (!wizard.state.data.description) {
+      console.log('No description provided for AI analysis');
+      return;
+    }
+    
+    console.log('Starting AI suggestion generation for description:', wizard.state.data.description.substring(0, 100) + '...');
     
     try {
       wizard.setProcessing(true);
-      const { analyzeWorldDescriptionClient } = await import('@/lib/ai/worldAnalyzerClient');
+      console.log('Calling analyzeWorldDescriptionClient...');
       const suggestions = await analyzeWorldDescriptionClient(wizard.state.data.description);
-      wizard.updateData({ aiSuggestions: suggestions });
+      console.log('AI suggestions received:', {
+        attributeCount: suggestions.attributes.length,
+        skillCount: suggestions.skills.length,
+        firstAttribute: suggestions.attributes[0]?.name
+      });
+      
+      wizard.updateData({ 
+        aiSuggestions: suggestions,
+        aiSuggestionsGenerated: true
+      });
       wizard.setProcessing(false);
+      console.log('AI suggestions successfully applied to wizard state');
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      console.error('Error generating AI suggestions:', error);
+      console.log('Falling back to default suggestions due to error');
+      
       // Use default suggestions as fallback
-      wizard.updateData({ aiSuggestions: getDefaultSuggestions() });
+      const defaultSuggestions = getDefaultSuggestions();
+      wizard.updateData({ 
+        aiSuggestions: defaultSuggestions,
+        aiSuggestionsGenerated: false // Mark as failed so it can be retried
+      });
       wizard.setProcessing(false);
+      console.log('Default suggestions applied as fallback');
     }
   }, [wizard]);
 
@@ -160,7 +186,7 @@ export default function WorldCreationWizard({
     }
     
     // Special handling for step 2 (Description step) when creating own world
-    if (wizard.state.currentStep === 2 && wizard.state.data.createOwnWorld && !wizard.state.data.aiSuggestions) {
+    if (wizard.state.currentStep === 2 && wizard.state.data.createOwnWorld && !wizard.state.data.aiSuggestionsGenerated) {
       await generateAISuggestions();
     }
     
@@ -203,6 +229,7 @@ export default function WorldCreationWizard({
         attributes: data.attributes || [],
         skills: data.skills || [],
         settings: data.settings!,
+        toneSettings: data.toneSettings || DEFAULT_TONE_SETTINGS,
         image: data.image, // Include any image if already generated
       });
       

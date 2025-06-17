@@ -4,6 +4,8 @@ import { useWorldStore } from '@/state/worldStore';
 import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { getDetailedToneInstructions } from './toneSettingsGuidance';
 
 /**
  * Parameters for choice generation
@@ -35,7 +37,8 @@ export class ChoiceGenerator {
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
       
       const context = this.buildContext(world, narrativeContext, characterIds);
-      const prompt = template(context);
+      const basePrompt = template(context);
+      const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
       const response = await this.aiClient.generateContent(prompt);
       
@@ -339,6 +342,52 @@ export class ChoiceGenerator {
       narrativeContext,
       characterIds
     };
+  }
+
+  /**
+   * Enhances a prompt with detailed tone settings for consistent choice generation
+   */
+  private enhancePromptWithToneSettings(prompt: string, world: World): string {
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
+    console.log('🎮 TONE SETTINGS DEBUG [ChoiceGenerator]:', {
+      worldId: world.id,
+      worldName: world.name,
+      toneSettings: {
+        contentRating: toneSettings.contentRating,
+        narrativeStyle: toneSettings.narrativeStyle,
+        languageComplexity: toneSettings.languageComplexity,
+        customInstructions: toneSettings.customInstructions || '(none)',
+        usingDefaults: !world.toneSettings
+      }
+    });
+    
+    const detailedInstructions = getDetailedToneInstructions(
+      toneSettings.contentRating,
+      toneSettings.narrativeStyle,
+      toneSettings.languageComplexity,
+      toneSettings.customInstructions
+    );
+
+    // Add specific guidance for choice generation
+    const choiceSpecificGuidance = `
+
+CHOICE GENERATION FOCUS:
+- ALL player choice options must strictly follow the content rating guidelines
+- Choice descriptions should match the specified narrative style
+- Use the specified language complexity in all choice text
+- Ensure choices are appropriate and align with the tone settings
+- Present options that respect the content boundaries while maintaining agency`;
+
+    console.log('🎯 CHOICE TONE INSTRUCTIONS APPLIED:', {
+      instructionLength: detailedInstructions.length + choiceSpecificGuidance.length,
+      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
+      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
+      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`),
+      hasChoiceSpecificGuidance: true
+    });
+
+    return prompt + detailedInstructions + choiceSpecificGuidance;
   }
 
 

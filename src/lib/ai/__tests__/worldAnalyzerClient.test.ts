@@ -36,27 +36,19 @@ describe('worldAnalyzerClient', () => {
     expect(result).toEqual(mockResponse);
   });
 
-  it('should return default suggestions when API fails', async () => {
+  it('should throw error when API fails', async () => {
     (fetch as jest.MockedFunction<typeof fetch>).mockRejectedValueOnce(new Error('API error'));
 
-    const result = await analyzeWorldDescriptionClient('A fantasy world');
-
-    expect(result.attributes).toHaveLength(6);
-    expect(result.skills).toHaveLength(12);
-    expect(result.attributes[0].name).toBe('Strength');
-    expect(result.skills[0].name).toBe('Combat');
+    await expect(analyzeWorldDescriptionClient('A fantasy world')).rejects.toThrow('API error');
   });
 
-  it('should handle HTTP errors gracefully', async () => {
+  it('should throw error on HTTP errors', async () => {
     (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: false,
       status: 500,
       json: async () => ({ error: 'Server error' }),
     } as Response);
 
-    const result = await analyzeWorldDescriptionClient('A fantasy world');
-
-    expect(result.attributes).toHaveLength(6);
-    expect(result.skills).toHaveLength(12);
+    await expect(analyzeWorldDescriptionClient('A fantasy world')).rejects.toThrow('Server error');
   });
 });

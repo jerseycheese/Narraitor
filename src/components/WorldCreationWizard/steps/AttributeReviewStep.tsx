@@ -125,7 +125,17 @@ export default function AttributeReviewStep({
       
       // Only update if we don't already have attributes or if the count is different
       if (!worldData.attributes || worldData.attributes.length !== acceptedAttributes.length) {
+        console.log('[AttributeReviewStep] Auto-applying accepted AI suggestions:', {
+          suggestionsCount: suggestions.length,
+          acceptedCount: acceptedAttributes.length,
+          worldDataAttributesCount: worldData.attributes?.length || 0
+        });
         onUpdate({ ...worldData, attributes: acceptedAttributes });
+      } else {
+        console.log('[AttributeReviewStep] Skipping auto-apply - attributes already match:', {
+          existingCount: worldData.attributes.length,
+          acceptedCount: acceptedAttributes.length
+        });
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -216,7 +226,7 @@ export default function AttributeReviewStep({
         description="We've suggested attributes for your world. Click 'Customize' to modify any attribute, or 'Selected/Excluded' to include/exclude it. You can have up to 6 attributes total."
       >
 
-      <div className="space-y-4">
+      <div className="space-y-4 my-4">
         {localSuggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">No attribute suggestions available</p>
