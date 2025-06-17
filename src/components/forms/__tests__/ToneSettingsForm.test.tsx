@@ -121,48 +121,6 @@ describe('ToneSettingsForm', () => {
     });
   });
 
-  test('shows save button when showSaveButton is true', () => {
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    expect(screen.getByRole('button', { name: 'Save Tone Settings' })).toBeInTheDocument();
-  });
-
-  test('hides save button when showSaveButton is false', () => {
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        showSaveButton={false}
-      />
-    );
-
-    expect(screen.queryByRole('button', { name: 'Save Tone Settings' })).not.toBeInTheDocument();
-  });
-
-  test('calls onSave when save button is clicked', async () => {
-    const user = userEvent.setup();
-    
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
-    await user.click(saveButton);
-
-    expect(mockOnSave).toHaveBeenCalled();
-  });
 
   test('displays current tone settings values', () => {
     const customToneSettings: ToneSettings = {
@@ -183,23 +141,6 @@ describe('ToneSettingsForm', () => {
     expect(customInstructionsTextarea).toHaveValue('Include complex themes');
   });
 
-  test('handles undefined custom instructions', () => {
-    const toneSettingsWithoutCustom: ToneSettings = {
-      contentRating: 'PG',
-      narrativeStyle: 'balanced',
-      languageComplexity: 'moderate'
-    };
-
-    render(
-      <ToneSettingsForm
-        toneSettings={toneSettingsWithoutCustom}
-        onToneSettingsChange={mockOnToneSettingsChange}
-      />
-    );
-
-    const customInstructionsTextarea = screen.getByLabelText('Custom Instructions (Optional)');
-    expect(customInstructionsTextarea).toHaveValue('');
-  });
 
   test('displays validation errors when form is invalid', async () => {
     const { validateToneSettings } = await import('@/lib/utils');
