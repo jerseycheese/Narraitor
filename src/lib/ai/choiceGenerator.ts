@@ -4,6 +4,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { Decision, DecisionOption, NarrativeContext, ChoiceAlignment } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 
 /**
  * Parameters for choice generation
@@ -35,7 +36,8 @@ export class ChoiceGenerator {
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
       
       const context = this.buildContext(world, narrativeContext, characterIds);
-      const prompt = template(context);
+      const basePrompt = template(context);
+      const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
       const response = await this.aiClient.generateContent(prompt);
       
@@ -339,6 +341,30 @@ export class ChoiceGenerator {
       narrativeContext,
       characterIds
     };
+  }
+
+  /**
+   * Enhances a prompt with tone settings for consistent choice generation
+   */
+  private enhancePromptWithToneSettings(prompt: string, world: World): string {
+    const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
+    
+    const toneInstructions = `
+
+TONE SETTINGS:
+Content Rating: ${toneSettings.contentRating}
+Narrative Style: ${toneSettings.narrativeStyle}
+Language Complexity: ${toneSettings.languageComplexity}
+${toneSettings.customInstructions ? `Custom Instructions: ${toneSettings.customInstructions}` : ''}
+
+IMPORTANT: Ensure all generated player choices strictly adhere to these tone settings:
+- All choice options must be appropriate for the ${toneSettings.contentRating} rating
+- Maintain a ${toneSettings.narrativeStyle} narrative style in choice descriptions
+- Use ${toneSettings.languageComplexity} language complexity in all choice text
+- Avoid any content that violates the specified content rating
+${toneSettings.customInstructions ? `- Follow these custom instructions: ${toneSettings.customInstructions}` : ''}`;
+
+    return prompt + toneInstructions;
   }
 
 

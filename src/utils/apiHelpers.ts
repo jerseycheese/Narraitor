@@ -95,6 +95,56 @@ export function createRateLimitHeaders(clientIP: string): Record<string, string>
 }
 
 /**
+ * Extract tone settings from prompt and return appropriate safety settings
+ */
+export function getSafetySettingsFromPrompt(prompt: string): Array<{
+  category: string;
+  threshold: string;
+}> {
+  // Look for tone settings in the prompt
+  const contentRatingMatch = prompt.match(/Content Rating:\s*(\w+)/i);
+  const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
+
+  // Map content ratings to safety thresholds
+  switch (contentRating) {
+    case 'g':
+      // G-rated: Block medium and above content
+      return [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+      ];
+    case 'pg':
+    case 'pg-13':
+      // PG/PG-13: Block only high content
+      return [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+      ];
+    case 'r':
+    case 'nc-17':
+      // R/NC-17: Allow most content but block extreme
+      return [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
+      ];
+    default:
+      // Default: Medium filtering for safety
+      return [
+        { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+        { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+      ];
+  }
+}
+
+/**
  * Make secure request to Gemini API using header authentication
  * Includes AbortController for timeout handling
  */
