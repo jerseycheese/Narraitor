@@ -33,6 +33,45 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Write comprehensive tests for critical paths
 - Review and refactor code regularly
 
+## Automation Workflow System
+Advanced automation capabilities for accelerated development:
+
+### Automation Modes
+- **Standard Mode**: `claude > /project:do-issue-auto 501` - Automated with verification checkpoints
+- **No-Verify Mode**: `claude > /project:do-issue-auto-noverify 501` - Fully autonomous implementation
+- **YOLO Mode**: `./scripts/yolo-mode.sh launch 501` - Containerized, network-isolated automation
+
+### Worktree System
+- **Parallel Development**: Work on multiple issues simultaneously using git worktrees
+- **Isolation**: Each issue gets its own working directory and branch
+- **Management**: `./scripts/worktree-helper.sh` for creating, managing, and cleaning up worktrees
+
+### Safety Features
+- **Container Isolation**: YOLO mode runs in Docker containers with `--network none`
+- **Permission Management**: Explicit permission handling for automated operations
+- **Resource Limits**: CPU, memory, and disk usage constraints
+- **Audit Trail**: Complete logging of all automation activities
+
+### Quick Start Automation
+```bash
+# Check status
+./scripts/automation-status.sh
+
+# Create worktree and launch YOLO mode
+./scripts/worktree-helper.sh create 501 feature-description
+./scripts/yolo-mode.sh launch 501
+
+# Batch processing
+./scripts/yolo-mode.sh batch 501,502,503
+```
+
+### Documentation
+Comprehensive automation guides available in personal docs:
+- [Automation Workflow Overview](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/automation-workflow-improvements.md)
+- [YOLO Mode Complete Guide](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/yolo-mode-complete-guide.md)
+- [Worktree System Guide](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/worktree-system-guide.md)
+- [Safety and Security Practices](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/automation-safety-guide.md)
+
 ## Claude Code Security & Directives
 - Commands can include special directives at the top of the file:
   ```
@@ -61,6 +100,7 @@ These scripts are pre-approved in `.claude/settings.local.json` and can be used 
 ## Intelligent Branch Handling
 - Helper script `./scripts/claude-branch.sh` manages branches to avoid permission prompts
 - Script is pre-approved in `.claude/settings.local.json`
+- Always pulls latest changes from the remote branch before creating new branches
 - In interactive mode (`do-issue`), the script offers options:
   1. Use the existing branch (continue previous work)
   2. Delete and recreate the branch (clean start)
