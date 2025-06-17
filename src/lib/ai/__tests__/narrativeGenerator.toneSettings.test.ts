@@ -15,7 +15,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
   beforeEach(() => {
     worldStore.getState().reset();
     mockAIClient.generateContent.mockClear();
-    generator = new NarrativeGenerator(mockAIClient as any);
+    generator = new NarrativeGenerator(mockAIClient as unknown as AIClient);
 
     // Create a world with tone settings
     const toneSettings: ToneSettings = {

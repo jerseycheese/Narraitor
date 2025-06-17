@@ -44,6 +44,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
       attributePointPool: 20,
       skillPointPool: 20
     },
+    toneSettings: worldData.toneSettings,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -67,6 +68,7 @@ interface WorldStoreActions {
   updateSkill: jest.Mock;
   removeSkill: jest.Mock;
   updateSettings: jest.Mock;
+  updateToneSettings: jest.Mock;
   reset: jest.Mock;
   setError: jest.Mock;
   clearError: jest.Mock;
@@ -217,6 +219,27 @@ const mockUpdateSettings = jest.fn((worldId: string, settings: Partial<WorldSett
   };
 });
 
+const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: any) => {
+  console.log('[__mocks__/worldStore.ts] updateToneSettings called:', worldId, toneSettings);
+  if (!mockState.worlds[worldId]) {
+    mockState.error = 'World not found';
+    return;
+  }
+  const currentToneSettings = mockState.worlds[worldId].toneSettings || {
+    contentRating: 'PG',
+    narrativeStyle: 'balanced',
+    languageComplexity: 'moderate'
+  };
+  mockState.worlds[worldId] = {
+    ...mockState.worlds[worldId],
+    toneSettings: {
+      ...currentToneSettings,
+      ...toneSettings
+    },
+    updatedAt: new Date().toISOString()
+  };
+});
+
 const mockGetWorldById = jest.fn((worldId: string) => {
   console.log('[__mocks__/worldStore.ts] getWorldById called:', worldId);
   return mockState.worlds[worldId] || null;
@@ -267,6 +290,7 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    updateToneSettings: mockUpdateToneSettings,
     getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,
@@ -303,6 +327,7 @@ const mockGetState = jest.fn((): WorldStore => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    updateToneSettings: mockUpdateToneSettings,
     getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,

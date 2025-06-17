@@ -44,7 +44,7 @@ describe('toneSettingsValidation', () => {
         contentRating: 'INVALID',
         narrativeStyle: 'dramatic',
         languageComplexity: 'moderate'
-      } as any;
+      } as unknown as ToneSettings;
 
       const result = validateToneSettings(invalidSettings);
       expect(result.valid).toBe(false);
@@ -67,7 +67,7 @@ describe('toneSettingsValidation', () => {
         contentRating: 'PG',
         narrativeStyle: 'invalid-style',
         languageComplexity: 'moderate'
-      } as any;
+      } as unknown as ToneSettings;
 
       const result = validateToneSettings(invalidSettings);
       expect(result.valid).toBe(false);
@@ -90,7 +90,7 @@ describe('toneSettingsValidation', () => {
         contentRating: 'PG',
         narrativeStyle: 'dramatic',
         languageComplexity: 'invalid-complexity'
-      } as any;
+      } as unknown as ToneSettings;
 
       const result = validateToneSettings(invalidSettings);
       expect(result.valid).toBe(false);

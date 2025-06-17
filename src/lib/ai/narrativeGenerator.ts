@@ -14,6 +14,7 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 
 export class NarrativeGenerator {

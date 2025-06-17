@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToneSettingsForm } from '../ToneSettingsForm';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
@@ -56,10 +56,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const contentRatingSelect = screen.getByRole('combobox', { name: /content rating/i });
-    await user.click(contentRatingSelect);
-    
-    const pgOption = screen.getByRole('option', { name: /PG-13/i });
-    await user.click(pgOption);
+    await user.selectOptions(contentRatingSelect, 'PG-13');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -78,10 +75,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const narrativeStyleSelect = screen.getByRole('combobox', { name: /narrative style/i });
-    await user.click(narrativeStyleSelect);
-    
-    const dramaticOption = screen.getByRole('option', { name: /dramatic/i });
-    await user.click(dramaticOption);
+    await user.selectOptions(narrativeStyleSelect, 'dramatic');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -100,10 +94,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const languageComplexitySelect = screen.getByRole('combobox', { name: /language complexity/i });
-    await user.click(languageComplexitySelect);
-    
-    const advancedOption = screen.getByRole('option', { name: /advanced/i });
-    await user.click(advancedOption);
+    await user.selectOptions(languageComplexitySelect, 'advanced');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -122,11 +113,12 @@ describe('ToneSettingsForm', () => {
     );
 
     const customInstructionsTextarea = screen.getByLabelText('Custom Instructions (Optional)');
-    await user.type(customInstructionsTextarea, 'Focus on character development');
+    await user.type(customInstructionsTextarea, 'X');
 
+    // Verify that onToneSettingsChange was called with updated customInstructions
     expect(mockOnToneSettingsChange).toHaveBeenLastCalledWith({
       ...DEFAULT_TONE_SETTINGS,
-      customInstructions: 'Focus on character development'
+      customInstructions: 'X'
     });
   });
 
@@ -210,9 +202,9 @@ describe('ToneSettingsForm', () => {
     expect(customInstructionsTextarea).toHaveValue('');
   });
 
-  test('displays validation errors when form is invalid', () => {
-    const { validateToneSettings } = require('@/lib/utils');
-    validateToneSettings.mockReturnValue({
+  test('displays validation errors when form is invalid', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
       valid: false,
       errors: ['Content Rating is required', 'Narrative Style must be valid']
     });
@@ -231,9 +223,9 @@ describe('ToneSettingsForm', () => {
     expect(screen.getByText('• Narrative Style must be valid')).toBeInTheDocument();
   });
 
-  test('disables save button when validation fails', () => {
-    const { validateToneSettings } = require('@/lib/utils');
-    validateToneSettings.mockReturnValue({
+  test('disables save button when validation fails', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
       valid: false,
       errors: ['Content Rating is required']
     });

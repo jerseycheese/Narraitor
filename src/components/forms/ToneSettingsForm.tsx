@@ -1,8 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ToneSettings,
@@ -50,81 +48,63 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tone Settings</CardTitle>
-        <CardDescription>
+    <div className="p-6 bg-white rounded-lg border shadow-sm">
+      <div className="mb-6">
+        <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
+        <p className="text-sm text-gray-600">
           Configure the narrative style, content rating, and language complexity for generated content.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+        </p>
+      </div>
+      <div className="space-y-6">
         {/* Content Rating */}
         <div className="space-y-2">
           <Label htmlFor="content-rating">Content Rating</Label>
-          <Select
+          <select
+            id="content-rating"
             value={toneSettings.contentRating}
-            onValueChange={(value) => formUpdater.updateField('contentRating', value as ContentRating)}
+            onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="content-rating">
-              <SelectValue placeholder="Select content rating" />
-            </SelectTrigger>
-            <SelectContent>
-              {contentRatingOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{option.label}</span>
-                    <span className="text-sm text-muted-foreground">{option.description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {contentRatingOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Narrative Style */}
         <div className="space-y-2">
           <Label htmlFor="narrative-style">Narrative Style</Label>
-          <Select
+          <select
+            id="narrative-style"
             value={toneSettings.narrativeStyle}
-            onValueChange={(value) => formUpdater.updateField('narrativeStyle', value as NarrativeStyle)}
+            onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="narrative-style">
-              <SelectValue placeholder="Select narrative style" />
-            </SelectTrigger>
-            <SelectContent>
-              {narrativeStyleOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{option.label}</span>
-                    <span className="text-sm text-muted-foreground">{option.description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {narrativeStyleOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Language Complexity */}
         <div className="space-y-2">
           <Label htmlFor="language-complexity">Language Complexity</Label>
-          <Select
+          <select
+            id="language-complexity"
             value={toneSettings.languageComplexity}
-            onValueChange={(value) => formUpdater.updateField('languageComplexity', value as LanguageComplexity)}
+            onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="language-complexity">
-              <SelectValue placeholder="Select language complexity" />
-            </SelectTrigger>
-            <SelectContent>
-              {languageComplexityOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{option.label}</span>
-                    <span className="text-sm text-muted-foreground">{option.description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {languageComplexityOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Custom Instructions */}
@@ -161,7 +141,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

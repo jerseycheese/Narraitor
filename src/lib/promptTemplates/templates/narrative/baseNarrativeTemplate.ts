@@ -11,6 +11,9 @@ export const baseNarrativeTemplate = (context: any) => { // eslint-disable-line 
     generationParameters,
     toneSettings
   } = context;
+  
+  // Tone settings are handled by the AI system prompt enhancement
+  void toneSettings;
 
   const length = generationParameters?.desiredLength || 'short';
   const lengthGuide: Record<string, string> = {

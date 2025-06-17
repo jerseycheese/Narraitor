@@ -51,7 +51,7 @@ export function createEnumChecker<T extends Record<string, unknown>>(
 export function getEnumValues<T extends Record<string, unknown>>(
   enumObject: T
 ): T[keyof T][] {
-  return Object.values(enumObject);
+  return Object.values(enumObject) as T[keyof T][];
 }
 
 /**

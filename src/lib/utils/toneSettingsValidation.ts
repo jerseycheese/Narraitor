@@ -1,4 +1,4 @@
-import { ToneSettings, ContentRating, NarrativeStyle, LanguageComplexity } from '@/types/tone-settings.types';
+import { ToneSettings } from '@/types/tone-settings.types';
 import { validators, validateField, ValidationResult } from '@/components/shared/wizard/utils/validation';
 
 /**
