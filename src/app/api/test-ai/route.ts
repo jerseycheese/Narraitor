@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('test-ai API: Starting test');
     
