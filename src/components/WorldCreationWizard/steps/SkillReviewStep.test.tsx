@@ -13,7 +13,7 @@ const mockSuggestions: SkillSuggestion[] = [
     difficulty: 'medium',
     category: 'Combat',
     linkedAttributeNames: ['Strength'],
-    accepted: false,
+    accepted: true,
     baseValue: 3,
     minValue: 1,
     maxValue: 5,
@@ -612,7 +612,7 @@ describe('SkillReviewStep', () => {
           difficulty: 'medium',
           category: 'Physical',
           linkedAttributeNames: ['Strength', 'Intelligence'], // Multi-attribute skill
-          accepted: false,
+          accepted: true,
           baseValue: 3,
           minValue: 1,
           maxValue: 5,
