@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ChoiceSelector from './ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+import { Character } from '@/types/character.types';
+import { WorldSkill } from '@/types/world.types';
 
 const meta: Meta<typeof ChoiceSelector> = {
   title: 'Narraitor/Shared/ChoiceSelector',
@@ -117,5 +119,107 @@ export const AlignedChoicesWithCustomInput: Story = {
   },
 };
 
-// Removed MixedAlignment story - redundant with AlignedChoices
+// Mock character and world data for skill requirements
+const mockCharacter: Character = {
+  id: 'char1',
+  name: 'Brave Adventurer',
+  description: 'A skilled adventurer',
+  worldId: 'world1',
+  attributes: [],
+  skills: [
+    { skillId: 'intimidation', level: 8, experience: 200, isActive: true },
+    { skillId: 'stealth', level: 4, experience: 80, isActive: true },
+    { skillId: 'lockpicking', level: 6, experience: 120, isActive: true },
+  ],
+  background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+  inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },
+  status: { health: 100, maxHealth: 100, conditions: [] },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+};
+
+const mockWorldSkills: WorldSkill[] = [
+  { 
+    id: 'intimidation', 
+    name: 'Intimidation', 
+    description: 'Force your will through fear', 
+    worldId: 'world1', 
+    difficulty: 'medium', 
+    baseValue: 1, 
+    minValue: 1, 
+    maxValue: 10
+  },
+  { 
+    id: 'stealth', 
+    name: 'Stealth', 
+    description: 'Move unseen and unheard', 
+    worldId: 'world1', 
+    difficulty: 'hard', 
+    baseValue: 1, 
+    minValue: 1, 
+    maxValue: 10
+  },
+  { 
+    id: 'lockpicking', 
+    name: 'Lockpicking', 
+    description: 'Open locked doors and containers', 
+    worldId: 'world1', 
+    difficulty: 'medium', 
+    baseValue: 1, 
+    minValue: 1, 
+    maxValue: 10
+  }
+];
+
+const decisionWithSkillRequirements: Decision = {
+  id: 'decision-skill',
+  prompt: 'You face a guarded treasure room. The guard blocks the door. How do you get past?',
+  options: [
+    {
+      id: 'opt-intimidate',
+      text: 'Intimidate the guard',
+      hint: 'Use your commanding presence',
+      requirements: [{ type: 'skill', targetId: 'intimidation', operator: 'gte', value: 6 }]
+    },
+    {
+      id: 'opt-sneak',
+      text: 'Sneak past when he\'s not looking',
+      hint: 'Requires exceptional stealth',
+      requirements: [{ type: 'skill', targetId: 'stealth', operator: 'gte', value: 7 }]
+    },
+    {
+      id: 'opt-lockpick',
+      text: 'Find a back entrance and pick the lock',
+      hint: 'Technical approach',
+      requirements: [{ type: 'skill', targetId: 'lockpicking', operator: 'gte', value: 5 }]
+    },
+    {
+      id: 'opt-unknown',
+      text: 'Use ancient magic',
+      hint: 'Requires mystical knowledge',
+      requirements: [{ type: 'skill', targetId: 'arcane-magic', operator: 'gte', value: 10 }]
+    },
+    {
+      id: 'opt-normal',
+      text: 'Ask politely',
+      hint: 'Sometimes the simple approach works'
+    }
+  ],
+};
+
+export const WithSkillRequirements: Story = {
+  args: {
+    decision: decisionWithSkillRequirements,
+    character: mockCharacter,
+    worldSkills: mockWorldSkills,
+    showHints: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows choices with skill requirements. Green badges indicate available skills, gray indicates unavailable skills. Character has Intimidation 8, Stealth 4, and Lockpicking 6.',
+      },
+    },
+  },
+};
 

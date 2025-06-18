@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from './ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+import { Character } from '@/types/character.types';
+import { WorldSkill } from '@/types/world.types';
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
@@ -390,6 +392,97 @@ describe('ChoiceSelector', () => {
       
       const input = screen.getByPlaceholderText('Type your custom response...');
       expect(input).toHaveAttribute('aria-label', 'Custom response input');
+    });
+  });
+
+  describe('Skill Requirements', () => {
+    const mockCharacter: Character = {
+      id: 'char1',
+      name: 'Test Character',
+      description: 'A test character',
+      worldId: 'world1',
+      attributes: [],
+      skills: [
+        { skillId: 'intimidation', level: 6, experience: 100, isActive: true },
+        { skillId: 'stealth', level: 3, experience: 50, isActive: true }
+      ],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const mockWorldSkills: WorldSkill[] = [
+      { 
+        id: 'intimidation', 
+        name: 'Intimidation', 
+        description: '', 
+        worldId: 'world1', 
+        difficulty: 'medium', 
+        baseValue: 1, 
+        minValue: 1, 
+        maxValue: 10
+      }
+    ];
+
+    const decisionWithRequirements: Decision = {
+      id: 'decision-1',
+      prompt: 'What do you do?',
+      options: [
+        { 
+          id: 'opt-1', 
+          text: 'Intimidate the guard',
+          requirements: [{ type: 'skill', targetId: 'intimidation', operator: 'gte', value: 5 }]
+        },
+        { 
+          id: 'opt-2', 
+          text: 'Sneak past',
+          requirements: [{ type: 'skill', targetId: 'stealth', operator: 'gte', value: 5 }]
+        },
+      ],
+    };
+
+    it('shows skill requirement badges for options with requirements', () => {
+      render(
+        <ChoiceSelector 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
+          onSelect={mockOnSelect}
+        />
+      );
+      
+      expect(screen.getByText('[Intimidation 5+]')).toBeInTheDocument();
+      expect(screen.getByText('[Unknown Skill 5+]')).toBeInTheDocument(); // stealth not in worldSkills
+    });
+
+    it('shows available state for met requirements', () => {
+      render(
+        <ChoiceSelector 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
+          onSelect={mockOnSelect}
+        />
+      );
+      
+      const intimidationBadge = screen.getByText('[Intimidation 5+]');
+      expect(intimidationBadge).toHaveClass('bg-green-100', 'text-green-800');
+    });
+
+    it('shows unavailable state for unmet requirements', () => {
+      render(
+        <ChoiceSelector 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
+          onSelect={mockOnSelect}
+        />
+      );
+      
+      const stealthBadge = screen.getByText('[Unknown Skill 5+]');
+      expect(stealthBadge).toHaveClass('bg-gray-100', 'text-gray-500');
     });
   });
 });
