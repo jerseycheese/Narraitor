@@ -14,8 +14,94 @@ const mockWorld: World = {
   name: 'Fantasy Realm',
   description: 'A high fantasy world of magic and adventure',
   theme: 'Fantasy',
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'strength',
+      name: 'Strength',
+      description: 'Physical power and muscle',
+      worldId: 'world-1',
+      difficulty: 'easy',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    },
+    {
+      id: 'intelligence',
+      name: 'Intelligence',
+      description: 'Mental acuity and reasoning',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    }
+  ],
+  skills: [
+    {
+      id: 'lockpicking',
+      name: 'Lockpicking',
+      description: 'The art of opening locks without keys',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    },
+    {
+      id: 'intimidation',
+      name: 'Intimidation',
+      description: 'Using presence and fear to influence others',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    },
+    {
+      id: 'stealth',
+      name: 'Stealth',
+      description: 'Moving unseen and unheard',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    },
+    {
+      id: 'magic',
+      name: 'Magic',
+      description: 'Wielding arcane forces',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    },
+    {
+      id: 'persuasion',
+      name: 'Persuasion',
+      description: 'Convincing others through words and charm',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+      createdAt: '2023-01-01T10:00:00Z',
+      updatedAt: '2023-01-01T10:00:00Z'
+    }
+  ],
   settings: {
     maxAttributes: 10,
     maxSkills: 10,
@@ -45,8 +131,68 @@ const mockCharacter = {
     type: 'placeholder' as const,
     url: null
   },
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'attr1',
+      characterId: 'test-character-123',
+      worldAttributeId: 'strength',
+      name: 'Strength',
+      baseValue: 14,
+      modifiedValue: 14,
+      category: 'physical'
+    },
+    {
+      id: 'attr2',
+      characterId: 'test-character-123', 
+      worldAttributeId: 'intelligence',
+      name: 'Intelligence',
+      baseValue: 16,
+      modifiedValue: 16,
+      category: 'mental'
+    }
+  ],
+  skills: [
+    {
+      id: 'skill1',
+      characterId: 'test-character-123',
+      worldSkillId: 'lockpicking',
+      name: 'Lockpicking',
+      level: 8,
+      category: 'stealth'
+    },
+    {
+      id: 'skill2',
+      characterId: 'test-character-123',
+      worldSkillId: 'intimidation',
+      name: 'Intimidation',
+      level: 6,
+      category: 'social'
+    },
+    {
+      id: 'skill3',
+      characterId: 'test-character-123',
+      worldSkillId: 'stealth',
+      name: 'Stealth',
+      level: 4,
+      category: 'stealth'
+    },
+    {
+      id: 'skill4',
+      characterId: 'test-character-123',
+      worldSkillId: 'magic',
+      name: 'Magic',
+      level: 9,
+      category: 'arcane'
+    },
+    {
+      id: 'skill5',
+      characterId: 'test-character-123',
+      worldSkillId: 'persuasion',
+      name: 'Persuasion',
+      level: 3,
+      category: 'social'
+    }
+  ],
   isPlayer: true,
   status: {
     health: 100,
