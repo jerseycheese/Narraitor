@@ -7,6 +7,39 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionState } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
+import type { SimpleChoice } from '@/components/shared/ChoiceSelector/ChoiceSelector';
+
+/**
+ * Efficiently compare two arrays of player choices without JSON.stringify
+ * Only compares essential fields to avoid performance issues with large lists
+ */
+const arePlayerChoicesEqual = (choices1?: SimpleChoice[], choices2?: SimpleChoice[]): boolean => {
+  if (!choices1 && !choices2) return true;
+  if (!choices1 || !choices2) return false;
+  if (choices1.length !== choices2.length) return false;
+  
+  // For small lists (< 10), do a full comparison
+  if (choices1.length < 10) {
+    return choices1.every((choice, index) => {
+      const other = choices2[index];
+      return choice.id === other.id && 
+             choice.text === other.text && 
+             choice.isSelected === other.isSelected;
+    });
+  }
+  
+  // For larger lists, compare only length, first/last items, and selected states
+  // This covers most real-world change scenarios while being performant
+  const firstMatch = choices1[0].id === choices2[0].id && choices1[0].isSelected === choices2[0].isSelected;
+  const lastMatch = choices1[choices1.length - 1].id === choices2[choices2.length - 1].id && 
+                   choices1[choices1.length - 1].isSelected === choices2[choices2.length - 1].isSelected;
+  
+  // Quick scan for any selection changes (most common update scenario)
+  const selectedCount1 = choices1.filter(c => c.isSelected).length;
+  const selectedCount2 = choices2.filter(c => c.isSelected).length;
+  
+  return firstMatch && lastMatch && selectedCount1 === selectedCount2;
+};
 
 interface UseGameSessionStateOptions {
   worldId: string;
@@ -247,7 +280,7 @@ export const useGameSessionState = ({
         state.error !== sessionState.error ||
         state.currentSceneId !== sessionState.currentSceneId ||
         state.id !== sessionState.id ||
-        JSON.stringify(state.playerChoices) !== JSON.stringify(sessionState.playerChoices);
+        !arePlayerChoicesEqual(state.playerChoices, sessionState.playerChoices);
       
       if (shouldUpdate) {
         
