@@ -353,32 +353,31 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         aria-labelledby="choices-heading"
       >
         {allOptions.map((option) => (
-          <div key={option.id} className="space-y-1">
-            <button
-              data-testid={`choice-option-${option.id}`}
-              className={`block w-full text-left p-3 border rounded transition-colors ${
-                option.isSelected
-                  ? 'bg-blue-100 border-blue-500 font-bold'
-                  : getAlignmentClasses(option.alignment, isDisabled)
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-              onClick={() => handleOptionSelect(option.id)}
-              disabled={isDisabled}
-              aria-checked={option.isSelected}
-              role="radio"
-            >
-              <div className="flex items-start gap-2">
-                {option.isSelected && <span>➤</span>}
-                {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                  <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
-                )}
-                <span className="flex-1">{option.text}</span>
-              </div>
-            </button>
+          <button
+            key={option.id}
+            data-testid={`choice-option-${option.id}`}
+            className={`block w-full text-left p-3 border rounded transition-colors ${
+              option.isSelected
+                ? 'bg-blue-100 border-blue-500 font-bold'
+                : getAlignmentClasses(option.alignment, isDisabled)
+            } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            onClick={() => handleOptionSelect(option.id)}
+            disabled={isDisabled}
+            aria-checked={option.isSelected}
+            role="radio"
+          >
+            <div className="flex items-start gap-2">
+              {option.isSelected && <span>➤</span>}
+              {!option.isSelected && getAlignmentIcon(option.alignment) && (
+                <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
+              )}
+              <span className="flex-1">{option.text}</span>
+            </div>
             {showHints && option.hint && (
-              <div className="text-sm text-gray-500 ml-6">{option.hint}</div>
+              <div className="text-sm text-gray-500 mt-1 ml-6">{option.hint}</div>
             )}
             {option.skillRequirements && option.skillRequirements.length > 0 && (
-              <div className="flex flex-wrap gap-1 ml-6">
+              <div className="flex flex-wrap gap-1 mt-2 ml-6">
                 {option.skillRequirements.map((skillReq, index) => (
                   <SkillRequirementBadge
                     key={`${option.id}-skill-${index}`}
@@ -389,7 +388,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                 ))}
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>
