@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Decision, ChoiceAlignment, DecisionWeight } from '@/types/narrative.types';
+import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
+import { Character } from '@/types/character.types';
+import { WorldSkill } from '@/types/world.types';
+import SkillRequirementBadge from '@/components/ui/SkillRequirementBadge';
+import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
+import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
@@ -28,6 +33,10 @@ interface ChoiceSelectorProps {
   onCustomSubmit?: (customText: string) => void;
   customInputPlaceholder?: string;
   maxCustomLength?: number;
+
+  // Skill requirement props
+  character?: Character;
+  worldSkills?: WorldSkill[];
 }
 
 /**
@@ -111,6 +120,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   onCustomSubmit,
   customInputPlaceholder = 'Type your custom response...',
   maxCustomLength = 250,
+  character,
+  worldSkills = [],
 }) => {
   // Custom input state
   const [customInputText, setCustomInputText] = useState('');
@@ -129,19 +140,38 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     hint?: string;
     isSelected?: boolean;
     alignment?: ChoiceAlignment;
+    skillRequirements?: Array<{
+      requirement: DecisionRequirement;
+      skillName?: string;
+      isAvailable: boolean;
+    }>;
   }> = isDecisionMode
-    ? (decision.options || []).map(opt => ({
-        id: opt.id,
-        text: opt.text,
-        hint: opt.hint,
-        isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
-        alignment: opt.alignment,
-      }))
+    ? (decision.options || []).map(opt => {
+        const skillRequirements = opt.requirements?.filter(req => req.type === 'skill').map(req => {
+          const skillData = resolveSkillData(req.targetId, worldSkills);
+          const isAvailable = character ? evaluateRequirement(req, character).success : false;
+          return {
+            requirement: req,
+            skillName: skillData?.name,
+            isAvailable
+          };
+        }) || [];
+
+        return {
+          id: opt.id,
+          text: opt.text,
+          hint: opt.hint,
+          isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
+          alignment: opt.alignment,
+          skillRequirements
+        };
+      })
     : (choices || []).map(choice => ({
         id: choice.id,
         text: choice.text,
         isSelected: choice.isSelected || choice.id === selectedOptionId,
         alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
+        skillRequirements: []
       }));
 
   // Use normalized options without custom input option
@@ -297,6 +327,18 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               )}
               <span className="flex-1">
                 {option.text}
+                {option.skillRequirements && option.skillRequirements.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {option.skillRequirements.map((skillReq, index) => (
+                      <SkillRequirementBadge
+                        key={`${option.id}-skill-${index}`}
+                        requirement={skillReq.requirement}
+                        skillName={skillReq.skillName}
+                        isAvailable={skillReq.isAvailable}
+                      />
+                    ))}
+                  </div>
+                )}
                 {showHints && option.hint && (
                   <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
                 )}

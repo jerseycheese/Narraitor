@@ -572,6 +572,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           ) : isGeneratingChoices ? (
@@ -586,6 +588,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           ) : (
@@ -597,6 +601,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           )}
