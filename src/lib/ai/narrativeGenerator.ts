@@ -129,9 +129,9 @@ export class NarrativeGenerator {
           const { useLoreStore } = await import('@/state/loreStore');
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, worldId);
-        } catch (error) {
-          console.warn('Failed to extract structured lore from initial scene:', error);
-          // No fallback - AI extraction or nothing
+        } catch {
+          // Failed to extract structured lore - this is non-critical
+          // Continue with narrative generation without lore extraction
         }
       }
       
