@@ -48,6 +48,9 @@ export class ChoiceGenerator {
         finishReason: response.finishReason
       });
       
+      // Debug: Log the actual AI response to see what format it's using
+      console.log('🔍 RAW AI RESPONSE:', response.content);
+      
       if (!response.content || response.content.trim() === '') {
         console.log('⚠️ CHOICE GENERATOR: Empty response, using fallback choices');
         return this.generateFallbackChoices(worldId, narrativeContext);
@@ -240,6 +243,14 @@ export class ChoiceGenerator {
       if (currentOption) {
         options.push(this.finalizeOption(currentOption));
       }
+      
+      // Debug: Log what we parsed
+      console.log('🔍 PARSED OPTIONS:', options.map(opt => ({
+        text: opt.text,
+        hasHint: !!opt.hint,
+        hasRequirements: !!(opt.requirements && opt.requirements.length > 0),
+        alignment: opt.alignment
+      })));
       
       // Create decision object with enhanced context (decisionWeight already extracted above)
       const decision = {
