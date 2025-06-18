@@ -394,17 +394,22 @@ Respond with JSON format:
       decision.id = storedDecisionId;
       
       // Only notify parent component if we have AI-generated choices (not fallback)
-      if (decision !== fallbackDecision) {
-        
+      // Check if this is a fallback decision by comparing the ID pattern
+      const isFallbackDecision = decision.id.includes('decision-fallback-');
+      
+      if (!isFallbackDecision) {
+        console.log('🎯 CHOICE GENERATION SUCCESS: Notifying parent with AI-generated choices');
         if (onChoicesGenerated) {
           try {
             // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = JSON.parse(JSON.stringify(decision));
             onChoicesGenerated(decisionCopy);
-          } catch {
-            // Error calling onChoicesGenerated callback
+          } catch (error) {
+            console.error('Error calling onChoicesGenerated callback:', error);
           }
         }
+      } else {
+        console.log('🔄 CHOICE GENERATION FALLBACK: Using fallback choices, not notifying parent');
       }
     } catch {
       // Unhandled error in generatePlayerChoices

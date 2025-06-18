@@ -40,9 +40,16 @@ export class ChoiceGenerator {
       const basePrompt = template(context);
       const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
+      console.log('🔄 CHOICE GENERATOR: Calling AI client for choice generation...');
       const response = await this.aiClient.generateContent(prompt);
+      console.log('🎯 CHOICE GENERATOR: AI response received:', {
+        hasContent: !!response.content,
+        contentLength: response.content?.length || 0,
+        finishReason: response.finishReason
+      });
       
       if (!response.content || response.content.trim() === '') {
+        console.log('⚠️ CHOICE GENERATOR: Empty response, using fallback choices');
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
@@ -65,6 +72,13 @@ export class ChoiceGenerator {
       if (decision.options.length > maxOptions) {
         decision.options = decision.options.slice(0, maxOptions);
       }
+      
+      console.log('✅ CHOICE GENERATOR: Decision created successfully:', {
+        id: decision.id,
+        prompt: decision.prompt,
+        optionCount: decision.options.length,
+        decisionWeight: decision.decisionWeight
+      });
       
       return decision;
     } catch (error) {
@@ -308,6 +322,12 @@ export class ChoiceGenerator {
     const { worlds } = useWorldStore.getState();
     const world = worlds[worldId];
     
+    console.log('🌍 CHOICE GENERATOR: Looking for world:', {
+      worldId,
+      availableWorlds: Object.keys(worlds),
+      foundWorld: !!world
+    });
+    
     if (!world) {
       console.error('🔄 CHOICE GENERATOR: World not found:', worldId);
       throw new Error(`World not found: ${worldId}`);
@@ -340,7 +360,12 @@ export class ChoiceGenerator {
       worldDescription: world.description,
       genre: world.theme,
       narrativeContext,
-      characterIds
+      characterIds,
+      worldSkills: world.skills?.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description
+      })) || []
     };
   }
 

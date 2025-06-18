@@ -6,6 +6,11 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  worldSkills?: Array<{
+    id: string;
+    name: string;
+    description: string;
+  }>;
 }
 
 /**
@@ -13,7 +18,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and 3-5 options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext } = context;
+  const { worldName, genre, narrativeContext, worldSkills } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -37,12 +42,20 @@ export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): stri
     shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
   }
   
+  // Build skills information for the prompt
+  let skillsInfo = '';
+  if (worldSkills && worldSkills.length > 0) {
+    skillsInfo = `
+AVAILABLE SKILLS IN THIS WORLD:
+${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
+  }
+
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
 ${shortContext}
-${location ? `Current location: ${location}` : ''}
+${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
 Based on the ENTIRE narrative context (both beginning and end if provided), create 3 distinct action choices that:
@@ -52,6 +65,19 @@ Based on the ENTIRE narrative context (both beginning and end if provided), crea
 4. Consider both the immediate situation AND the broader story context
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
+
+SKILL REQUIREMENTS:
+Some choices should require specific skills when appropriate to the situation. When a choice would logically require expertise, add a skill requirement:
+- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Intimidation for threatening, Stealth for sneaking)
+- Set reasonable difficulty levels (typically 4-8, with 5-6 being common)
+- Not every choice needs requirements - include variety
+- Format skill requirements as: [SkillName X+] where X is the minimum level
+
+CHOICE HINTS:
+Add helpful hint text when choices benefit from explanation:
+- Explain potential consequences or approaches
+- Clarify what the choice involves
+- Provide context for skill-based choices
 
 DECISION WEIGHT ANALYSIS:
 Carefully evaluate the narrative situation and determine the significance of this decision:
@@ -67,10 +93,24 @@ Decision: What will you do?
 
 Options:
 1. [First choice - action referencing specific story elements]
-2. [Second choice - different approach to the situation]
-3. [Third choice - alternative path considering story context]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
 
-Keep your response EXACTLY in this format. Include the Decision Weight line, then Decision and Options sections.`;
+2. [Second choice - different approach to the situation] 
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+3. [Third choice - alternative path considering story context]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+IMPORTANT FORMATTING RULES:
+- Each option starts with a number and period
+- Hint and Requirements lines are optional but should be indented
+- Use exact format "Requirements: SkillName X+" for skill checks
+- Keep hints concise (under 20 words)
+
+Keep your response EXACTLY in this format. Include the Decision Weight line, then Decision and Options sections with optional Hint and Requirements for each choice.`;
 };
 
 export default playerChoiceTemplate;

@@ -1,0 +1,53 @@
+
+> narraitor@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, using available port 3002 instead.
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.1.203:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1133ms
+ ○ Compiling /api/narrative/choices ...
+ ✓ Compiled /api/narrative/choices in 532ms (363 modules)
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 32,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/choices 200 in 2534ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 1124,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/choices 200 in 1796ms
+ ✓ Compiled in 208ms (363 modules)
+ ○ Compiling /dev/game-session ...
+ ✓ Compiled /dev/game-session in 1759ms (1369 modules)
+(node:51302) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ GET /dev/game-session 200 in 1988ms
+ ✓ Compiled in 315ms (549 modules)
+ ✓ Compiled /debug-choices in 194ms (1362 modules)
+ GET /debug-choices 200 in 312ms
+ ✓ Compiled in 406ms (551 modules)
+ ✓ Compiled in 180ms (551 modules)
+ ✓ Compiled in 199ms (551 modules)
+ ✓ Compiled in 231ms (551 modules)
+ ✓ Compiled in 251ms (551 modules)
+ ✓ Compiled in 322ms (551 modules)
