@@ -8,7 +8,8 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
     tone,
     narrativeContext,
     generationParameters,
-    playerCharacterName
+    playerCharacterName,
+    characterSkillContext
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
@@ -20,12 +21,21 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
-Tone: ${tone}
+Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}
 
 STORY SO FAR:
 ${recentContent}
 
 ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+
+${narrativeContext?.currentTags?.some((tag: string) => tag.includes('skill-success') || tag.includes('skill-failure')) ? `
+SKILL CHECK RESULT GUIDANCE:
+${narrativeContext.currentTags.includes('skill-success') ? '- The player SUCCEEDED at their skill check - acknowledge their competence and expertise' : ''}
+${narrativeContext.currentTags.includes('skill-failure') ? '- The player FAILED at their skill check - show the consequences and areas for improvement' : ''}
+- Reference the specific skill used in a natural way within the narrative
+- Show how the character's abilities (or lack thereof) affected the outcome
+- Make skill usage feel meaningful to the story progression
+` : ''}
 
 CRITICAL CONTINUITY RULES:
 - The player is EXACTLY where the last scene ended

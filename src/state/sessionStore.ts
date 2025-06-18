@@ -72,9 +72,36 @@ export const useSessionStore = create<SessionStore>()(
     
     logger.debug('Initializing session for worldId:', worldId, 'characterId:', characterId);
     
-    // Generate session ID immediately and persistently
-    const sessionId = currentState.id || `session-${worldId}-${Date.now()}`;
-    logger.debug('🆔 Using session ID:', sessionId);
+    // Generate a new session ID for fresh sessions or when changing characters
+    const isNewCharacterSession = currentState.characterId !== characterId;
+    const sessionId = (isNewCharacterSession || !currentState.id) 
+      ? `session-${worldId}-${characterId}-${Date.now()}` 
+      : currentState.id;
+    logger.debug('🆔 Using session ID:', sessionId, { isNewCharacterSession, previousCharacterId: currentState.characterId });
+    
+    // Clear narrative data when starting a fresh session or changing characters
+    // This prevents new characters from inheriting previous game narratives
+    if (sessionId && (isNewCharacterSession || !currentState.id)) {
+      try {
+        const { useNarrativeStore } = await import('./narrativeStore');
+        const narrativeStore = useNarrativeStore.getState();
+        
+        // If changing characters, clear the old session's data
+        if (isNewCharacterSession && currentState.id) {
+          narrativeStore.clearSessionSegments(currentState.id);
+          narrativeStore.clearSessionDecisions(currentState.id);
+          logger.debug('🧹 Cleared old session data for:', currentState.id);
+        }
+        
+        // Clear any existing data for the new session
+        narrativeStore.clearSessionSegments(sessionId);
+        narrativeStore.clearSessionDecisions(sessionId);
+        narrativeStore.clearEnding();
+        logger.debug('🧹 Cleared narrative data for new session:', sessionId);
+      } catch (error) {
+        logger.warn('Failed to clear narrative data:', error);
+      }
+    }
     
     set(state => {
       logger.debug('Setting loading state from:', state);

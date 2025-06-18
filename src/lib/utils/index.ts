@@ -29,3 +29,20 @@ export { descriptionsToSelectOptions, createEnumChecker, getEnumValues, isValidE
 export type { SelectOptionWithDescription } from './enumHelpers';
 export { createFormUpdater, createFieldProps } from './formHelpers';
 export { validateToneSettings, validateToneSettingsCompatibility } from './toneSettingsValidation';
+
+// Skill-related utilities
+export { 
+  buildCharacterSkillContext, 
+  getCharacterSkillInfo, 
+  hasActiveSkills 
+} from './characterSkillContextBuilder';
+export type { SkillContextOptions } from './characterSkillContextBuilder';
+
+export {
+  shouldAcknowledgeSkillUsage,
+  extractSkillUsageFromContext,
+  extractCustomActionFromContext,
+  generateSkillAcknowledgmentTags,
+  getSkillAcknowledgmentMood
+} from './skillAcknowledgmentHelper';
+export type { SkillUsageData, CustomActionData } from './skillAcknowledgmentHelper';

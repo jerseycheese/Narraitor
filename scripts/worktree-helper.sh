@@ -18,14 +18,27 @@ fi
 
 # Function to create a new worktree
 create_worktree() {
-    if [ "$#" -ne 2 ]; then
-        echo "Usage: create_worktree <issue-number> <short-description>"
-        echo "Example: create_worktree 504 portrait-caching"
+    if [ "$#" -lt 1 ]; then
+        echo "Usage: create_worktree <issue-number> [description]"
+        echo "Example: create_worktree 504 toast-notifications"
+        echo "If no description provided, it will be fetched from GitHub"
         return 1
     fi
     
     local issue_number=$1
     local description=$2
+    
+    # If no description provided, try to get it from GitHub
+    if [ -z "$description" ]; then
+        echo -e "${BLUE}Fetching issue details from GitHub...${NC}"
+        local branch_name=$("$NARRAITOR_MAIN/scripts/get-issue-branch-name.sh" "$issue_number" 2>/dev/null)
+        if [[ "$branch_name" =~ ^feature/issue-[0-9]+-(.+)$ ]]; then
+            description="${BASH_REMATCH[1]}"
+        else
+            description="implementation"
+        fi
+    fi
+    
     local branch_name="feature/issue-${issue_number}-${description}"
     local worktree_path="${WORKTREE_DIR}/issue-${issue_number}-${description}"
     
@@ -259,7 +272,7 @@ if [ "$#" -eq 0 ]; then
     echo -e "${BLUE}Narraitor Worktree Helper${NC}"
     echo -e "${BLUE}════════════════════════${NC}"
     echo "Commands:"
-    echo "  create <issue-number> <description>  - Create new worktree"
+    echo "  create <issue-number> [description]  - Create new worktree (auto-fetches description if not provided)"
     echo "  list                                 - List all worktrees"
     echo "  status                               - Show status overview"
     echo "  switch <issue-number>               - Switch to worktree"
@@ -267,7 +280,8 @@ if [ "$#" -eq 0 ]; then
     echo "  launch <issue-number>               - Launch terminal for Claude Code"
     echo ""
     echo "Example workflow:"
-    echo "  $0 create 501 portrait-generation"
+    echo "  $0 create 501                   # Auto-fetch description from GitHub"
+    echo "  $0 create 501 portrait-gen      # Use custom description"
     echo "  $0 launch 501"
     echo "  # In new terminal: claude"
     echo "  # Then: /project:do-issue-auto 501"

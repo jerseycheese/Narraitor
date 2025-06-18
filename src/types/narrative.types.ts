@@ -148,11 +148,26 @@ export interface NarrativeGenerationResult {
     mood?: 'tense' | 'relaxed' | 'mysterious' | 'action' | 'emotional' | 'neutral';
     tags: string[];
     timestamp?: string;
+    // Skill-related metadata for tracking skill usage acknowledgment
+    skillsUsed?: Array<{
+      skillId: string;
+      skillName: string;
+      success: boolean;
+      difficulty?: number;
+    }>;
+    // Custom action tracking for implicit skill check situations
+    customActionPerformed?: {
+      action: string;
+      implicitSkills?: string[];
+    };
   };
   choices?: Array<{
     text: string;
     outcome?: string;
     tags?: string[];
+    // Enhanced choice data for skill-based decisions
+    skillRequirements?: DecisionRequirement[];
+    skillHint?: string;
   }>;
   tokenUsage?: {
     promptTokens: number;

@@ -129,9 +129,9 @@ export class NarrativeGenerator {
           const { useLoreStore } = await import('@/state/loreStore');
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, worldId);
-        } catch (error) {
-          console.warn('Failed to extract structured lore from initial scene:', error);
-          // No fallback - AI extraction or nothing
+        } catch {
+          // Failed to extract structured lore - this is non-critical
+          // Continue with narrative generation without lore extraction
         }
       }
       
@@ -187,6 +187,17 @@ export class NarrativeGenerator {
     
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
+    // Build character skill context for AI
+    let characterSkillContext = '';
+    if (playerCharacter && world.skills && playerCharacter.skills.length > 0) {
+      characterSkillContext = `
+CHARACTER ABILITIES:
+${playerCharacter.skills.map(skill => {
+  const worldSkill = world.skills?.find(ws => ws.id === skill.worldSkillId);
+  return `- ${worldSkill?.name || skill.name}: Level ${skill.level}`;
+}).join('\n')}`;
+    }
+    
     return {
       worldName: world.name,
       worldDescription: world.description,
@@ -199,7 +210,14 @@ export class NarrativeGenerator {
       sessionId: request.sessionId,
       narrativeContext: request.narrativeContext,
       generationParameters: request.generationParameters,
-      toneSettings: toneSettings
+      toneSettings: toneSettings,
+      // Enhanced skill context for narrative generation
+      characterSkillContext,
+      worldSkills: world.skills?.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description
+      })) || []
     };
   }
 
@@ -368,6 +386,54 @@ export class NarrativeGenerator {
     }
   }
   
+  /**
+   * Generate narrative that acknowledges skill usage
+   */
+  async generateSkillAcknowledgment(
+    worldId: string,
+    narrativeContext: NarrativeContext,
+    characterIds: string[],
+    skillUsed?: {
+      skillId: string;
+      skillName: string;
+      success: boolean;
+      difficulty: number;
+    },
+    customAction?: {
+      action: string;
+      implicitSkills?: string[];
+    }
+  ): Promise<NarrativeGenerationResult> {
+    try {
+      const world = this.getWorld(worldId);
+      const template = this.getTemplate('skillAcknowledgment');
+      
+      // Get character details
+      const { characters } = useCharacterStore.getState();
+      const playerCharacterId = characterIds[0];
+      const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+      
+      const context = {
+        worldName: world.name,
+        genre: world.theme,
+        narrativeContext,
+        playerCharacterName: playerCharacter?.name,
+        skillUsed,
+        customAction
+      };
+
+      const prompt = template(context);
+      const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
+      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, worldId);
+
+      const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
+      
+      return this.formatResponse(response, 'scene');
+    } catch {
+      throw new Error('Failed to generate skill acknowledgment narrative');
+    }
+  }
+
   /**
    * Generate player choices based on the current narrative context
    */
