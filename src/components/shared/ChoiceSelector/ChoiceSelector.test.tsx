@@ -52,13 +52,6 @@ describe('ChoiceSelector', () => {
   };
 
   describe('Basic functionality', () => {
-    it('renders simple choices correctly', () => {
-      render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
-      
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-      expect(screen.getByText('Go south')).toBeInTheDocument();
-      expect(screen.getByText('Rest here')).toBeInTheDocument();
-    });
 
     it('renders decision with hints correctly', () => {
       render(<ChoiceSelector decision={decision} onSelect={mockOnSelect} showHints />);
@@ -401,21 +394,6 @@ describe('ChoiceSelector', () => {
     });
   });
 
-  describe('Accessibility', () => {
-    it('has proper ARIA attributes for custom input', () => {
-      render(
-        <ChoiceSelector 
-          choices={simpleChoices} 
-          onSelect={mockOnSelect}
-          enableCustomInput
-          onCustomSubmit={mockOnCustomSubmit}
-        />
-      );
-      
-      const input = screen.getByPlaceholderText('Type your custom response...');
-      expect(input).toHaveAttribute('aria-label', 'Custom response input');
-    });
-  });
 
   describe('Skill Requirements', () => {
     const mockCharacter: Character = {

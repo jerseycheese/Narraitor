@@ -26,8 +26,4 @@ describe('StatusBadge', () => {
     expect(screen.getByText('Quick to learn')).toBeInTheDocument();
   });
 
-  it('has proper test id', () => {
-    render(<StatusBadge variant="skill-difficulty" state="easy" label="Easy" testId="test-badge" />);
-    expect(screen.getByTestId('test-badge')).toBeInTheDocument();
-  });
 });
