@@ -259,6 +259,21 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
     
+    // Auto-start a session for testing
+    const autoStartSession = () => {
+      const sessionState = useSessionStore.getState();
+      
+      // Only start if no active session exists
+      if (!sessionState.sessionId || sessionState.status !== 'active') {
+        logger.info('Starting new session');
+        useSessionStore.getState().startSession(mockWorld.id, mockCharacter.id);
+        logger.info('Session started');
+      }
+    };
+    
+    // Start session after a short delay to ensure stores are ready
+    const sessionTimeout = setTimeout(autoStartSession, 100);
+    
     // Get initial state
     setCurrentState({...useSessionStore.getState()});
     
@@ -269,9 +284,10 @@ export default function GameSessionTestHarness() {
     
     return () => {
       // Clean up
+      clearTimeout(sessionTimeout);
       clearInterval(intervalId);
     };
-  }, [createTestWorld]);
+  }, [createTestWorld, logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');
