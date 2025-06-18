@@ -45,13 +45,13 @@ export default function CustomActionProcessorTestPage() {
           Test the custom text action skill detection system. Try actions like:
         </p>
         <ul className="list-disc list-inside mt-2 text-sm text-gray-500">
-          <li>&quot;I intimidate the guard&quot;</li>
-          <li>&quot;I sneak past the enemy&quot;</li>
-          <li>&quot;I persuade the merchant&quot;</li>
-          <li>&quot;I climb the wall&quot;</li>
-          <li>&quot;I hack the computer&quot;</li>
-          <li>&quot;I search for clues&quot;</li>
-          <li>&quot;I lie about my identity&quot;</li>
+          <li>&quot;I try to intimidate the guard into letting me pass&quot;</li>
+          <li>&quot;I carefully sneak past the sleeping enemy&quot;</li>
+          <li>&quot;I persuade the merchant to give me a discount&quot;</li>
+          <li>&quot;I climb over the stone wall&quot;</li>
+          <li>&quot;I search the room for hidden clues&quot;</li>
+          <li>&quot;I examine the ancient artifact&quot;</li>
+          <li>&quot;I sprint across the open courtyard&quot;</li>
         </ul>
       </div>
 
@@ -116,22 +116,28 @@ export default function CustomActionProcessorTestPage() {
               <h3 className="font-medium mb-2">Action: &quot;{result.text}&quot;</h3>
               
               {result.skillChecks.length > 0 ? (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-700">Skill Checks Triggered:</h4>
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">AI-Detected Skill Checks:</h4>
                   {result.skillChecks.map((check, checkIndex) => (
-                    <div key={checkIndex} className="flex items-center gap-3 text-sm">
-                      <span className="font-medium">{check.skillName}</span>
-                      <span className="text-gray-500">({check.action})</span>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        check.success 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {check.success ? 'SUCCESS' : 'FAILED'}
-                      </span>
-                      <span className="text-gray-500 text-xs">
-                        ({check.current} vs {check.required} required)
-                      </span>
+                    <div key={checkIndex} className="border-l-4 border-gray-200 pl-3 space-y-1">
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="font-medium">{check.skillName}</span>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          check.success 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {check.success ? 'SUCCESS' : 'FAILED'}
+                        </span>
+                        <span className="text-gray-500 text-xs">
+                          {check.current}/{check.required} (Confidence: {Math.round(check.confidence * 100)}%)
+                        </span>
+                      </div>
+                      {check.reasoning && (
+                        <div className="text-xs text-gray-600 italic">
+                          AI Reasoning: {check.reasoning}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
