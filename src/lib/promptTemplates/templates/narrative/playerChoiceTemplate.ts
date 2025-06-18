@@ -72,11 +72,18 @@ ALIGNMENT VARIETY (when appropriate):
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
-SKILL REQUIREMENTS:
-Some choices should require specific skills when appropriate to the situation. When a choice would logically require expertise, add a skill requirement:
-- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Intimidation for threatening, Stealth for sneaking)
-- Set reasonable difficulty levels (typically 4-8, with 5-6 being common)
-- Not every choice needs requirements - include variety
+SKILL REQUIREMENTS (CRITICAL FOR MVP):
+Generate choices with skill requirements when the situation naturally calls for specialized abilities:
+- Analyze the current scene for opportunities where skills would logically apply
+- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+- Set reasonable difficulty levels based on the challenge severity:
+  * Easy tasks: 3-4 skill level
+  * Moderate tasks: 5-6 skill level  
+  * Hard tasks: 7-8 skill level
+  * Very hard tasks: 9+ skill level
+- VARY skill requirements across choices - use different character abilities when possible
+- Balance: Include both skill-required and non-skill choices for player agency
+- Custom actions by players should trigger implicit skill checks when appropriate
 - Format skill requirements as: [SkillName X+] where X is the minimum level
 
 CHOICE HINTS:
