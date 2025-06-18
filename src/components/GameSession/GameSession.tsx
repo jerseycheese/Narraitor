@@ -6,6 +6,7 @@ import { GameSessionState } from '@/types/game.types';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
@@ -123,7 +124,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     }
     
     // Last resort: Create a new stable ID if no existing session found
-    const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
+    const sessionId = generateUniqueId(`session-${worldId}`);
     
     return sessionId;
   }, [worldId, sessionState.id, savedSession]);
