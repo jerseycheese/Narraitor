@@ -371,8 +371,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               {!option.isSelected && getAlignmentIcon(option.alignment) && (
                 <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
               )}
-              <span className="flex-1">
-                {option.text}
+              <span className="flex-1 flex flex-col">
+                <span>{option.text}</span>
+                {showHints && option.hint && (
+                  <span className="text-sm text-gray-500 mt-1">{option.hint}</span>
+                )}
                 {option.skillRequirements && option.skillRequirements.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {option.skillRequirements.map((skillReq, index) => (
@@ -384,9 +387,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                       />
                     ))}
                   </div>
-                )}
-                {showHints && option.hint && (
-                  <span className="block text-sm text-gray-500 mt-1">{option.hint}</span>
                 )}
               </span>
             </span>
