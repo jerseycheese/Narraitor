@@ -15,7 +15,7 @@ jest.mock('@/components/shared/NavigationLoadingProvider', () => ({
 }));
 
 const meta: Meta<typeof RecentPagesDropdown> = {
-  title: 'Navigation/RecentPagesDropdown',
+  title: 'Narraitor/Navigation/RecentPagesDropdown',
   component: RecentPagesDropdown,
   parameters: {
     layout: 'centered',

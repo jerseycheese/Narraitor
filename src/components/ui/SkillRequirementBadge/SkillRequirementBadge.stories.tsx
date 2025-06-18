@@ -3,7 +3,7 @@ import SkillRequirementBadge from './SkillRequirementBadge';
 import { DecisionRequirement } from '@/types/narrative.types';
 
 const meta: Meta<typeof SkillRequirementBadge> = {
-  title: 'UI/SkillRequirementBadge',
+  title: 'Narraitor/UI/SkillRequirementBadge',
   component: SkillRequirementBadge,
   parameters: {
     layout: 'centered',
