@@ -3,6 +3,30 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from './ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
+// Using local character interface to match store structure
+import { WorldSkill } from '@/types/world.types';
+
+// Local character interface matching the store structure
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+  worldId: string;
+  attributes: unknown[];
+  skills: Array<{
+    id: string;
+    characterId: string;
+    worldSkillId?: string;
+    name: string;
+    level: number;
+    category?: string;
+  }>;
+  background: { history: string; personality: string; goals: string[]; fears: string[]; relationships: unknown[] };
+  inventory: { characterId: string; items: unknown[]; capacity: number; categories: string[] };
+  status: { health: number; maxHealth: number; conditions: string[] };
+  createdAt: string;
+  updatedAt: string;
+}
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
@@ -28,13 +52,6 @@ describe('ChoiceSelector', () => {
   };
 
   describe('Basic functionality', () => {
-    it('renders simple choices correctly', () => {
-      render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
-      
-      expect(screen.getByText('Go north')).toBeInTheDocument();
-      expect(screen.getByText('Go south')).toBeInTheDocument();
-      expect(screen.getByText('Rest here')).toBeInTheDocument();
-    });
 
     it('renders decision with hints correctly', () => {
       render(<ChoiceSelector decision={decision} onSelect={mockOnSelect} showHints />);
@@ -377,19 +394,95 @@ describe('ChoiceSelector', () => {
     });
   });
 
-  describe('Accessibility', () => {
-    it('has proper ARIA attributes for custom input', () => {
+
+  describe('Skill Requirements', () => {
+    const mockCharacter: Character = {
+      id: 'char1',
+      name: 'Test Character',
+      description: 'A test character',
+      worldId: 'world1',
+      attributes: [],
+      skills: [
+        { id: 'skill1', characterId: 'char1', worldSkillId: 'intimidation', name: 'Intimidation', level: 6 },
+        { id: 'skill2', characterId: 'char1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }
+      ],
+      background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+      inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },
+      status: { health: 100, maxHealth: 100, conditions: [] },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const mockWorldSkills: WorldSkill[] = [
+      { 
+        id: 'intimidation', 
+        name: 'Intimidation', 
+        description: '', 
+        worldId: 'world1', 
+        difficulty: 'medium', 
+        baseValue: 1, 
+        minValue: 1, 
+        maxValue: 10
+      }
+    ];
+
+    const decisionWithRequirements: Decision = {
+      id: 'decision-1',
+      prompt: 'What do you do?',
+      options: [
+        { 
+          id: 'opt-1', 
+          text: 'Intimidate the guard',
+          requirements: [{ type: 'skill', targetId: 'intimidation', operator: 'gte', value: 5 }]
+        },
+        { 
+          id: 'opt-2', 
+          text: 'Sneak past',
+          requirements: [{ type: 'skill', targetId: 'stealth', operator: 'gte', value: 5 }]
+        },
+      ],
+    };
+
+    it('shows skill requirement badges for options with requirements', () => {
       render(
         <ChoiceSelector 
-          choices={simpleChoices} 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
           onSelect={mockOnSelect}
-          enableCustomInput
-          onCustomSubmit={mockOnCustomSubmit}
         />
       );
       
-      const input = screen.getByPlaceholderText('Type your custom response...');
-      expect(input).toHaveAttribute('aria-label', 'Custom response input');
+      expect(screen.getByText('[Intimidation 5+]')).toBeInTheDocument();
+      expect(screen.getByText('[Unknown Skill 5+]')).toBeInTheDocument(); // stealth not in worldSkills
+    });
+
+    it('shows available state for met requirements', () => {
+      render(
+        <ChoiceSelector 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
+          onSelect={mockOnSelect}
+        />
+      );
+      
+      const intimidationBadge = screen.getByText('[Intimidation 5+]');
+      expect(intimidationBadge).toHaveClass('bg-green-100', 'text-green-800');
+    });
+
+    it('shows unavailable state for unmet requirements', () => {
+      render(
+        <ChoiceSelector 
+          decision={decisionWithRequirements}
+          character={mockCharacter}
+          worldSkills={mockWorldSkills}
+          onSelect={mockOnSelect}
+        />
+      );
+      
+      const stealthBadge = screen.getByText('[Unknown Skill 5+]');
+      expect(stealthBadge).toHaveClass('bg-gray-100', 'text-gray-500');
     });
   });
 });

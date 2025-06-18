@@ -40,7 +40,9 @@ export class ChoiceGenerator {
       const basePrompt = template(context);
       const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
+
       const response = await this.aiClient.generateContent(prompt);
+      
       
       if (!response.content || response.content.trim() === '') {
         return this.generateFallbackChoices(worldId, narrativeContext);
@@ -66,9 +68,20 @@ export class ChoiceGenerator {
         decision.options = decision.options.slice(0, maxOptions);
       }
       
+      
       return decision;
     } catch (error) {
-      console.error('Error generating AI choices:', error);
+      console.error('❌ CHOICE GENERATOR ERROR:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        worldId: params.worldId,
+        hasNarrativeContext: !!params.narrativeContext
+      });
+      
+      // Add an alert to make the error visible to the user for debugging
+      if (typeof window !== 'undefined') {
+      }
+      
       return this.generateFallbackChoices(params.worldId, params.narrativeContext);
     }
   }
@@ -126,9 +139,9 @@ export class ChoiceGenerator {
       }
       
       
-      // Extract the AI-generated context summary
+      // Extract the AI-generated context summary from original content (before cleaning)
       let contextSummary = '';
-      const contextMatch = cleanedContent.match(/Context Summary:?\s*([^\n]+)/i);
+      const contextMatch = content.match(/Context Summary:?\s*([^\n]+)/i);
       if (contextMatch && contextMatch[1]) {
         contextSummary = contextMatch[1].trim();
       }
@@ -149,59 +162,84 @@ export class ChoiceGenerator {
         prompt = 'What will you do?';
       }
       
-      // Extract options with alignment tags from cleaned content
+      // Extract options with hints and requirements from cleaned content
       const options: DecisionOption[] = [];
       
-      // First, try to match all numbered options and parse alignment if present
-      const numberedMatches = cleanedContent.matchAll(/^\s*\d+\.\s*(.+)$/gm);
-      for (const match of numberedMatches) {
-        if (match[1] && match[1].trim()) {
-          const fullText = match[1].trim();
+      // Parse the new format with optional Hint and Requirements lines
+      // Split into lines and process options with their associated hints/requirements
+      const lines = cleanedContent.split('\n');
+      let currentOption: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }> | null = null;
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Check for numbered option (e.g., "1. Do something")
+        const optionMatch = trimmed.match(/^(\d+)\.\s*(.+)$/);
+        if (optionMatch) {
+          // Save previous option if exists
+          if (currentOption) {
+            options.push(this.finalizeOption(currentOption));
+          }
           
-          // Check if this option has an alignment tag
-          // Supported alignment tags: [LAWFUL], [NEUTRAL], [CHAOTIC]
-          const alignmentMatch = fullText.match(/^\[([^\]]+)\]\s*(.+)$/);
+          // Start new option
+          const optionText = optionMatch[2].trim();
+          
+          // Check for alignment tag in option text
+          const alignmentMatch = optionText.match(/^\[([^\]]+)\]\s*(.+)$/);
+          let alignment: ChoiceAlignment = 'neutral';
+          let text = optionText;
           
           if (alignmentMatch) {
-            // Has alignment tag
             const alignmentText = alignmentMatch[1].trim().toLowerCase();
-            let alignment: ChoiceAlignment = 'neutral';
-            
             if (alignmentText === 'lawful') {
               alignment = 'lawful';
             } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
               alignment = 'chaotic';
             }
-            
-            options.push({
-              id: generateUniqueId('option'),
-              text: alignmentMatch[2].trim(),
-              alignment
-            });
-          } else {
-            // No alignment tag, default to neutral
-            options.push({
-              id: generateUniqueId('option'),
-              text: fullText,
-              alignment: 'neutral'
-            });
+            text = alignmentMatch[2].trim();
+          }
+          
+          currentOption = {
+            id: generateUniqueId('option'),
+            text: text,
+            alignment: alignment,
+            hint: undefined,
+            requirements: []
+          };
+        }
+        // Check for Hint line
+        else if (trimmed.match(/^Hint:\s*(.+)$/i)) {
+          const hintMatch = trimmed.match(/^Hint:\s*(.+)$/i);
+          if (currentOption && hintMatch) {
+            currentOption.hint = hintMatch[1].trim();
+          }
+        }
+        // Check for Requirements line
+        else if (trimmed.match(/^Requirements?:\s*(.+)$/i)) {
+          const reqMatch = trimmed.match(/^Requirements?:\s*(.+)$/i);
+          if (currentOption && reqMatch) {
+            const reqText = reqMatch[1].trim();
+            // Parse requirement format: "SkillName X+"
+            const skillMatch = reqText.match(/^(\w+)\s+(\d+)\+?$/);
+            if (skillMatch) {
+              const skillName = skillMatch[1];
+              const level = parseInt(skillMatch[2]);
+              currentOption.requirements?.push({
+                type: 'skill',
+                targetId: skillName.toLowerCase(),
+                operator: 'gte',
+                value: level
+              });
+            }
           }
         }
       }
       
-      // If no numbered options found, try bullet points
-      if (options.length === 0) {
-        const bulletMatches = cleanedContent.matchAll(/^\s*[-*]\s*(.+)$/gm);
-        for (const match of bulletMatches) {
-          if (match[1] && match[1].trim()) {
-            options.push({
-              id: generateUniqueId('option'),
-              text: match[1].trim(),
-              alignment: 'neutral'
-            });
-          }
-        }
+      // Don't forget the last option
+      if (currentOption) {
+        options.push(this.finalizeOption(currentOption));
       }
+      
       
       // Create decision object with enhanced context (decisionWeight already extracted above)
       const decision = {
@@ -253,9 +291,36 @@ export class ChoiceGenerator {
     switch (theme) {
       case 'fantasy':
         options.push(
-          { id: generateUniqueId('option'), text: 'Search for clues', alignment: 'neutral' },
-          { id: generateUniqueId('option'), text: 'Talk to nearby characters', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Cast a random spell at the sky', alignment: 'chaotic' }
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Search for clues', 
+            alignment: 'neutral',
+            hint: 'Look around carefully for important details'
+          },
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Talk to nearby characters', 
+            alignment: 'lawful',
+            hint: 'Gather information through conversation',
+            requirements: [{
+              type: 'skill',
+              targetId: 'persuasion',
+              operator: 'gte',
+              value: 3
+            }]
+          },
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Cast a spell to illuminate the area', 
+            alignment: 'neutral',
+            hint: 'Use magic to reveal hidden things',
+            requirements: [{
+              type: 'skill',
+              targetId: 'magic',
+              operator: 'gte',
+              value: 4
+            }]
+          }
         );
         break;
       case 'sci-fi':
@@ -308,8 +373,9 @@ export class ChoiceGenerator {
     const { worlds } = useWorldStore.getState();
     const world = worlds[worldId];
     
+    
     if (!world) {
-      console.error('🔄 CHOICE GENERATOR: World not found:', worldId);
+      console.error('World not found:', worldId);
       throw new Error(`World not found: ${worldId}`);
     }
     
@@ -326,7 +392,7 @@ export class ChoiceGenerator {
       const template = narrativeTemplateManager.getTemplate(templateKey);
       return template;
     } catch (error) {
-      console.error('🔄 CHOICE GENERATOR: Template not found:', templateKey, error);
+      console.error('Template not found:', templateKey, error);
       throw error;
     }
   }
@@ -335,13 +401,21 @@ export class ChoiceGenerator {
    * Build context for the prompt template
    */
   private buildContext(world: World, narrativeContext: NarrativeContext, characterIds: string[]) {
-    return {
+    const context = {
       worldName: world.name,
       worldDescription: world.description,
       genre: world.theme,
       narrativeContext,
-      characterIds
+      characterIds,
+      worldSkills: world.skills?.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        description: skill.description
+      })) || []
     };
+
+
+    return context;
   }
 
   /**
@@ -350,17 +424,6 @@ export class ChoiceGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    console.log('🎮 TONE SETTINGS DEBUG [ChoiceGenerator]:', {
-      worldId: world.id,
-      worldName: world.name,
-      toneSettings: {
-        contentRating: toneSettings.contentRating,
-        narrativeStyle: toneSettings.narrativeStyle,
-        languageComplexity: toneSettings.languageComplexity,
-        customInstructions: toneSettings.customInstructions || '(none)',
-        usingDefaults: !world.toneSettings
-      }
-    });
     
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
@@ -379,23 +442,61 @@ CHOICE GENERATION FOCUS:
 - Ensure choices are appropriate and align with the tone settings
 - Present options that respect the content boundaries while maintaining agency`;
 
-    console.log('🎯 CHOICE TONE INSTRUCTIONS APPLIED:', {
-      instructionLength: detailedInstructions.length + choiceSpecificGuidance.length,
-      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
-      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
-      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`),
-      hasChoiceSpecificGuidance: true
-    });
 
     return prompt + detailedInstructions + choiceSpecificGuidance;
   }
 
 
   /**
-   * Create a fallback context summary when AI doesn't provide one
+   * Create a meaningful context summary from the narrative context
    */
   private createFallbackContextSummary(narrativeContext: NarrativeContext): string {
     const location = narrativeContext.currentLocation || 'an unknown location';
-    return `A decision point at ${location}.`;
+    
+    // Try to get the most recent narrative content for context
+    const recentSegments = narrativeContext.recentSegments || narrativeContext.previousSegments || [];
+    if (recentSegments.length > 0) {
+      const latestSegment = recentSegments[recentSegments.length - 1];
+      if (latestSegment && latestSegment.content) {
+        // Extract the first sentence or up to 100 characters for context
+        const firstSentence = latestSegment.content.split('.')[0];
+        const contextText = firstSentence.length > 100 
+          ? firstSentence.substring(0, 100) + '...' 
+          : firstSentence + '.';
+        
+        return contextText;
+      }
+    }
+    
+    // Check if there's a current situation context
+    if (narrativeContext.currentSituation) {
+      return narrativeContext.currentSituation;
+    }
+    
+    // Fallback to location-based context
+    return `You find yourself at ${location}, considering your next move.`;
+  }
+
+  /**
+   * Finalize an option by cleaning up the structure and adding requirements
+   */
+  private finalizeOption(option: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }>): DecisionOption {
+    const finalOption: DecisionOption = {
+      id: option.id || generateUniqueId('option'),
+      text: option.text || 'Unknown option',
+      alignment: option.alignment || 'neutral'
+    };
+
+    // Add hint if present
+    if (option.hint && option.hint.trim()) {
+      finalOption.hint = option.hint.trim();
+    }
+
+    // Add requirements if present
+    if (option.requirements && option.requirements.length > 0) {
+      finalOption.requirements = option.requirements;
+    }
+
+    return finalOption;
   }
 }

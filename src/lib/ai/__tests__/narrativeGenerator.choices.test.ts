@@ -93,7 +93,7 @@ describe('NarrativeGenerator - Player Choices', () => {
         characterIds: ['character-1'],
         minOptions: 3,
         maxOptions: 4,
-        useAlignedChoices: true
+        useAlignedChoices: false
       });
     });
 

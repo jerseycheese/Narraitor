@@ -108,90 +108,84 @@ export const AlignedChoices: Story = {
   },
 };
 
-export const AlignedChoicesWithCustomInput: Story = {
+// Decision with skill requirements for testing
+const createSkillRequirementDecision = (): Decision => ({
+  id: 'skill-requirement-decision',
+  prompt: 'A locked chest sits before you, heavy with treasure. How do you proceed?',
+  options: [
+    {
+      id: 'option-lockpick',
+      text: 'Carefully pick the lock',
+      alignment: 'neutral',
+      hint: 'Requires deft fingers and patience',
+      requirements: [{ type: 'skill', targetId: 'lockpicking', operator: 'gte', value: 5 }]
+    },
+    {
+      id: 'option-force',
+      text: 'Smash it open with brute force',
+      alignment: 'chaotic',
+      hint: 'Might damage the contents',
+      requirements: [{ type: 'skill', targetId: 'strength', operator: 'gte', value: 8 }]
+    },
+    {
+      id: 'option-magic',
+      text: 'Use magic to unlock it',
+      alignment: 'neutral',
+      hint: 'A more elegant solution',
+      requirements: [{ type: 'skill', targetId: 'magic', operator: 'gte', value: 6 }]
+    },
+    {
+      id: 'option-search',
+      text: 'Search for a hidden key',
+      alignment: 'lawful',
+      hint: 'Safe but time-consuming'
+      // No requirements - anyone can try this
+    }
+  ],
+  decisionWeight: 'major',
+  contextSummary: 'A treasure chest awaits, but it requires skill to open safely.',
+});
+
+// Mock character for testing
+const createMockCharacter = () => ({
+  id: 'test-char',
+  name: 'Test Character',
+  description: 'A test character',
+  worldId: 'test-world',
+  attributes: [],
+  skills: [
+    { id: 'skill1', characterId: 'test-char', worldSkillId: 'lockpicking', name: 'Lockpicking', level: 7 },
+    { id: 'skill2', characterId: 'test-char', worldSkillId: 'strength', name: 'Strength', level: 4 },
+    { id: 'skill3', characterId: 'test-char', worldSkillId: 'magic', name: 'Magic', level: 9 }
+  ],
+  background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+  inventory: { characterId: 'test-char', items: [], capacity: 20, categories: [] },
+  status: { health: 100, maxHealth: 100, conditions: [] },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
+
+// Mock world skills
+const createMockWorldSkills = () => [
+  { id: 'lockpicking', name: 'Lockpicking', description: '', worldId: 'test-world', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 10 },
+  { id: 'strength', name: 'Strength', description: '', worldId: 'test-world', difficulty: 'easy', baseValue: 1, minValue: 1, maxValue: 10 },
+  { id: 'magic', name: 'Magic', description: '', worldId: 'test-world', difficulty: 'hard', baseValue: 1, minValue: 1, maxValue: 10 }
+];
+
+export const WithSkillRequirements: Story = {
   args: {
-    decision: createAlignedDecision(),
-    enableCustomInput: true,
+    decision: createSkillRequirementDecision(),
+    character: createMockCharacter(),
+    worldSkills: createMockWorldSkills(),
     showHints: true,
-    onCustomSubmit: (text: string) => console.log('Custom submission:', text),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Shows aligned choices with custom input field displayed above for immediate use.',
+        story: 'Shows choices with skill requirements. Green badges indicate the character meets the requirement, gray badges indicate they do not. This character has Lockpicking 7 (✓), Strength 4 (✗), and Magic 9 (✓).',
       },
     },
   },
 };
 
-// === DECISION WEIGHT STORIES ===
-
-export const MinorDecision: Story = {
-  args: {
-    decision: {
-      id: 'minor-decision',
-      prompt: 'What will you have for breakfast?',
-      options: [
-        { id: 'toast', text: 'Toast with jam', alignment: 'neutral' },
-        { id: 'cereal', text: 'Bowl of cereal', alignment: 'neutral' },
-        { id: 'skip', text: 'Skip breakfast', alignment: 'chaotic' },
-      ],
-      decisionWeight: 'minor',
-      contextSummary: 'A simple morning choice with little consequence.',
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Minor decisions have subtle styling with minimal visual prominence.',
-      },
-    },
-  },
-};
-
-export const MajorDecision: Story = {
-  args: {
-    decision: {
-      id: 'major-decision',
-      prompt: 'The dragon offers you a deal. How do you respond?',
-      options: [
-        { id: 'accept', text: 'Accept the dragon\'s terms', alignment: 'lawful' },
-        { id: 'negotiate', text: 'Try to negotiate better terms', alignment: 'neutral' },
-        { id: 'refuse', text: 'Refuse and stand your ground', alignment: 'chaotic' },
-      ],
-      decisionWeight: 'major',
-      contextSummary: 'A significant choice that will shape your relationship with the ancient dragon.',
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Major decisions have amber borders and enhanced visual prominence to indicate importance.',
-      },
-    },
-  },
-};
-
-export const CriticalDecision: Story = {
-  args: {
-    decision: {
-      id: 'critical-decision',
-      prompt: 'The kingdom\'s fate hangs in the balance. What is your final choice?',
-      options: [
-        { id: 'sacrifice', text: 'Sacrifice yourself to save the kingdom', alignment: 'lawful' },
-        { id: 'bargain', text: 'Attempt a desperate bargain with fate', alignment: 'neutral' },
-        { id: 'seize', text: 'Seize power and rule through force', alignment: 'chaotic' },
-      ],
-      decisionWeight: 'critical',
-      contextSummary: 'The climactic moment where your choice will determine the fate of thousands.',
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Critical decisions have red borders, shadows, and maximum visual prominence for life-changing moments.',
-      },
-    },
-  },
-};
 

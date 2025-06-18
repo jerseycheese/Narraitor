@@ -67,7 +67,10 @@ jest.mock('@/state/worldStore', () => ({
 jest.mock('@/state/sessionStore', () => ({
   useSessionStore: Object.assign(
     jest.fn(() => mockSessionStoreState),
-    { getState: jest.fn(() => mockSessionStoreState) }
+    { 
+      getState: jest.fn(() => mockSessionStoreState),
+      subscribe: jest.fn(() => jest.fn()) // Mock subscribe method that returns unsubscribe function
+    }
   )
 }));
 

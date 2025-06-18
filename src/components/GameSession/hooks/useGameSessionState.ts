@@ -7,6 +7,39 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { GameSessionState } from '@/types/game.types';
 import Logger from '@/lib/utils/logger';
+import type { SimpleChoice } from '@/components/shared/ChoiceSelector/ChoiceSelector';
+
+/**
+ * Efficiently compare two arrays of player choices without JSON.stringify
+ * Only compares essential fields to avoid performance issues with large lists
+ */
+const arePlayerChoicesEqual = (choices1?: SimpleChoice[], choices2?: SimpleChoice[]): boolean => {
+  if (!choices1 && !choices2) return true;
+  if (!choices1 || !choices2) return false;
+  if (choices1.length !== choices2.length) return false;
+  
+  // For small lists (< 10), do a full comparison
+  if (choices1.length < 10) {
+    return choices1.every((choice, index) => {
+      const other = choices2[index];
+      return choice.id === other.id && 
+             choice.text === other.text && 
+             choice.isSelected === other.isSelected;
+    });
+  }
+  
+  // For larger lists, compare only length, first/last items, and selected states
+  // This covers most real-world change scenarios while being performant
+  const firstMatch = choices1[0].id === choices2[0].id && choices1[0].isSelected === choices2[0].isSelected;
+  const lastMatch = choices1[choices1.length - 1].id === choices2[choices2.length - 1].id && 
+                   choices1[choices1.length - 1].isSelected === choices2[choices2.length - 1].isSelected;
+  
+  // Quick scan for any selection changes (most common update scenario)
+  const selectedCount1 = choices1.filter(c => c.isSelected).length;
+  const selectedCount2 = choices2.filter(c => c.isSelected).length;
+  
+  return firstMatch && lastMatch && selectedCount1 === selectedCount2;
+};
 
 interface UseGameSessionStateOptions {
   worldId: string;
@@ -200,7 +233,18 @@ export const useGameSessionState = ({
   useEffect(() => {
     if (!isClient) return;
     
-    // Only initialize if session is not already active
+    // Get current store state to check for existing session
+    const currentStoreState = useSessionStore.getState();
+    
+    // If store already has an active session that matches our requirements, don't initialize
+    if (currentStoreState.status === 'active' && 
+        currentStoreState.worldId === worldId && 
+        currentStoreState.characterId === sessionCharacterId) {
+      logger.debug('[useGameSessionState] Store already has active session for this world/character, skipping initialization');
+      return;
+    }
+    
+    // Only initialize if session is not already active and we haven't already initiated
     if (sessionState.status === 'initializing' && worldExists && sessionCharacterId) {
       // Clear any existing ending state when starting any session
       useNarrativeStore.getState().clearEnding();
@@ -224,49 +268,56 @@ export const useGameSessionState = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClient, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
   
-  // Poll for session state updates to avoid subscription issues
+  // Subscribe to session store changes directly to avoid polling issues
   useEffect(() => {
     if (!isClient) return;
     
-    // Function to update state from the store
-    const updateStateFromStore = () => {
-      const storeState = useSessionStore.getState();
-      
+    // Subscribe to store changes
+    const unsubscribe = useSessionStore.subscribe((state) => {
       // Only update if there's a meaningful change to avoid unnecessary re-renders
       const shouldUpdate = 
-        storeState.status !== sessionState.status ||
-        storeState.error !== sessionState.error ||
-        storeState.currentSceneId !== sessionState.currentSceneId ||
-        JSON.stringify(storeState.playerChoices) !== JSON.stringify(sessionState.playerChoices);
+        state.status !== sessionState.status ||
+        state.error !== sessionState.error ||
+        state.currentSceneId !== sessionState.currentSceneId ||
+        state.id !== sessionState.id ||
+        !arePlayerChoicesEqual(state.playerChoices, sessionState.playerChoices);
       
       if (shouldUpdate) {
+        
         setSessionState(prev => {
-          const effectiveStatus = storeState.status;
-          
           // Store previous status for focus management
           prevStatusRef.current = prev.status!;
           
           return {
             ...prev,
-            status: effectiveStatus, // Use our effective status
-            error: storeState.error,
-            currentSceneId: storeState.currentSceneId,
-            playerChoices: storeState.playerChoices,
+            id: state.id,
+            status: state.status,
+            error: state.error,
+            currentSceneId: state.currentSceneId,
+            playerChoices: state.playerChoices,
+            worldId: state.worldId,
+            characterId: state.characterId,
           };
         });
       }
-    };
+    });
     
-    // Update immediately
-    updateStateFromStore();
+    // Initial sync to get current state
+    const currentState = useSessionStore.getState();
+    setSessionState(prev => ({
+      ...prev,
+      id: currentState.id,
+      status: currentState.status,
+      error: currentState.error,
+      currentSceneId: currentState.currentSceneId,
+      playerChoices: currentState.playerChoices,
+      worldId: currentState.worldId,
+      characterId: currentState.characterId,
+    }));
     
-    // Then set up polling interval - use a longer interval to reduce console noise
-    const intervalId = setInterval(updateStateFromStore, 5000);
-    
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [isClient, sessionState.currentSceneId, sessionState.error, sessionState.playerChoices, sessionState.status]);
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient]); // Intentionally excluding sessionState to prevent infinite loops
   
   
   // Get saved session for current world/character

@@ -48,10 +48,43 @@ export const useSessionStore = create<SessionStore>()(
 
   // Initialize a new game session
   initializeSession: async (worldId, characterId, onComplete) => {
+    const currentState = get();
+    
+    logger.debug('🎯 initializeSession called:', {
+      worldId,
+      characterId,
+      currentState: {
+        id: currentState.id,
+        status: currentState.status,
+        worldId: currentState.worldId,
+        characterId: currentState.characterId
+      }
+    });
+    
+    // Don't initialize if we already have an active session for the same world/character
+    if (currentState.status === 'active' && 
+        currentState.worldId === worldId && 
+        currentState.characterId === characterId) {
+      logger.debug('Session already active for this world/character, skipping initialization');
+      if (onComplete) onComplete();
+      return;
+    }
+    
     logger.debug('Initializing session for worldId:', worldId, 'characterId:', characterId);
+    
+    // Generate session ID immediately and persistently
+    const sessionId = currentState.id || `session-${worldId}-${Date.now()}`;
+    logger.debug('🆔 Using session ID:', sessionId);
+    
     set(state => {
       logger.debug('Setting loading state from:', state);
-      return { status: 'loading', worldId, characterId, error: null };
+      return { 
+        id: sessionId,
+        status: 'loading', 
+        worldId, 
+        characterId, 
+        error: null 
+      };
     });
     
     try {
@@ -87,6 +120,17 @@ export const useSessionStore = create<SessionStore>()(
   // End the current session (save it instead of destroying)
   endSession: () => {
     const state = get();
+    
+    // Add stack trace to debug unexpected calls
+    const stack = new Error().stack;
+    logger.debug('🔚 endSession called:', {
+      currentId: state.id,
+      status: state.status,
+      worldId: state.worldId,
+      characterId: state.characterId,
+      stack: stack?.split('\n').slice(0, 5).join('\n') // First 5 lines of stack
+    });
+    
     if (state.id && state.worldId && state.characterId) {
       logger.debug('Saving session before ending:', state.id);
       
@@ -105,7 +149,7 @@ export const useSessionStore = create<SessionStore>()(
           }
         };
         
-        logger.debug('Saving session:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
+        logger.debug('🔚 Saving session and resetting state:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
         
         return {
           ...initialState,
@@ -113,6 +157,7 @@ export const useSessionStore = create<SessionStore>()(
         };
       });
     } else {
+      logger.debug('🔚 No active session to save, just resetting state');
       // Keep savedSessions when resetting
       set(prevState => ({
         ...initialState,

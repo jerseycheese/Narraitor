@@ -25,7 +25,7 @@ jest.mock('../../hooks/useNavigationPersistence', () => ({
 }));
 
 const meta: Meta<typeof NavigationPersistenceProvider> = {
-  title: 'Navigation/NavigationPersistenceProvider',
+  title: 'Narraitor/Navigation/NavigationPersistenceProvider',
   component: NavigationPersistenceProvider,
   parameters: {
     layout: 'fullscreen',

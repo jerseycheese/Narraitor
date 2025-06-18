@@ -214,7 +214,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
     if (!characterId) return;
     
-    
     // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
     let cleanContent = segment.content;
     let actualLocation = segment.metadata?.location;
@@ -399,8 +398,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
+    
     if (!decision || !decision.options || decision.options.length === 0) {
-      // Invalid decision received, stop generation
       setIsGeneratingChoices(false);
       return;
     }
@@ -572,6 +571,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           ) : isGeneratingChoices ? (
@@ -586,6 +587,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           ) : (
@@ -597,6 +600,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
                 isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                character={character}
+                worldSkills={world?.skills || []}
               />
             </div>
           )}

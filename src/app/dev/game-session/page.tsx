@@ -6,6 +6,7 @@ import GameSession from '@/components/GameSession/GameSession';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import Logger from '@/lib/utils/logger';
 
 // Mock world
@@ -14,8 +15,78 @@ const mockWorld: World = {
   name: 'Fantasy Realm',
   description: 'A high fantasy world of magic and adventure',
   theme: 'Fantasy',
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'strength',
+      name: 'Strength',
+      description: 'Physical power and muscle',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+    },
+    {
+      id: 'intelligence',
+      name: 'Intelligence',
+      description: 'Mental acuity and reasoning',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+    }
+  ],
+  skills: [
+    {
+      id: 'lockpicking',
+      name: 'Lockpicking',
+      description: 'The art of opening locks without keys',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'intimidation',
+      name: 'Intimidation',
+      description: 'Using presence and fear to influence others',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'stealth',
+      name: 'Stealth',
+      description: 'Moving unseen and unheard',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'magic',
+      name: 'Magic',
+      description: 'Wielding arcane forces',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'persuasion',
+      name: 'Persuasion',
+      description: 'Convincing others through words and charm',
+      worldId: 'world-1',
+      difficulty: 'easy',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    }
+  ],
   settings: {
     maxAttributes: 10,
     maxSkills: 10,
@@ -45,8 +116,68 @@ const mockCharacter = {
     type: 'placeholder' as const,
     url: null
   },
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'attr1',
+      characterId: 'test-character-123',
+      worldAttributeId: 'strength',
+      name: 'Strength',
+      baseValue: 14,
+      modifiedValue: 14,
+      category: 'physical'
+    },
+    {
+      id: 'attr2',
+      characterId: 'test-character-123', 
+      worldAttributeId: 'intelligence',
+      name: 'Intelligence',
+      baseValue: 16,
+      modifiedValue: 16,
+      category: 'mental'
+    }
+  ],
+  skills: [
+    {
+      id: 'skill1',
+      characterId: 'test-character-123',
+      worldSkillId: 'lockpicking',
+      name: 'Lockpicking',
+      level: 8,
+      category: 'stealth'
+    },
+    {
+      id: 'skill2',
+      characterId: 'test-character-123',
+      worldSkillId: 'intimidation',
+      name: 'Intimidation',
+      level: 6,
+      category: 'social'
+    },
+    {
+      id: 'skill3',
+      characterId: 'test-character-123',
+      worldSkillId: 'stealth',
+      name: 'Stealth',
+      level: 4,
+      category: 'stealth'
+    },
+    {
+      id: 'skill4',
+      characterId: 'test-character-123',
+      worldSkillId: 'magic',
+      name: 'Magic',
+      level: 9,
+      category: 'arcane'
+    },
+    {
+      id: 'skill5',
+      characterId: 'test-character-123',
+      worldSkillId: 'persuasion',
+      name: 'Persuasion',
+      level: 3,
+      category: 'social'
+    }
+  ],
   isPlayer: true,
   status: {
     health: 100,
@@ -113,6 +244,10 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
     
+    // Don't auto-start sessions - let the GameSession component handle it
+    // This prevents conflicts between test harness and component initialization
+    logger.info('Test harness ready - GameSession component will handle session initialization');
+    
     // Get initial state
     setCurrentState({...useSessionStore.getState()});
     
@@ -125,7 +260,7 @@ export default function GameSessionTestHarness() {
       // Clean up
       clearInterval(intervalId);
     };
-  }, [createTestWorld]);
+  }, [createTestWorld, logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');
@@ -193,6 +328,49 @@ export default function GameSessionTestHarness() {
         >
           End Session
         </button>
+        
+        <button 
+          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Reset all session state to break infinite loops
+            logger.info('🔄 Resetting all session and narrative state');
+            
+            // 1. Reset session store completely
+            useSessionStore.setState({
+              id: null,
+              status: 'initializing',
+              currentSceneId: null,
+              playerChoices: [],
+              error: null,
+              worldId: null,
+              characterId: null,
+              savedSessions: {}, // Clear saved sessions too
+              autoSave: {
+                enabled: true,
+                lastSaveTime: null,
+                status: 'idle',
+                errorMessage: null,
+                totalSaves: 0,
+              }
+            });
+            
+            // 2. Clear all narrative data using reset method
+            const narrativeStore = useNarrativeStore.getState();
+            narrativeStore.reset(); // This clears all segments, decisions, and endings
+            narrativeStore.clearEnding();
+            
+            // 3. Reset character state
+            useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
+            
+            // 4. Force page refresh to ensure clean state
+            setTimeout(() => {
+              logger.info('🔄 Forcing page refresh for complete reset');
+              window.location.reload();
+            }, 500);
+          }}
+        >
+          Reset State & Refresh
+        </button>
       </div>
       
       <div className="border p-4 rounded bg-gray-50">
@@ -201,7 +379,6 @@ export default function GameSessionTestHarness() {
             worldId={mockWorld.id}
             onSessionStart={handleSessionStart}
             onSessionEnd={handleSessionEnd}
-            disableAutoResume={true}
           />
         ) : (
           <div>Component hidden</div>
