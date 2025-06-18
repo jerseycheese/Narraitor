@@ -6,6 +6,7 @@ import GameSession from '@/components/GameSession/GameSession';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import Logger from '@/lib/utils/logger';
 
 // Mock world
@@ -259,21 +260,9 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
     
-    // Auto-start a session for testing
-    const autoStartSession = () => {
-      const sessionState = useSessionStore.getState();
-      
-      // Only start if no active session exists
-      if (!sessionState.id || sessionState.status !== 'active') {
-        logger.info('Starting new session');
-        useSessionStore.getState().initializeSession(mockWorld.id, mockCharacter.id, () => {
-          logger.info('Session started');
-        });
-      }
-    };
-    
-    // Start session after a short delay to ensure stores are ready
-    const sessionTimeout = setTimeout(autoStartSession, 100);
+    // Don't auto-start sessions - let the GameSession component handle it
+    // This prevents conflicts between test harness and component initialization
+    logger.info('Test harness ready - GameSession component will handle session initialization');
     
     // Get initial state
     setCurrentState({...useSessionStore.getState()});
@@ -285,7 +274,6 @@ export default function GameSessionTestHarness() {
     
     return () => {
       // Clean up
-      clearTimeout(sessionTimeout);
       clearInterval(intervalId);
     };
   }, [createTestWorld, logger]);
@@ -356,6 +344,49 @@ export default function GameSessionTestHarness() {
         >
           End Session
         </button>
+        
+        <button 
+          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Reset all session state to break infinite loops
+            logger.info('🔄 Resetting all session and narrative state');
+            
+            // 1. Reset session store completely
+            useSessionStore.setState({
+              id: null,
+              status: 'initializing',
+              currentSceneId: null,
+              playerChoices: [],
+              error: null,
+              worldId: null,
+              characterId: null,
+              savedSessions: {}, // Clear saved sessions too
+              autoSave: {
+                enabled: true,
+                lastSaveTime: null,
+                status: 'idle',
+                errorMessage: null,
+                totalSaves: 0,
+              }
+            });
+            
+            // 2. Clear all narrative data using reset method
+            const narrativeStore = useNarrativeStore.getState();
+            narrativeStore.reset(); // This clears all segments, decisions, and endings
+            narrativeStore.clearEnding();
+            
+            // 3. Reset character state
+            useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
+            
+            // 4. Force page refresh to ensure clean state
+            setTimeout(() => {
+              logger.info('🔄 Forcing page refresh for complete reset');
+              window.location.reload();
+            }, 500);
+          }}
+        >
+          Reset State & Refresh
+        </button>
       </div>
       
       <div className="border p-4 rounded bg-gray-50">
@@ -364,7 +395,6 @@ export default function GameSessionTestHarness() {
             worldId={mockWorld.id}
             onSessionStart={handleSessionStart}
             onSessionEnd={handleSessionEnd}
-            disableAutoResume={true}
           />
         ) : (
           <div>Component hidden</div>

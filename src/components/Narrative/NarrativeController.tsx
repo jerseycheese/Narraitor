@@ -397,15 +397,34 @@ Respond with JSON format:
       // Check if this is a fallback decision by comparing the ID pattern
       const isFallbackDecision = decision.id.includes('decision-fallback-');
       
+      console.log('🔍 CHOICE GENERATION CALLBACK CHECK:', {
+        decisionId: decision.id,
+        isFallbackDecision,
+        hasOnChoicesGenerated: !!onChoicesGenerated,
+        optionCount: decision.options?.length || 0
+      });
+      
       if (!isFallbackDecision) {
         console.log('🎯 CHOICE GENERATION SUCCESS: Notifying parent with AI-generated choices');
         if (onChoicesGenerated) {
           try {
             // Create a deep copy of the decision to ensure React state updates
             const decisionCopy = JSON.parse(JSON.stringify(decision));
+            console.log('🎯 CHOICE GENERATION: About to call onChoicesGenerated with decision:', {
+              id: decisionCopy.id,
+              hasOptions: !!decisionCopy.options,
+              optionCount: decisionCopy.options?.length || 0,
+              options: decisionCopy.options?.map(opt => ({
+                text: opt.text,
+                alignment: opt.alignment,
+                hasHint: !!opt.hint,
+                hasRequirements: !!(opt.requirements && opt.requirements.length > 0)
+              }))
+            });
             onChoicesGenerated(decisionCopy);
+            console.log('🎯 CHOICE GENERATION: onChoicesGenerated callback completed successfully');
           } catch (error) {
-            console.error('Error calling onChoicesGenerated callback:', error);
+            console.error('❌ Error calling onChoicesGenerated callback:', error);
           }
         }
       } else {

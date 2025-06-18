@@ -200,7 +200,18 @@ export const useGameSessionState = ({
   useEffect(() => {
     if (!isClient) return;
     
-    // Only initialize if session is not already active
+    // Get current store state to check for existing session
+    const currentStoreState = useSessionStore.getState();
+    
+    // If store already has an active session that matches our requirements, don't initialize
+    if (currentStoreState.status === 'active' && 
+        currentStoreState.worldId === worldId && 
+        currentStoreState.characterId === sessionCharacterId) {
+      logger.debug('[useGameSessionState] Store already has active session for this world/character, skipping initialization');
+      return;
+    }
+    
+    // Only initialize if session is not already active and we haven't already initiated
     if (sessionState.status === 'initializing' && worldExists && sessionCharacterId) {
       // Clear any existing ending state when starting any session
       useNarrativeStore.getState().clearEnding();
@@ -224,49 +235,62 @@ export const useGameSessionState = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isClient, worldExists, sessionState.status, sessionCharacterId, disableAutoResume]); // Dependencies carefully selected to avoid infinite loops
   
-  // Poll for session state updates to avoid subscription issues
+  // Subscribe to session store changes directly to avoid polling issues
   useEffect(() => {
     if (!isClient) return;
     
-    // Function to update state from the store
-    const updateStateFromStore = () => {
-      const storeState = useSessionStore.getState();
-      
+    // Subscribe to store changes
+    const unsubscribe = useSessionStore.subscribe((state) => {
       // Only update if there's a meaningful change to avoid unnecessary re-renders
       const shouldUpdate = 
-        storeState.status !== sessionState.status ||
-        storeState.error !== sessionState.error ||
-        storeState.currentSceneId !== sessionState.currentSceneId ||
-        JSON.stringify(storeState.playerChoices) !== JSON.stringify(sessionState.playerChoices);
+        state.status !== sessionState.status ||
+        state.error !== sessionState.error ||
+        state.currentSceneId !== sessionState.currentSceneId ||
+        state.id !== sessionState.id ||
+        JSON.stringify(state.playerChoices) !== JSON.stringify(sessionState.playerChoices);
       
       if (shouldUpdate) {
+        console.log('🔄 SESSION STATE SYNC:', {
+          from: sessionState.status,
+          to: state.status,
+          storeId: state.id,
+          componentId: sessionState.id
+        });
+        
         setSessionState(prev => {
-          const effectiveStatus = storeState.status;
-          
           // Store previous status for focus management
           prevStatusRef.current = prev.status!;
           
           return {
             ...prev,
-            status: effectiveStatus, // Use our effective status
-            error: storeState.error,
-            currentSceneId: storeState.currentSceneId,
-            playerChoices: storeState.playerChoices,
+            id: state.id,
+            status: state.status,
+            error: state.error,
+            currentSceneId: state.currentSceneId,
+            playerChoices: state.playerChoices,
+            worldId: state.worldId,
+            characterId: state.characterId,
           };
         });
       }
-    };
+    });
     
-    // Update immediately
-    updateStateFromStore();
+    // Initial sync to get current state
+    const currentState = useSessionStore.getState();
+    setSessionState(prev => ({
+      ...prev,
+      id: currentState.id,
+      status: currentState.status,
+      error: currentState.error,
+      currentSceneId: currentState.currentSceneId,
+      playerChoices: currentState.playerChoices,
+      worldId: currentState.worldId,
+      characterId: currentState.characterId,
+    }));
     
-    // Then set up polling interval - use a longer interval to reduce console noise
-    const intervalId = setInterval(updateStateFromStore, 5000);
-    
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [isClient, sessionState.currentSceneId, sessionState.error, sessionState.playerChoices, sessionState.status]);
+    return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient]); // Intentionally excluding sessionState to prevent infinite loops
   
   
   // Get saved session for current world/character

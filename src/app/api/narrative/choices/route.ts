@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+
     // Validate API key
     const apiKey = validateAPIKey();
     if (!apiKey) {
@@ -105,6 +106,7 @@ export async function POST(request: NextRequest) {
 
     const content = data.candidates[0].content.parts[0]?.text || '';
     const finishReason = data.candidates[0].finishReason || 'STOP';
+    
     
     // Extract token usage if available
     const promptTokens = data.usageMetadata?.promptTokenCount || undefined;

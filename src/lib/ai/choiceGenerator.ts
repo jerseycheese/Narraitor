@@ -40,6 +40,9 @@ export class ChoiceGenerator {
       const basePrompt = template(context);
       const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
+      // Debug: Log the actual prompt being sent to AI
+      console.log('🔍 FULL PROMPT SENT TO AI:', prompt);
+
       console.log('🔄 CHOICE GENERATOR: Calling AI client for choice generation...');
       const response = await this.aiClient.generateContent(prompt);
       console.log('🎯 CHOICE GENERATOR: AI response received:', {
@@ -85,7 +88,18 @@ export class ChoiceGenerator {
       
       return decision;
     } catch (error) {
-      console.error('Error generating AI choices:', error);
+      console.error('❌ CHOICE GENERATOR ERROR:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        worldId: params.worldId,
+        hasNarrativeContext: !!params.narrativeContext
+      });
+      
+      // Add an alert to make the error visible to the user for debugging
+      if (typeof window !== 'undefined') {
+        console.log('🚨 CHOICE GENERATOR: Falling back to simple choices due to error. Check console for details.');
+      }
+      
       return this.generateFallbackChoices(params.worldId, params.narrativeContext);
     }
   }
@@ -143,9 +157,9 @@ export class ChoiceGenerator {
       }
       
       
-      // Extract the AI-generated context summary
+      // Extract the AI-generated context summary from original content (before cleaning)
       let contextSummary = '';
-      const contextMatch = cleanedContent.match(/Context Summary:?\s*([^\n]+)/i);
+      const contextMatch = content.match(/Context Summary:?\s*([^\n]+)/i);
       if (contextMatch && contextMatch[1]) {
         contextSummary = contextMatch[1].trim();
       }
@@ -302,9 +316,36 @@ export class ChoiceGenerator {
     switch (theme) {
       case 'fantasy':
         options.push(
-          { id: generateUniqueId('option'), text: 'Search for clues', alignment: 'neutral' },
-          { id: generateUniqueId('option'), text: 'Talk to nearby characters', alignment: 'lawful' },
-          { id: generateUniqueId('option'), text: 'Cast a random spell at the sky', alignment: 'chaotic' }
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Search for clues', 
+            alignment: 'neutral',
+            hint: 'Look around carefully for important details'
+          },
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Talk to nearby characters', 
+            alignment: 'lawful',
+            hint: 'Gather information through conversation',
+            requirements: [{
+              type: 'skill',
+              targetId: 'persuasion',
+              operator: 'gte',
+              value: 3
+            }]
+          },
+          { 
+            id: generateUniqueId('option'), 
+            text: 'Cast a spell to illuminate the area', 
+            alignment: 'neutral',
+            hint: 'Use magic to reveal hidden things',
+            requirements: [{
+              type: 'skill',
+              targetId: 'magic',
+              operator: 'gte',
+              value: 4
+            }]
+          }
         );
         break;
       case 'sci-fi':
@@ -390,7 +431,7 @@ export class ChoiceGenerator {
    * Build context for the prompt template
    */
   private buildContext(world: World, narrativeContext: NarrativeContext, characterIds: string[]) {
-    return {
+    const context = {
       worldName: world.name,
       worldDescription: world.description,
       genre: world.theme,
@@ -402,6 +443,16 @@ export class ChoiceGenerator {
         description: skill.description
       })) || []
     };
+
+    // Debug: Log the context being passed to template
+    console.log('🔍 CONTEXT FOR TEMPLATE:', {
+      worldName: context.worldName,
+      hasWorldSkills: context.worldSkills.length > 0,
+      worldSkillsCount: context.worldSkills.length,
+      skillNames: context.worldSkills.map(s => s.name)
+    });
+
+    return context;
   }
 
   /**
@@ -452,11 +503,33 @@ CHOICE GENERATION FOCUS:
 
 
   /**
-   * Create a fallback context summary when AI doesn't provide one
+   * Create a meaningful context summary from the narrative context
    */
   private createFallbackContextSummary(narrativeContext: NarrativeContext): string {
     const location = narrativeContext.currentLocation || 'an unknown location';
-    return `A decision point at ${location}.`;
+    
+    // Try to get the most recent narrative content for context
+    const recentSegments = narrativeContext.recentSegments || narrativeContext.previousSegments || [];
+    if (recentSegments.length > 0) {
+      const latestSegment = recentSegments[recentSegments.length - 1];
+      if (latestSegment && latestSegment.content) {
+        // Extract the first sentence or up to 100 characters for context
+        const firstSentence = latestSegment.content.split('.')[0];
+        const contextText = firstSentence.length > 100 
+          ? firstSentence.substring(0, 100) + '...' 
+          : firstSentence + '.';
+        
+        return contextText;
+      }
+    }
+    
+    // Check if there's a current situation context
+    if (narrativeContext.currentSituation) {
+      return narrativeContext.currentSituation;
+    }
+    
+    // Fallback to location-based context
+    return `You find yourself at ${location}, considering your next move.`;
   }
 
   /**

@@ -86,16 +86,23 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
+    // First priority: Use session ID from session state (from store)
     if (sessionState.id) {
       return sessionState.id;
     }
     
-    // Check if we're resuming a saved session
+    // Second priority: Check if store already has a session ID
+    const currentStoreState = useSessionStore.getState();
+    if (currentStoreState.id && currentStoreState.worldId === worldId) {
+      return currentStoreState.id;
+    }
+    
+    // Third priority: Check if we're resuming a saved session
     if (savedSession) {
       return savedSession.id;
     }
     
-    // Check if there's existing narrative data for this world that we can resume
+    // Fourth priority: Check if there's existing narrative data for this world that we can resume
     const narrativeState = useNarrativeStore.getState();
     const existingSessions = Object.keys(narrativeState.sessionSegments);
     
@@ -115,7 +122,7 @@ const GameSession: React.FC<GameSessionProps> = ({
       }
     }
     
-    // Create a new stable ID if no existing session found
+    // Last resort: Create a new stable ID if no existing session found
     const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
     
     return sessionId;
@@ -207,14 +214,22 @@ const GameSession: React.FC<GameSessionProps> = ({
     };
   }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
   
-  // Clean up on unmount - save session when navigating away
+  // Clean up on unmount - only in production or when actually navigating away
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
     
     return () => {
+      // In development mode with fast refresh, don't end sessions
+      // This prevents the infinite reset loop during hot reloading
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 Development mode: Skipping session cleanup to prevent fast refresh issues');
+        return;
+      }
+      
       // Save the session when component unmounts (navigating away)
       const currentState = useSessionStore.getState();
       if (currentState.status === 'active' && currentState.id) {
+        console.log('🔚 Production mode: Saving session on unmount');
         // Don't reset the session, just save it
         useSessionStore.getState().endSession();
         
@@ -261,6 +276,14 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'initializing') {
+    console.log('🎮 GAME SESSION DEBUG: Status is initializing', {
+      sessionId: sessionState.id,
+      status: sessionState.status,
+      worldId: sessionState.worldId,
+      characterId: sessionState.characterId,
+      hasSavedSession: !!savedSession
+    });
+    
     // Check if there's a saved session to resume
     if (savedSession && !sessionState.id) {
       // Show loading if auto-resuming
@@ -297,11 +320,20 @@ const GameSession: React.FC<GameSessionProps> = ({
       );
     }
     
+    console.log('🎮 GAME SESSION DEBUG: Showing "Session Not Started" screen', {
+      sessionId: sessionState.id,
+      status: sessionState.status,
+      worldCharacterCount: worldCharacters.length
+    });
+    
     return (
       <div data-testid="game-session-initializing" className="p-4">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
           <p className="text-gray-600 mb-4">No active game session.</p>
+          <div className="text-xs text-gray-500 mb-4">
+            Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
+          </div>
           <button 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={startSession}

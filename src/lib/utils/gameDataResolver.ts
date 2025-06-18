@@ -5,7 +5,19 @@ export const resolveSkillData = (
   skillId: EntityID,
   worldSkills: WorldSkill[]
 ): WorldSkill | undefined => {
-  return worldSkills.find(skill => skill.id === skillId);
+  // First try exact ID match
+  let skill = worldSkills.find(skill => skill.id === skillId);
+  
+  // If no exact match, try case-insensitive name match
+  if (!skill) {
+    const normalizedSkillId = skillId.toLowerCase();
+    skill = worldSkills.find(skill => 
+      skill.name.toLowerCase() === normalizedSkillId ||
+      skill.id.toLowerCase() === normalizedSkillId
+    );
+  }
+  
+  return skill;
 };
 
 export const resolveAttributeData = (

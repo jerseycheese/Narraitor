@@ -405,7 +405,7 @@ export class NarrativeGenerator {
         characterIds,
         minOptions: 3,
         maxOptions: 4,
-        useAlignedChoices: true
+        useAlignedChoices: false  // Use enhanced playerChoice template with hints and requirements
       });
       
       
