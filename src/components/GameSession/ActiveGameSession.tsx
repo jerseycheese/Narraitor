@@ -214,7 +214,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
     if (!characterId) return;
     
-    
     // The narrative generator should now handle JSON parsing, but keep fallback for legacy content
     let cleanContent = segment.content;
     let actualLocation = segment.metadata?.location;
@@ -399,15 +398,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
-    console.log('🎯 ACTIVE GAME SESSION: Received choices from NarrativeController:', {
-      hasDecision: !!decision,
-      hasOptions: !!decision?.options,
-      optionCount: decision?.options?.length || 0,
-      decisionId: decision?.id
-    });
     
     if (!decision || !decision.options || decision.options.length === 0) {
-      console.log('❌ ACTIVE GAME SESSION: Invalid decision received, stopping generation');
       setIsGeneratingChoices(false);
       return;
     }
@@ -432,7 +424,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setCurrentDecision(decisionCopy);
     // Stop the choice generation loading state
     setIsGeneratingChoices(false);
-    console.log('✅ ACTIVE GAME SESSION: Successfully set current decision and stopped generating choices');
     
     // Convert AI-generated decision to player choices format for the session
     const playerChoices = decision.options.map(option => ({

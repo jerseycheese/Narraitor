@@ -250,12 +250,6 @@ export const useGameSessionState = ({
         JSON.stringify(state.playerChoices) !== JSON.stringify(sessionState.playerChoices);
       
       if (shouldUpdate) {
-        console.log('🔄 SESSION STATE SYNC:', {
-          from: sessionState.status,
-          to: state.status,
-          storeId: state.id,
-          componentId: sessionState.id
-        });
         
         setSessionState(prev => {
           // Store previous status for focus management

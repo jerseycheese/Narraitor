@@ -276,14 +276,6 @@ const GameSession: React.FC<GameSessionProps> = ({
   }
   
   if (sessionState.status === 'initializing') {
-    console.log('🎮 GAME SESSION DEBUG: Status is initializing', {
-      sessionId: sessionState.id,
-      status: sessionState.status,
-      worldId: sessionState.worldId,
-      characterId: sessionState.characterId,
-      hasSavedSession: !!savedSession
-    });
-    
     // Check if there's a saved session to resume
     if (savedSession && !sessionState.id) {
       // Show loading if auto-resuming
@@ -319,12 +311,6 @@ const GameSession: React.FC<GameSessionProps> = ({
         </div>
       );
     }
-    
-    console.log('🎮 GAME SESSION DEBUG: Showing "Session Not Started" screen', {
-      sessionId: sessionState.id,
-      status: sessionState.status,
-      worldCharacterCount: worldCharacters.length
-    });
     
     return (
       <div data-testid="game-session-initializing" className="p-4">

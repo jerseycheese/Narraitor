@@ -197,13 +197,6 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           const skillData = resolveSkillData(req.targetId, worldSkills);
           const isAvailable = character ? evaluateRequirement(req, character).success : false;
           
-          // Debug: Log skill resolution
-          console.log('🔍 SKILL RESOLUTION DEBUG:', {
-            targetId: req.targetId,
-            foundSkill: skillData,
-            availableSkills: worldSkills.map(s => ({ id: s.id, name: s.name })),
-            requirement: req
-          });
           
           return {
             requirement: req,

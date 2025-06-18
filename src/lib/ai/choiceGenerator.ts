@@ -40,22 +40,11 @@ export class ChoiceGenerator {
       const basePrompt = template(context);
       const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
 
-      // Debug: Log the actual prompt being sent to AI
-      console.log('🔍 FULL PROMPT SENT TO AI:', prompt);
 
-      console.log('🔄 CHOICE GENERATOR: Calling AI client for choice generation...');
       const response = await this.aiClient.generateContent(prompt);
-      console.log('🎯 CHOICE GENERATOR: AI response received:', {
-        hasContent: !!response.content,
-        contentLength: response.content?.length || 0,
-        finishReason: response.finishReason
-      });
       
-      // Debug: Log the actual AI response to see what format it's using
-      console.log('🔍 RAW AI RESPONSE:', response.content);
       
       if (!response.content || response.content.trim() === '') {
-        console.log('⚠️ CHOICE GENERATOR: Empty response, using fallback choices');
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
@@ -79,12 +68,6 @@ export class ChoiceGenerator {
         decision.options = decision.options.slice(0, maxOptions);
       }
       
-      console.log('✅ CHOICE GENERATOR: Decision created successfully:', {
-        id: decision.id,
-        prompt: decision.prompt,
-        optionCount: decision.options.length,
-        decisionWeight: decision.decisionWeight
-      });
       
       return decision;
     } catch (error) {
@@ -97,7 +80,6 @@ export class ChoiceGenerator {
       
       // Add an alert to make the error visible to the user for debugging
       if (typeof window !== 'undefined') {
-        console.log('🚨 CHOICE GENERATOR: Falling back to simple choices due to error. Check console for details.');
       }
       
       return this.generateFallbackChoices(params.worldId, params.narrativeContext);
@@ -186,7 +168,7 @@ export class ChoiceGenerator {
       // Parse the new format with optional Hint and Requirements lines
       // Split into lines and process options with their associated hints/requirements
       const lines = cleanedContent.split('\n');
-      let currentOption: any = null;
+      let currentOption: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }> | null = null;
       
       for (const line of lines) {
         const trimmed = line.trim();
@@ -221,7 +203,7 @@ export class ChoiceGenerator {
             id: generateUniqueId('option'),
             text: text,
             alignment: alignment,
-            hint: null,
+            hint: undefined,
             requirements: []
           };
         }
@@ -242,7 +224,7 @@ export class ChoiceGenerator {
             if (skillMatch) {
               const skillName = skillMatch[1];
               const level = parseInt(skillMatch[2]);
-              currentOption.requirements.push({
+              currentOption.requirements?.push({
                 type: 'skill',
                 targetId: skillName.toLowerCase(),
                 operator: 'gte',
@@ -258,13 +240,6 @@ export class ChoiceGenerator {
         options.push(this.finalizeOption(currentOption));
       }
       
-      // Debug: Log what we parsed
-      console.log('🔍 PARSED OPTIONS:', options.map(opt => ({
-        text: opt.text,
-        hasHint: !!opt.hint,
-        hasRequirements: !!(opt.requirements && opt.requirements.length > 0),
-        alignment: opt.alignment
-      })));
       
       // Create decision object with enhanced context (decisionWeight already extracted above)
       const decision = {
@@ -398,14 +373,9 @@ export class ChoiceGenerator {
     const { worlds } = useWorldStore.getState();
     const world = worlds[worldId];
     
-    console.log('🌍 CHOICE GENERATOR: Looking for world:', {
-      worldId,
-      availableWorlds: Object.keys(worlds),
-      foundWorld: !!world
-    });
     
     if (!world) {
-      console.error('🔄 CHOICE GENERATOR: World not found:', worldId);
+      console.error('World not found:', worldId);
       throw new Error(`World not found: ${worldId}`);
     }
     
@@ -422,7 +392,7 @@ export class ChoiceGenerator {
       const template = narrativeTemplateManager.getTemplate(templateKey);
       return template;
     } catch (error) {
-      console.error('🔄 CHOICE GENERATOR: Template not found:', templateKey, error);
+      console.error('Template not found:', templateKey, error);
       throw error;
     }
   }
@@ -444,13 +414,6 @@ export class ChoiceGenerator {
       })) || []
     };
 
-    // Debug: Log the context being passed to template
-    console.log('🔍 CONTEXT FOR TEMPLATE:', {
-      worldName: context.worldName,
-      hasWorldSkills: context.worldSkills.length > 0,
-      worldSkillsCount: context.worldSkills.length,
-      skillNames: context.worldSkills.map(s => s.name)
-    });
 
     return context;
   }
@@ -461,17 +424,6 @@ export class ChoiceGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    console.log('🎮 TONE SETTINGS DEBUG [ChoiceGenerator]:', {
-      worldId: world.id,
-      worldName: world.name,
-      toneSettings: {
-        contentRating: toneSettings.contentRating,
-        narrativeStyle: toneSettings.narrativeStyle,
-        languageComplexity: toneSettings.languageComplexity,
-        customInstructions: toneSettings.customInstructions || '(none)',
-        usingDefaults: !world.toneSettings
-      }
-    });
     
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
@@ -490,13 +442,6 @@ CHOICE GENERATION FOCUS:
 - Ensure choices are appropriate and align with the tone settings
 - Present options that respect the content boundaries while maintaining agency`;
 
-    console.log('🎯 CHOICE TONE INSTRUCTIONS APPLIED:', {
-      instructionLength: detailedInstructions.length + choiceSpecificGuidance.length,
-      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
-      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
-      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`),
-      hasChoiceSpecificGuidance: true
-    });
 
     return prompt + detailedInstructions + choiceSpecificGuidance;
   }
@@ -535,10 +480,10 @@ CHOICE GENERATION FOCUS:
   /**
    * Finalize an option by cleaning up the structure and adding requirements
    */
-  private finalizeOption(option: any): DecisionOption {
+  private finalizeOption(option: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }>): DecisionOption {
     const finalOption: DecisionOption = {
-      id: option.id,
-      text: option.text,
+      id: option.id || generateUniqueId('option'),
+      text: option.text || 'Unknown option',
       alignment: option.alignment || 'neutral'
     };
 

@@ -39,7 +39,7 @@ export default function DebugChoicesPage() {
           id: 'test-segment',
           content: 'The ancient forest of Fantasy Realm stretched before you, emerald and gold in dappled sunlight. Towering trees rustled with ancient secrets. In the distance, crystalline spires glimmered like jewels.',
           type: 'scene',
-          metadata: { location: 'Enchanted Forest' },
+          metadata: { location: 'Enchanted Forest', mood: 'mysterious', tags: ['fantasy'] },
           sessionId: 'test-session',
           worldId: 'world-1',
           timestamp: new Date(),
@@ -106,7 +106,7 @@ export default function DebugChoicesPage() {
             <div className="mt-2">
               <strong>Options:</strong>
               <ul className="list-disc list-inside ml-4">
-                {result.options.map((option, index) => (
+                {result.options.map((option) => (
                   <li key={option.id}>
                     <strong>[{option.alignment?.toUpperCase()}]</strong> {option.text}
                   </li>

@@ -39,17 +39,6 @@ export class NarrativeGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    console.log('🎨 TONE SETTINGS DEBUG [NarrativeGenerator]:', {
-      worldId: world.id,
-      worldName: world.name,
-      toneSettings: {
-        contentRating: toneSettings.contentRating,
-        narrativeStyle: toneSettings.narrativeStyle,
-        languageComplexity: toneSettings.languageComplexity,
-        customInstructions: toneSettings.customInstructions || '(none)',
-        usingDefaults: !world.toneSettings
-      }
-    });
     
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
@@ -58,12 +47,6 @@ export class NarrativeGenerator {
       toneSettings.customInstructions
     );
 
-    console.log('🎯 TONE INSTRUCTIONS APPLIED:', {
-      instructionLength: detailedInstructions.length,
-      containsContentGuidelines: detailedInstructions.includes(`${toneSettings.contentRating.toUpperCase()}-RATED CONTENT GUIDELINES`),
-      containsStyleGuidance: detailedInstructions.includes(`${toneSettings.narrativeStyle.toUpperCase()} NARRATIVE STYLE`),
-      containsComplexityGuidance: detailedInstructions.includes(`${toneSettings.languageComplexity.toUpperCase()} LANGUAGE COMPLEXITY`)
-    });
 
     return prompt + detailedInstructions;
   }
@@ -249,7 +232,6 @@ export class NarrativeGenerator {
           const contentMatch = jsonStr.match(/"content"\s*:\s*"([\s\S]*?)(?:",|\s*$)/);
           if (contentMatch && contentMatch[1]) {
             actualContent = contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
-            console.log('Extracted content from incomplete JSON:', actualContent.substring(0, 100) + '...');
             // Skip JSON.parse and continue with extracted content
           } else {
             throw new Error('Incomplete JSON without extractable content');
@@ -263,7 +245,6 @@ export class NarrativeGenerator {
           const parsed = JSON.parse(jsonStr);
           if (parsed.content) {
             actualContent = parsed.content;
-            console.log('Successfully extracted content from JSON response:', actualContent.substring(0, 100) + '...');
           }
           if (parsed.metadata) {
             extractedMetadata = {
@@ -272,7 +253,6 @@ export class NarrativeGenerator {
               tags: Array.isArray(parsed.metadata.tags) ? parsed.metadata.tags : [],
               characterIds: Array.isArray(parsed.metadata.characterIds) ? parsed.metadata.characterIds : []
             };
-            console.log('Successfully extracted metadata from JSON response:', extractedMetadata);
           }
         }
       } catch (parseError) {
@@ -289,19 +269,16 @@ export class NarrativeGenerator {
               .replace(/\\"/g, '"')
               .replace(/\\n/g, '\n')
               .replace(/\\\\/g, '\\');
-            console.log('Successfully extracted content via regex (method 1):', actualContent.substring(0, 100) + '...');
           } else {
             // Try alternative extraction: find content field and extract until next JSON field
             const altContentMatch = actualContent.match(/"content"\s*:\s*"([^"]*(?:"[^"]*"[^"]*)*)"/);
             if (altContentMatch && altContentMatch[1]) {
               actualContent = altContentMatch[1];
-              console.log('Successfully extracted content via regex (method 2):', actualContent.substring(0, 100) + '...');
             } else {
               // Final attempt: extract everything between "content": " and the next field pattern
               const finalContentMatch = actualContent.match(/"content"\s*:\s*"(.+?)"\s*,\s*"(?:type|metadata)/);
               if (finalContentMatch && finalContentMatch[1]) {
                 actualContent = finalContentMatch[1];
-                console.log('Successfully extracted content via regex (method 3):', actualContent.substring(0, 100) + '...');
               }
             }
           }
@@ -310,14 +287,12 @@ export class NarrativeGenerator {
           const locationMatch = actualContent.match(/"location"\s*:\s*"((?:[^"\\]|\\.)*)"/);
           if (locationMatch && locationMatch[1]) {
             extractedMetadata.location = locationMatch[1].replace(/\\"/g, '"');
-            console.log('Successfully extracted location via regex:', extractedMetadata.location);
           }
           
           // Try to extract mood
           const moodMatch = actualContent.match(/"mood"\s*:\s*"((?:[^"\\]|\\.)*)"/);
           if (moodMatch && moodMatch[1]) {
             extractedMetadata.mood = this.validateMood(moodMatch[1]);
-            console.log('Successfully extracted mood via regex:', extractedMetadata.mood);
           }
         } catch (regexError) {
           console.warn('Regex extraction also failed:', regexError);

@@ -21,24 +21,18 @@ const mockWorld: World = {
       name: 'Strength',
       description: 'Physical power and muscle',
       worldId: 'world-1',
-      difficulty: 'easy',
       baseValue: 1,
       minValue: 1,
       maxValue: 20,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     },
     {
       id: 'intelligence',
       name: 'Intelligence',
       description: 'Mental acuity and reasoning',
       worldId: 'world-1',
-      difficulty: 'medium',
       baseValue: 1,
       minValue: 1,
       maxValue: 20,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     }
   ],
   skills: [
@@ -47,24 +41,20 @@ const mockWorld: World = {
       name: 'Lockpicking',
       description: 'The art of opening locks without keys',
       worldId: 'world-1',
-      difficulty: 'hard',
+      difficulty: 'medium',
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     },
     {
       id: 'intimidation',
       name: 'Intimidation',
       description: 'Using presence and fear to influence others',
       worldId: 'world-1',
-      difficulty: 'medium',
+      difficulty: 'hard',
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     },
     {
       id: 'stealth',
@@ -75,8 +65,6 @@ const mockWorld: World = {
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     },
     {
       id: 'magic',
@@ -87,20 +75,16 @@ const mockWorld: World = {
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     },
     {
       id: 'persuasion',
       name: 'Persuasion',
       description: 'Convincing others through words and charm',
       worldId: 'world-1',
-      difficulty: 'medium',
+      difficulty: 'easy',
       baseValue: 1,
       minValue: 1,
       maxValue: 10,
-      createdAt: '2023-01-01T10:00:00Z',
-      updatedAt: '2023-01-01T10:00:00Z'
     }
   ],
   settings: {
