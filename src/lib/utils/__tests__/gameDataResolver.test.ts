@@ -84,7 +84,7 @@ describe('gameDataResolver', () => {
     it('should handle undefined skills array', () => {
       // The function will throw an error, so we need to catch it
       expect(() => {
-        resolveSkillData('intimidation', undefined as any);
+        resolveSkillData('intimidation', undefined as unknown as WorldSkill[]);
       }).toThrow();
     });
 

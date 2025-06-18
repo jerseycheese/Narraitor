@@ -251,7 +251,7 @@ describe('requirementEvaluator', () => {
 
     it('should handle unknown requirement types gracefully', () => {
       const requirement: DecisionRequirement = {
-        type: 'unknown' as any,
+        type: 'unknown' as 'skill',
         targetId: 'test',
         operator: 'gte',
         value: 5
