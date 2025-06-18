@@ -1,9 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { detectSkillActions, createSkillRequirement } from '@/lib/utils/actionSkillMapper';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
+import { useTextAnalysis } from '@/lib/hooks/useTextAnalysis';
 import SkillRequirementBadge from '@/components/ui/SkillRequirementBadge';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { DecisionRequirement } from '@/types/narrative.types';
 
+// Local character type definition that matches the actual store structure
+// to avoid type mismatches with the main Character type
 interface Character {
   skills: Array<{
     id: string;
@@ -42,36 +47,49 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   placeholder = "Describe your action...",
   className = ""
 }) => {
-  const [actionText, setActionText] = useState('');
+  // Analyzer function for skill detection
+  const analyzeSkills = useCallback(
+    (text: string): Array<{
+      skillId: string;
+      skillName: string;
+      action: string;
+      success: boolean;
+      current: number;
+      required: number;
+      requirement: DecisionRequirement;
+    }> => {
+      const detectedActions = detectSkillActions(text);
+      
+      return detectedActions.map(mapping => {
+        const requirement = createSkillRequirement(mapping);
+        const evaluation = evaluateRequirement(requirement, character);
+        
+        // Find skill name from character's skills
+        const skill = character.skills.find(s => 
+          s.worldSkillId === mapping.skillId || 
+          s.name.toLowerCase() === mapping.skillId.toLowerCase()
+        );
+        const skillName = skill ? skill.name : mapping.skillId;
+        
+        return {
+          skillId: mapping.skillId,
+          skillName,
+          action: mapping.action,
+          success: evaluation.success,
+          current: evaluation.current,
+          required: evaluation.required as number,
+          requirement
+        };
+      });
+    },
+    [character]
+  );
 
-  // Detect skill actions and evaluate them whenever text changes
-  const skillCheckResults = useMemo(() => {
-    if (!actionText.trim()) return [];
-    
-    const detectedActions = detectSkillActions(actionText);
-    
-    return detectedActions.map(mapping => {
-      const requirement = createSkillRequirement(mapping);
-      const evaluation = evaluateRequirement(requirement, character);
-      
-      // Find skill name from character's skills
-      const skill = character.skills.find(s => 
-        s.worldSkillId === mapping.skillId || 
-        s.name.toLowerCase() === mapping.skillId.toLowerCase()
-      );
-      const skillName = skill ? skill.name : mapping.skillId;
-      
-      return {
-        skillId: mapping.skillId,
-        skillName,
-        action: mapping.action,
-        success: evaluation.success,
-        current: evaluation.current,
-        required: evaluation.required as number,
-        requirement
-      };
-    });
-  }, [actionText, character]);
+  // Use the reusable text analysis hook
+  const { text: actionText, setText: setActionText, results: skillCheckResults, clear } = useTextAnalysis({
+    analyzer: analyzeSkills,
+    analyzerDeps: [character]
+  });
 
   const handleSubmit = () => {
     if (!actionText.trim()) return;
@@ -83,7 +101,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
     };
     
     onActionSubmit(result);
-    setActionText(''); // Clear input after submission
+    clear(); // Clear input and results after submission
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -96,12 +114,12 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   return (
     <div className={`space-y-3 ${className}`}>
       <div className="space-y-2">
-        <textarea
+        <Textarea
           value={actionText}
           onChange={(e) => setActionText(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
-          className="w-full min-h-[80px] p-3 border border-gray-300 rounded-md resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="min-h-[80px] resize-vertical"
           rows={3}
         />
         
