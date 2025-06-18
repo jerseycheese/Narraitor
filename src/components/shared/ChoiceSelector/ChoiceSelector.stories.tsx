@@ -108,4 +108,84 @@ export const AlignedChoices: Story = {
   },
 };
 
+// Decision with skill requirements for testing
+const createSkillRequirementDecision = (): Decision => ({
+  id: 'skill-requirement-decision',
+  prompt: 'A locked chest sits before you, heavy with treasure. How do you proceed?',
+  options: [
+    {
+      id: 'option-lockpick',
+      text: 'Carefully pick the lock',
+      alignment: 'neutral',
+      hint: 'Requires deft fingers and patience',
+      requirements: [{ type: 'skill', targetId: 'lockpicking', operator: 'gte', value: 5 }]
+    },
+    {
+      id: 'option-force',
+      text: 'Smash it open with brute force',
+      alignment: 'chaotic',
+      hint: 'Might damage the contents',
+      requirements: [{ type: 'skill', targetId: 'strength', operator: 'gte', value: 8 }]
+    },
+    {
+      id: 'option-magic',
+      text: 'Use magic to unlock it',
+      alignment: 'neutral',
+      hint: 'A more elegant solution',
+      requirements: [{ type: 'skill', targetId: 'magic', operator: 'gte', value: 6 }]
+    },
+    {
+      id: 'option-search',
+      text: 'Search for a hidden key',
+      alignment: 'lawful',
+      hint: 'Safe but time-consuming'
+      // No requirements - anyone can try this
+    }
+  ],
+  decisionWeight: 'major',
+  contextSummary: 'A treasure chest awaits, but it requires skill to open safely.',
+});
+
+// Mock character for testing
+const createMockCharacter = () => ({
+  id: 'test-char',
+  name: 'Test Character',
+  description: 'A test character',
+  worldId: 'test-world',
+  attributes: [],
+  skills: [
+    { id: 'skill1', characterId: 'test-char', worldSkillId: 'lockpicking', name: 'Lockpicking', level: 7 },
+    { id: 'skill2', characterId: 'test-char', worldSkillId: 'strength', name: 'Strength', level: 4 },
+    { id: 'skill3', characterId: 'test-char', worldSkillId: 'magic', name: 'Magic', level: 9 }
+  ],
+  background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
+  inventory: { characterId: 'test-char', items: [], capacity: 20, categories: [] },
+  status: { health: 100, maxHealth: 100, conditions: [] },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
+
+// Mock world skills
+const createMockWorldSkills = () => [
+  { id: 'lockpicking', name: 'Lockpicking', description: '', worldId: 'test-world', difficulty: 'medium', baseValue: 1, minValue: 1, maxValue: 10 },
+  { id: 'strength', name: 'Strength', description: '', worldId: 'test-world', difficulty: 'easy', baseValue: 1, minValue: 1, maxValue: 10 },
+  { id: 'magic', name: 'Magic', description: '', worldId: 'test-world', difficulty: 'hard', baseValue: 1, minValue: 1, maxValue: 10 }
+];
+
+export const WithSkillRequirements: Story = {
+  args: {
+    decision: createSkillRequirementDecision(),
+    character: createMockCharacter(),
+    worldSkills: createMockWorldSkills(),
+    showHints: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows choices with skill requirements. Green badges indicate the character meets the requirement, gray badges indicate they do not. This character has Lockpicking 7 (✓), Strength 4 (✗), and Magic 9 (✓).',
+      },
+    },
+  },
+};
+
 
