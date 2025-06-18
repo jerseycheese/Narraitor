@@ -3,8 +3,30 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChoiceSelector, { SimpleChoice } from './ChoiceSelector';
 import { Decision } from '@/types/narrative.types';
-import { Character } from '@/types/character.types';
+// Using local character interface to match store structure
 import { WorldSkill } from '@/types/world.types';
+
+// Local character interface matching the store structure
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+  worldId: string;
+  attributes: unknown[];
+  skills: Array<{
+    id: string;
+    characterId: string;
+    worldSkillId?: string;
+    name: string;
+    level: number;
+    category?: string;
+  }>;
+  background: { history: string; personality: string; goals: string[]; fears: string[]; relationships: unknown[] };
+  inventory: { characterId: string; items: unknown[]; capacity: number; categories: string[] };
+  status: { health: number; maxHealth: number; conditions: string[] };
+  createdAt: string;
+  updatedAt: string;
+}
 
 describe('ChoiceSelector', () => {
   const mockOnSelect = jest.fn();
@@ -403,8 +425,8 @@ describe('ChoiceSelector', () => {
       worldId: 'world1',
       attributes: [],
       skills: [
-        { skillId: 'intimidation', level: 6, experience: 100, isActive: true },
-        { skillId: 'stealth', level: 3, experience: 50, isActive: true }
+        { id: 'skill1', characterId: 'char1', worldSkillId: 'intimidation', name: 'Intimidation', level: 6 },
+        { id: 'skill2', characterId: 'char1', worldSkillId: 'stealth', name: 'Stealth', level: 3 }
       ],
       background: { history: '', personality: '', goals: [], fears: [], relationships: [] },
       inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },

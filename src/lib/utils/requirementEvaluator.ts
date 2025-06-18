@@ -1,5 +1,16 @@
 import { DecisionRequirement } from '@/types/narrative.types';
-import { Character } from '@/types/character.types';
+
+// Local character interface matching the store structure
+interface Character {
+  skills: Array<{
+    id: string;
+    characterId: string;
+    worldSkillId?: string;
+    name: string;
+    level: number;
+    category?: string;
+  }>;
+}
 
 export interface RequirementEvaluationResult {
   success: boolean;
@@ -13,7 +24,11 @@ export const evaluateRequirement = (
   character: Character
 ): RequirementEvaluationResult => {
   if (requirement.type === 'skill') {
-    const skill = character.skills.find(s => s.skillId === requirement.targetId);
+    // Try to find skill by worldSkillId first, then by name (case-insensitive)
+    const skill = character.skills.find(s => 
+      s.worldSkillId === requirement.targetId || 
+      s.name.toLowerCase() === requirement.targetId.toLowerCase()
+    );
     const currentLevel = skill ? skill.level : 0;
     const requiredValue = typeof requirement.value === 'number' ? requirement.value : 0;
     

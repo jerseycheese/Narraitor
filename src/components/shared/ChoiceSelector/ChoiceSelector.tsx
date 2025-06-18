@@ -2,11 +2,57 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
-import { Character } from '@/types/character.types';
+// Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
 import SkillRequirementBadge from '@/components/ui/SkillRequirementBadge';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
+
+// Local character type definition that matches the actual store structure
+// to avoid type mismatches with the main Character type
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+  worldId: string;
+  level: number;
+  attributes: Array<{
+    id: string;
+    characterId: string;
+    worldAttributeId?: string;
+    name: string;
+    baseValue: number;
+    modifiedValue: number;
+    category?: string;
+  }>;
+  skills: Array<{
+    id: string;
+    characterId: string;
+    worldSkillId?: string;
+    name: string;
+    level: number;
+    category?: string;
+  }>;
+  background: {
+    history: string;
+    personality: string;
+    goals: string[];
+    fears: string[];
+    relationships: unknown[];
+  };
+  isPlayer: boolean;
+  status: {
+    health: number;
+    maxHealth: number;
+    conditions: string[];
+  };
+  inventory: {
+    characterId: string;
+    items: unknown[];
+    capacity: number;
+    categories: string[];
+  };
+}
 
 // Simple choice interface for backwards compatibility
 export interface SimpleChoice {
