@@ -40,15 +40,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate request
-    const requestData = await validateAIRequest(request);
-    if (!requestData || typeof requestData !== 'object' || !('text' in requestData) || !('availableSkills' in requestData)) {
+    const body = await request.json();
+    if (!body.text || !body.availableSkills || !Array.isArray(body.availableSkills)) {
       return NextResponse.json(
         { error: 'Text and availableSkills are required' },
         { status: 400 }
       );
     }
 
-    const { text, availableSkills } = requestData as SkillDetectionRequest;
+    const { text, availableSkills } = body as SkillDetectionRequest;
 
     // Validate API key
     const apiKey = validateAPIKey();
@@ -139,8 +139,16 @@ Example response format:
     const content = data.candidates[0].content.parts[0]?.text || '';
 
     try {
+      // Clean the AI response - remove markdown code blocks if present
+      let cleanContent = content.trim();
+      if (cleanContent.startsWith('```json')) {
+        cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanContent.startsWith('```')) {
+        cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
       // Parse the AI response as JSON
-      const aiResult = JSON.parse(content);
+      const aiResult = JSON.parse(cleanContent);
       
       // Validate the response structure
       if (!aiResult.detectedSkills || !Array.isArray(aiResult.detectedSkills)) {

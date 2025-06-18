@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { DevToolsProvider, DevToolsPanel } from "@/components/devtools";
-import { DevMockState } from "@/components/devtools/DevMockState";
+import { DevToolsProvider } from "@/components/devtools";
+import { ClientOnlyDevTools } from "@/components/ClientOnlyDevTools";
 import { Navigation } from "@/components/Navigation";
 import { NavigationLoadingProvider } from "@/components/shared/NavigationLoadingProvider";
 import { NavigationPersistenceProvider } from "@/components/shared/NavigationPersistenceProvider";
@@ -22,14 +22,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
             <DevToolsProvider>
-              {/* Only render DevMockState in development */}
-              {process.env.NODE_ENV === 'development' && <DevMockState />}
               <Navigation />
               <div className="min-h-screen pb-12 md:pb-14">
                 {children}
               </div>
-              {/* Only render DevToolsPanel in development */}
-              {process.env.NODE_ENV === 'development' && <DevToolsPanel />}
+              {/* Only render dev tools in development */}
+              {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
             </DevToolsProvider>
           </NavigationPersistenceProvider>
         </NavigationLoadingProvider>
