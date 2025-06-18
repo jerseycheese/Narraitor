@@ -163,58 +163,82 @@ export class ChoiceGenerator {
         prompt = 'What will you do?';
       }
       
-      // Extract options with alignment tags from cleaned content
+      // Extract options with hints and requirements from cleaned content
       const options: DecisionOption[] = [];
       
-      // First, try to match all numbered options and parse alignment if present
-      const numberedMatches = cleanedContent.matchAll(/^\s*\d+\.\s*(.+)$/gm);
-      for (const match of numberedMatches) {
-        if (match[1] && match[1].trim()) {
-          const fullText = match[1].trim();
+      // Parse the new format with optional Hint and Requirements lines
+      // Split into lines and process options with their associated hints/requirements
+      const lines = cleanedContent.split('\n');
+      let currentOption: any = null;
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        
+        // Check for numbered option (e.g., "1. Do something")
+        const optionMatch = trimmed.match(/^(\d+)\.\s*(.+)$/);
+        if (optionMatch) {
+          // Save previous option if exists
+          if (currentOption) {
+            options.push(this.finalizeOption(currentOption));
+          }
           
-          // Check if this option has an alignment tag
-          // Supported alignment tags: [LAWFUL], [NEUTRAL], [CHAOTIC]
-          const alignmentMatch = fullText.match(/^\[([^\]]+)\]\s*(.+)$/);
+          // Start new option
+          const optionText = optionMatch[2].trim();
+          
+          // Check for alignment tag in option text
+          const alignmentMatch = optionText.match(/^\[([^\]]+)\]\s*(.+)$/);
+          let alignment: ChoiceAlignment = 'neutral';
+          let text = optionText;
           
           if (alignmentMatch) {
-            // Has alignment tag
             const alignmentText = alignmentMatch[1].trim().toLowerCase();
-            let alignment: ChoiceAlignment = 'neutral';
-            
             if (alignmentText === 'lawful') {
               alignment = 'lawful';
             } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
               alignment = 'chaotic';
             }
-            
-            options.push({
-              id: generateUniqueId('option'),
-              text: alignmentMatch[2].trim(),
-              alignment
-            });
-          } else {
-            // No alignment tag, default to neutral
-            options.push({
-              id: generateUniqueId('option'),
-              text: fullText,
-              alignment: 'neutral'
-            });
+            text = alignmentMatch[2].trim();
+          }
+          
+          currentOption = {
+            id: generateUniqueId('option'),
+            text: text,
+            alignment: alignment,
+            hint: null,
+            requirements: []
+          };
+        }
+        // Check for Hint line
+        else if (trimmed.match(/^Hint:\s*(.+)$/i)) {
+          const hintMatch = trimmed.match(/^Hint:\s*(.+)$/i);
+          if (currentOption && hintMatch) {
+            currentOption.hint = hintMatch[1].trim();
+          }
+        }
+        // Check for Requirements line
+        else if (trimmed.match(/^Requirements?:\s*(.+)$/i)) {
+          const reqMatch = trimmed.match(/^Requirements?:\s*(.+)$/i);
+          if (currentOption && reqMatch) {
+            const reqText = reqMatch[1].trim();
+            // Parse requirement format: "SkillName X+"
+            const skillMatch = reqText.match(/^(\w+)\s+(\d+)\+?$/);
+            if (skillMatch) {
+              const skillName = skillMatch[1];
+              const level = parseInt(skillMatch[2]);
+              currentOption.requirements.push({
+                type: 'skill',
+                targetId: skillName.toLowerCase(),
+                operator: 'gte',
+                value: level
+              });
+            }
           }
         }
       }
       
-      // If no numbered options found, try bullet points
-      if (options.length === 0) {
-        const bulletMatches = cleanedContent.matchAll(/^\s*[-*]\s*(.+)$/gm);
-        for (const match of bulletMatches) {
-          if (match[1] && match[1].trim()) {
-            options.push({
-              id: generateUniqueId('option'),
-              text: match[1].trim(),
-              alignment: 'neutral'
-            });
-          }
-        }
+      // Don't forget the last option
+      if (currentOption) {
+        options.push(this.finalizeOption(currentOption));
       }
       
       // Create decision object with enhanced context (decisionWeight already extracted above)
@@ -422,5 +446,28 @@ CHOICE GENERATION FOCUS:
   private createFallbackContextSummary(narrativeContext: NarrativeContext): string {
     const location = narrativeContext.currentLocation || 'an unknown location';
     return `A decision point at ${location}.`;
+  }
+
+  /**
+   * Finalize an option by cleaning up the structure and adding requirements
+   */
+  private finalizeOption(option: any): DecisionOption {
+    const finalOption: DecisionOption = {
+      id: option.id,
+      text: option.text,
+      alignment: option.alignment || 'neutral'
+    };
+
+    // Add hint if present
+    if (option.hint && option.hint.trim()) {
+      finalOption.hint = option.hint.trim();
+    }
+
+    // Add requirements if present
+    if (option.requirements && option.requirements.length > 0) {
+      finalOption.requirements = option.requirements;
+    }
+
+    return finalOption;
   }
 }
