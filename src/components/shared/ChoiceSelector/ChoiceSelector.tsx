@@ -374,10 +374,10 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
               <span className="flex-1">{option.text}</span>
             </div>
             {showHints && option.hint && (
-              <div className="text-sm text-gray-500 mt-1 ml-6">{option.hint}</div>
+              <div className="text-sm text-gray-500 mt-1">{option.hint}</div>
             )}
             {option.skillRequirements && option.skillRequirements.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2 ml-6">
+              <div className="flex flex-wrap gap-1 mt-2">
                 {option.skillRequirements.map((skillReq, index) => (
                   <SkillRequirementBadge
                     key={`${option.id}-skill-${index}`}
