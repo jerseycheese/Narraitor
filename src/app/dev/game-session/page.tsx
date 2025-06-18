@@ -264,10 +264,11 @@ export default function GameSessionTestHarness() {
       const sessionState = useSessionStore.getState();
       
       // Only start if no active session exists
-      if (!sessionState.sessionId || sessionState.status !== 'active') {
+      if (!sessionState.id || sessionState.status !== 'active') {
         logger.info('Starting new session');
-        useSessionStore.getState().startSession(mockWorld.id, mockCharacter.id);
-        logger.info('Session started');
+        useSessionStore.getState().initializeSession(mockWorld.id, mockCharacter.id, () => {
+          logger.info('Session started');
+        });
       }
     };
     
