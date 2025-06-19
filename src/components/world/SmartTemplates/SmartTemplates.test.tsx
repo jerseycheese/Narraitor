@@ -1,5 +1,6 @@
 // src/components/world/SmartTemplates/SmartTemplates.test.tsx
 
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SmartTemplates } from './SmartTemplates';
 

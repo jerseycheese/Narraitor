@@ -129,7 +129,7 @@ describe('TemplateGenerator', () => {
 
       await expect(
         templateGenerator.generateWorldTemplate({ type: 'surprise-me' })
-      ).rejects.toThrow('Failed to parse world template');
+      ).rejects.toThrow('Failed to generate world template');
     });
 
     test('handles AI generation failure', async () => {
