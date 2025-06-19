@@ -1,24 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { sessionStore } from '@/state/sessionStore';
 import { worldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
+import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
+import { validators, validateField } from '@/components/shared/wizard/utils/validation';
 
-interface GuidedStep {
-  id: string;
-  label: string;
-}
-
-const GUIDED_STEPS: GuidedStep[] = [
+const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
   { id: 'concept', label: 'World Concept' },
   { id: 'details', label: 'World Details' },
 ];
 
-interface WorldConcept {
+interface OnboardingData {
   name: string;
   theme: string;
   description: string;
@@ -28,46 +25,47 @@ export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const { setOnboardingCompleted, shouldShowOnboarding } = sessionStore();
   const { createWorld, setCurrentWorld } = worldStore();
-  
-  const [currentStep, setCurrentStep] = useState(0);
-  const [worldConcept, setWorldConcept] = useState<WorldConcept>({
-    name: '',
-    theme: '',
-    description: '',
-  });
-  const [isCompleting, setIsCompleting] = useState(false);
 
-  // Don't render if onboarding shouldn't be shown
-  if (!shouldShowOnboarding()) {
-    return null;
-  }
-
-  const handleSkip = () => {
-    setOnboardingCompleted(true);
-    router.push('/worlds');
-  };
-
-  const handleNext = () => {
-    if (currentStep < GUIDED_STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+  // Validation function for wizard steps
+  const validateStep = useCallback((step: number, data: OnboardingData) => {
+    switch (step) {
+      case 0: // Welcome step
+        return { valid: true, errors: [], touched: true };
+      case 1: // Concept step
+        const conceptError = validateField(data.description, [
+          (value) => validators.required(value, 'World concept'),
+        ]);
+        return {
+          valid: !conceptError,
+          errors: conceptError ? [conceptError] : [],
+          touched: true,
+        };
+      case 2: // Details step
+        const nameError = validateField(data.name, [
+          (value) => validators.required(value, 'World name'),
+        ]);
+        const themeError = validateField(data.theme, [
+          (value) => validators.required(value, 'Theme'),
+        ]);
+        const errors = [nameError, themeError].filter(Boolean) as string[];
+        return {
+          valid: errors.length === 0,
+          errors,
+          touched: true,
+        };
+      default:
+        return { valid: true, errors: [], touched: true };
     }
-  };
+  }, []);
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleComplete = async () => {
-    setIsCompleting(true);
-    
+  // Complete onboarding and create world
+  const handleComplete = useCallback(async (data: OnboardingData) => {
     try {
       // Create the world with smart defaults
       const worldId = createWorld({
-        name: worldConcept.name || 'My First World',
-        description: worldConcept.description || 'A world of endless possibilities',
-        theme: worldConcept.theme || 'fantasy',
+        name: data.name || 'My First World',
+        description: data.description || 'A world of endless possibilities',
+        theme: data.theme || 'fantasy',
         attributes: [], // Smart defaults will be applied
         skills: [], // Smart defaults will be applied
         settings: {
@@ -88,12 +86,28 @@ export function GuidedFirstTimeExperience() {
       router.push(`/characters/create?worldId=${worldId}`);
     } catch (error) {
       console.error('Error completing onboarding:', error);
-    } finally {
-      setIsCompleting(false);
+      throw error; // Re-throw to let wizard handle it
     }
-  };
+  }, [createWorld, setCurrentWorld, setOnboardingCompleted, router]);
 
-  const renderWelcomeStep = () => (
+  // Handle skip
+  const handleSkip = useCallback(() => {
+    setOnboardingCompleted(true);
+    router.push('/worlds');
+  }, [setOnboardingCompleted, router]);
+
+  // Initialize wizard state
+  const wizard = useWizardState({
+    steps: GUIDED_STEPS,
+    initialData: { name: '', theme: '', description: '' },
+    onComplete: handleComplete,
+    onCancel: handleSkip,
+    validateStep,
+    persistKey: 'narraitor-onboarding',
+  });
+
+  // Memoized render functions for performance
+  const renderWelcomeStep = useMemo(() => (
     <div className="text-center space-y-6" data-testid="guided-experience-container">
       <div className="max-w-md mx-auto">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -110,9 +124,9 @@ export function GuidedFirstTimeExperience() {
         </div>
       </div>
     </div>
-  );
+  ), []);
 
-  const renderConceptStep = () => (
+  const renderConceptStep = useMemo(() => (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -134,12 +148,15 @@ export function GuidedFirstTimeExperience() {
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="E.g., A magical forest realm, Cyberpunk city, Medieval kingdom..."
-            value={worldConcept.description}
-            onChange={(e) => setWorldConcept(prev => ({ ...prev, description: e.target.value }))}
+            value={wizard.state.data.description}
+            onChange={(e) => wizard.handlers.updateData({ description: e.target.value })}
           />
+          {wizard.stepValidation?.errors.length > 0 && (
+            <p className="text-sm text-red-600 mt-1">{wizard.stepValidation.errors[0]}</p>
+          )}
         </div>
         
-        {worldConcept.description && (
+        {wizard.state.data.description && (
           <div className="bg-green-50 rounded-lg p-3">
             <p className="text-sm text-green-800">
               <strong>AI Suggestions:</strong> Great choice! This concept offers rich storytelling possibilities.
@@ -148,9 +165,9 @@ export function GuidedFirstTimeExperience() {
         )}
       </div>
     </div>
-  );
+  ), [wizard.state.data.description, wizard.stepValidation, wizard.handlers]);
 
-  const renderDetailsStep = () => (
+  const renderDetailsStep = useMemo(() => (
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -171,8 +188,8 @@ export function GuidedFirstTimeExperience() {
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your world's name"
-            value={worldConcept.name}
-            onChange={(e) => setWorldConcept(prev => ({ ...prev, name: e.target.value }))}
+            value={wizard.state.data.name}
+            onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
           />
         </div>
         
@@ -183,8 +200,8 @@ export function GuidedFirstTimeExperience() {
           <select
             id="world-theme"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={worldConcept.theme}
-            onChange={(e) => setWorldConcept(prev => ({ ...prev, theme: e.target.value }))}
+            value={wizard.state.data.theme}
+            onChange={(e) => wizard.handlers.updateData({ theme: e.target.value })}
           >
             <option value="">Select a theme</option>
             <option value="fantasy">Fantasy</option>
@@ -195,82 +212,81 @@ export function GuidedFirstTimeExperience() {
             <option value="cyberpunk">Cyberpunk</option>
           </select>
         </div>
+        
+        {wizard.stepValidation?.errors.length > 0 && (
+          <div className="text-sm text-red-600">
+            {wizard.stepValidation.errors.map((error, index) => (
+              <p key={index}>{error}</p>
+            ))}
+          </div>
+        )}
       </div>
     </div>
-  );
+  ), [wizard.state.data.name, wizard.state.data.theme, wizard.stepValidation, wizard.handlers]);
 
-  const renderCurrentStep = () => {
-    switch (currentStep) {
+  // Render current step
+  const renderCurrentStep = useCallback(() => {
+    switch (wizard.currentStep) {
       case 0:
-        return renderWelcomeStep();
+        return renderWelcomeStep;
       case 1:
-        return renderConceptStep();
+        return renderConceptStep;
       case 2:
-        return renderDetailsStep();
+        return renderDetailsStep;
       default:
-        return renderWelcomeStep();
+        return renderWelcomeStep;
     }
-  };
+  }, [wizard.currentStep, renderWelcomeStep, renderConceptStep, renderDetailsStep]);
 
-  const canProgress = () => {
-    switch (currentStep) {
-      case 0:
-        return true; // Welcome step can always progress
-      case 1:
-        return worldConcept.description.trim().length > 0;
-      case 2:
-        return worldConcept.name.trim().length > 0 && worldConcept.theme.length > 0;
-      default:
-        return false;
-    }
-  };
-
-  const isLastStep = currentStep === GUIDED_STEPS.length - 1;
+  // Don't render if onboarding shouldn't be shown
+  if (!shouldShowOnboarding()) {
+    return null;
+  }
 
   return (
     <WizardContainer title="Get Started with Narraitor">
       <div className="space-y-8">
         <WizardProgress 
           steps={GUIDED_STEPS} 
-          currentStep={currentStep}
+          currentStep={wizard.currentStep}
         />
         
         <div className="text-center text-sm text-gray-500 mb-6">
-          Step {currentStep + 1} of {GUIDED_STEPS.length}
+          Step {wizard.currentStep + 1} of {GUIDED_STEPS.length}
         </div>
         
         {renderCurrentStep()}
         
         <div className="flex justify-between items-center pt-6">
           <button
-            onClick={handleSkip}
+            onClick={wizard.handlers.handleCancel}
             className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
           >
             Skip
           </button>
           
           <div className="flex gap-3">
-            {currentStep > 0 && (
+            {!wizard.isFirstStep && (
               <button
-                onClick={handleBack}
+                onClick={wizard.handlers.handleBack}
                 className="px-4 py-2 border border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-md transition-colors"
               >
                 Back
               </button>
             )}
             
-            {isLastStep ? (
+            {wizard.isLastStep ? (
               <button
-                onClick={handleComplete}
-                disabled={!canProgress() || isCompleting}
+                onClick={wizard.handlers.handleComplete}
+                disabled={!wizard.stepValidation?.valid || wizard.state.isProcessing}
                 className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
-                {isCompleting ? 'Creating World...' : 'Try it now'}
+                {wizard.state.isProcessing ? 'Creating World...' : 'Try it now'}
               </button>
             ) : (
               <button
-                onClick={handleNext}
-                disabled={!canProgress()}
+                onClick={wizard.handlers.handleNext}
+                disabled={!wizard.stepValidation?.valid}
                 className="min-h-12 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
                 Next
@@ -278,6 +294,12 @@ export function GuidedFirstTimeExperience() {
             )}
           </div>
         </div>
+        
+        {wizard.currentError && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-3">
+            <p className="text-sm text-red-600">{wizard.currentError}</p>
+          </div>
+        )}
       </div>
     </WizardContainer>
   );
