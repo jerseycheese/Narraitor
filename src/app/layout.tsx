@@ -9,6 +9,12 @@ import { NavigationPersistenceProvider } from "@/components/shared/NavigationPer
 export const metadata: Metadata = {
   title: "Narraitor",
   description: "A narrative-driven RPG framework using AI",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 interface RootLayoutProps {

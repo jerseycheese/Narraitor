@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
+import { useMobileNavigation } from '@/hooks/useMobileNavigation';
 import { Breadcrumbs } from './Breadcrumbs';
 import { RecentPagesDropdown } from './RecentPagesDropdown';
+import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
+import { Button } from '@/components/ui/button';
 
 /**
  * Navigation - Main application navigation component
@@ -35,6 +38,7 @@ export function Navigation() {
   const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
   const { characters } = useCharacterStore();
   const { navigateWithLoading } = useNavigationLoadingContext();
+  const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
@@ -75,11 +79,33 @@ export function Navigation() {
   
   return (
     <>
-      <nav className="bg-gray-900 text-white shadow-lg">
+      <nav className="bg-gray-900 text-white shadow-lg" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Left side - Main navigation */}
+            {/* Left side - Logo and mobile menu button */}
             <div className="flex items-center space-x-4">
+              {/* Mobile menu button */}
+              {isMobile && (
+                <Button
+                  onClick={toggleMenu}
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden min-h-11 min-w-11 bg-gray-800 hover:bg-gray-700 text-white"
+                  aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={isMenuOpen}
+                >
+                  {isMenuOpen ? (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  )}
+                </Button>
+              )}
+              
               <Link 
                 href="/" 
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -88,7 +114,8 @@ export function Navigation() {
                 <LogoText size="sm" className="text-white" />
               </Link>
               
-              <div className="hidden sm:flex items-center space-x-1 ml-8">
+              {/* Desktop navigation */}
+              <div className="hidden md:flex items-center space-x-1 ml-8" data-testid="desktop-navigation">
                 <Link 
                   href="/worlds" 
                   className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
@@ -108,8 +135,8 @@ export function Navigation() {
               </div>
             </div>
             
-            {/* Right side - Quick actions and current context */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            {/* Right side - Quick actions and current context (hidden on mobile) */}
+            <div className="hidden md:flex items-center gap-2 sm:gap-4">
               {/* Recent Pages Dropdown */}
               <RecentPagesDropdown />
               
@@ -205,31 +232,15 @@ export function Navigation() {
               )}
             </div>
           </div>
-          
-          {/* Mobile menu hint */}
-          <div className="sm:hidden py-2 border-t border-gray-800">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
-                <Link href="/worlds" className="hover:text-gray-300">
-                  Worlds
-                </Link>
-                <Link href="/characters" className="hover:text-gray-300">
-                  Characters
-                </Link>
-              </div>
-              {currentWorld && (
-                <button 
-                  type="button"
-                  onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
-                  className="text-indigo-400 hover:text-indigo-300"
-                >
-                  ▶ Play
-                </button>
-              )}
-            </div>
-          </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Menu */}
+      <MobileNavigationMenu 
+        isOpen={isMenuOpen}
+        onClose={closeMenu}
+        onNavigate={navigateWithLoading}
+      />
       
       {/* Breadcrumbs */}
       {shouldShowBreadcrumbs && (

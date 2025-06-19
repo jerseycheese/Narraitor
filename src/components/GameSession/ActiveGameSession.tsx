@@ -509,12 +509,13 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1">
+          {/* Responsive layout: stacked on small screens, side-by-side on larger screens */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+            <div className="flex-1 min-w-0">
               <CharacterSummary character={character} />
             </div>
             {/* Auto-save indicator */}
-            <div className="ml-4">
+            <div className="flex-shrink-0">
               <SaveIndicator
                 status={autoSave.status}
                 lastSaveTime={autoSave.lastSaveTime}
@@ -523,7 +524,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onManualSave={autoSave.triggerSave}
                 onRetryError={autoSave.retry}
                 retryable={true}
-                compact={false}
+                compact={true}
                 className="text-sm"
               />
             </div>
@@ -608,29 +609,30 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between items-center">
+      {/* Bottom action buttons - responsive layout */}
+      <div className="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         {/* Journal Access Button - Issue #278: AC1 */}
         {character && (
           <button
             data-testid="journal-access-button"
             onClick={() => setShowJournalModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 w-full sm:w-auto"
             aria-label="Open journal to view your adventure entries"
             title="View your journal entries"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            <span>Journal</span>
+            <span className="hidden sm:inline">Journal</span>
           </button>
         )}
 
         {/* Session Control Buttons */}
         {onEnd && (
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               data-testid="game-session-new"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer w-full sm:w-auto"
               onClick={() => {
                 // Save current session and clear narrative
                 useSessionStore.getState().endSession();
@@ -644,7 +646,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </button>
             <button
               data-testid="game-session-end-story"
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer w-full sm:w-auto"
               onClick={handleEndStoryClick}
               disabled={isGeneratingEnding || isSessionEnded(sessionId)}
               title="End your story with an AI-generated epilogue"
@@ -653,7 +655,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </button>
             <button
               data-testid="game-session-end"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer w-full sm:w-auto"
               onClick={onEnd}
             >
               End Session

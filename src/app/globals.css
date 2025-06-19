@@ -265,7 +265,7 @@
   background-color: var(--color-slate-500);
 }
 
-/* Utility layer for custom animations */
+/* Utility layer for custom animations and mobile optimizations */
 @layer utilities {
   @keyframes slide-up {
     from {
@@ -280,5 +280,33 @@
   
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
+  }
+
+  /* Touch-friendly utilities for mobile navigation */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .touch-area {
+    padding: 8px;
+    margin: -8px;
+  }
+  
+  /* Prevent text selection on touch elements */
+  .touch-element {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile-specific scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }
