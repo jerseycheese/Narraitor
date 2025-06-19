@@ -80,19 +80,17 @@ export function ConfirmationDialog({
           'max-w-md sm:rounded-lg',
           variantClasses[variant]
         )}
-        aria-labelledby={title ? "confirmation-title" : undefined}
+        aria-labelledby="confirmation-title"
         aria-describedby="confirmation-message"
       >
-        {title && (
-          <DialogHeader>
-            <DialogTitle
-              id="confirmation-title"
-              className="text-lg font-semibold"
-            >
-              {title}
-            </DialogTitle>
-          </DialogHeader>
-        )}
+        <DialogHeader>
+          <DialogTitle
+            id="confirmation-title"
+            className={title ? "text-lg font-semibold" : "sr-only"}
+          >
+            {title || "Confirmation"}
+          </DialogTitle>
+        </DialogHeader>
         
         <DialogDescription
           id="confirmation-message"

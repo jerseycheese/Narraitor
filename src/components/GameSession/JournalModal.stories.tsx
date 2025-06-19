@@ -10,7 +10,7 @@ const meta: Meta<typeof JournalModal> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Modal component for displaying journal entries during active gameplay sessions. Preserves game state and provides smooth access to journal content.',
+        component: 'Enhanced journal modal with book-like interface for MVP. Provides an elegant reading experience for completed story sessions.',
       },
     },
   },
@@ -40,8 +40,8 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'character_event',
-    title: '', // No title needed - content is sufficient
-    content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy and missing artifacts.',
+    title: '',
+    content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy and missing artifacts. He spoke of dark times ahead and the need for chosen heroes.',
     significance: 'critical',
     isRead: false,
     relatedEntities: [
@@ -53,14 +53,14 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       automaticEntry: true,
       narrativeSegmentId: 'segment-1'
     },
-    updatedAt: '2023-01-01T00:00:00Z'
+    updatedAt: '2023-01-01T10:30:00Z'
   },
   {
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'discovery',
-    title: '', // No title needed
-    content: 'Discovered a concealed entrance behind the waterfall leading into the mountain.',
+    title: '',
+    content: 'Discovered a concealed entrance behind the waterfall leading into the mountain. The passage seems ancient and untouched by time.',
     significance: 'major',
     isRead: false,
     relatedEntities: [
@@ -68,18 +68,18 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       { type: 'location', id: 'passage', name: 'Hidden Passage' }
     ],
     metadata: {
-      tags: ['exploration', 'secret'],
+      tags: ['exploration', 'secret', 'mountain'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-2'
     },
-    updatedAt: '2023-01-01T00:00:00Z'
+    updatedAt: '2023-01-01T14:15:00Z'
   },
   {
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'combat',
-    title: '', // No title needed
-    content: 'Defeated bandits who mentioned working for someone called "The Shadow".',
+    title: '',
+    content: 'Defeated bandits who mentioned working for someone called "The Shadow". They carried strange coins with unknown markings.',
     significance: 'minor',
     isRead: false,
     relatedEntities: [
@@ -87,29 +87,29 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
       { type: 'event', id: 'bandit-fight', name: 'Bandit Ambush' }
     ],
     metadata: {
-      tags: ['combat', 'bandits', 'shadow'],
+      tags: ['combat', 'bandits', 'shadow', 'mystery'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-3'
     },
-    updatedAt: '2023-01-01T00:00:00Z'
+    updatedAt: '2023-01-02T09:45:00Z'
   },
   {
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'relationship_change',
-    title: '', // No title needed
-    content: 'Helped Maya the merchant recover stolen goods and gained her trust.',
+    title: '',
+    content: 'Helped Maya the merchant recover stolen goods and gained her trust. She offered valuable information about trade routes and safe havens.',
     significance: 'minor',
     isRead: false,
     relatedEntities: [
       { type: 'character', id: 'maya', name: 'Maya the Merchant' }
     ],
     metadata: {
-      tags: ['merchant', 'trust', 'trade'],
+      tags: ['merchant', 'trust', 'trade', 'information'],
       automaticEntry: true,
       narrativeSegmentId: 'segment-4'
     },
-    updatedAt: '2023-01-01T00:00:00Z'
+    updatedAt: '2023-01-02T16:20:00Z'
   }
 ];
 
@@ -166,25 +166,26 @@ export const ManyEntries: Story = {
       characterId: 'char-1',
       type: 'achievement',
       title: '',
-      content: 'Completed the first major quest objective.',
+      content: 'Completed the first major quest objective by retrieving the Crystal of Ages from the depths of the Forgotten Temple.',
       significance: 'critical',
       isRead: false,
       relatedEntities: [],
-      metadata: { tags: ['quest', 'achievement'], automaticEntry: true },
-      updatedAt: '2023-01-01T00:00:00Z'
+      metadata: { tags: ['quest', 'achievement', 'crystal', 'temple'], automaticEntry: true },
+      updatedAt: '2023-01-03T12:00:00Z'
     },
     {
       worldId: 'world-1',
       characterId: 'char-1',
       type: 'world_event',
       title: '',
-      content: 'The ancient magic began to stir throughout the land.',
+      content: 'The ancient magic began to stir throughout the land, causing strange phenomena and awakening long-dormant creatures.',
       significance: 'major',
       isRead: false,
       relatedEntities: [],
-      metadata: { tags: ['magic', 'world'], automaticEntry: true },
-      updatedAt: '2023-01-01T00:00:00Z'
+      metadata: { tags: ['magic', 'world', 'awakening'], automaticEntry: true },
+      updatedAt: '2023-01-03T18:30:00Z'
     }
   ], 'session-many')],
 };
+
 

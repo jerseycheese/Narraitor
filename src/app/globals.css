@@ -278,8 +278,21 @@
     }
   }
   
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
   }
 
   /* Touch-friendly utilities for mobile navigation */
