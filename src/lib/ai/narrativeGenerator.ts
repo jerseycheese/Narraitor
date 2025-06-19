@@ -15,12 +15,16 @@ import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { TemplateGenerator, WorldTemplate } from './templateGenerator';
+import { TemplateGenerationContext } from './templatePrompts';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
+  private templateGenerator: TemplateGenerator;
   
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
+    this.templateGenerator = new TemplateGenerator(geminiClient);
   }
 
   /**
@@ -301,5 +305,19 @@ ${toneSettings.customInstructions ? `- Follow these custom instructions: ${toneS
         ]
       };
     }
+  }
+
+  /**
+   * Generate world template using AI
+   */
+  async generateWorldTemplate(context: TemplateGenerationContext): Promise<WorldTemplate> {
+    return this.templateGenerator.generateWorldTemplate(context);
+  }
+
+  /**
+   * Convert template to world format
+   */
+  convertTemplateToWorld(template: WorldTemplate): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
+    return this.templateGenerator.convertTemplateToWorld(template);
   }
 }

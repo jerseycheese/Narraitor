@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { SessionStore } from '../types/game.types';
+import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 
@@ -28,6 +28,7 @@ const initialState = {
     lastPlayed: string;
     narrativeCount: number;
   }>,
+  templateHistory: [] as TemplateHistoryEntry[],
 };
 
 /**
@@ -239,12 +240,33 @@ export const sessionStore = create<SessionStore>()(
       return state;
     });
   },
+
+  // Template history actions
+  addTemplateToHistory: (entry: TemplateHistoryEntry) => {
+    logger.debug('Adding template to history:', entry.template.name);
+    set(state => {
+      const newHistory = [entry, ...state.templateHistory].slice(0, 5); // Keep only last 5
+      return { templateHistory: newHistory };
+    });
+  },
+
+  getTemplateHistory: () => {
+    return get().templateHistory;
+  },
+
+  clearTemplateHistory: () => {
+    logger.debug('Clearing template history');
+    set({ templateHistory: [] });
+  },
 }),
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
   version: 1,
-  // Only persist saved sessions, not active session state
-  partialize: (state) => ({ savedSessions: state.savedSessions }),
+  // Only persist saved sessions and template history, not active session state
+  partialize: (state) => ({ 
+    savedSessions: state.savedSessions,
+    templateHistory: state.templateHistory 
+  }),
 }
 ));

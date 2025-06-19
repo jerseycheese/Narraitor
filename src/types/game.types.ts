@@ -1,4 +1,5 @@
 import { EntityID } from './common.types';
+import { WorldTemplate } from '../lib/ai/templateGenerator';
 
 /**
  * Player choice interface
@@ -33,6 +34,17 @@ export interface SavedSessionInfo {
 }
 
 /**
+ * Template history entry
+ */
+export interface TemplateHistoryEntry {
+  template: WorldTemplate;
+  generatedAt: string;
+  generationType: 'inspired-by' | 'genre-mix' | 'surprise-me';
+  userInput?: string;
+  genres?: string[];
+}
+
+/**
  * Session store interface
  */
 export interface SessionStore {
@@ -45,6 +57,7 @@ export interface SessionStore {
   worldId: EntityID | null;
   characterId: EntityID | null;
   savedSessions: Record<string, SavedSessionInfo>;
+  templateHistory: TemplateHistoryEntry[];
   
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
@@ -63,4 +76,9 @@ export interface SessionStore {
   resumeSavedSession: (sessionId: string) => boolean;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
+  
+  // Template history actions
+  addTemplateToHistory: (entry: TemplateHistoryEntry) => void;
+  getTemplateHistory: () => TemplateHistoryEntry[];
+  clearTemplateHistory: () => void;
 }
