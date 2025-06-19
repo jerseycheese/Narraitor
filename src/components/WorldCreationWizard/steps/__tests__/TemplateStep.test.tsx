@@ -3,6 +3,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import TemplateStep from '../TemplateStep';
 import { templates } from '../../../../lib/templates/worldTemplates';
 import { applyWorldTemplate } from '../../../../lib/templates/templateLoader';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createMockWorldStore } from '../../../../lib/test-utils/mockStore';
 
 // Mock the generateUniqueId function
@@ -49,9 +50,46 @@ jest.mock('../../../world/TemplateSelector', () => {
 // Mock the worldStore
 jest.mock('../../../../state/worldStore', () => {
   return {
-    worldStore: createMockWorldStore()
+    useWorldStore: {
+      getState: jest.fn(() => ({
+        worlds: {},
+        currentWorldId: null,
+        error: null,
+        loading: false,
+        createWorld: jest.fn(),
+        updateWorld: jest.fn(),
+        deleteWorld: jest.fn(),
+        setCurrentWorld: jest.fn(),
+        fetchWorlds: jest.fn(),
+        addAttribute: jest.fn(),
+        updateAttribute: jest.fn(),
+        removeAttribute: jest.fn(),
+        addSkill: jest.fn(),
+        updateSkill: jest.fn(),
+        removeSkill: jest.fn(),
+        updateSettings: jest.fn(),
+        updateToneSettings: jest.fn(),
+        reset: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn(),
+        setLoading: jest.fn()
+      })),
+      subscribe: jest.fn(),
+      setState: jest.fn()
+    }
   };
 });
+
+// Mock SmartTemplates to prevent circular imports
+jest.mock('../../../world/SmartTemplates', () => ({
+  SmartTemplates: ({ onTemplateGenerated }: { onTemplateGenerated: (template: unknown) => void }) => (
+    <div data-testid="smart-templates">
+      <button onClick={() => onTemplateGenerated({ name: 'Test', theme: 'Fantasy', description: 'Test', attributes: [], skills: [], explanation: 'Test' })}>
+        Generate Template
+      </button>
+    </div>
+  )
+}));
 
 describe.skip('TemplateStep', () => {
   const mockOnNext = jest.fn();

@@ -8,7 +8,7 @@ import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { geminiClient } from '@/lib/ai/geminiClient';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -69,7 +69,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       const worldData = narrativeGenerator.convertTemplateToWorld(template);
       
       // Create the world using the world store
-      const worldId = worldStore.getState().createWorld(worldData);
+      const worldId = useWorldStore.getState().createWorld(worldData);
       
       // Mark as not creating own world since we're using a template
       onUpdate({ selectedTemplateId: worldId, createOwnWorld: false });

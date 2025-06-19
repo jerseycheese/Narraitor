@@ -49,7 +49,7 @@ jest.mock('@/components/ui/ErrorDisplay', () => ({
 }));
 
 jest.mock('@/components/shared/GenreSelector', () => ({
-  GenreSelector: ({ selectedGenres, onToggleGenre }: any) => (
+  GenreSelector: ({ selectedGenres, onToggleGenre }: { selectedGenres: string[]; onToggleGenre: (genre: string) => void }) => (
     <div data-testid="genre-selector">
       {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk'].map(genre => (
         <button
