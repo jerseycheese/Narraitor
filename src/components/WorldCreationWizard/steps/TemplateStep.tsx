@@ -2,8 +2,13 @@
 
 import React, { useState } from 'react';
 import TemplateSelector from '../../world/TemplateSelector';
+import { SmartTemplates } from '../../world/SmartTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { WorldTemplate } from '@/lib/ai/templateGenerator';
+import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
+import { geminiClient } from '@/lib/ai/geminiClient';
+import { worldStore } from '@/state/worldStore';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -21,6 +26,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   onCancel,
 }) => {
   const [isApplying, setIsApplying] = useState(false);
+  const [currentMode, setCurrentMode] = useState<'traditional' | 'smart'>('traditional');
   
   // Handler for template selection
   const handleSelectTemplate = (templateId: string) => {
@@ -53,6 +59,31 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     }
   };
   
+  // Handler for AI-generated templates
+  const handleSmartTemplateGenerated = async (template: WorldTemplate) => {
+    try {
+      setIsApplying(true);
+      
+      // Convert template to world format and create it
+      const narrativeGenerator = new NarrativeGenerator(geminiClient);
+      const worldData = narrativeGenerator.convertTemplateToWorld(template);
+      
+      // Create the world using the world store
+      const worldId = worldStore.getState().createWorld(worldData);
+      
+      // Mark as not creating own world since we're using a template
+      onUpdate({ selectedTemplateId: worldId, createOwnWorld: false });
+      
+      // Complete the step
+      onComplete(false);
+      
+    } catch (error) {
+      console.error('Error creating world from template:', error);
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
   // Handler for creating a blank world
   const handleCreateOwnWorld = () => {
     console.log('handleCreateOwnWorld called');
@@ -69,13 +100,48 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     <div data-testid="template-step">
       <WizardFormSection
         title="Getting Started"
-        description="You can choose a template to quickly set up your world, or create your own world from scratch."
+        description="Choose how you'd like to create your world - use existing templates, generate with AI, or start from scratch."
       >
-      
-      <TemplateSelector
-        onSelect={handleSelectTemplate}
-        selectedTemplateId={selectedTemplateId}
-      />
+        
+        {/* Mode Selection */}
+        <div className="mb-6">
+          <div className="flex gap-2 mb-4">
+            <button
+              type="button"
+              onClick={() => setCurrentMode('traditional')}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                currentMode === 'traditional'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              Choose Template
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentMode('smart')}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                currentMode === 'smart'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              AI Generate ✨
+            </button>
+          </div>
+        </div>
+
+        {/* Content based on mode */}
+        {currentMode === 'traditional' ? (
+          <TemplateSelector
+            onSelect={handleSelectTemplate}
+            selectedTemplateId={selectedTemplateId}
+          />
+        ) : (
+          <div className="border rounded-lg p-4">
+            <SmartTemplates onTemplateGenerated={handleSmartTemplateGenerated} />
+          </div>
+        )}
       
       </WizardFormSection>
       
@@ -104,17 +170,19 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
             Create My Own World
           </button>
           
-          <button
-            type="button"
-            onClick={handleApplyTemplate}
-            disabled={!selectedTemplateId || isApplying}
-            className={`${wizardStyles.navigation.primaryButton} ${
-              (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
-            }`}
-            data-testid="next-button"
-          >
-            {isApplying ? 'Applying Template...' : 'Use Selected Template'}
-          </button>
+          {currentMode === 'traditional' && (
+            <button
+              type="button"
+              onClick={handleApplyTemplate}
+              disabled={!selectedTemplateId || isApplying}
+              className={`${wizardStyles.navigation.primaryButton} ${
+                (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
+              }`}
+              data-testid="next-button"
+            >
+              {isApplying ? 'Applying Template...' : 'Use Selected Template'}
+            </button>
+          )}
         </div>
       </div>
     </div>
