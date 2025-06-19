@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuickPlay } from '../QuickPlay';
-import { useSessionStore } from '@/state/useSessionStore';
-import { useWorldStore } from '@/state/useWorldStore';
-import { useCharacterStore } from '@/state/useCharacterStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation

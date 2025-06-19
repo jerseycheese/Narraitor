@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GuidedFirstTimeExperience } from './GuidedFirstTimeExperience';
-import { useSessionStore } from '@/state/useSessionStore';
-import { useWorldStore } from '@/state/useWorldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
