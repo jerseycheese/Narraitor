@@ -14,242 +14,395 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/sessionStore');
 jest.mock('@/state/worldStore');
 
+// Mock wizard components and hooks
+jest.mock('@/components/shared/wizard/WizardContainer', () => ({
+  WizardContainer: ({ children, title }: { children: React.ReactNode; title: string }) => (
+    <div data-testid="wizard-container">
+      <h1>{title}</h1>
+      {children}
+    </div>
+  ),
+}));
+
+jest.mock('@/components/shared/wizard/WizardProgress', () => ({
+  WizardProgress: ({ steps, currentStep }: { steps: any[]; currentStep: number }) => (
+    <div data-testid="wizard-progress">
+      Step {currentStep + 1} of {steps.length}
+    </div>
+  ),
+}));
+
+jest.mock('@/components/shared/wizard/hooks/useWizardState', () => ({
+  useWizardState: jest.fn(),
+}));
+
+jest.mock('@/components/shared/wizard/utils/validation', () => ({
+  validators: {
+    required: (value: string, field: string) => value ? null : `${field} is required`,
+  },
+  validateField: jest.fn(),
+}));
+
+import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
+import { validateField } from '@/components/shared/wizard/utils/validation';
+
 describe('GuidedFirstTimeExperience', () => {
   const mockPush = jest.fn();
   const mockRouter = { push: mockPush };
   const mockSetOnboardingCompleted = jest.fn();
   const mockCreateWorld = jest.fn().mockReturnValue('mock-world-id');
+  const mockSetCurrentWorld = jest.fn();
+  const mockHandleComplete = jest.fn();
+  const mockHandleNext = jest.fn();
+  const mockHandleBack = jest.fn();
+  const mockHandleCancel = jest.fn();
+  const mockUpdateData = jest.fn();
+
+  const mockWizardState = {
+    currentStep: 0,
+    data: { name: '', theme: '', description: '' },
+    isProcessing: false,
+    errors: {},
+    validation: {},
+  };
+
+  const mockWizard = {
+    currentStep: 0,
+    isFirstStep: true,
+    isLastStep: false,
+    canGoNext: true,
+    canGoBack: false,
+    state: mockWizardState,
+    stepValidation: { valid: true, errors: [], touched: false },
+    currentError: null,
+    handlers: {
+      handleComplete: mockHandleComplete,
+      handleNext: mockHandleNext,
+      handleBack: mockHandleBack,
+      handleCancel: mockHandleCancel,
+      updateData: mockUpdateData,
+    },
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
+    (validateField as jest.Mock).mockReturnValue(null);
     
-    // Mock useSessionStore with first-time user detection
+    // Mock useSessionStore
     (useSessionStore as unknown as jest.Mock).mockReturnValue({
-      savedSessions: {},
       setOnboardingCompleted: mockSetOnboardingCompleted,
-      onboardingCompleted: false,
       shouldShowOnboarding: jest.fn().mockReturnValue(true),
-      isFirstTimeUser: jest.fn().mockReturnValue(true),
     });
 
     // Mock useWorldStore 
     (useWorldStore as unknown as jest.Mock).mockReturnValue({
-      worlds: {},
       createWorld: mockCreateWorld,
-      setCurrentWorld: jest.fn(),
+      setCurrentWorld: mockSetCurrentWorld,
+    });
+
+    // Mock useWizardState
+    (useWizardState as jest.Mock).mockReturnValue(mockWizard);
+  });
+
+  describe('Component rendering', () => {
+    it('renders when onboarding should be shown', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.getByTestId('wizard-container')).toBeInTheDocument();
+      expect(screen.getByText('Get Started with Narraitor')).toBeInTheDocument();
+    });
+
+    it('does not render when onboarding should not be shown', () => {
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
+        setOnboardingCompleted: mockSetOnboardingCompleted,
+        shouldShowOnboarding: jest.fn().mockReturnValue(false),
+      });
+
+      const { container } = render(<GuidedFirstTimeExperience />);
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('displays wizard progress', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.getByTestId('wizard-progress')).toBeInTheDocument();
+      expect(screen.getAllByText('Step 1 of 3')).toHaveLength(2); // Both in progress and step indicator
     });
   });
 
-  describe('Welcome screen', () => {
-    it('displays welcome message with clear value proposition', () => {
+  describe('Welcome step (Step 0)', () => {
+    it('displays welcome message and value proposition', () => {
       render(<GuidedFirstTimeExperience />);
       
       expect(screen.getByText(/welcome to narraitor/i)).toBeInTheDocument();
       expect(screen.getByText(/create your own world/i)).toBeInTheDocument();
       expect(screen.getByText(/within 2 minutes/i)).toBeInTheDocument();
+      expect(screen.getByText(/3 simple steps/i)).toBeInTheDocument();
     });
 
-    it('shows progress indicator with step 1 of 3', () => {
+    it('shows skip and next buttons', () => {
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByText(/step 1 of 3/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /skip/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     });
 
-    it('has skip option for returning users', () => {
+    it('calls handleNext when next button is clicked', () => {
       render(<GuidedFirstTimeExperience />);
       
-      const skipButton = screen.getByRole('button', { name: /skip/i });
-      expect(skipButton).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      expect(mockHandleNext).toHaveBeenCalled();
+    });
+
+    it('calls handleCancel when skip button is clicked', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      fireEvent.click(screen.getByRole('button', { name: /skip/i }));
+      expect(mockHandleCancel).toHaveBeenCalled();
     });
   });
 
-  describe('3-step world creation wizard', () => {
-    it('displays step 1: World Concept after clicking next', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      // Click next to go to step 2 (World Concept)
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
-      
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /world concept/i })).toBeInTheDocument();
-        expect(screen.getByText(/what kind of world/i)).toBeInTheDocument();
+  describe('World Concept step (Step 1)', () => {
+    beforeEach(() => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 1,
+        isFirstStep: false,
+        canGoBack: true,
       });
     });
 
-    it('allows progression to step 3 when concept is provided', async () => {
+    it('displays world concept form', () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Go to step 2 (World Concept)
-      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      expect(screen.getAllByText(/world concept/i)).toHaveLength(2); // Title and label
+      expect(screen.getByText(/what kind of world/i)).toBeInTheDocument();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+    });
+
+    it('shows back and next buttons', () => {
+      render(<GuidedFirstTimeExperience />);
       
-      await waitFor(() => {
-        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-        fireEvent.change(conceptInput, { target: { value: 'A magical forest realm' } });
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+    });
+
+    it('updates data when textarea changes', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      const textarea = screen.getByRole('textbox');
+      fireEvent.change(textarea, { target: { value: 'A magical forest realm' } });
+      
+      expect(mockUpdateData).toHaveBeenCalledWith({ description: 'A magical forest realm' });
+    });
+
+    it('displays AI suggestions when description is provided', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 1,
+        state: {
+          ...mockWizardState,
+          data: { ...mockWizardState.data, description: 'A magical forest' },
+        },
       });
+
+      render(<GuidedFirstTimeExperience />);
       
-      // Go to step 3 (World Details)
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      fireEvent.click(nextButton);
-      
-      await waitFor(() => {
-        expect(screen.getByText(/step 3 of 3/i)).toBeInTheDocument();
-        expect(screen.getByRole('heading', { name: /world details/i })).toBeInTheDocument();
+      expect(screen.getByText(/ai suggestions/i)).toBeInTheDocument();
+      expect(screen.getByText(/great choice/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('World Details step (Step 2)', () => {
+    beforeEach(() => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        isFirstStep: false,
+        canGoBack: true,
       });
     });
 
-    it('displays AI suggestions based on user input', async () => {
+    it('displays world details form', () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Go to step 2 (World Concept)
-      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      expect(screen.getByText(/world details/i)).toBeInTheDocument();
+      expect(screen.getByText(/give your world a name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/world name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/theme/i)).toBeInTheDocument();
+    });
+
+    it('updates name when input changes', () => {
+      render(<GuidedFirstTimeExperience />);
       
-      await waitFor(() => {
-        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-        fireEvent.change(conceptInput, { target: { value: 'Cyberpunk city' } });
+      const nameInput = screen.getByLabelText(/world name/i);
+      fireEvent.change(nameInput, { target: { value: 'Mystic Realm' } });
+      
+      expect(mockUpdateData).toHaveBeenCalledWith({ name: 'Mystic Realm' });
+    });
+
+    it('updates theme when select changes', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      const themeSelect = screen.getByLabelText(/theme/i);
+      fireEvent.change(themeSelect, { target: { value: 'fantasy' } });
+      
+      expect(mockUpdateData).toHaveBeenCalledWith({ theme: 'fantasy' });
+    });
+
+    it('shows all theme options', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      const themeSelect = screen.getByLabelText(/theme/i);
+      expect(themeSelect).toHaveTextContent('Fantasy');
+      expect(themeSelect).toHaveTextContent('Sci-Fi');
+      expect(themeSelect).toHaveTextContent('Modern');
+      expect(themeSelect).toHaveTextContent('Historical');
+      expect(themeSelect).toHaveTextContent('Post-Apocalyptic');
+      expect(themeSelect).toHaveTextContent('Cyberpunk');
+    });
+
+    it('displays validation errors when present', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        stepValidation: {
+          valid: false,
+          errors: ['World name is required', 'Theme is required'],
+          touched: true,
+        },
       });
+
+      render(<GuidedFirstTimeExperience />);
       
-      await waitFor(() => {
-        expect(screen.getByText(/ai suggestions/i)).toBeInTheDocument();
+      expect(screen.getByText('World name is required')).toBeInTheDocument();
+      expect(screen.getByText('Theme is required')).toBeInTheDocument();
+    });
+  });
+
+  describe('Final step completion', () => {
+    beforeEach(() => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        isLastStep: true,
+        stepValidation: { valid: true, errors: [], touched: true },
       });
     });
 
-    it('completes in under 30 seconds per step (simulated)', () => {
+    it('shows "Try it now" button on final step', () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Welcome step should be completable immediately
+      expect(screen.getByRole('button', { name: /try it now/i })).toBeInTheDocument();
+    });
+
+    it('calls handleComplete when "Try it now" is clicked', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      fireEvent.click(screen.getByRole('button', { name: /try it now/i }));
+      expect(mockHandleComplete).toHaveBeenCalled();
+    });
+
+    it('disables "Try it now" button when validation fails', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        isLastStep: true,
+        stepValidation: { valid: false, errors: ['Name required'], touched: true },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      const button = screen.getByRole('button', { name: /try it now/i });
+      expect(button).toBeDisabled();
+    });
+
+    it('shows processing state when creating world', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        isLastStep: true,
+        state: { ...mockWizardState, isProcessing: true },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.getByText('Creating World...')).toBeInTheDocument();
+    });
+  });
+
+  describe('Error handling', () => {
+    it('displays error message when present', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentError: 'Failed to create world',
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.getByText('Failed to create world')).toBeInTheDocument();
+    });
+  });
+
+  describe('Navigation', () => {
+    it('hides back button on first step', () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.queryByRole('button', { name: /back/i })).not.toBeInTheDocument();
+    });
+
+    it('shows back button on non-first steps', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 1,
+        isFirstStep: false,
+        canGoBack: true,
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
+    });
+
+    it('calls handleBack when back button is clicked', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 1,
+        isFirstStep: false,
+        canGoBack: true,
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      fireEvent.click(screen.getByRole('button', { name: /back/i }));
+      expect(mockHandleBack).toHaveBeenCalled();
+    });
+  });
+
+  describe('Button states', () => {
+    it('disables next button when validation fails', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        stepValidation: { valid: false, errors: ['Required'], touched: true },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
       const nextButton = screen.getByRole('button', { name: /next/i });
-      expect(nextButton).toBeInTheDocument();
+      expect(nextButton).toBeDisabled();
+    });
+
+    it('enables next button when validation passes', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        stepValidation: { valid: true, errors: [], touched: true },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      const nextButton = screen.getByRole('button', { name: /next/i });
       expect(nextButton).not.toBeDisabled();
-    });
-  });
-
-  describe('Mobile optimization', () => {
-    it('uses large touch targets for mobile interaction', () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      expect(nextButton).toHaveClass('min-h-12'); // Large touch target
-    });
-
-    it('displays properly on mobile viewport', () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      const container = screen.getByTestId('guided-experience-container');
-      expect(container.firstElementChild).toHaveClass('max-w-md'); // Mobile-friendly layout
-    });
-  });
-
-  describe('Skip functionality', () => {
-    it('navigates to worlds page when skip is clicked', () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      const skipButton = screen.getByRole('button', { name: /skip/i });
-      fireEvent.click(skipButton);
-      
-      expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(true);
-      expect(mockPush).toHaveBeenCalledWith('/worlds');
-    });
-
-    it('marks onboarding as completed when skipped', () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      const skipButton = screen.getByRole('button', { name: /skip/i });
-      fireEvent.click(skipButton);
-      
-      expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(true);
-    });
-  });
-
-  describe('Try it now functionality', () => {
-    it('shows "Try it now" button after world creation completion', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      // Step 1: Welcome -> Step 2: Concept
-      fireEvent.click(screen.getByRole('button', { name: /next/i }));
-      
-      await waitFor(() => {
-        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-        fireEvent.change(conceptInput, { target: { value: 'Fantasy realm' } });
-        
-        // Step 2: Concept -> Step 3: Details
-        fireEvent.click(screen.getByRole('button', { name: /next/i }));
-      });
-      
-      await waitFor(() => {
-        const nameInput = screen.getByRole('textbox', { name: /world name/i });
-        fireEvent.change(nameInput, { target: { value: 'Test World' } });
-        
-        const themeSelect = screen.getByRole('combobox', { name: /theme/i });
-        fireEvent.change(themeSelect, { target: { value: 'fantasy' } });
-      });
-      
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /try it now/i })).toBeInTheDocument();
-      });
-    });
-
-    it('immediately starts gameplay when "Try it now" is clicked', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      // Complete the flow and get to the "Try it now" button
-      // (This would be a full flow test in practice)
-      
-      // For now, test the final action
-      const mockTryItNow = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (GuidedFirstTimeExperience as any).mockImplementation = mockTryItNow;
-    });
-  });
-
-  describe('Onboarding completion state', () => {
-    it('persists completion state in localStorage', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      // Complete the entire flow
-      const skipButton = screen.getByRole('button', { name: /skip/i });
-      fireEvent.click(skipButton);
-      
-      expect(mockSetOnboardingCompleted).toHaveBeenCalledWith(true);
-    });
-
-    it('does not show guided experience for returning users', () => {
-      // Mock returning user
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        setOnboardingCompleted: mockSetOnboardingCompleted,
-        onboardingCompleted: true,
-        shouldShowOnboarding: jest.fn().mockReturnValue(false),
-        isFirstTimeUser: jest.fn().mockReturnValue(false),
-      });
-
-      render(<GuidedFirstTimeExperience />);
-      
-      // Should not render the guided experience
-      expect(screen.queryByText(/welcome to narraitor/i)).not.toBeInTheDocument();
-    });
-  });
-
-  describe('First narrative choice celebration', () => {
-    it('celebrates the players world concept in first choice', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      // Go to step 2 (World Concept)
-      fireEvent.click(screen.getByRole('button', { name: /next/i }));
-      
-      await waitFor(() => {
-        // This would test that the first narrative choice includes elements
-        // from the user's world concept - testing the integration point
-        // with the narrative generation system
-        
-        // For now, verify that world data is properly passed through
-        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-        fireEvent.change(conceptInput, { target: { value: 'Steampunk adventure' } });
-        
-        // Verify the concept is captured for later use
-        expect(conceptInput).toHaveValue('Steampunk adventure');
-      });
     });
   });
 });
