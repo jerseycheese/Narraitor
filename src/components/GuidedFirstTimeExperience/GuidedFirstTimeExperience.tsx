@@ -6,7 +6,6 @@ import { sessionStore } from '@/state/sessionStore';
 import { worldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
-import { WizardNavigation } from '@/components/shared/wizard/WizardNavigation';
 
 interface GuidedStep {
   id: string;
@@ -68,9 +67,15 @@ export function GuidedFirstTimeExperience() {
       const worldId = createWorld({
         name: worldConcept.name || 'My First World',
         description: worldConcept.description || 'A world of endless possibilities',
-        theme: (worldConcept.theme as any) || 'fantasy',
+        theme: worldConcept.theme || 'fantasy',
         attributes: [], // Smart defaults will be applied
         skills: [], // Smart defaults will be applied
+        settings: {
+          maxAttributes: 6,
+          maxSkills: 8,
+          attributePointPool: 27,
+          skillPointPool: 40,
+        },
       });
 
       // Set as current world
@@ -99,7 +104,7 @@ export function GuidedFirstTimeExperience() {
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            We'll guide you through creating your first world in just 3 simple steps. 
+            We&apos;ll guide you through creating your first world in just 3 simple steps. 
             Each step takes less than 30 seconds to complete.
           </p>
         </div>
