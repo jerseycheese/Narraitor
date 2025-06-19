@@ -1,9 +1,25 @@
-import { NarrativeSegment } from '@/types/narrative.types';
+import { NarrativeSegment, EndingGenerationRequest } from '@/types/narrative.types';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
+import { JournalEntry } from '@/types/journal.types';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useJournalStore } from '@/state/journalStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 interface PrioritizedElement {
   type: string;
   content: string;
   priority: number;
+}
+
+export interface EndingContext {
+  world: World;
+  character: Character;
+  narrativeSegments: NarrativeSegment[];
+  journalEntries?: JournalEntry[];
+  sessionStartTime?: Date;
 }
 
 export class NarrativeContextManager {
@@ -81,4 +97,43 @@ export class NarrativeContextManager {
   clear(): void {
     this.segments = [];
   }
+
+  async buildEndingContext(request: EndingGenerationRequest): Promise<EndingContext> {
+    // Get world
+    const world = useWorldStore.getState().worlds[request.worldId];
+    if (!world) {
+      throw new Error(`World not found: ${request.worldId}`);
+    }
+
+    // Get character
+    const character = useCharacterStore.getState().characters[request.characterId];
+    if (!character) {
+      throw new Error(`Character not found: ${request.characterId}`);
+    }
+
+    // Get narrative segments for the session
+    const narrativeSegments = Object.values(useNarrativeStore.getState().segments)
+      .filter(segment => segment.sessionId === request.sessionId)
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    // Get journal entries if available
+    const journalEntries = useJournalStore.getState().entries
+      ? Object.values(useJournalStore.getState().entries).filter(entry => entry.sessionId === request.sessionId)
+      : undefined;
+
+    // Get session start time
+    const session = useSessionStore.getState().savedSessions[request.sessionId];
+    const sessionStartTime = session?.lastPlayed ? new Date(session.lastPlayed) : undefined;
+
+    return {
+      world,
+      character: character as unknown as Character,
+      narrativeSegments,
+      journalEntries,
+      sessionStartTime
+    };
+  }
 }
+
+// Export singleton instance
+export const contextManager = new NarrativeContextManager();

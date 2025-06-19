@@ -6,23 +6,21 @@ import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 export default function ChoiceAlignmentTestPage() {
   const [decision, setDecision] = useState<Decision | null>(null);
   const [loading, setLoading] = useState(false);
-  const [useAligned, setUseAligned] = useState(true);
   const [scenario, setScenario] = useState<'bandits' | 'merchant' | 'dragon'>('bandits');
   const [error, setError] = useState<string | null>(null);
+  const [worldId, setWorldId] = useState<string | null>(null);
 
   const choiceGenerator = new ChoiceGenerator(createDefaultGeminiClient());
-  const testWorldId = 'test-world-id';
 
   // Create a test world when component mounts
   useEffect(() => {
-    const existingWorld = worldStore.getState().worlds[testWorldId];
-    if (!existingWorld) {
-      worldStore.getState().createWorld({
+    try {
+      const newWorldId = useWorldStore.getState().createWorld({
         name: 'Test World',
         description: 'A fantasy world for testing choice alignment',
         theme: 'fantasy',
@@ -35,6 +33,19 @@ export default function ChoiceAlignmentTestPage() {
           skillPointPool: 100
         }
       });
+      
+      // Verify the world was created and stored
+      const storedWorld = useWorldStore.getState().worlds[newWorldId];
+      if (storedWorld) {
+        setWorldId(newWorldId);
+        console.log('Created test world with ID:', newWorldId, storedWorld);
+      } else {
+        console.error('World was not stored properly');
+        setError('Failed to create test world');
+      }
+    } catch (err) {
+      console.error('Error creating world:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create world');
     }
   }, []);
 
@@ -42,27 +53,40 @@ export default function ChoiceAlignmentTestPage() {
     bandits: {
       location: 'Forest Path',
       situation: 'A group of bandits blocks your path',
-      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, demanding you pay a toll to pass.'
+      context: 'You are traveling through a dark forest when a group of armed bandits steps out from behind the trees, weapons drawn, demanding you pay a toll to pass. Their leader, a scarred man with a wicked grin, counts your coin purse with greedy eyes while his companions block all escape routes.'
     },
     merchant: {
       location: 'Town Market',
       situation: 'A suspicious merchant offers a deal',
-      context: 'A hooded merchant approaches you in the market with an ornate artifact, offering to sell it for much less than it appears to be worth.'
+      context: 'A hooded merchant approaches you in the bustling market square with an ornate, glowing artifact. The item pulses with magical energy, yet he offers to sell it for mere copper coins - far less than it appears to be worth. Other merchants nearby whisper nervously and avoid eye contact.'
     },
     dragon: {
       location: 'Mountain Cave',
       situation: 'A dragon guards its treasure',
-      context: 'You have found the legendary dragon\'s lair. The massive creature sits atop a pile of gold, watching you with intelligent, ancient eyes.'
+      context: 'You have found the legendary dragon\'s lair deep within the mountain. The massive ancient red dragon sits atop an enormous pile of gold and jewels, its intelligent amber eyes following your every movement. Smoke curls from its nostrils as it speaks in a voice like rolling thunder, offering you a riddle for safe passage.'
     }
   };
 
   const generateChoices = async () => {
+    if (!worldId) {
+      setError('World not yet created. Please wait a moment and try again.');
+      return;
+    }
+    
+    // Double-check that the world still exists
+    const currentWorld = useWorldStore.getState().worlds[worldId];
+    if (!currentWorld) {
+      setError(`World ${worldId} no longer exists. This may be a persistence issue.`);
+      console.error('Available worlds:', Object.keys(useWorldStore.getState().worlds));
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     
     try {
       const mockNarrativeContext: NarrativeContext = {
-        worldId: 'test-world',
+        worldId: worldId,
         currentSceneId: generateUniqueId('scene'),
         characterIds: [generateUniqueId('character')],
         previousSegments: [{
@@ -84,10 +108,10 @@ export default function ChoiceAlignmentTestPage() {
       };
 
       const result = await choiceGenerator.generateChoices({
-        worldId: testWorldId,
+        worldId: worldId,
         narrativeContext: mockNarrativeContext,
         characterIds: [generateUniqueId('character')],
-        useAlignedChoices: useAligned
+        useAlignedChoices: true
       });
 
       setDecision(result);
@@ -126,7 +150,7 @@ export default function ChoiceAlignmentTestPage() {
           <div className="bg-gray-100 rounded-lg p-4 mb-6">
             <h2 className="text-lg font-semibold mb-4">Test Controls</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Scenario
@@ -142,26 +166,13 @@ export default function ChoiceAlignmentTestPage() {
                 </select>
               </div>
               
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="use-aligned"
-                  checked={useAligned}
-                  onChange={(e) => setUseAligned(e.target.checked)}
-                  className="mr-2"
-                />
-                <label htmlFor="use-aligned" className="text-sm font-medium text-gray-700">
-                  Use Aligned Choices
-                </label>
-              </div>
-              
               <div className="flex items-end">
                 <button
                   onClick={generateChoices}
-                  disabled={loading}
+                  disabled={loading || !worldId}
                   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {loading ? 'Generating...' : 'Generate Choices'}
+                  {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Aligned Choices'}
                 </button>
               </div>
             </div>
@@ -225,11 +236,11 @@ export default function ChoiceAlignmentTestPage() {
               <div className="mt-6 bg-gray-100 rounded-lg p-4">
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">Debug Information:</h3>
                 <div className="text-xs text-gray-700 space-y-1">
-                  <p><strong>Template Used:</strong> {useAligned ? 'Aligned Choice Template' : 'Regular Choice Template'}</p>
+                  <p><strong>Template Used:</strong> Aligned Choice Template</p>
                   <p><strong>Options Count:</strong> {decision.options.length}</p>
                   <p><strong>Alignment Distribution:</strong></p>
                   <ul className="ml-4 space-y-1">
-                    {['lawful', 'neutral', 'chaos'].map(alignment => {
+                    {['lawful', 'neutral', 'chaotic'].map(alignment => {
                       const count = decision.options.filter(opt => opt.alignment === alignment).length;
                       return (
                         <li key={alignment}>
@@ -256,9 +267,10 @@ export default function ChoiceAlignmentTestPage() {
           <div className="mt-8 bg-amber-50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-amber-800 mb-2">Testing Instructions</h3>
             <ul className="text-sm text-amber-700 space-y-1">
-              <li>• Toggle &quot;Use Aligned Choices&quot; to see the difference between aligned and regular templates</li>
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>
+              <li>• <strong>CHAOS VERIFICATION:</strong> Red choices should be wildly unexpected, dramatic, and could completely change the situation</li>
+              <li>• Test that chaotic options ignore social norms and offer creative/disruptive solutions</li>
               <li>• Test the custom input feature alongside aligned choices</li>
               <li>• Check the debug information to verify alignment distribution</li>
             </ul>

@@ -1,5 +1,8 @@
 import React from 'react';
 import { World } from '@/types/world.types';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface WorldBasicInfoFormProps {
   world: World;
@@ -12,42 +15,39 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
       <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
       
       <div className="space-y-4">
-        <div>
-          <label htmlFor="worldName" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="worldName">
             Name
-          </label>
-          <input
+          </Label>
+          <Input
             id="worldName"
             type="text"
             value={world.name}
             onChange={(e) => onChange({ name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
           />
         </div>
         
-        <div>
-          <label htmlFor="worldDescription" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="worldDescription">
             Description
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             id="worldDescription"
             value={world.description}
             onChange={(e) => onChange({ description: e.target.value })}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
           />
         </div>
         
-        <div>
-          <label htmlFor="worldTheme" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="worldTheme">
             Theme
-          </label>
-          <input
+          </Label>
+          <Input
             id="worldTheme"
             type="text"
             value={world.theme}
             onChange={(e) => onChange({ theme: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded"
           />
         </div>
       </div>

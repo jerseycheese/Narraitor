@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation Prompt Engineering"
+type: guide
+category: ai
+tags: [portrait, prompt-engineering, ai, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation Prompt Engineering
 
 This document details how the portrait generation system constructs prompts for optimal results with Google Gemini's image generation capabilities.

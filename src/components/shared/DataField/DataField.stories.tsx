@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { DataField } from './DataField';
 
 const meta: Meta<typeof DataField> = {
-  title: 'Narraitor/Shared/DataField',
+  title: 'Narraitor/UI/Controls/DataField',
   component: DataField,
   parameters: {
     layout: 'padded',

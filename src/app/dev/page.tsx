@@ -6,8 +6,11 @@ export default function DevPage() {
   const testHarnesses = {
     'Core Systems': [
       { href: '/dev/game-session', label: 'Game Session', color: 'blue' },
+      { href: '/dev/ending-screen', label: 'Ending Screen', color: 'blue' },
       { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
       { href: '/dev/choice-generator', label: 'Player Choice Generator', color: 'blue' },
+      { href: '/dev/choice-alignment', label: 'Choice Alignment Test', color: 'blue' },
+      { href: '/dev/decision-points', label: 'Decision Points Test', color: 'blue' },
       { href: '/dev/lore-viewer', label: 'Lore Viewer', color: 'indigo' },
     ],
     'World Management': [
@@ -23,9 +26,12 @@ export default function DevPage() {
       { href: '/dev/character-generation', label: 'Character Generation (AI)', color: 'orange' },
       { href: '/dev/portrait-prompt-test', label: 'Portrait Testing', color: 'purple' },
     ],
+    'Journal System': [
+      { href: '/dev/enhanced-journal', label: 'Enhanced Journal UI (Issue #562)', color: 'amber' },
+      { href: '/dev/journal-access', label: 'Basic Journal Access (Issue #278)', color: 'orange' },
+    ],
     'Navigation & UI': [
       { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
-      { href: '/dev/global-styles', label: 'Global Styles', color: 'pink' },
       { href: '/dev/template-selector', label: 'Template Selector', color: 'cyan' },
     ],
     'Development Tools': [
@@ -45,6 +51,7 @@ export default function DevPage() {
     teal: 'bg-teal-100 hover:bg-teal-200',
     pink: 'bg-pink-100 hover:bg-pink-200',
     cyan: 'bg-cyan-100 hover:bg-cyan-200',
+    amber: 'bg-amber-100 hover:bg-amber-200',
   };
 
   return (

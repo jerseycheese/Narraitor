@@ -3,7 +3,7 @@ title: Journal Interface Requirements
 aliases: [Journal UI Requirements]
 tags: [narraitor, requirements, ui, journal-interface]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-06-10
 ---
 
 # Journal Interface Requirements
@@ -14,7 +14,7 @@ The Journal Interface provides a way for players to review their game history, i
 ## Core Functionality
 - **Journal Entry Listing**: Display a chronological list of journal entries
 - **Entry Viewing**: Read detailed entry content
-- **Entry Filtering**: Filter entries by type or other criteria (post-MVP)
+- **Entry Filtering**: Filter entries by type or other criteria (future enhancement)
 - **Chronological Organization**: Timeline-based display of entries
 - **Entry Navigation**: Move between related entries
 - **Journal Persistence**: Access entries across multiple sessions

@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CharactersPage from '../page';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -66,13 +66,13 @@ describe.skip('CharactersPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: mockCharacters,
       currentCharacterId: null,
       deleteCharacter: jest.fn(),
       setCurrentCharacter: jest.fn(),
     });
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: { 'world-1': mockWorld },
       currentWorldId: 'world-1',
     });
@@ -108,7 +108,7 @@ describe.skip('CharactersPage', () => {
       },
     };
     
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: charactersMultiWorld,
       currentCharacterId: null,
       deleteCharacter: jest.fn(),
@@ -132,7 +132,7 @@ describe.skip('CharactersPage', () => {
   });
 
   it('shows empty state when no characters exist', () => {
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: {},
       currentCharacterId: null,
       deleteCharacter: jest.fn(),
@@ -146,7 +146,7 @@ describe.skip('CharactersPage', () => {
   });
 
   it('shows message when no world is selected', () => {
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: {},
       currentWorldId: null,
     });
@@ -158,7 +158,7 @@ describe.skip('CharactersPage', () => {
   });
 
   it('navigates to worlds page when no world selected', () => {
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: {},
       currentWorldId: null,
     });
@@ -173,7 +173,7 @@ describe.skip('CharactersPage', () => {
 
   it('allows selecting a character', () => {
     const mockSetCurrentCharacter = jest.fn();
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: mockCharacters,
       currentCharacterId: null,
       deleteCharacter: jest.fn(),

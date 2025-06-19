@@ -4,6 +4,22 @@ import userEvent from '@testing-library/user-event';
 import { ToneSettingsForm } from '../ToneSettingsForm';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
 
+// Mock the validation utility
+jest.mock('@/lib/utils', () => ({
+  ...jest.requireActual('@/lib/utils'),
+  validateToneSettings: jest.fn(() => ({ valid: true, errors: [] })),
+  descriptionsToSelectOptions: jest.fn((descriptions) => 
+    Object.entries(descriptions).map(([value, description]) => ({
+      value,
+      label: value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      description
+    }))
+  ),
+  createFormUpdater: jest.fn((state, onChange) => ({
+    updateField: (field, value) => onChange({ ...state, [field]: value }),
+  })),
+}));
+
 const mockOnToneSettingsChange = jest.fn();
 const mockOnSave = jest.fn();
 
@@ -39,10 +55,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const contentRatingSelect = screen.getByRole('combobox', { name: /content rating/i });
-    await user.click(contentRatingSelect);
-    
-    const pgOption = screen.getByRole('option', { name: /PG-13/i });
-    await user.click(pgOption);
+    await user.selectOptions(contentRatingSelect, 'PG-13');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -61,10 +74,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const narrativeStyleSelect = screen.getByRole('combobox', { name: /narrative style/i });
-    await user.click(narrativeStyleSelect);
-    
-    const dramaticOption = screen.getByRole('option', { name: /dramatic/i });
-    await user.click(dramaticOption);
+    await user.selectOptions(narrativeStyleSelect, 'dramatic');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -83,10 +93,7 @@ describe('ToneSettingsForm', () => {
     );
 
     const languageComplexitySelect = screen.getByRole('combobox', { name: /language complexity/i });
-    await user.click(languageComplexitySelect);
-    
-    const advancedOption = screen.getByRole('option', { name: /advanced/i });
-    await user.click(advancedOption);
+    await user.selectOptions(languageComplexitySelect, 'advanced');
 
     expect(mockOnToneSettingsChange).toHaveBeenCalledWith({
       ...DEFAULT_TONE_SETTINGS,
@@ -105,56 +112,15 @@ describe('ToneSettingsForm', () => {
     );
 
     const customInstructionsTextarea = screen.getByLabelText('Custom Instructions (Optional)');
-    await user.type(customInstructionsTextarea, 'Focus on character development');
+    await user.type(customInstructionsTextarea, 'X');
 
+    // Verify that onToneSettingsChange was called with updated customInstructions
     expect(mockOnToneSettingsChange).toHaveBeenLastCalledWith({
       ...DEFAULT_TONE_SETTINGS,
-      customInstructions: 'Focus on character development'
+      customInstructions: 'X'
     });
   });
 
-  test('shows save button when showSaveButton is true', () => {
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    expect(screen.getByRole('button', { name: 'Save Tone Settings' })).toBeInTheDocument();
-  });
-
-  test('hides save button when showSaveButton is false', () => {
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        showSaveButton={false}
-      />
-    );
-
-    expect(screen.queryByRole('button', { name: 'Save Tone Settings' })).not.toBeInTheDocument();
-  });
-
-  test('calls onSave when save button is clicked', async () => {
-    const user = userEvent.setup();
-    
-    render(
-      <ToneSettingsForm
-        toneSettings={DEFAULT_TONE_SETTINGS}
-        onToneSettingsChange={mockOnToneSettingsChange}
-        onSave={mockOnSave}
-        showSaveButton={true}
-      />
-    );
-
-    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
-    await user.click(saveButton);
-
-    expect(mockOnSave).toHaveBeenCalled();
-  });
 
   test('displays current tone settings values', () => {
     const customToneSettings: ToneSettings = {
@@ -175,21 +141,68 @@ describe('ToneSettingsForm', () => {
     expect(customInstructionsTextarea).toHaveValue('Include complex themes');
   });
 
-  test('handles undefined custom instructions', () => {
-    const toneSettingsWithoutCustom: ToneSettings = {
-      contentRating: 'PG',
-      narrativeStyle: 'balanced',
-      languageComplexity: 'moderate'
-    };
+
+  test('displays validation errors when form is invalid', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
+      valid: false,
+      errors: ['Content Rating is required', 'Narrative Style must be valid']
+    });
 
     render(
       <ToneSettingsForm
-        toneSettings={toneSettingsWithoutCustom}
+        toneSettings={DEFAULT_TONE_SETTINGS}
         onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
       />
     );
 
-    const customInstructionsTextarea = screen.getByLabelText('Custom Instructions (Optional)');
-    expect(customInstructionsTextarea).toHaveValue('');
+    expect(screen.getByText('Please fix the following issues:')).toBeInTheDocument();
+    expect(screen.getByText('• Content Rating is required')).toBeInTheDocument();
+    expect(screen.getByText('• Narrative Style must be valid')).toBeInTheDocument();
+  });
+
+  test('disables save button when validation fails', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
+      valid: false,
+      errors: ['Content Rating is required']
+    });
+
+    render(
+      <ToneSettingsForm
+        toneSettings={DEFAULT_TONE_SETTINGS}
+        onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
+      />
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
+    expect(saveButton).toBeDisabled();
+  });
+
+  test('calls onSave when save button is clicked in valid state', async () => {
+    const { validateToneSettings } = await import('@/lib/utils');
+    (validateToneSettings as jest.Mock).mockReturnValue({
+      valid: true,
+      errors: []
+    });
+
+    render(
+      <ToneSettingsForm
+        toneSettings={DEFAULT_TONE_SETTINGS}
+        onToneSettingsChange={mockOnToneSettingsChange}
+        onSave={mockOnSave}
+        showSaveButton={true}
+      />
+    );
+
+    const saveButton = screen.getByRole('button', { name: 'Save Tone Settings' });
+    expect(saveButton).not.toBeDisabled();
+    
+    fireEvent.click(saveButton);
+    expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 
 // Sample narrative context for testing
 const createSampleNarrativeContext = (): NarrativeContext => {
@@ -55,12 +54,12 @@ export default function ChoiceGeneratorTestPage() {
   // Initialize a test world in the store if it doesn't exist
   useEffect(() => {
     // Check if the test world already exists
-    const worldExists = worldStore.getState().worlds[worldId];
+    const worldExists = useWorldStore.getState().worlds[worldId];
     
     if (!worldExists) {
       try {
         // Create a test world
-        const newWorldId = worldStore.getState().createWorld({
+        const newWorldId = useWorldStore.getState().createWorld({
           name: worldName,
           description: worldDescription,
           theme: worldTheme,
@@ -89,13 +88,13 @@ export default function ChoiceGeneratorTestPage() {
 
     try {
       // Update world properties if they've changed
-      const currentWorld = worldStore.getState().worlds[worldId];
+      const currentWorld = useWorldStore.getState().worlds[worldId];
       if (currentWorld && (
         currentWorld.name !== worldName ||
         currentWorld.description !== worldDescription ||
         currentWorld.theme !== worldTheme
       )) {
-        worldStore.getState().updateWorld(worldId, {
+        useWorldStore.getState().updateWorld(worldId, {
           name: worldName,
           description: worldDescription,
           theme: worldTheme
@@ -186,13 +185,7 @@ export default function ChoiceGeneratorTestPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-2xl font-bold mb-4 mt-4">Choice Generator Test Harness</h1>
+      <h2 className="text-2xl font-bold mb-6">Choice Generator Test Harness</h2>
       
       <div className="mb-8 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">World Settings</h2>

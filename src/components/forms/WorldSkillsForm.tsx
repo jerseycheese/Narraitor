@@ -12,6 +12,9 @@ import {
   SkillDifficulty
 } from '@/lib/constants/skillDifficultyLevels';
 import SkillRangeEditor from './SkillRangeEditor';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface WorldSkillsFormProps {
   skills: WorldSkill[];
@@ -86,49 +89,50 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
               
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="space-y-2">
+                    <Label htmlFor={`skill-name-${index}`}>
                       Name
-                    </label>
-                    <input
+                    </Label>
+                    <Input
+                      id={`skill-name-${index}`}
                       type="text"
                       value={skill.name}
                       onChange={(e) => handleUpdateSkill(index, { name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
                     />
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="space-y-2">
+                    <Label htmlFor={`skill-category-${index}`}>
                       Category
-                    </label>
-                    <input
+                    </Label>
+                    <Input
+                      id={`skill-category-${index}`}
                       type="text"
                       value={skill.category || ''}
                       onChange={(e) => handleUpdateSkill(index, { category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
                     />
                   </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className="space-y-2">
+                  <Label htmlFor={`skill-description-${index}`}>
                     Description
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
+                    id={`skill-description-${index}`}
                     value={skill.description}
                     onChange={(e) => handleUpdateSkill(index, { description: e.target.value })}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded"
                   />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="space-y-2">
+                    <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
-                    </label>
+                    </Label>
                     <select
+                      id={`skill-difficulty-${index}`}
                       value={skill.difficulty}
                       onChange={(e) => handleUpdateSkill(index, { 
                         difficulty: e.target.value as SkillDifficulty
@@ -143,10 +147,10 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     </select>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="space-y-2">
+                    <Label>
                       Linked Attributes
-                    </label>
+                    </Label>
                     {attributes.length === 0 ? (
                       <p className="text-gray-500 text-sm">No attributes available</p>
                     ) : (
@@ -155,7 +159,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                           <label key={attr.id} className="flex items-center space-x-2">
                             <input
                               type="checkbox"
-                              checked={skill.attributeIds.includes(attr.id)}
+                              checked={skill.attributeIds?.includes(attr.id) || false}
                               onChange={(e) => {
                                 const isChecked = e.target.checked;
                                 const currentAttributeIds = skill.attributeIds || [];

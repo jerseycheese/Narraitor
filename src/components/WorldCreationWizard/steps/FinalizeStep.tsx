@@ -109,7 +109,7 @@ export default function FinalizeStep({
         description="Review your world configuration before creating it. You can go back to make changes or proceed to create your world."
       >
 
-      <div className="space-y-6">
+      <div className="space-y-6 my-4">
         <div>
           <h3 className={wizardStyles.subheading}>Basic Information</h3>
           <div className="space-y-3">
@@ -213,9 +213,12 @@ export default function FinalizeStep({
                   </span>
                 </div>
                 <div className="text-sm">{skill.description}</div>
-                {skill.linkedAttributeId && (
+                {skill.attributeIds && skill.attributeIds.length > 0 && (
                   <div className="text-sm text-blue-600 mt-1">
-                    Linked to: {worldData.attributes?.find(a => a.id === skill.linkedAttributeId)?.name || 'Unknown'}
+                    Linked to: {skill.attributeIds
+                      .map(id => worldData.attributes?.find(a => a.id === id)?.name)
+                      .filter(Boolean)
+                      .join(', ') || 'Unknown'}
                   </div>
                 )}
               </div>

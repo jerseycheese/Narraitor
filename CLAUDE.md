@@ -9,8 +9,17 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Zustand for state management
 - Storybook for component development
 - Jest and React Testing Library for testing
-- Google Gemini for AI integration
+- Google Gemini for AI integration (secure server-side implementation)
 - IndexedDB for client-side persistence
+- Tailwind CSS v4 for styling
+- shadcn/ui for accessible component library
+
+## Security Architecture
+- **API Key Protection**: All API keys stored server-side only (`GEMINI_API_KEY`)
+- **Secure Proxy Pattern**: Client-side requests route through Next.js API endpoints
+- **Rate Limiting**: 50 requests per hour per IP to prevent abuse and control costs
+- **Request Validation**: Input sanitization and content filtering on all API routes
+- **No Client Exposure**: Zero sensitive data in browser or JavaScript bundles
 
 ## Development Workflow
 - Always write tests first (TDD)
@@ -23,6 +32,45 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Document architectural decisions
 - Write comprehensive tests for critical paths
 - Review and refactor code regularly
+
+## Automation Workflow System
+Advanced automation capabilities for accelerated development:
+
+### Automation Modes
+- **Standard Mode**: `claude > /project:do-issue-auto 501` - Automated with verification checkpoints
+- **No-Verify Mode**: `claude > /project:do-issue-auto-noverify 501` - Fully autonomous implementation
+- **YOLO Mode**: `./scripts/yolo-mode.sh launch 501` - Containerized, network-isolated automation
+
+### Worktree System
+- **Parallel Development**: Work on multiple issues simultaneously using git worktrees
+- **Isolation**: Each issue gets its own working directory and branch
+- **Management**: `./scripts/worktree-helper.sh` for creating, managing, and cleaning up worktrees
+
+### Safety Features
+- **Container Isolation**: YOLO mode runs in Docker containers with `--network none`
+- **Permission Management**: Explicit permission handling for automated operations
+- **Resource Limits**: CPU, memory, and disk usage constraints
+- **Audit Trail**: Complete logging of all automation activities
+
+### Quick Start Automation
+```bash
+# Check status
+./scripts/automation-status.sh
+
+# Create worktree and launch YOLO mode
+./scripts/worktree-helper.sh create 501 feature-description
+./scripts/yolo-mode.sh launch 501
+
+# Batch processing
+./scripts/yolo-mode.sh batch 501,502,503
+```
+
+### Documentation
+Comprehensive automation guides available in personal docs:
+- [Automation Workflow Overview](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/automation-workflow-improvements.md)
+- [YOLO Mode Complete Guide](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/yolo-mode-complete-guide.md)
+- [Worktree System Guide](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/worktree-system-guide.md)
+- [Safety and Security Practices](https://github.com/jerseycheese/Docs/blob/main/narraitor/docs/development/workflows/automation-safety-guide.md)
 
 ## Claude Code Security & Directives
 - Commands can include special directives at the top of the file:
@@ -52,6 +100,7 @@ These scripts are pre-approved in `.claude/settings.local.json` and can be used 
 ## Intelligent Branch Handling
 - Helper script `./scripts/claude-branch.sh` manages branches to avoid permission prompts
 - Script is pre-approved in `.claude/settings.local.json`
+- Always pulls latest changes from the remote branch before creating new branches
 - In interactive mode (`do-issue`), the script offers options:
   1. Use the existing branch (continue previous work)
   2. Delete and recreate the branch (clean start)
@@ -84,7 +133,6 @@ All implementations must go through the Three-Stage Verification process:
    - End-to-end flow verification
 
 This verification process is MANDATORY - the workflow will not proceed until verification is complete.
-See `/docs/development/claude-integration/three-stage-verification.md` for detailed guidelines.
 
 ## Testing Principles
 - Focus on testing WHAT the feature does, not HOW it does it
@@ -205,7 +253,7 @@ This script will:
 3. Generate JavaScript code for creating the PR with the MCP GitHub tool
 4. Always target the `develop` branch
 
-See `/docs/development/claude-integration/mcp-github-usage.md` for complete MCP GitHub tool documentation.
+See the MCP GitHub tool documentation for complete usage details.
 
 ## Domain Boundaries
 - World: World configuration, templates, attributes
@@ -227,6 +275,25 @@ See `/docs/development/claude-integration/mcp-github-usage.md` for complete MCP 
 - `npm run build-storybook`: Build Storybook for deployment
 - `npm run lint`: Run ESLint
 
+## Security Testing Commands
+- `./demo-secure-api.sh`: Quick verification of secure API implementation
+- `./test-secure-api.sh`: Comprehensive security testing (requires dev server)
+- See `SECURITY_TESTING_GUIDE.md` for manual browser testing instructions
+
+## Environment Configuration
+```bash
+# .env.local (Development)
+GEMINI_API_KEY=your-api-key  # Server-side only, never use NEXT_PUBLIC_*
+NEXT_PUBLIC_DEBUG_LOGGING=true
+GITHUB_TOKEN=your-github-token
+
+# .env.production (Production - set in deployment platform)
+GEMINI_API_KEY=your-api-key  # Server-side only
+NEXT_PUBLIC_DEBUG_LOGGING=false
+```
+
+**Security Note**: Always use `GEMINI_API_KEY` (server-side) never `NEXT_PUBLIC_GEMINI_API_KEY` (client-exposed)
+
 ## State Management Architecture
 Each domain has its own Zustand store following consistent patterns:
 ```typescript
@@ -246,6 +313,24 @@ interface StoreInterface {
 ```
 
 Stores include: `worldStore`, `characterStore`, `narrativeStore`, `journalStore`, `inventoryStore`, `sessionStore`, `aiContextStore`
+
+## UI Component System (shadcn/ui)
+The project uses shadcn/ui for accessible, themeable components:
+- **Foundation**: Tailwind CSS v4 with CSS variables for theming
+- **Components**: Located in `/src/components/ui/` directory
+- **Utilities**: `cn()` helper in `/src/lib/utils/cn.ts` for className merging
+- **Storybook**: All UI components follow `Narraitor/UI/[Component]` naming
+- **Documentation**: See `/docs/ui/shadcn-integration-guide.md` for setup details
+- **Test Page**: Visit `/dev/shadcn-test` to see component showcase
+
+### Using shadcn/ui Components
+```tsx
+import { Button } from '@/components/ui/button'
+
+// Available variants: default, secondary, destructive, outline, ghost, link
+// Available sizes: default, sm, lg, icon
+<Button variant="outline" size="lg">Click me</Button>
+```
 
 ## Claude Code Commands
 We've created several custom Claude Code slash commands:
@@ -276,7 +361,7 @@ For smoothly transitioning between planning in Claude App and implementation in 
    - Implement in Claude Code using `/project:do-issue [issue-number]`
    - Verify and complete following the guided process
 
-See `/docs/development/claude-integration/simple-workflow-guide.md` for detailed instructions.
+Use the custom Claude Code commands for guided development workflows.
 
 ## Development Test Harnesses
 Available at `/dev/*` routes:

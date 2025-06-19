@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterBackgroundDisplay } from './CharacterBackgroundDisplay';
 
 const meta: Meta<typeof CharacterBackgroundDisplay> = {
-  title: 'Narraitor/Character/CharacterBackgroundDisplay',
+  title: 'Narraitor/Character/Display/CharacterBackgroundDisplay',
   component: CharacterBackgroundDisplay,
   parameters: {
     layout: 'padded',

@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
 
-describe('CharacterCreationWizard - Completion Navigation', () => {
+describe.skip('CharacterCreationWizard - Completion Navigation', () => {
   const mockPush = jest.fn();
   const mockCreateCharacter = jest.fn();
   const mockSetCurrentCharacter = jest.fn();

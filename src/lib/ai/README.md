@@ -1,15 +1,17 @@
 # AI Service Integration
 
-This module provides integration with Google's Generative AI (Gemini) for dynamic narrative generation in the Narraitor project.
+This module provides secure integration with Google's Generative AI (Gemini) for dynamic narrative generation in the Narraitor project. All AI requests are processed through secure server-side API routes to protect API keys and implement rate limiting.
 
 ## Overview
 
 The AI service integration consists of several key components:
-- `GeminiClient`: Handles direct communication with the Google Generative AI SDK
+- `ClientGeminiClient`: Client-side proxy that communicates with secure API routes
+- `GeminiClient`: Server-side client for direct communication with Google Generative AI SDK
 - `AIPromptProcessor`: Processes templates and manages AI requests
 - `ResponseFormatter`: Formats AI responses with context-appropriate text styling
 - Configuration utilities for managing API settings
 - Comprehensive error handling with retry logic
+- Rate limiting (50 requests per hour per IP)
 
 ## Installation
 
@@ -19,26 +21,34 @@ npm install @google/genai
 
 ## Configuration
 
-Set the following environment variable:
+Set the following environment variable (server-side only):
 
 ```env
-NEXT_PUBLIC_GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=your-gemini-api-key
 ```
+
+**Important**: API keys are now server-side only for security. Never use `NEXT_PUBLIC_GEMINI_API_KEY` or expose API keys to the browser.
 
 ## Usage
 
-### Basic Content Generation
+### Client-Side Content Generation
 
 ```typescript
-import { GeminiClient } from '@/lib/ai';
+import { ClientGeminiClient } from '@/lib/ai';
 
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-  modelName: 'gemini-2.0-flash',
-  maxRetries: 3,
-  timeout: 30000
-};
+// Client-side usage through secure API proxy
+const client = new ClientGeminiClient();
+const response = await client.generateContent('Tell me a story');
+console.log(response.content);
+```
 
+### Server-Side Content Generation
+
+```typescript
+import { GeminiClient, getAIConfig } from '@/lib/ai';
+
+// Server-side usage with direct API access
+const config = getAIConfig(); // Automatically reads GEMINI_API_KEY
 const client = new GeminiClient(config);
 const response = await client.generateContent('Tell me a story');
 console.log(response.content);
@@ -66,9 +76,37 @@ console.log(response.content);          // Raw AI response
 console.log(response.formattedContent); // Formatted with dialogue and italics
 ```
 
+## Secure API Routes
+
+All AI requests are routed through secure Next.js API endpoints:
+
+- **`/api/narrative/generate`**: General narrative content generation
+- **`/api/narrative/choices`**: Choice generation for interactive narratives
+- **`/api/generate-portrait`**: Character portrait generation
+
+These routes handle:
+- API key security (server-side only)
+- Rate limiting (50 requests per hour per IP)
+- Request validation and sanitization
+- Error handling and fallback responses
+
 ## API Reference
 
-### GeminiClient
+### ClientGeminiClient (Client-Side)
+
+#### Constructor
+```typescript
+constructor()
+```
+
+#### Methods
+```typescript
+generateContent(prompt: string): Promise<AIResponse>
+generateChoices(context: string, options?: ChoiceOptions): Promise<ChoiceResponse>
+generatePortrait(characterData: CharacterData): Promise<PortraitResponse>
+```
+
+### GeminiClient (Server-Side)
 
 #### Constructor
 ```typescript
@@ -119,6 +157,24 @@ interface GenerationConfig {
 }
 ```
 
+## Security Features
+
+### Server-Side API Key Protection
+- API keys are stored server-side only (`GEMINI_API_KEY`)
+- No API keys are exposed to the browser or client-side code
+- All requests are proxied through secure Next.js API routes
+
+### Rate Limiting
+- 50 requests per hour per IP address
+- Prevents abuse and controls API costs
+- Returns HTTP 429 when limits are exceeded
+- Rate limit headers included in responses
+
+### Request Validation
+- Input sanitization for all prompts
+- Content filtering for inappropriate requests
+- Structured response validation
+
 ## Error Handling
 
 The service includes built-in retry logic with exponential backoff for transient errors:
@@ -130,6 +186,12 @@ Non-retryable errors are thrown immediately:
 - Authentication errors
 - Invalid API key
 - Invalid request format
+
+### Client-Side Error Handling
+When using `ClientGeminiClient`, errors from API routes are automatically handled:
+- Rate limit exceeded (429): Clear error message with retry guidance
+- Server errors (500): Graceful fallback with user-friendly messages
+- Network errors: Automatic retry with exponential backoff
 
 ## Testing
 

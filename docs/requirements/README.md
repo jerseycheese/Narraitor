@@ -1,3 +1,12 @@
+---
+title: "Narraitor Requirements System"
+type: overview
+category: requirements
+tags: [requirements, documentation, github-sync]
+created: 2025-05-08
+updated: 2025-06-08
+---
+
 # Narraitor Requirements System
 
 ## Overview

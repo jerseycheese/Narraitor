@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import TemplateSelector from '../../../components/world/TemplateSelector/TemplateSelector';
 import { templates, WorldTemplate } from '../../../lib/templates/worldTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
@@ -31,13 +30,7 @@ export default function TemplateSelectorTestHarness() {
   
   return (
     <div className="p-6 bg-white rounded shadow">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-2xl font-bold mb-4 mt-4" data-testid="test-harness-title">Template Selector Test Harness</h1>
+      <h2 className="text-2xl font-bold mb-6">Template Selector Test Harness</h2>
       
       <div className="flex gap-6 flex-col md:flex-row">
         <div className="w-full md:w-2/3">

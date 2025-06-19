@@ -7,15 +7,13 @@ import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { characterStore } from '../../../state/characterStore';
 import { worldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
-import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
-import { createAIClient } from '../../../lib/ai/clientFactory';
-import { AIClient } from '../../../lib/ai/types';
+// Removed AI client imports - using API routes instead
 
 // Mock the dependencies
 jest.mock('../../../state/characterStore');
 jest.mock('../../../state/worldStore');
-jest.mock('../../../lib/ai/portraitGenerator');
-jest.mock('../../../lib/ai/clientFactory');
+// Mock fetch for API routes
+const mockFetch = jest.fn();
 jest.mock('../../../hooks/useCharacterCreationAutoSave', () => ({
   useCharacterCreationAutoSave: () => ({
     data: null,
@@ -36,7 +34,6 @@ jest.mock('next/navigation', () => ({
 
 const mockCharacterStore = characterStore as jest.MockedFunction<typeof characterStore>;
 const mockWorldStore = worldStore as jest.MockedFunction<typeof worldStore>;
-const mockCreateAIClient = createAIClient as jest.MockedFunction<typeof createAIClient>;
 
 describe('PortraitStep Component', () => {
   const mockData = {
@@ -66,19 +63,12 @@ describe('PortraitStep Component', () => {
   };
 
   const mockOnUpdate = jest.fn();
-  const mockGeneratePortrait = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    (PortraitGenerator as jest.Mock).mockImplementation(() => ({
-      generatePortrait: mockGeneratePortrait
-    }));
-
-    mockCreateAIClient.mockReturnValue({
-      generateContent: jest.fn(),
-      generateImage: jest.fn()
-    } as unknown as AIClient);
+    
+    // Set up fetch mock for API routes
+    global.fetch = mockFetch;
   });
 
   it('should render portrait step with placeholder', () => {
@@ -97,10 +87,17 @@ describe('PortraitStep Component', () => {
 
   it('should generate portrait when button clicked', async () => {
     const user = userEvent.setup();
-    mockGeneratePortrait.mockResolvedValue({
-      type: 'ai-generated',
-      url: 'data:image/png;base64,mockimage',
-      generatedAt: new Date().toISOString()
+    
+    // Mock successful API response
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        portrait: {
+          type: 'ai-generated',
+          url: 'data:image/png;base64,mockimage',
+          generatedAt: new Date().toISOString()
+        }
+      })
     });
 
     render(
@@ -115,7 +112,11 @@ describe('PortraitStep Component', () => {
     await user.click(generateButton);
 
     await waitFor(() => {
-      expect(mockGeneratePortrait).toHaveBeenCalled();
+      expect(mockFetch).toHaveBeenCalledWith('/api/generate-portrait', expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: expect.stringContaining('Elara Moonshadow')
+      }));
       expect(mockOnUpdate).toHaveBeenCalledWith({
         portrait: expect.objectContaining({
           type: 'ai-generated',
@@ -127,7 +128,9 @@ describe('PortraitStep Component', () => {
 
   it('should show error message on generation failure', async () => {
     const user = userEvent.setup();
-    mockGeneratePortrait.mockRejectedValue(new Error('API error'));
+    
+    // Mock failed API response
+    mockFetch.mockRejectedValue(new Error('API error'));
 
     render(
       <PortraitStep 

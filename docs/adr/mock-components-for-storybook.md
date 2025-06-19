@@ -1,3 +1,14 @@
+---
+title: "Architectural Decision Record: Mock Components for Storybook"
+type: adr
+date: 2025-05-15
+status: accepted
+category: architecture
+tags: [storybook, nextjs, testing, mocks]
+created: 2025-05-15
+updated: 2025-06-08
+---
+
 # Architectural Decision Record: Mock Components for Storybook
 
 ## Date

@@ -1,625 +1,404 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SkillEditor } from '../SkillEditor';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
-import { EntityID } from '@/types/common.types';
+// Note: SkillDifficulty type is used implicitly in WorldSkill interface
 
-describe('SkillEditor - TDD Comprehensive Tests', () => {
-  const mockWorldId = 'world-123' as EntityID;
-  const mockSkillId = 'skill-456' as EntityID;
-  
-  const mockAttributes: WorldAttribute[] = [
-    {
-      id: 'attr-1' as EntityID,
-      worldId: mockWorldId,
-      name: 'Strength',
-      description: 'Physical power',
-      baseValue: 10,
-      minValue: 1,
-      maxValue: 20,
-    },
-    {
-      id: 'attr-2' as EntityID,
-      worldId: mockWorldId,
-      name: 'Intelligence',
-      description: 'Mental acuity',
-      baseValue: 12,
-      minValue: 1,
-      maxValue: 20,
-    },
-    {
-      id: 'attr-3' as EntityID,
-      worldId: mockWorldId,
-      name: 'Dexterity',
-      description: 'Agility and reflexes',
-      baseValue: 14,
-      minValue: 1,
-      maxValue: 20,
-    },
-  ];
+// Mock components
+jest.mock('@/components/DeleteConfirmationDialog', () => {
+  return function MockDeleteConfirmationDialog({ 
+    isOpen, 
+    onConfirm, 
+    onClose
+  }: {
+    isOpen: boolean;
+    onConfirm: () => void;
+    onClose: () => void;
+  }) {
+    if (!isOpen) return null;
+    return (
+      <div data-testid="delete-dialog">
+        <p>Delete confirmation</p>
+        <button onClick={onConfirm} data-testid="confirm-delete">Confirm</button>
+        <button onClick={onClose} data-testid="cancel-delete">Cancel</button>
+      </div>
+    );
+  };
+});
 
-  const mockExistingSkills: WorldSkill[] = [
-    {
-      id: 'existing-skill-1' as EntityID,
-      worldId: mockWorldId,
-      name: 'Athletics',
-      description: 'Physical prowess and endurance',
-      attributeIds: ['attr-1'],
-      difficulty: 'medium',
-      baseValue: 3,
-      minValue: 1,
-      maxValue: 5,
-    },
-  ];
+// Test data
+const mockWorldId = 'world-1';
+const mockAttributes: WorldAttribute[] = [
+  {
+    id: 'attr-1',
+    name: 'Strength',
+    description: 'Physical power',
+    worldId: mockWorldId,
+    baseValue: 8,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'attr-2', 
+    name: 'Intelligence',
+    description: 'Mental ability',
+    worldId: mockWorldId,
+    baseValue: 7,
+    minValue: 1,
+    maxValue: 10,
+  },
+  {
+    id: 'attr-3',
+    name: 'Dexterity',
+    description: 'Agility and precision',
+    worldId: mockWorldId,
+    baseValue: 6,
+    minValue: 1,
+    maxValue: 10,
+  },
+];
 
-  const mockOnSave = jest.fn();
-  const mockOnDelete = jest.fn();
-  const mockOnCancel = jest.fn();
+const mockSkills: WorldSkill[] = [
+  {
+    id: 'skill-1',
+    name: 'Swordsmanship',
+    description: 'Combat with bladed weapons',
+    worldId: mockWorldId,
+    attributeIds: ['attr-1', 'attr-3'],
+    difficulty: 'medium',
+    baseValue: 5,
+    minValue: 1,
+    maxValue: 10,
+  },
+];
 
+const mockProps = {
+  worldId: mockWorldId,
+  mode: 'create' as const,
+  onSave: jest.fn(),
+  onCancel: jest.fn(),
+  existingAttributes: mockAttributes,
+  existingSkills: mockSkills,
+};
+
+describe('SkillEditor', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('Create Mode - Basic Functionality', () => {
-    test('renders create mode form with all required fields', () => {
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Check form title
+  describe('Create Mode', () => {
+    it('renders create mode interface correctly', () => {
+      render(<SkillEditor {...mockProps} />);
+      
       expect(screen.getByText('Create New Skill')).toBeInTheDocument();
-
-      // Check all form fields are present
       expect(screen.getByLabelText(/skill name/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/category/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/difficulty/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/minimum value/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/maximum value/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/base value/i)).toBeInTheDocument();
+      expect(screen.getByText('Linked Attributes')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create skill/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    });
 
-      // Check linked attributes section
-      expect(screen.getByText(/linked attributes/i)).toBeInTheDocument();
+    it('displays all available attributes as checkboxes', () => {
+      render(<SkillEditor {...mockProps} />);
+      
       mockAttributes.forEach(attr => {
-        expect(screen.getByText(attr.name)).toBeInTheDocument();
+        expect(screen.getByLabelText(attr.name)).toBeInTheDocument();
       });
-
-      // Check action buttons
-      expect(screen.getByText('Create Skill')).toBeInTheDocument();
-      expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
-    test('allows user to input skill data', async () => {
+    it('allows creating a skill with multiple attribute links', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Input skill name
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Investigation');
-      expect(nameInput).toHaveValue('Investigation');
-
-      // Input description
-      const descInput = screen.getByLabelText(/description/i);
-      await user.clear(descInput);
-      await user.type(descInput, 'Finding clues and solving mysteries');
-      expect(descInput).toHaveValue('Finding clues and solving mysteries');
-
-      // Input category
-      const categoryInput = screen.getByLabelText(/category/i);
-      await user.clear(categoryInput);
-      await user.type(categoryInput, 'Mental');
-      expect(categoryInput).toHaveValue('Mental');
-    });
-
-    test('allows selecting multiple attributes via checkboxes', async () => {
-      const user = userEvent.setup();
+      // Fill in skill details
+      await user.type(screen.getByLabelText(/skill name/i), 'Acrobatics');
+      await user.type(screen.getByLabelText(/description/i), 'Tumbling and gymnastics');
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Check multiple attributes
-      const strengthCheckbox = screen.getByRole('checkbox', { name: /strength/i });
-      const intelligenceCheckbox = screen.getByRole('checkbox', { name: /intelligence/i });
-      
-      await user.click(strengthCheckbox);
-      await user.click(intelligenceCheckbox);
-      
-      expect(strengthCheckbox).toBeChecked();
-      expect(intelligenceCheckbox).toBeChecked();
-    });
-
-    test('validates required fields before saving', async () => {
-      const user = userEvent.setup();
-      
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Try to save without filling required fields
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should show validation errors
-      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
-      expect(mockOnSave).not.toHaveBeenCalled();
-    });
-
-    test('prevents duplicate skill names', async () => {
-      const user = userEvent.setup();
-      
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Input duplicate name
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Athletics'); // Existing skill name
-
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should show duplicate error
-      expect(screen.getByText(/skill with this name already exists/i)).toBeInTheDocument();
-      expect(mockOnSave).not.toHaveBeenCalled();
-    });
-
-    test('validates value ranges (min < max)', async () => {
-      const user = userEvent.setup();
-      
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Set invalid range (min >= max)
-      const minInput = screen.getByLabelText(/minimum value/i);
-      const maxInput = screen.getByLabelText(/maximum value/i);
-      
-      await user.clear(minInput);
-      await user.type(minInput, '5');
-      await user.clear(maxInput);
-      await user.type(maxInput, '3');
-
-      // Fill required name field
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Test Skill');
-
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should show range validation error
-      expect(screen.getByText(/maximum value must be greater than minimum value/i)).toBeInTheDocument();
-      expect(mockOnSave).not.toHaveBeenCalled();
-    });
-
-    test('saves valid skill with multiple attributes', async () => {
-      const user = userEvent.setup();
-      
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Fill form with valid data
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Investigation');
-
-      const descInput = screen.getByLabelText(/description/i);
-      await user.clear(descInput);
-      await user.type(descInput, 'Finding clues');
-
       // Select multiple attributes
-      const strengthCheckbox = screen.getByRole('checkbox', { name: /strength/i });
-      const intelligenceCheckbox = screen.getByRole('checkbox', { name: /intelligence/i });
-      await user.click(strengthCheckbox);
-      await user.click(intelligenceCheckbox);
-
-      // Save
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should call onSave with correct data
-      expect(mockOnSave).toHaveBeenCalledWith(
+      await user.click(screen.getByLabelText('Strength'));
+      await user.click(screen.getByLabelText('Dexterity'));
+      
+      // Submit form
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(mockProps.onSave).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'Investigation',
-          description: 'Finding clues',
-          attributeIds: ['attr-1', 'attr-2'],
+          name: 'Acrobatics',
+          description: 'Tumbling and gymnastics',
+          attributeIds: ['attr-1', 'attr-3'],
           worldId: mockWorldId,
         })
       );
     });
 
-    test('calls onCancel when cancel button is clicked', async () => {
+    it('prevents creating skills with duplicate names', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
       
+      await user.type(screen.getByLabelText(/skill name/i), 'Swordsmanship'); // Duplicate name
+      await user.type(screen.getByLabelText(/description/i), 'Test description');
+      await user.click(screen.getByLabelText('Strength'));
+      
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(screen.getByText(/skill name "Swordsmanship" already exists/i)).toBeInTheDocument();
+      expect(mockProps.onSave).not.toHaveBeenCalled();
+    });
+
+    it('requires at least one attribute to be selected', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      await user.type(screen.getByLabelText(/skill name/i), 'New Skill');
+      await user.type(screen.getByLabelText(/description/i), 'Test description');
+      // Don't select any attributes
+      
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(screen.getByText(/at least one attribute must be selected/i)).toBeInTheDocument();
+      expect(mockProps.onSave).not.toHaveBeenCalled();
+    });
+
+    it('validates required fields', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/description is required/i)).toBeInTheDocument();
+      expect(mockProps.onSave).not.toHaveBeenCalled();
+    });
+
+    it('enforces maximum skills limit when provided', () => {
+      const skillsAtMax = Array.from({ length: 12 }, (_, i) => ({
+        id: `skill-${i}`,
+        name: `Skill ${i}`,
+        description: `Description ${i}`,
+        worldId: mockWorldId,
+        attributeIds: ['attr-1'],
+        difficulty: 'easy',
+        baseValue: 5,
+        minValue: 1,
+        maxValue: 10,
+      }));
+
       render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
+        <SkillEditor 
+          {...mockProps} 
+          existingSkills={skillsAtMax}
+          maxSkills={12}
         />
       );
-
-      const cancelButton = screen.getByText('Cancel');
-      await user.click(cancelButton);
-
-      expect(mockOnCancel).toHaveBeenCalled();
+      
+      expect(screen.getByText(/maximum number of skills \(12\) reached/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create skill/i })).toBeDisabled();
     });
   });
 
-  describe('Edit Mode - Existing Skill Functionality', () => {
-    const existingSkill: WorldSkill = {
-      id: mockSkillId,
-      worldId: mockWorldId,
-      name: 'Existing Skill',
-      description: 'An existing skill for testing',
-      attributeIds: ['attr-1', 'attr-3'],
-      difficulty: 'hard',
-      category: 'Combat',
-      baseValue: 4,
-      minValue: 1,
-      maxValue: 5,
+  describe('Edit Mode', () => {
+    const editProps = {
+      ...mockProps,
+      mode: 'edit' as const,
+      skillId: 'skill-1',
+      onDelete: jest.fn(),
     };
 
-    test('renders edit mode with populated fields', () => {
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="edit"
-          skillId={mockSkillId}
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={[...mockExistingSkills, existingSkill]}
-        />
-      );
-
-      // Check form title
+    it('renders edit mode interface correctly', () => {
+      render(<SkillEditor {...editProps} />);
+      
       expect(screen.getByText('Edit Skill')).toBeInTheDocument();
-
-      // Check fields are populated
-      expect(screen.getByDisplayValue('Existing Skill')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('An existing skill for testing')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('Combat')).toBeInTheDocument();
-
-      // Check attributes are pre-selected
-      const strengthCheckbox = screen.getByRole('checkbox', { name: /strength/i });
-      const dexterityCheckbox = screen.getByRole('checkbox', { name: /dexterity/i });
-      const intelligenceCheckbox = screen.getByRole('checkbox', { name: /intelligence/i });
-      
-      expect(strengthCheckbox).toBeChecked(); // attr-1
-      expect(dexterityCheckbox).toBeChecked(); // attr-3
-      expect(intelligenceCheckbox).not.toBeChecked(); // not selected
-
-      // Check action buttons
-      expect(screen.getByText('Save Changes')).toBeInTheDocument();
-      expect(screen.getByText('Delete Skill')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /save changes/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /delete skill/i })).toBeInTheDocument();
     });
 
-    test('shows delete confirmation dialog with linked attributes warning', async () => {
-      const user = userEvent.setup();
+    it('loads existing skill data for editing', () => {
+      render(<SkillEditor {...editProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="edit"
-          skillId={mockSkillId}
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={[...mockExistingSkills, existingSkill]}
-        />
-      );
-
-      const deleteButton = screen.getByRole('button', { name: /delete skill/i });
-      await user.click(deleteButton);
-
-      // Should show delete confirmation dialog
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: /delete skill/i })).toBeInTheDocument();
-      expect(screen.getByText(/linked to.*attributes/i)).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Swordsmanship')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('Combat with bladed weapons')).toBeInTheDocument();
+      
+      // Check that linked attributes are selected
+      expect(screen.getByLabelText('Strength')).toBeChecked();
+      expect(screen.getByLabelText('Dexterity')).toBeChecked();
+      expect(screen.getByLabelText('Intelligence')).not.toBeChecked();
     });
 
-    test('confirms skill deletion', async () => {
+    it('allows updating skill with new attribute links', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...editProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="edit"
-          skillId={mockSkillId}
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={[...mockExistingSkills, existingSkill]}
-        />
-      );
-
-      // Open delete dialog
-      const deleteButton = screen.getByRole('button', { name: /delete skill/i });
-      await user.click(deleteButton);
-
-      // Confirm deletion - find the button within the dialog
-      const dialog = screen.getByRole('dialog');
-      const confirmButton = within(dialog).getByRole('button', { name: /delete skill/i });
-      await user.click(confirmButton);
-
-      expect(mockOnDelete).toHaveBeenCalledWith(mockSkillId);
-    });
-
-    test('updates existing skill data', async () => {
-      const user = userEvent.setup();
+      // Update name and attributes
+      await user.clear(screen.getByDisplayValue('Swordsmanship'));
+      await user.type(screen.getByLabelText(/skill name/i), 'Advanced Swordsmanship');
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="edit"
-          skillId={mockSkillId}
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={[...mockExistingSkills, existingSkill]}
-        />
-      );
-
-      // Modify skill name
-      const nameInput = screen.getByDisplayValue('Existing Skill');
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Updated Skill');
-
       // Change attribute selection
-      const intelligenceCheckbox = screen.getByRole('checkbox', { name: /intelligence/i });
-      await user.click(intelligenceCheckbox);
-
-      // Save changes
-      const saveButton = screen.getByText('Save Changes');
-      await user.click(saveButton);
-
-      expect(mockOnSave).toHaveBeenCalledWith(
+      await user.click(screen.getByLabelText('Intelligence')); // Add Intelligence
+      await user.click(screen.getByLabelText('Dexterity')); // Remove Dexterity
+      
+      await user.click(screen.getByRole('button', { name: /save changes/i }));
+      
+      expect(mockProps.onSave).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: mockSkillId,
-          name: 'Updated Skill',
-          attributeIds: expect.arrayContaining(['attr-1', 'attr-3', 'attr-2']),
+          id: 'skill-1',
+          name: 'Advanced Swordsmanship',
+          attributeIds: ['attr-1', 'attr-2'], // Strength + Intelligence
+        })
+      );
+    });
+
+    it('shows delete confirmation dialog', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...editProps} />);
+      
+      await user.click(screen.getByRole('button', { name: /delete skill/i }));
+      
+      expect(screen.getByTestId('delete-dialog')).toBeInTheDocument();
+    });
+
+    it('handles delete confirmation', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...editProps} />);
+      
+      await user.click(screen.getByRole('button', { name: /delete skill/i }));
+      await user.click(screen.getByTestId('confirm-delete'));
+      
+      expect(editProps.onDelete).toHaveBeenCalledWith('skill-1');
+    });
+
+    it('cancels delete when dialog is cancelled', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...editProps} />);
+      
+      await user.click(screen.getByRole('button', { name: /delete skill/i }));
+      await user.click(screen.getByTestId('cancel-delete'));
+      
+      expect(editProps.onDelete).not.toHaveBeenCalled();
+      expect(screen.queryByTestId('delete-dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Validation', () => {
+    it('validates skill name length limits', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      // Test name too long
+      const longName = 'a'.repeat(101);
+      await user.type(screen.getByLabelText(/skill name/i), longName);
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(screen.getByText(/skill name must be 100 characters or less/i)).toBeInTheDocument();
+    });
+
+    it('validates description length limits', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      await user.type(screen.getByLabelText(/skill name/i), 'Valid Name');
+      
+      // Test description too long
+      const longDescription = 'a'.repeat(501);
+      await user.type(screen.getByLabelText(/description/i), longDescription);
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(screen.getByText(/description must be 500 characters or less/i)).toBeInTheDocument();
+    });
+
+    it('trims whitespace from inputs', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      await user.type(screen.getByLabelText(/skill name/i), '  Swimming  ');
+      await user.type(screen.getByLabelText(/description/i), '  Water-based movement  ');
+      await user.click(screen.getByLabelText('Strength'));
+      
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      
+      expect(mockProps.onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Swimming',
+          description: 'Water-based movement',
         })
       );
     });
   });
 
-  describe('Multi-Attribute Selection UI', () => {
-    test('displays all available attributes as checkboxes', () => {
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      mockAttributes.forEach(attribute => {
-        const checkbox = screen.getByRole('checkbox', { name: new RegExp(attribute.name, 'i') });
-        expect(checkbox).toBeInTheDocument();
-        expect(screen.getByText(attribute.description)).toBeInTheDocument();
-      });
-    });
-
-    test('allows selecting and deselecting multiple attributes', async () => {
+  describe('Error Handling', () => {
+    it('displays multiple validation errors', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      const strengthCheckbox = screen.getByRole('checkbox', { name: /strength/i });
-      const intelligenceCheckbox = screen.getByRole('checkbox', { name: /intelligence/i });
-      const dexterityCheckbox = screen.getByRole('checkbox', { name: /dexterity/i });
-
-      // Select multiple attributes
-      await user.click(strengthCheckbox);
-      await user.click(intelligenceCheckbox);
+      // Submit empty form
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
       
-      expect(strengthCheckbox).toBeChecked();
-      expect(intelligenceCheckbox).toBeChecked();
-      expect(dexterityCheckbox).not.toBeChecked();
-
-      // Deselect one
-      await user.click(strengthCheckbox);
-      expect(strengthCheckbox).not.toBeChecked();
-      expect(intelligenceCheckbox).toBeChecked();
+      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/description is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/at least one attribute must be selected/i)).toBeInTheDocument();
     });
 
-    test('handles empty attributes list gracefully', () => {
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={[]}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      expect(screen.getByText(/no attributes available/i)).toBeInTheDocument();
+    it('clears errors when valid input is provided', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      // Trigger validation errors
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
+      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
+      
+      // Fix the error
+      await user.type(screen.getByLabelText(/skill name/i), 'Valid Name');
+      
+      // Error should be cleared
+      await waitFor(() => {
+        expect(screen.queryByText(/skill name is required/i)).not.toBeInTheDocument();
+      });
     });
   });
 
-  describe('Error Handling and Edge Cases', () => {
-    test('clears validation errors when user starts typing', async () => {
+  describe('Cancel Functionality', () => {
+    it('calls onCancel when cancel button is clicked', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
-
-      // Trigger validation error
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-      expect(screen.getByText(/skill name is required/i)).toBeInTheDocument();
-
-      // Start typing to clear error
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.type(nameInput, 'New Skill');
-
-      expect(screen.queryByText(/skill name is required/i)).not.toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      
+      expect(mockProps.onCancel).toHaveBeenCalled();
     });
 
-    test('handles missing skillId in edit mode gracefully', () => {
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="edit"
-          onSave={mockOnSave}
-          onDelete={mockOnDelete}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={mockExistingSkills}
-        />
-      );
+    it('does not save when canceling after making changes', async () => {
+      const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
+      
+      await user.type(screen.getByLabelText(/skill name/i), 'Test Skill');
+      await user.click(screen.getByRole('button', { name: /cancel/i }));
+      
+      expect(mockProps.onSave).not.toHaveBeenCalled();
+      expect(mockProps.onCancel).toHaveBeenCalled();
+    });
+  });
 
-      // Should still render form but with empty fields
-      expect(screen.getByText('Edit Skill')).toBeInTheDocument();
-      expect(screen.getByLabelText(/skill name/i)).toHaveValue('');
+  describe('Accessibility', () => {
+    it('has proper ARIA labels and structure', () => {
+      render(<SkillEditor {...mockProps} />);
+      
+      expect(screen.getByRole('form')).toBeInTheDocument();
+      expect(screen.getByLabelText(/skill name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
+      
+      mockAttributes.forEach(attr => {
+        expect(screen.getByLabelText(attr.name)).toBeInTheDocument();
+      });
     });
 
-    test('enforces maximum attributes limit if applicable (up to 12 total skills)', async () => {
+    it('displays error messages with proper ARIA attributes', async () => {
       const user = userEvent.setup();
+      render(<SkillEditor {...mockProps} />);
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={Array(11).fill(null).map((_, i) => ({
-            ...mockExistingSkills[0],
-            id: `skill-${i}` as EntityID,
-            name: `Skill ${i}`,
-          }))}
-        />
-      );
-
-      // Fill form
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Last Skill');
-
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should allow creation (12th skill)
-      expect(mockOnSave).toHaveBeenCalled();
-    });
-
-    test('prevents creating more than 12 skills total', async () => {
-      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: /create skill/i }));
       
-      render(
-        <SkillEditor
-          worldId={mockWorldId}
-          mode="create"
-          onSave={mockOnSave}
-          onCancel={mockOnCancel}
-          existingAttributes={mockAttributes}
-          existingSkills={Array(12).fill(null).map((_, i) => ({
-            ...mockExistingSkills[0],
-            id: `skill-${i}` as EntityID,
-            name: `Skill ${i}`,
-          }))}
-        />
-      );
-
-      // Try to add 13th skill
-      const nameInput = screen.getByLabelText(/skill name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Too Many Skills');
-
-      const saveButton = screen.getByText('Create Skill');
-      await user.click(saveButton);
-
-      // Should show limit error
-      expect(screen.getByText(/cannot create more than 12 skills/i)).toBeInTheDocument();
-      expect(mockOnSave).not.toHaveBeenCalled();
+      const errorMessages = screen.getAllByRole('alert');
+      expect(errorMessages.length).toBeGreaterThan(0);
     });
   });
 });

@@ -3,12 +3,15 @@ import { cn } from '@/lib/utils';
 
 export type LoadingVariant = 'spinner' | 'pulse' | 'dots' | 'skeleton';
 export type LoadingSize = 'sm' | 'md' | 'lg' | 'xl';
+export type LoadingTheme = 'light' | 'dark';
 
 interface LoadingStateProps {
   /** The variant of loading indicator to display */
   variant?: LoadingVariant;
   /** Size of the loading indicator */
   size?: LoadingSize;
+  /** Theme for text and elements (light or dark background) */
+  theme?: LoadingTheme;
   /** Optional message to display below the loading indicator */
   message?: string;
   /** Additional CSS classes */
@@ -50,9 +53,25 @@ const sizeClasses = {
   },
 };
 
+const themeClasses = {
+  light: {
+    text: 'text-gray-600',
+    skeleton: 'bg-gray-200',
+    spinner: 'text-gray-400',
+    dots: 'text-gray-400',
+  },
+  dark: {
+    text: 'text-gray-100',
+    skeleton: 'bg-gray-700',
+    spinner: 'text-gray-200',
+    dots: 'text-gray-200',
+  },
+};
+
 export const LoadingState: React.FC<LoadingStateProps> = ({
   variant = 'spinner',
   size = 'md',
+  theme = 'light',
   message,
   className,
   centered = true,
@@ -73,7 +92,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           <div
             className={cn(
               'animate-spin rounded-full border-solid border-current border-r-transparent',
-              sizeClasses[size].spinner
+              sizeClasses[size].spinner,
+              themeClasses[theme].spinner
             )}
             role="status"
             aria-label="Loading"
@@ -87,10 +107,10 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           <div className="animate-pulse" role="status" aria-label="Loading">
             {showAvatar && (
               <div className="flex items-center gap-4 mb-4">
-                <div className="rounded-full bg-gray-200 h-12 w-12" />
+                <div className={cn('rounded-full h-12 w-12', themeClasses[theme].skeleton)} />
                 <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className={cn('h-4 rounded w-3/4 mb-2', themeClasses[theme].skeleton)} />
+                  <div className={cn('h-3 rounded w-1/2', themeClasses[theme].skeleton)} />
                 </div>
               </div>
             )}
@@ -98,7 +118,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
               <div
                 key={i}
                 className={cn(
-                  'bg-gray-200 rounded mb-2',
+                  'rounded mb-2',
+                  themeClasses[theme].skeleton,
                   sizeClasses[size].skeleton,
                   i === skeletonLines - 1 ? 'w-2/3' : 'w-full'
                 )}
@@ -109,7 +130,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
 
       case 'dots':
         return (
-          <div className="flex items-center gap-1" role="status" aria-label="Loading">
+          <div className={cn('flex items-center gap-1', themeClasses[theme].dots)} role="status" aria-label="Loading">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
@@ -134,7 +155,8 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
                 <div
                   key={i}
                   className={cn(
-                    'bg-gray-200 rounded',
+                    'rounded',
+                    themeClasses[theme].skeleton,
                     sizeClasses[size].skeleton,
                     i === 0 && 'w-3/4',
                     i === 1 && 'w-full',
@@ -157,7 +179,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
       {renderLoadingIndicator()}
       {message && (
         <p
-          className={cn('text-gray-600', sizeClasses[size].text)}
+          className={cn(themeClasses[theme].text, sizeClasses[size].text)}
           aria-live="polite"
         >
           {message}

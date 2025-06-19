@@ -1,3 +1,12 @@
+---
+title: "Prompt Context API"
+type: guide
+category: ai
+tags: [prompt, context, api, ai]
+created: 2025-05-12
+updated: 2025-06-08
+---
+
 # Prompt Context API
 
 The prompt context system provides structured world and character information for AI prompts, ensuring the AI has relevant context when generating narrative content, decisions, and other game elements.

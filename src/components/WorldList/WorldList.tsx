@@ -1,7 +1,7 @@
 import React from 'react';
 import { World } from '../../types/world.types';
 import WorldCard from '../WorldCard/WorldCard';
-import { characterStore } from '../../state/characterStore';
+import { useCharacterStore } from '../../state/characterStore';
 
 interface WorldListProps {
   worlds: World[];
@@ -18,7 +18,7 @@ interface WorldListProps {
 
 const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
   // Get character counts for each world
-  const characters = characterStore.getState().characters;
+  const characters = useCharacterStore.getState().characters;
   const characterCounts = worlds.reduce((counts, world) => {
     counts[world.id] = Object.values(characters).filter(char => char.worldId === world.id).length;
     return counts;

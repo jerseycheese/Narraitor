@@ -7,6 +7,7 @@ import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
+import { EndingImageDebugSection } from '../EndingImageDebugSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -129,6 +130,9 @@ export const DevToolsPanel = () => {
           
           {/* Portrait Generation Debug Section */}
           <PortraitDebugSection />
+          
+          {/* Ending Image Generation Debug Section */}
+          <EndingImageDebugSection />
         </div>
       )}
     </div>

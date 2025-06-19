@@ -12,7 +12,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock character store
 jest.mock('@/state/characterStore', () => ({
-  characterStore: jest.fn(() => ({
+  useCharacterStore: jest.fn(() => ({
     characters: {
       'char-123': {
         id: 'char-123',
@@ -53,7 +53,7 @@ jest.mock('@/state/characterStore', () => ({
 
 // Mock world store
 jest.mock('@/state/worldStore', () => ({
-  worldStore: jest.fn(() => ({
+  useWorldStore: jest.fn(() => ({
     worlds: {
       'world-1': {
         id: 'world-1',
@@ -94,9 +94,11 @@ describe('CharacterViewPage', () => {
   test('displays character information when character exists', () => {
     render(<CharacterViewPage />);
     
-    // Should display character name and level
-    expect(screen.getByText('Test Character')).toBeInTheDocument();
-    expect(screen.getByText('Level 5')).toBeInTheDocument();
+    // Should display character name in the page title
+    expect(screen.getByRole('heading', { level: 1, name: 'Test Character' })).toBeInTheDocument();
+    // Should also display character name in the character details (h2)
+    expect(screen.getByRole('heading', { level: 2, name: 'Test Character' })).toBeInTheDocument();
+    expect(screen.getByText('Level 5 • Test World')).toBeInTheDocument();
     
     // Should display character attributes 
     expect(screen.getByText('Strength')).toBeInTheDocument();

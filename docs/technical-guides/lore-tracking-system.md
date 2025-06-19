@@ -1,3 +1,12 @@
+---
+title: "Lore Tracking System"
+type: guide
+category: narrative
+tags: [lore, tracking, ai, narrative-consistency]
+created: 2025-05-28
+updated: 2025-06-08
+---
+
 # Lore Tracking System
 
 ## Overview

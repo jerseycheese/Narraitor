@@ -45,6 +45,17 @@ export interface TemplateHistoryEntry {
 }
 
 /**
+ * Auto-save status and metadata
+ */
+export interface AutoSaveState {
+  enabled: boolean;
+  lastSaveTime: string | null;
+  status: 'idle' | 'saving' | 'saved' | 'error';
+  errorMessage: string | null;
+  totalSaves: number;
+}
+
+/**
  * Session store interface
  */
 export interface SessionStore {
@@ -58,6 +69,7 @@ export interface SessionStore {
   characterId: EntityID | null;
   savedSessions: Record<string, SavedSessionInfo>;
   templateHistory: TemplateHistoryEntry[];
+  autoSave: AutoSaveState;
   
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
@@ -81,4 +93,9 @@ export interface SessionStore {
   addTemplateToHistory: (entry: TemplateHistoryEntry) => void;
   getTemplateHistory: () => TemplateHistoryEntry[];
   clearTemplateHistory: () => void;
+  
+  // Auto-save actions
+  setAutoSaveEnabled: (enabled: boolean) => void;
+  updateAutoSaveStatus: (status: AutoSaveState['status'], errorMessage?: string) => void;
+  recordAutoSave: (timestamp: string) => void;
 }

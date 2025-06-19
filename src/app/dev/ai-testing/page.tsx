@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { AITestingPanel } from '../../../components/devtools/AITestingPanel';
 
 /**
@@ -14,21 +13,7 @@ export default function AITestingPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <Link 
-          href="/dev" 
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          ← Back to Dev Harnesses
-        </Link>
-        <div className="mb-8 mt-4">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            AI Testing Panel Test Harness
-          </h1>
-          <p className="text-gray-600">
-            Test the AI Testing Panel component in isolation. This panel allows developers 
-            to override world, character, and narrative context to test AI responses.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold mb-6">AI Testing Panel Test Harness</h2>
 
         {/* AI Testing Panel in a dark container to simulate DevTools */}
         <div className="bg-slate-800 p-6 rounded-lg border-2 border-slate-600">
@@ -58,12 +43,6 @@ export default function AITestingPage() {
 
         {/* Navigation */}
         <div className="mt-8 flex space-x-4">
-          <a 
-            href="/dev" 
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            ← Back to Dev Tools
-          </a>
           <a 
             href="/dev/devtools-test" 
             className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"

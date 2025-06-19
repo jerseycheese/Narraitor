@@ -1,3 +1,12 @@
+---
+title: "GitHub Issue & CSV Synchronization"
+type: guide
+category: technical
+tags: [github, csv, synchronization, automation]
+created: 2025-05-09
+updated: 2025-06-08
+---
+
 # GitHub Issue & CSV Synchronization
 
 This document provides technical details on the synchronization process between GitHub issues and user story CSV files in the Narraitor project.

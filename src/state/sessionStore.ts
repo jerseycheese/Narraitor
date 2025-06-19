@@ -29,6 +29,14 @@ const initialState = {
     narrativeCount: number;
   }>,
   templateHistory: [] as TemplateHistoryEntry[],
+  // Auto-save state
+  autoSave: {
+    enabled: true,
+    lastSaveTime: null,
+    status: 'idle' as const,
+    errorMessage: null,
+    totalSaves: 0,
+  },
 };
 
 /**
@@ -41,10 +49,70 @@ export const sessionStore = create<SessionStore>()(
 
   // Initialize a new game session
   initializeSession: async (worldId, characterId, onComplete) => {
+    const currentState = get();
+    
+    logger.debug('🎯 initializeSession called:', {
+      worldId,
+      characterId,
+      currentState: {
+        id: currentState.id,
+        status: currentState.status,
+        worldId: currentState.worldId,
+        characterId: currentState.characterId
+      }
+    });
+    
+    // Don't initialize if we already have an active session for the same world/character
+    if (currentState.status === 'active' && 
+        currentState.worldId === worldId && 
+        currentState.characterId === characterId) {
+      logger.debug('Session already active for this world/character, skipping initialization');
+      if (onComplete) onComplete();
+      return;
+    }
+    
     logger.debug('Initializing session for worldId:', worldId, 'characterId:', characterId);
+    
+    // Generate a new session ID for fresh sessions or when changing characters
+    const isNewCharacterSession = currentState.characterId !== characterId;
+    const sessionId = (isNewCharacterSession || !currentState.id) 
+      ? `session-${worldId}-${characterId}-${Date.now()}` 
+      : currentState.id;
+    logger.debug('🆔 Using session ID:', sessionId, { isNewCharacterSession, previousCharacterId: currentState.characterId });
+    
+    // Clear narrative data when starting a fresh session or changing characters
+    // This prevents new characters from inheriting previous game narratives
+    if (sessionId && (isNewCharacterSession || !currentState.id)) {
+      try {
+        const { useNarrativeStore } = await import('./narrativeStore');
+        const narrativeStore = useNarrativeStore.getState();
+        
+        // If changing characters, clear the old session's data
+        if (isNewCharacterSession && currentState.id) {
+          narrativeStore.clearSessionSegments(currentState.id);
+          narrativeStore.clearSessionDecisions(currentState.id);
+          logger.debug('🧹 Cleared old session data for:', currentState.id);
+        }
+        
+        // Clear any existing data for the new session
+        narrativeStore.clearSessionSegments(sessionId);
+        narrativeStore.clearSessionDecisions(sessionId);
+        narrativeStore.clearEnding();
+        logger.debug('🧹 Cleared narrative data for new session:', sessionId);
+      } catch (error) {
+        logger.warn('Failed to clear narrative data:', error);
+      }
+    }
+    
     set(state => {
       logger.debug('Setting loading state from:', state);
-      return { status: 'loading', worldId, characterId, error: null };
+      return { 
+        id: sessionId,
+        status: 'loading', 
+        worldId, 
+        characterId, 
+        error: null 
+      };
     });
     
     try {
@@ -80,6 +148,17 @@ export const sessionStore = create<SessionStore>()(
   // End the current session (save it instead of destroying)
   endSession: () => {
     const state = get();
+    
+    // Add stack trace to debug unexpected calls
+    const stack = new Error().stack;
+    logger.debug('🔚 endSession called:', {
+      currentId: state.id,
+      status: state.status,
+      worldId: state.worldId,
+      characterId: state.characterId,
+      stack: stack?.split('\n').slice(0, 5).join('\n') // First 5 lines of stack
+    });
+    
     if (state.id && state.worldId && state.characterId) {
       logger.debug('Saving session before ending:', state.id);
       
@@ -98,7 +177,7 @@ export const sessionStore = create<SessionStore>()(
           }
         };
         
-        logger.debug('Saving session:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
+        logger.debug('🔚 Saving session and resetting state:', sessionId, 'Total saved sessions:', Object.keys(newSavedSessions).length);
         
         return {
           ...initialState,
@@ -106,6 +185,7 @@ export const sessionStore = create<SessionStore>()(
         };
       });
     } else {
+      logger.debug('🔚 No active session to save, just resetting state');
       // Keep savedSessions when resetting
       set(prevState => ({
         ...initialState,
@@ -258,15 +338,59 @@ export const sessionStore = create<SessionStore>()(
     logger.debug('Clearing template history');
     set({ templateHistory: [] });
   },
+
+  // Auto-save methods
+  setAutoSaveEnabled: (enabled: boolean) => {
+    logger.debug('Setting auto-save enabled:', enabled);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        enabled
+      }
+    }));
+  },
+
+  updateAutoSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error', errorMessage?: string) => {
+    logger.debug('Updating auto-save status:', status, errorMessage);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        status,
+        errorMessage: errorMessage || null
+      }
+    }));
+  },
+
+  recordAutoSave: (timestamp: string) => {
+    logger.debug('Recording auto-save at:', timestamp);
+    set(state => ({
+      autoSave: {
+        ...state.autoSave,
+        lastSaveTime: timestamp,
+        status: 'saved' as const,
+        totalSaves: state.autoSave.totalSaves + 1,
+        errorMessage: null
+      }
+    }));
+  },
 }),
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
-  version: 1,
-  // Only persist saved sessions and template history, not active session state
+  version: 2,
+  // Persist active session state to maintain continuity across browser refreshes
   partialize: (state) => ({ 
     savedSessions: state.savedSessions,
-    templateHistory: state.templateHistory 
+    templateHistory: state.templateHistory,
+    // Persist active session state
+    id: state.id,
+    characterId: state.characterId,
+    worldId: state.worldId,
+    status: state.status,
+    currentSceneId: state.currentSceneId,
+    playerChoices: state.playerChoices,
+    // Persist auto-save state
+    autoSave: state.autoSave
   }),
 }
 ));

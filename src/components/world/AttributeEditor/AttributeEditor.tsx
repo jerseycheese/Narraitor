@@ -3,6 +3,9 @@ import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export interface AttributeEditorProps {
   worldId: EntityID;
@@ -13,6 +16,8 @@ export interface AttributeEditorProps {
   onCancel: () => void;
   existingAttributes?: WorldAttribute[];
   existingSkills?: WorldSkill[];
+  /** Maximum number of attributes allowed in create mode. When specified, prevents creation beyond this limit */
+  maxAttributes?: number;
 }
 
 export function AttributeEditor({
@@ -24,6 +29,7 @@ export function AttributeEditor({
   onCancel,
   existingAttributes = [],
   existingSkills = [],
+  maxAttributes,
 }: AttributeEditorProps) {
   const linkedSkills = existingSkills;
 
@@ -87,6 +93,11 @@ export function AttributeEditor({
         formData.minValue >= formData.maxValue) {
       validationErrors.push('Maximum value must be greater than minimum value');
     }
+    
+    // Check maxAttributes limit in create mode
+    if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
+      validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
+    }
 
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
@@ -137,61 +148,57 @@ export function AttributeEditor({
       </h2>
 
       <div className="space-y-4">
-        <div>
-          <label htmlFor="attribute-name" className="block text-sm font-medium mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="attribute-name">
             Attribute Name
-          </label>
-          <input
+          </Label>
+          <Input
             id="attribute-name"
             type="text"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="e.g., Strength, Intelligence"
           />
         </div>
 
-        <div>
-          <label htmlFor="attribute-description" className="block text-sm font-medium mb-1">
+        <div className="space-y-2">
+          <Label htmlFor="attribute-description">
             Description
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             id="attribute-description"
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[80px]"
             placeholder="Describe what this attribute represents"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="min-value" className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="min-value">
               Minimum Value
-            </label>
-            <input
+            </Label>
+            <Input
               id="min-value"
               type="number"
               value={formData.minValue}
               onChange={(e) => handleChange('minValue', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="-999"
-              max="999"
+              min={-999}
+              max={999}
             />
           </div>
 
-          <div>
-            <label htmlFor="max-value" className="block text-sm font-medium mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="max-value">
               Maximum Value
-            </label>
-            <input
+            </Label>
+            <Input
               id="max-value"
               type="number"
               value={formData.maxValue}
               onChange={(e) => handleChange('maxValue', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="-999"
-              max="999"
+              min={-999}
+              max={999}
             />
           </div>
         </div>

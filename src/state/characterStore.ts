@@ -30,17 +30,22 @@ interface CharacterBackground {
   goals: string[];
   fears: string[];
   physicalDescription?: string;
+  relationships: unknown[];
+  isKnownFigure?: boolean;
+  knownFigureType?: 'historical' | 'fictional' | 'celebrity' | 'mythological' | 'other';
 }
 
 interface CharacterStatus {
-  hp: number;
-  mp: number;
-  stamina: number;
+  health: number;
+  maxHealth: number;
+  conditions: string[];
+  location?: string;
 }
 
 interface Character {
   id: EntityID;
   name: string;
+  description: string;
   worldId: EntityID;
   level: number;
   attributes: CharacterAttribute[];
@@ -48,6 +53,12 @@ interface Character {
   background: CharacterBackground;
   isPlayer: boolean;
   status: CharacterStatus;
+  inventory: {
+    characterId: EntityID;
+    items: unknown[];
+    capacity: number;
+    categories: string[];
+  };
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
@@ -98,7 +109,7 @@ const initialState = {
 };
 
 // Character Store implementation with persistence
-export const characterStore = create<CharacterStore>()(
+export const useCharacterStore = create<CharacterStore>()(
   persist(
     (set) => ({
       ...initialState,
@@ -116,6 +127,18 @@ export const characterStore = create<CharacterStore>()(
           ...characterData,
           id: characterId,
           level: characterData.level || 1, // Default to level 1 if not provided
+          inventory: {
+            ...characterData.inventory,
+            characterId: characterId
+          },
+          attributes: characterData.attributes.map(attr => ({
+            ...attr,
+            characterId: characterId
+          })),
+          skills: characterData.skills.map(skill => ({
+            ...skill,
+            characterId: characterId
+          })),
           createdAt: now,
           updatedAt: now,
         };
@@ -308,10 +331,10 @@ export const characterStore = create<CharacterStore>()(
       // - Add field transformations for new/changed fields
       // - Add state structure upgrades between versions
       // - Add validation of migrated data
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-      migrate: (persistedState: any, version: number) => {
-        // Simple migration for MVP - just return the state
-        return persistedState;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      migrate: (persistedState: unknown, version: number) => {
+        // Simple migration for MVP - just return the state as CharacterState
+        return persistedState as CharacterStore;
       }
     }
   )

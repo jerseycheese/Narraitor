@@ -14,8 +14,8 @@ const debugLog = (message: string) => {
 export const testUtils = {
   // Add test worlds to the store
   async addTestWorlds() {
-    const { worldStore } = await import('@/state/worldStore');
-    const store = worldStore.getState() as WorldStore;
+    const { useWorldStore } = await import('@/state/worldStore');
+    const store = useWorldStore.getState() as WorldStore;
     
     const testWorlds = [
       {
@@ -56,8 +56,8 @@ export const testUtils = {
   
   // Clear all worlds from the store
   async clearWorlds() {
-    const { worldStore } = await import('@/state/worldStore');
-    const store = worldStore.getState() as WorldStore;
+    const { useWorldStore } = await import('@/state/worldStore');
+    const store = useWorldStore.getState() as WorldStore;
     
     if ('worlds' in store && 'deleteWorld' in store) {
       const worlds = Object.values(store.worlds);
@@ -72,8 +72,8 @@ export const testUtils = {
   
   // Trigger loading state
   async setLoadingState(loading: boolean) {
-    const { worldStore } = await import('@/state/worldStore');
-    const store = worldStore.getState() as WorldStore;
+    const { useWorldStore } = await import('@/state/worldStore');
+    const store = useWorldStore.getState() as WorldStore;
     
     if ('setLoading' in store) {
       store.setLoading(loading);
@@ -84,8 +84,8 @@ export const testUtils = {
   
   // Trigger error state
   async setErrorState(error: string | null) {
-    const { worldStore } = await import('@/state/worldStore');
-    const store = worldStore.getState() as WorldStore;
+    const { useWorldStore } = await import('@/state/worldStore');
+    const store = useWorldStore.getState() as WorldStore;
     
     if ('setError' in store) {
       store.setError(error);

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 
 interface DebugInfo {
@@ -16,7 +16,7 @@ interface DebugInfo {
 }
 
 export default function TestCharacterFormPage() {
-  const { worlds, currentWorldId } = worldStore();
+  const { worlds, currentWorldId } = useWorldStore();
   const [debugInfo, setDebugInfo] = useState<DebugInfo>({
     currentWorldId: null,
     worldName: 'None',
@@ -97,13 +97,7 @@ export default function TestCharacterFormPage() {
   
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-2xl font-bold mb-4 mt-4">Character Form Test & Debug</h1>
+      <h1 className="text-2xl font-bold mb-4">Character Form Test & Debug</h1>
       
       <div className="mb-6 space-y-4">
         <div className="bg-blue-50 p-4 rounded-lg">

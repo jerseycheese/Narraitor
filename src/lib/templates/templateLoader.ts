@@ -1,5 +1,5 @@
 import { WorldTemplate, templates } from './worldTemplates';
-import { worldStore } from '../../state/worldStore';
+import { useWorldStore } from '../../state/worldStore';
 import { generateUniqueId } from '../utils/generateId';
 import { WorldAttribute, WorldSkill } from '../../types/world.types';
 
@@ -44,10 +44,10 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     name: skill.name,
     description: skill.description,
     worldId,
-    // Convert linkedAttributes array to linkedAttributeId
+    // Convert linkedAttributes array to attributeIds array
     // For now, just use the first attribute in the list if available
-    linkedAttributeId: skill.linkedAttributes?.length > 0 
-      ? attributes.find(a => a.name === skill.linkedAttributes[0])?.id 
+    attributeIds: skill.linkedAttributes?.length > 0 
+      ? [attributes.find(a => a.name === skill.linkedAttributes[0])?.id].filter(Boolean) as string[]
       : undefined,
     difficulty: 'medium', // Default difficulty level
     baseValue: 5, // Default middle value
@@ -57,7 +57,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
   }));
   
   // Update the world store with the new world
-  worldStore.setState(state => {
+  useWorldStore.setState(state => {
     // Create a copy of the existing state
     const newState = { ...state };
     

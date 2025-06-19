@@ -1,18 +1,17 @@
 /**
- * Journal System - POST-MVP
- * Status: Implementation complete but not included in MVP
- * Reason: Deprioritized to focus on core narrative experience
- * Date: May 2025
+ * Journal System
  * 
- * Note: This store is fully functional and tested but will not be 
- * exposed in the UI until post-MVP. Automatic journal entry creation
- * is suspended until post-MVP implementation.
+ * Provides persistent storage of journal entries across gameplay sessions.
+ * Supports automatic journal entry creation from narrative events and
+ * manual entry management through the journal interface.
  */
 
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
+import { createIndexedDBStorage } from './persistence';
 
 /**
  * Journal store interface with state and actions
@@ -50,13 +49,15 @@ const initialState = {
 };
 
 // Journal Store implementation
-export const journalStore = create<JournalStore>()((set, get) => ({
+export const useJournalStore = create<JournalStore>()(
+  persist(
+    (set, get) => ({
   ...initialState,
 
   // Add entry
   addEntry: (sessionId, entryData) => {
-    if (!entryData.title || entryData.title.trim() === '') {
-      throw new Error('Entry title is required');
+    if (!entryData.content || entryData.content.trim() === '') {
+      throw new Error('Entry content is required');
     }
 
     const entryId = generateUniqueId('entry');
@@ -172,4 +173,15 @@ export const journalStore = create<JournalStore>()((set, get) => ({
   setError: (error) => set(() => ({ error })),
   clearError: () => set(() => ({ error: null })),
   setLoading: (loading) => set(() => ({ loading })),
-}));
+}),
+{
+  name: 'narraitor-journal-store',
+  storage: createIndexedDBStorage(),
+  version: 1,
+  // Persist journal entries and session mappings
+  partialize: (state) => ({
+    entries: state.entries,
+    sessionEntries: state.sessionEntries,
+  }),
+}
+));

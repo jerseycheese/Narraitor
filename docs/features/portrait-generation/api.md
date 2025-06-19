@@ -1,3 +1,12 @@
+---
+title: "Portrait Generation API Documentation"
+type: api
+category: character
+tags: [portrait, api, generation, character]
+created: 2025-05-27
+updated: 2025-06-08
+---
+
 # Portrait Generation API Documentation
 
 ## Endpoint Overview
@@ -198,10 +207,9 @@ The API requires the following environment variables:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| GEMINI_API_KEY | Google Gemini API key for server-side use | Yes* |
-| NEXT_PUBLIC_GEMINI_API_KEY | Alternative API key location | Yes* |
+| GEMINI_API_KEY | Google Gemini API key (server-side only) | Yes |
 
-*At least one of these must be set with a valid API key.
+**⚠️ Security Note**: Only use `GEMINI_API_KEY` (server-side). Never use `NEXT_PUBLIC_GEMINI_API_KEY` as this exposes your API key to client-side JavaScript, creating a security vulnerability.
 
 ## Rate Limiting
 

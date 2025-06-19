@@ -61,8 +61,8 @@ export function useWizardState<T>(config: WizardConfig<T>) {
           const parsed = JSON.parse(saved);
           // State restored from persistence
           return parsed;
-        } catch (e) {
-          if (debug) console.error(`[useWizardState] Failed to parse saved state:`, e);
+        } catch {
+          // Failed to parse saved state, will use initial state
         }
       }
     }

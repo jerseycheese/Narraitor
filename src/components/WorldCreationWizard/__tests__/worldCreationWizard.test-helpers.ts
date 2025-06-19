@@ -73,7 +73,7 @@ export const setupMocks = () => {
           difficulty: 'medium',
           accepted: false,
           category: 'Combat',
-          linkedAttributeId: null,
+          attributeIds: undefined,
         },
       ],
     });

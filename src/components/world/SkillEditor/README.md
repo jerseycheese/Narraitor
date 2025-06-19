@@ -1,6 +1,6 @@
 # SkillEditor Component
 
-The SkillEditor component provides a comprehensive interface for creating and editing skills within a world, including the ability to link skills to multiple attributes.
+The SkillEditor component provides a comprehensive interface for creating and editing skills within a world, with full support for multi-attribute skill linking.
 
 ## Features
 
@@ -53,7 +53,7 @@ import { SkillEditor } from '@/components/world/SkillEditor';
 
 ## Data Structure Changes
 
-This component works with the updated `WorldSkill` interface that supports multiple attribute connections:
+This component implements the multi-attribute skill linking system. The updated `WorldSkill` interface supports multiple attribute connections:
 
 ```typescript
 interface WorldSkill extends NamedEntity {
@@ -69,11 +69,12 @@ interface WorldSkill extends NamedEntity {
 
 ## Validation Rules
 
-- **Name**: Required, must be unique within the world
-- **Attribute Links**: Optional, can link to 0 or more attributes
+- **Name**: Required (1-100 characters), must be unique within the world
+- **Description**: Required (1-500 characters)
+- **Attribute Links**: At least one attribute must be selected
 - **Value Ranges**: minValue must be less than maxValue
 - **Base Value**: Must be between minValue and maxValue
-- **Skill Limit**: Maximum 12 skills per world
+- **Skill Limit**: Configurable maximum skills per world (default: 12)
 
 ## Testing
 

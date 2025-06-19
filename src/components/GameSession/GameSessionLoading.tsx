@@ -7,7 +7,7 @@ interface GameSessionLoadingProps {
 }
 
 const GameSessionLoading: React.FC<GameSessionLoadingProps> = ({
-  loadingMessage = 'Loading game session...',
+  loadingMessage = 'Loading your game...',
 }) => {
   return (
     <div data-testid="game-session-loading" className="p-4" aria-live="polite" role="status">

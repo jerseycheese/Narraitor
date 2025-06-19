@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { World } from '@/types/world.types';
 import GameSession from '@/components/GameSession/GameSession';
-import { worldStore } from '@/state/worldStore';
-import { sessionStore } from '@/state/sessionStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
 import Logger from '@/lib/utils/logger';
 
 // Mock world
@@ -15,8 +15,78 @@ const mockWorld: World = {
   name: 'Fantasy Realm',
   description: 'A high fantasy world of magic and adventure',
   theme: 'Fantasy',
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'strength',
+      name: 'Strength',
+      description: 'Physical power and muscle',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+    },
+    {
+      id: 'intelligence',
+      name: 'Intelligence',
+      description: 'Mental acuity and reasoning',
+      worldId: 'world-1',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 20,
+    }
+  ],
+  skills: [
+    {
+      id: 'lockpicking',
+      name: 'Lockpicking',
+      description: 'The art of opening locks without keys',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'intimidation',
+      name: 'Intimidation',
+      description: 'Using presence and fear to influence others',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'stealth',
+      name: 'Stealth',
+      description: 'Moving unseen and unheard',
+      worldId: 'world-1',
+      difficulty: 'medium',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'magic',
+      name: 'Magic',
+      description: 'Wielding arcane forces',
+      worldId: 'world-1',
+      difficulty: 'hard',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    },
+    {
+      id: 'persuasion',
+      name: 'Persuasion',
+      description: 'Convincing others through words and charm',
+      worldId: 'world-1',
+      difficulty: 'easy',
+      baseValue: 1,
+      minValue: 1,
+      maxValue: 10,
+    }
+  ],
   settings: {
     maxAttributes: 10,
     maxSkills: 10,
@@ -31,6 +101,7 @@ const mockWorld: World = {
 const mockCharacter = {
   id: 'test-character-123',
   name: 'Test Hero',
+  description: 'A test character for debugging purposes',
   worldId: 'world-1',
   level: 5,
   background: {
@@ -38,19 +109,86 @@ const mockCharacter = {
     personality: 'Deterministic and reliable',
     goals: ['To pass all tests'],
     fears: ['Null pointer exceptions', 'Infinite loops'],
-    physicalDescription: 'A well-structured test character'
+    physicalDescription: 'A well-structured test character',
+    relationships: []
   },
   portrait: {
     type: 'placeholder' as const,
     url: null
   },
-  attributes: [],
-  skills: [],
+  attributes: [
+    {
+      id: 'attr1',
+      characterId: 'test-character-123',
+      worldAttributeId: 'strength',
+      name: 'Strength',
+      baseValue: 14,
+      modifiedValue: 14,
+      category: 'physical'
+    },
+    {
+      id: 'attr2',
+      characterId: 'test-character-123', 
+      worldAttributeId: 'intelligence',
+      name: 'Intelligence',
+      baseValue: 16,
+      modifiedValue: 16,
+      category: 'mental'
+    }
+  ],
+  skills: [
+    {
+      id: 'skill1',
+      characterId: 'test-character-123',
+      worldSkillId: 'lockpicking',
+      name: 'Lockpicking',
+      level: 8,
+      category: 'stealth'
+    },
+    {
+      id: 'skill2',
+      characterId: 'test-character-123',
+      worldSkillId: 'intimidation',
+      name: 'Intimidation',
+      level: 6,
+      category: 'social'
+    },
+    {
+      id: 'skill3',
+      characterId: 'test-character-123',
+      worldSkillId: 'stealth',
+      name: 'Stealth',
+      level: 4,
+      category: 'stealth'
+    },
+    {
+      id: 'skill4',
+      characterId: 'test-character-123',
+      worldSkillId: 'magic',
+      name: 'Magic',
+      level: 9,
+      category: 'arcane'
+    },
+    {
+      id: 'skill5',
+      characterId: 'test-character-123',
+      worldSkillId: 'persuasion',
+      name: 'Persuasion',
+      level: 3,
+      category: 'social'
+    }
+  ],
   isPlayer: true,
   status: {
-    hp: 100,
-    mp: 50,
-    stamina: 80
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
+  inventory: {
+    characterId: 'test-character-123',
+    items: [],
+    capacity: 20,
+    categories: []
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
@@ -73,12 +211,12 @@ export default function GameSessionTestHarness() {
   
   // Create mock world and character for testing
   const createTestWorld = React.useCallback(() => {
-    const worlds = worldStore.getState().worlds || {};
-    const characters = characterStore.getState().characters || {};
+    const worlds = useWorldStore.getState().worlds || {};
+    const characters = useCharacterStore.getState().characters || {};
     
     // Only create if they don't exist
     if (!worlds[mockWorld.id]) {
-      worldStore.setState({
+      useWorldStore.setState({
         worlds: {
           ...worlds,
           [mockWorld.id]: mockWorld
@@ -88,7 +226,7 @@ export default function GameSessionTestHarness() {
     }
     
     if (!characters[mockCharacter.id]) {
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {
           ...characters,
           [mockCharacter.id]: mockCharacter
@@ -106,19 +244,23 @@ export default function GameSessionTestHarness() {
     // Create test world only once on initial mount
     createTestWorld();
     
+    // Don't auto-start sessions - let the GameSession component handle it
+    // This prevents conflicts between test harness and component initialization
+    logger.info('Test harness ready - GameSession component will handle session initialization');
+    
     // Get initial state
-    setCurrentState({...sessionStore.getState()});
+    setCurrentState({...useSessionStore.getState()});
     
     // Setup state display refreshing
     const intervalId = setInterval(() => {
-      setCurrentState({...sessionStore.getState()});
+      setCurrentState({...useSessionStore.getState()});
     }, 1000);
     
     return () => {
       // Clean up
       clearInterval(intervalId);
     };
-  }, [createTestWorld]);
+  }, [createTestWorld, logger]);
   
   const handleSessionStart = () => {
     logger.info('Session started');
@@ -140,13 +282,7 @@ export default function GameSessionTestHarness() {
   
   return (
     <div className="p-6">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-2xl font-bold mb-4 mt-4">Game Session Test Harness</h1>
+      <h2 className="text-2xl font-bold mb-6">Game Session Test Harness</h2>
       
       <div className="mb-4">
         <button 
@@ -170,7 +306,7 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
-            const store = sessionStore.getState();
+            const store = useSessionStore.getState();
             if (store.initializeSession) {
               // Use the test character ID
               store.initializeSession(mockWorld.id, mockCharacter.id, handleSessionStart);
@@ -187,10 +323,53 @@ export default function GameSessionTestHarness() {
           onClick={() => {
             // End current session only
             logger.info('Ending session');
-            sessionStore.getState().endSession();
+            useSessionStore.getState().endSession();
           }}
         >
           End Session
+        </button>
+        
+        <button 
+          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
+          onClick={() => {
+            // Reset all session state to break infinite loops
+            logger.info('🔄 Resetting all session and narrative state');
+            
+            // 1. Reset session store completely
+            useSessionStore.setState({
+              id: null,
+              status: 'initializing',
+              currentSceneId: null,
+              playerChoices: [],
+              error: null,
+              worldId: null,
+              characterId: null,
+              savedSessions: {}, // Clear saved sessions too
+              autoSave: {
+                enabled: true,
+                lastSaveTime: null,
+                status: 'idle',
+                errorMessage: null,
+                totalSaves: 0,
+              }
+            });
+            
+            // 2. Clear all narrative data using reset method
+            const narrativeStore = useNarrativeStore.getState();
+            narrativeStore.reset(); // This clears all segments, decisions, and endings
+            narrativeStore.clearEnding();
+            
+            // 3. Reset character state
+            useCharacterStore.getState().setCurrentCharacter(mockCharacter.id);
+            
+            // 4. Force page refresh to ensure clean state
+            setTimeout(() => {
+              logger.info('🔄 Forcing page refresh for complete reset');
+              window.location.reload();
+            }, 500);
+          }}
+        >
+          Reset State & Refresh
         </button>
       </div>
       
@@ -200,7 +379,6 @@ export default function GameSessionTestHarness() {
             worldId={mockWorld.id}
             onSessionStart={handleSessionStart}
             onSessionEnd={handleSessionEnd}
-            disableAutoResume={true}
           />
         ) : (
           <div>Component hidden</div>
@@ -213,8 +391,8 @@ export default function GameSessionTestHarness() {
           Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
         </p>
         <p className="text-sm text-gray-600 mb-2">
-          Store methods: {Object.keys(sessionStore.getState()).filter(key => {
-            const value = sessionStore.getState()[key as keyof typeof sessionStore.getState];
+          Store methods: {Object.keys(useSessionStore.getState()).filter(key => {
+            const value = useSessionStore.getState()[key as keyof typeof useSessionStore.getState];
             return typeof value === 'function';
           }).join(', ')}
         </p>

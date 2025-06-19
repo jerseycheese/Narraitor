@@ -39,7 +39,7 @@ const defaultWorldData: Partial<World> = {
   attributes: [],
 };
 
-describe.skip('AttributeReviewStep', () => {
+describe('AttributeReviewStep', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -199,7 +199,7 @@ describe.skip('AttributeReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Selected attributes: 2 / 6');
+    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Attributes Selected: 2 / 6');
   });
 
   test('enforces maximum 6 attributes limit', () => {
@@ -237,7 +237,7 @@ describe.skip('AttributeReviewStep', () => {
 
     // Note: We're not enforcing max limit in the component itself anymore
     // Just checking that the count is correctly displayed
-    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Selected attributes: 8 / 6');
+    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Attributes Selected: 8 / 6');
   });
 
   test('allows toggling attributes on and off', () => {

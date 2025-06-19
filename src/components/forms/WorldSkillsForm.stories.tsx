@@ -30,9 +30,8 @@ const mockSkills: WorldSkill[] = [
     worldId: 'world-123',
     name: 'Athletics',
     description: 'Physical prowess and sports',
-    linkedAttributeId: 'attr-1',
+    attributeIds: ['attr-1'],
     difficulty: DEFAULT_SKILL_DIFFICULTY,
-    category: 'Physical',
     baseValue: 5,
     minValue: 1,
     maxValue: 10,
@@ -42,9 +41,8 @@ const mockSkills: WorldSkill[] = [
     worldId: 'world-123',
     name: 'Research',
     description: 'Finding and analyzing information',
-    linkedAttributeId: 'attr-2',
+    attributeIds: ['attr-2'],
     difficulty: 'easy' as const,
-    category: 'Mental',
     baseValue: 5,
     minValue: 1,
     maxValue: 10,
@@ -52,7 +50,7 @@ const mockSkills: WorldSkill[] = [
 ];
 
 const meta: Meta<typeof WorldSkillsForm> = {
-  title: 'Narraitor/UI/Forms/WorldSkillsForm',
+  title: 'Narraitor/World/Forms/WorldSkillsForm',
   component: WorldSkillsForm,
   parameters: {
     layout: 'padded',
@@ -87,50 +85,3 @@ export const Empty: Story = {
   },
 };
 
-export const NoAttributes: Story = {
-  args: {
-    skills: mockSkills,
-    attributes: [],
-    worldId: 'world-123',
-  },
-};
-
-export const SingleSkill: Story = {
-  args: {
-    skills: [mockSkills[0]],
-    attributes: mockAttributes,
-    worldId: 'world-123',
-  },
-};
-
-export const AllDifficulties: Story = {
-  args: {
-    skills: [
-      { ...mockSkills[0], difficulty: 'easy' as const },
-      { ...mockSkills[1], difficulty: 'medium' as const },
-      {
-        id: 'skill-3',
-        worldId: 'world-123',
-        name: 'Advanced Magic',
-        description: 'Complex spell casting',
-        difficulty: 'hard' as const,
-        baseValue: 5,
-        minValue: 1,
-        maxValue: 10,
-      },
-    ],
-    attributes: mockAttributes,
-    worldId: 'world-123',
-  },
-};
-
-export const UnlinkedSkills: Story = {
-  args: {
-    skills: mockSkills.map(skill => ({
-      ...skill,
-      linkedAttributeId: undefined,
-    })),
-    attributes: mockAttributes,
-    worldId: 'world-123',
-  },
-};

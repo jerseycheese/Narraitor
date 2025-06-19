@@ -1,8 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ToneSettings,
@@ -14,124 +12,102 @@ import {
   LANGUAGE_COMPLEXITY_DESCRIPTIONS,
   DEFAULT_TONE_SETTINGS
 } from '@/types/tone-settings.types';
+import { 
+  descriptionsToSelectOptions,
+  validateToneSettings 
+} from '@/lib/utils';
+import { createFormUpdater } from '@/lib/utils/formHelpers';
 
 export interface ToneSettingsFormProps {
   toneSettings?: ToneSettings;
   onToneSettingsChange: (toneSettings: ToneSettings) => void;
   onSave?: () => void;
   showSaveButton?: boolean;
+  showHeader?: boolean;
 }
 
 export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
   toneSettings = DEFAULT_TONE_SETTINGS,
   onToneSettingsChange,
   onSave,
-  showSaveButton = false
+  showSaveButton = false,
+  showHeader = true
 }) => {
-  const handleContentRatingChange = (value: ContentRating) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      contentRating: value
-    });
-  };
+  // Create form updater utilities
+  const formUpdater = createFormUpdater(toneSettings, onToneSettingsChange);
+  
+  // Convert description objects to select options
+  const contentRatingOptions = descriptionsToSelectOptions(CONTENT_RATING_DESCRIPTIONS);
+  const narrativeStyleOptions = descriptionsToSelectOptions(NARRATIVE_STYLE_DESCRIPTIONS);
+  const languageComplexityOptions = descriptionsToSelectOptions(LANGUAGE_COMPLEXITY_DESCRIPTIONS);
 
-  const handleNarrativeStyleChange = (value: NarrativeStyle) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      narrativeStyle: value
-    });
-  };
-
-  const handleLanguageComplexityChange = (value: LanguageComplexity) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      languageComplexity: value
-    });
-  };
+  // Validation state
+  const validationResult = validateToneSettings(toneSettings);
 
   const handleCustomInstructionsChange = (value: string) => {
-    onToneSettingsChange({
-      ...toneSettings,
-      customInstructions: value || undefined
-    });
+    formUpdater.updateField('customInstructions', value === '' ? undefined : value);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tone Settings</CardTitle>
-        <CardDescription>
-          Configure the narrative style, content rating, and language complexity for generated content.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div className="p-6 bg-white rounded-lg border shadow-sm">
+      {showHeader && (
+        <div className="mb-6">
+          <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
+          <p className="text-sm text-gray-600">
+            Configure the narrative style, content rating, and language complexity for generated content.
+          </p>
+        </div>
+      )}
+      <div className="space-y-6">
         {/* Content Rating */}
         <div className="space-y-2">
           <Label htmlFor="content-rating">Content Rating</Label>
-          <Select
+          <select
+            id="content-rating"
             value={toneSettings.contentRating}
-            onValueChange={handleContentRatingChange}
+            onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="content-rating">
-              <SelectValue placeholder="Select content rating" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(CONTENT_RATING_DESCRIPTIONS).map(([rating, description]) => (
-                <SelectItem key={rating} value={rating}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{rating}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {contentRatingOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Narrative Style */}
         <div className="space-y-2">
           <Label htmlFor="narrative-style">Narrative Style</Label>
-          <Select
+          <select
+            id="narrative-style"
             value={toneSettings.narrativeStyle}
-            onValueChange={handleNarrativeStyleChange}
+            onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="narrative-style">
-              <SelectValue placeholder="Select narrative style" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(NARRATIVE_STYLE_DESCRIPTIONS).map(([style, description]) => (
-                <SelectItem key={style} value={style}>
-                  <div className="flex flex-col">
-                    <span className="font-medium capitalize">{style.replace('-', ' ')}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {narrativeStyleOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Language Complexity */}
         <div className="space-y-2">
           <Label htmlFor="language-complexity">Language Complexity</Label>
-          <Select
+          <select
+            id="language-complexity"
             value={toneSettings.languageComplexity}
-            onValueChange={handleLanguageComplexityChange}
+            onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
+            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <SelectTrigger id="language-complexity">
-              <SelectValue placeholder="Select language complexity" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(LANGUAGE_COMPLEXITY_DESCRIPTIONS).map(([complexity, description]) => (
-                <SelectItem key={complexity} value={complexity}>
-                  <div className="flex flex-col">
-                    <span className="font-medium capitalize">{complexity}</span>
-                    <span className="text-sm text-muted-foreground">{description}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {languageComplexityOptions.map((option) => (
+              <option key={option.value} value={option.value} title={option.description}>
+                {option.label} - {option.description}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Custom Instructions */}
@@ -146,12 +122,29 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
           />
         </div>
 
-        {showSaveButton && onSave && (
-          <div className="flex justify-end">
-            <Button onClick={onSave}>Save Tone Settings</Button>
+        {/* Validation Errors */}
+        {!validationResult.valid && (
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-sm text-destructive font-medium mb-1">Please fix the following issues:</p>
+            <ul className="text-sm text-destructive space-y-1">
+              {validationResult.errors.map((error, index) => (
+                <li key={index}>• {error}</li>
+              ))}
+            </ul>
           </div>
         )}
-      </CardContent>
-    </Card>
+
+        {showSaveButton && onSave && (
+          <div className="flex justify-end">
+            <Button 
+              onClick={onSave}
+              disabled={!validationResult.valid}
+            >
+              Save Tone Settings
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

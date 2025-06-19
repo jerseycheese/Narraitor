@@ -42,15 +42,10 @@ This implementation creates a comprehensive system for automatically processing 
 
 ### Updated Documentation
 
-1. **docs/development/claude-integration/complete-development-flowchart.md**
+1. **Development workflow documentation**
    - Added continuous issue processing to the development approaches
    - Included workflow steps for batch processing
    - Updated best practices
-
-2. **docs/development/claude-integration/workflow-scripts.md**
-   - Added documentation for all new scripts
-   - Updated usage examples
-   - Added best practices section
 
 3. **scripts/README.md**
    - Added new sections for Claude Code integration

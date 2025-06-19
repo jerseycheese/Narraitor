@@ -23,6 +23,8 @@ export interface World extends NamedEntity, TimestampedEntity {
   skills: WorldSkill[];
   settings: WorldSettings;
   image?: WorldImage;
+  reference?: string;
+  relationship?: 'set_in' | 'based_on';
   toneSettings?: ToneSettings;
 }
 

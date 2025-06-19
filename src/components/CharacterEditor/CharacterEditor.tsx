@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
-import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+// Removed direct AI client imports - using API routes instead
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
@@ -15,7 +14,7 @@ import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
 
 // Use the Character type from the store since it's different from the main types
-type Character = ReturnType<typeof characterStore.getState>['characters'][string];
+type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
 interface CharacterEditorProps {
   characterId: string;
@@ -34,7 +33,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   // Load character data on mount
   useEffect(() => {
     try {
-      const { characters } = characterStore.getState();
+      const { characters } = useCharacterStore.getState();
       const characterData = characters[characterId];
       
       if (!characterData) {
@@ -44,7 +43,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
       
       // Load world data for attribute/skill limits
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldData = worlds[characterData.worldId];
       setWorld(worldData);
       
@@ -63,7 +62,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     
     setSaving(true);
     try {
-      const { updateCharacter } = characterStore.getState();
+      const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, character);
       
       // Small delay to show save state
@@ -85,7 +84,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   
   // Handle character deletion
   const handleDelete = () => {
-    characterStore.getState().deleteCharacter(characterId);
+    useCharacterStore.getState().deleteCharacter(characterId);
     router.push('/characters');
   };
   
@@ -95,55 +94,66 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     
     setGeneratingPortrait(true);
     try {
-      const aiClient = createAIClient();
-      const portraitGenerator = new PortraitGenerator(aiClient);
-      
-      // Create a Character-like object for portrait generation
-      const characterForPortrait = {
-        id: characterId,
-        name: character.name,
-        description: character.background?.history || '',
-        worldId: character.worldId,
-        background: {
-          history: character.background.history,
-          personality: character.background.personality,
-          physicalDescription: customDescription || character.background.physicalDescription || '',
-          goals: character.background.goals || [],
-          fears: character.background.fears || [],
-          relationships: []
+      // Use the portrait generation API route
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        attributes: character.attributes.map(attr => ({
-          attributeId: attr.id,
-          value: attr.modifiedValue
-        })),
-        skills: character.skills.map(skill => ({
-          skillId: skill.id,
-          level: skill.level,
-          experience: 0,
-          isActive: true
-        })),
-        inventory: {
-          characterId: characterId,
-          items: [],
-          capacity: 100,
-          categories: []
-        },
-        status: {
-          health: character.status.hp,
-          maxHealth: 100,
-          conditions: [],
-          location: undefined
-        },
-        createdAt: character.createdAt,
-        updatedAt: character.updatedAt
-      };
-      
-      const portrait = await portraitGenerator.generatePortrait(characterForPortrait, {
-        worldTheme: world.theme
+        body: JSON.stringify({
+          character: {
+            id: characterId,
+            name: character.name,
+            worldId: character.worldId,
+            background: {
+              history: character.background.history,
+              personality: character.background.personality,
+              physicalDescription: customDescription || character.background.physicalDescription || '',
+              goals: character.background.goals || [],
+              fears: character.background.fears || [],
+              relationships: []
+            },
+            attributes: character.attributes.map(attr => ({
+              attributeId: attr.id,
+              value: attr.modifiedValue
+            })),
+            skills: character.skills.map(skill => ({
+              skillId: skill.id,
+              level: skill.level,
+              experience: 0,
+              isActive: true
+            })),
+            inventory: {
+              characterId: characterId,
+              items: [],
+              capacity: 100,
+              categories: []
+            },
+            status: {
+              health: character.status.health,
+              maxHealth: character.status.maxHealth,
+              conditions: character.status.conditions
+            },
+            createdAt: character.createdAt,
+            updatedAt: character.updatedAt
+          },
+          world: world,
+          customDescription: customDescription
+        }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate portrait');
+      }
+
+      const { portrait } = await response.json();
       
       // Update character with new portrait
       setCharacter({ ...character, portrait });
+      
+      // Also update the character store
+      useCharacterStore.getState().updateCharacter(characterId, { portrait });
     } catch (error) {
       console.error('Failed to generate portrait:', error);
       setError('Failed to generate portrait. Please try again.');
@@ -190,8 +200,20 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Background Section */}
       <BackgroundForm
-        background={character.background}
-        onBackgroundChange={(background) => setCharacter({ ...character, background })}
+        background={{
+          history: character.background.history,
+          personality: character.background.personality,
+          goals: character.background.goals,
+          fears: character.background.fears,
+          physicalDescription: character.background.physicalDescription
+        }}
+        onBackgroundChange={(background) => setCharacter({ 
+          ...character, 
+          background: {
+            ...character.background,
+            ...background
+          }
+        })}
       />
       
       {/* Attributes Section */}

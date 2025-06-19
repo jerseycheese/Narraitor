@@ -8,21 +8,37 @@ const meta: Meta<typeof SessionControls> = {
     layout: 'padded',
   },
   argTypes: {
-    status: {
-      control: 'select',
-      options: ['active', 'paused', 'ended'],
-    },
-    onPause: { action: 'pause clicked' },
-    onResume: { action: 'resume clicked' },
     onEnd: { action: 'end clicked' },
+    onRestart: { action: 'restart clicked' },
+    onEndStory: { action: 'end story clicked' },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const ActiveSession: Story = {
   args: {
-    status: 'active',
+    onRestart: undefined,
+    onEndStory: undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Basic session controls with only the End Session button.',
+      },
+    },
   },
 };
+
+export const WithAllControls: Story = {
+  args: {},
+  parameters: {
+    docs: {
+      description: {
+        story: 'Session controls with all optional buttons: New Session, End Story, and End Session.',
+      },
+    },
+  },
+};
+

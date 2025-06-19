@@ -12,6 +12,18 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
+  // Configure external image domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+  
   // Optional: You can add experimental features if needed
   // experimental: {
   //   serverActions: true,

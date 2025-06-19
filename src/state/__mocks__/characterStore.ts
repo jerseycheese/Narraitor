@@ -27,7 +27,8 @@ const mockState = {
   reset: createMockFn(),
   setError: createMockFn(),
   clearError: createMockFn(),
-  setLoading: createMockFn()
+  setLoading: createMockFn(),
+  getCharacterById: createMockFn(null)
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,6 +40,7 @@ const mockSelector = (selector?: any) => {
 };
 
 export const characterStore = isJestEnvironment ? jest.fn(mockSelector) : mockSelector;
+export const useCharacterStore = characterStore;
 
 // Add Zustand-style methods
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

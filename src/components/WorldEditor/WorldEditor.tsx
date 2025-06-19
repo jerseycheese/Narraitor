@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
@@ -22,7 +22,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   // Load world data on mount
   useEffect(() => {
     try {
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldData = worlds[worldId];
       
       if (!worldData) {
@@ -33,10 +33,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       
       setWorld(worldData);
       setLoading(false);
-    } catch (err) {
+    } catch {
       setError('Failed to load world data');
       setLoading(false);
-      console.error('Error loading world:', err);
     }
   }, [worldId]);
   
@@ -46,16 +45,15 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     
     setSaving(true);
     try {
-      const { updateWorld } = worldStore.getState();
+      const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, world);
       
       // Small delay to show save state
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push('/worlds'); // Navigate back to worlds list
-    } catch (err) {
+    } catch {
       setError('Failed to save world');
-      console.error('Error saving world:', err);
     } finally {
       setSaving(false);
     }
@@ -110,6 +108,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         attributes={world.attributes} 
         skills={world.skills}
         worldId={worldId} 
+        maxAttributes={world.settings.maxAttributes}
         onChange={(attributes) => handleWorldChange({ attributes })} 
       />
       
@@ -122,7 +121,9 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       
       <WorldSettingsForm 
         settings={world.settings} 
+        toneSettings={world.toneSettings}
         onChange={(settings) => handleWorldChange({ settings })} 
+        onToneSettingsChange={(toneSettings) => handleWorldChange({ toneSettings })}
       />
       
       <div className="flex justify-end space-x-4 pt-4 border-t">

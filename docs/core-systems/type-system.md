@@ -1,3 +1,12 @@
+---
+title: "Type System Documentation"
+type: architecture
+category: types
+tags: [typescript, types, system, architecture]
+created: 2025-05-13
+updated: 2025-06-08
+---
+
 # Type System Documentation
 
 The Narraitor type system provides comprehensive TypeScript interfaces and types for all core domains in the application. This document describes the type architecture, design decisions, and usage patterns.

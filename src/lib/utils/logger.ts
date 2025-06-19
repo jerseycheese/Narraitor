@@ -113,3 +113,6 @@ export class Logger {
 
 // Default export for convenience
 export default Logger;
+
+// Create a default logger instance
+export const logger = new Logger('Narraitor');

@@ -15,7 +15,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
   beforeEach(() => {
     worldStore.getState().reset();
     mockAIClient.generateContent.mockClear();
-    generator = new NarrativeGenerator(mockAIClient as any);
+    generator = new NarrativeGenerator(mockAIClient as unknown as AIClient);
 
     // Create a world with tone settings
     const toneSettings: ToneSettings = {
@@ -57,13 +57,13 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     });
 
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Content Rating: PG-13')
+      expect.stringContaining('PG-13 CONTENT GUIDELINES')
     );
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Narrative Style: dramatic')
+      expect.stringContaining('DRAMATIC NARRATIVE STYLE')
     );
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Language Complexity: advanced')
+      expect.stringContaining('ADVANCED LANGUAGE COMPLEXITY')
     );
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
       expect.stringContaining('Focus on character development and emotional depth')
@@ -142,12 +142,12 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       characterIds: ['test-character']
     });
 
-    // Should use default tone settings
+    // Should use default tone settings with detailed guidance
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Content Rating: PG')
+      expect.stringContaining('PG-RATED CONTENT GUIDELINES')
     );
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Narrative Style: balanced')
+      expect.stringContaining('BALANCED NARRATIVE STYLE')
     );
   });
 
@@ -160,10 +160,10 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     await generator.generateInitialScene(worldId, ['test-character']);
 
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('dramatic')
+      expect.stringContaining('DRAMATIC NARRATIVE STYLE')
     );
     expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-      expect.stringContaining('PG-13')
+      expect.stringContaining('PG-13 CONTENT GUIDELINES')
     );
   });
 });

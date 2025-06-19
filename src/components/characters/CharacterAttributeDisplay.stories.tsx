@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterAttributeDisplay } from './CharacterAttributeDisplay';
 
 const meta: Meta<typeof CharacterAttributeDisplay> = {
-  title: 'Narraitor/Character/CharacterAttributeDisplay',
+  title: 'Narraitor/Character/Display/CharacterAttributeDisplay',
   component: CharacterAttributeDisplay,
   parameters: {
     layout: 'padded',

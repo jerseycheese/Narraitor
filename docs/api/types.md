@@ -1,3 +1,12 @@
+---
+title: "Narraitor Type System API"
+type: api
+category: development
+tags: [api, types, typescript]
+created: 2025-05-13
+updated: 2025-06-08
+---
+
 # Narraitor Type System API
 
 The Narraitor type system provides TypeScript interfaces and types for all core domains in the application. This document serves as a comprehensive reference for all available types.
@@ -94,15 +103,19 @@ interface WorldAttribute extends NamedEntity {
 ```typescript
 interface WorldSkill extends NamedEntity {
   worldId: EntityID;
-  linkedAttributeId?: EntityID;
+  attributeIds?: EntityID[]; // Multi-attribute linking
   difficulty: 'easy' | 'medium' | 'hard';
   category?: string;
+  baseValue: number;
+  minValue: number;
+  maxValue: number;
 }
 ```
 
 **Properties:**
-- `linkedAttributeId`: Optional attribute that affects this skill
+- `attributeIds`: Array of attribute IDs that affect this skill (multi-attribute linking)
 - `difficulty`: Learning difficulty affecting XP requirements
+- `baseValue`, `minValue`, `maxValue`: Skill value constraints
 
 ### WorldSettings
 

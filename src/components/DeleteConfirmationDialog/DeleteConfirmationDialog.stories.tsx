@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 
 const meta = {
-  title: 'Narraitor/Common/DeleteConfirmationDialog',
+  title: 'Narraitor/UI/Modals/DeleteConfirmationDialog',
   component: DeleteConfirmationDialog,
   parameters: {
     layout: 'centered',

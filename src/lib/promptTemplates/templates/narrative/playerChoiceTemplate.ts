@@ -6,6 +6,11 @@ interface PlayerChoiceTemplateContext {
   genre?: string;
   narrativeContext?: NarrativeContext;
   characterIds?: string[];
+  worldSkills?: Array<{
+    id: string;
+    name: string;
+    description: string;
+  }>;
 }
 
 /**
@@ -13,7 +18,7 @@ interface PlayerChoiceTemplateContext {
  * Generates a decision prompt and 3-5 options based on the current narrative context
  */
 export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): string => {
-  const { worldName, genre, narrativeContext } = context;
+  const { worldName, genre, narrativeContext, worldSkills } = context;
   
   // Extract recent narrative content to provide context
   const recentContent = narrativeContext?.recentSegments
@@ -37,31 +42,109 @@ export const playerChoiceTemplate = (context: PlayerChoiceTemplateContext): stri
     shortContext = `${firstPart}\n\n[...narrative continues...]\n\n${lastPart}`;
   }
   
+  // Build skills information for the prompt
+  let skillsInfo = '';
+  if (worldSkills && worldSkills.length > 0) {
+    skillsInfo = `
+AVAILABLE SKILLS IN THIS WORLD:
+${worldSkills.map(skill => `- ${skill.name}: ${skill.description}`).join('\n')}`;
+  }
+
   return `You are creating meaningful player choices for an interactive narrative game set in the world of "${worldName}".
 ${genre ? `Genre: ${genre}` : ''}
 
 CURRENT CONTEXT (brief summary):
 ${shortContext}
-${location ? `Current location: ${location}` : ''}
+${location ? `Current location: ${location}` : ''}${skillsInfo}
 
 INSTRUCTIONS:
-Based on the ENTIRE narrative context (both beginning and end if provided), create 3 distinct action choices that:
+Based on the ENTIRE narrative context (both beginning and end if provided), create 3-4 distinct action choices that:
 1. Reference specific elements from the current scene (characters, objects, events, locations)
 2. Offer meaningfully different paths forward in the story
 3. Are concise (under 15 words) and written as direct actions
 4. Consider both the immediate situation AND the broader story context
+5. Include variety in character alignment approaches when possible
+
+ALIGNMENT VARIETY (when appropriate):
+- LAWFUL: Follows rules, respects authority, seeks order, honors agreements, protects others
+- NEUTRAL: Balanced approach, practical solutions, adapts to situation, moderate response  
+- CHAOTIC: Unexpected, disruptive actions that change the situation dramatically
 
 Write choices as direct actions without "you" (e.g., "Investigate the noise" not "You investigate the noise").
 
+SKILL REQUIREMENTS (CRITICAL FOR MVP):
+Generate choices with skill requirements when the situation naturally calls for specialized abilities:
+- Analyze the current scene for opportunities where skills would logically apply
+- Use skills that make narrative sense (e.g., Lockpicking for locked doors, Persuasion for social encounters, Stealth for avoiding detection, Athletics for physical challenges)
+- Set reasonable difficulty levels based on the challenge severity:
+  * Easy tasks: 3-4 skill level
+  * Moderate tasks: 5-6 skill level  
+  * Hard tasks: 7-8 skill level
+  * Very hard tasks: 9+ skill level
+- VARY skill requirements across choices - use different character abilities when possible
+- Balance: Include both skill-required and non-skill choices for player agency
+- Custom actions by players should trigger implicit skill checks when appropriate
+- Format skill requirements as: [SkillName X+] where X is the minimum level
+
+CHOICE HINTS:
+Add helpful hint text when choices benefit from explanation:
+- Explain potential consequences or approaches
+- Clarify what the choice involves
+- Provide context for skill-based choices
+
+DECISION WEIGHT ANALYSIS:
+Carefully evaluate the narrative situation and determine the significance of this decision:
+- MINOR: Routine choices with limited consequences (casual conversations, basic exploration, everyday interactions)
+- MAJOR: Important choices that significantly impact the story direction (meeting key characters, choosing major paths, using powerful abilities, entering dangerous areas, making moral choices)
+- CRITICAL: Life-changing decisions with major consequences (combat with deadly enemies, final confrontations, destiny-altering choices, choosing between life and death)
+
+Consider the stakes, potential consequences, and story impact. Don't default to MINOR - use MAJOR for interesting story moments and CRITICAL for climactic situations.
+
 FORMAT:
+Decision Weight: [MINOR/MAJOR/CRITICAL]
 Decision: What will you do?
+Context Summary: [Brief 1-2 sentence summary of the current situation that led to this decision]
 
 Options:
-1. [First choice - action referencing specific story elements]
-2. [Second choice - different approach to the situation]
-3. [Third choice - alternative path considering story context]
+1. [NEUTRAL] [First choice - action referencing specific story elements]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
 
-Keep your response EXACTLY in this format. Only include the Decision and Options sections.`;
+2. [NEUTRAL] [Second choice - different approach to the situation] 
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+3. [LAWFUL] [Third choice - honorable/rule-following approach when appropriate]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+4. [CHAOTIC] [Fourth choice - unexpected/disruptive alternative when appropriate]
+   Hint: [Optional explanation of the choice]
+   Requirements: [Optional - SkillName X+]
+
+ALIGNMENT INSTRUCTIONS: 
+- Always include alignment tags [LAWFUL], [NEUTRAL], or [CHAOTIC] at the start of each choice
+- LAWFUL choices follow rules, respect authority, protect others
+- NEUTRAL choices are practical, balanced approaches
+- CHAOTIC choices are unexpected, dramatic, or disruptive
+- Mix alignments to provide variety - not every choice needs to be neutral!
+- DO NOT include any emojis in your response - the frontend will add them automatically
+
+CONTEXT SUMMARY INSTRUCTIONS:
+- Provide a brief 1-2 sentence summary that captures the current narrative moment
+- Focus on what just happened that led to this decision point
+- Reference specific story elements, locations, or character actions
+- Example: "After discovering the hidden chamber, strange symbols glow on the walls around you."
+
+IMPORTANT FORMATTING RULES:
+- Each option starts with a number and period
+- Hint and Requirements lines are optional but should be indented
+- Use exact format "Requirements: SkillName X+" for skill checks
+- Keep hints concise (under 20 words)
+
+Keep your response EXACTLY in this format. Include the Decision Weight line, Context Summary, then Decision and Options sections with optional Hint and Requirements for each choice.
+
+IMPORTANT: Never include emojis anywhere in your response. Use only plain text - the user interface will add visual elements automatically.`;
 };
 
 export default playerChoiceTemplate;

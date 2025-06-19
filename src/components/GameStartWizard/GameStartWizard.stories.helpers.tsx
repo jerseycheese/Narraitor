@@ -1,7 +1,7 @@
 import React from 'react';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
-import { sessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 // Shared mock data
 const mockWorlds = {
@@ -102,14 +102,14 @@ export const createWizardMockState = (options: WizardMockOptions) => {
     const worlds = hasWorlds ? mockWorlds : {};
     const characters = hasCharacters ? mockCharacters : {};
     
-    worldStore.setState({ 
+    useWorldStore.setState({ 
       worlds,
       currentWorldId: null 
     });
-    characterStore.setState({ 
+    useCharacterStore.setState({ 
       characters 
     });
-    sessionStore.setState({ 
+    useSessionStore.setState({ 
       savedSessions: {},
       initializeSession: async (worldId: string, characterId: string, callback?: () => void) => {
         console.log('Initializing session:', { worldId, characterId });

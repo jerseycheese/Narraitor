@@ -1,3 +1,12 @@
+---
+title: "Extending the DevTools Panel"
+type: guide
+category: development
+tags: [devtools, development, debugging, extension]
+created: 2025-05-17
+updated: 2025-06-08
+---
+
 # Extending the DevTools Panel
 
 The DevTools panel in Narraitor is designed to be easily extensible. This document explains how to add new debugging tools and sections to the panel.

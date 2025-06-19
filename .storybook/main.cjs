@@ -7,14 +7,18 @@ const path = require('path');
 const config = {
   stories: [
     // Include all stories from the project
-    '../src/**/*.stories.@(js|jsx|ts|tsx)'
+    '../src/**/*.stories.@(js|jsx|ts|tsx)',
+    '../src/**/*.mdx'
   ],
   addons: [
-    '@storybook/addon-essentials'
+    '@storybook/addon-essentials',
+    '@storybook/addon-a11y'
   ],
   framework: {
     name: '@storybook/nextjs',
-    options: {}
+    options: {
+      nextConfigPath: path.resolve(__dirname, '../next.config.ts'),
+    }
   },
   staticDirs: ['../public'],
   

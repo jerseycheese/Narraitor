@@ -15,6 +15,7 @@ The GameSession has been refactored using the Container/Presenter pattern:
 - **GameSessionLoading** (`GameSessionLoading.tsx`): Loading state component
 - **PlayerChoices** (`PlayerChoices.tsx`): Renders and handles player choices
 - **SessionControls** (`SessionControls.tsx`): Pause/Resume/End session controls
+- **JournalModal** (`JournalModal.tsx`): Displays persistent journal entries with accessibility features
 
 ### Custom Hook
 
@@ -99,6 +100,28 @@ The `ActiveGameSession` component includes:
 - **Contextual Choices**: AI generates options relevant to current story situation
 - **Error Resilience**: System continues functioning even with AI service issues
 
+## Journal System Integration
+
+The GameSession includes a fully integrated journal system that:
+
+### Core Journal Features
+- **Persistent Storage**: Journal entries persist across browser sessions using IndexedDB
+- **Automatic Entry Creation**: AI-generated journal entries from narrative events
+- **Modal Interface**: Accessible journal modal with proper ARIA attributes, including full keyboard navigation and screen reader support
+- **Entry Organization**: Entries grouped by type with significance indicators
+- **Session Integration**: Journal access available during active gameplay
+
+### Technical Implementation
+- **Zustand Persistence**: Uses `journalStore` with IndexedDB adapter
+- **AI Summarization**: Automatic journal entry generation from narrative segments
+- **Performance**: Fast loading with synchronous data access
+
+### Usage
+- Journal button appears when character is present
+- Click to open modal showing all session entries
+- Entries automatically created during story progression
+- Data persists across browser refreshes and sessions
+
 ## Future Improvements
 
 - Context API for deeper component nesting
@@ -106,3 +129,4 @@ The `ActiveGameSession` component includes:
 - Enhanced loading states with progress indicators
 - Additional accessibility improvements
 - Character integration for personalized choice generation (linked to issues #116, #118, #121, #123, #124, #251)
+- Journal entry filtering and search functionality

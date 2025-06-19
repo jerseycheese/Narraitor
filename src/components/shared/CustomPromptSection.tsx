@@ -1,4 +1,6 @@
 import React from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface CustomPromptSectionProps {
   value: string;
@@ -23,15 +25,14 @@ export const CustomPromptSection: React.FC<CustomPromptSectionProps> = ({
 }) => {
   return (
     <div className={`space-y-2 ${className}`}>
-      <label htmlFor="custom-prompt" className="block text-sm font-medium text-gray-700">
+      <Label htmlFor="custom-prompt">
         {label}
-      </label>
-      <textarea
+      </Label>
+      <Textarea
         id="custom-prompt"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         rows={rows}
       />
       {helpText && (

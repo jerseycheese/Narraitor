@@ -24,7 +24,6 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       
       onChange({ image });
     } catch (err) {
-      console.error('Failed to generate world image:', err);
       throw err; // Let ImageGenerationSection handle the error display
     } finally {
       setIsGenerating(false);

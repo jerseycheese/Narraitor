@@ -178,5 +178,4 @@ Run the TDD workflow script to enforce testing practices:
 
 ## Related Documents
 - [[tdd-with-kiss|Test-Driven Development with KISS]]
-- [[claude-app-workflow|Claude App Workflow]]
 - [[kiss-principles-react|KISS Principles for React]]

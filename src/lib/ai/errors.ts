@@ -1,37 +1,10 @@
 // src/lib/ai/errors.ts
 
 import { AIServiceError } from './types';
+import { isRetryableError } from '@/lib/utils/errorUtils';
 
-/**
- * Determines if an error is retryable
- * @param error - The error to check
- * @returns True if the error is retryable
- */
-export const isRetryableError = (error: Error): boolean => {
-  const message = error.message.toLowerCase();
-  
-  // Network and timeout errors
-  if (
-    message.includes('network') || 
-    message.includes('timeout') ||
-    message.includes('429') ||
-    message.includes('rate limit')
-  ) {
-    return true;
-  }
-  
-  // Authentication and invalid key errors are not retryable
-  if (
-    message.includes('401') ||
-    message.includes('invalid api key') ||
-    message.includes('unauthorized')
-  ) {
-    return false;
-  }
-  
-  // Default to non-retryable
-  return false;
-};
+// Re-export the shared utility for backward compatibility
+export { isRetryableError };
 
 /**
  * Creates a standardized error object

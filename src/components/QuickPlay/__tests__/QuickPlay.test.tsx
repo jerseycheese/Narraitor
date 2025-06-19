@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuickPlay } from '../QuickPlay';
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -27,13 +27,13 @@ describe('QuickPlay', () => {
 
   describe('when no saved sessions exist', () => {
     beforeEach(() => {
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
     });
@@ -87,18 +87,18 @@ describe('QuickPlay', () => {
     };
 
     beforeEach(() => {
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': mockSavedSession,
         },
         resumeSavedSession: jest.fn().mockReturnValue(true),
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {
           'world-1': mockWorld,
         },
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-1': mockCharacter,
         },
@@ -122,7 +122,7 @@ describe('QuickPlay', () => {
 
     it('should resume session and navigate when "Continue Last Game" is clicked', async () => {
       const mockResume = jest.fn().mockReturnValue(true);
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': mockSavedSession,
         },
@@ -146,7 +146,7 @@ describe('QuickPlay', () => {
         lastPlayed: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
       };
 
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-old': olderSession,
           'session-1': mockSavedSession,
@@ -163,7 +163,7 @@ describe('QuickPlay', () => {
 
   describe('when saved session references deleted world/character', () => {
     beforeEach(() => {
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {
           'session-1': {
             id: 'session-1',
@@ -175,10 +175,10 @@ describe('QuickPlay', () => {
         },
         resumeSavedSession: jest.fn().mockReturnValue(true),
       });
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},
       });
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
       });
     });

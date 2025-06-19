@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 export interface GameReadyStepProps {
   worldId: string;
@@ -19,14 +19,14 @@ export function GameReadyStep({
   onBack,
   isStarting = false 
 }: GameReadyStepProps) {
-  const { worlds } = worldStore();
-  const { characters } = characterStore();
+  const { worlds } = useWorldStore();
+  const { characters } = useCharacterStore();
   
   const world = worlds[worldId];
   const character = characters[characterId];
 
   return (
-    <div className="text-center py-8">
+    <div data-testid="game-ready-step" className="text-center py-8">
       <h3 className="text-2xl font-bold text-gray-900 mb-6">
         Ready to Begin Your Story!
       </h3>

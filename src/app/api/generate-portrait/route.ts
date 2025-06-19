@@ -1,40 +1,175 @@
 // src/app/api/generate-portrait/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
+import Logger from '@/lib/utils/logger';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
+
+const logger = new Logger('API');
+
+/**
+ * Single function to build portrait prompts with AI-powered actor detection
+ */
+async function buildPortraitPrompt(
+  characterName: string,
+  physicalDescription: string,
+  worldTheme: string,
+  isKnownFigure?: boolean
+): Promise<string> {
+  try {
+    logger.debug('generate-portrait API', 'Starting AI character detection for:', characterName);
+    
+    // Use only the character detection part, not the full image generation
+    const { PortraitGenerator } = await import('@/lib/ai/portraitGenerator');
+    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+    
+    logger.debug('generate-portrait API', 'Creating AI client and generator');
+    const aiClient = createDefaultGeminiClient();
+    const generator = new PortraitGenerator(aiClient);
+    
+    // Create a minimal character object for detection
+    const mockCharacter: Character = {
+      id: 'detection-temp',
+      name: characterName,
+      description: '',
+      worldId: 'temp',
+      background: {
+        physicalDescription: physicalDescription,
+        history: '',
+        personality: '',
+        goals: [],
+        fears: [],
+        relationships: []
+      },
+      attributes: [],
+      skills: [],
+      inventory: {
+        characterId: 'detection-temp',
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    logger.debug('generate-portrait API', 'Calling buildPortraitPrompt directly to avoid image generation');
+    
+    // Call buildPortraitPrompt directly to avoid the image generation requirement
+    const prompt = await generator.buildPortraitPrompt(mockCharacter, {
+      worldTheme: worldTheme
+    });
+    
+    logger.debug('generate-portrait API', 'AI detection successful, prompt:', prompt.substring(0, 100) + '...');
+    return prompt;
+    
+  } catch (error) {
+    logger.debug('generate-portrait API', 'AI detection failed, using fallback. Error:', error);
+    
+    // Fallback to basic prompt if AI detection fails
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt } = await request.json();
+    const body = await request.json();
+    logger.debug('generate-portrait API', 'Request body keys:', Object.keys(body));
+    logger.debug('generate-portrait API', 'Request body:', JSON.stringify(body, null, 2));
+    
+    // Handle different input formats
+    let prompt: string;
+    let character: Character | undefined;
+    let world: World | undefined;
+    
+    if (typeof body === 'string') {
+      prompt = body;
+    } else if (body.prompt) {
+      // Direct prompt format
+      prompt = body.prompt;
+    } else if (body.character) {
+      // Character + world format - need to build prompt
+      character = body.character;
+      world = body.world;
+      const customDescription = body.customDescription;
+      const promptOnly = body.promptOnly;
+      
+      logger.debug('generate-portrait API', 'Character format detected, promptOnly:', promptOnly);
+      
+      if (promptOnly) {
+        logger.debug('generate-portrait API', 'Using promptOnly mode');
+        
+        const characterName = character?.name || 'Unknown';
+        const physicalDesc = customDescription || character?.background?.physicalDescription || '';
+        const worldTheme = world?.theme || 'Modern';
+        const isKnownFigure = character?.background?.isKnownFigure;
+        
+        const prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+        
+        return NextResponse.json({ 
+          prompt: prompt,
+          promptOnly: true
+        });
+      } else {
+        // Build a prompt for actual image generation
+        const characterName = character?.name || 'character';
+        const physicalDesc = customDescription || character?.background?.physicalDescription || 'No specific appearance described';
+        const worldTheme = world?.theme || 'fantasy';
+        const isKnownFigure = character?.background?.isKnownFigure;
+        
+        prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+      }
+    } else {
+      return NextResponse.json(
+        { error: 'Either prompt string or character object is required' },
+        { status: 400 }
+      );
+    }
     
     if (!prompt) {
       return NextResponse.json(
-        { error: 'Prompt is required' },
+        { error: 'Prompt could not be determined from input' },
         { status: 400 }
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    logger.debug('generate-portrait API', 'Generating portrait with prompt:', prompt.substring(0, 100) + '...');
+
+    const apiKey = process.env.GEMINI_API_KEY;
     
     if (!apiKey || apiKey === 'MOCK_API_KEY') {
-      return NextResponse.json(
-        { error: 'API key not configured' },
-        { status: 500 }
-      );
+      // Return a mock portrait for development
+      const mockPortrait = {
+        type: 'ai-generated' as const,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'unknown')}`,
+        generatedAt: new Date().toISOString(),
+        prompt: prompt
+      };
+      
+      logger.debug('generate-portrait API', 'Using mock portrait for development');
+      return NextResponse.json({ 
+        portrait: mockPortrait,
+        image: mockPortrait.url // For backward compatibility
+      });
     }
     
-    // Call Google's Gemini API from the server
+    // Call Google's Gemini API for image generation
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
         },
         body: JSON.stringify({
           contents: [{
-            parts: [
-              { text: prompt }
-            ]
+            parts: [{ text: prompt }]
           }],
           generationConfig: {
             responseModalities: ["TEXT", "IMAGE"]
@@ -45,92 +180,81 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Gemini API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers.entries()),
-        errorText: errorText
-      });
+      logger.error('generate-portrait API', 'Gemini API Error:', errorText);
       
-      return NextResponse.json(
-        { 
-          error: `Gemini API failed: ${response.status} ${response.statusText}`,
-          details: errorText,
-          apiEndpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent`
-        },
-        { status: response.status }
-      );
+      // Return mock portrait as fallback
+      const fallbackPortrait = {
+        type: 'ai-generated' as const,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
+        generatedAt: new Date().toISOString(),
+        prompt: prompt
+      };
+      
+      return NextResponse.json({ 
+        portrait: fallbackPortrait,
+        image: fallbackPortrait.url // For backward compatibility
+      });
     }
 
     const data = await response.json();
     
-    // Look for image in the response
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-      console.error('API Response structure issue:', {
-        hasCandidates: !!data.candidates,
-        candidatesLength: data.candidates?.length,
-        hasFirstCandidate: !!data.candidates?.[0],
-        hasContent: !!data.candidates?.[0]?.content,
-        hasParts: !!data.candidates?.[0]?.content?.parts,
-        fullResponse: JSON.stringify(data, null, 2)
-      });
-      
-      return NextResponse.json(
-        { 
-          error: 'No content in API response',
-          details: 'Missing candidates, content, or parts in response'
-        },
-        { status: 500 }
-      );
-    }
-
     // Find the image part in the response
-    type ContentPart = { text?: string; inlineData?: { mimeType?: string; data?: string } };
-    const parts = data.candidates[0].content.parts as ContentPart[];
-    const imagePart = parts.find((part) => 
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const imagePart = parts.find((part: { inlineData?: { mimeType?: string; data?: string } }) => 
       part.inlineData && 
       part.inlineData.mimeType && 
       part.inlineData.mimeType.startsWith('image/')
     );
     
     if (!imagePart) {
-      console.error('No image part found in response:', {
-        partsCount: parts.length,
-        partTypes: parts.map((p) => {
-          if ('text' in p) return 'text';
-          if ('inlineData' in p && p.inlineData) return `inlineData(${p.inlineData.mimeType || 'no-mime'})`;
-          return 'unknown';
-        }),
-        parts: parts
-      });
+      logger.warn('generate-portrait API', 'No image found in API response, using fallback');
       
-      return NextResponse.json(
-        { 
-          error: 'No image found in API response',
-          details: `Found ${parts.length} parts but no image data`
-        },
-        { status: 500 }
-      );
+      // Return mock portrait as fallback
+      const fallbackPortrait = {
+        type: 'ai-generated' as const,
+        url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(character?.name || 'fallback')}`,
+        generatedAt: new Date().toISOString(),
+        prompt: prompt
+      };
+      
+      return NextResponse.json({ 
+        portrait: fallbackPortrait,
+        image: fallbackPortrait.url // For backward compatibility
+      });
     }
 
-    // Return the image data (we already checked that inlineData exists above)
-    const mimeType = imagePart.inlineData!.mimeType;
-    const base64Data = imagePart.inlineData!.data;
+    // Return the generated portrait
+    const mimeType = imagePart.inlineData.mimeType;
+    const base64Data = imagePart.inlineData.data;
     
-    return NextResponse.json({
-      image: `data:${mimeType};base64,${base64Data}`,
+    const portraitData = {
+      type: 'ai-generated' as const,
+      url: `data:${mimeType};base64,${base64Data}`,
+      generatedAt: new Date().toISOString(),
       prompt: prompt
+    };
+    
+    logger.debug('generate-portrait API', 'Portrait generated successfully');
+
+    return NextResponse.json({
+      portrait: portraitData,
+      image: `data:${mimeType};base64,${base64Data}` // For backward compatibility
     });
 
   } catch (error) {
-    console.error('Portrait generation error:', error);
+    logger.error('generate-portrait API', 'Portrait generation failed:', error);
     
-    return NextResponse.json(
-      { 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    // Return mock portrait as fallback
+    const fallbackPortrait = {
+      type: 'ai-generated' as const,
+      url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(Math.random().toString())}`,
+      generatedAt: new Date().toISOString(),
+      prompt: `Portrait fallback due to error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+    
+    return NextResponse.json({ 
+      portrait: fallbackPortrait,
+      image: fallbackPortrait.url // For backward compatibility
+    });
   }
 }

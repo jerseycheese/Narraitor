@@ -45,6 +45,8 @@ export class WorldImageGenerator {
       themeContext = 'in steampunk style, brass machinery, steam-powered technology';
     } else if (themeLC.includes('medieval')) {
       themeContext = 'in medieval style, historical architecture, period atmosphere';
+    } else if (themeLC.includes('modern') || themeLC.includes('comedy') || themeLC.includes('workplace') || themeLC.includes('crime') || themeLC.includes('drama') || themeLC.includes('contemporary')) {
+      themeContext = 'in modern realistic style, contemporary setting, real-world environment, no fantasy or magical elements';
     } else {
       themeContext = `in ${world.theme} style`;
     }
@@ -94,13 +96,13 @@ export class WorldImageGenerator {
         };
       }
       
-      // Make the API call through our existing portrait generation endpoint
-      const response = await fetch('/api/generate-portrait', {
+      // Make the API call through our dedicated world image generation endpoint
+      const response = await fetch('/api/generate-world-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ world }),
       });
 
       if (!response.ok) {
@@ -111,10 +113,10 @@ export class WorldImageGenerator {
       const data = await response.json();
       
       return {
-        type: 'ai-generated',
-        url: data.image,
+        type: data.aiGenerated ? 'ai-generated' : 'placeholder',
+        url: data.imageUrl,
         generatedAt: new Date().toISOString(),
-        prompt: prompt
+        prompt: data.prompt || prompt
       };
     } catch (error) {
       console.error('World image generation error:', error);

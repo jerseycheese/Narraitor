@@ -32,11 +32,11 @@ export default function CreateWorldPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen">
       <WorldCreationWizard 
         onComplete={handleComplete}
         onCancel={handleCancel}
-        initialData={generatedData ? { worldData: generatedData } : undefined}
+        initialData={generatedData || undefined}
         initialStep={generatedData ? 5 : 0} // Skip to final step if we have generated data
       />
     </main>

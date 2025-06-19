@@ -18,16 +18,41 @@ describe('PortraitGenerator', () => {
     jest.clearAllMocks();
     generator = new PortraitGenerator(mockAIClient);
     
-    // Mock detection responses
+    // Mock detection and enhancement responses
     (mockAIClient.generateContent as jest.Mock).mockImplementation((prompt: string) => {
-      if (prompt.includes('Nathan Fielder')) {
+      // Handle detection requests
+      if (prompt.includes('Is "') && prompt.includes('" a character from any form of media')) {
+        if (prompt.includes('Nathan Fielder')) {
+          return Promise.resolve({
+            content: '{"isKnownFigure": true, "figureType": "comedian"}',
+            finishReason: 'stop'
+          });
+        }
         return Promise.resolve({
-          content: '{"isKnownFigure": true, "figureType": "comedian", "actorName": null}',
+          content: '{"isKnownFigure": false, "figureType": null}',
           finishReason: 'stop'
         });
       }
+      
+      // Handle personality to visual traits conversion
+      if (prompt.includes('Convert these personality traits into visible physical expressions')) {
+        return Promise.resolve({
+          content: 'expressing wise mysterious character',
+          finishReason: 'stop'
+        });
+      }
+      
+      // Handle physical diversity enhancement  
+      if (prompt.includes('Add specific, non-idealized physical features')) {
+        return Promise.resolve({
+          content: 'realistic average person with natural imperfections',
+          finishReason: 'stop'
+        });
+      }
+      
+      // Default fallback for any other prompts
       return Promise.resolve({
-        content: '{"isKnownFigure": false, "figureType": null, "actorName": null}',
+        content: 'test response',
         finishReason: 'stop'
       });
     });
@@ -75,12 +100,6 @@ describe('PortraitGenerator', () => {
     });
 
     it('should build descriptive prompt from character attributes', async () => {
-      // Mock should specifically return false for Elara
-      (mockAIClient.generateContent as jest.Mock).mockResolvedValueOnce({
-        content: '{"isKnownFigure": false, "figureType": null, "actorName": null}',
-        finishReason: 'stop'
-      });
-      
       (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
         image: 'data:image/png;base64,abc123',
         prompt: ''
@@ -98,7 +117,7 @@ describe('PortraitGenerator', () => {
       // The prompt should be for an unknown character (not a comedian)
       expect(callArgs).toContain('Elara Moonshadow');
       expect(callArgs).toContain('Character portrait'); // Not "Photorealistic portrait"
-      expect(callArgs).toContain('Tall elf with long silver hair'); // Should include physical description
+      expect(callArgs).toContain('realistic average person'); // Should include enhanced physical description
       expect(callArgs).not.toContain('comedian');
       expect(callArgs).not.toContain('comedy club');
     });
@@ -127,8 +146,8 @@ describe('PortraitGenerator', () => {
   });
 
   describe('buildPortraitPrompt', () => {
-    it('should create detailed prompt from character data', () => {
-      const prompt = generator.buildPortraitPrompt(mockCharacter);
+    it('should create detailed prompt from character data', async () => {
+      const prompt = await generator.buildPortraitPrompt(mockCharacter);
 
       expect(prompt).toContain('Elara Moonshadow');
       expect(prompt).toContain('expressing wise mysterious character');
@@ -166,7 +185,7 @@ describe('PortraitGenerator', () => {
       expect(imagePrompt).not.toContain('digital painting');
     });
 
-    it('should limit prompt length to avoid token limits', () => {
+    it('should limit prompt length to avoid token limits', async () => {
       const longCharacter = {
         ...mockCharacter,
         background: {
@@ -176,17 +195,17 @@ describe('PortraitGenerator', () => {
         }
       };
 
-      const prompt = generator.buildPortraitPrompt(longCharacter);
+      const prompt = await generator.buildPortraitPrompt(longCharacter);
       
       // Gemini has 480 token limit, roughly 1920 characters
       expect(prompt.length).toBeLessThan(1920);
     });
 
-    it('should include style keywords for quality', () => {
-      const prompt = generator.buildPortraitPrompt(mockCharacter);
+    it('should include style keywords for quality', async () => {
+      const prompt = await generator.buildPortraitPrompt(mockCharacter);
 
       expect(prompt).toMatch(/portrait|character art|fantasy art/i);
-      expect(prompt).toMatch(/detailed|high quality/i);
+      expect(prompt).toMatch(/photorealistic|documentary photography/i);
     });
   });
 });

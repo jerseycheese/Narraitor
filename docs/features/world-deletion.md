@@ -1,3 +1,12 @@
+---
+title: "World Deletion Feature"
+type: feature
+category: world
+tags: [world, deletion, confirmation, ui]
+created: 2025-05-19
+updated: 2025-06-08
+---
+
 # World Deletion Feature
 
 This feature allows users to delete worlds they no longer need, with a confirmation dialog to prevent accidental deletions.

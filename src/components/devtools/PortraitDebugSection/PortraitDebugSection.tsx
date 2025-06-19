@@ -1,12 +1,12 @@
 // src/components/devtools/PortraitDebugSection/PortraitDebugSection.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
 import { createAIClient } from '../../../lib/ai';
-import { characterStore } from '../../../state/characterStore';
-import { worldStore } from '../../../state/worldStore';
+import { useCharacterStore } from '../../../state/characterStore';
+import { useWorldStore } from '../../../state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
 import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
@@ -21,25 +21,17 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
-  const [apiKeyStatus, setApiKeyStatus] = useState<boolean>(false);
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
   const [showBreakdown, setShowBreakdown] = useState(false);
   
   // Get characters from store
-  const characters = characterStore((state) => state.characters);
+  const characters = useCharacterStore((state) => state.characters);
   const charactersArray = Object.values(characters);
   const selectedCharacter = selectedCharacterId ? characters[selectedCharacterId] : null;
   
   // Get worlds from store
-  const worlds = worldStore((state) => state.worlds);
+  const worlds = useWorldStore((state) => state.worlds);
   const selectedWorld = selectedCharacter ? worlds[selectedCharacter.worldId] : null;
-  
-  // Use effect to check API key status on client side only
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setApiKeyStatus(!!process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-    }
-  }, []);
   
   // Use selected character data or passed props
   const effectiveCharacterData = selectedCharacter || characterData;
@@ -61,16 +53,16 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     return status?.[prop];
   };
 
-  const generatePromptPreview = () => {
+  const generatePromptPreview = async () => {
+    console.log('generatePromptPreview called');
     if (!effectiveCharacterData) {
+      console.log('No effective character data');
       setGeneratedPrompt('No character data available. Please select a character or provide character data.');
       return;
     }
 
+    console.log('Starting prompt generation with API...');
     try {
-      const aiClient = createAIClient();
-      const generator = new PortraitGenerator(aiClient);
-      
       // Create a mock character for prompt generation
       // Handle the different attribute/skill formats between store and types
       type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
@@ -117,11 +109,40 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         updatedAt: new Date().toISOString()
       };
 
-      const prompt = generator.buildPortraitPrompt(mockCharacter, {
-        worldTheme: effectiveWorldConfig?.theme
+      // Use the server-side API for portrait generation to include character detection
+      const requestBody = {
+        character: mockCharacter,
+        world: effectiveWorldConfig,
+        customDescription: getBackgroundProp('physicalDescription'),
+        promptOnly: true // Add a flag to return only the prompt
+      };
+      
+      console.log('Calling API with character:', mockCharacter.name);
+      console.log('Custom description:', requestBody.customDescription);
+      console.log('Request body:', requestBody);
+      console.log('promptOnly flag:', requestBody.promptOnly);
+      
+      const response = await fetch('/api/generate-portrait', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
       });
+      
+      console.log('API response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('API error response:', errorText);
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('API response result:', result);
+      const prompt = result.prompt || result.portrait?.prompt;
+      console.log('Extracted prompt:', prompt);
 
       setGeneratedPrompt(prompt);
+      console.log('Prompt set successfully');
     } catch (error) {
       setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -326,7 +347,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
           <div className="space-y-1 text-slate-300">
             <div><strong>Endpoint:</strong> /api/generate-portrait</div>
             <div><strong>Model:</strong> gemini-2.0-flash-preview-image-generation</div>
-            <div><strong>API Key Status:</strong> {apiKeyStatus ? '✅ Set' : '❌ Missing'}</div>
+            <div><strong>Security:</strong> ✅ Server-side API key (secure)</div>
           </div>
         </div>
       </div>

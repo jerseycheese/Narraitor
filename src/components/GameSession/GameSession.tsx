@@ -3,9 +3,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
-import { narrativeStore } from '@/state/narrativeStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
 import GameSessionError from './GameSessionError';
@@ -21,8 +22,8 @@ interface GameSessionProps {
   disableAutoResume?: boolean; // For testing/dev harnesses
   // Optional testing props
   _stores?: {
-    worldStore: Partial<ReturnType<typeof worldStore.getState>> | (() => Partial<ReturnType<typeof worldStore.getState>>);
-    sessionStore: Partial<ReturnType<typeof sessionStore.getState>> | (() => Partial<ReturnType<typeof sessionStore.getState>>);
+    worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
+    sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
   };
   _router?: {
     push: (url: string) => void;
@@ -86,34 +87,67 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
+    // First priority: Use session ID from session state (from store)
     if (sessionState.id) {
-      console.log(`[GameSession] Using existing session ID: ${sessionState.id}`);
       return sessionState.id;
     }
     
-    // Check if we're resuming a saved session
+    // Second priority: Check if store already has a session ID
+    const currentStoreState = useSessionStore.getState();
+    if (currentStoreState.id && currentStoreState.worldId === worldId) {
+      return currentStoreState.id;
+    }
+    
+    // Third priority: Check if we're resuming a saved session
     if (savedSession) {
-      console.log(`[GameSession] Using saved session ID: ${savedSession.id}`);
       return savedSession.id;
     }
     
-    // Create a new stable ID if one doesn't exist
-    const sessionId = `session-${worldId}-${Math.floor(Date.now() / 1000)}`;
-    console.log(`[GameSession] Created new stable session ID: ${sessionId}`);
+    // Fourth priority: Check if there's existing narrative data for this world that we can resume
+    const narrativeState = useNarrativeStore.getState();
+    const existingSessions = Object.keys(narrativeState.sessionSegments);
+    
+    // Look for existing sessions that have segments for this world
+    for (const existingSessionId of existingSessions) {
+      const segments = narrativeState.sessionSegments[existingSessionId] || [];
+      if (segments.length > 0) {
+        // Check if any segments belong to this world by looking at the actual segments
+        const hasWorldSegments = segments.some(segmentId => {
+          const segment = narrativeState.segments[segmentId];
+          return segment && segment.worldId === worldId;
+        });
+        
+        if (hasWorldSegments) {
+          return existingSessionId;
+        }
+      }
+    }
+    
+    // Last resort: Create a new stable ID if no existing session found
+    const sessionId = generateUniqueId(`session-${worldId}`);
     
     return sessionId;
   }, [worldId, sessionState.id, savedSession]);
   
-  // Update session store and clear segments when session ID changes
+  // Update session store when session ID changes
   useEffect(() => {
     if (!stableSessionId) return;
     
-    // Clear any existing segments for this session ID to prevent duplicates
-    narrativeStore.getState().clearSessionSegments(stableSessionId);
+    // Only clear segments if this is a brand new session (not resuming existing)
+    const narrativeState = useNarrativeStore.getState();
+    const existingSegments = narrativeState.sessionSegments[stableSessionId] || [];
+    const isNewSession = existingSegments.length === 0;
+    
+    if (isNewSession) {
+      // New session - clearing any stale segments
+      useNarrativeStore.getState().clearSessionSegments(stableSessionId);
+    } else {
+      // Resuming existing session with segments
+    }
     
     // Update the session store
-    if (sessionStore.getState().setSessionId) {
-      sessionStore.getState().setSessionId(stableSessionId);
+    if (useSessionStore.getState().setSessionId) {
+      useSessionStore.getState().setSessionId(stableSessionId);
     }
   }, [stableSessionId]);
   
@@ -181,21 +215,28 @@ const GameSession: React.FC<GameSessionProps> = ({
     };
   }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
   
-  // Clean up on unmount - save session when navigating away
+  // Clean up on unmount - only in production or when actually navigating away
   useEffect(() => {
     if (!isClient) return; // Skip on server-side
     
     return () => {
+      // In development mode with fast refresh, don't end sessions
+      // This prevents the infinite reset loop during hot reloading
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔧 Development mode: Skipping session cleanup to prevent fast refresh issues');
+        return;
+      }
+      
       // Save the session when component unmounts (navigating away)
-      const currentState = sessionStore.getState();
+      const currentState = useSessionStore.getState();
       if (currentState.status === 'active' && currentState.id) {
-        console.log('[GameSession] Saving session on unmount:', currentState.id);
+        console.log('🔚 Production mode: Saving session on unmount');
         // Don't reset the session, just save it
-        sessionStore.getState().endSession();
+        useSessionStore.getState().endSession();
         
         // Update the narrative count after saving
-        const narrativeCount = narrativeStore.getState().getSessionSegments(currentState.id).length;
-        sessionStore.getState().updateSavedSessionNarrativeCount(currentState.id, narrativeCount);
+        const narrativeCount = useNarrativeStore.getState().getSessionSegments(currentState.id).length;
+        useSessionStore.getState().updateSavedSessionNarrativeCount(currentState.id, narrativeCount);
       }
       
       // Only call onSessionEnd if the session is actually ending (status is 'ended')
@@ -277,6 +318,9 @@ const GameSession: React.FC<GameSessionProps> = ({
         <div className="text-center">
           <h2 className="text-xl font-bold mb-2">Session Not Started</h2>
           <p className="text-gray-600 mb-4">No active game session.</p>
+          <div className="text-xs text-gray-500 mb-4">
+            Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
+          </div>
           <button 
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             onClick={startSession}

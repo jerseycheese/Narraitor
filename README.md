@@ -8,14 +8,20 @@ Narraitor is a Next.js-based web application providing an AI-driven narrative ex
 
 ## Features
 
-- World configuration system for defining settings, rules, and parameters
-- World Creation Wizard with AI-assisted attribute and skill suggestions
-- Character creation and management system with attributes and skills
-- AI-driven narrative engine for dynamic storytelling
-- Journal system for tracking gameplay events
-- State persistence between sessions using IndexedDB
-- Basic visual theming based on world settings
-- Template worlds (Western, Sitcom, Adventure)
+- **World Configuration**: Flexible system for defining settings, rules, and parameters for any fictional universe
+- **AI-Assisted World Creation**: Wizard with intelligent attribute and skill suggestions based on genre and theme
+- **Character Management**: Comprehensive creation and management system with attributes, skills, and background
+- **Dynamic AI Narrative Engine**: Advanced storytelling with context-aware generation and decision weight analysis
+- **Decision Weight System**: Visual prominence indicators for important narrative choices (Minor/Major/Critical)
+- **Choice Alignment System**: Lawful/Neutral/Chaotic choice categorization with visual indicators
+- **Smart Context Summaries**: AI-generated decision context that explains stakes rather than retelling story
+- **Ending Generation**: AI-powered story conclusions with multiple ending types and visual feedback
+- **Journal System**: Comprehensive tracking of gameplay events, decisions, and narrative progression
+- **State Persistence**: Reliable session management using IndexedDB for seamless gameplay continuation
+- **Navigation Loading System**: Comprehensive loading states with debounced indicators, accessibility support, and graceful error handling
+- **Visual Theming**: Dynamic styling and presentation based on world settings and narrative context
+- **Template Worlds**: Pre-configured worlds (Western, Sitcom, Adventure) for quick start gameplay
+- **Accessibility**: Screen reader support, keyboard navigation, semantic HTML structure, and focus management
 
 ## Getting Started
 
@@ -37,7 +43,7 @@ npm install
 
 # Configure environment variables
 cp .env.example .env.local
-# Edit .env.local and add your NEXT_PUBLIC_GEMINI_API_KEY
+# Edit .env.local and add your GEMINI_API_KEY (server-side only for security)
 
 # Start the development server
 npm run dev
@@ -111,14 +117,21 @@ The application has been migrated from Next.js Pages Router to App Router, lever
 
 ## AI Service Integration
 
-Narraitor uses Google Gemini AI for dynamic narrative generation. Configure the service by setting environment variables:
+Narraitor uses Google Gemini AI for dynamic narrative generation through secure server-side API routes. Configure the service by setting environment variables:
 
 ```bash
 # .env.local
-NEXT_PUBLIC_GEMINI_API_KEY=your-api-key
+GEMINI_API_KEY=your-api-key  # Server-side only for security
 ```
 
-The AI service integrates with the template system to generate contextual narratives based on world and character data. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
+### Security Features
+
+- **Server-side API keys**: API keys are never exposed to the browser
+- **Rate limiting**: 50 requests per hour per IP to prevent abuse
+- **Secure proxy**: All AI requests route through Next.js API endpoints
+- **Request validation**: Input sanitization and error handling
+
+All AI requests are processed through secure API routes (`/api/narrative/generate`, `/api/narrative/choices`) instead of direct client-side calls. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
 
 ### Portrait Generation
 

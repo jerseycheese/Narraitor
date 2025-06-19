@@ -1,49 +1,86 @@
+---
+title: "AI Service Integration API"
+type: guide
+category: technical
+tags: [ai, api, gemini, integration]
+created: 2025-05-12
+updated: 2025-06-08
+---
+
 # AI Service Integration API
 
 ## Overview
 
-The AI Service Integration provides a bridge between the Narraitor application and Google's Generative AI (Gemini) service for dynamic narrative generation.
+The AI Service Integration provides a secure bridge between the Narraitor application and Google's Generative AI (Gemini) service for dynamic narrative generation. All AI requests are processed through secure server-side API routes to protect API keys and implement rate limiting.
+
+## Security Architecture
+
+### Secure Proxy Pattern
+
+All AI requests from the browser route through Next.js API endpoints:
+
+- **Client-side**: Uses `ClientGeminiClient` proxy
+- **Server-side**: Uses `GeminiClient` with secure API key
+- **API Routes**: `/api/narrative/generate`, `/api/narrative/choices`, `/api/generate-portrait`
+
+### Rate Limiting
+
+- **Limit**: 50 requests per hour per IP address
+- **Purpose**: Prevent abuse and control API costs
+- **Headers**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 
 ## Core Components
 
-### GeminiClient
+### ClientGeminiClient (Browser)
 
-Low-level client for direct communication with the Google Generative AI SDK.
+Secure client-side proxy that routes requests through API endpoints.
 
 ```typescript
+const client = new ClientGeminiClient();
+const response = await client.generateContent('Generate a story');
+```
+
+### GeminiClient (Server)
+
+Low-level server-side client for direct communication with Google Gemini API.
+
+```typescript
+// Server-side only
 const client = new GeminiClient({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY,  // Server-side only
   modelName: 'gemini-2.0-flash',
   maxRetries: 3,
   timeout: 30000
 });
-
-const response = await client.generateContent('Generate a story');
 ```
 
-### AIPromptProcessor
+### Default Client Factory
 
-High-level integration that processes templates and manages AI requests.
+Automatically selects the appropriate client based on environment:
 
 ```typescript
-const processor = new AIPromptProcessor({
-  templateManager,
-  config: getAIConfig()
-});
+const client = createDefaultGeminiClient();
+// Returns ClientGeminiClient in browser, GeminiClient on server, MockGeminiClient in tests
 ```
 
 ## Configuration
 
 ### Environment Variables
 
-- `NEXT_PUBLIC_GEMINI_API_KEY` - Google Gemini API key
+```bash
+# Server-side only (secure)
+GEMINI_API_KEY=your-api-key
 
-### Default Configuration
+# Never use this (security vulnerability)
+# NEXT_PUBLIC_GEMINI_API_KEY=your-api-key  # ❌ Exposes to browser
+```
+
+### Secure Configuration
 
 ```typescript
 export const getAIConfig = (): AIConfig => {
   return {
-    geminiApiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '',
+    geminiApiKey: process.env.GEMINI_API_KEY || '',  // Server-side only
     modelName: 'gemini-2.0-flash',
     maxRetries: 3,
     timeout: 30000
@@ -233,59 +270,69 @@ function NarrativeGenerator() {
 ### Basic Content Generation
 
 ```typescript
-import { GeminiClient } from '@/lib/ai';
+// ❌ OLD PATTERN (Security Vulnerability)
+// Never use direct AI clients in browser code
 
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-  modelName: 'gemini-2.0-flash',
-  maxRetries: 3,
-  timeout: 30000
-};
+// ✅ NEW SECURE PATTERN
+// Use API endpoints for all AI operations
 
-const client = new GeminiClient(config);
-
-try {
-  const response = await client.generateContent('Tell me a story');
-  console.log(response.content);
-} catch (error) {
-  console.error('Generation failed:', error.message);
+async function generateContent(prompt: string) {
+  try {
+    const response = await fetch('/api/narrative/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Generation failed');
+    }
+    
+    const data = await response.json();
+    console.log(data.content);
+    return data;
+  } catch (error) {
+    console.error('Generation failed:', error.message);
+    throw error;
+  }
 }
 ```
 
 ### With Template Processing
 
 ```typescript
-import { AIPromptProcessor, getAIConfig } from '@/lib/ai';
-import { PromptTemplateManager, PromptType } from '@/lib/promptTemplates';
+// ❌ OLD PATTERN (Security Vulnerability)
+// Never use AIPromptProcessor directly in browser code
 
-// Initialize template manager
-const templateManager = new PromptTemplateManager();
-templateManager.addTemplate({
-  id: 'narrative-intro',
-  type: PromptType.NARRATIVE,
-  content: 'Create an introduction for {{characterName}} in {{location}}',
-  variables: [
-    { name: 'characterName', description: 'Character name' },
-    { name: 'location', description: 'Story location' }
-  ]
-});
+// ✅ NEW SECURE PATTERN  
+// Templates are processed server-side via API endpoints
 
-// Create processor
-const processor = new AIPromptProcessor({
-  templateManager,
-  config: getAIConfig()
-});
-
-// Generate content with automatic formatting
-try {
-  const response = await processor.processAndSend('narrative-intro', {
-    characterName: 'John the Brave',
-    location: 'Narraitor Castle'
-  });
-  console.log(response.content);          // Raw content
-  console.log(response.formattedContent); // Formatted content
-} catch (error) {
-  console.error('AI generation failed:', error.message);
+async function generateNarrative(characterName: string, location: string) {
+  try {
+    const response = await fetch('/api/narrative/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        templateId: 'narrative-intro',
+        variables: {
+          characterName: characterName,
+          location: location
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Narrative generation failed');
+    }
+    
+    const data = await response.json();
+    console.log(data.content);          // Raw content
+    console.log(data.formattedContent); // Formatted content
+    return data;
+  } catch (error) {
+    console.error('AI generation failed:', error.message);
+    throw error;
+  }
 }
 ```
 

@@ -27,9 +27,9 @@ describe('ChoiceSelector - Alignment Styling', () => {
         alignment: 'neutral'
       },
       {
-        id: 'chaos-option',
+        id: 'chaotic-option',
         text: 'Act unpredictably',
-        alignment: 'chaos'
+        alignment: 'chaotic'
       }
     ]
   };
@@ -46,7 +46,7 @@ describe('ChoiceSelector - Alignment Styling', () => {
     expect(lawfulButton).toHaveClass('bg-blue-50', 'border-blue-300', 'hover:bg-blue-100');
   });
 
-  it('should apply chaos styling to chaos choices', () => {
+  it('should apply chaotic styling to chaotic choices', () => {
     render(
       <ChoiceSelector
         decision={alignedDecision}
@@ -54,8 +54,8 @@ describe('ChoiceSelector - Alignment Styling', () => {
       />
     );
 
-    const chaosButton = screen.getByTestId('choice-option-chaos-option');
-    expect(chaosButton).toHaveClass('bg-red-50', 'border-red-300', 'hover:bg-red-100');
+    const chaoticButton = screen.getByTestId('choice-option-chaotic-option');
+    expect(chaoticButton).toHaveClass('bg-red-50', 'border-red-300', 'hover:bg-red-100');
   });
 
   it('should apply neutral styling to neutral choices', () => {
@@ -130,11 +130,11 @@ describe('ChoiceSelector - Alignment Styling', () => {
     const neutralButton = screen.getByTestId('choice-option-neutral-option');
     expect(neutralButton).toHaveClass('bg-white', 'border-gray-200', 'hover:bg-gray-50');
 
-    const chaosButton = screen.getByTestId('choice-option-chaos-option');
-    expect(chaosButton).toHaveClass('bg-red-50', 'border-red-300', 'hover:bg-red-100');
+    const chaoticButton = screen.getByTestId('choice-option-chaotic-option');
+    expect(chaoticButton).toHaveClass('bg-red-50', 'border-red-300', 'hover:bg-red-100');
   });
 
-  it('should apply neutral styling to custom input option', () => {
+  it('should show custom input field when enabled', () => {
     render(
       <ChoiceSelector
         decision={alignedDecision}
@@ -144,8 +144,11 @@ describe('ChoiceSelector - Alignment Styling', () => {
       />
     );
 
-    const customButton = screen.getByTestId('choice-option-custom-input');
-    expect(customButton).toHaveClass('bg-white', 'border-gray-200', 'hover:bg-gray-50');
+    const customInput = screen.getByLabelText('Custom response input');
+    expect(customInput).toBeInTheDocument();
+    
+    const submitButton = screen.getByText('Submit');
+    expect(submitButton).toBeInTheDocument();
   });
 
   it('should handle mixed alignment combinations correctly', () => {
@@ -154,9 +157,9 @@ describe('ChoiceSelector - Alignment Styling', () => {
       prompt: 'Choose your approach',
       options: [
         {
-          id: 'chaos-1',
-          text: 'Chaos option 1',
-          alignment: 'chaos'
+          id: 'chaotic-1',
+          text: 'Chaotic option 1',
+          alignment: 'chaotic'
         },
         {
           id: 'lawful-1',
@@ -164,9 +167,9 @@ describe('ChoiceSelector - Alignment Styling', () => {
           alignment: 'lawful'
         },
         {
-          id: 'chaos-2',
-          text: 'Chaos option 2',
-          alignment: 'chaos'
+          id: 'chaotic-2',
+          text: 'Chaotic option 2',
+          alignment: 'chaotic'
         },
         {
           id: 'lawful-2',
@@ -183,9 +186,9 @@ describe('ChoiceSelector - Alignment Styling', () => {
       />
     );
 
-    // Both chaos options should have chaos styling
-    expect(screen.getByTestId('choice-option-chaos-1')).toHaveClass('bg-red-50');
-    expect(screen.getByTestId('choice-option-chaos-2')).toHaveClass('bg-red-50');
+    // Both chaotic options should have chaotic styling
+    expect(screen.getByTestId('choice-option-chaotic-1')).toHaveClass('bg-red-50');
+    expect(screen.getByTestId('choice-option-chaotic-2')).toHaveClass('bg-red-50');
 
     // Both lawful options should have lawful styling
     expect(screen.getByTestId('choice-option-lawful-1')).toHaveClass('bg-blue-50');

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import CharacterEditor from './CharacterEditor';
-import { characterStore } from '@/state/characterStore';
-import { worldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { LoadingState as LoadingStateComponent } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
 
@@ -19,12 +19,12 @@ const meta = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      characterStore.getState().reset();
-      worldStore.getState().reset();
+      useCharacterStore.getState().reset();
+      useWorldStore.getState().reset();
       
       // Set up test world
       const testWorldId = 'test-world-id';
-      worldStore.getState().createWorld({
+      useWorldStore.getState().createWorld({
         name: 'Test World',
         theme: 'Fantasy',
         description: 'A fantasy world for testing',
@@ -55,7 +55,7 @@ const meta = {
             description: 'Skill with bladed weapons',
             worldId: testWorldId,
             difficulty: 'medium' as const,
-            linkedAttributeId: 'attr1',
+            attributeIds: ['attr1'],
             baseValue: 5,
             minValue: 0,
             maxValue: 10
@@ -66,7 +66,7 @@ const meta = {
             description: 'Arcane knowledge',
             worldId: testWorldId,
             difficulty: 'hard' as const,
-            linkedAttributeId: 'attr2',
+            attributeIds: ['attr2'],
             baseValue: 3,
             minValue: 0,
             maxValue: 10
@@ -99,12 +99,13 @@ export const NewCharacter: Story = {
   decorators: [
     (Story) => {
       // Create a test character
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
       
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
+        description: 'A brave adventurer who started their journey in a small village',
         worldId: worldId,
         level: 3,
         attributes: world.attributes.map((attr, index) => ({
@@ -125,13 +126,20 @@ export const NewCharacter: Story = {
           personality: 'Courageous and kind',
           goals: ['Seeking glory and treasure', 'Protecting the innocent'],
           fears: ['Losing loved ones', 'Failing their quest'],
-          physicalDescription: 'Tall and athletic with distinctive scars'
+          physicalDescription: 'Tall and athletic with distinctive scars',
+          relationships: []
         },
         isPlayer: true,
         status: {
-          hp: 100,
-          mp: 50,
-          stamina: 75
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '', // Will be set by the store
+          items: [],
+          capacity: 20,
+          categories: []
         }
       });
       
@@ -147,12 +155,13 @@ export const WithPortrait: Story = {
   decorators: [
     (Story) => {
       // Create a test character with portrait
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const worldId = Object.keys(worlds)[0];
       const world = worlds[worldId];
       
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Hero with Portrait',
+        description: 'A legendary warrior from the northern kingdoms',
         worldId: worldId,
         level: 5,
         attributes: world.attributes.map((attr, index) => ({
@@ -173,19 +182,26 @@ export const WithPortrait: Story = {
           personality: 'Stoic and honorable, with a hidden sense of humor',
           goals: ['Protecting the innocent and upholding justice'],
           fears: ['Dishonor', 'Failing in duty'],
-          physicalDescription: 'Battle-scarred warrior with piercing eyes'
+          physicalDescription: 'Battle-scarred warrior with piercing eyes',
+          relationships: []
         },
         isPlayer: true,
         status: {
-          hp: 150,
-          mp: 30,
-          stamina: 100
+          health: 150,
+          maxHealth: 150,
+          conditions: []
         },
         portrait: {
           type: 'ai-generated',
           url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjNEY0NkU1Ii8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSI0MCIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEwMCAxMjBDNzAgMTIwIDUwIDE0MCA1MCAxNjBWMjAwSDE1MFYxNjBDMTUwIDE0MCAxMzAgMTIwIDEwMCAxMjBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4=',
           generatedAt: new Date().toISOString(),
           prompt: 'A legendary warrior with noble bearing'
+        },
+        inventory: {
+          characterId: '', // Will be set by the store
+          items: [],
+          capacity: 20,
+          categories: []
         }
       });
       

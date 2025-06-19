@@ -44,6 +44,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
       attributePointPool: 20,
       skillPointPool: 20
     },
+    toneSettings: worldData.toneSettings,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -67,10 +68,12 @@ interface WorldStoreActions {
   updateSkill: jest.Mock;
   removeSkill: jest.Mock;
   updateSettings: jest.Mock;
+  updateToneSettings: jest.Mock;
   reset: jest.Mock;
   setError: jest.Mock;
   clearError: jest.Mock;
   setLoading: jest.Mock;
+  getWorldById: jest.Mock;
 }
 
 type WorldStore = MockWorldState & WorldStoreActions;
@@ -173,7 +176,7 @@ const mockAddSkill = jest.fn((worldId: string, skill: Partial<WorldSkill>) => {
     description: skill.description || '',
     difficulty: skill.difficulty || 'medium',
     category: skill.category,
-    linkedAttributeId: skill.linkedAttributeId,
+    attributeIds: skill.attributeIds,
     baseValue: skill.baseValue || 5,
     minValue: skill.minValue || 1,
     maxValue: skill.maxValue || 10
@@ -214,6 +217,32 @@ const mockUpdateSettings = jest.fn((worldId: string, settings: Partial<WorldSett
     ...mockState.worlds[worldId].settings,
     ...settings
   };
+});
+
+const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<typeof import('@/types/tone-settings.types').ToneSettings>) => {
+  console.log('[__mocks__/worldStore.ts] updateToneSettings called:', worldId, toneSettings);
+  if (!mockState.worlds[worldId]) {
+    mockState.error = 'World not found';
+    return;
+  }
+  const currentToneSettings = mockState.worlds[worldId].toneSettings || {
+    contentRating: 'PG',
+    narrativeStyle: 'balanced',
+    languageComplexity: 'moderate'
+  };
+  mockState.worlds[worldId] = {
+    ...mockState.worlds[worldId],
+    toneSettings: {
+      ...currentToneSettings,
+      ...toneSettings
+    },
+    updatedAt: new Date().toISOString()
+  };
+});
+
+const mockGetWorldById = jest.fn((worldId: string) => {
+  console.log('[__mocks__/worldStore.ts] getWorldById called:', worldId);
+  return mockState.worlds[worldId] || null;
 });
 
 const mockReset = jest.fn(() => {
@@ -261,6 +290,8 @@ const mockWorldStore = jest.fn((selector?: (state: WorldStore) => any) => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    updateToneSettings: mockUpdateToneSettings,
+    getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -296,6 +327,8 @@ const mockGetState = jest.fn((): WorldStore => {
     updateSkill: mockUpdateSkill,
     removeSkill: mockRemoveSkill,
     updateSettings: mockUpdateSettings,
+    updateToneSettings: mockUpdateToneSettings,
+    getWorldById: mockGetWorldById,
     reset: mockReset,
     setError: mockSetError,
     clearError: mockClearError,
@@ -337,6 +370,8 @@ export const worldStore = Object.assign(mockWorldStore, {
   },
   getState: mockGetState,
 });
+
+export const useWorldStore = worldStore;
 
 console.log('[__mocks__/worldStore.ts] Mock module exported');
 console.log('[__mocks__/worldStore.ts] worldStore has getState:', typeof worldStore.getState);

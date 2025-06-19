@@ -41,6 +41,11 @@ Welcome to the documentation for Narraitor, a world-agnostic narrative-driven RP
 - [[development/feature-development-workflow|Feature Development Workflow]]
 - [[development/documentation-workflow|Documentation Workflow]]
 
+### Security
+- [[security/README|Security Overview]]
+- [[security/SECURITY_TESTING_GUIDE|Security Testing Guide]]
+- [[technical-guides/ai-service-api|AI Service Security Documentation]]
+
 ### Flows
 - [[flows/world-creation|World Creation Flow]]
 - [[flows/character-creation|Character Creation Flow]]

@@ -62,7 +62,7 @@ const initialState = {
 };
 
 // Inventory Store implementation
-export const inventoryStore = create<InventoryStore>()((set, get) => ({
+export const useInventoryStore = create<InventoryStore>()((set, get) => ({
   ...initialState,
 
   // Add item

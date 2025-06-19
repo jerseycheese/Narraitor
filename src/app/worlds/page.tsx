@@ -3,11 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
-import { worldStore } from '@/state/worldStore';
-import { generateWorld } from '@/lib/ai/worldGenerator';
-import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
-import { createAIClient } from '@/lib/ai/clientFactory';
+import { PageLayout } from '@/components/shared/PageLayout';
+import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
 export default function WorldsPage() {
   const router = useRouter();
@@ -17,6 +16,7 @@ export default function WorldsPage() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [worldReference, setWorldReference] = useState('');
   const [worldName, setWorldName] = useState('');
+  const [worldRelationship, setWorldRelationship] = useState<'set_in' | 'based_on' | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   // Handle focus when modal opens/closes
@@ -31,6 +31,7 @@ export default function WorldsPage() {
           setShowPrompt(false);
           setWorldReference('');
           setWorldName('');
+          setWorldRelationship(undefined);
           setError(null);
         }
       };
@@ -45,8 +46,8 @@ export default function WorldsPage() {
   };
 
   const handleGenerateWorld = async () => {
-    if (!worldReference.trim()) {
-      setError('Please enter a world reference');
+    if (worldRelationship && !worldReference.trim()) {
+      setError('Please enter an existing setting');
       return;
     }
 
@@ -56,11 +57,29 @@ export default function WorldsPage() {
 
     try {
       // Get existing world names to ensure uniqueness
-      const { worlds } = worldStore.getState();
+      const { worlds } = useWorldStore.getState();
       const existingNames = Object.values(worlds).map(w => w.name);
 
-      // Generate the world data
-      const generatedData = await generateWorld(worldReference, existingNames, worldName);
+      // Generate the world data via API
+      const response = await fetch('/api/generate-world', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          worldReference: worldReference || undefined,
+          worldRelationship: worldRelationship || undefined,
+          existingNames,
+          suggestedName: worldName || undefined
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate world');
+      }
+
+      const generatedData: GeneratedWorldData = await response.json();
 
       // Create attributes with IDs and worldId placeholder
       const attributes = generatedData.attributes.map(attr => ({
@@ -78,10 +97,12 @@ export default function WorldsPage() {
       }));
 
       // Create the world initially without an image
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: generatedData.name,
         theme: generatedData.theme,
         description: generatedData.description,
+        reference: worldReference || undefined,
+        relationship: worldRelationship || undefined,
         attributes,
         skills,
         settings: generatedData.settings
@@ -91,71 +112,83 @@ export default function WorldsPage() {
       setGeneratingStatus('Generating world image...');
       
       try {
-        const aiClient = createAIClient();
-        const imageGenerator = new WorldImageGenerator(aiClient);
-        
         // Get the created world to generate image for it
-        const createdWorld = worldStore.getState().worlds[worldId];
-        const worldImage = await imageGenerator.generateWorldImage(createdWorld);
+        const createdWorld = useWorldStore.getState().worlds[worldId];
         
-        // Update the world with the generated image
-        worldStore.getState().updateWorld(worldId, {
-          image: worldImage
+        const imageResponse = await fetch('/api/generate-world-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            world: createdWorld
+          }),
         });
-      } catch (imageError) {
-        console.error('Failed to generate world image:', imageError);
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          
+          // Only update with image if we actually got one
+          if (imageData.imageUrl) {
+            useWorldStore.getState().updateWorld(worldId, {
+              image: {
+                type: 'placeholder' as const,
+                url: imageData.imageUrl,
+                generatedAt: new Date().toISOString()
+              }
+            });
+          }
+          // If no image was generated (placeholder mode), just continue without image
+        }
+      } catch {
         // Continue without image - world creation should still succeed
       }
 
       // Set as current world
-      worldStore.getState().setCurrentWorld(worldId);
+      useWorldStore.getState().setCurrentWorld(worldId);
 
       // Hide the prompt and reset state
       setShowPrompt(false);
       setWorldReference('');
       setWorldName('');
+      setWorldRelationship(undefined);
       setIsGenerating(false);
       
       // Stay on worlds page to see the new world
     } catch (err) {
-      console.error('Failed to generate world:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate world');
       setIsGenerating(false);
     }
   };
 
-  return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-4xl font-bold">
-              My Worlds
-            </h1>
-            <div className="flex gap-2">
-              <button
-                onClick={handleCreateWorld}
-                data-testid="create-world-button"
-                className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
-              >
-                Create World
-              </button>
-              <button
-                onClick={() => setShowPrompt(true)}
-                disabled={isGenerating}
-                className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Generate World
-              </button>
-            </div>
-          </div>
-          <p className="text-gray-600">
-            Select a world to make it active, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.
-          </p>
-        </header>
+  const actions = (
+    <>
+      <button
+        onClick={handleCreateWorld}
+        data-testid="create-world-button"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+      >
+        Create World
+      </button>
+      <button
+        onClick={() => setShowPrompt(true)}
+        disabled={isGenerating}
+        className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Generate World
+      </button>
+    </>
+  );
 
-        {/* World Generation Prompt */}
-        {showPrompt && (
+  return (
+    <PageLayout
+      title="My Worlds"
+      description="Use the 'Make Active' button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar."
+      actions={actions}
+    >
+
+      {/* World Generation Prompt */}
+      {showPrompt && (
           <div 
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             role="dialog"
@@ -178,46 +211,125 @@ export default function WorldsPage() {
                     type="text"
                     value={worldName}
                     onChange={(e) => setWorldName(e.target.value)}
-                    placeholder="e.g., The Shattered Realms, Neo Tokyo 2185..."
+                    placeholder="e.g., The Lost Kingdom"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Leave empty for an auto-generated name
+                    Give your world a custom name, or leave empty for an auto-generated name
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Based On <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    World Type
                   </label>
-                  <input
-                    type="text"
-                    value={worldReference}
-                    onChange={(e) => setWorldReference(e.target.value)}
-                    placeholder="e.g., Middle Earth, Star Wars, Victorian London..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    disabled={isGenerating}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter a fictional or non-fictional world to base your new world on
-                  </p>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="radio"
+                        id="generate-relationship-none"
+                        name="generate-relationship"
+                        value=""
+                        checked={!worldRelationship}
+                        onChange={() => {
+                          setWorldRelationship(undefined);
+                          setWorldReference('');
+                        }}
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <label htmlFor="generate-relationship-none" className="text-sm font-medium text-gray-900">
+                          Original World
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Generate a completely original world with unique settings and themes
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="radio"
+                        id="generate-relationship-based-on"
+                        name="generate-relationship"
+                        value="based_on"
+                        checked={worldRelationship === 'based_on'}
+                        onChange={() => setWorldRelationship('based_on')}
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <label htmlFor="generate-relationship-based-on" className="text-sm font-medium text-gray-900">
+                          Inspired By
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Generate an original world inspired by an existing fictional universe or real setting
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="radio"
+                        id="generate-relationship-set-in"
+                        name="generate-relationship"
+                        value="set_in"
+                        checked={worldRelationship === 'set_in'}
+                        onChange={() => setWorldRelationship('set_in')}
+                        className="mt-1 text-purple-600 focus:ring-purple-500"
+                        disabled={isGenerating}
+                      />
+                      <div>
+                        <label htmlFor="generate-relationship-set-in" className="text-sm font-medium text-gray-900">
+                          Set Within
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          Generate a world directly within an existing fictional universe or real setting
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                {worldRelationship && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Existing Setting <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={worldReference}
+                      onChange={(e) => setWorldReference(e.target.value)}
+                      placeholder="e.g., Star Wars, Victorian era"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      disabled={isGenerating}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      {worldRelationship === 'set_in' 
+                        ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
+                        : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
               {error && (
-                <p className="text-red-600 text-sm mb-4">{error}</p>
+                <p className="text-red-600 text-sm mt-4 mb-4">{error}</p>
               )}
               {isGenerating && (
-                <p className="text-purple-600 text-sm mb-4 flex items-center gap-2">
+                <p className="text-purple-600 text-sm mt-4 mb-4 flex items-center gap-2">
                   <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
                   {generatingStatus}
                 </p>
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-6">
                 <button
                   onClick={() => {
                     setShowPrompt(false);
                     setWorldReference('');
                     setWorldName('');
+                    setWorldRelationship(undefined);
                     setError(null);
                   }}
                   disabled={isGenerating}
@@ -227,7 +339,7 @@ export default function WorldsPage() {
                 </button>
                 <button
                   onClick={handleGenerateWorld}
-                  disabled={isGenerating || !worldReference.trim()}
+                  disabled={isGenerating || (worldRelationship && !worldReference.trim())}
                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? 'Generating...' : 'Generate'}
@@ -237,10 +349,7 @@ export default function WorldsPage() {
           </div>
         )}
 
-        <section>
-          <WorldListScreen />
-        </section>
-      </div>
-    </main>
+      <WorldListScreen />
+    </PageLayout>
   );
 }

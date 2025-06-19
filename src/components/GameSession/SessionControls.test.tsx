@@ -3,83 +3,38 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import SessionControls from './SessionControls';
 
 describe('SessionControls', () => {
-  const mockOnPause = jest.fn();
-  const mockOnResume = jest.fn();
   const mockOnEnd = jest.fn();
+  const mockOnRestart = jest.fn();
+  const mockOnEndStory = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders controls for active session', () => {
-    render(
-      <SessionControls 
-        status="active"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
-        onEnd={mockOnEnd}
-      />
-    );
+  test('renders minimal controls with only end session button', () => {
+    render(<SessionControls onEnd={mockOnEnd} />);
 
-    expect(screen.getByText(/Pause/)).toBeInTheDocument();
-    expect(screen.getByText(/End Session/)).toBeInTheDocument();
+    expect(screen.getByText('End Session')).toBeInTheDocument();
+    expect(screen.queryByText('New Session')).not.toBeInTheDocument();
+    expect(screen.queryByText('End Story')).not.toBeInTheDocument();
   });
 
-  test('renders controls for paused session', () => {
+  test('renders all optional controls when provided', () => {
     render(
       <SessionControls 
-        status="paused"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
         onEnd={mockOnEnd}
+        onRestart={mockOnRestart}
+        onEndStory={mockOnEndStory}
       />
     );
 
-    expect(screen.getByText(/Resume/)).toBeInTheDocument();
-    expect(screen.getByText(/End Session/)).toBeInTheDocument();
-  });
-
-  test('calls onPause when pause button is clicked', () => {
-    render(
-      <SessionControls 
-        status="active"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
-        onEnd={mockOnEnd}
-      />
-    );
-
-    const pauseButton = screen.getByRole('button', { name: /Pause/ });
-    fireEvent.click(pauseButton);
-
-    expect(mockOnPause).toHaveBeenCalledTimes(1);
-  });
-
-  test('calls onResume when resume button is clicked', () => {
-    render(
-      <SessionControls 
-        status="paused"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
-        onEnd={mockOnEnd}
-      />
-    );
-
-    const resumeButton = screen.getByRole('button', { name: /Resume/ });
-    fireEvent.click(resumeButton);
-
-    expect(mockOnResume).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('End Session')).toBeInTheDocument();
+    expect(screen.getByText('New Session')).toBeInTheDocument();
+    expect(screen.getByText('End Story')).toBeInTheDocument();
   });
 
   test('calls onEnd when end session button is clicked', () => {
-    render(
-      <SessionControls 
-        status="active"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
-        onEnd={mockOnEnd}
-      />
-    );
+    render(<SessionControls onEnd={mockOnEnd} />);
 
     const endButton = screen.getByRole('button', { name: /End Session/ });
     fireEvent.click(endButton);
@@ -87,17 +42,31 @@ describe('SessionControls', () => {
     expect(mockOnEnd).toHaveBeenCalledTimes(1);
   });
 
-  test('maintains button accessibility attributes', () => {
+  test('calls onRestart when new session button is clicked', () => {
     render(
       <SessionControls 
-        status="paused"
-        onPause={mockOnPause}
-        onResume={mockOnResume}
         onEnd={mockOnEnd}
+        onRestart={mockOnRestart}
       />
     );
 
-    const pauseResumeButton = screen.getByTestId('game-session-controls-pause');
-    expect(pauseResumeButton).toHaveAttribute('aria-pressed', 'true');
+    const restartButton = screen.getByRole('button', { name: /New Session/ });
+    fireEvent.click(restartButton);
+
+    expect(mockOnRestart).toHaveBeenCalledTimes(1);
+  });
+
+  test('calls onEndStory when end story button is clicked', () => {
+    render(
+      <SessionControls 
+        onEnd={mockOnEnd}
+        onEndStory={mockOnEndStory}
+      />
+    );
+
+    const endStoryButton = screen.getByRole('button', { name: /End Story/ });
+    fireEvent.click(endStoryButton);
+
+    expect(mockOnEndStory).toHaveBeenCalledTimes(1);
   });
 });

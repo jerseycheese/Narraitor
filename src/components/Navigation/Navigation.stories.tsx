@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Navigation } from './Navigation';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
 const meta: Meta<typeof Navigation> = {
-  title: 'Narraitor/Navigation/Navigation',
+  title: 'Narraitor/UI/Navigation/Navigation',
   component: Navigation,
   parameters: {
     layout: 'fullscreen',
@@ -31,14 +32,14 @@ const meta: Meta<typeof Navigation> = {
   decorators: [
     (Story) => {
       // Reset stores before each story
-      worldStore.setState({
+      useWorldStore.setState({
         worlds: {},
         currentWorldId: null,
         error: null,
         loading: false,
       });
       
-      characterStore.setState({
+      useCharacterStore.setState({
         characters: {},
         currentCharacterId: null,
         error: null,
@@ -46,18 +47,20 @@ const meta: Meta<typeof Navigation> = {
       });
       
       return (
-        <div className="min-h-screen bg-gray-100">
-          <Story />
-          <div className="p-8">
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-              <p className="text-gray-600">
-                This area represents the page content below the navigation.
-                The navigation component adapts based on the current world state and user context.
-              </p>
+        <NavigationLoadingProvider>
+          <div className="min-h-screen bg-gray-100">
+            <Story />
+            <div className="p-8">
+              <div className="bg-white rounded-lg p-6 shadow">
+                <h2 className="text-xl font-semibold mb-4">Page Content</h2>
+                <p className="text-gray-600">
+                  This area represents the page content below the navigation.
+                  The navigation component adapts based on the current world state and user context.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </NavigationLoadingProvider>
       );
     },
   ],
@@ -110,9 +113,9 @@ const setupWorlds = () => {
     },
   };
   
-  const worldId1 = worldStore.getState().createWorld(fantasyWorld);
-  const worldId2 = worldStore.getState().createWorld(scifiWorld);
-  const worldId3 = worldStore.getState().createWorld(westernWorld);
+  const worldId1 = useWorldStore.getState().createWorld(fantasyWorld);
+  const worldId2 = useWorldStore.getState().createWorld(scifiWorld);
+  const worldId3 = useWorldStore.getState().createWorld(westernWorld);
   
   return { worldId1, worldId2, worldId3 };
 };
@@ -120,6 +123,7 @@ const setupWorlds = () => {
 const setupCharacters = (worldId1: string, worldId2: string) => {
   const character1 = {
     name: 'Aria Starweaver',
+    description: 'A brave warrior from the fantasy realm',
     worldId: worldId1,
     level: 5,
     isPlayer: true,
@@ -131,11 +135,18 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       goals: ['Protect the innocent'],
       fears: ['Failing in duty'],
       physicalDescription: 'Tall and strong',
+      relationships: [],
     },
     status: {
-      hp: 100,
-      mp: 50,
-      stamina: 75,
+      health: 100,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,
@@ -145,6 +156,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
   
   const character2 = {
     name: 'Zara Chen',
+    description: 'A skilled mage with ancient knowledge',
     worldId: worldId1,
     level: 3,
     isPlayer: true,
@@ -155,12 +167,19 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       personality: 'Wise and mysterious',
       goals: ['Seek ancient knowledge'],
       fears: ['Losing magical powers'],
-      physicalDescription: 'Small and quick'
+      physicalDescription: 'Small and quick',
+      relationships: [],
     },
     status: {
-      hp: 80,
-      mp: 120,
-      stamina: 60,
+      health: 80,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,
@@ -170,6 +189,7 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
   
   const character3 = {
     name: 'Jack Harrison',
+    description: 'A cyber-enhanced detective investigating corruption',
     worldId: worldId2,
     level: 1,
     isPlayer: true,
@@ -180,12 +200,19 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
       personality: 'Cynical but determined',
       goals: ['Uncover corporate conspiracy'],
       fears: ['Corporate retaliation'],
-      physicalDescription: 'Scarred face, cybernetic eyes'
+      physicalDescription: 'Scarred face, cybernetic eyes',
+      relationships: [],
     },
     status: {
-      hp: 90,
-      mp: 30,
-      stamina: 85,
+      health: 90,
+      maxHealth: 100,
+      conditions: [],
+    },
+    inventory: {
+      characterId: '',
+      items: [],
+      capacity: 100,
+      categories: [],
     },
     portrait: {
       type: 'placeholder' as const,
@@ -193,9 +220,9 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
     },
   };
   
-  characterStore.getState().createCharacter(character1);
-  characterStore.getState().createCharacter(character2);
-  characterStore.getState().createCharacter(character3);
+  useCharacterStore.getState().createCharacter(character1);
+  useCharacterStore.getState().createCharacter(character2);
+  useCharacterStore.getState().createCharacter(character3);
 };
 
 export const NoWorlds: Story = {
@@ -230,7 +257,7 @@ export const WithActiveWorld: Story = {
     (Story) => {
       const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
-      worldStore.getState().setCurrentWorld(worldId1);
+      useWorldStore.getState().setCurrentWorld(worldId1);
       return <Story />;
     },
   ],
@@ -248,7 +275,7 @@ export const WorldSwitcherOpen: Story = {
     (Story) => {
       const { worldId1, worldId2 } = setupWorlds();
       setupCharacters(worldId1, worldId2);
-      worldStore.getState().setCurrentWorld(worldId1);
+      useWorldStore.getState().setCurrentWorld(worldId1);
       
       // Simulate opened dropdown by adding CSS to show it
       const style = document.createElement('style');
@@ -266,6 +293,42 @@ export const WorldSwitcherOpen: Story = {
     docs: {
       description: {
         story: 'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator'
+      }
+    }
+  }
+};
+
+export const MobileView: Story = {
+  decorators: [
+    (Story) => {
+      const { worldId1, worldId2 } = setupWorlds();
+      setupCharacters(worldId1, worldId2);
+      useWorldStore.getState().setCurrentWorld(worldId1);
+      return (
+        <NavigationLoadingProvider>
+          <div className="min-h-screen bg-gray-100">
+            <Story />
+            <div className="p-8">
+              <div className="bg-white rounded-lg p-6 shadow">
+                <h2 className="text-xl font-semibold mb-4">Mobile Page Content</h2>
+                <p className="text-gray-600">
+                  This shows the mobile navigation with hamburger menu. 
+                  The menu should show when screen width is ≤768px.
+                </p>
+              </div>
+            </div>
+          </div>
+        </NavigationLoadingProvider>
+      );
+    },
+  ],
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout'
       }
     }
   }

@@ -38,8 +38,8 @@ jest.mock('../../persistence', () => {
 jest.unmock('../../worldStore');
 jest.unmock('../../characterStore');
 
-import { worldStore } from '../../worldStore';
-import { characterStore } from '../../characterStore';
+import { useWorldStore } from '../../worldStore';
+import { useCharacterStore } from '../../characterStore';
 
 // Mock indexedDB
 const mockIndexedDB = {
@@ -70,8 +70,8 @@ describe('Persistence Integration - MVP', () => {
     }
     
     // Reset stores using their reset methods
-    worldStore.getState().reset();
-    characterStore.getState().reset();
+    useWorldStore.getState().reset();
+    useCharacterStore.getState().reset();
     
     // Mock global indexedDB
     (global as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
@@ -90,7 +90,7 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.setItem.mockClear();
       
       // Create a character using the actual store
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
         worldId: 'test-world-1',
         level: 1,
@@ -128,7 +128,7 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.setItem.mockClear();
       
       // Create a world
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
         theme: 'fantasy',
         attributes: [],
@@ -142,7 +142,7 @@ describe('Persistence Integration - MVP', () => {
       });
 
       // Create a character referencing the world
-      const characterId = characterStore.getState().createCharacter({
+      const characterId = useCharacterStore.getState().createCharacter({
         name: 'Reference Character',
         worldId: worldId,
         level: 1,
@@ -162,15 +162,15 @@ describe('Persistence Integration - MVP', () => {
       await Promise.resolve();
 
       // Check if the character was persisted with the correct world reference
-      const characterStoreCall = mockStorage.setItem.mock.calls.find(
+      const useCharacterStoreCall = mockStorage.setItem.mock.calls.find(
         call => call[0] === 'narraitor-character-store' && 
         call[1].includes(characterId)
       );
 
-      expect(characterStoreCall).toBeDefined();
+      expect(useCharacterStoreCall).toBeDefined();
       
-      if (characterStoreCall) {
-        const characterData = JSON.parse(characterStoreCall[1]);
+      if (useCharacterStoreCall) {
+        const characterData = JSON.parse(useCharacterStoreCall[1]);
         const character = characterData.state.characters[characterId];
         expect(character.worldId).toBe(worldId);
       }
@@ -186,7 +186,7 @@ describe('Persistence Integration - MVP', () => {
       delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
       // Stores should still function without persistence
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Fallback World',
         theme: 'fantasy',
         attributes: [],
@@ -202,7 +202,7 @@ describe('Persistence Integration - MVP', () => {
       expect(worldId).toBeDefined();
       
       // State should work in memory
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       expect(state.worlds[worldId]).toBeDefined();
     });
 
@@ -216,7 +216,7 @@ describe('Persistence Integration - MVP', () => {
       mockStorage.setItem.mockRejectedValue(error);
 
       // Store should still function despite errors
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Error Test World',
         theme: 'fantasy',
         attributes: [],

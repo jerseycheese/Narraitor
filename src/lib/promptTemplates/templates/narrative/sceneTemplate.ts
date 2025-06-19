@@ -8,7 +8,8 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
     tone,
     narrativeContext,
     generationParameters,
-    playerCharacterName
+    playerCharacterName,
+    characterSkillContext
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
@@ -20,12 +21,21 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
-Tone: ${tone}
+Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}
 
 STORY SO FAR:
 ${recentContent}
 
 ${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
+
+${narrativeContext?.currentTags?.some((tag: string) => tag.includes('skill-success') || tag.includes('skill-failure')) ? `
+SKILL CHECK RESULT GUIDANCE:
+${narrativeContext.currentTags.includes('skill-success') ? '- The player SUCCEEDED at their skill check - acknowledge their competence and expertise' : ''}
+${narrativeContext.currentTags.includes('skill-failure') ? '- The player FAILED at their skill check - show the consequences and areas for improvement' : ''}
+- Reference the specific skill used in a natural way within the narrative
+- Show how the character's abilities (or lack thereof) affected the outcome
+- Make skill usage feel meaningful to the story progression
+` : ''}
 
 CRITICAL CONTINUITY RULES:
 - The player is EXACTLY where the last scene ended
@@ -39,7 +49,19 @@ Generate a ${segmentType} that:
 3. Does NOT repeat or revisit events that already happened
 4. Advances the story forward in time (never backward)
 5. Maintains the ${tone} tone
-6. Is approximately 1-2 paragraphs long
+6. Is approximately 4-6 sentences long (1 focused paragraph)
+
+${(worldName && (worldName.toLowerCase().includes('1990') || worldName.toLowerCase().includes('1980') || worldName.toLowerCase().includes('1970'))) || (genre && (genre.toLowerCase().includes('modern') || genre.toLowerCase().includes('contemporary') || genre.toLowerCase().includes('realistic'))) ? `
+
+CRITICAL REALISM CONSTRAINTS:
+- This is a completely realistic, mundane setting with NO supernatural elements
+- NO magical, mystical, fantasy, psychic, or otherworldly phenomena whatsoever
+- NO special powers, reality-shifting, destiny, or metaphysical concepts
+- Focus on real human drama, realistic challenges, and authentic period details
+- Use only technology, situations, and social dynamics that actually existed in the time period
+- Any tension should come from realistic human conflict, not supernatural forces
+- All sounds and effects must have normal, realistic explanations
+` : ''}
 
 CRITICAL INSTRUCTIONS:
 1. Write in SECOND PERSON perspective (using "you")
@@ -52,7 +74,10 @@ Examples:
 ✗ WRONG: "${playerCharacterName || 'The character'} feels the cold wind..."
 ✓ CORRECT (dialogue): "'${playerCharacterName || 'Friend'}, are you alright?' the guard asks."
 
-Focus on sensory details and the character's reactions to bring the scene to life.
+Focus on varied sensory details and the character's reactions to bring the scene to life. 
+- Use visual, auditory, and tactile descriptions primarily
+- Avoid repetitive olfactory descriptions (smells/scents/odors) unless essential to the scene
+- Vary your sensory language to avoid overused phrases
 
 Response Format:
 {

@@ -173,7 +173,7 @@ describe.skip('FinalizeStep', () => {
           description: 'Fighting ability',
           difficulty: 'medium',
           category: 'general',
-          linkedAttributeId: 'attr1',
+          attributeIds: ['attr1'],
         },
       ],
     };

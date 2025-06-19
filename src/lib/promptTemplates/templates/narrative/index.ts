@@ -5,6 +5,7 @@ import { sceneTemplate } from './sceneTemplate';
 import { transitionTemplate } from './transitionTemplate';
 import { playerChoiceTemplate } from './playerChoiceTemplate';
 import { alignedChoiceTemplate } from './choiceTypeTemplates';
+import { skillAcknowledgmentTemplate } from './skillAcknowledgmentTemplate';
 
 // Convert function templates to PromptTemplate objects
 export const narrativeTemplates: PromptTemplate[] = [
@@ -97,5 +98,20 @@ export const narrativeTemplates: PromptTemplate[] = [
       }
     ],
     generate: alignedChoiceTemplate
+  },
+  {
+    id: 'narrative/skillAcknowledgment',
+    name: 'Skill Acknowledgment Template',
+    type: PromptType.NarrativeGeneration,
+    content: '{{prompt}}',
+    variables: [
+      {
+        name: 'prompt',
+        type: 'string',
+        description: 'The generated prompt for skill acknowledgment narrative',
+        required: true
+      }
+    ],
+    generate: skillAcknowledgmentTemplate
   }
 ];

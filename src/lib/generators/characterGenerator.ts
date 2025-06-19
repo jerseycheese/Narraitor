@@ -1,5 +1,4 @@
 import { World } from '@/types/world.types';
-import { createAIClient } from '@/lib/ai/clientFactory';
 import Logger from '../utils/logger';
 
 const logger = new Logger('CharacterGenerator');
@@ -120,11 +119,11 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
     name: finalName,
     level: Math.floor(Math.random() * 3) + 1, // Level 1-3
     background: {
-      description: `A ${finalName.toLowerCase()} from the ${world.name} world with an interesting past.`,
+      description: `A mysterious figure with an interesting past${world.reference ? ` from the ${world.reference} universe` : ''}.`,
       personality: personalities[Math.floor(Math.random() * personalities.length)],
       motivation: motivations[Math.floor(Math.random() * motivations.length)],
       fears: fears[Math.floor(Math.random() * fears.length)],
-      physicalDescription: `Average height and build with distinctive features befitting the ${world.theme} setting.`
+      physicalDescription: `${Math.floor(Math.random() * 40) + 20}-year-old human of average height and build with distinctive features befitting the ${world.theme} setting.`
     },
     attributes,
     skills: selectedSkills,
@@ -139,22 +138,46 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
 async function generateWithAI(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
   const { world, existingNames = [], suggestedName, generationType = 'known' } = options;
   
+  logger.debug('CharacterGenerator', `Generating ${generationType} character for world:`, {
+    worldName: world.name,
+    worldReference: world.reference,
+    worldRelationship: world.relationship,
+    theme: world.theme,
+    attributesCount: world.attributes?.length || 0,
+    skillsCount: world.skills?.length || 0,
+    attributes: world.attributes?.map(a => ({ id: a.id, name: a.name })) || [],
+    skills: world.skills?.map(s => ({ id: s.id, name: s.name })) || []
+  });
+
+  // Check if world has attributes and skills
+  if (!world.attributes || world.attributes.length === 0) {
+    logger.error('CharacterGenerator', 'World has no attributes defined. Cannot generate character.');
+    throw new Error('Cannot generate character: World has no attributes defined');
+  }
+
+  if (!world.skills || world.skills.length === 0) {
+    logger.error('CharacterGenerator', 'World has no skills defined. Cannot generate character.');
+    throw new Error('Cannot generate character: World has no skills defined');
+  }
+  
   try {
     const prompt = `
-You are creating a character for the world "${world.name}" with the theme "${world.theme}".
+You are creating a character for a ${world.theme} themed world${world.reference ? ` based on ${world.reference}` : ''}.
+${world.reference && world.relationship === 'set_in' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
+${world.reference && world.relationship === 'based_on' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
 ${world.description ? `\nWorld Context: ${world.description}` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
-${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist in this world and must NOT be used: ${existingNames.join(', ')}` : ''}
+${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}
 
-World Attributes: ${world.attributes.map(a => `${a.name} (${a.minValue}-${a.maxValue})`).join(', ')}
-World Skills: ${world.skills.map(s => s.name).join(', ')}
+World Attributes: ${world.attributes?.map(a => `${a.name} (${a.minValue}-${a.maxValue})`).join(', ') || 'None defined'}
+World Skills: ${world.skills?.map(s => s.name).join(', ') || 'None defined'}
 
 Create a character that:
 ${generationType === 'specific' && suggestedName ? 
-  `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from the actual ${world.name} source material` :
+  `1. Is named "${suggestedName}" and MUST be a REAL, EXISTING character from ${world.reference ? `the actual ${world.reference} source material` : 'this world'}` :
   generationType === 'known' ?
-  `1. MUST be a REAL, EXISTING character from the actual ${world.name} source material (NOT made up)` :
-  `1. Should be an original character that fits the ${world.name} world theme and has never appeared in the source material`
+  `1. MUST be a REAL, EXISTING character from ${world.reference ? `the actual ${world.reference} source material. Use only actual named characters that appear in ${world.reference}. Do NOT make up new characters!` : 'this world'} (NOT made up)` :
+  `1. Should be an original character that fits the world theme and has never appeared in any source material`
 }
 2. Is NOT one of the existing characters listed above (check names carefully)
 3. Has an interesting background story that fits the world
@@ -167,10 +190,10 @@ ${generationType === 'specific' && suggestedName ?
 Think about this character's strengths and weaknesses, then assign appropriate attribute and skill values.
 
 For attributes, consider:
-${world.attributes.map(a => `- ${a.name} (${a.minValue}-${a.maxValue}): How strong is this character in this area?`).join('\n')}
+${world.attributes?.map(a => `- ${a.name} (${a.minValue}-${a.maxValue}): How strong is this character in this area?`).join('\n') || '- No attributes defined for this world'}
 
 For skills, consider:
-${world.skills.map(s => `- ${s.name} (1-10): What is their experience level?`).join('\n')}
+${world.skills?.map(s => `- ${s.name} (1-10): What is their experience level?`).join('\n') || '- No skills defined for this world'}
 
 Generate a character and return ONLY a valid JSON object:
 
@@ -182,13 +205,13 @@ Generate a character and return ONLY a valid JSON object:
     "personality": "Their personality traits and behavioral patterns", 
     "motivation": "What drives them and their goals",
     "fears": ["List 2-3 specific fears or anxieties this character has"],
-    "physicalDescription": "Their appearance including height, build, hair, eyes, clothing"
+    "physicalDescription": "Their appearance including age, race/ethnicity, height, build, hair, eyes, and typical clothing"
   },
-  "attributes": [${world.attributes.map((a) => `
-    {"id": "${a.id}", "value": REPLACE_WITH_NUMBER_${a.minValue}_TO_${a.maxValue}}`).join(',')}
+  "attributes": [${world.attributes?.map((a) => `
+    {"id": "${a.id}", "value": REPLACE_WITH_NUMBER_${a.minValue}_TO_${a.maxValue}}`).join(',') || ''}
   ],
-  "skills": [${world.skills.map((s) => `
-    {"id": "${s.id}", "level": REPLACE_WITH_NUMBER_1_TO_10}`).join(',')}
+  "skills": [${world.skills?.map((s) => `
+    {"id": "${s.id}", "level": REPLACE_WITH_NUMBER_1_TO_10}`).join(',') || ''}
   ]
 }
 
@@ -201,16 +224,24 @@ CRITICAL INSTRUCTIONS:
 
     logger.debug('CharacterGenerator', 'Generated prompt:', prompt);
     
-    const client = createAIClient();
+    // Import and use the AI client directly for server-side usage
+    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+    const client = createDefaultGeminiClient();
+    
+    // Generate with AI
     const response = await client.generateContent(prompt);
+    const apiResponse = {
+      content: response.content,
+      finishReason: response.finishReason
+    };
     
     // Log the raw response for debugging
-    logger.debug('CharacterGenerator', 'Raw AI response:', response.content);
+    logger.debug('CharacterGenerator', 'Raw AI response:', apiResponse.content);
     
     // Extract JSON from response
-    const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+    const jsonMatch = apiResponse.content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logger.error('CharacterGenerator', 'No JSON found in response:', response.content);
+      logger.error('CharacterGenerator', 'No JSON found in response:', apiResponse.content);
       throw new Error('No valid JSON found in response');
     }
     
@@ -225,7 +256,7 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, ''); // Remove multi-line comments
     
     // Remove any placeholder text that wasn't replaced with random values within ranges
-    jsonString = jsonString.replace(/REPLACE_WITH_NUMBER_(\d+)_TO_(\d+)/g, (match, min, max) => {
+    jsonString = jsonString.replace(/REPLACE_WITH_NUMBER_(\d+)_TO_(\d+)/g, (match: string, min: string, max: string) => {
       const minVal = parseInt(min, 10);
       const maxVal = parseInt(max, 10);
       const randomValue = Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
@@ -234,7 +265,7 @@ CRITICAL INSTRUCTIONS:
     });
     
     // Fallback for any remaining number placeholders
-    jsonString = jsonString.replace(/<number>/g, (match) => {
+    jsonString = jsonString.replace(/<number>/g, (match: string) => {
       logger.debug('CharacterGenerator', `Found unhandled placeholder ${match}, using fallback value 5`);
       return '5';
     });
@@ -251,7 +282,7 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
     
     // Ensure proper escaping of quotes inside strings
-    jsonString = jsonString.replace(/"([^"]*)":/g, (match, key) => {
+    jsonString = jsonString.replace(/"([^"]*)":/g, (match: string, key: string) => {
       // Escape any unescaped quotes inside the key
       const escapedKey = key.replace(/\\"/g, '"').replace(/"/g, '\\"');
       return `"${escapedKey}":`;
@@ -375,8 +406,13 @@ CRITICAL INSTRUCTIONS:
     
     logger.error('CharacterGenerator', 'AI generation failed:', error);
     
-    // If AI generation fails, fall back to template generation
-    logger.debug('CharacterGenerator', 'Falling back to template generation due to AI error');
+    // For known figures, we should never fall back to template generation
+    if (generationType === 'known' || generationType === 'specific') {
+      throw new Error(`Failed to generate known character from ${world.reference || 'this world'}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    
+    // Only fall back to template generation for original characters
+    logger.debug('CharacterGenerator', 'Falling back to template generation for original character due to AI error');
     try {
       return generateFromTemplate({ 
         method: 'template', 

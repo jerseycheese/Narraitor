@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateWorld, type GeneratedWorldData } from '@/lib/ai/worldGenerator';
 
 export default function WorldGenerationTestPage() {
@@ -12,7 +11,7 @@ export default function WorldGenerationTestPage() {
   const [generatedWorld, setGeneratedWorld] = useState<GeneratedWorldData | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const { worlds } = worldStore();
+  const { worlds, createWorld } = useWorldStore();
   
   const handleGenerate = async () => {
     if (!worldReference.trim()) {
@@ -43,7 +42,7 @@ export default function WorldGenerationTestPage() {
   const handleCreateWorld = () => {
     if (!generatedWorld) return;
     
-    worldStore.getState().createWorld({
+    createWorld({
       name: generatedWorld.name,
       theme: generatedWorld.theme,
       description: generatedWorld.description,
@@ -71,7 +70,6 @@ export default function WorldGenerationTestPage() {
     'Harry Potter',
     'Game of Thrones',
     'Cyberpunk 2077',
-    'The Witcher',
     'Ancient Rome',
     'Victorian England',
     'Wild West',
@@ -85,13 +83,7 @@ export default function WorldGenerationTestPage() {
   
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <Link 
-        href="/dev" 
-        className="text-blue-600 hover:text-blue-800 underline"
-      >
-        ← Back to Dev Harnesses
-      </Link>
-      <h1 className="text-3xl font-bold mb-6 mt-4">World Generation Test Harness</h1>
+      <h1 className="text-3xl font-bold mb-6">World Generation Test Harness</h1>
       
       <div className="space-y-6">
         {/* World Reference Input */}

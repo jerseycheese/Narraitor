@@ -13,7 +13,7 @@ export interface JournalEntry extends TimestampedEntity {
   type: JournalEntryType;
   title: string;
   content: string;
-  significance: 'major' | 'minor';
+  significance: 'minor' | 'major' | 'critical';
   isRead: boolean;
   relatedEntities: RelatedEntity[];
   metadata: JournalMetadata;

@@ -1,3 +1,12 @@
+---
+title: "AI Choice Generation Implementation Summary"
+type: implementation
+category: ai-features
+tags: [ai, choices, implementation, github-304]
+created: 2025-05-21
+updated: 2025-06-08
+---
+
 # AI Choice Generation Implementation Summary
 
 ## Overview
