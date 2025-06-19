@@ -19,11 +19,11 @@ describe('MobileNavigationMenu', () => {
       worlds: {},
       currentWorldId: null,
       setCurrentWorld: jest.fn(),
-    } as any);
+    });
     
     mockUseCharacterStore.mockReturnValue({
       characters: {},
-    } as any);
+    });
   });
 
   test('renders mobile navigation menu when open', () => {

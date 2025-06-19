@@ -37,7 +37,7 @@ export function Navigation() {
   const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
   const { characters } = useCharacterStore();
   const { navigateWithLoading } = useNavigationLoadingContext();
-  const { isMenuOpen, isMobile, openMenu, closeMenu, toggleMenu } = useMobileNavigation();
+  const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -36,9 +35,6 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
   const startY = useRef<number>(0);
 
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
-  const worldCharacterCount = Object.values(characters).filter(
-    char => char.worldId === currentWorldId
-  ).length;
 
   // Focus management - focus first element when opened
   useEffect(() => {
@@ -83,7 +79,6 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
 
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
-    const worldName = worlds[worldId]?.name || 'world';
     onNavigate(`/world/${worldId}`);
     onClose();
   };

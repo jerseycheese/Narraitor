@@ -37,15 +37,15 @@ describe('Navigation - Mobile Experience', () => {
       worlds: {},
       currentWorldId: null,
       setCurrentWorld: jest.fn(),
-    } as any);
+    });
     
     mockUseCharacterStore.mockReturnValue({
       characters: {},
-    } as any);
+    });
     
     mockUseNavigationLoadingContext.mockReturnValue({
       navigateWithLoading: jest.fn(),
-    } as any);
+    });
   });
 
   test('shows hamburger menu button on mobile', () => {
