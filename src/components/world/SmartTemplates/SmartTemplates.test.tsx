@@ -15,10 +15,11 @@ jest.mock('@/lib/ai/narrativeGenerator', () => ({
 const mockSessionStore = {
   templateHistory: [],
   addTemplateToHistory: jest.fn(),
+  clearTemplateHistory: jest.fn(),
 };
 
 jest.mock('@/state/sessionStore', () => ({
-  sessionStore: {
+  useSessionStore: {
     getState: () => mockSessionStore,
     subscribe: jest.fn(),
     setState: jest.fn(),

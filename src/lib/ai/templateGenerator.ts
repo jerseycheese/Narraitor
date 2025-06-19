@@ -44,15 +44,16 @@ export class TemplateGenerator {
     );
   }
 
-  validateTemplate(template: any): asserts template is WorldTemplate {
+  validateTemplate(template: unknown): asserts template is WorldTemplate {
     const requiredFields = ['name', 'description', 'theme', 'attributes', 'skills', 'explanation'];
     const arrayFields = ['attributes', 'skills'];
     
     validateRequiredFields(template, requiredFields, 'template structure');
-    validateArrayFields(template, arrayFields, 'template structure');
+    const templateRecord = template as Record<string, unknown>;
+    validateArrayFields(templateRecord, arrayFields, 'template structure');
 
     // Validate each attribute
-    for (const attr of template.attributes) {
+    for (const attr of (templateRecord.attributes as any[])) {
       if (!attr.name || typeof attr.baseValue !== 'number' || 
           typeof attr.minValue !== 'number' || typeof attr.maxValue !== 'number') {
         throw new Error('Invalid attribute structure');
@@ -60,7 +61,7 @@ export class TemplateGenerator {
     }
 
     // Validate each skill
-    for (const skill of template.skills) {
+    for (const skill of (templateRecord.skills as any[])) {
       if (!skill.name || typeof skill.baseValue !== 'number' || 
           typeof skill.minValue !== 'number' || typeof skill.maxValue !== 'number' ||
           !['trivial', 'easy', 'moderate', 'hard', 'extreme'].includes(skill.difficulty)) {
