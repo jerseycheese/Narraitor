@@ -1,4 +1,24 @@
-// src/lib/ai/skillDetectionService.ts
+/**
+ * AI Skill Detection Service
+ * 
+ * Client-side service for calling the AI skill detection API. Provides caching,
+ * error handling, and a singleton pattern for efficient API usage.
+ * 
+ * Features:
+ * - 5-minute response caching to reduce API calls
+ * - Comprehensive error handling with fallback
+ * - Singleton pattern for consistent state management
+ * - TypeScript interfaces for type safety
+ * 
+ * @example
+ * const result = await skillDetectionService.detectSkills(
+ *   "I sneak past the guard",
+ *   [{id: "stealth", name: "Stealth"}]
+ * );
+ * if (!result.error) {
+ *   console.log(result.detectedSkills);
+ * }
+ */
 
 export interface SkillInfo {
   id: string;

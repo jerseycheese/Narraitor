@@ -1,3 +1,26 @@
+/**
+ * CustomActionProcessor Component
+ * 
+ * Processes custom player text input and uses AI to detect which skills should be triggered.
+ * Replaces the previous hardcoded action-to-skill mapping with intelligent AI analysis.
+ * 
+ * Features:
+ * - Real-time AI-powered skill detection as user types
+ * - Debounced analysis (500ms) for performance optimization
+ * - Visual feedback with confidence scores and AI reasoning
+ * - Integration with existing skill evaluation system
+ * - Comprehensive error handling and loading states
+ * 
+ * @param {Character} character - Character with skills for evaluation
+ * @param {Function} onActionSubmit - Callback when action is submitted with skill results
+ * 
+ * @example
+ * <CustomActionProcessor 
+ *   character={character}
+ *   onActionSubmit={(result) => console.log(result.skillChecks)}
+ * />
+ */
+
 import React, { useCallback, useState, useEffect } from 'react';
 import { skillDetectionService } from '@/lib/ai/skillDetectionService';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';

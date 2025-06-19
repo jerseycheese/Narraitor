@@ -1,9 +1,36 @@
-// src/app/api/ai/detect-skills/route.ts
+/**
+ * AI Skill Detection API Endpoint
+ * 
+ * Analyzes custom player text input using Google Gemini AI to determine which skills 
+ * should be triggered for the action. Replaces hardcoded action-to-skill mappings 
+ * with intelligent, context-aware skill detection.
+ * 
+ * @route POST /api/ai/detect-skills
+ * @param {SkillDetectionRequest} body - Text to analyze and available skills
+ * @returns {SkillDetectionResponse} - Detected skills with confidence scores and reasoning
+ * 
+ * @example
+ * POST /api/ai/detect-skills
+ * {
+ *   "text": "I convince the guard I am his friend",
+ *   "availableSkills": [{"id": "charisma", "name": "Charisma"}]
+ * }
+ * 
+ * Response:
+ * {
+ *   "detectedSkills": [{
+ *     "skillId": "charisma",
+ *     "skillName": "Charisma", 
+ *     "confidence": 0.9,
+ *     "reasoning": "Action involves social persuasion",
+ *     "suggestedDifficulty": 5
+ *   }]
+ * }
+ */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { 
   handleRateLimiting, 
-  validateAIRequest, 
   validateAPIKey, 
   makeGeminiRequest,
 } from '../../../../utils/apiHelpers';

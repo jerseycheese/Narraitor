@@ -1,3 +1,21 @@
+/**
+ * Custom Action Processor Test Harness
+ * 
+ * Test page for the AI-powered skill detection system. Allows manual testing
+ * of the CustomActionProcessor component with different character configurations.
+ * 
+ * Features:
+ * - High/Low skill character toggles for testing success/failure scenarios
+ * - Real-time AI skill detection with confidence scores and reasoning
+ * - Visual display of skill check results and character skill levels
+ * 
+ * Test Examples:
+ * - "Convince the guard I am his friend" → Charisma skill detection
+ * - "I hack into the mainframe" → Computer Use skill detection  
+ * - "I push my way past the guard" → Athletics + Intimidation detection
+ * - "I drop my pants and do the moonwalk" → No skills (correctly identified)
+ */
+
 'use client';
 
 import React, { useState } from 'react';
