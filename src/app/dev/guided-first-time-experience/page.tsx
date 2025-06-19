@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
-import { sessionStore } from '@/state/sessionStore';
+import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { setOnboardingCompleted, onboardingCompleted } = sessionStore();
+  const { setOnboardingCompleted, onboardingCompleted } = useSessionStore();
 
   const handleReset = () => {
     setOnboardingCompleted(false);
