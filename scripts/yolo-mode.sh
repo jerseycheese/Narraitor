@@ -60,9 +60,9 @@ check_prerequisites() {
         return 1
     fi
     
-    # Check for do-issue-auto-noverify command
-    if [ ! -f "$NARRAITOR_MAIN/.claude/commands/do-issue-auto-noverify.md" ]; then
-        echo -e "${YELLOW}⚠️  do-issue-auto-noverify.md not found${NC}"
+    # Check for do-issue-auto command
+    if [ ! -f "$NARRAITOR_MAIN/.claude/commands/do-issue-auto.md" ]; then
+        echo -e "${YELLOW}⚠️  do-issue-auto.md not found${NC}"
         echo "This is required for YOLO mode"
         return 1
     fi
@@ -145,7 +145,7 @@ launch_yolo() {
         -e "GEMINI_API_KEY=${GEMINI_API_KEY:-mock}" \
         --network none \
         "narraitor-yolo-$issue_number:latest" \
-        sh -c "cd /app && claude --dangerously-skip-permissions /project:do-issue-auto-noverify $issue_number"
+        sh -c "cd /app && claude --dangerously-skip-permissions /project:do-issue-auto $issue_number"
     
     echo -e "${GREEN}✅ YOLO container started${NC}"
     echo -e "${YELLOW}Monitor with: $0 logs $issue_number${NC}"
