@@ -11,6 +11,7 @@ import { Breadcrumbs } from './Breadcrumbs';
 import { RecentPagesDropdown } from './RecentPagesDropdown';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
+import { Button } from '@/components/ui/button';
 
 /**
  * Navigation - Main application navigation component
@@ -85,9 +86,11 @@ export function Navigation() {
             <div className="flex items-center space-x-4">
               {/* Mobile menu button */}
               {isMobile && (
-                <button
+                <Button
                   onClick={toggleMenu}
-                  className="md:hidden min-h-11 min-w-11 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden min-h-11 min-w-11 bg-gray-800 hover:bg-gray-700 text-white"
                   aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={isMenuOpen}
                 >
@@ -100,7 +103,7 @@ export function Navigation() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   )}
-                </button>
+                </Button>
               )}
               
               <Link 

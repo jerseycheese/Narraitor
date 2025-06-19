@@ -14,19 +14,18 @@ export function useMobileNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile viewport
+  // Detect mobile viewport (optimized with memoized callback)
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.matchMedia('(max-width: 768px)').matches);
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
     };
 
-    // Check initial state
-    checkIsMobile();
+    // Set initial state
+    setIsMobile(mediaQuery.matches);
 
     // Listen for viewport changes
-    const mediaQuery = window.matchMedia('(max-width: 768px)');
-    const handleChange = () => checkIsMobile();
-    
     mediaQuery.addEventListener('change', handleChange);
     
     return () => {

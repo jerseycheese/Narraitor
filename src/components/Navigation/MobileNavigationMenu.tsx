@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
+import { Button } from '@/components/ui/button';
 
 interface MobileNavigationMenuProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ interface MobileNavigationMenuProps {
  * @param onClose - Callback to close the menu
  * @param onNavigate - Callback for navigation with loading states
  */
-export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavigationMenuProps) {
+export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavigationMenuProps) {
   const pathname = usePathname();
   const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
   const { characters } = useCharacterStore();
@@ -46,13 +47,13 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
     }
   }, [isOpen]);
 
-  // Touch gesture handling for swipe to close
-  const handleTouchStart = (e: React.TouchEvent) => {
+  // Touch gesture handling for swipe to close (memoized)
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     startX.current = e.touches[0].clientX;
     startY.current = e.touches[0].clientY;
-  };
+  }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!startX.current || !startY.current) return;
 
     const currentX = e.touches[0].clientX;
@@ -65,23 +66,23 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
     if (Math.abs(diffX) > Math.abs(diffY) && diffX < -100) {
       onClose();
     }
-  };
+  }, [onClose]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     startX.current = 0;
     startY.current = 0;
-  };
+  }, []);
 
-  const handleNavigation = (path: string) => {
+  const handleNavigation = useCallback((path: string) => {
     onNavigate(path);
     onClose();
-  };
+  }, [onNavigate, onClose]);
 
-  const handleWorldSwitch = (worldId: string) => {
+  const handleWorldSwitch = useCallback((worldId: string) => {
     setCurrentWorld(worldId);
     onNavigate(`/world/${worldId}`);
     onClose();
-  };
+  }, [setCurrentWorld, onNavigate, onClose]);
 
   if (!isOpen) {
     return null;
@@ -103,22 +104,25 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
           <LogoIcon size="small" className="brightness-0 invert" />
           <LogoText size="sm" className="text-white" />
         </div>
-        <button
+        <Button
           onClick={onClose}
-          className="min-h-11 min-w-11 flex items-center justify-center rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+          variant="ghost"
+          size="icon"
+          className="min-h-11 min-w-11 text-white hover:bg-gray-700"
           aria-label="Close menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
+        </Button>
       </div>
 
       {/* Main navigation items */}
       <div className="flex-1 px-4 py-6 space-y-2">
-        <button
+        <Button
           onClick={() => handleNavigation('/worlds')}
-          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium rounded-lg transition-colors ${
+          variant="ghost"
+          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
             pathname === '/worlds' || pathname.startsWith('/world/') 
               ? 'bg-gray-700 text-white' 
               : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -128,11 +132,12 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Worlds
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={() => handleNavigation('/characters')}
-          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium rounded-lg transition-colors ${
+          variant="ghost"
+          className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
             pathname === '/characters' || pathname.startsWith('/characters/') 
               ? 'bg-gray-700 text-white' 
               : 'text-gray-300 hover:text-white hover:bg-gray-800'
@@ -142,7 +147,7 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           Characters
-        </button>
+        </Button>
 
         {/* World switcher section */}
         {Object.keys(worlds).length > 0 && (
@@ -157,12 +162,13 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
                 ).length;
                 
                 return (
-                  <button
+                  <Button
                     key={world.id}
                     onClick={() => handleWorldSwitch(world.id)}
-                    className={`w-full min-h-11 flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors ${
+                    variant="ghost"
+                    className={`w-full min-h-11 flex items-center justify-between px-4 py-3 text-left ${
                       world.id === currentWorldId 
-                        ? 'bg-green-600 text-white' 
+                        ? 'bg-green-600 text-white hover:bg-green-700' 
                         : 'text-gray-300 hover:text-white hover:bg-gray-800'
                     }`}
                   >
@@ -175,7 +181,7 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -185,39 +191,39 @@ export function MobileNavigationMenu({ isOpen, onClose, onNavigate }: MobileNavi
         {/* Quick actions */}
         <div className="pt-4 mt-4 border-t border-gray-700">
           {currentWorld ? (
-            <button
+            <Button
               onClick={() => handleNavigation(`/world/${currentWorld.id}/play`)}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium rounded-lg transition-colors"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Play {currentWorld.name}
-            </button>
+            </Button>
           ) : Object.keys(worlds).length === 0 ? (
-            <button
+            <Button
               onClick={() => handleNavigation('/world/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-colors"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Create Your First World
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={() => handleNavigation('/world/create')}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-colors"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Create New World
-            </button>
+            </Button>
           )}
         </div>
       </div>
     </div>
   );
-}
+});
