@@ -17,48 +17,38 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 describe('useMobileNavigation', () => {
-  test('initializes with menu closed', () => {
+  test('manages menu state correctly', () => {
     const { result } = renderHook(() => useMobileNavigation());
     
+    // Initial state
     expect(result.current.isMenuOpen).toBe(false);
-  });
-
-  test('can toggle menu state', () => {
-    const { result } = renderHook(() => useMobileNavigation());
     
-    act(() => {
-      result.current.toggleMenu();
-    });
-    
-    expect(result.current.isMenuOpen).toBe(true);
-    
-    act(() => {
-      result.current.toggleMenu();
-    });
-    
-    expect(result.current.isMenuOpen).toBe(false);
-  });
-
-  test('can open and close menu explicitly', () => {
-    const { result } = renderHook(() => useMobileNavigation());
-    
+    // Test all state management functions
     act(() => {
       result.current.openMenu();
     });
-    
     expect(result.current.isMenuOpen).toBe(true);
     
     act(() => {
       result.current.closeMenu();
     });
+    expect(result.current.isMenuOpen).toBe(false);
     
+    act(() => {
+      result.current.toggleMenu();
+    });
+    expect(result.current.isMenuOpen).toBe(true);
+    
+    act(() => {
+      result.current.toggleMenu();
+    });
     expect(result.current.isMenuOpen).toBe(false);
   });
 
-  test('detects mobile breakpoint correctly', () => {
+  test('detects mobile viewport correctly', () => {
     const { result } = renderHook(() => useMobileNavigation());
     
-    // Should be mobile by default in test environment
+    // Should detect mobile breakpoint based on matchMedia mock
     expect(result.current.isMobile).toBe(true);
   });
 });

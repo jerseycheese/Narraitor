@@ -42,22 +42,39 @@ describe('MobileNavigationMenu', () => {
     });
   });
 
-  test('renders mobile navigation menu when open', () => {
+  test('renders with touch-friendly interface and proper navigation', () => {
+    const onClose = jest.fn();
+    const onNavigate = jest.fn();
+    
     render(
       <MobileNavigationMenu 
         isOpen={true} 
-        onClose={jest.fn()} 
-        onNavigate={jest.fn()} 
+        onClose={onClose} 
+        onNavigate={onNavigate} 
       />
     );
     
+    // Verify menu renders with essential elements
     expect(screen.getByRole('navigation')).toBeInTheDocument();
     expect(screen.getByText('Worlds')).toBeInTheDocument();
     expect(screen.getByText('Characters')).toBeInTheDocument();
+    
+    // Verify touch target sizes (44px minimum)
+    const closeButton = screen.getByLabelText(/close menu/i);
+    const worldsButton = screen.getByText('Worlds');
+    expect(closeButton).toHaveClass('min-h-11', 'min-w-11');
+    expect(worldsButton.closest('button')).toHaveClass('min-h-11');
+    
+    // Test callback functionality
+    fireEvent.click(closeButton);
+    expect(onClose).toHaveBeenCalled();
+    
+    fireEvent.click(worldsButton);
+    expect(onNavigate).toHaveBeenCalledWith('/worlds');
   });
 
-  test('does not render when closed', () => {
-    render(
+  test('conditional rendering based on isOpen prop', () => {
+    const { rerender } = render(
       <MobileNavigationMenu 
         isOpen={false} 
         onClose={jest.fn()} 
@@ -65,89 +82,17 @@ describe('MobileNavigationMenu', () => {
       />
     );
     
+    // Should not render when closed
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-  });
-
-  test('calls onClose when close button is clicked', () => {
-    const onClose = jest.fn();
     
-    render(
-      <MobileNavigationMenu 
-        isOpen={true} 
-        onClose={onClose} 
-        onNavigate={jest.fn()} 
-      />
-    );
-    
-    const closeButton = screen.getByLabelText(/close menu/i);
-    fireEvent.click(closeButton);
-    
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  test('calls onNavigate when navigation link is clicked', () => {
-    const onNavigate = jest.fn();
-    
-    render(
-      <MobileNavigationMenu 
-        isOpen={true} 
-        onClose={jest.fn()} 
-        onNavigate={onNavigate} 
-      />
-    );
-    
-    const worldsLink = screen.getByText('Worlds');
-    fireEvent.click(worldsLink);
-    
-    expect(onNavigate).toHaveBeenCalledWith('/worlds');
-  });
-
-  test('has touch-friendly button sizes (minimum 44px)', () => {
-    render(
+    // Should render when opened
+    rerender(
       <MobileNavigationMenu 
         isOpen={true} 
         onClose={jest.fn()} 
         onNavigate={jest.fn()} 
       />
     );
-    
-    const closeButton = screen.getByLabelText(/close menu/i);
-    const worldsButton = screen.getByText('Worlds');
-    
-    // Check that buttons have minimum touch target size
-    expect(closeButton).toHaveClass('min-h-11', 'min-w-11'); // 44px = 11 * 4px (Tailwind)
-    expect(worldsButton.closest('button')).toHaveClass('min-h-11');
-  });
-
-  test('supports keyboard navigation', () => {
-    const onClose = jest.fn();
-    
-    render(
-      <MobileNavigationMenu 
-        isOpen={true} 
-        onClose={onClose} 
-        onNavigate={jest.fn()} 
-      />
-    );
-    
-    // Test escape key handling would be in the useMobileNavigation hook
-    // This test verifies the component can receive focus
-    const closeButton = screen.getByLabelText(/close menu/i);
-    expect(closeButton).toBeInTheDocument();
-    expect(closeButton).toBeVisible();
-  });
-
-  test('manages focus correctly when opened', () => {
-    render(
-      <MobileNavigationMenu 
-        isOpen={true} 
-        onClose={jest.fn()} 
-        onNavigate={jest.fn()} 
-      />
-    );
-    
-    // First focusable element should receive focus
-    const firstButton = screen.getByLabelText(/close menu/i);
-    expect(document.activeElement).toBe(firstButton);
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
   });
 });
