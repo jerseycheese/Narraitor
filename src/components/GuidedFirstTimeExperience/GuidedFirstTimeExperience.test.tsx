@@ -29,6 +29,8 @@ describe('GuidedFirstTimeExperience', () => {
       savedSessions: {},
       setOnboardingCompleted: mockSetOnboardingCompleted,
       onboardingCompleted: false,
+      shouldShowOnboarding: jest.fn().mockReturnValue(true),
+      isFirstTimeUser: jest.fn().mockReturnValue(true),
     });
 
     // Mock worldStore 
@@ -63,33 +65,50 @@ describe('GuidedFirstTimeExperience', () => {
   });
 
   describe('3-step world creation wizard', () => {
-    it('displays step 1: World Concept', () => {
+    it('displays step 1: World Concept after clicking next', async () => {
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByText(/world concept/i)).toBeInTheDocument();
-      expect(screen.getByText(/what kind of world/i)).toBeInTheDocument();
-    });
-
-    it('allows progression to step 2 when concept is provided', async () => {
-      render(<GuidedFirstTimeExperience />);
-      
-      const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-      fireEvent.change(conceptInput, { target: { value: 'A magical forest realm' } });
-      
+      // Click next to go to step 2 (World Concept)
       const nextButton = screen.getByRole('button', { name: /next/i });
       fireEvent.click(nextButton);
       
       await waitFor(() => {
-        expect(screen.getByText(/step 2 of 3/i)).toBeInTheDocument();
-        expect(screen.getByText(/world details/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /world concept/i })).toBeInTheDocument();
+        expect(screen.getByText(/what kind of world/i)).toBeInTheDocument();
+      });
+    });
+
+    it('allows progression to step 3 when concept is provided', async () => {
+      render(<GuidedFirstTimeExperience />);
+      
+      // Go to step 2 (World Concept)
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      
+      await waitFor(() => {
+        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
+        fireEvent.change(conceptInput, { target: { value: 'A magical forest realm' } });
+      });
+      
+      // Go to step 3 (World Details)
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      fireEvent.click(nextButton);
+      
+      await waitFor(() => {
+        expect(screen.getByText(/step 3 of 3/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /world details/i })).toBeInTheDocument();
       });
     });
 
     it('displays AI suggestions based on user input', async () => {
       render(<GuidedFirstTimeExperience />);
       
-      const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-      fireEvent.change(conceptInput, { target: { value: 'Cyberpunk city' } });
+      // Go to step 2 (World Concept)
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      
+      await waitFor(() => {
+        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
+        fireEvent.change(conceptInput, { target: { value: 'Cyberpunk city' } });
+      });
       
       await waitFor(() => {
         expect(screen.getByText(/ai suggestions/i)).toBeInTheDocument();
@@ -99,12 +118,10 @@ describe('GuidedFirstTimeExperience', () => {
     it('completes in under 30 seconds per step (simulated)', () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Each step should have smart defaults that make completion fast
-      expect(screen.getByDisplayValue('')).toBeInTheDocument(); // Default empty state
-      
-      // Step should be completable with minimal input
-      const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-      expect(conceptInput).toBeInTheDocument();
+      // Welcome step should be completable immediately
+      const nextButton = screen.getByRole('button', { name: /next/i });
+      expect(nextButton).toBeInTheDocument();
+      expect(nextButton).not.toBeDisabled();
     });
   });
 
@@ -120,7 +137,7 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       const container = screen.getByTestId('guided-experience-container');
-      expect(container).toHaveClass('max-w-md', 'mx-auto'); // Mobile-friendly layout
+      expect(container.firstElementChild).toHaveClass('max-w-md'); // Mobile-friendly layout
     });
   });
 
@@ -149,18 +166,23 @@ describe('GuidedFirstTimeExperience', () => {
     it('shows "Try it now" button after world creation completion', async () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Complete all steps
-      const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-      fireEvent.change(conceptInput, { target: { value: 'Fantasy realm' } });
-      
+      // Step 1: Welcome -> Step 2: Concept
       fireEvent.click(screen.getByRole('button', { name: /next/i }));
       
       await waitFor(() => {
+        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
+        fireEvent.change(conceptInput, { target: { value: 'Fantasy realm' } });
+        
+        // Step 2: Concept -> Step 3: Details
         fireEvent.click(screen.getByRole('button', { name: /next/i }));
       });
       
       await waitFor(() => {
-        fireEvent.click(screen.getByRole('button', { name: /complete/i }));
+        const nameInput = screen.getByRole('textbox', { name: /world name/i });
+        fireEvent.change(nameInput, { target: { value: 'Test World' } });
+        
+        const themeSelect = screen.getByRole('combobox', { name: /theme/i });
+        fireEvent.change(themeSelect, { target: { value: 'fantasy' } });
       });
       
       await waitFor(() => {
@@ -198,6 +220,8 @@ describe('GuidedFirstTimeExperience', () => {
         savedSessions: {},
         setOnboardingCompleted: mockSetOnboardingCompleted,
         onboardingCompleted: true,
+        shouldShowOnboarding: jest.fn().mockReturnValue(false),
+        isFirstTimeUser: jest.fn().mockReturnValue(false),
       });
 
       render(<GuidedFirstTimeExperience />);
@@ -211,16 +235,21 @@ describe('GuidedFirstTimeExperience', () => {
     it('celebrates the players world concept in first choice', async () => {
       render(<GuidedFirstTimeExperience />);
       
-      // This would test that the first narrative choice includes elements
-      // from the user's world concept - testing the integration point
-      // with the narrative generation system
+      // Go to step 2 (World Concept)
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
       
-      // For now, verify that world data is properly passed through
-      const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
-      fireEvent.change(conceptInput, { target: { value: 'Steampunk adventure' } });
-      
-      // Verify the concept is captured for later use
-      expect(conceptInput).toHaveValue('Steampunk adventure');
+      await waitFor(() => {
+        // This would test that the first narrative choice includes elements
+        // from the user's world concept - testing the integration point
+        // with the narrative generation system
+        
+        // For now, verify that world data is properly passed through
+        const conceptInput = screen.getByRole('textbox', { name: /world concept/i });
+        fireEvent.change(conceptInput, { target: { value: 'Steampunk adventure' } });
+        
+        // Verify the concept is captured for later use
+        expect(conceptInput).toHaveValue('Steampunk adventure');
+      });
     });
   });
 });

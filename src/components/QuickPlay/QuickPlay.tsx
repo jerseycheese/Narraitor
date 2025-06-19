@@ -14,7 +14,8 @@ export function QuickPlay() {
   const router = useRouter();
   const { worlds } = useWorldStore();
   const { characters } = useCharacterStore();
-  const { savedSessions, resumeSavedSession, shouldShowOnboarding } = useSessionStore();
+  const sessionState = useSessionStore();
+  const { savedSessions, resumeSavedSession, shouldShowOnboarding, onboardingCompleted } = sessionState;
 
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
@@ -49,7 +50,12 @@ export function QuickPlay() {
   };
 
   // Show guided experience for first-time users
-  if (shouldShowOnboarding()) {
+  // Fallback logic if helper methods don't exist
+  const showOnboarding = shouldShowOnboarding
+    ? shouldShowOnboarding()
+    : Object.keys(savedSessions).length === 0 && !onboardingCompleted;
+    
+  if (showOnboarding) {
     return <GuidedFirstTimeExperience />;
   }
 

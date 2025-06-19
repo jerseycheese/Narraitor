@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useWorldStore } from '@/state/worldStore';
 import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 
@@ -26,8 +26,8 @@ interface WorldConcept {
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
-  const { setOnboardingCompleted, shouldShowOnboarding } = sessionStore();
-  const { createWorld, setCurrentWorld } = worldStore();
+  const { setOnboardingCompleted, shouldShowOnboarding } = useSessionStore();
+  const { createWorld, setCurrentWorld } = useWorldStore();
   
   const [currentStep, setCurrentStep] = useState(0);
   const [worldConcept, setWorldConcept] = useState<WorldConcept>({

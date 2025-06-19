@@ -182,15 +182,17 @@ export const useSessionStore = create<SessionStore>()(
         
         return {
           ...initialState,
-          savedSessions: newSavedSessions
+          savedSessions: newSavedSessions,
+          onboardingCompleted: prevState.onboardingCompleted
         };
       });
     } else {
       logger.debug('🔚 No active session to save, just resetting state');
-      // Keep savedSessions when resetting
+      // Keep savedSessions and onboarding state when resetting
       set(prevState => ({
         ...initialState,
-        savedSessions: prevState.savedSessions
+        savedSessions: prevState.savedSessions,
+        onboardingCompleted: prevState.onboardingCompleted
       }));
     }
   },
