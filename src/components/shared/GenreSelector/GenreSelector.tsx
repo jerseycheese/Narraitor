@@ -1,7 +1,7 @@
 // src/components/shared/GenreSelector/GenreSelector.tsx
 
 import React, { memo } from 'react';
-import { AVAILABLE_GENRES, Genre } from '@/lib/constants/genres';
+import { AVAILABLE_GENRES } from '@/lib/constants/genres';
 
 interface GenreSelectorProps {
   selectedGenres: string[];
@@ -11,7 +11,7 @@ interface GenreSelectorProps {
   disabled?: boolean;
 }
 
-export const GenreSelector: React.FC<GenreSelectorProps> = memo(({
+const GenreSelector: React.FC<GenreSelectorProps> = memo(({
   selectedGenres,
   onToggleGenre,
   maxSelections,
@@ -50,3 +50,7 @@ export const GenreSelector: React.FC<GenreSelectorProps> = memo(({
     </div>
   );
 });
+
+GenreSelector.displayName = 'GenreSelector';
+
+export { GenreSelector };

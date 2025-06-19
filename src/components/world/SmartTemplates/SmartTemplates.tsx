@@ -47,7 +47,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     );
   }, []);
 
-  const generateTemplate = async (generationMode: TemplateMode, context?: Partial<TemplateGenerationContext>) => {
+  const generateTemplate = useCallback(async (generationMode: TemplateMode, context?: Partial<TemplateGenerationContext>) => {
     setIsGenerating(true);
     setError(null);
     
@@ -75,12 +75,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       // Show preview
       setPreviewTemplate(template);
       
-    } catch (err) {
+    } catch {
       setError('Failed to generate template. Please try again.');
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [narrativeGenerator, templateHistoryManager, userInput, selectedGenres]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -109,7 +109,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     generateTemplate('surprise-me');
   }, [generateTemplate]);
 
-  const useHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
+  const handleHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
     setPreviewTemplate(entry.template);
   }, []);
 
@@ -243,7 +243,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                   <div 
                     key={index}
                     className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors"
-                    onClick={() => useHistoryTemplate(entry)}
+                    onClick={() => handleHistoryTemplate(entry)}
                   >
                     <div className="flex items-start justify-between">
                       <div>

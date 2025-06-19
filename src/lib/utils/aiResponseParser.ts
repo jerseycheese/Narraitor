@@ -19,7 +19,7 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
 
   try {
     return JSON.parse(response.content);
-  } catch (parseError) {
+  } catch {
     throw new Error(errorMessage);
   }
 }
@@ -28,12 +28,13 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
  * Validate that a parsed object has required fields
  */
 export function validateRequiredFields(
-  obj: any, 
+  obj: unknown, 
   requiredFields: string[], 
   objectName: string = 'object'
 ): void {
+  const typedObj = obj as Record<string, unknown>;
   for (const field of requiredFields) {
-    if (!(field in obj)) {
+    if (!(field in typedObj)) {
       throw new Error(`Invalid ${objectName}: missing ${field}`);
     }
   }
@@ -43,7 +44,7 @@ export function validateRequiredFields(
  * Validate array fields in parsed objects
  */
 export function validateArrayFields(
-  obj: any,
+  obj: Record<string, unknown>,
   arrayFields: string[],
   objectName: string = 'object'
 ): void {

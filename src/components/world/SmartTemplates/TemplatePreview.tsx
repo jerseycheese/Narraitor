@@ -3,7 +3,6 @@
 import React, { memo } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
-import { SkillDifficulty } from '@/components/ui/SkillDifficulty';
 
 interface TemplatePreviewProps {
   template: WorldTemplate;
@@ -11,7 +10,7 @@ interface TemplatePreviewProps {
   onBack: () => void;
 }
 
-export const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
+const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
   template,
   onUse,
   onBack
@@ -80,7 +79,9 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <span className="font-medium">{skill.name}</span>
-                  <SkillDifficulty difficulty={skill.difficulty} />
+                  <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
+                    {skill.difficulty}
+                  </span>
                   {skill.category && (
                     <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
                       {skill.category}
@@ -122,3 +123,7 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
     </div>
   );
 });
+
+TemplatePreview.displayName = 'TemplatePreview';
+
+export { TemplatePreview };

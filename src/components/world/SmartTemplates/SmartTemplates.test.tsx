@@ -78,7 +78,8 @@ describe('SmartTemplates', () => {
 
       // Mock successful generation
       const mockGenerateWorldTemplate = jest.fn().mockResolvedValue(mockTemplate);
-      require('@/lib/ai/narrativeGenerator').NarrativeGenerator.mockImplementation(() => ({
+      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
+      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
         generateWorldTemplate: mockGenerateWorldTemplate
       }));
 
@@ -105,7 +106,8 @@ describe('SmartTemplates', () => {
       const mockGenerateWorldTemplate = jest.fn().mockImplementation(
         () => new Promise(resolve => setTimeout(resolve, 100))
       );
-      require('@/lib/ai/narrativeGenerator').NarrativeGenerator.mockImplementation(() => ({
+      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
+      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
         generateWorldTemplate: mockGenerateWorldTemplate
       }));
 
@@ -120,7 +122,8 @@ describe('SmartTemplates', () => {
     test('handles generation errors gracefully', async () => {
       // Mock failed generation
       const mockGenerateWorldTemplate = jest.fn().mockRejectedValue(new Error('Generation failed'));
-      require('@/lib/ai/narrativeGenerator').NarrativeGenerator.mockImplementation(() => ({
+      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
+      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
         generateWorldTemplate: mockGenerateWorldTemplate
       }));
 

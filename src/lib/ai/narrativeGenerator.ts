@@ -14,7 +14,7 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
-import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
