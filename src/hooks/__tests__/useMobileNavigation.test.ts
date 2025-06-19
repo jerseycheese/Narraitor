@@ -1,6 +1,21 @@
 import { renderHook, act } from '@testing-library/react';
 import { useMobileNavigation } from '../useMobileNavigation';
 
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: query.includes('max-width: 768px'), // Simulate mobile
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 describe('useMobileNavigation', () => {
   test('initializes with menu closed', () => {
     const { result } = renderHook(() => useMobileNavigation());

@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Navigation } from '../Navigation';
 import { useWorldStore } from '@/state/worldStore';
