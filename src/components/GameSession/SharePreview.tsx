@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { JournalEntry } from '@/types/journal.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -26,6 +26,16 @@ export const SharePreview: React.FC<SharePreviewProps> = ({
 }) => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [previewFormat, setPreviewFormat] = useState<'markdown' | 'text'>('text');
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -33,7 +43,14 @@ export const SharePreview: React.FC<SharePreviewProps> = ({
     try {
       await copyJournalToClipboard(entries, storyTitle, previewFormat);
       setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
+      
+      // Clear existing timeout if any
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      // Set new timeout and store reference
+      timeoutRef.current = setTimeout(() => setCopySuccess(false), 2000);
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
     }
