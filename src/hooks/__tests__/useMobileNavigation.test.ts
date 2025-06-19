@@ -51,4 +51,22 @@ describe('useMobileNavigation', () => {
     // Should detect mobile breakpoint based on matchMedia mock
     expect(result.current.isMobile).toBe(true);
   });
+
+  test('closes menu when Escape key is pressed', () => {
+    const { result } = renderHook(() => useMobileNavigation());
+    
+    // Open menu first
+    act(() => {
+      result.current.openMenu();
+    });
+    expect(result.current.isMenuOpen).toBe(true);
+    
+    // Simulate Escape key press
+    act(() => {
+      const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      document.dispatchEvent(escapeEvent);
+    });
+    
+    expect(result.current.isMenuOpen).toBe(false);
+  });
 });

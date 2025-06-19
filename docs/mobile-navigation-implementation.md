@@ -64,7 +64,7 @@ Implemented comprehensive mobile navigation improvements to enhance touch-based 
 - **Character Summary**: Stacked layout on mobile, side-by-side on desktop
 - **Action Buttons**: Full-width on mobile, auto-width on larger screens
 - **Button Containers**: Vertical stacking prevents horizontal overflow
-- **Proper Breakpoints**: Uses Tailwind `sm:` (640px+) breakpoint
+- **Proper Breakpoints**: Uses Tailwind `md:` (768px) breakpoint for navigation collapse, `sm:` (640px) for layout adjustments
 
 ### Files Modified
 - `src/hooks/useMobileNavigation.ts` - Mobile navigation state management
