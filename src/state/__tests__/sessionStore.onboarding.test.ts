@@ -1,4 +1,4 @@
-import { sessionStore } from '../sessionStore';
+import { useSessionStore } from '../sessionStore';
 
 // Mock the logger to avoid console output during tests
 jest.mock('@/lib/utils/logger', () => ({
@@ -23,7 +23,7 @@ jest.mock('../persistence', () => ({
 describe('SessionStore - Onboarding Functionality', () => {
   beforeEach(() => {
     // Reset the store state before each test
-    sessionStore.setState({
+    useSessionStore.setState({
       id: null,
       status: 'initializing',
       currentSceneId: null,
@@ -38,7 +38,7 @@ describe('SessionStore - Onboarding Functionality', () => {
 
   describe('First-time user detection', () => {
     it('identifies first-time users when no saved sessions exist', () => {
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       
       const isFirstTime = Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
       
@@ -47,7 +47,7 @@ describe('SessionStore - Onboarding Functionality', () => {
 
     it('identifies returning users when saved sessions exist', () => {
       // Add a saved session
-      sessionStore.setState({
+      useSessionStore.setState({
         savedSessions: {
           'session-1': {
             id: 'session-1',
@@ -59,18 +59,18 @@ describe('SessionStore - Onboarding Functionality', () => {
         }
       });
 
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       const isFirstTime = Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
       
       expect(isFirstTime).toBe(false);
     });
 
     it('identifies returning users when onboarding was completed but no sessions saved', () => {
-      sessionStore.setState({
+      useSessionStore.setState({
         onboardingCompleted: true,
       });
 
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       const isFirstTime = Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
       
       expect(isFirstTime).toBe(false);
@@ -79,38 +79,38 @@ describe('SessionStore - Onboarding Functionality', () => {
 
   describe('Onboarding completion tracking', () => {
     it('has setOnboardingCompleted action', () => {
-      expect(typeof sessionStore.getState().setOnboardingCompleted).toBe('function');
+      expect(typeof useSessionStore.getState().setOnboardingCompleted).toBe('function');
     });
 
     it('marks onboarding as completed', () => {
-      const { setOnboardingCompleted } = sessionStore.getState();
+      const { setOnboardingCompleted } = useSessionStore.getState();
       
       setOnboardingCompleted(true);
       
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       expect(state.onboardingCompleted).toBe(true);
     });
 
     it('can reset onboarding completion state', () => {
-      const { setOnboardingCompleted } = sessionStore.getState();
+      const { setOnboardingCompleted } = useSessionStore.getState();
       
       // First set it to true
       setOnboardingCompleted(true);
-      expect(sessionStore.getState().onboardingCompleted).toBe(true);
+      expect(useSessionStore.getState().onboardingCompleted).toBe(true);
       
       // Then reset it to false
       setOnboardingCompleted(false);
-      expect(sessionStore.getState().onboardingCompleted).toBe(false);
+      expect(useSessionStore.getState().onboardingCompleted).toBe(false);
     });
 
     it('persists onboarding completion state', () => {
-      const { setOnboardingCompleted } = sessionStore.getState();
+      const { setOnboardingCompleted } = useSessionStore.getState();
       
       setOnboardingCompleted(true);
       
       // The state should be persisted (we're testing the interface)
       // In a real integration test, we'd verify localStorage or IndexedDB
-      expect(sessionStore.getState().onboardingCompleted).toBe(true);
+      expect(useSessionStore.getState().onboardingCompleted).toBe(true);
     });
   });
 
@@ -125,7 +125,7 @@ describe('SessionStore - Onboarding Functionality', () => {
         'updateSavedSessionNarrativeCount',
       ];
 
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       
       existingFunctionality.forEach(funcName => {
         expect(typeof state[funcName]).toBe('function');
@@ -133,53 +133,53 @@ describe('SessionStore - Onboarding Functionality', () => {
     });
 
     it('does not interfere with session initialization', async () => {
-      const { setOnboardingCompleted, initializeSession } = sessionStore.getState();
+      const { setOnboardingCompleted, initializeSession } = useSessionStore.getState();
       
       setOnboardingCompleted(true);
       
       const mockCallback = jest.fn();
       await initializeSession('world-1', 'char-1', mockCallback);
       
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       expect(state.worldId).toBe('world-1');
       expect(state.characterId).toBe('char-1');
       expect(state.onboardingCompleted).toBe(true); // Should remain true
     });
 
     it('maintains onboarding state when ending sessions', () => {
-      const { setOnboardingCompleted, endSession, setSessionId } = sessionStore.getState();
+      const { setOnboardingCompleted, endSession, setSessionId } = useSessionStore.getState();
       
       setOnboardingCompleted(true);
       setSessionId('test-session');
-      sessionStore.setState({
+      useSessionStore.setState({
         worldId: 'world-1',
         characterId: 'char-1',
       });
       
       endSession();
       
-      const state = sessionStore.getState();
+      const state = useSessionStore.getState();
       expect(state.onboardingCompleted).toBe(true); // Should persist through session end
     });
   });
 
   describe('Helper methods for onboarding flow', () => {
     it('provides isFirstTimeUser helper method', () => {
-      expect(typeof sessionStore.getState().isFirstTimeUser).toBe('function');
+      expect(typeof useSessionStore.getState().isFirstTimeUser).toBe('function');
     });
 
     it('isFirstTimeUser returns correct values', () => {
-      const { isFirstTimeUser } = sessionStore.getState();
+      const { isFirstTimeUser } = useSessionStore.getState();
       
       // Should be true for fresh state
       expect(isFirstTimeUser()).toBe(true);
       
       // Should be false after marking onboarding as completed
-      sessionStore.getState().setOnboardingCompleted(true);
+      useSessionStore.getState().setOnboardingCompleted(true);
       expect(isFirstTimeUser()).toBe(false);
       
       // Should be false when saved sessions exist (even if onboarding not explicitly completed)
-      sessionStore.setState({
+      useSessionStore.setState({
         onboardingCompleted: false,
         savedSessions: {
           'session-1': {
@@ -195,13 +195,13 @@ describe('SessionStore - Onboarding Functionality', () => {
     });
 
     it('should show onboarding returns correct values', () => {
-      const { shouldShowOnboarding } = sessionStore.getState();
+      const { shouldShowOnboarding } = useSessionStore.getState();
       
       // Should show onboarding for first-time users
       expect(shouldShowOnboarding()).toBe(true);
       
       // Should not show after completion
-      sessionStore.getState().setOnboardingCompleted(true);
+      useSessionStore.getState().setOnboardingCompleted(true);
       expect(shouldShowOnboarding()).toBe(false);
     });
   });

@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GuidedFirstTimeExperience } from './GuidedFirstTimeExperience';
-import { sessionStore } from '@/state/sessionStore';
-import { worldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/useSessionStore';
+import { useWorldStore } from '@/state/useWorldStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -24,8 +24,8 @@ describe('GuidedFirstTimeExperience', () => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     
-    // Mock sessionStore with first-time user detection
-    (sessionStore as unknown as jest.Mock).mockReturnValue({
+    // Mock useSessionStore with first-time user detection
+    (useSessionStore as unknown as jest.Mock).mockReturnValue({
       savedSessions: {},
       setOnboardingCompleted: mockSetOnboardingCompleted,
       onboardingCompleted: false,
@@ -33,8 +33,8 @@ describe('GuidedFirstTimeExperience', () => {
       isFirstTimeUser: jest.fn().mockReturnValue(true),
     });
 
-    // Mock worldStore 
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    // Mock useWorldStore 
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: {},
       createWorld: mockCreateWorld,
       setCurrentWorld: jest.fn(),
@@ -216,7 +216,7 @@ describe('GuidedFirstTimeExperience', () => {
 
     it('does not show guided experience for returning users', () => {
       // Mock returning user
-      (sessionStore as unknown as jest.Mock).mockReturnValue({
+      (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
         setOnboardingCompleted: mockSetOnboardingCompleted,
         onboardingCompleted: true,

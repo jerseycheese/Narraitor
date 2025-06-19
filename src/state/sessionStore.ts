@@ -374,7 +374,6 @@ export const useSessionStore = create<SessionStore>()(
     const state = get();
     return state.isFirstTimeUser();
   },
-  },
 }),
 {
   name: 'narraitor-session-store',
