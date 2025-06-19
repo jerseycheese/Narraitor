@@ -36,6 +36,8 @@ const initialState = {
     errorMessage: null,
     totalSaves: 0,
   },
+  // Onboarding state
+  onboardingCompleted: false,
 };
 
 /**
@@ -354,6 +356,23 @@ export const useSessionStore = create<SessionStore>()(
       }
     }));
   },
+  
+  // Onboarding actions
+  setOnboardingCompleted: (completed: boolean) => {
+    logger.debug('Setting onboarding completed:', completed);
+    set({ onboardingCompleted: completed });
+  },
+  
+  isFirstTimeUser: () => {
+    const state = get();
+    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+  },
+  
+  shouldShowOnboarding: () => {
+    const state = get();
+    return state.isFirstTimeUser();
+  },
+  },
 }),
 {
   name: 'narraitor-session-store',
@@ -370,7 +389,9 @@ export const useSessionStore = create<SessionStore>()(
     currentSceneId: state.currentSceneId,
     playerChoices: state.playerChoices,
     // Persist auto-save state
-    autoSave: state.autoSave
+    autoSave: state.autoSave,
+    // Persist onboarding state
+    onboardingCompleted: state.onboardingCompleted
   }),
 }
 ));
