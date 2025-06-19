@@ -63,7 +63,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
     const diffY = startY.current - currentY;
 
     // Only close on significant horizontal swipe (left to right)
-    if (Math.abs(diffX) > Math.abs(diffY) && diffX < -100) {
+    if (Math.abs(diffX) > Math.abs(diffY) && diffX > 100) {
       onClose();
     }
   }, [onClose]);
