@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils/classNames';
 
 interface JournalFloatingButtonProps {
   onClick: () => void;

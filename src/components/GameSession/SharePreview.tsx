@@ -5,7 +5,7 @@ import { JournalEntry } from '@/types/journal.types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { exportJournalToMarkdown, exportJournalToText, copyJournalToClipboard } from '@/lib/utils/journalExport';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils/classNames';
 
 interface SharePreviewProps {
   entries: JournalEntry[];

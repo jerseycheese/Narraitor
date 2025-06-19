@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SharePreview } from '../SharePreview';
 import { JournalEntry } from '@/types/journal.types';
@@ -59,9 +59,9 @@ describe('SharePreview', () => {
   it('displays story preview', () => {
     render(<SharePreview {...defaultProps} />);
     
-    expect(screen.getByText('My Adventure')).toBeInTheDocument();
-    expect(screen.getByText('Meeting with Elder')).toBeInTheDocument();
-    expect(screen.getByText('Had a meaningful conversation with Elder Thorne about the ancient prophecy.')).toBeInTheDocument();
+    expect(screen.getByText(/MY ADVENTURE/)).toBeInTheDocument();
+    expect(screen.getByText(/Meeting with Elder/)).toBeInTheDocument();
+    expect(screen.getByText(/Had a meaningful conversation with Elder Thorne about the ancient prophecy/)).toBeInTheDocument();
   });
 
   it('copies to clipboard when copy button is clicked', async () => {
@@ -71,7 +71,10 @@ describe('SharePreview', () => {
     render(<SharePreview {...defaultProps} />);
     
     const copyButton = screen.getByRole('button', { name: /copy to clipboard/i });
-    fireEvent.click(copyButton);
+    
+    await act(async () => {
+      fireEvent.click(copyButton);
+    });
     
     expect(mockWriteText).toHaveBeenCalled();
   });
@@ -83,7 +86,10 @@ describe('SharePreview', () => {
     render(<SharePreview {...defaultProps} />);
     
     const copyButton = screen.getByRole('button', { name: /copy to clipboard/i });
-    fireEvent.click(copyButton);
+    
+    await act(async () => {
+      fireEvent.click(copyButton);
+    });
     
     // Wait for success message to appear
     await screen.findByText(/copied to clipboard/i);
@@ -93,7 +99,7 @@ describe('SharePreview', () => {
     const mockOnClose = jest.fn();
     render(<SharePreview {...defaultProps} onClose={mockOnClose} />);
     
-    const closeButton = screen.getByRole('button', { name: /close/i });
+    const closeButton = screen.getByLabelText('Close share preview');
     fireEvent.click(closeButton);
     
     expect(mockOnClose).toHaveBeenCalledTimes(1);

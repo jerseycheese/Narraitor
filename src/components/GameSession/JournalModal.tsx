@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { SharePreview } from './SharePreview';
 import { exportJournalAsMarkdownFile, exportJournalAsTextFile } from '@/lib/utils/journalExport';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils/classNames';
 
 interface JournalModalProps {
   isOpen: boolean;

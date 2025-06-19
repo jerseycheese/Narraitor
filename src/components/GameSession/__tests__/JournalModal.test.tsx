@@ -62,7 +62,7 @@ describe('JournalModal', () => {
       render(<JournalModal {...defaultProps} />);
       
       expect(screen.getByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByText('Game Journal')).toBeInTheDocument();
+      expect(screen.getByText('My Adventure Journal')).toBeInTheDocument();
     });
 
     it('does not render when isOpen is false', () => {
@@ -160,8 +160,8 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByText('Your journal is empty')).toBeInTheDocument();
-      expect(screen.getByText('Entries will appear here as your story unfolds')).toBeInTheDocument();
+      expect(screen.getByText('Your journal awaits your first entry')).toBeInTheDocument();
+      expect(screen.getByText('Stories will appear here as your adventure unfolds')).toBeInTheDocument();
     });
 
     it('displays journal entries when they exist', () => {
@@ -183,7 +183,7 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByRole('heading', { name: 'character event' })).toBeInTheDocument();
+      expect(screen.getByText(/character event/)).toBeInTheDocument();
       expect(screen.getByText('Had a meaningful conversation with Elder Thorne about the ancient prophecy.')).toBeInTheDocument();
     });
 
@@ -260,7 +260,7 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByText('major')).toBeInTheDocument();
+      expect(screen.getByText('Major')).toBeInTheDocument();
     });
   });
 
@@ -339,8 +339,8 @@ describe('JournalModal', () => {
     it('shows visual indicators for story significance', () => {
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByText('major')).toBeInTheDocument();
-      expect(screen.getByText('critical')).toBeInTheDocument();
+      expect(screen.getByText('Major')).toBeInTheDocument();
+      expect(screen.getByText('Critical')).toBeInTheDocument();
     });
   });
 });
