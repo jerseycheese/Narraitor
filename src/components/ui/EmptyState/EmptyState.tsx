@@ -6,13 +6,14 @@ export interface EmptyStateProps {
   description?: string;
   icon?: React.ReactNode;
   action?: React.ReactNode;
-  variant?: 'default' | 'centered' | 'compact';
+  variant?: 'centered' | 'compact';
   className?: string;
 }
 
 /**
  * Reusable empty state component
- * Provides consistent styling for empty states across the application
+ * Provides consistent styling for empty states across the application.
+ * The `variant` prop supports 'centered' and 'compact' options.
  */
 export const EmptyState: React.FC<EmptyStateProps> = ({
   title,

@@ -291,7 +291,7 @@
     animation: slide-up 0.3s ease-out;
   }
   
-  .animate-fadeIn {
+  .animate-fade-in {
     animation: fade-in 0.2s ease-out;
   }
 

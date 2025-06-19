@@ -37,7 +37,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       role="dialog" 
       aria-modal="true" 
       aria-labelledby="journal-modal-title"
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn"
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in"
       onClick={onClose}
     >
       <Card 
