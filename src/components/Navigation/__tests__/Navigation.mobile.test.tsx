@@ -11,6 +11,14 @@ jest.mock('@/state/characterStore');
 jest.mock('@/components/shared/NavigationLoadingProvider');
 jest.mock('next/navigation', () => ({
   usePathname: () => '/test',
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    refresh: jest.fn(),
+    prefetch: jest.fn(),
+  }),
 }));
 
 const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;

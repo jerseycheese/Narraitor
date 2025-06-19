@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Navigation } from './Navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
 import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
@@ -46,18 +47,20 @@ const meta: Meta<typeof Navigation> = {
       });
       
       return (
-        <div className="min-h-screen bg-gray-100">
-          <Story />
-          <div className="p-8">
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-              <p className="text-gray-600">
-                This area represents the page content below the navigation.
-                The navigation component adapts based on the current world state and user context.
-              </p>
+        <NavigationLoadingProvider>
+          <div className="min-h-screen bg-gray-100">
+            <Story />
+            <div className="p-8">
+              <div className="bg-white rounded-lg p-6 shadow">
+                <h2 className="text-xl font-semibold mb-4">Page Content</h2>
+                <p className="text-gray-600">
+                  This area represents the page content below the navigation.
+                  The navigation component adapts based on the current world state and user context.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </NavigationLoadingProvider>
       );
     },
   ],
@@ -290,6 +293,42 @@ export const WorldSwitcherOpen: Story = {
     docs: {
       description: {
         story: 'Navigation with world switcher dropdown open - shows all worlds with character counts and active indicator'
+      }
+    }
+  }
+};
+
+export const MobileView: Story = {
+  decorators: [
+    (Story) => {
+      const { worldId1, worldId2 } = setupWorlds();
+      setupCharacters(worldId1, worldId2);
+      useWorldStore.getState().setCurrentWorld(worldId1);
+      return (
+        <NavigationLoadingProvider>
+          <div className="min-h-screen bg-gray-100">
+            <Story />
+            <div className="p-8">
+              <div className="bg-white rounded-lg p-6 shadow">
+                <h2 className="text-xl font-semibold mb-4">Mobile Page Content</h2>
+                <p className="text-gray-600">
+                  This shows the mobile navigation with hamburger menu. 
+                  The menu should show when screen width is ≤768px.
+                </p>
+              </div>
+            </div>
+          </div>
+        </NavigationLoadingProvider>
+      );
+    },
+  ],
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1',
+    },
+    docs: {
+      description: {
+        story: 'Navigation in mobile viewport - shows hamburger menu button and mobile-optimized layout'
       }
     }
   }

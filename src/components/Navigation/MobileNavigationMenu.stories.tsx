@@ -237,21 +237,6 @@ const setupCharacters = (worldId1: string, worldId2: string) => {
   useCharacterStore.getState().createCharacter(character3);
 };
 
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    onClose: () => {},
-    onNavigate: () => {},
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Mobile menu in closed state - should not render anything when closed'
-      }
-    }
-  }
-};
-
 export const Open: Story = {
   args: {
     isOpen: true,
@@ -312,51 +297,3 @@ export const WithActiveWorld: Story = {
   }
 };
 
-export const TouchInteraction: Story = {
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    onNavigate: () => {},
-  },
-  decorators: [
-    (Story) => {
-      const { worldId1, worldId2 } = setupWorlds();
-      setupCharacters(worldId1, worldId2);
-      useWorldStore.getState().setCurrentWorld(worldId1);
-      
-      // Add touch interaction guide
-      const style = document.createElement('style');
-      style.textContent = `
-        .touch-guide {
-          position: fixed;
-          bottom: 20px;
-          left: 20px;
-          right: 20px;
-          background: rgba(0, 0, 0, 0.8);
-          color: white;
-          padding: 12px;
-          border-radius: 8px;
-          font-size: 14px;
-          z-index: 100;
-        }
-      `;
-      document.head.appendChild(style);
-      
-      return (
-        <div>
-          <Story />
-          <div className="touch-guide">
-            💡 Try swiping left from the right edge to close the menu
-          </div>
-        </div>
-      );
-    },
-  ],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Interactive version demonstrating touch gestures - swipe left to close menu'
-      }
-    }
-  }
-};
