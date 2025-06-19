@@ -5,7 +5,7 @@ import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { geminiClient } from '@/lib/ai/geminiClient';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
-import { sessionStore } from '@/state/sessionStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
@@ -33,9 +33,9 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
   // Use the generic history hook
   const templateHistoryManager = useHistory(
-    sessionStore.getState().templateHistory,
-    sessionStore.getState().addTemplateToHistory,
-    sessionStore.getState().clearTemplateHistory,
+    useSessionStore.getState().templateHistory,
+    useSessionStore.getState().addTemplateToHistory,
+    useSessionStore.getState().clearTemplateHistory,
     5
   );
 

@@ -394,3 +394,6 @@ export const sessionStore = create<SessionStore>()(
   }),
 }
 ));
+
+// Export alias for compatibility with develop branch naming
+export { sessionStore as useSessionStore };
