@@ -77,7 +77,6 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       
     } catch (err) {
       setError('Failed to generate template. Please try again.');
-      console.error('Template generation error:', err);
     } finally {
       setIsGenerating(false);
     }
