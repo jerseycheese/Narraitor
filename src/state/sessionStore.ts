@@ -103,14 +103,16 @@ export const sessionStore = create<SessionStore>()(
         
         return {
           ...initialState,
-          savedSessions: newSavedSessions
+          savedSessions: newSavedSessions,
+          onboardingCompleted: prevState.onboardingCompleted
         };
       });
     } else {
-      // Keep savedSessions when resetting
+      // Keep savedSessions and onboarding state when resetting
       set(prevState => ({
         ...initialState,
-        savedSessions: prevState.savedSessions
+        savedSessions: prevState.savedSessions,
+        onboardingCompleted: prevState.onboardingCompleted
       }));
     }
   },
