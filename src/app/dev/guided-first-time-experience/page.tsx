@@ -63,7 +63,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
               <li>• Test mobile responsiveness by resizing window</li>
               <li>• Ensure progress indicator updates correctly</li>
               <li>• Verify world creation and navigation at completion</li>
-              <li>• Test that onboarding doesn't show when marked completed</li>
+              <li>• Test that onboarding doesn&apos;t show when marked completed</li>
             </ul>
           </div>
         </div>

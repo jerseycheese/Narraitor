@@ -176,6 +176,7 @@ describe('GuidedFirstTimeExperience', () => {
       
       // For now, test the final action
       const mockTryItNow = jest.fn();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (GuidedFirstTimeExperience as any).mockImplementation = mockTryItNow;
     });
   });
