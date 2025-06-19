@@ -80,7 +80,7 @@
     "storybook": "^8.6.12",
     "tailwindcss": "^3.4.17",
     "ts-jest": "^29.4.0",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   },
   "eslintConfig": {
     "extends": [

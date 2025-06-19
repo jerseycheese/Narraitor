@@ -10,7 +10,7 @@ const meta: Meta<typeof JournalModal> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Enhanced journal modal with book-like interface, search functionality, export capabilities, and sharing features. Provides an elegant reading experience for completed story sessions.',
+        component: 'Enhanced journal modal with book-like interface for MVP. Provides an elegant reading experience for completed story sessions.',
       },
     },
   },
@@ -34,13 +34,13 @@ const meta: Meta<typeof JournalModal> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Mock journal entries for stories - enhanced with titles for better display
+// Mock journal entries for stories
 const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
   {
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'character_event',
-    title: 'Meeting with Elder Thorne',
+    title: '',
     content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy and missing artifacts. He spoke of dark times ahead and the need for chosen heroes.',
     significance: 'critical',
     isRead: false,
@@ -59,7 +59,7 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'discovery',
-    title: 'Hidden Waterfall Passage',
+    title: '',
     content: 'Discovered a concealed entrance behind the waterfall leading into the mountain. The passage seems ancient and untouched by time.',
     significance: 'major',
     isRead: false,
@@ -78,7 +78,7 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'combat',
-    title: 'Bandit Ambush',
+    title: '',
     content: 'Defeated bandits who mentioned working for someone called "The Shadow". They carried strange coins with unknown markings.',
     significance: 'minor',
     isRead: false,
@@ -97,7 +97,7 @@ const mockEntries: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'>[] = [
     worldId: 'world-1',
     characterId: 'char-1',
     type: 'relationship_change',
-    title: 'Maya\'s Trust',
+    title: '',
     content: 'Helped Maya the merchant recover stolen goods and gained her trust. She offered valuable information about trade routes and safe havens.',
     significance: 'minor',
     isRead: false,
@@ -165,7 +165,7 @@ export const ManyEntries: Story = {
       worldId: 'world-1',
       characterId: 'char-1',
       type: 'achievement',
-      title: 'Quest Completed',
+      title: '',
       content: 'Completed the first major quest objective by retrieving the Crystal of Ages from the depths of the Forgotten Temple.',
       significance: 'critical',
       isRead: false,
@@ -177,7 +177,7 @@ export const ManyEntries: Story = {
       worldId: 'world-1',
       characterId: 'char-1',
       type: 'world_event',
-      title: 'Magic Awakens',
+      title: '',
       content: 'The ancient magic began to stir throughout the land, causing strange phenomena and awakening long-dormant creatures.',
       significance: 'major',
       isRead: false,
@@ -188,62 +188,4 @@ export const ManyEntries: Story = {
   ], 'session-many')],
 };
 
-export const BookLikeDesign: Story = {
-  args: {
-    isOpen: true,
-    sessionId: 'session-book'
-  },
-  decorators: [withMockJournal(mockEntries, 'session-book')],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Showcases the enhanced book-like design with amber theme, organized entries by date, and visual significance indicators.',
-      },
-    },
-  },
-};
-
-export const SearchAndFilter: Story = {
-  args: {
-    isOpen: true,
-    sessionId: 'session-search'
-  },
-  decorators: [withMockJournal([
-    ...mockEntries,
-    {
-      worldId: 'world-1',
-      characterId: 'char-1',
-      type: 'dialogue',
-      title: 'Mysterious Stranger',
-      content: 'Spoke with a hooded stranger who knew about the prophecy and mentioned The Shadow\'s growing influence.',
-      significance: 'major',
-      isRead: false,
-      relatedEntities: [],
-      metadata: { tags: ['stranger', 'prophecy', 'shadow', 'information'], automaticEntry: true },
-      updatedAt: '2023-01-04T08:15:00Z'
-    }
-  ], 'session-search')],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates search functionality - try searching for terms like "shadow", "prophecy", or "temple" to see filtering in action.',
-      },
-    },
-  },
-};
-
-export const ExportAndShare: Story = {
-  args: {
-    isOpen: true,
-    sessionId: 'session-export'
-  },
-  decorators: [withMockJournal(mockEntries, 'session-export')],
-  parameters: {
-    docs: {
-      description: {
-        story: 'Shows export and share functionality. Click the Export button to download story as markdown/text, or Share to copy formatted content.',
-      },
-    },
-  },
-};
 

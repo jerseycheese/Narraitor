@@ -3,24 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { JournalModal } from '@/components/GameSession/JournalModal';
 import { JournalFloatingButton } from '@/components/GameSession/JournalFloatingButton';
-import { SharePreview } from '@/components/GameSession/SharePreview';
 import { useJournalStore } from '@/state/journalStore';
 import { useJournalShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { JournalEntry } from '@/types/journal.types';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 
 /**
  * Test Harness for Issue #562: Enhanced Journal UI
  * Comprehensive testing environment for book-like journal interface
  * 
- * Features to Test:
+ * MVP Features to Test:
  * - Book-like visual design with amber theme
- * - Session grouping with timestamps
- * - Export functionality (markdown/text)
- * - Share preview with copy-to-clipboard
- * - Search/filter functionality
+ * - Clean entry list with visual polish
  * - Floating action button with unread indicators
  * - Mobile-responsive design
  * - Keyboard shortcuts (J key)
@@ -28,8 +23,6 @@ import { Card } from '@/components/ui/card';
  */
 export default function EnhancedJournalTestPage() {
   const [isJournalOpen, setIsJournalOpen] = useState(false);
-  const [isShareOpen, setIsShareOpen] = useState(false);
-  const [hasUnreadEntries, setHasUnreadEntries] = useState(true);
   const [sessionId] = useState('enhanced-test-session');
   
   const { addEntry, reset, getSessionEntries } = useJournalStore();
@@ -47,7 +40,7 @@ export default function EnhancedJournalTestPage() {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'character_event',
-        title: 'Meeting with Elder Thorne',
+        title: '',
         content: 'Had a meaningful conversation with Elder Thorne about the ancient prophecy and missing artifacts. He spoke of dark times ahead and the need for chosen heroes to rise up and defend the realm.',
         significance: 'critical',
         isRead: false,
@@ -56,17 +49,17 @@ export default function EnhancedJournalTestPage() {
           { type: 'location', id: 'temple', name: 'Ancient Temple' }
         ],
         metadata: {
-          tags: ['prophecy', 'elder', 'temple', 'heroes'],
+          tags: ['prophecy', 'elder'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-1'
         },
-        updatedAt: '2023-01-01T10:30:00Z'
+        updatedAt: '2023-01-01T12:00:00Z',
       },
       {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'discovery',
-        title: 'Hidden Waterfall Passage',
+        title: '',
         content: 'Discovered a concealed entrance behind the Crystal Waterfall leading deep into the mountain. The passage seems ancient and untouched by time, with strange runes carved into the stone walls.',
         significance: 'major',
         isRead: false,
@@ -75,17 +68,17 @@ export default function EnhancedJournalTestPage() {
           { type: 'location', id: 'passage', name: 'Hidden Passage' }
         ],
         metadata: {
-          tags: ['exploration', 'secret', 'mountain', 'runes'],
+          tags: ['discovery', 'waterfall'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-2'
         },
-        updatedAt: '2023-01-01T14:15:00Z'
+        updatedAt: '2023-01-01T12:15:00Z',
       },
       {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'combat',
-        title: 'Bandit Ambush on Trade Route',
+        title: '',
         content: 'Defeated a group of bandits who attacked our caravan on the trade route. During the battle, they mentioned working for someone called "The Shadow" and carried strange coins with unknown markings.',
         significance: 'minor',
         isRead: false,
@@ -94,17 +87,17 @@ export default function EnhancedJournalTestPage() {
           { type: 'event', id: 'bandit-fight', name: 'Bandit Ambush' }
         ],
         metadata: {
-          tags: ['combat', 'bandits', 'shadow', 'mystery', 'trade route'],
+          tags: ['combat', 'bandits'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-3'
         },
-        updatedAt: '2023-01-02T09:45:00Z'
+        updatedAt: '2023-01-01T12:30:00Z',
       },
       {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'relationship_change',
-        title: 'Gaining Maya\'s Trust',
+        title: '',
         content: 'Helped Maya the merchant recover her stolen goods from the bandits and gained her trust. She offered valuable information about safe trade routes and hidden havens throughout the region.',
         significance: 'minor',
         isRead: false,
@@ -112,17 +105,17 @@ export default function EnhancedJournalTestPage() {
           { type: 'character', id: 'maya', name: 'Maya the Merchant' }
         ],
         metadata: {
-          tags: ['merchant', 'trust', 'trade', 'information', 'alliance'],
+          tags: ['relationship', 'merchant'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-4'
         },
-        updatedAt: '2023-01-02T16:20:00Z'
+        updatedAt: '2023-01-01T12:45:00Z',
       },
       {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'achievement',
-        title: 'Crystal of Ages Retrieved',
+        title: '',
         content: 'Successfully completed the first major quest objective by retrieving the legendary Crystal of Ages from the depths of the Forgotten Temple. The crystal pulses with ancient magic and seems to respond to my presence.',
         significance: 'critical',
         isRead: false,
@@ -131,27 +124,27 @@ export default function EnhancedJournalTestPage() {
           { type: 'location', id: 'forgotten-temple', name: 'Forgotten Temple' }
         ],
         metadata: {
-          tags: ['quest', 'achievement', 'crystal', 'temple', 'magic'],
+          tags: ['achievement', 'crystal'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-5'
         },
-        updatedAt: '2023-01-03T12:00:00Z'
+        updatedAt: '2023-01-01T13:00:00Z',
       },
       {
         worldId: 'enhanced-world-1',
         characterId: 'enhanced-char-1',
         type: 'world_event',
-        title: 'The Great Awakening',
+        title: '',
         content: 'Witnessed the great awakening as ancient magic began to stir throughout the land, causing strange phenomena and awakening long-dormant creatures. The very fabric of reality seems to be changing.',
         significance: 'critical',
         isRead: false,
         relatedEntities: [],
         metadata: {
-          tags: ['magic', 'awakening', 'world', 'change', 'creatures'],
+          tags: ['world-event', 'magic'],
           automaticEntry: true,
           narrativeSegmentId: 'segment-6'
         },
-        updatedAt: '2023-01-03T18:30:00Z'
+        updatedAt: '2023-01-01T13:15:00Z',
       }
     ];
 
@@ -172,10 +165,10 @@ export default function EnhancedJournalTestPage() {
         isRead: false,
         relatedEntities: [],
         metadata: {
-          tags: ['oracle', 'prophecy', 'shadow', 'artifacts'],
+          tags: ['dialogue', 'oracle'],
           automaticEntry: true
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: '2023-01-01T14:00:00Z',
       },
       {
         worldId: 'enhanced-world-1',
@@ -187,16 +180,15 @@ export default function EnhancedJournalTestPage() {
         isRead: false,
         relatedEntities: [],
         metadata: {
-          tags: ['library', 'ancient', 'magic', 'civilization'],
+          tags: ['discovery', 'library'],
           automaticEntry: true
         },
-        updatedAt: new Date().toISOString()
+        updatedAt: '2023-01-01T14:15:00Z',
       }
     ];
     
     const randomEntry = testEntries[Math.floor(Math.random() * testEntries.length)];
     addEntry(sessionId, randomEntry);
-    setHasUnreadEntries(true);
   };
 
   return (
@@ -231,9 +223,9 @@ export default function EnhancedJournalTestPage() {
             </Card>
             <Card className="p-3 bg-blue-50 border-blue-200">
               <div className="text-2xl font-bold text-blue-800">
-                {entries.reduce((acc, e) => acc + e.metadata.tags.length, 0)}
+                {entries.filter(e => e.isRead === false).length}
               </div>
-              <div className="text-sm text-blue-600">Total Tags</div>
+              <div className="text-sm text-blue-600">Unread Entries</div>
             </Card>
           </div>
         </div>
@@ -256,13 +248,6 @@ export default function EnhancedJournalTestPage() {
                   Open Journal Modal
                 </Button>
                 <Button 
-                  onClick={() => setIsShareOpen(true)}
-                  variant="outline"
-                  className="w-full border-amber-300 text-amber-700 hover:bg-amber-50"
-                >
-                  Open Share Preview
-                </Button>
-                <Button 
                   onClick={addTestEntry}
                   variant="outline"
                   className="w-full border-green-300 text-green-700 hover:bg-green-50"
@@ -276,17 +261,8 @@ export default function EnhancedJournalTestPage() {
             <div>
               <h3 className="font-medium text-gray-800 mb-3">Floating Button</h3>
               <div className="space-y-2">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={hasUnreadEntries}
-                    onChange={(e) => setHasUnreadEntries(e.target.checked)}
-                    className="rounded"
-                  />
-                  <span className="text-sm">Show unread indicator</span>
-                </label>
-                <p className="text-xs text-gray-600">
-                  Toggle the red notification dot on the floating action button
+                <p className="text-sm text-gray-600">
+                  Floating action button provides quick access to journal
                 </p>
               </div>
             </div>
@@ -304,7 +280,7 @@ export default function EnhancedJournalTestPage() {
                   <code className="bg-gray-100 px-2 py-1 rounded">Esc</code>
                 </div>
                 <p className="text-xs mt-2">
-                  Press 'J' anywhere on this page to open the journal
+                  Press &apos;J&apos; anywhere on this page to open the journal
                 </p>
               </div>
             </div>
@@ -324,8 +300,8 @@ export default function EnhancedJournalTestPage() {
                   <span>Book-like amber theme with gradient backgrounds</span>
                 </li>
                 <li className="flex items-start space-x-2">
-                  <span className="text-blue-500">📅</span>
-                  <span>Session grouping by date with timeline layout</span>
+                  <span className="text-blue-500">📋</span>
+                  <span>Clean entry list layout without timestamps</span>
                 </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-blue-500">🏷️</span>
@@ -345,18 +321,6 @@ export default function EnhancedJournalTestPage() {
             <div>
               <h3 className="font-medium text-blue-800 mb-3">Functional Features</h3>
               <ul className="space-y-2 text-sm text-blue-700">
-                <li className="flex items-start space-x-2">
-                  <span className="text-blue-500">🔍</span>
-                  <span>Search entries by content, title, type, or tags</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="text-blue-500">📤</span>
-                  <span>Export stories as markdown or plain text files</span>
-                </li>
-                <li className="flex items-start space-x-2">
-                  <span className="text-blue-500">📋</span>
-                  <span>Share preview with copy-to-clipboard functionality</span>
-                </li>
                 <li className="flex items-start space-x-2">
                   <span className="text-blue-500">🎯</span>
                   <span>Floating action button with unread indicators</span>
@@ -379,10 +343,7 @@ export default function EnhancedJournalTestPage() {
               <h3 className="font-medium text-green-800 mb-3">Manual Testing Steps</h3>
               <ol className="space-y-2 text-sm text-green-700 list-decimal list-inside">
                 <li>Click the floating action button to open the journal</li>
-                <li>Try the search functionality with terms like "shadow" or "temple"</li>
-                <li>Test the export button to download markdown/text files</li>
-                <li>Use the share button to preview and copy formatted content</li>
-                <li>Press 'J' key to test keyboard shortcuts</li>
+                <li>Press &apos;J&apos; key to test keyboard shortcuts</li>
                 <li>Add new entries and verify they appear correctly</li>
                 <li>Test on mobile device for responsive design</li>
                 <li>Verify accessibility with screen readers</li>
@@ -392,11 +353,7 @@ export default function EnhancedJournalTestPage() {
             <div>
               <h3 className="font-medium text-green-800 mb-3">Expected Behaviors</h3>
               <ul className="space-y-2 text-sm text-green-700">
-                <li>• Entries grouped by date with visual separation</li>
-                <li>• Search filters entries in real-time as you type</li>
-                <li>• Export downloads formatted files to your device</li>
-                <li>• Share modal shows formatted content preview</li>
-                <li>• Copy button successfully copies to clipboard</li>
+                <li>• Entries display in clean list format</li>
                 <li>• Floating button shows/hides unread indicator</li>
                 <li>• Keyboard shortcuts work from anywhere on page</li>
                 <li>• Smooth animations enhance user experience</li>
@@ -409,26 +366,15 @@ export default function EnhancedJournalTestPage() {
       {/* Floating Action Button */}
       <JournalFloatingButton
         onClick={() => setIsJournalOpen(true)}
-        hasUnreadEntries={hasUnreadEntries}
       />
 
       {/* Journal Modal */}
       <JournalModal
         isOpen={isJournalOpen}
-        onClose={() => {
-          setIsJournalOpen(false);
-          setHasUnreadEntries(false);
-        }}
+        onClose={() => setIsJournalOpen(false)}
         sessionId={sessionId}
       />
 
-      {/* Share Preview */}
-      <SharePreview
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        entries={entries}
-        storyTitle="My Epic Adventure - Enhanced Journal Test"
-      />
     </div>
   );
 }

@@ -8,7 +8,7 @@ const meta: Meta<typeof JournalFloatingButton> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Floating action button for quick journal access during gameplay. Features visual indicators for unread entries and includes keyboard shortcut hint.',
+        component: 'Floating action button for quick journal access during gameplay.',
       },
     },
   },
@@ -17,10 +17,6 @@ const meta: Meta<typeof JournalFloatingButton> = {
     onClick: {
       action: 'clicked',
       description: 'Callback when button is clicked'
-    },
-    hasUnreadEntries: {
-      control: 'boolean',
-      description: 'Whether there are unread journal entries (shows red indicator dot)'
     },
     className: {
       control: 'text',
@@ -33,9 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    hasUnreadEntries: false,
-  },
+  args: {},
   parameters: {
     docs: {
       description: {
@@ -45,22 +39,8 @@ export const Default: Story = {
   },
 };
 
-export const WithUnreadEntries: Story = {
-  args: {
-    hasUnreadEntries: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Button with unread indicator showing red dot and pulsing animation to draw attention to new journal entries.',
-      },
-    },
-  },
-};
-
 export const CustomPosition: Story = {
   args: {
-    hasUnreadEntries: false,
     className: 'bottom-4 right-4', // Override default positioning
   },
   parameters: {
@@ -73,9 +53,7 @@ export const CustomPosition: Story = {
 };
 
 export const Interactive: Story = {
-  args: {
-    hasUnreadEntries: true,
-  },
+  args: {},
   parameters: {
     docs: {
       description: {
@@ -83,7 +61,7 @@ export const Interactive: Story = {
       },
     },
   },
-  play: async ({ canvasElement, args }) => {
+  play: async ({ canvasElement }) => {
     // This would be used for interaction testing in Storybook
     const button = canvasElement.querySelector('button');
     if (button) {

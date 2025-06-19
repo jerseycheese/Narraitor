@@ -62,7 +62,7 @@ describe('JournalModal', () => {
       render(<JournalModal {...defaultProps} />);
       
       expect(screen.getByRole('dialog')).toBeInTheDocument();
-      expect(screen.getByText('My Adventure Journal')).toBeInTheDocument();
+      expect(screen.getByText('Journal')).toBeInTheDocument();
     });
 
     it('does not render when isOpen is false', () => {
@@ -160,8 +160,8 @@ describe('JournalModal', () => {
 
       render(<JournalModal {...defaultProps} />);
       
-      expect(screen.getByText('Your journal awaits your first entry')).toBeInTheDocument();
-      expect(screen.getByText('Stories will appear here as your adventure unfolds')).toBeInTheDocument();
+      expect(screen.getByText('This journal awaits its first entry')).toBeInTheDocument();
+      expect(screen.getByText('Updates will appear here as things unfold')).toBeInTheDocument();
     });
 
     it('displays journal entries when they exist', () => {
@@ -308,33 +308,7 @@ describe('JournalModal', () => {
       expect(screen.getByText('Second entry content')).toBeInTheDocument();
     });
 
-    it('shows export button', () => {
-      render(<JournalModal {...defaultProps} />);
-      
-      expect(screen.getByRole('button', { name: /export/i })).toBeInTheDocument();
-    });
 
-    it('shows share button', () => {
-      render(<JournalModal {...defaultProps} />);
-      
-      expect(screen.getByRole('button', { name: /share/i })).toBeInTheDocument();
-    });
-
-    it('displays search input for filtering entries', () => {
-      render(<JournalModal {...defaultProps} />);
-      
-      expect(screen.getByPlaceholderText(/search entries/i)).toBeInTheDocument();
-    });
-    
-    it('filters entries based on search input', () => {
-      render(<JournalModal {...defaultProps} />);
-      
-      const searchInput = screen.getByPlaceholderText(/search entries/i);
-      fireEvent.change(searchInput, { target: { value: 'First' } });
-      
-      expect(screen.getByText('First entry content')).toBeInTheDocument();
-      expect(screen.queryByText('Second entry content')).not.toBeInTheDocument();
-    });
 
     it('shows visual indicators for story significance', () => {
       render(<JournalModal {...defaultProps} />);
