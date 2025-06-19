@@ -1,6 +1,6 @@
 // src/components/world/SmartTemplates/SmartTemplates.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { geminiClient } from '@/lib/ai/geminiClient';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
@@ -33,16 +33,16 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
   
-  const templateHistory = sessionStore.getState().templateHistory;
-  const narrativeGenerator = new NarrativeGenerator(geminiClient);
+  const templateHistory = useMemo(() => sessionStore.getState().templateHistory, []);
+  const narrativeGenerator = useMemo(() => new NarrativeGenerator(geminiClient), []);
 
-  const toggleGenre = (genre: string) => {
+  const toggleGenre = useCallback((genre: string) => {
     setSelectedGenres(prev => 
       prev.includes(genre) 
         ? prev.filter(g => g !== genre)
         : [...prev, genre]
     );
-  };
+  }, []);
 
   const generateTemplate = async (generationMode: TemplateMode, context?: Partial<TemplateGenerationContext>) => {
     setIsGenerating(true);
@@ -80,36 +80,36 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     }
   };
 
-  const handleUseTemplate = () => {
+  const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
       onTemplateGenerated(previewTemplate);
       setPreviewTemplate(null);
     }
-  };
+  }, [previewTemplate, onTemplateGenerated]);
 
-  const handleGenerateInspiredBy = () => {
+  const handleGenerateInspiredBy = useCallback(() => {
     if (!userInput.trim()) {
       setError('Please describe what you want your world to be like');
       return;
     }
     generateTemplate('inspired-by');
-  };
+  }, [userInput, generateTemplate]);
 
-  const handleGenerateGenreMix = () => {
+  const handleGenerateGenreMix = useCallback(() => {
     if (selectedGenres.length < 2) {
       setError('Please select at least 2 genres to mix');
       return;
     }
     generateTemplate('genre-mix');
-  };
+  }, [selectedGenres, generateTemplate]);
 
-  const handleSurpriseMe = () => {
+  const handleSurpriseMe = useCallback(() => {
     generateTemplate('surprise-me');
-  };
+  }, [generateTemplate]);
 
-  const useHistoryTemplate = (entry: TemplateHistoryEntry) => {
+  const useHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
     setPreviewTemplate(entry.template);
-  };
+  }, []);
 
   if (previewTemplate) {
     return (

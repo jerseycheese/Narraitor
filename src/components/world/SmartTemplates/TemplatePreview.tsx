@@ -1,6 +1,6 @@
 // src/components/world/SmartTemplates/TemplatePreview.tsx
 
-import React from 'react';
+import React, { memo } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { SkillDifficulty } from '@/components/ui/SkillDifficulty';
@@ -11,7 +11,7 @@ interface TemplatePreviewProps {
   onBack: () => void;
 }
 
-export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
+export const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
   template,
   onUse,
   onBack
@@ -121,4 +121,4 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
       </div>
     </div>
   );
-};
+});
