@@ -22,11 +22,20 @@ echo -e "${PURPLE}════════════════════�
 echo -e "\n${BLUE}📋 Fetching open issues...${NC}"
 cd "$NARRAITOR_DIR"
 
-# This would normally fetch from GitHub
+# Check for YOLO safety documentation
+if [ -f "docs/development/workflows/yolo-safe-issues.md" ]; then
+    echo -e "${YELLOW}📖 Review YOLO safety guide: docs/development/workflows/yolo-safe-issues.md${NC}"
+fi
+
+# This would normally fetch from GitHub API and filter for yolo-safe label
 # For demo, using example issues
 ISSUES=(510 511 512 513 514)
 
 echo -e "${GREEN}Found ${#ISSUES[@]} issues to process${NC}"
+echo -e "${YELLOW}⚠️  Ensure these issues meet YOLO safety criteria:${NC}"
+echo -e "  - Clear acceptance criteria"
+echo -e "  - Automated verification possible"
+echo -e "  - No visual/UX judgment required"
 
 # Step 2: Create worktrees for all issues
 echo -e "\n${BLUE}🌳 Creating worktrees...${NC}"

@@ -74,6 +74,10 @@ create_worktree() {
             echo -e "${GREEN}✅ Copied .env.local${NC}"
         fi
         
+        # Set up Claude configuration for the worktree
+        echo -e "${BLUE}Setting up Claude configuration...${NC}"
+        "$NARRAITOR_MAIN/scripts/setup-claude-worktree.sh" "$worktree_path"
+        
         echo ""
         echo -e "${GREEN}🎯 Next steps:${NC}"
         echo -e "  1. ${BLUE}cd $worktree_path${NC}"
