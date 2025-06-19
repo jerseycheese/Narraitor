@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SmartTemplates } from '@/components/world/SmartTemplates';
 import { TemplatePreview } from '@/components/world/SmartTemplates/TemplatePreview';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
+import { AVAILABLE_GENRES } from '@/lib/constants/genres';
 
 // Mock session store for Storybook
 jest.mock('@/state/sessionStore', () => ({
@@ -27,7 +28,7 @@ jest.mock('@/state/sessionStore', () => ({
           },
           generatedAt: '2023-01-01',
           generationType: 'genre-mix' as const,
-          genres: ['Cyberpunk', 'Western']
+          genres: [AVAILABLE_GENRES[4], AVAILABLE_GENRES[3]] // Cyberpunk, Western
         }
       ],
       addTemplateToHistory: () => {}

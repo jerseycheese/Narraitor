@@ -3,5 +3,10 @@
     "autoAcceptEdits": true,
     "autoApproveCommands": true,
     "autoCreateFiles": true
+  },
+  "extendedWorkspace": {
+    "additionalPaths": [
+      "/Users/jackhaas/Projects/narraitor"
+    ]
   }
 }

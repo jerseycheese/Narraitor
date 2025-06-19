@@ -11,6 +11,8 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { ToggleButton } from '@/components/shared/wizard/components/ToggleButton';
+import { GenreSelector } from '@/components/shared/GenreSelector';
+import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplatePreview } from './TemplatePreview';
 
 interface SmartTemplatesProps {
@@ -18,12 +20,6 @@ interface SmartTemplatesProps {
 }
 
 type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
-
-const AVAILABLE_GENRES = [
-  'Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 
-  'Steampunk', 'Post-Apocalyptic', 'Modern', 'Historical', 
-  'Comedy', 'Mystery', 'Romance', 'Adventure', 'Thriller'
-];
 
 export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenerated }) => {
   const [mode, setMode] = useState<TemplateMode>('inspired-by');
@@ -33,8 +29,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
   
-  const templateHistory = useMemo(() => sessionStore.getState().templateHistory, []);
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(geminiClient), []);
+
+  // Use the generic history hook
+  const templateHistoryManager = useHistory(
+    sessionStore.getState().templateHistory,
+    sessionStore.getState().addTemplateToHistory,
+    sessionStore.getState().clearTemplateHistory,
+    5
+  );
 
   const toggleGenre = useCallback((genre: string) => {
     setSelectedGenres(prev => 
@@ -67,7 +70,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
         genres: generationContext.genres
       };
       
-      sessionStore.getState().addTemplateToHistory(historyEntry);
+      templateHistoryManager.addEntry(historyEntry);
       
       // Show preview
       setPreviewTemplate(template);
@@ -192,21 +195,10 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                 {mode === 'genre-mix' && (
                   <div className="space-y-4">
                     <p className="text-sm text-gray-600">Select 2 or more genres to blend together</p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {AVAILABLE_GENRES.map(genre => (
-                        <button
-                          key={genre}
-                          onClick={() => toggleGenre(genre)}
-                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                            selectedGenres.includes(genre)
-                              ? 'bg-blue-100 text-blue-700 border-blue-300 selected'
-                              : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
-                          }`}
-                        >
-                          {genre}
-                        </button>
-                      ))}
-                    </div>
+                    <GenreSelector
+                      selectedGenres={selectedGenres}
+                      onToggleGenre={toggleGenre}
+                    />
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">
                         {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
@@ -244,11 +236,11 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
           </div>
 
           {/* Template History */}
-          {templateHistory.length > 0 && (
+          {!templateHistoryManager.isEmpty && (
             <div className={wizardStyles.divider}>
               <h3 className={wizardStyles.subheading}>Recent Templates</h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {templateHistory.map((entry, index) => (
+                {templateHistoryManager.history.map((entry, index) => (
                   <div 
                     key={index}
                     className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors"
@@ -273,7 +265,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             </div>
           )}
 
-          {templateHistory.length === 0 && (
+          {templateHistoryManager.isEmpty && (
             <div className="text-center py-8 text-gray-500">
               <p>No recent templates</p>
               <p className="text-sm">Generate your first template to get started!</p>

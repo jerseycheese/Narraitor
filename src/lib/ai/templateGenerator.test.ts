@@ -129,7 +129,7 @@ describe('TemplateGenerator', () => {
 
       await expect(
         templateGenerator.generateWorldTemplate({ type: 'surprise-me' })
-      ).rejects.toThrow('Failed to generate world template');
+      ).rejects.toThrow('Failed to parse world template');
     });
 
     test('handles AI generation failure', async () => {
@@ -137,7 +137,7 @@ describe('TemplateGenerator', () => {
 
       await expect(
         templateGenerator.generateWorldTemplate({ type: 'surprise-me' })
-      ).rejects.toThrow('Failed to generate world template');
+      ).rejects.toThrow('AI service unavailable');
     });
   });
 
@@ -166,7 +166,7 @@ describe('TemplateGenerator', () => {
       };
 
       expect(() => templateGenerator.validateTemplate(invalidTemplate as any))
-        .toThrow('Invalid template structure');
+        .toThrow('Invalid template structure: missing description');
     });
   });
 });

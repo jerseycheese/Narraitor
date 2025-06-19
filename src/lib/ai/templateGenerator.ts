@@ -3,6 +3,7 @@
 import { AIClient } from './types';
 import { generateWorldTemplatePrompt, TemplateGenerationContext } from './templatePrompts';
 import { World } from '@/types/world.types';
+import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handleAIRequest } from '@/lib/utils/aiResponseParser';
 
 export interface WorldTemplate {
   name: string;
@@ -30,43 +31,25 @@ export class TemplateGenerator {
   constructor(private geminiClient: AIClient) {}
 
   async generateWorldTemplate(context: TemplateGenerationContext): Promise<WorldTemplate> {
-    try {
-      const prompt = generateWorldTemplatePrompt(context);
-      const response = await this.geminiClient.generateContent(prompt);
-      
-      if (!response.content) {
-        throw new Error('No content received from AI service');
+    return handleAIRequest(
+      () => {
+        const prompt = generateWorldTemplatePrompt(context);
+        return this.geminiClient.generateContent(prompt);
+      },
+      (response) => {
+        const templateData = parseAIJsonResponse<WorldTemplate>(response, 'Failed to parse world template');
+        this.validateTemplate(templateData);
+        return templateData;
       }
-
-      // Parse the JSON response
-      let templateData: WorldTemplate;
-      try {
-        templateData = JSON.parse(response.content);
-      } catch (parseError) {
-        throw new Error('Failed to parse world template');
-      }
-
-      // Validate the template structure
-      this.validateTemplate(templateData);
-
-      return templateData;
-    } catch (error) {
-      throw new Error('Failed to generate world template');
-    }
+    );
   }
 
   validateTemplate(template: any): asserts template is WorldTemplate {
     const requiredFields = ['name', 'description', 'theme', 'attributes', 'skills', 'explanation'];
+    const arrayFields = ['attributes', 'skills'];
     
-    for (const field of requiredFields) {
-      if (!(field in template)) {
-        throw new Error(`Invalid template structure: missing ${field}`);
-      }
-    }
-
-    if (!Array.isArray(template.attributes) || !Array.isArray(template.skills)) {
-      throw new Error('Invalid template structure: attributes and skills must be arrays');
-    }
+    validateRequiredFields(template, requiredFields, 'template structure');
+    validateArrayFields(template, arrayFields, 'template structure');
 
     // Validate each attribute
     for (const attr of template.attributes) {
