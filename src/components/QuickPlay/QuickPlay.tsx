@@ -8,12 +8,13 @@ import { sessionStore } from '@/state/sessionStore';
 import { formatDistanceToNow } from '@/lib/utils/textFormatter';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
+import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 
 export function QuickPlay() {
   const router = useRouter();
   const { worlds } = worldStore();
   const { characters } = characterStore();
-  const { savedSessions, resumeSavedSession } = sessionStore();
+  const { savedSessions, resumeSavedSession, shouldShowOnboarding } = sessionStore();
 
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
@@ -46,6 +47,11 @@ export function QuickPlay() {
   const handleNewGame = () => {
     router.push('/worlds');
   };
+
+  // Show guided experience for first-time users
+  if (shouldShowOnboarding()) {
+    return <GuidedFirstTimeExperience />;
+  }
 
   if (!hasValidSession) {
     return (

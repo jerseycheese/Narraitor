@@ -45,6 +45,7 @@ export interface SessionStore {
   worldId: EntityID | null;
   characterId: EntityID | null;
   savedSessions: Record<string, SavedSessionInfo>;
+  onboardingCompleted: boolean;
   
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
@@ -63,4 +64,9 @@ export interface SessionStore {
   resumeSavedSession: (sessionId: string) => boolean;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
+  
+  // Onboarding actions
+  setOnboardingCompleted: (completed: boolean) => void;
+  isFirstTimeUser: () => boolean;
+  shouldShowOnboarding: () => boolean;
 }

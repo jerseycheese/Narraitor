@@ -28,6 +28,8 @@ const initialState = {
     lastPlayed: string;
     narrativeCount: number;
   }>,
+  // Onboarding state
+  onboardingCompleted: false,
 };
 
 /**
@@ -239,12 +241,31 @@ export const sessionStore = create<SessionStore>()(
       return state;
     });
   },
+  
+  // Onboarding actions
+  setOnboardingCompleted: (completed: boolean) => {
+    logger.debug('Setting onboarding completed:', completed);
+    set({ onboardingCompleted: completed });
+  },
+  
+  isFirstTimeUser: () => {
+    const state = get();
+    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+  },
+  
+  shouldShowOnboarding: () => {
+    const state = get();
+    return state.isFirstTimeUser();
+  },
 }),
 {
   name: 'narraitor-session-store',
   storage: createIndexedDBStorage(),
   version: 1,
-  // Only persist saved sessions, not active session state
-  partialize: (state) => ({ savedSessions: state.savedSessions }),
+  // Persist saved sessions and onboarding state, not active session state
+  partialize: (state) => ({ 
+    savedSessions: state.savedSessions,
+    onboardingCompleted: state.onboardingCompleted 
+  }),
 }
 ));
