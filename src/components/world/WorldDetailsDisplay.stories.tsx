@@ -33,7 +33,7 @@ const mockWorld: World = {
   id: 'world-1',
   name: 'Middle Earth',
   description: 'A vast and mystical realm where magic flows through every living thing. Ancient forests hold secrets of the old gods, while towering mountains guard hidden valleys where legendary creatures dwell. This world is filled with wonder and danger in equal measure, where heroes are forged in the crucible of adventure and legends are born from acts of courage.',
-  theme: 'Fantasy',
+  theme: 'fantasy',
   relationship: 'set_in',
   reference: 'Lord of the Rings',
   attributes: [

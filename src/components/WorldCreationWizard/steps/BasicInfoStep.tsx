@@ -12,6 +12,7 @@ import {
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
+import { THEMES } from '@/lib/constants/themes';
 
 interface BasicInfoStepProps {
   worldData: Partial<World>;
@@ -19,16 +20,8 @@ interface BasicInfoStepProps {
   onUpdate: (updates: Partial<World>) => void;
 }
 
-const GENRE_OPTIONS = [
-  { value: 'fantasy', label: 'Fantasy' },
-  { value: 'sci-fi', label: 'Science Fiction' },
-  { value: 'modern', label: 'Modern' },
-  { value: 'historical', label: 'Historical' },
-  { value: 'post-apocalyptic', label: 'Post-Apocalyptic' },
-  { value: 'cyberpunk', label: 'Cyberpunk' },
-  { value: 'western', label: 'Western' },
-  { value: 'other', label: 'Other' },
-];
+// Use centralized theme constants
+const GENRE_OPTIONS = THEMES;
 
 export default function BasicInfoStep({
   worldData,
@@ -49,7 +42,7 @@ export default function BasicInfoStep({
         title="World Details"
         description="Essential information about your world."
       >
-        <WizardFormGroup label="World Name" error={combinedErrors.name} required>
+        <WizardFormGroup label="World Name (optional)" error={combinedErrors.name}>
           <WizardTextField
             value={worldData.name || ''}
             onChange={(value) => onUpdate({ ...worldData, name: value })}

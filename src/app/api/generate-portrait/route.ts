@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         
         const characterName = character?.name || 'Unknown';
         const physicalDesc = customDescription || character?.background?.physicalDescription || '';
-        const worldTheme = world?.theme || 'Modern';
+        const worldTheme = world?.theme || 'modern';
         const isKnownFigure = character?.background?.isKnownFigure;
         
         const prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);

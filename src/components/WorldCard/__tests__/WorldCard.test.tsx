@@ -7,7 +7,7 @@ describe('WorldCard', () => {
   const mockWorld = createMockWorld({
     name: 'Fantasy Realm',
     description: 'A magical world of adventure',
-    theme: 'High Fantasy',
+    theme: 'Fantasy',
   });
 
   // Test case for displaying world data (updated to address all acceptance criteria)

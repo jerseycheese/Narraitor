@@ -70,6 +70,7 @@ export interface SessionStore {
   savedSessions: Record<string, SavedSessionInfo>;
   templateHistory: TemplateHistoryEntry[];
   autoSave: AutoSaveState;
+  onboardingCompleted: boolean;
   
   // Actions
   initializeSession: (worldId: EntityID, characterId: EntityID, onComplete?: () => void) => Promise<void>;
@@ -98,4 +99,9 @@ export interface SessionStore {
   setAutoSaveEnabled: (enabled: boolean) => void;
   updateAutoSaveStatus: (status: AutoSaveState['status'], errorMessage?: string) => void;
   recordAutoSave: (timestamp: string) => void;
+  
+  // Onboarding actions
+  setOnboardingCompleted: (completed: boolean) => void;
+  isFirstTimeUser: () => boolean;
+  shouldShowOnboarding: () => boolean;
 }

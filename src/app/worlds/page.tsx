@@ -6,6 +6,7 @@ import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { useWorldStore } from '@/state/worldStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { InlineError } from '@/components/shared';
 import type { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
 export default function WorldsPage() {
@@ -216,7 +217,7 @@ export default function WorldsPage() {
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Give your world a custom name, or leave empty for an auto-generated name
+                    Give your world a custom name, or leave empty for a generated name
                   </p>
                 </div>
                 <div>
@@ -315,7 +316,9 @@ export default function WorldsPage() {
                 )}
               </div>
               {error && (
-                <p className="text-red-600 text-sm mt-4 mb-4">{error}</p>
+                <div className="mt-4 mb-4">
+                  <InlineError error={error} />
+                </div>
               )}
               {isGenerating && (
                 <p className="text-purple-600 text-sm mt-4 mb-4 flex items-center gap-2">

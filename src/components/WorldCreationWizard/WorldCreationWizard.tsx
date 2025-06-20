@@ -84,8 +84,6 @@ export default function WorldCreationWizard({
         })
         .build(),
       1: createWizardValidator<WorldCreationData>()
-        .field('name')
-        .required('World name is required')
         .field('theme')
         .required('World theme is required')
         .build(),
@@ -223,7 +221,7 @@ export default function WorldCreationWizard({
     try {
       // Create the world first
       const worldId = createWorld({
-        name: data.name!,
+        name: data.name || 'Untitled World',
         description: data.description!,
         theme: data.theme!,
         attributes: data.attributes || [],

@@ -37,6 +37,8 @@ const initialState = {
     errorMessage: null,
     totalSaves: 0,
   },
+  // Onboarding state
+  onboardingCompleted: false,
 };
 
 /**
@@ -181,15 +183,17 @@ export const sessionStore = create<SessionStore>()(
         
         return {
           ...initialState,
-          savedSessions: newSavedSessions
+          savedSessions: newSavedSessions,
+          onboardingCompleted: prevState.onboardingCompleted
         };
       });
     } else {
       logger.debug('🔚 No active session to save, just resetting state');
-      // Keep savedSessions when resetting
+      // Keep savedSessions and onboarding state when resetting
       set(prevState => ({
         ...initialState,
-        savedSessions: prevState.savedSessions
+        savedSessions: prevState.savedSessions,
+        onboardingCompleted: prevState.onboardingCompleted
       }));
     }
   },
@@ -373,6 +377,22 @@ export const sessionStore = create<SessionStore>()(
       }
     }));
   },
+  
+  // Onboarding actions
+  setOnboardingCompleted: (completed: boolean) => {
+    logger.debug('Setting onboarding completed:', completed);
+    set({ onboardingCompleted: completed });
+  },
+  
+  isFirstTimeUser: () => {
+    const state = get();
+    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+  },
+  
+  shouldShowOnboarding: () => {
+    const state = get();
+    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
+  },
 }),
 {
   name: 'narraitor-session-store',
@@ -390,7 +410,9 @@ export const sessionStore = create<SessionStore>()(
     currentSceneId: state.currentSceneId,
     playerChoices: state.playerChoices,
     // Persist auto-save state
-    autoSave: state.autoSave
+    autoSave: state.autoSave,
+    // Persist onboarding state
+    onboardingCompleted: state.onboardingCompleted
   }),
 }
 ));

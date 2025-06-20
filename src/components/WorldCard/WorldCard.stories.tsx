@@ -8,7 +8,7 @@ const mockWorld: World = {
   id: '1',
   name: 'Mystical Realms of Avaloria',
   description: 'An epic fantasy world filled with magic, dragons, and ancient prophecies. Heroes must band together to face the rising darkness.',
-  theme: 'Fantasy',
+  theme: 'fantasy',
   attributes: [],
   skills: [],
   settings: {
@@ -248,7 +248,7 @@ export const SetInWorld: Story = {
       ...mockWorld,
       name: 'Middle-earth Adventure',
       description: 'Journey through the Shire, visit Rivendell, and brave the paths to Mordor in this epic quest through Tolkien\'s beloved world.',
-      theme: 'Fantasy',
+      theme: 'fantasy',
       reference: 'Lord of the Rings',
       relationship: 'set_in'
     },

@@ -8,7 +8,7 @@ const mockWorldStoreState = {
       id: 'test-world',
       name: 'Test World',
       description: 'A test world',
-      theme: 'Fantasy',
+      theme: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

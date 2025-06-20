@@ -9,7 +9,7 @@ const mockWorlds: World[] = [
     id: '1',
     name: 'World 1',
     description: 'Desc 1',
-    theme: 'Fantasy',
+    theme: 'fantasy',
     attributes: [],
     skills: [],
     settings: {

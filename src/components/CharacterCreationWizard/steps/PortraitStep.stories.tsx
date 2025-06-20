@@ -61,7 +61,7 @@ const defaultData = {
 };
 
 const mockWorldConfig = {
-  theme: 'High Fantasy',
+  theme: 'fantasy',
   name: 'Test World',
 };
 

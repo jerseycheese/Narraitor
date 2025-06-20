@@ -53,7 +53,7 @@ export const westernTemplate: WorldTemplate = {
   id: 'western',
   name: 'Western',
   description: 'A world set in the American frontier during the late 19th century.',
-  genre: 'Western',
+  genre: 'western',
   attributes: [
     {
       name: 'Grit',
@@ -225,7 +225,7 @@ export const sitcomTemplate: WorldTemplate = {
   id: 'sitcom',
   name: 'Sitcom',
   description: 'A comedic world based on modern situation comedies.',
-  genre: 'Comedy',
+  genre: 'comedy',
   attributes: [
     {
       name: 'Humor',
@@ -397,7 +397,7 @@ export const fantasyTemplate: WorldTemplate = {
   id: 'fantasy',
   name: 'Fantasy',
   description: 'A magical world of heroes, monsters, and epic quests.',
-  genre: 'Fantasy',
+  genre: 'fantasy',
   attributes: [
     {
       name: 'Strength',

@@ -33,7 +33,7 @@ describe('WorldImageGenerator theme handling', () => {
 
   describe('prompt generation for different themes', () => {
     it('should not include fantasy elements for Modern theme', async () => {
-      const world = createMockWorld('Modern', 'A corporate office environment');
+      const world = createMockWorld('modern', 'A corporate office environment');
       
       // Access the private buildPrompt method via reflection
       const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
@@ -64,7 +64,7 @@ describe('WorldImageGenerator theme handling', () => {
     });
 
     it('should allow fantasy elements for Fantasy theme', async () => {
-      const world = createMockWorld('Fantasy', 'A magical realm');
+      const world = createMockWorld('fantasy', 'A magical realm');
       
       const buildPrompt = (generator as WorldImageGenerator & { buildPrompt: (world: World) => string }).buildPrompt.bind(generator);
       const prompt = buildPrompt(world);
@@ -100,7 +100,7 @@ describe('WorldImageGenerator theme handling', () => {
   describe('The Office specific scenario', () => {
     it('should generate appropriate prompt for The Office world', async () => {
       const world = createMockWorld(
-        'Modern', 
+        'modern', 
         'A paper supply company office in Scranton, PA where everyday workplace situations become comedic adventures'
       );
       
