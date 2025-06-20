@@ -5282,3 +5282,35 @@ Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  GET /_next/static/css/app/layout.css?v=1750443962591 404 in 12ms
+ ✓ Compiled in 335ms (660 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters 200 in 82ms
+ ✓ Compiled /_not-found in 319ms (1464 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:128)
+    at JSON.parse (<anonymous>) {
+  digest: '882057409'
+}
+TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:128)
+    at JSON.parse (<anonymous>)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⨯ TypeError: Cannot read properties of undefined (reading 'call')
+    at Object.t [as require] (.next/server/webpack-runtime.js:1:128)
+    at JSON.parse (<anonymous>)
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 595ms (1797 modules)
+ GET /_next/static/css/app/layout.css?v=1750444403375 500 in 2130ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters 200 in 412ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters 200 in 7ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/css/app/layout.css?v=1750444405646 404 in 49ms
