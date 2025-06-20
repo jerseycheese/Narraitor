@@ -10,7 +10,7 @@ export interface AIResponse {
 }
 
 /**
- * Parse JSON from AI response with proper error handling
+ * Parse JSON from AI response with proper error handling and markdown code block support
  */
 export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: string = 'Failed to parse AI response'): T {
   if (!response.content) {
@@ -18,10 +18,29 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
   }
 
   try {
+    // First try to parse directly
     return JSON.parse(response.content);
-  } catch (parseError) {
-    const originalError = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
-    throw new Error(`${errorMessage}. Original error: ${originalError}. Content: ${response.content?.substring(0, 100)}...`);
+  } catch {
+    try {
+      // Fallback to extract JSON from response if not pure JSON
+      // Look for JSON wrapped in markdown code blocks
+      const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        return JSON.parse(codeBlockMatch[1]);
+      } else {
+        // Look for JSON object anywhere in the content
+        // Use a more flexible regex that allows nested objects
+        const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          return JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error('No valid JSON found in response');
+        }
+      }
+    } catch (parseError) {
+      const originalError = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
+      throw new Error(`${errorMessage}. Original error: ${originalError}. Content: ${response.content?.substring(0, 100)}...`);
+    }
   }
 }
 
