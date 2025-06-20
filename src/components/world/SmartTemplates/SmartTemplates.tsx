@@ -1,11 +1,13 @@
 // src/components/world/SmartTemplates/SmartTemplates.tsx
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { useSessionStore } from '@/state/sessionStore';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { ThemeSelector } from '@/components/shared/ThemeSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
@@ -26,17 +28,17 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
 
-  // Tab navigation options
-  const tabOptions: TabOption<TemplateMode>[] = [
+  // Tab navigation options - memoized to prevent unnecessary re-renders
+  const tabOptions: TabOption<TemplateMode>[] = useMemo(() => [
     { value: 'inspired-by', label: 'I want something like...' },
     { value: 'genre-mix', label: 'Theme Mixer' },
     { value: 'surprise-me', label: 'Surprise me!' }
-  ];
+  ], []);
 
-  // Use proper React hooks for reactivity
-  const templateHistory = useSessionStore(state => state.templateHistory);
-  const addTemplateToHistory = useSessionStore(state => state.addTemplateToHistory);
-  const clearTemplateHistory = useSessionStore(state => state.clearTemplateHistory);
+  // Use proper React hooks for reactivity - memoized selectors for performance
+  const templateHistory = useSessionStore(useCallback(state => state.templateHistory, []));
+  const addTemplateToHistory = useSessionStore(useCallback(state => state.addTemplateToHistory, []));
+  const clearTemplateHistory = useSessionStore(useCallback(state => state.clearTemplateHistory, []));
   
   const templateHistoryManager = useHistory(
     templateHistory,
@@ -140,22 +142,26 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     }
   }, [handleHistoryTemplate]);
 
-  if (previewTemplate) {
-    return (
-      <TemplatePreview
-        template={previewTemplate}
-        onUse={handleUseTemplate}
-        onBack={() => setPreviewTemplate(null)}
-      />
-    );
-  }
+  // Template preview modal
+  const templatePreviewModal = previewTemplate && (
+    <TemplatePreview
+      template={previewTemplate}
+      isOpen={!!previewTemplate}
+      onUse={handleUseTemplate}
+      onBack={() => setPreviewTemplate(null)}
+    />
+  );
 
   return (
-    <div className={wizardStyles.container}>
-      <div className={wizardStyles.header}>
-        <h2 className={wizardStyles.title}>Smart World Templates</h2>
-        <p className="text-gray-600">Get creative starting points for your world with AI assistance</p>
-      </div>
+    <>
+      {/* Template Preview Modal */}
+      {templatePreviewModal}
+      
+      <div className={wizardStyles.container}>
+        <div className={wizardStyles.header}>
+          <h2 className={wizardStyles.title}>Smart World Templates</h2>
+          <p className="text-gray-600">Get creative starting points for your world with AI assistance</p>
+        </div>
 
       {error && (
         <ErrorDisplay 
@@ -191,20 +197,20 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                   <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
                 </div>
                 <div className="space-y-4">
-                  <input
+                  <Input
                     type="text"
                     placeholder="Steampunk Victorian London, Space pirates, etc."
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    className={wizardStyles.form.input}
                   />
-                  <button
+                  <Button
                     onClick={handleGenerateInspiredBy}
                     disabled={!userInput.trim()}
-                    className={wizardStyles.navigation.primaryButton}
+                    variant="default"
+                    size="default"
                   >
                     Generate World
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -227,13 +233,14 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                     <span className="text-sm text-gray-600">
                       {selectedThemes.length} theme{selectedThemes.length !== 1 ? 's' : ''} selected
                     </span>
-                    <button
+                    <Button
                       onClick={handleGenerateGenreMix}
                       disabled={selectedThemes.length < 2}
-                      className={wizardStyles.navigation.primaryButton}
+                      variant="default"
+                      size="default"
                     >
                       Mix Themes
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -249,12 +256,13 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                   <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
                 </div>
                 <div>
-                  <button
+                  <Button
                     onClick={handleSurpriseMe}
-                    className={wizardStyles.navigation.primaryButton}
+                    variant="default"
+                    size="default"
                   >
                     Generate Random World
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -303,6 +311,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
