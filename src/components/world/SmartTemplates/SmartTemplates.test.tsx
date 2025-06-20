@@ -4,12 +4,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SmartTemplates } from './SmartTemplates';
 
-// Mock the AI service
-jest.mock('@/lib/ai/narrativeGenerator', () => ({
-  NarrativeGenerator: jest.fn().mockImplementation(() => ({
-    generateWorldTemplate: jest.fn()
-  }))
-}));
+// Mock fetch for API calls
+global.fetch = jest.fn();
 
 // Mock the session store
 const mockSessionStore = {
@@ -69,7 +65,9 @@ describe('SmartTemplates', () => {
   const mockOnTemplateGenerated = jest.fn();
 
   beforeEach(() => {
+    // Clear all mocks
     jest.clearAllMocks();
+    (global.fetch as jest.Mock).mockClear();
     // Reset mock store to initial state
     mockSessionStore.templateHistory = [];
   });
@@ -121,12 +119,11 @@ describe('SmartTemplates', () => {
         explanation: 'Test explanation'
       };
 
-      // Mock successful generation
-      const mockGenerateWorldTemplate = jest.fn().mockResolvedValue(mockTemplate);
-      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
-      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
-        generateWorldTemplate: mockGenerateWorldTemplate
-      }));
+      // Mock successful API response
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockTemplate),
+      });
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
@@ -137,24 +134,30 @@ describe('SmartTemplates', () => {
       fireEvent.click(generateButton);
       
       await waitFor(() => {
-        expect(mockGenerateWorldTemplate).toHaveBeenCalledWith(
-          expect.objectContaining({
+        expect(global.fetch).toHaveBeenCalledWith('/api/ai/generate-template', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'inspired-by',
             userInput: 'Space pirates',
-            type: 'inspired-by'
-          })
-        );
+            genres: undefined,
+          }),
+        });
       });
     });
 
     test('shows loading state during generation', async () => {
-      // Mock delayed generation
-      const mockGenerateWorldTemplate = jest.fn().mockImplementation(
-        () => new Promise(resolve => setTimeout(resolve, 100))
+      // Mock delayed API response
+      (global.fetch as jest.Mock).mockImplementationOnce(
+        () => new Promise(resolve => 
+          setTimeout(() => resolve({
+            ok: true,
+            json: () => Promise.resolve({}),
+          }), 100)
+        )
       );
-      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
-      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
-        generateWorldTemplate: mockGenerateWorldTemplate
-      }));
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
@@ -169,12 +172,11 @@ describe('SmartTemplates', () => {
     });
 
     test('handles generation errors gracefully', async () => {
-      // Mock failed generation
-      const mockGenerateWorldTemplate = jest.fn().mockRejectedValue(new Error('Generation failed'));
-      const { NarrativeGenerator } = await import('@/lib/ai/narrativeGenerator');
-      (NarrativeGenerator as jest.Mock).mockImplementation(() => ({
-        generateWorldTemplate: mockGenerateWorldTemplate
-      }));
+      // Mock failed API response
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: 'Generation failed' }),
+      });
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       

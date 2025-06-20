@@ -1,10 +1,7 @@
 // src/components/world/SmartTemplates/SmartTemplates.tsx
 
-import React, { useState, useCallback, useMemo } from 'react';
-import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { geminiClient } from '@/lib/ai/geminiClient';
+import React, { useState, useCallback } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
-import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { useSessionStore } from '@/state/sessionStore';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -35,8 +32,6 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     { value: 'genre-mix', label: 'Theme Mixer' },
     { value: 'surprise-me', label: 'Surprise me!' }
   ];
-  
-  const narrativeGenerator = useMemo(() => new NarrativeGenerator(geminiClient), []);
 
   // Use proper React hooks for reactivity
   const templateHistory = useSessionStore(state => state.templateHistory);
@@ -58,27 +53,41 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     );
   }, []);
 
-  const generateTemplate = useCallback(async (generationMode: TemplateMode, context?: Partial<TemplateGenerationContext>) => {
+  const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      const generationContext: TemplateGenerationContext = {
+      // Create request payload for secure API
+      const requestBody = {
         type: generationMode,
         userInput: generationMode === 'inspired-by' ? userInput : undefined,
         genres: generationMode === 'genre-mix' ? selectedThemes : undefined,
-        ...context
       };
 
-      const template = await narrativeGenerator.generateWorldTemplate(generationContext);
+      // Call the secure API route instead of client-side AI
+      const response = await fetch('/api/ai/generate-template', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate template');
+      }
+
+      const template: WorldTemplate = await response.json();
       
       // Add to history
       const historyEntry: TemplateHistoryEntry = {
         template,
         generatedAt: new Date().toISOString(),
         generationType: generationMode,
-        userInput: generationContext.userInput,
-        genres: generationContext.genres
+        userInput: requestBody.userInput,
+        genres: requestBody.genres
       };
       
       templateHistoryManager.addEntry(historyEntry);
@@ -86,12 +95,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       // Show preview
       setPreviewTemplate(template);
       
-    } catch {
-      setError('Failed to generate template. Please try again.');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to generate template. Please try again.');
     } finally {
       setIsGenerating(false);
     }
-  }, [narrativeGenerator, templateHistoryManager, userInput, selectedThemes]);
+  }, [templateHistoryManager, userInput, selectedThemes]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
