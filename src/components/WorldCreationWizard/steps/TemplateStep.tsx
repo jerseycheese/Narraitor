@@ -34,7 +34,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   // Tab navigation options
   const tabOptions: TabOption<TemplateMode>[] = [
     { value: 'traditional', label: 'Choose Template' },
-    { value: 'smart', label: 'AI Generate ✨' }
+    { value: 'smart', label: 'Generate' }
   ];
   
   // Handler for template selection
