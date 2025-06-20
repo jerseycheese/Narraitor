@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       timeoutPromise
     ]);
     
-    logger.debug('generate-template API', 'Template generated:', (template as any).name);
+    logger.debug('generate-template API', 'Template generated:', template && typeof template === 'object' && 'name' in template ? template.name : 'Unknown template');
 
     return NextResponse.json(template);
 

@@ -8,19 +8,19 @@ interface AIGenerationState<T> {
   error: string | null;
 }
 
-interface AIGenerationOptions<TRequest, TResponse> {
+interface AIGenerationOptions<TResponse> {
   endpoint: string;
   onSuccess?: (result: TResponse) => void;
   onError?: (error: string) => void;
-  transform?: (response: any) => TResponse;
+  transform?: (response: unknown) => TResponse;
 }
 
 /**
  * Reusable hook for AI generation requests
  * Provides consistent loading states, error handling, and result management
  */
-export function useAIGeneration<TRequest = any, TResponse = any>(
-  options: AIGenerationOptions<TRequest, TResponse>
+export function useAIGeneration<TRequest = Record<string, unknown>, TResponse = unknown>(
+  options: AIGenerationOptions<TResponse>
 ) {
   const [state, setState] = useState<AIGenerationState<TResponse>>({
     isGenerating: false,

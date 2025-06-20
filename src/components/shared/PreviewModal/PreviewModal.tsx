@@ -35,7 +35,7 @@ interface PreviewModalProps<T> extends Pick<ModalProps, 'size' | 'closeOnBackdro
  * Extends the existing Modal component for consistent behavior
  * Reusable across different features (world templates, characters, etc.)
  */
-const PreviewModal = memo(<T extends any>({
+function PreviewModalInner<T>({
   isOpen,
   data,
   title,
@@ -49,7 +49,7 @@ const PreviewModal = memo(<T extends any>({
   size = 'xl',
   closeOnBackdropClick = false,
   className
-}: PreviewModalProps<T>) => {
+}: PreviewModalProps<T>) {
   return (
     <Modal
       isOpen={isOpen}
@@ -96,8 +96,6 @@ const PreviewModal = memo(<T extends any>({
       </div>
     </Modal>
   );
-});
+}
 
-PreviewModal.displayName = 'PreviewModal';
-
-export { PreviewModal };
+export const PreviewModal = memo(PreviewModalInner) as typeof PreviewModalInner;

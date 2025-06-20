@@ -329,6 +329,7 @@ export const PreviewScreen: Story = {
   render: () => (
     <TemplatePreview
       template={mockTemplate}
+      isOpen={true}
       onUse={() => console.log('Using template')}
       onBack={() => console.log('Going back')}
     />
