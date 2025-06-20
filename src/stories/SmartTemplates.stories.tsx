@@ -3,6 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { TemplatePreview } from '@/components/world/SmartTemplates/TemplatePreview';
+import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { THEMES } from '@/lib/constants/themes';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
@@ -45,16 +46,25 @@ const mockGeneratedTemplate: WorldTemplate = {
   explanation: 'A classic fantasy world with balanced attributes and skills'
 };
 
+type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
+
 // Create a mock version of SmartTemplates for Storybook
 const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTemplate) => void; hasHistory?: boolean }> = ({ 
   onTemplateGenerated, 
   hasHistory = false 
 }) => {
-  const [mode, setMode] = React.useState<'inspired-by' | 'genre-mix' | 'surprise-me'>('inspired-by');
+  const [mode, setMode] = React.useState<TemplateMode>('inspired-by');
   const [userInput, setUserInput] = React.useState('');
   const [selectedGenres, setSelectedGenres] = React.useState<string[]>([]);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Tab navigation options
+  const tabOptions: TabOption<TemplateMode>[] = [
+    { value: 'inspired-by', label: 'I want something like...' },
+    { value: 'genre-mix', label: 'Theme Mixer' },
+    { value: 'surprise-me', label: 'Surprise me!' }
+  ];
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -90,97 +100,108 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
       )}
 
       {!isGenerating && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Mode Selection */}
-          <div className="grid gap-4">
-            {/* Inspired By Mode */}
-            <div className={`border rounded-lg p-6 ${mode === 'inspired-by' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">I want something like...</h3>
-                <button
-                  onClick={() => setMode('inspired-by')}
-                  className={`px-4 py-2 rounded ${mode === 'inspired-by' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-                >
-                  {mode === 'inspired-by' ? 'Selected' : 'Select'}
-                </button>
-              </div>
-              {mode === 'inspired-by' && (
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Describe what you want (e.g., 'Steampunk Victorian London')"
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  />
-                  <button
-                    onClick={handleGenerate}
-                    disabled={!userInput.trim()}
-                    className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
-                  >
-                    Generate World
-                  </button>
-                </div>
-              )}
+          <div className="space-y-6">
+            {/* Tab-style Mode Selection */}
+            <div className="mb-6">
+              <TabNavigation
+                options={tabOptions}
+                activeValue={mode}
+                onChange={setMode}
+                className="mb-6"
+              />
             </div>
 
-            {/* Genre Mixer Mode */}
-            <div className={`border rounded-lg p-6 ${mode === 'genre-mix' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Genre Mixer</h3>
-                <button
-                  onClick={() => setMode('genre-mix')}
-                  className={`px-4 py-2 rounded ${mode === 'genre-mix' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-                >
-                  {mode === 'genre-mix' ? 'Selected' : 'Select'}
-                </button>
-              </div>
-              {mode === 'genre-mix' && (
+            {/* Inspired By Mode */}
+            {mode === 'inspired-by' && (
+              <div className="border rounded-lg p-6">
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-600">Select 2 or more genres to blend together</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery'].map(genre => (
-                      <button
-                        key={genre}
-                        onClick={() => setSelectedGenres(prev => 
-                          prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
-                        )}
-                        className={`px-3 py-2 rounded text-sm ${
-                          selectedGenres.includes(genre) 
-                            ? 'bg-blue-100 text-blue-700 border border-blue-300' 
-                            : 'bg-gray-100 border border-gray-300'
-                        }`}
-                      >
-                        {genre}
-                      </button>
-                    ))}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
                   </div>
-                  <button
-                    onClick={handleGenerate}
-                    disabled={selectedGenres.length < 2}
-                    className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
-                  >
-                    Mix Genres
-                  </button>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Steampunk Victorian London, Space pirates, etc."
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    <button
+                      onClick={handleGenerate}
+                      disabled={!userInput.trim()}
+                      className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                    >
+                      Generate World
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Theme Mixer Mode */}
+            {mode === 'genre-mix' && (
+              <div className="border rounded-lg p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Mix Themes Together</h3>
+                    <p className="text-sm text-gray-600 mb-4">Select 2 or more themes to blend together</p>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery'].map(genre => (
+                        <button
+                          key={genre}
+                          onClick={() => setSelectedGenres(prev => 
+                            prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
+                          )}
+                          className={`px-3 py-2 rounded text-sm ${
+                            selectedGenres.includes(genre) 
+                              ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+                              : 'bg-gray-100 border border-gray-300'
+                          }`}
+                        >
+                          {genre}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">
+                        {selectedGenres.length} theme{selectedGenres.length !== 1 ? 's' : ''} selected
+                      </span>
+                      <button
+                        onClick={handleGenerate}
+                        disabled={selectedGenres.length < 2}
+                        className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                      >
+                        Mix Themes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Surprise Me Mode */}
-            <div className="border rounded-lg p-6 border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">Surprise me!</h3>
-                  <p className="text-sm text-gray-600">Generate a completely unexpected world</p>
+            {mode === 'surprise-me' && (
+              <div className="border rounded-lg p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
+                    <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                  </div>
+                  <div>
+                    <button
+                      onClick={handleGenerate}
+                      className="bg-purple-600 text-white px-6 py-2 rounded"
+                    >
+                      Generate Random World
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={handleGenerate}
-                  className="bg-purple-600 text-white px-6 py-2 rounded"
-                >
-                  Surprise me!
-                </button>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Template History */}
@@ -254,14 +275,21 @@ const meta: Meta<typeof MockSmartTemplates> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const Interactive: Story = {
   args: {
     onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
     hasHistory: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Interactive Smart Templates component showing the new tab-based UI and all three generation modes'
+      }
+    }
   }
 };
 
-export const WithHistory: Story = {
+export const WithTemplateHistory: Story = {
   args: {
     onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
     hasHistory: true
@@ -269,29 +297,7 @@ export const WithHistory: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Shows the component with existing template history for reuse'
-      }
-    }
-  }
-};
-
-export const Loading: Story = {
-  args: {
-    onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
-    hasHistory: false
-  },
-  play: async ({ canvasElement }) => {
-    // Simulate clicking "Surprise me" to show loading state
-    const canvas = canvasElement;
-    const surpriseButton = canvas.querySelector('button') as HTMLButtonElement;
-    if (surpriseButton && surpriseButton.textContent?.includes('Surprise')) {
-      surpriseButton.click();
-    }
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Demonstrates the loading state during template generation'
+        story: 'Shows the component with existing template history for reuse and the improved UX'
       }
     }
   }
@@ -319,7 +325,7 @@ const mockTemplate: WorldTemplate = {
   explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian social structures. The Steam Affinity attribute represents connection to the mystical power source, while skills balance technical expertise with social graces and combat readiness.'
 };
 
-export const TemplatePreviewStory: Story = {
+export const PreviewScreen: Story = {
   render: () => (
     <TemplatePreview
       template={mockTemplate}
@@ -330,24 +336,7 @@ export const TemplatePreviewStory: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Preview screen showing a generated world template with all details'
-      }
-    }
-  }
-};
-
-export const MobileView: Story = {
-  args: {
-    onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
-    hasHistory: false
-  },
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1'
-    },
-    docs: {
-      description: {
-        story: 'Mobile-responsive view of the Smart Templates component'
+        story: 'Template preview screen showing a generated world template with comprehensive details'
       }
     }
   }

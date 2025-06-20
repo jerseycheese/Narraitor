@@ -63,21 +63,21 @@ const ThemeSelectorWrapper = (args: {
   );
 };
 
-export const Default: Story = {
-  render: ThemeSelectorWrapper,
-  args: {
-    selectedThemes: [],
-  }
-};
-
-export const WithSelection: Story = {
+export const MultipleSelections: Story = {
   render: ThemeSelectorWrapper,
   args: {
     selectedThemes: ['Fantasy', 'Sci-Fi', 'Cyberpunk'],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Demonstrates multiple theme selection for genre mixing functionality'
+      }
+    }
   }
 };
 
-export const WithMaxSelections: Story = {
+export const MaxSelectionsLimit: Story = {
   render: ThemeSelectorWrapper,
   args: {
     selectedThemes: ['Fantasy', 'Sci-Fi'],
@@ -86,39 +86,7 @@ export const WithMaxSelections: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Limits the number of themes that can be selected. Additional selections are disabled.'
-      }
-    }
-  }
-};
-
-export const Disabled: Story = {
-  render: ThemeSelectorWrapper,
-  args: {
-    selectedThemes: ['Fantasy', 'Horror'],
-    disabled: true,
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'All theme selection is disabled.'
-      }
-    }
-  }
-};
-
-export const Mobile: Story = {
-  render: ThemeSelectorWrapper,
-  args: {
-    selectedThemes: [],
-  },
-  parameters: {
-    viewport: {
-      defaultViewport: 'mobile1'
-    },
-    docs: {
-      description: {
-        story: 'Mobile-responsive layout with proper grid adjustments.'
+        story: 'Shows selection limit behavior - additional selections are disabled when limit is reached.'
       }
     }
   }

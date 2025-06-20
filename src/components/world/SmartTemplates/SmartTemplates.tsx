@@ -10,8 +10,8 @@ import { TemplateHistoryEntry } from '@/types/game.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
-import { ToggleButton } from '@/components/shared/wizard/components/ToggleButton';
 import { ThemeSelector } from '@/components/shared/ThemeSelector';
+import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplatePreview } from './TemplatePreview';
 
@@ -28,6 +28,13 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
+
+  // Tab navigation options
+  const tabOptions: TabOption<TemplateMode>[] = [
+    { value: 'inspired-by', label: 'I want something like...' },
+    { value: 'genre-mix', label: 'Theme Mixer' },
+    { value: 'surprise-me', label: 'Surprise me!' }
+  ];
   
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(geminiClient), []);
 
@@ -157,92 +164,92 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
         <div className="space-y-8">
           {/* Mode Selection */}
           <div className="space-y-6">
+            {/* Tab-style Mode Selection */}
+            <div className="mb-6">
+              <TabNavigation
+                options={tabOptions}
+                activeValue={mode}
+                onChange={setMode}
+                className="mb-6"
+              />
+            </div>
+
             {/* Inspired By Mode */}
-            <div className={`${wizardStyles.card.base} ${mode === 'inspired-by' ? wizardStyles.card.selected : wizardStyles.card.unselected}`}>
+            {mode === 'inspired-by' && (
+            <div className={wizardStyles.card.base}>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">I want something like...</h3>
-                  <ToggleButton
-                    isActive={mode === 'inspired-by'}
-                    activeLabel="Selected"
-                    inactiveLabel="Select"
-                    onClick={() => setMode('inspired-by')}
-                  />
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
                 </div>
-                {mode === 'inspired-by' && (
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Describe what you want (e.g., 'Steampunk Victorian London' or 'Space pirates')"
-                      value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
-                      className={wizardStyles.form.input}
-                    />
-                    <button
-                      onClick={handleGenerateInspiredBy}
-                      disabled={!userInput.trim()}
-                      className={wizardStyles.navigation.primaryButton}
-                    >
-                      Generate World
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Theme Mixer Mode */}
-            <div className={`${wizardStyles.card.base} ${mode === 'genre-mix' ? wizardStyles.card.selected : wizardStyles.card.unselected}`}>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Theme Mixer</h3>
-                  <ToggleButton
-                    isActive={mode === 'genre-mix'}
-                    activeLabel="Selected"
-                    inactiveLabel="Select"
-                    onClick={() => setMode('genre-mix')}
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Steampunk Victorian London, Space pirates, etc."
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    className={wizardStyles.form.input}
                   />
-                </div>
-                {mode === 'genre-mix' && (
-                  <div className="space-y-4">
-                    <p className="text-sm text-gray-600">Select 2 or more themes to blend together</p>
-                    <ThemeSelector
-                      selectedThemes={selectedThemes}
-                      onToggleTheme={toggleTheme}
-                    />
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">
-                        {selectedThemes.length} theme{selectedThemes.length !== 1 ? 's' : ''} selected
-                      </span>
-                      <button
-                        onClick={handleGenerateGenreMix}
-                        disabled={selectedThemes.length < 2}
-                        className={wizardStyles.navigation.primaryButton}
-                      >
-                        Mix Themes
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Surprise Me Mode */}
-            <div className={`${wizardStyles.card.base} ${mode === 'surprise-me' ? wizardStyles.card.selected : wizardStyles.card.unselected}`}>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">Surprise me!</h3>
-                    <p className="text-sm text-gray-600">Generate a completely unexpected world</p>
-                  </div>
                   <button
-                    onClick={handleSurpriseMe}
+                    onClick={handleGenerateInspiredBy}
+                    disabled={!userInput.trim()}
                     className={wizardStyles.navigation.primaryButton}
                   >
-                    Surprise me!
+                    Generate World
                   </button>
                 </div>
               </div>
             </div>
+            )}
+
+            {/* Theme Mixer Mode */}
+            {mode === 'genre-mix' && (
+            <div className={wizardStyles.card.base}>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Mix Themes Together</h3>
+                  <p className="text-sm text-gray-600 mb-4">Select 2 or more themes to blend together</p>
+                </div>
+                <div className="space-y-4">
+                  <ThemeSelector
+                    selectedThemes={selectedThemes}
+                    onToggleTheme={toggleTheme}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">
+                      {selectedThemes.length} theme{selectedThemes.length !== 1 ? 's' : ''} selected
+                    </span>
+                    <button
+                      onClick={handleGenerateGenreMix}
+                      disabled={selectedThemes.length < 2}
+                      className={wizardStyles.navigation.primaryButton}
+                    >
+                      Mix Themes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            )}
+
+            {/* Surprise Me Mode */}
+            {mode === 'surprise-me' && (
+            <div className={wizardStyles.card.base}>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
+                  <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                </div>
+                <div>
+                  <button
+                    onClick={handleSurpriseMe}
+                    className={wizardStyles.navigation.primaryButton}
+                  >
+                    Generate Random World
+                  </button>
+                </div>
+              </div>
+            </div>
+            )}
           </div>
 
           {/* Template History */}

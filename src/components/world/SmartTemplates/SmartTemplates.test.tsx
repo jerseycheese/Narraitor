@@ -78,15 +78,15 @@ describe('SmartTemplates', () => {
     test('displays all three template generation modes', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      expect(screen.getByText(/I want something like/i)).toBeInTheDocument();
-      expect(screen.getByText(/Theme Mixer/i)).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: /Surprise me/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Theme Mixer/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Surprise me!/i })).toBeInTheDocument();
     });
 
     test('allows user input for "inspired by" mode', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      const input = screen.getByPlaceholderText(/describe what you want/i);
+      const input = screen.getByPlaceholderText(/Steampunk Victorian London, Space pirates, etc\./i);
       fireEvent.change(input, { target: { value: 'Steampunk Victorian London' } });
       
       expect(input).toHaveValue('Steampunk Victorian London');
@@ -96,15 +96,15 @@ describe('SmartTemplates', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
       // Check that we start in "inspired by" mode (default)
-      expect(screen.getByText(/I want something like/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
       
       // Switch to theme mixer mode
-      const themeMixerButton = screen.getByText(/Theme Mixer/i);
+      const themeMixerButton = screen.getByRole('button', { name: /Theme Mixer/i });
       fireEvent.click(themeMixerButton);
       
       // Check that we have a different UI state after clicking theme mixer
-      // The button text should change to "Generate World" 
-      const generateButton = screen.getByRole('button', { name: /generate world/i });
+      // The button text should change to "Mix Themes" 
+      const generateButton = screen.getByRole('button', { name: /mix themes/i });
       expect(generateButton).toBeInTheDocument();
       // Note: The button might be disabled until themes are selected, which is expected behavior
     });
@@ -130,10 +130,10 @@ describe('SmartTemplates', () => {
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      const input = screen.getByPlaceholderText(/describe what you want/i);
+      const input = screen.getByPlaceholderText(/Steampunk Victorian London, Space pirates, etc\./i);
       fireEvent.change(input, { target: { value: 'Space pirates' } });
       
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const generateButton = screen.getByRole('button', { name: /generate world/i });
       fireEvent.click(generateButton);
       
       await waitFor(() => {
@@ -158,7 +158,11 @@ describe('SmartTemplates', () => {
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      const generateButton = screen.getByRole('button', { name: /surprise me/i });
+      // Switch to surprise me mode first
+      const surpriseMeTab = screen.getByRole('button', { name: /Surprise me!/i });
+      fireEvent.click(surpriseMeTab);
+      
+      const generateButton = screen.getByRole('button', { name: /generate random world/i });
       fireEvent.click(generateButton);
       
       expect(screen.getByTestId('loading')).toBeInTheDocument();
@@ -174,7 +178,11 @@ describe('SmartTemplates', () => {
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      const generateButton = screen.getByRole('button', { name: /surprise me/i });
+      // Switch to surprise me mode first
+      const surpriseMeTab = screen.getByRole('button', { name: /Surprise me!/i });
+      fireEvent.click(surpriseMeTab);
+      
+      const generateButton = screen.getByRole('button', { name: /generate random world/i });
       fireEvent.click(generateButton);
       
       await waitFor(() => {
@@ -228,7 +236,7 @@ describe('SmartTemplates', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
       // Component should render without issues on mobile
-      expect(screen.getByText(/I want something like/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
     });
   });
 });

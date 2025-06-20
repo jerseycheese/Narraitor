@@ -5,6 +5,7 @@ import TemplateSelector from '../../world/TemplateSelector';
 import { SmartTemplates } from '../../world/SmartTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { geminiClient } from '@/lib/ai/geminiClient';
@@ -18,6 +19,8 @@ interface TemplateStepProps {
   onCancel?: () => void;
 }
 
+type TemplateMode = 'traditional' | 'smart';
+
 const TemplateStep: React.FC<TemplateStepProps> = ({
   selectedTemplateId,
   onUpdate,
@@ -26,7 +29,13 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   onCancel,
 }) => {
   const [isApplying, setIsApplying] = useState(false);
-  const [currentMode, setCurrentMode] = useState<'traditional' | 'smart'>('traditional');
+  const [currentMode, setCurrentMode] = useState<TemplateMode>('traditional');
+
+  // Tab navigation options
+  const tabOptions: TabOption<TemplateMode>[] = [
+    { value: 'traditional', label: 'Choose Template' },
+    { value: 'smart', label: 'AI Generate ✨' }
+  ];
   
   // Handler for template selection
   const handleSelectTemplate = (templateId: string) => {
@@ -101,30 +110,12 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         
         {/* Mode Selection */}
         <div className="mb-6">
-          <div className="flex gap-2 mb-4">
-            <button
-              type="button"
-              onClick={() => setCurrentMode('traditional')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                currentMode === 'traditional'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Choose Template
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentMode('smart')}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                currentMode === 'smart'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              AI Generate ✨
-            </button>
-          </div>
+          <TabNavigation
+            options={tabOptions}
+            activeValue={currentMode}
+            onChange={setCurrentMode}
+            className="mb-4"
+          />
         </div>
 
         {/* Content based on mode */}
