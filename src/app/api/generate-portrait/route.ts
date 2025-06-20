@@ -13,7 +13,7 @@ const logger = new Logger('API');
 async function buildPortraitPrompt(
   characterName: string,
   physicalDescription: string,
-  worldTheme: string,
+  worldGenre: string,
   isKnownFigure?: boolean
 ): Promise<string> {
   try {
@@ -62,7 +62,7 @@ async function buildPortraitPrompt(
     
     // Call buildPortraitPrompt directly to avoid the image generation requirement
     const prompt = await generator.buildPortraitPrompt(mockCharacter, {
-      worldTheme: worldTheme
+      worldGenre: worldGenre
     });
     
     logger.debug('generate-portrait API', 'AI detection successful, prompt:', prompt.substring(0, 100) + '...');
@@ -72,7 +72,7 @@ async function buildPortraitPrompt(
     logger.debug('generate-portrait API', 'AI detection failed, using fallback. Error:', error);
     
     // Fallback to basic prompt if AI detection fails
-    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting theme: ${worldTheme}.`;
+    return `Create a professional portrait of ${characterName}, ${physicalDescription}. ${isKnownFigure ? `This should be recognizable as ${characterName} from the source material.` : 'This is an original character.'} Style: realistic portrait, professional lighting, clear facial features, suitable for a character profile. Setting genre: ${worldGenre}.`;
   }
 }
 
@@ -106,10 +106,10 @@ export async function POST(request: NextRequest) {
         
         const characterName = character?.name || 'Unknown';
         const physicalDesc = customDescription || character?.background?.physicalDescription || '';
-        const worldTheme = world?.theme || 'modern';
+        const worldGenre = world?.genre || 'modern';
         const isKnownFigure = character?.background?.isKnownFigure;
         
-        const prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+        const prompt = await buildPortraitPrompt(characterName, physicalDesc, worldGenre, isKnownFigure);
         
         return NextResponse.json({ 
           prompt: prompt,
@@ -119,10 +119,10 @@ export async function POST(request: NextRequest) {
         // Build a prompt for actual image generation
         const characterName = character?.name || 'character';
         const physicalDesc = customDescription || character?.background?.physicalDescription || 'No specific appearance described';
-        const worldTheme = world?.theme || 'fantasy';
+        const worldGenre = world?.genre || 'fantasy';
         const isKnownFigure = character?.background?.isKnownFigure;
         
-        prompt = await buildPortraitPrompt(characterName, physicalDesc, worldTheme, isKnownFigure);
+        prompt = await buildPortraitPrompt(characterName, physicalDesc, worldGenre, isKnownFigure);
       }
     } else {
       return NextResponse.json(

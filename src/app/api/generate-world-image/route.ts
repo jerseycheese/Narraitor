@@ -11,16 +11,16 @@ interface GenerateWorldImageRequest {
 
 // Generate a detailed image prompt based on world characteristics
 function generateImagePrompt(world: World): string {
-  const theme = world.theme?.toLowerCase() || 'fantasy';
+  const genre = world.genre?.toLowerCase() || 'fantasy';
   const name = world.name;
   const description = world.description;
   
   // Create a detailed prompt for image generation
-  const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Theme: ${theme}. Description: ${description}`;
+  const basePrompt = `Create a highly detailed, cinematic landscape image representing the world "${name}". Genre: ${genre}. Description: ${description}`;
   
   // Add theme-specific style guidance
   let styleGuidance = '';
-  switch(theme) {
+  switch(genre) {
     case 'fantasy':
       styleGuidance = 'Epic fantasy landscape with magical elements, mystical lighting, ancient architecture, floating islands or magical forests. Style: high fantasy art, detailed digital painting, dramatic lighting.';
       break;
@@ -68,10 +68,10 @@ Requirements:
 
 // Generate fallback placeholder if AI generation fails
 function generateFallbackImage(world: World): string {
-  const theme = world.theme?.toLowerCase() || 'fantasy';
+  const genre = world.genre?.toLowerCase() || 'fantasy';
   
   // Use themed placeholder as fallback
-  switch(theme) {
+  switch(genre) {
     case 'fantasy':
       return `https://picsum.photos/seed/${world.name}/800/600?blur=1`;
     case 'sci-fi':
@@ -145,7 +145,7 @@ Requirements:
 - High quality digital art style
 - Professional game concept art
 - Rich atmospheric lighting and details
-- ${body.world.theme} theme elements
+- ${body.world.genre} genre elements
 - No text, logos, or watermarks
 - Landscape orientation suitable for world imagery`;
 
@@ -228,7 +228,7 @@ Requirements:
       
       return NextResponse.json({ 
         imageUrl: fallbackUrl,
-        description: `A ${body.world.theme} landscape representing ${body.world.name}: ${body.world.description}`,
+        description: `A ${body.world.genre} landscape representing ${body.world.name}: ${body.world.description}`,
         placeholder: true,
         aiGenerated: false
       });

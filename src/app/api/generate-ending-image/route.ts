@@ -202,7 +202,7 @@ Requirements:
 - Professional game/film concept art
 - Rich atmospheric lighting and emotional depth
 - ${body.ending.tone} tone and mood
-- ${body.world?.theme || 'fantasy'} theme elements
+- ${body.world?.genre || 'fantasy'} genre elements
 - Focus on the end of the journey or its aftermath
 - No text, logos, or watermarks
 - Landscape orientation suitable for story ending imagery`;
