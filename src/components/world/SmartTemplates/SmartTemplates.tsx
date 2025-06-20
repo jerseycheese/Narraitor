@@ -9,7 +9,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
-import { ThemeSelector } from '@/components/shared/ThemeSelector';
+import { GenreSelector } from '@/components/shared/GenreSelector/GenreSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplatePreview } from './TemplatePreview';
@@ -23,7 +23,7 @@ type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
 export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenerated }) => {
   const [mode, setMode] = useState<TemplateMode>('inspired-by');
   const [userInput, setUserInput] = useState('');
-  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
@@ -31,7 +31,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   // Tab navigation options - memoized to prevent unnecessary re-renders
   const tabOptions: TabOption<TemplateMode>[] = useMemo(() => [
     { value: 'inspired-by', label: 'I want something like...' },
-    { value: 'genre-mix', label: 'Theme Mixer' },
+    { value: 'genre-mix', label: 'Genre Mixer' },
     { value: 'surprise-me', label: 'Surprise me!' }
   ], []);
 
@@ -47,11 +47,11 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     5
   );
 
-  const toggleTheme = useCallback((theme: string) => {
-    setSelectedThemes(prev => 
-      prev.includes(theme) 
-        ? prev.filter(t => t !== theme)
-        : [...prev, theme]
+  const toggleGenre = useCallback((genre: string) => {
+    setSelectedGenres(prev => 
+      prev.includes(genre) 
+        ? prev.filter(g => g !== genre)
+        : [...prev, genre]
     );
   }, []);
 
@@ -64,7 +64,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       const requestBody = {
         type: generationMode,
         userInput: generationMode === 'inspired-by' ? userInput : undefined,
-        genres: generationMode === 'genre-mix' ? selectedThemes : undefined,
+        genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
       };
 
       // Call the secure API route instead of client-side AI
@@ -102,7 +102,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     } finally {
       setIsGenerating(false);
     }
-  }, [templateHistoryManager, userInput, selectedThemes]);
+  }, [templateHistoryManager, userInput, selectedGenres]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -120,12 +120,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   }, [userInput, generateTemplate]);
 
   const handleGenerateGenreMix = useCallback(() => {
-    if (selectedThemes.length < 2) {
-      setError('Please select at least 2 themes to mix');
+    if (selectedGenres.length < 2) {
+      setError('Please select at least 2 genres to mix');
       return;
     }
     generateTemplate('genre-mix');
-  }, [selectedThemes, generateTemplate]);
+  }, [selectedGenres, generateTemplate]);
 
   const handleSurpriseMe = useCallback(() => {
     generateTemplate('surprise-me');
@@ -216,30 +216,30 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             </div>
             )}
 
-            {/* Theme Mixer Mode */}
+            {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
             <div className={wizardStyles.card.base}>
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Mix Themes Together</h3>
-                  <p className="text-sm text-gray-600 mb-4">Select 2 or more themes to blend together</p>
+                  <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
+                  <p className="text-sm text-gray-600 mb-4">Select 2 or more genres to blend together</p>
                 </div>
                 <div className="space-y-4">
-                  <ThemeSelector
-                    selectedThemes={selectedThemes}
-                    onToggleTheme={toggleTheme}
+                  <GenreSelector
+                    selectedGenres={selectedGenres}
+                    onToggleGenre={toggleGenre}
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">
-                      {selectedThemes.length} theme{selectedThemes.length !== 1 ? 's' : ''} selected
+                      {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                     </span>
                     <Button
                       onClick={handleGenerateGenreMix}
-                      disabled={selectedThemes.length < 2}
+                      disabled={selectedGenres.length < 2}
                       variant="default"
                       size="default"
                     >
-                      Mix Themes
+                      Mix Genres
                     </Button>
                   </div>
                 </div>
@@ -282,12 +282,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                     onKeyPress={(e) => handleHistoryKeyPress(e, entry)}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Use template: ${entry.template.name} (${entry.template.theme})`}
+                    aria-label={`Use template: ${entry.template.name} (${entry.template.genre})`}
                   >
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-medium">{entry.template.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{entry.template.theme}</p>
+                        <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
                         <p className="text-xs text-gray-500 mt-2">
                           {new Date(entry.generatedAt).toLocaleDateString()}
                         </p>

@@ -9,7 +9,6 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { geminiClient } from '@/lib/ai/geminiClient';
-import { useWorldStore } from '@/state/worldStore';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -85,7 +84,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         // Populate form fields with template data
         name: worldData.name,
         description: worldData.description,
-        theme: worldData.theme,
+        genre: worldData.genre,
         attributes: worldData.attributes,
         skills: worldData.skills,
         settings: worldData.settings

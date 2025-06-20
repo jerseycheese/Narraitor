@@ -24,7 +24,7 @@ interface GenerateEndingImageRequest {
 
 // Generate a detailed image prompt based on ending characteristics
 function generateImagePrompt(ending: StoryEnding, world?: World, character?: Character, recentNarrative?: string[]): string {
-  const theme = world?.theme?.toLowerCase() || 'fantasy';
+  const genre = world?.genre?.toLowerCase() || 'fantasy';
   const worldName = world?.name || 'Unknown Realm';
   const characterName = character?.name || 'The Hero';
   const tone = ending.tone;
@@ -54,9 +54,9 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
       toneGuidance = 'Reflective ending atmosphere with dramatic lighting and emotional depth.';
   }
   
-  // Add theme-specific style guidance
+  // Add genre-specific style guidance
   let styleGuidance = '';
-  switch(theme) {
+  switch(genre) {
     case 'fantasy':
       styleGuidance = 'Epic fantasy setting with magical elements, ancient architecture, mystical lighting. Style: high fantasy art, detailed digital painting, cinematic composition.';
       break;

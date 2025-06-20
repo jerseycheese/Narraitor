@@ -9,7 +9,7 @@ import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handl
 export interface WorldTemplate {
   name: string;
   description: string;
-  theme: string;
+  genre: string;
   attributes: Array<{
     name: string;
     description?: string;
@@ -97,7 +97,7 @@ export class TemplateGenerator {
     return {
       name: template.name,
       description: template.description,
-      theme: template.theme,
+      genre: template.genre,
       attributes: template.attributes.map((attr, index) => ({
         id: `attr-${index}`,
         worldId: '', // Will be set when world is created

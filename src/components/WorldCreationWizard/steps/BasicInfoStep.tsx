@@ -12,7 +12,7 @@ import {
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
-import { THEMES } from '@/lib/constants/themes';
+import { GENRES } from '@/lib/constants/genres';
 
 interface BasicInfoStepProps {
   worldData: Partial<World>;
@@ -20,8 +20,8 @@ interface BasicInfoStepProps {
   onUpdate: (updates: Partial<World>) => void;
 }
 
-// Use centralized theme constants
-const GENRE_OPTIONS = THEMES;
+// Use centralized genre constants
+const GENRE_OPTIONS = GENRES;
 
 export default function BasicInfoStep({
   worldData,
@@ -65,8 +65,8 @@ export default function BasicInfoStep({
 
         <WizardFormGroup label="Genre" required>
           <WizardSelect
-            value={worldData.theme || 'fantasy'}
-            onChange={(value) => onUpdate({ ...worldData, theme: value })}
+            value={worldData.genre || 'fantasy'}
+            onChange={(value) => onUpdate({ ...worldData, genre: value })}
             options={GENRE_OPTIONS}
             testId="world-genre-select"
           />

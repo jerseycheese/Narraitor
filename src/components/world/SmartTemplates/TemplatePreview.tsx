@@ -25,9 +25,9 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
         <h3 className="text-xl font-bold mb-4">{template.name}</h3>
         <div className="space-y-3">
           <div>
-            <span className="font-medium text-gray-700">Theme:</span>
+            <span className="font-medium text-gray-700">Genre:</span>
             <span className={`ml-2 ${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
-              {template.theme}
+              {template.genre}
             </span>
           </div>
           <div>
