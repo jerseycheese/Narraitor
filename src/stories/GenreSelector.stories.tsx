@@ -32,7 +32,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Wrapper component to handle state for stories
-const GenreSelectorWrapper = (args: any) => {
+const GenreSelectorWrapper = (args: { 
+  selectedGenres?: string[]; 
+  maxSelections?: number; 
+  disabled?: boolean;
+  onToggleGenre?: (genre: string) => void;
+}) => {
   const [selectedGenres, setSelectedGenres] = useState<string[]>(args.selectedGenres || []);
 
   const handleToggleGenre = (genre: string) => {
@@ -41,7 +46,7 @@ const GenreSelectorWrapper = (args: any) => {
         ? prev.filter(g => g !== genre)
         : [...prev, genre]
     );
-    args.onToggleGenre(genre);
+    args.onToggleGenre?.(genre);
   };
 
   return (

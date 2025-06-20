@@ -3,6 +3,7 @@
 import { AIClient } from './types';
 import { generateWorldTemplatePrompt, TemplateGenerationContext } from './templatePrompts';
 import { World } from '@/types/world.types';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields, handleAIRequest } from '@/lib/utils/aiResponseParser';
 
 export interface WorldTemplate {
@@ -11,6 +12,7 @@ export interface WorldTemplate {
   theme: string;
   attributes: Array<{
     name: string;
+    description?: string;
     baseValue: number;
     minValue: number;
     maxValue: number;
@@ -18,10 +20,11 @@ export interface WorldTemplate {
   }>;
   skills: Array<{
     name: string;
+    description?: string;
     baseValue: number;
     minValue: number;
     maxValue: number;
-    difficulty: 'trivial' | 'easy' | 'moderate' | 'hard' | 'extreme';
+    difficulty: SkillDifficulty;
     category: string;
   }>;
   explanation: string;
@@ -53,7 +56,7 @@ export class TemplateGenerator {
     validateArrayFields(templateRecord, arrayFields, 'template structure');
 
     // Validate each attribute
-    for (const attr of (templateRecord.attributes as any[])) {
+    for (const attr of (templateRecord.attributes as Record<string, unknown>[])) {
       if (!attr.name || typeof attr.baseValue !== 'number' || 
           typeof attr.minValue !== 'number' || typeof attr.maxValue !== 'number') {
         throw new Error('Invalid attribute structure');
@@ -61,10 +64,10 @@ export class TemplateGenerator {
     }
 
     // Validate each skill
-    for (const skill of (templateRecord.skills as any[])) {
+    for (const skill of (templateRecord.skills as Record<string, unknown>[])) {
       if (!skill.name || typeof skill.baseValue !== 'number' || 
           typeof skill.minValue !== 'number' || typeof skill.maxValue !== 'number' ||
-          !['trivial', 'easy', 'moderate', 'hard', 'extreme'].includes(skill.difficulty)) {
+          !['easy', 'medium', 'hard'].includes(skill.difficulty as string)) {
         throw new Error('Invalid skill structure');
       }
     }
@@ -79,6 +82,7 @@ export class TemplateGenerator {
         id: `attr-${index}`,
         worldId: '', // Will be set when world is created
         name: attr.name,
+        description: attr.description || '',
         baseValue: attr.baseValue,
         minValue: attr.minValue,
         maxValue: attr.maxValue,
@@ -88,6 +92,7 @@ export class TemplateGenerator {
         id: `skill-${index}`,
         worldId: '', // Will be set when world is created
         name: skill.name,
+        description: skill.description || '',
         baseValue: skill.baseValue,
         minValue: skill.minValue,
         maxValue: skill.maxValue,

@@ -31,11 +31,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(geminiClient), []);
 
-  // Use the generic history hook
+  // Use proper React hooks for reactivity
+  const templateHistory = useSessionStore(state => state.templateHistory);
+  const addTemplateToHistory = useSessionStore(state => state.addTemplateToHistory);
+  const clearTemplateHistory = useSessionStore(state => state.clearTemplateHistory);
+  
   const templateHistoryManager = useHistory(
-    useSessionStore.getState().templateHistory,
-    useSessionStore.getState().addTemplateToHistory,
-    useSessionStore.getState().clearTemplateHistory,
+    templateHistory,
+    addTemplateToHistory,
+    clearTemplateHistory,
     5
   );
 
@@ -112,6 +116,13 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const handleHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
     setPreviewTemplate(entry.template);
   }, []);
+
+  const handleHistoryKeyPress = useCallback((event: React.KeyboardEvent, entry: TemplateHistoryEntry) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleHistoryTemplate(entry);
+    }
+  }, [handleHistoryTemplate]);
 
   if (previewTemplate) {
     return (
@@ -239,11 +250,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             <div className={wizardStyles.divider}>
               <h3 className={wizardStyles.subheading}>Recent Templates</h3>
               <div className="grid gap-4 md:grid-cols-2">
-                {templateHistoryManager.history.map((entry, index) => (
+                {templateHistoryManager.getRecent().map((entry, index) => (
                   <div 
                     key={index}
-                    className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors"
+                    className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     onClick={() => handleHistoryTemplate(entry)}
+                    onKeyPress={(e) => handleHistoryKeyPress(e, entry)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Use template: ${entry.template.name} (${entry.template.theme})`}
                   >
                     <div className="flex items-start justify-between">
                       <div>

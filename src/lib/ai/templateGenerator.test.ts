@@ -2,6 +2,7 @@
 
 import { TemplateGenerator } from './templateGenerator';
 import { generateWorldTemplatePrompt } from './templatePrompts';
+import { AIClient } from './types';
 
 // Mock the AI client
 const mockAIClient = {
@@ -12,7 +13,7 @@ describe('TemplateGenerator', () => {
   let templateGenerator: TemplateGenerator;
 
   beforeEach(() => {
-    templateGenerator = new TemplateGenerator(mockAIClient as any);
+    templateGenerator = new TemplateGenerator(mockAIClient as AIClient);
     jest.clearAllMocks();
   });
 
@@ -165,7 +166,7 @@ describe('TemplateGenerator', () => {
         // Missing other required fields
       };
 
-      expect(() => templateGenerator.validateTemplate(invalidTemplate as any))
+      expect(() => templateGenerator.validateTemplate(invalidTemplate as unknown))
         .toThrow('Invalid template structure: missing description');
     });
   });
