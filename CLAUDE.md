@@ -255,6 +255,7 @@ This script will:
 
 See the MCP GitHub tool documentation for complete usage details.
 
+
 ## Domain Boundaries
 - World: World configuration, templates, attributes
 - Character: Character creation, sheets, progression

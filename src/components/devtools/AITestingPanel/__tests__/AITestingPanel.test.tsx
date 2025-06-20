@@ -41,8 +41,8 @@ describe('AITestingPanel', () => {
     
     // Test world theme input
     const worldThemeInput = screen.getByLabelText(/world theme/i);
-    fireEvent.change(worldThemeInput, { target: { value: 'Fantasy' } });
-    expect(worldThemeInput).toHaveValue('Fantasy');
+    fireEvent.change(worldThemeInput, { target: { value: 'fantasy' } });
+    expect(worldThemeInput).toHaveValue('fantasy');
   });
 
   test('allows configuration of custom character settings', () => {

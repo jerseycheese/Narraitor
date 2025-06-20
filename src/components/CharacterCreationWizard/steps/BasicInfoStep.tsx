@@ -1,6 +1,7 @@
 import React from 'react';
 import { CharacterPortraitPlaceholder } from '../components/CharacterPortraitPlaceholder';
 import { WizardFormSection } from '@/components/shared/wizard';
+import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -66,6 +67,14 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
       title="Basic Information"
       description="Create your character by providing their name and basic details."
     >
+      {/* Helpful tip */}
+      <div className="border rounded-lg p-4 bg-blue-50 mb-6">
+        <p className="text-sm text-blue-800">
+          Choose a unique name for your character. The name should be between 3 and 50 characters 
+          and must be unique within this world.
+        </p>
+      </div>
+
       <div className="flex items-start gap-6">
         {/* Portrait placeholder */}
         <div className="flex-shrink-0">
@@ -76,7 +85,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         <div className="flex-1 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="character-name">
-              Character Name
+              Character Name <span className="text-red-500">*</span>
             </Label>
             <Input
               id="character-name"
@@ -87,16 +96,11 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
               maxLength={50}
               placeholder="Enter character name"
             />
-            {showErrors && validation.errors.map((error: string, index: number) => (
-              <p key={index} className="text-red-600 text-sm mt-1">
-                {error}
-              </p>
-            ))}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="character-description">
-              Description
+              Description (optional)
             </Label>
             <Textarea
               id="character-description"
@@ -110,7 +114,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="physical-description">
-              Physical Description
+              Physical Description (optional)
             </Label>
             <Textarea
               id="physical-description"
@@ -128,12 +132,10 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         </div>
       </div>
 
-      <div className="bg-blue-50 p-4 rounded">
-        <p className="text-sm text-blue-800">
-          Choose a unique name for your character. The name should be between 3 and 50 characters 
-          and must be unique within this world.
-        </p>
-      </div>
+      {/* Validation errors */}
+      {showErrors && (
+        <ErrorBlock errors={validation.errors} />
+      )}
     </WizardFormSection>
   );
 };

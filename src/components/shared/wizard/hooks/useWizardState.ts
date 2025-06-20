@@ -100,6 +100,11 @@ export function useWizardState<T>(config: WizardConfig<T>) {
     return validation;
   }, [state.currentStep, state.data, validateStep]);
 
+  // Validate current step when it changes
+  useEffect(() => {
+    validateCurrentStep();
+  }, [state.currentStep, validateCurrentStep]);
+
   // Navigation handlers
   const handleNext = useCallback(() => {
     const validation = validateCurrentStep();

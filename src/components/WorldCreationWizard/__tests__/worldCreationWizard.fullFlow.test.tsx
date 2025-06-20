@@ -58,7 +58,7 @@ describe.skip('WorldCreationWizard Integration - Full Flow', () => {
     // Step 1: Basic Info
     expect(screen.getByTestId('basic-info-step')).toBeInTheDocument();
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'My Fantasy World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     
     // Click Next button from shared navigation
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
@@ -96,7 +96,7 @@ describe.skip('WorldCreationWizard Integration - Full Flow', () => {
     expect((worldStore as unknown as { getState: () => { createWorld: jest.Mock } }).getState().createWorld).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'My Fantasy World',
-        theme: 'Fantasy',
+        theme: 'fantasy',
         // The implementation has been updated, and skills are no longer included in the test data.
       })
     );

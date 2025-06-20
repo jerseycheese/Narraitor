@@ -6,7 +6,7 @@ describe('contextOverride', () => {
     id: 'world-1',
     name: 'Test World',
     description: 'A test world',
-    theme: 'Fantasy',
+    theme: 'fantasy',
     attributes: [],
     skills: [],
     createdAt: new Date(),
@@ -42,7 +42,7 @@ describe('contextOverride', () => {
     const result = createTestContext(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
 
     expect(result.world.name).toBe('Custom World Name');
-    expect(result.world.theme).toBe('Fantasy'); // Unchanged
+    expect(result.world.theme).toBe('fantasy'); // Unchanged
     expect(result.character.description).toBe('Modified character');
     expect(result.character.name).toBe('Test Character'); // Unchanged
     expect(result.narrativeContext.currentLocation).toBe('Custom location');

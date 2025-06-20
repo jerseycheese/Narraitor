@@ -34,7 +34,7 @@ export const testUtils = {
       {
         name: 'Test Space Colony',
         description: 'A test sci-fi space colony for development purposes',
-        theme: 'scifi' as const,
+        theme: 'sci-fi' as const,
         attributes: [],
         skills: [],
         settings: {

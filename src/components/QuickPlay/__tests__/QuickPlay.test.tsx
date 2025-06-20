@@ -29,6 +29,8 @@ describe('QuickPlay', () => {
     beforeEach(() => {
       (useSessionStore as unknown as jest.Mock).mockReturnValue({
         savedSessions: {},
+        onboardingCompleted: true, // Assume onboarding completed for regular tests
+        shouldShowOnboarding: () => false, // Don't show onboarding for these tests
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},
@@ -92,6 +94,8 @@ describe('QuickPlay', () => {
           'session-1': mockSavedSession,
         },
         resumeSavedSession: jest.fn().mockReturnValue(true),
+        onboardingCompleted: true,
+        shouldShowOnboarding: () => false,
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {
@@ -127,6 +131,8 @@ describe('QuickPlay', () => {
           'session-1': mockSavedSession,
         },
         resumeSavedSession: mockResume,
+        onboardingCompleted: true,
+        shouldShowOnboarding: () => false,
       });
 
       render(<QuickPlay />);
@@ -152,6 +158,8 @@ describe('QuickPlay', () => {
           'session-1': mockSavedSession,
         },
         resumeSavedSession: jest.fn().mockReturnValue(true),
+        onboardingCompleted: true,
+        shouldShowOnboarding: () => false,
       });
 
       render(<QuickPlay />);
@@ -174,6 +182,8 @@ describe('QuickPlay', () => {
           },
         },
         resumeSavedSession: jest.fn().mockReturnValue(true),
+        onboardingCompleted: true,
+        shouldShowOnboarding: () => false,
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},

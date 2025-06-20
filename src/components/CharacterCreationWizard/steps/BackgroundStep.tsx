@@ -1,5 +1,6 @@
 import React from 'react';
 import { WizardFormSection } from '@/components/shared/wizard';
+import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -70,7 +71,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="character-history">
-          Character History
+          Character History <span className="text-red-500">*</span>
         </Label>
         <Textarea
           id="character-history"
@@ -86,7 +87,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="character-personality">
-          Personality
+          Personality <span className="text-red-500">*</span>
         </Label>
         <Textarea
           id="character-personality"
@@ -102,17 +103,17 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="character-motivation">
-          Motivation
+          Motivation (optional)
         </Label>
         <Input
           id="character-motivation"
           type="text"
           value={data.characterData.background.motivation}
           onChange={handleMotivationChange}
-          placeholder="What drives your character? (minimum 10 characters)"
+          placeholder="What drives your character?"
         />
         <p className="text-gray-500 text-sm mt-1">
-          {data.characterData.background.motivation.length} / 10 characters minimum
+          Optional field to help define your character&apos;s driving force
         </p>
       </div>
 
@@ -131,13 +132,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
 
       {/* Validation errors */}
       {showErrors && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          {validation.errors.map((error: string, index: number) => (
-            <p key={index} className="text-red-600 text-sm mt-1">
-              {error}
-            </p>
-          ))}
-        </div>
+        <ErrorBlock errors={validation.errors} />
       )}
     </WizardFormSection>
   );

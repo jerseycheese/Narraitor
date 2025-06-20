@@ -81,7 +81,7 @@ const mockWorld = {
   id: 'world-456',
   name: 'Eldoria',
   description: 'A realm where magic and technology coexist',
-  theme: 'High Fantasy',
+  theme: 'fantasy',
   attributes: [],
   skills: [],
   settings: {

@@ -46,7 +46,7 @@ const MOCK_CHARACTER_DATA = {
 const MOCK_WORLD_DATA = {
     name: 'Eldoria',
     description: 'A realm where magic and technology coexist',
-    theme: 'High Fantasy',
+    theme: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
