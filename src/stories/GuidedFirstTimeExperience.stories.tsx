@@ -20,16 +20,12 @@ const MockGuidedFirstTimeExperience = () => {
   const renderWelcomeStep = () => (
     <div className="text-center space-y-6">
       <div className="max-w-md mx-auto">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Welcome to Narraitor
-        </h2>
         <p className="text-lg text-gray-600 mb-6">
-          Create your own world and start your adventure within 2 minutes
+          Create your own world and start your story
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            We'll guide you through creating your first world in just 3 simple steps. 
-            Each step takes less than 30 seconds to complete.
+            Let&apos;s guide you through creating your first world in just 3 steps.
           </p>
         </div>
       </div>
@@ -43,7 +39,7 @@ const MockGuidedFirstTimeExperience = () => {
           World Concept
         </h2>
         <p className="text-gray-600">
-          What kind of world do you want to explore?
+          Create an RPG in any fictional universe or original setting
         </p>
       </div>
       
@@ -57,19 +53,11 @@ const MockGuidedFirstTimeExperience = () => {
             name="world-concept"
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., A magical forest realm, Cyberpunk city, Medieval kingdom..."
+            placeholder="E.g., The world of Harry Potter, Star Wars galaxy, Middle-earth from LOTR, The Office workplace, or your own original fantasy realm..."
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           />
         </div>
-        
-        {formData.description && (
-          <div className="bg-green-50 rounded-lg p-3">
-            <p className="text-sm text-green-800">
-              <strong>AI Suggestions:</strong> Great choice! This concept offers rich storytelling possibilities.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -88,13 +76,13 @@ const MockGuidedFirstTimeExperience = () => {
       <div className="space-y-4">
         <div>
           <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
-            World Name
+            World Name (optional)
           </label>
           <input
             id="world-name"
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your world's name"
+            placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
             value={formData.name}
             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           />
@@ -144,7 +132,7 @@ const MockGuidedFirstTimeExperience = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-auto">
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Get Started with Narraitor</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">Get Started</h1>
         
         <div className="space-y-8">
           {/* Progress indicator */}
@@ -167,9 +155,6 @@ const MockGuidedFirstTimeExperience = () => {
             </div>
           </div>
           
-          <div className="text-center text-sm text-gray-500 mb-6">
-            Step {currentStep + 1} of {steps.length}
-          </div>
           
           {renderCurrentStep()}
           
@@ -254,10 +239,9 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
       const renderWelcomeStep = () => (
         <div className="text-center space-y-6">
           <div className="max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Narraitor</h2>
-            <p className="text-lg text-gray-600 mb-6">Create your own world and start your adventure within 2 minutes</p>
+            <p className="text-lg text-gray-600 mb-6">Create a world and start a story</p>
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">We'll guide you through creating your first world in just 3 simple steps. Each step takes less than 30 seconds to complete.</p>
+              <p className="text-sm text-blue-800">Let&apos;s guide you through creating your first world in just 3 steps.</p>
             </div>
           </div>
         </div>
@@ -267,7 +251,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
         <div className="max-w-md mx-auto space-y-6">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">World Concept</h2>
-            <p className="text-gray-600">What kind of world do you want to explore?</p>
+            <p className="text-gray-600">Create an RPG in any fictional universe or original setting</p>
           </div>
           <div className="space-y-4">
             <div>
@@ -277,16 +261,11 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
                 name="world-concept"
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="E.g., A magical forest realm, Cyberpunk city, Medieval kingdom..."
+                placeholder="E.g., The world of Harry Potter, Star Wars galaxy, Middle-earth from LOTR, The Office workplace, or your own original fantasy realm..."
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               />
             </div>
-            {formData.description && (
-              <div className="bg-green-50 rounded-lg p-3">
-                <p className="text-sm text-green-800"><strong>AI Suggestions:</strong> Great choice! This concept offers rich storytelling possibilities.</p>
-              </div>
-            )}
           </div>
         </div>
       );
@@ -299,12 +278,12 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
           </div>
           <div className="space-y-4">
             <div>
-              <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">World Name</label>
+              <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">World Name (optional)</label>
               <input
                 id="world-name"
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your world's name"
+                placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               />
@@ -351,7 +330,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
       return (
         <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-auto">
           <div className="p-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Get Started with Narraitor</h1>
+            <h1 className="text-3xl font-bold text-center mb-8">Get Started</h1>
             <div className="space-y-8">
               <div className="flex justify-center">
                 <div className="flex space-x-4">
@@ -371,7 +350,6 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
                   ))}
                 </div>
               </div>
-              <div className="text-center text-sm text-gray-500 mb-6">Step {currentStep + 1} of {steps.length}</div>
               {renderCurrentStep()}
               <div className="flex justify-between items-center pt-6">
                 <button onClick={() => alert('Skip functionality')} className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors">Skip</button>
@@ -400,7 +378,7 @@ export const WelcomeStep: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Step 1: Welcome screen with value proposition and clear call-to-action. Shows the 2-minute promise and 3-step overview.',
+        story: 'Step 1: Welcome screen with value proposition and clear call-to-action. Shows 3-step overview for creating your world.',
       },
     },
   },
@@ -411,22 +389,12 @@ export const ConceptStep: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Step 2: World concept definition. Users describe their world idea and receive AI-powered suggestions.',
+        story: 'Step 2: World concept definition. Users describe their world idea with fictional universe examples.',
       },
     },
   },
 };
 
-export const ConceptStepWithContent: Story = {
-  render: createStoryWithStep(1, { description: 'A magical forest realm inhabited by ancient spirits and mystical creatures' }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Step 2 with example content showing AI suggestions triggered by user input.',
-      },
-    },
-  },
-};
 
 export const DetailsStep: Story = {
   render: createStoryWithStep(2),
@@ -439,22 +407,12 @@ export const DetailsStep: Story = {
   },
 };
 
-export const DetailsStepCompleted: Story = {
-  render: createStoryWithStep(2, { name: 'Elderwood Sanctuary', theme: 'fantasy', description: 'A magical forest realm' }),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Step 3 with all fields completed, showing the enabled "Try it now" button ready for submission.',
-      },
-    },
-  },
-};
 
 export const MobileExperience: Story = {
   render: createStoryWithStep(0),
   parameters: {
     viewport: {
-      defaultViewport: 'iphone6',
+      defaultViewport: 'mobile1',
     },
     docs: {
       description: {

@@ -10,10 +10,10 @@ export default function TestWorldGeneration() {
   const [error, setError] = useState<string | null>(null);
 
   const testCases = [
-    { reference: 'The Office', relationship: 'set_in' as const, expectedTheme: 'Modern' },
+    { reference: 'The Office', relationship: 'set_in' as const, expectedTheme: 'modern' },
     { reference: 'Star Wars', relationship: 'set_in' as const, expectedTheme: 'Sci-Fi' },
     { reference: 'Lord of the Rings', relationship: 'set_in' as const, expectedTheme: 'Fantasy' },
-    { reference: 'Breaking Bad', relationship: 'set_in' as const, expectedTheme: 'Modern' },
+    { reference: 'Breaking Bad', relationship: 'set_in' as const, expectedTheme: 'modern' },
     { reference: 'The Walking Dead', relationship: 'set_in' as const, expectedTheme: 'Post-Apocalyptic' },
   ];
 

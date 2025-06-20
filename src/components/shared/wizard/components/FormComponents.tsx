@@ -1,5 +1,6 @@
 import React from 'react';
 import { wizardStyles } from '../styles/wizardStyles';
+import { errorStyles } from '@/styles/errorStyles';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -25,7 +26,7 @@ export const WizardFormGroup: React.FC<WizardFormGroupProps> = ({
       </Label>
       {children}
       {error && (
-        <p className="text-red-600 text-sm">{error}</p>
+        <p className={errorStyles.message}>{error}</p>
       )}
     </div>
   );
@@ -64,7 +65,7 @@ export const WizardTextField: React.FC<WizardTextFieldProps> = ({
       disabled={disabled}
       autoFocus={autoFocus}
       maxLength={maxLength}
-      className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
+      className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
     />
   );
@@ -102,7 +103,7 @@ export const WizardTextArea: React.FC<WizardTextAreaProps> = ({
       disabled={disabled}
       rows={rows}
       maxLength={maxLength}
-      className={error ? 'border-destructive focus-visible:ring-destructive' : ''}
+      className={error ? errorStyles.input.combined : ''}
       data-testid={testId}
     />
   );
@@ -158,7 +159,7 @@ export const WizardFieldError: React.FC<WizardFieldErrorProps> = ({ error }) => 
   if (!error) return null;
   
   return (
-    <p className="text-red-600 text-sm">{error}</p>
+    <p className={errorStyles.message}>{error}</p>
   );
 };
 

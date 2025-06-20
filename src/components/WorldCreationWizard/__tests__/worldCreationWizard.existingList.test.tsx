@@ -25,7 +25,7 @@ describe.skip('WorldCreationWizard Integration - Existing List', () => {
       const existingWorld: World = {
         id: 'existing-world',
         name: 'Existing World',
-        theme: 'Fantasy',
+        theme: 'fantasy',
         description: 'An existing fantasy world',
         attributes: [],
         skills: [],
@@ -88,7 +88,7 @@ describe.skip('WorldCreationWizard Integration - Existing List', () => {
         target: { value: 'New Test World' },
       });
       await fireEvent.change(await screen.findByTestId('world-theme-input'), {
-        target: { value: 'Fantasy' },
+        target: { value: 'fantasy' },
       });
       await fireEvent.click(await screen.findByRole('button', { name: 'Next' }));
     });

@@ -19,7 +19,7 @@ const baseWorld: World = {
   id: 'world-1',
   name: 'Middle Earth',
   description: 'A fantasy world of magic and adventure',
-  theme: 'Fantasy',
+  theme: 'fantasy',
   attributes: [],
   skills: [],
   settings: {

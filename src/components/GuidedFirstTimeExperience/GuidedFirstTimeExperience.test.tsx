@@ -255,9 +255,9 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       const themeSelect = screen.getByLabelText(/theme/i);
-      expect(themeSelect).toHaveTextContent('Fantasy');
+      expect(themeSelect).toHaveTextContent('fantasy');
       expect(themeSelect).toHaveTextContent('Sci-Fi');
-      expect(themeSelect).toHaveTextContent('Modern');
+      expect(themeSelect).toHaveTextContent('modern');
       expect(themeSelect).toHaveTextContent('Historical');
       expect(themeSelect).toHaveTextContent('Post-Apocalyptic');
       expect(themeSelect).toHaveTextContent('Cyberpunk');

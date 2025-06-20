@@ -6,6 +6,7 @@ import { World } from '../../types/world.types';
 import { useWorldStore } from '../../state/worldStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useCharacterStore } from '../../state/characterStore';
+import { getThemeLabel } from '@/lib/constants/themes';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
@@ -189,7 +190,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   data-testid="world-card-theme" 
                   className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
                 >
-                  {world.theme.charAt(0).toUpperCase() + world.theme.slice(1)}
+                  {getThemeLabel(world.theme)}
                 </span>
               )}
               

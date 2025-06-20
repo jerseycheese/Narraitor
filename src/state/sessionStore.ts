@@ -372,7 +372,7 @@ export const useSessionStore = create<SessionStore>()(
   
   shouldShowOnboarding: () => {
     const state = get();
-    return state.isFirstTimeUser();
+    return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
   },
 }),
 {

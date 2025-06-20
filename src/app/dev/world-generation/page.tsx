@@ -74,7 +74,7 @@ export default function WorldGenerationTestPage() {
     'Victorian England',
     'Wild West',
     'Post-Apocalyptic Wasteland',
-    'Space Opera',
+    'space-opera',
     'Steampunk',
     'Modern Spy Thriller',
     'Medieval Fantasy',

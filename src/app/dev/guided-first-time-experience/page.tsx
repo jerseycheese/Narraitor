@@ -6,7 +6,7 @@ import { useSessionStore } from '@/state/sessionStore';
 
 export default function GuidedFirstTimeExperienceTestHarness() {
   const [resetKey, setResetKey] = useState(0);
-  const { setOnboardingCompleted, onboardingCompleted } = useSessionStore();
+  const { setOnboardingCompleted, onboardingCompleted, shouldShowOnboarding, isFirstTimeUser } = useSessionStore();
 
   const handleReset = () => {
     setOnboardingCompleted(false);
@@ -16,6 +16,34 @@ export default function GuidedFirstTimeExperienceTestHarness() {
   const handleMarkCompleted = () => {
     setOnboardingCompleted(true);
     setResetKey(prev => prev + 1);
+  };
+
+  const handleClearStorage = async () => {
+    // Clear IndexedDB storage completely
+    if (typeof window !== 'undefined') {
+      try {
+        const databases = await indexedDB.databases();
+        await Promise.all(
+          databases.map(db => {
+            if (db.name) {
+              const deleteReq = indexedDB.deleteDatabase(db.name);
+              return new Promise((resolve, reject) => {
+                deleteReq.onsuccess = () => resolve(undefined);
+                deleteReq.onerror = () => reject(deleteReq.error);
+              });
+            }
+          })
+        );
+        
+        // Also clear localStorage
+        localStorage.clear();
+        
+        // Force page reload to reinitialize stores
+        window.location.reload();
+      } catch (error) {
+        console.error('Error clearing storage:', error);
+      }
+    }
   };
 
   return (
@@ -40,6 +68,12 @@ export default function GuidedFirstTimeExperienceTestHarness() {
               </span>
             </div>
             
+            {/* Debug info */}
+            <div className="text-xs text-gray-500">
+              shouldShow: {shouldShowOnboarding?.().toString() || 'undefined'} | 
+              isFirstTime: {isFirstTimeUser?.().toString() || 'undefined'}
+            </div>
+            
             <button
               onClick={handleReset}
               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
@@ -52,6 +86,13 @@ export default function GuidedFirstTimeExperienceTestHarness() {
               className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors"
             >
               Mark Completed (Hide Onboarding)
+            </button>
+            
+            <button
+              onClick={handleClearStorage}
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
+            >
+              Clear All Storage & Reload
             </button>
           </div>
           

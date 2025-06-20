@@ -2,13 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import { World } from '@/types/world.types';
+import { THEMES } from '@/lib/constants/themes';
 
 describe('WorldBasicInfoForm - MVP Level Tests', () => {
   const mockWorld: World = {
     id: 'world-123',
     name: 'Test World',
     description: 'A test world description',
-    theme: 'Fantasy',
+    theme: 'fantasy',
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
@@ -40,8 +41,8 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     expect(descriptionInput).toHaveValue(mockWorld.description);
 
     // Check if theme field is displayed with current value
-    const themeInput = screen.getByLabelText(/theme/i);
-    expect(themeInput).toHaveValue(mockWorld.theme);
+    const themeSelect = screen.getByLabelText(/theme/i);
+    expect(themeSelect).toHaveValue(mockWorld.theme);
   });
 
   // Test updating the world name
@@ -72,11 +73,23 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
   test('calls onChange when theme is updated', () => {
     render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
 
-    const themeInput = screen.getByLabelText(/theme/i);
-    fireEvent.change(themeInput, { target: { value: 'Science Fiction' } });
+    const themeSelect = screen.getByLabelText(/theme/i);
+    fireEvent.change(themeSelect, { target: { value: 'sci-fi' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      theme: 'Science Fiction',
+      theme: 'sci-fi',
+    });
+  });
+
+  // Test that all theme options are available
+  test('displays all available theme options', () => {
+    render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
+
+    const themeSelect = screen.getByLabelText(/theme/i);
+    
+    // Check that all themes from the constant are available as options
+    THEMES.forEach(theme => {
+      expect(screen.getByRole('option', { name: theme.label })).toBeInTheDocument();
     });
   });
 

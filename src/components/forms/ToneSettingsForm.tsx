@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ErrorBlock } from '@/components/shared';
 import {
   ToneSettings,
   ContentRating,
@@ -124,14 +125,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
 
         {/* Validation Errors */}
         {!validationResult.valid && (
-          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-            <p className="text-sm text-destructive font-medium mb-1">Please fix the following issues:</p>
-            <ul className="text-sm text-destructive space-y-1">
-              {validationResult.errors.map((error, index) => (
-                <li key={index}>• {error}</li>
-              ))}
-            </ul>
-          </div>
+          <ErrorBlock errors={validationResult.errors} />
         )}
 
         {showSaveButton && onSave && (

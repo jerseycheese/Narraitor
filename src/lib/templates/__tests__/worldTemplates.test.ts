@@ -90,6 +90,6 @@ describe('World Templates', () => {
     
     const fantasy = templates.find(t => t.id === 'fantasy');
     expect(fantasy).toBeDefined();
-    expect(fantasy?.name).toBe('Fantasy');
+    expect(fantasy?.name).toBe('fantasy');
   });
 });

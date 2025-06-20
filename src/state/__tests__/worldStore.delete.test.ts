@@ -14,7 +14,7 @@ describe('useWorldStore - deleteWorld integration', () => {
     const worldData = {
       name: 'Test World',
       description: 'A world to test deletion',
-      theme: 'Fantasy',
+      theme: 'fantasy',
       attributes: [],
       skills: [],
       settings: {
@@ -55,7 +55,7 @@ describe('useWorldStore - deleteWorld integration', () => {
     const worldData = {
       name: 'Test World',
       description: 'A world to test deletion',
-      theme: 'Fantasy',
+      theme: 'fantasy',
       attributes: [],
       skills: [],
       settings: {
@@ -82,7 +82,7 @@ describe('useWorldStore - deleteWorld integration', () => {
     // Create two worlds
     const worldData1 = {
       name: 'World 1',
-      theme: 'Fantasy',
+      theme: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

@@ -84,7 +84,7 @@ describe.skip('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // Fill in basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Test World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     
     // Fill in description and proceed - this should trigger AI analysis  
@@ -110,7 +110,7 @@ describe.skip('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // Fill in basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Test World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     
     // Wait for description step
@@ -150,7 +150,7 @@ describe.skip('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // Fill in basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Test World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     
     // Wait for description step
@@ -196,7 +196,7 @@ describe.skip('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // Fill in basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'Test World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     
     // Wait for description step
@@ -225,7 +225,7 @@ describe.skip('WorldCreationWizard - AI Suggestions Integration', () => {
     
     // Fill in basic info
     fireEvent.change(screen.getByTestId('world-name-input'), { target: { value: 'AI World' } });
-    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'Fantasy' } });
+    fireEvent.change(screen.getByTestId('world-theme-input'), { target: { value: 'fantasy' } });
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     
     // Wait for description step

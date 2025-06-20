@@ -26,7 +26,7 @@ const meta = {
       const testWorldId = 'test-world-id';
       useWorldStore.getState().createWorld({
         name: 'Test World',
-        theme: 'Fantasy',
+        theme: 'fantasy',
         description: 'A fantasy world for testing',
         attributes: [
           {

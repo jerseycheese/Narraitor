@@ -8,6 +8,11 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
+import { THEMES } from '@/lib/constants/themes';
+import { generateUniqueId } from '@/lib/utils/generateId';
+import { WorldAttribute, WorldSkill } from '@/types/world.types';
+import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
+import { WorldAnalysisResult } from '@/lib/ai/worldAnalyzer';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -21,6 +26,40 @@ interface OnboardingData {
   description: string;
 }
 
+// Helper function to convert AI suggestions to world entities
+function convertSuggestionsToWorldEntities(worldId: string, suggestions: WorldAnalysisResult): { attributes: WorldAttribute[], skills: WorldSkill[] } {
+  // Create world attributes from suggestions
+  const attributes: WorldAttribute[] = suggestions.attributes.map(attr => ({
+    id: generateUniqueId('attribute'),
+    name: attr.name,
+    description: attr.description,
+    worldId,
+    baseValue: attr.baseValue,
+    minValue: attr.minValue,
+    maxValue: attr.maxValue
+  }));
+
+  // Helper to find attribute ID by name
+  const findAttributeId = (name: string) => attributes.find(a => a.name === name)?.id;
+
+  // Create world skills from suggestions
+  const skills: WorldSkill[] = suggestions.skills.map(skill => ({
+    id: generateUniqueId('skill'),
+    name: skill.name,
+    description: skill.description,
+    worldId,
+    difficulty: skill.difficulty,
+    category: skill.category,
+    // Convert linkedAttributeNames to attributeIds
+    attributeIds: skill.linkedAttributeNames?.map((attrName: string) => findAttributeId(attrName)).filter(Boolean) || [],
+    baseValue: skill.baseValue,
+    minValue: skill.minValue,
+    maxValue: skill.maxValue
+  }));
+
+  return { attributes, skills };
+}
+
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
   const { setOnboardingCompleted, shouldShowOnboarding } = useSessionStore();
@@ -29,7 +68,7 @@ export function GuidedFirstTimeExperience() {
   // Validation function for wizard steps
   const validateStep = useCallback((step: number, data: OnboardingData) => {
     switch (step) {
-      case 0: // Welcome step
+      case 0: // Welcome step - always valid
         return { valid: true, errors: [], touched: true };
       case 1: // Concept step
         const conceptError = validateField(data.description, [
@@ -41,13 +80,10 @@ export function GuidedFirstTimeExperience() {
           touched: true,
         };
       case 2: // Details step
-        const nameError = validateField(data.name, [
-          (value) => validators.required(value, 'World name'),
-        ]);
         const themeError = validateField(data.theme, [
           (value) => validators.required(value, 'Theme'),
         ]);
-        const errors = [nameError, themeError].filter(Boolean) as string[];
+        const errors = [themeError].filter(Boolean) as string[];
         return {
           valid: errors.length === 0,
           errors,
@@ -61,20 +97,51 @@ export function GuidedFirstTimeExperience() {
   // Complete onboarding and create world
   const handleComplete = useCallback(async (data: OnboardingData) => {
     try {
-      // Create the world with smart defaults
+      // Generate a world name if none provided
+      let worldName = data.name;
+      if (!worldName?.trim()) {
+        // Use a simple fallback name generation based on theme
+        const themeNames = {
+          fantasy: ['Mystical Realm', 'Enchanted Lands', 'Arcane Kingdom'],
+          'sci-fi': ['Stellar Colony', 'Cosmic Frontier', 'Galactic Outpost'],
+          modern: ['Metropolitan Hub', 'Urban Center', 'City State'],
+          historical: ['Ancient Dominion', 'Classical Empire', 'Heritage Lands'],
+          horror: ['Dark Sanctuary', 'Shadow Realm', 'Haunted Territory'],
+          mystery: ['Enigma District', 'Puzzle Grounds', 'Secret Haven'],
+          western: ['Frontier Town', 'Desert Settlement', 'Wild Territory'],
+          cyberpunk: ['Neon City', 'Cyber District', 'Digital Metropolis'],
+          other: ['New World', 'Uncharted Territory', 'Unknown Realm']
+        };
+        const themeKey = data.theme as keyof typeof themeNames || 'other';
+        const nameOptions = themeNames[themeKey] || themeNames.other;
+        worldName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
+      }
+
+      // First create the world to get the worldId
       const worldId = createWorld({
-        name: data.name || 'My First World',
+        name: worldName,
         description: data.description || 'A world of endless possibilities',
         theme: data.theme || 'fantasy',
-        attributes: [], // Smart defaults will be applied
-        skills: [], // Smart defaults will be applied
+        attributes: [], // Will be populated with AI suggestions or defaults below
+        skills: [], // Will be populated with AI suggestions or defaults below
         settings: {
           maxAttributes: 6,
-          maxSkills: 8,
+          maxSkills: 12, // Increased to match our 12 default skills
           attributePointPool: 27,
           skillPointPool: 40,
         },
       });
+
+      // Use the existing AI analyzer which will generate smart suggestions based on the 
+      // world description or fall back to comprehensive defaults if AI is unavailable
+      const suggestions = await analyzeWorldDescriptionClient(data.description || 'A world of endless possibilities');
+      
+      // Convert AI suggestions to world entities
+      const { attributes, skills } = convertSuggestionsToWorldEntities(worldId, suggestions);
+      
+      // Update the world with the generated attributes and skills
+      const { updateWorld } = useWorldStore.getState();
+      updateWorld(worldId, { attributes, skills });
 
       // Set as current world
       setCurrentWorld(worldId);
@@ -110,16 +177,12 @@ export function GuidedFirstTimeExperience() {
   const renderWelcomeStep = useMemo(() => (
     <div className="text-center space-y-6" data-testid="guided-experience-container">
       <div className="max-w-md mx-auto">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Welcome to Narraitor
-        </h2>
         <p className="text-lg text-gray-600 mb-6">
-          Create your own world and start your adventure within 2 minutes
+          Create a world and start a story
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            We&apos;ll guide you through creating your first world in just 3 simple steps. 
-            Each step takes less than 30 seconds to complete.
+            Let&apos;s guide you through creating your first world in just 3 steps.
           </p>
         </div>
       </div>
@@ -133,7 +196,7 @@ export function GuidedFirstTimeExperience() {
           World Concept
         </h2>
         <p className="text-gray-600">
-          What kind of world do you want to explore?
+          Create an RPG in any fictional universe or original setting
         </p>
       </div>
       
@@ -147,7 +210,7 @@ export function GuidedFirstTimeExperience() {
             name="world-concept"
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., A magical forest realm, Cyberpunk city, Medieval kingdom..."
+            placeholder="E.g., The world of Harry Potter, Star Wars galaxy, Middle-earth from LOTR, The Office workplace, or your own original fantasy realm..."
             value={wizard.state.data.description}
             onChange={(e) => wizard.handlers.updateData({ description: e.target.value })}
           />
@@ -156,13 +219,6 @@ export function GuidedFirstTimeExperience() {
           )}
         </div>
         
-        {wizard.state.data.description && (
-          <div className="bg-green-50 rounded-lg p-3">
-            <p className="text-sm text-green-800">
-              <strong>AI Suggestions:</strong> Great choice! This concept offers rich storytelling possibilities.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   ), [wizard.state.data.description, wizard.stepValidation, wizard.handlers]);
@@ -181,13 +237,13 @@ export function GuidedFirstTimeExperience() {
       <div className="space-y-4">
         <div>
           <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
-            World Name
+            World Name (optional)
           </label>
           <input
             id="world-name"
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your world's name"
+            placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
             value={wizard.state.data.name}
             onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
           />
@@ -204,12 +260,11 @@ export function GuidedFirstTimeExperience() {
             onChange={(e) => wizard.handlers.updateData({ theme: e.target.value })}
           >
             <option value="">Select a theme</option>
-            <option value="fantasy">Fantasy</option>
-            <option value="sci-fi">Sci-Fi</option>
-            <option value="modern">Modern</option>
-            <option value="historical">Historical</option>
-            <option value="post-apocalyptic">Post-Apocalyptic</option>
-            <option value="cyberpunk">Cyberpunk</option>
+            {THEMES.map((theme) => (
+              <option key={theme.value} value={theme.value}>
+                {theme.label}
+              </option>
+            ))}
           </select>
         </div>
         
@@ -244,7 +299,7 @@ export function GuidedFirstTimeExperience() {
   }
 
   return (
-    <WizardContainer title="Get Started with Narraitor">
+    <WizardContainer title="Get Started">
       <div className="space-y-8">
         <WizardProgress 
           steps={GUIDED_STEPS} 

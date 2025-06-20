@@ -15,7 +15,7 @@ export const WizardContainer: React.FC<WizardContainerProps> = ({
   return (
     <div className={`${wizardStyles.container} ${className}`}>
       <div className={wizardStyles.header}>
-        <h1 className={wizardStyles.title}>{title}</h1>
+        <h1 className={`${wizardStyles.title} text-center`}>{title}</h1>
       </div>
       {children}
     </div>
