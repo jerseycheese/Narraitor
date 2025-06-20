@@ -52,11 +52,20 @@ export async function POST(request: NextRequest) {
       genres: body.genres
     };
 
-    // Generate the template using the secure server-side client
+    // Generate the template using the secure server-side client with timeout
     const templateGenerator = new TemplateGenerator(geminiClient);
-    const template = await templateGenerator.generateWorldTemplate(context);
     
-    logger.debug('generate-template API', 'Template generated:', template.name);
+    // Add timeout wrapper to prevent hanging requests
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Template generation timeout')), 45000)
+    );
+    
+    const template = await Promise.race([
+      templateGenerator.generateWorldTemplate(context),
+      timeoutPromise
+    ]);
+    
+    logger.debug('generate-template API', 'Template generated:', (template as any).name);
 
     return NextResponse.json(template);
 
