@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { GuidedFirstTimeExperience } from './GuidedFirstTimeExperience';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -25,7 +25,7 @@ jest.mock('@/components/shared/wizard/WizardContainer', () => ({
 }));
 
 jest.mock('@/components/shared/wizard/WizardProgress', () => ({
-  WizardProgress: ({ steps, currentStep }: { steps: any[]; currentStep: number }) => (
+  WizardProgress: ({ steps, currentStep }: { steps: unknown[]; currentStep: number }) => (
     <div data-testid="wizard-progress">
       Step {currentStep + 1} of {steps.length}
     </div>
