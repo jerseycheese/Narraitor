@@ -1,0 +1,188 @@
+
+> narraitor@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.203:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1097ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1564ms (1175 modules)
+(node:38577) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 1831ms
+ ✓ Compiled in 362ms (452 modules)
+ ✓ Compiled /dev/guided-first-time-experience in 253ms (1174 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/guided-first-time-experience 200 in 403ms
+ ✓ Compiled /_not-found in 270ms (1178 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /.well-known/appspecific/com.chrome.devtools.json. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 337ms
+ ✓ Compiled /favicon.ico in 116ms (749 modules)
+ GET /favicon.ico 200 in 180ms
+ GET /favicon.ico 200 in 3ms
+ ✓ Compiled /characters/create in 371ms (1309 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 441ms
+ ✓ Compiled in 311ms (1314 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 64ms
+ ✓ Compiled in 248ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 95ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/guided-first-time-experience 200 in 109ms
+ ✓ Compiled /_not-found in 115ms (1286 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /.well-known/appspecific/com.chrome.devtools.json. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 214ms
+ ✓ Compiled /favicon.ico in 79ms (801 modules)
+ GET /favicon.ico 200 in 141ms
+ GET /favicon.ico 200 in 3ms
+ ✓ Compiled /api/ai/analyze-world in 371ms (1427 modules)
+[11:12:17.320] DEBUG [API] analyze-world API Request received
+[11:12:17.320] DEBUG [API] analyze-world API Request body parsed
+[11:12:17.320] DEBUG [API] analyze-world API Analyzing world description...
+analyzeWorldDescription called with: A planet of ghoul politicians...
+Using AI config: { modelName: 'gemini-2.0-flash', timeout: 30000, hasApiKey: true }
+Calling AI service directly...
+Making AI request...
+🔥 GEMINI API: Making request with prompt length: 1389
+🔥 GEMINI API: Response received, content length: 3931
+Response received, length: 3931
+Response content preview: ```json
+{
+  "attributes": [
+    {
+      "name": "Cunning",
+      "description": "Mental acuity, guile, and ability to deceive.",
+      "minValue": 1,
+      "maxValue": 10,
+      "category": "Mental"
+ ...
+Initial parse failed, attempting to extract JSON from markdown...
+Successfully parsed from code block
+[11:12:23.781] DEBUG [API] analyze-world API Analysis completed successfully
+ POST /api/ai/analyze-world 200 in 6931ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 78ms
+ ✓ Compiled in 387ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 181ms
+ ✓ Compiled in 187ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 55ms
+ ✓ Compiled in 174ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
+ ✓ Compiled in 357ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 70ms
+ ✓ Compiled in 185ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
+ ✓ Compiled in 207ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 46ms
+ ✓ Compiled in 179ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 58ms
+ ✓ Compiled in 236ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
+ ✓ Compiled in 378ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 78ms
+ ✓ Compiled in 193ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 45ms
+ ✓ Compiled in 530ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 51ms
+ ✓ Compiled in 183ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 53ms
+ ✓ Compiled in 206ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
+ ✓ Compiled in 215ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 63ms
+ ✓ Compiled in 241ms (1296 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 51ms
+ ✓ Compiled in 262ms (512 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 41ms
+ ✓ Compiled in 457ms (512 modules)
+ ✓ Compiled in 124ms (512 modules)
+ ✓ Compiled in 226ms (512 modules)
+ ✓ Compiled in 114ms (512 modules)
+ ✓ Compiled in 463ms (1300 modules)
+ ✓ Compiled in 181ms (514 modules)
+ ✓ Compiled in 190ms (1302 modules)
+ ✓ Compiled in 194ms (1302 modules)
+ ✓ Compiled in 138ms (515 modules)
+ ✓ Compiled in 127ms (515 modules)
+ ✓ Compiled in 188ms (515 modules)
+ ✓ Compiled in 119ms (515 modules)
+ ✓ Compiled in 114ms (515 modules)
+ ✓ Compiled in 129ms (515 modules)
+ ✓ Compiled in 126ms (515 modules)
+ ✓ Compiled in 144ms (515 modules)
+ ✓ Compiled in 308ms (1302 modules)
+ ✓ Compiled in 177ms (1302 modules)
+ ✓ Compiled in 203ms (1302 modules)
+ ✓ Compiled in 204ms (1302 modules)
+ ✓ Compiled in 231ms (1302 modules)
+ ✓ Compiled in 142ms (515 modules)
+ ✓ Compiled in 124ms (515 modules)
+ ✓ Compiled in 331ms (1302 modules)
+ ✓ Compiled in 176ms (1302 modules)
+ ✓ Compiled in 193ms (1302 modules)
+ ✓ Compiled in 194ms (1302 modules)
+ ✓ Compiled in 494ms (1302 modules)
+ ✓ Compiled in 315ms (1302 modules)
+ ✓ Compiled in 163ms (515 modules)
+ ✓ Compiled in 261ms (1302 modules)
+ ✓ Compiled in 187ms (1304 modules)
+ ✓ Compiled in 187ms (1304 modules)
+ ✓ Compiled in 228ms (1304 modules)
+ ✓ Compiled in 172ms (1304 modules)
+ ✓ Compiled in 194ms (1304 modules)
+ ✓ Compiled in 216ms (1304 modules)
+ ✓ Compiled in 257ms (1304 modules)
+ ✓ Compiled in 228ms (1304 modules)
+ ✓ Compiled in 228ms (1304 modules)
+ ✓ Compiled in 184ms (1304 modules)
+ ✓ Compiled in 212ms (1304 modules)
+ ✓ Compiled in 204ms (1304 modules)
+ ✓ Compiled in 259ms (1304 modules)

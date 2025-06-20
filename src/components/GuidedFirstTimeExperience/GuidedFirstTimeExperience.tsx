@@ -13,6 +13,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { WorldAnalysisResult } from '@/lib/ai/worldAnalyzer';
+import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -243,7 +244,7 @@ export function GuidedFirstTimeExperience() {
             id="world-name"
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., Neo-Tokyo..."
+            placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
             value={wizard.state.data.name}
             onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
           />
