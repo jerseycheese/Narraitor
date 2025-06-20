@@ -110,7 +110,7 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       expect(screen.getByTestId('wizard-container')).toBeInTheDocument();
-      expect(screen.getByText('Get Started with Narraitor')).toBeInTheDocument();
+      expect(screen.getByText('Get Started')).toBeInTheDocument();
     });
 
     it('does not render when onboarding should not be shown', () => {
@@ -135,10 +135,9 @@ describe('GuidedFirstTimeExperience', () => {
     it('displays welcome message and value proposition', () => {
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByText(/welcome to narraitor/i)).toBeInTheDocument();
-      expect(screen.getByText(/create your own world/i)).toBeInTheDocument();
-      expect(screen.getByText(/within 2 minutes/i)).toBeInTheDocument();
-      expect(screen.getByText(/3 simple steps/i)).toBeInTheDocument();
+      expect(screen.getByText(/create a world and start a story/i)).toBeInTheDocument();
+      expect(screen.getByText(/guide you through creating your first world/i)).toBeInTheDocument();
+      expect(screen.getByText(/3 steps/i)).toBeInTheDocument();
     });
 
     it('shows skip and next buttons', () => {
@@ -177,7 +176,7 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       expect(screen.getAllByText(/world concept/i)).toHaveLength(2); // Title and label
-      expect(screen.getByText(/what kind of world/i)).toBeInTheDocument();
+      expect(screen.getByText(/create an rpg in any fictional universe/i)).toBeInTheDocument();
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
@@ -197,7 +196,7 @@ describe('GuidedFirstTimeExperience', () => {
       expect(mockUpdateData).toHaveBeenCalledWith({ description: 'A magical forest realm' });
     });
 
-    it('displays AI suggestions when description is provided', () => {
+    it('displays world concept step with description input', () => {
       (useWizardState as jest.Mock).mockReturnValue({
         ...mockWizard,
         currentStep: 1,
@@ -209,8 +208,8 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByText(/ai suggestions/i)).toBeInTheDocument();
-      expect(screen.getByText(/great choice/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/world concept/i)).toBeInTheDocument();
+      expect(screen.getByDisplayValue('A magical forest')).toBeInTheDocument();
     });
   });
 
@@ -255,12 +254,15 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       const themeSelect = screen.getByLabelText(/theme/i);
-      expect(themeSelect).toHaveTextContent('fantasy');
+      expect(themeSelect).toHaveTextContent('Fantasy');
       expect(themeSelect).toHaveTextContent('Sci-Fi');
-      expect(themeSelect).toHaveTextContent('modern');
+      expect(themeSelect).toHaveTextContent('Modern');
       expect(themeSelect).toHaveTextContent('Historical');
-      expect(themeSelect).toHaveTextContent('Post-Apocalyptic');
+      expect(themeSelect).toHaveTextContent('Horror');
+      expect(themeSelect).toHaveTextContent('Mystery');
+      expect(themeSelect).toHaveTextContent('Western');
       expect(themeSelect).toHaveTextContent('Cyberpunk');
+      expect(themeSelect).toHaveTextContent('Other');
     });
 
     it('displays validation errors when present', () => {
