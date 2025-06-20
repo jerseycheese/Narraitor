@@ -5314,3 +5314,35 @@ Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  GET /_next/static/css/app/layout.css?v=1750444405646 404 in 49ms
+ ✓ Compiled in 529ms (905 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /characters 200 in 31ms
+ ✓ Compiled /_not-found in 333ms (1754 modules)
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor-worktrees/issue-559-guided-exp/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:3014)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:3067) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ✓ Compiled /_error in 142ms (1797 modules)
+ GET /_next/static/css/app/layout.css?v=1750445034503 500 in 538ms

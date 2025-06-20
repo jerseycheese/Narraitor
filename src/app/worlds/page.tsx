@@ -217,7 +217,7 @@ export default function WorldsPage() {
                     disabled={isGenerating}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Give your world a custom name, or leave empty for an AI-generated name
+                    Give your world a custom name, or leave empty for a generated name
                   </p>
                 </div>
                 <div>
