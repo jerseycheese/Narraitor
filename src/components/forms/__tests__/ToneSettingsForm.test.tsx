@@ -158,9 +158,8 @@ describe('ToneSettingsForm', () => {
       />
     );
 
-    expect(screen.getByText('Please fix the following issues:')).toBeInTheDocument();
-    expect(screen.getByText('• Content Rating is required')).toBeInTheDocument();
-    expect(screen.getByText('• Narrative Style must be valid')).toBeInTheDocument();
+    expect(screen.getByText('Content Rating is required')).toBeInTheDocument();
+    expect(screen.getByText('Narrative Style must be valid')).toBeInTheDocument();
   });
 
   test('disables save button when validation fails', async () => {

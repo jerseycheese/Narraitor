@@ -74,8 +74,8 @@ describe('worldGenerator', () => {
       expect(promptArg).toContain('NEVER default to Fantasy');
       
       // Verify the result has Modern theme, not Fantasy
-      expect(result.theme).toBe('modern');
-      expect(result.theme).not.toBe('fantasy');
+      expect(result.theme).toBe('Modern');
+      expect(result.theme).not.toBe('Fantasy');
     });
 
     it('should use Sci-Fi theme for Star Wars setting', async () => {
@@ -120,7 +120,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "The Prancing Pony",
-          theme: "fantasy",
+          theme: "Fantasy",
           description: "A famous inn in Bree where travelers from all corners of Middle-earth gather.",
           attributes: [
             {
@@ -151,7 +151,7 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      expect(result.theme).toBe('fantasy');
+      expect(result.theme).toBe('Fantasy');
     });
   });
 

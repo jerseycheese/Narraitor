@@ -183,7 +183,7 @@ export function GuidedFirstTimeExperience() {
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            Let&apos;s guide you through creating your first world in just 3 steps.
+            Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
       </div>
@@ -252,7 +252,7 @@ export function GuidedFirstTimeExperience() {
         
         <div>
           <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">
-            Theme
+            Theme <span className="text-red-500">*</span>
           </label>
           <select
             id="world-theme"
@@ -300,7 +300,12 @@ export function GuidedFirstTimeExperience() {
   }
 
   return (
-    <WizardContainer title="Get Started">
+    <WizardContainer title={
+      <div className="text-center">
+        <div>First time?</div>
+        <div className="text-sm font-normal text-gray-600">Quick start:</div>
+      </div>
+    }>
       <div className="space-y-8">
         <WizardProgress 
           steps={GUIDED_STEPS} 
@@ -337,7 +342,7 @@ export function GuidedFirstTimeExperience() {
                 disabled={!wizard.stepValidation?.valid || wizard.state.isProcessing}
                 className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
-                {wizard.state.isProcessing ? 'Creating World...' : 'Try it now'}
+                {wizard.state.isProcessing ? 'Creating world...' : 'Create world'}
               </button>
             ) : (
               <button

@@ -110,7 +110,8 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       expect(screen.getByTestId('wizard-container')).toBeInTheDocument();
-      expect(screen.getByText('Get Started')).toBeInTheDocument();
+      expect(screen.getByText('First time?')).toBeInTheDocument();
+      expect(screen.getByText('Quick start:')).toBeInTheDocument();
     });
 
     it('does not render when onboarding should not be shown', () => {
@@ -137,7 +138,7 @@ describe('GuidedFirstTimeExperience', () => {
       
       expect(screen.getByText(/create a world and start a story/i)).toBeInTheDocument();
       expect(screen.getByText(/guide you through creating your first world/i)).toBeInTheDocument();
-      expect(screen.getByText(/3 steps/i)).toBeInTheDocument();
+      expect(screen.getByText(/2 steps, then create your character/i)).toBeInTheDocument();
     });
 
     it('shows skip and next buttons', () => {
@@ -293,20 +294,20 @@ describe('GuidedFirstTimeExperience', () => {
       });
     });
 
-    it('shows "Try it now" button on final step', () => {
+    it('shows "Create World" button on final step', () => {
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByRole('button', { name: /try it now/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create world/i })).toBeInTheDocument();
     });
 
-    it('calls handleComplete when "Try it now" is clicked', () => {
+    it('calls handleComplete when "Create World" is clicked', () => {
       render(<GuidedFirstTimeExperience />);
       
-      fireEvent.click(screen.getByRole('button', { name: /try it now/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create world/i }));
       expect(mockHandleComplete).toHaveBeenCalled();
     });
 
-    it('disables "Try it now" button when validation fails', () => {
+    it('disables "Create World" button when validation fails', () => {
       (useWizardState as jest.Mock).mockReturnValue({
         ...mockWizard,
         currentStep: 2,
@@ -316,7 +317,7 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      const button = screen.getByRole('button', { name: /try it now/i });
+      const button = screen.getByRole('button', { name: /create world/i });
       expect(button).toBeDisabled();
     });
 
@@ -330,7 +331,7 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByText('Creating World...')).toBeInTheDocument();
+      expect(screen.getByText('Creating world...')).toBeInTheDocument();
     });
   });
 

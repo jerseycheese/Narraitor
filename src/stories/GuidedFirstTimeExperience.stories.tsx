@@ -24,7 +24,7 @@ const MockGuidedFirstTimeExperience = () => {
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            Let&apos;s guide you through creating your first world in just 3 steps.
+            Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
       </div>
@@ -89,7 +89,7 @@ const MockGuidedFirstTimeExperience = () => {
         
         <div>
           <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">
-            Theme
+            Theme <span className="text-red-500">*</span>
           </label>
           <select
             id="world-theme"
@@ -131,7 +131,10 @@ const MockGuidedFirstTimeExperience = () => {
   return (
     <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-auto">
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Get Started</h1>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold">First time?</h1>
+          <div className="text-lg text-gray-600">Quick start:</div>
+        </div>
         
         <div className="space-y-8">
           {/* Progress indicator */}
@@ -189,7 +192,7 @@ const MockGuidedFirstTimeExperience = () => {
                   disabled={!canProceed()}
                   className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
                 >
-                  Try it now
+                  Create world
                 </button>
               )}
             </div>
@@ -207,7 +210,7 @@ const meta: Meta<typeof MockGuidedFirstTimeExperience> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'A guided 3-step onboarding flow that helps first-time users create their first world in under 2 minutes. This is a fully interactive demo showing the complete user experience.',
+        component: 'A guided onboarding flow that helps first-time users create their first world in 2 steps, then proceed to character creation. This is a fully interactive demo showing the complete user experience.',
       },
     },
   },
@@ -240,7 +243,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
           <div className="max-w-md mx-auto">
             <p className="text-lg text-gray-600 mb-6">Create a world and start a story</p>
             <div className="bg-blue-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">Let&apos;s guide you through creating your first world in just 3 steps.</p>
+              <p className="text-sm text-blue-800">Let&apos;s guide you through creating your first world in just 2 steps, then create your character.</p>
             </div>
           </div>
         </div>
@@ -288,7 +291,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
               />
             </div>
             <div>
-              <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+              <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">Theme <span className="text-red-500">*</span></label>
               <select
                 id="world-theme"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -329,7 +332,10 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
       return (
         <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-auto">
           <div className="p-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Get Started</h1>
+            <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold">First time?</h1>
+          <div className="text-lg text-gray-600">Quick start:</div>
+        </div>
             <div className="space-y-8">
               <div className="flex justify-center">
                 <div className="flex space-x-4">
@@ -359,7 +365,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
                   {currentStep < steps.length - 1 ? (
                     <button onClick={() => canProceed() && setCurrentStep(prev => prev + 1)} disabled={!canProceed()} className="min-h-12 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors">Next</button>
                   ) : (
-                    <button onClick={() => alert('World created successfully!')} disabled={!canProceed()} className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors">Try it now</button>
+                    <button onClick={() => alert('World created successfully!')} disabled={!canProceed()} className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors">Create world</button>
                   )}
                 </div>
               </div>
@@ -379,7 +385,7 @@ export const WelcomeStep: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Step 1: Welcome screen with value proposition and clear call-to-action. Shows 3-step overview for creating your world.',
+        story: 'Step 1: Welcome screen with value proposition and clear call-to-action. Shows 2-step world creation process plus character creation.',
       },
     },
   },

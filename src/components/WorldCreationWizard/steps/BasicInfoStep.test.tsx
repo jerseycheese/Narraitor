@@ -171,16 +171,17 @@ describe('BasicInfoStep', () => {
     const genreSelect = screen.getByTestId('world-genre-select');
     const options = genreSelect.querySelectorAll('option');
 
-    expect(options).toHaveLength(9); // Including "Select an option" placeholder
+    expect(options).toHaveLength(10); // 9 theme options + "Select an option" placeholder
     expect(options[0]).toHaveValue(''); // Placeholder
     expect(options[1]).toHaveValue('fantasy');
     expect(options[2]).toHaveValue('sci-fi');
     expect(options[3]).toHaveValue('modern');
     expect(options[4]).toHaveValue('historical');
-    expect(options[5]).toHaveValue('post-apocalyptic');
-    expect(options[6]).toHaveValue('cyberpunk');
+    expect(options[5]).toHaveValue('horror');
+    expect(options[6]).toHaveValue('mystery');
     expect(options[7]).toHaveValue('western');
-    expect(options[8]).toHaveValue('other');
+    expect(options[8]).toHaveValue('cyberpunk');
+    expect(options[9]).toHaveValue('other');
   });
 
   test('preserves field values when re-rendered', () => {
