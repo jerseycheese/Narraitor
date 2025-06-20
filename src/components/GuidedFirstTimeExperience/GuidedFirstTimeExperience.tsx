@@ -144,6 +144,40 @@ export function GuidedFirstTimeExperience() {
       const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, { attributes, skills });
 
+      // Generate world image in the background
+      try {
+        const imageResponse = await fetch('/api/generate-world-image', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            world: {
+              id: worldId,
+              name: worldName,
+              description: data.description || 'A world of endless possibilities',
+              theme: data.theme || 'fantasy'
+            }
+          }),
+        });
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          // Update the world with the generated image
+          updateWorld(worldId, { 
+            image: {
+              type: imageData.aiGenerated ? 'ai-generated' : 'placeholder',
+              url: imageData.imageUrl,
+              generatedAt: new Date().toISOString(),
+              prompt: imageData.prompt
+            }
+          });
+        }
+      } catch (imageError) {
+        console.error('Failed to generate world image:', imageError);
+        // Don't fail the onboarding if image generation fails
+      }
+
       // Set as current world
       setCurrentWorld(worldId);
       

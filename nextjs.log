@@ -8,236 +8,677 @@
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Ready in 1097ms
- ○ Compiling / ...
- ✓ Compiled / in 1564ms (1175 modules)
-(node:38577) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+ ✓ Ready in 966ms
+ ○ Compiling /dev/guided-first-time-experience ...
+ ✓ Compiled /dev/guided-first-time-experience in 2.5s (1171 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/guided-first-time-experience 200 in 2686ms
+ ✓ Compiled in 287ms (449 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/guided-first-time-experience 200 in 41ms
+ ✓ Compiled /_not-found in 272ms (1161 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /.well-known/appspecific/com.chrome.devtools.json. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 344ms
+ ✓ Compiled /favicon.ico in 99ms (739 modules)
+ GET /favicon.ico 200 in 170ms
+ GET /favicon.ico 200 in 5ms
+ ✓ Compiled /api/ai/analyze-world in 371ms (1302 modules)
+[14:06:52.865] DEBUG [API] analyze-world API Request received
+(node:44331) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
- ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET / 200 in 1831ms
- ✓ Compiled in 362ms (452 modules)
- ✓ Compiled /dev/guided-first-time-experience in 253ms (1174 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /dev/guided-first-time-experience 200 in 403ms
- ✓ Compiled /_not-found in 270ms (1178 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /.well-known/appspecific/com.chrome.devtools.json. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 337ms
- ✓ Compiled /favicon.ico in 116ms (749 modules)
- GET /favicon.ico 200 in 180ms
- GET /favicon.ico 200 in 3ms
- ✓ Compiled /characters/create in 371ms (1309 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 441ms
- ✓ Compiled in 311ms (1314 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 64ms
- ✓ Compiled in 248ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_69df0707-64fc-459e-8232-89f3275d7bf6 200 in 95ms
- ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /dev/guided-first-time-experience 200 in 109ms
- ✓ Compiled /_not-found in 115ms (1286 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /.well-known/appspecific/com.chrome.devtools.json. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 214ms
- ✓ Compiled /favicon.ico in 79ms (801 modules)
- GET /favicon.ico 200 in 141ms
- GET /favicon.ico 200 in 3ms
- ✓ Compiled /api/ai/analyze-world in 371ms (1427 modules)
-[11:12:17.320] DEBUG [API] analyze-world API Request received
-[11:12:17.320] DEBUG [API] analyze-world API Request body parsed
-[11:12:17.320] DEBUG [API] analyze-world API Analyzing world description...
-analyzeWorldDescription called with: A planet of ghoul politicians...
+[14:06:52.865] DEBUG [API] analyze-world API Request body parsed
+[14:06:52.865] DEBUG [API] analyze-world API Analyzing world description...
+analyzeWorldDescription called with: A planet where Chris Farley is king...
 Using AI config: { modelName: 'gemini-2.0-flash', timeout: 30000, hasApiKey: true }
 Calling AI service directly...
 Making AI request...
-🔥 GEMINI API: Making request with prompt length: 1389
-🔥 GEMINI API: Response received, content length: 3931
-Response received, length: 3931
+🔥 GEMINI API: Making request with prompt length: 1395
+🔥 GEMINI API: Response received, content length: 4883
+Response received, length: 4883
 Response content preview: ```json
 {
   "attributes": [
     {
-      "name": "Cunning",
-      "description": "Mental acuity, guile, and ability to deceive.",
-      "minValue": 1,
-      "maxValue": 10,
-      "category": "Mental"
- ...
+      "name": "Girth",
+      "description": "Represents a character's size, presence, and physical dominance, inspired by Farley's physicality.",
+      "minValue": 1,...
 Initial parse failed, attempting to extract JSON from markdown...
 Successfully parsed from code block
-[11:12:23.781] DEBUG [API] analyze-world API Analysis completed successfully
- POST /api/ai/analyze-world 200 in 6931ms
+[14:07:00.285] DEBUG [API] analyze-world API Analysis completed successfully
+ POST /api/ai/analyze-world 200 in 7874ms
+ ✓ Compiled /characters/create in 388ms (1431 modules)
  ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 78ms
- ✓ Compiled in 387ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+ GET /characters/create?worldId=world_6b134595-33f6-4185-b4d4-20c795a11a6e 200 in 447ms
+ ✓ Compiled /api/generate-portrait in 234ms (1428 modules)
+[14:08:52.427] DEBUG [API] generate-portrait API Request body keys: [ 'character', 'world', 'customDescription' ]
+[14:08:52.428] DEBUG [API] generate-portrait API Request body: {
+  "character": {
+    "id": "temp",
+    "name": "Bobbie Bogan",
+    "description": "",
+    "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+    "attributes": [
+      {
+        "attributeId": "attribute_876d7607-ab80-495e-be9e-a6a57e606f85",
+        "value": 9
+      },
+      {
+        "attributeId": "attribute_5b0b8e6e-d4e6-4b11-867a-ace476c20368",
+        "value": 1
+      },
+      {
+        "attributeId": "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+        "value": 1
+      },
+      {
+        "attributeId": "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473",
+        "value": 1
+      },
+      {
+        "attributeId": "attribute_41d9ebed-ab05-4ce8-8f74-7e56624f2f60",
+        "value": 6
+      },
+      {
+        "attributeId": "attribute_1f8f9b3f-3e26-45ec-abc2-003c0d12d6bc",
+        "value": 9
+      }
+    ],
+    "skills": [
+      {
+        "skillId": "skill_70479653-b222-4fb9-915e-52c4c8ff4b90",
+        "level": 1,
+        "experience": 0,
+        "isActive": true
+      },
+      {
+        "skillId": "skill_621fe6d8-947f-4311-9f08-fcde6d5d09f5",
+        "level": 1,
+        "experience": 0,
+        "isActive": true
+      },
+      {
+        "skillId": "skill_8616e239-7037-408d-a84f-7d769529292c",
+        "level": 1,
+        "experience": 0,
+        "isActive": true
+      },
+      {
+        "skillId": "skill_3e3c00d1-5ce9-4dc4-a2e7-2e167a697a60",
+        "level": 1,
+        "experience": 0,
+        "isActive": true
+      }
+    ],
+    "background": {
+      "history": "Grew up on this planet, wants to beome the new king",
+      "personality": "Greedy and ready to backstab friends",
+      "goals": [],
+      "fears": [],
+      "relationships": []
+    },
+    "inventory": {
+      "items": [],
+      "capacity": 100,
+      "categories": [],
+      "characterId": "temp"
+    },
+    "status": {
+      "health": 100,
+      "maxHealth": 100,
+      "conditions": []
+    },
+    "createdAt": "2025-06-20T18:08:52.144Z",
+    "updatedAt": "2025-06-20T18:08:52.144Z"
+  },
+  "world": {
+    "name": "Shadow Realm",
+    "description": "A planet where Chris Farley is king",
+    "theme": "horror",
+    "attributes": [
+      {
+        "id": "attribute_876d7607-ab80-495e-be9e-a6a57e606f85",
+        "name": "Girth",
+        "description": "Represents a character's size, presence, and physical dominance, inspired by Farley's physicality.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "attribute_5b0b8e6e-d4e6-4b11-867a-ace476c20368",
+        "name": "Energy",
+        "description": "Reflects a character's stamina, enthusiasm, and ability to keep up with high-energy situations.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+        "name": "Charisma",
+        "description": "Measures a character's persuasiveness, humor, and ability to connect with others, channeling Farley's charm.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473",
+        "name": "Improvisation",
+        "description": "Determines a character's ability to think on their feet, react spontaneously, and adapt to unexpected situations.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "attribute_41d9ebed-ab05-4ce8-8f74-7e56624f2f60",
+        "name": "Tolerance",
+        "description": "Represents a character's ability to withstand physical punishment, excesses, and the general chaos of the Farley-esque world.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "attribute_1f8f9b3f-3e26-45ec-abc2-003c0d12d6bc",
+        "name": "Loyalty",
+        "description": "Measures a character's faithfulness, trustworthiness, and dedication to the King and his unique vision.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      }
+    ],
+    "skills": [
+      {
+        "id": "skill_70479653-b222-4fb9-915e-52c4c8ff4b90",
+        "name": "Slapstick",
+        "description": "The art of physical comedy, pratfalls, and generally making a fool of oneself for comedic effect.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "easy",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_876d7607-ab80-495e-be9e-a6a57e606f85",
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_621fe6d8-947f-4311-9f08-fcde6d5d09f5",
+        "name": "Inspirational Speech",
+        "description": "The ability to deliver rousing, often nonsensical, speeches that motivate others to action.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_c2b4db42-5001-482e-ab27-0b4e5d2deaff",
+        "name": "Feast Management",
+        "description": "Organizing and overseeing large-scale feasts, ensuring there's enough food, drink, and revelry for everyone.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_41d9ebed-ab05-4ce8-8f74-7e56624f2f60"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_91ac4819-c410-4626-b7c7-028fbd8b32d9",
+        "name": "Chair Throwing",
+        "description": "The skillful and accurate throwing of chairs, often in fits of rage or celebratory enthusiasm.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Combat",
+        "attributeIds": [
+          "attribute_5b0b8e6e-d4e6-4b11-867a-ace476c20368"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_198fc634-a084-4095-93a1-d52351b1b8d8",
+        "name": "Gut Instinct",
+        "description": "Relying on your intuition and hunches to make decisions, often leading to unexpected and hilarious outcomes.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "easy",
+        "category": "Mental",
+        "attributeIds": [
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473",
+          "attribute_41d9ebed-ab05-4ce8-8f74-7e56624f2f60"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_550d84d5-9292-4daf-ad48-574c4c8ba32e",
+        "name": "Party Crashing",
+        "description": "The art of infiltrating parties and social gatherings uninvited, often with boisterous results.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_3e6046d1-90a7-436a-b50d-e1e7d0da377b",
+        "name": "Food Coma Recovery",
+        "description": "The ability to quickly recover from a state of extreme food-induced lethargy and return to full functionality.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "hard",
+        "category": "Physical",
+        "attributeIds": [
+          "attribute_876d7607-ab80-495e-be9e-a6a57e606f85",
+          "attribute_41d9ebed-ab05-4ce8-8f74-7e56624f2f60"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_8616e239-7037-408d-a84f-7d769529292c",
+        "name": "Animal Mimicry",
+        "description": "Imitating animal sounds and movements with surprising accuracy, often used for comedic effect or communication.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473",
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_3c25f0b3-e432-439f-9fa0-c809eca2b3f7",
+        "name": "Secret Handshake",
+        "description": "Knowing and executing elaborate and often ridiculous secret handshakes to identify allies.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "easy",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_1f8f9b3f-3e26-45ec-abc2-003c0d12d6bc"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_cc83fae8-9dbf-4072-b4ca-d8196c467ef6",
+        "name": "Overcome Obstacles",
+        "description": "The skill of getting over, under, around, or through obstacles--with the grace of a rhino, and the dedication of a honey badger.",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Physical",
+        "attributeIds": [
+          "attribute_876d7607-ab80-495e-be9e-a6a57e606f85",
+          "attribute_5b0b8e6e-d4e6-4b11-867a-ace476c20368"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_9aa4da38-e62f-46c6-96e9-2dbbcc83e1e8",
+        "name": "Negotiation",
+        "description": "Convincing people with your unique brand of charm or threats, sometimes both",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "medium",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      },
+      {
+        "id": "skill_3e3c00d1-5ce9-4dc4-a2e7-2e167a697a60",
+        "name": "Expressive Dance",
+        "description": "Using movement to portray stories or concepts",
+        "worldId": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+        "difficulty": "hard",
+        "category": "Social",
+        "attributeIds": [
+          "attribute_ba61aea7-a3cc-4939-b951-128a76f6492f",
+          "attribute_add14ee0-1ff9-4b2e-bd67-c28edccb7473"
+        ],
+        "baseValue": 5,
+        "minValue": 1,
+        "maxValue": 10
+      }
+    ],
+    "settings": {
+      "maxAttributes": 6,
+      "maxSkills": 12,
+      "attributePointPool": 27,
+      "skillPointPool": 40
+    },
+    "id": "world_6b134595-33f6-4185-b4d4-20c795a11a6e",
+    "createdAt": "2025-06-20T18:06:52.408Z",
+    "updatedAt": "2025-06-20T18:07:00.292Z"
+  },
+  "customDescription": ""
+}
+[14:08:52.428] DEBUG [API] generate-portrait API Character format detected, promptOnly: undefined
+[14:08:52.428] DEBUG [API] generate-portrait API Starting AI character detection for: Bobbie Bogan
+[14:08:52.489] DEBUG [API] generate-portrait API Creating AI client and generator
+Using real Gemini client with server-side API key
+[14:08:52.489] DEBUG [API] generate-portrait API Calling buildPortraitPrompt directly to avoid image generation
+🔥 GEMINI API: Making request with prompt length: 216
+🔥 GEMINI API: Response received, content length: 56
+🔥 GEMINI API: Making request with prompt length: 1084
+🔥 GEMINI API: Response received, content length: 246
+[14:08:53.922] DEBUG [API] generate-portrait API AI detection successful, prompt: Character portrait of Bobbie Bogan, No specific appearance described, but he had a noticeable pot be...
+[14:08:53.922] DEBUG [API] generate-portrait API Generating portrait with prompt: Character portrait of Bobbie Bogan, No specific appearance described, but he had a noticeable pot be...
+[14:08:57.006] DEBUG [API] generate-portrait API Portrait generated successfully
+ POST /api/generate-portrait 200 in 4872ms
+ ○ Compiling /world/[id]/play ...
+ ✓ Compiled /world/[id]/play in 725ms (1645 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e/play. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 181ms
- ✓ Compiled in 187ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+ GET /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e/play 200 in 1153ms
+ ✓ Compiled /api/narrative/generate in 153ms (1649 modules)
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 5944,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 5944,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1840ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 2650,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 2065ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 2685,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1944ms
+ POST /api/narrative/generate 200 in 1796ms
+ ✓ Compiled /api/narrative/summarize in 147ms (1651 modules)
+Using real Gemini client with server-side API key
+🔥 GEMINI API: Making request with prompt length: 3856
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 9654,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+🔥 GEMINI API: Response received, content length: 165
+ POST /api/narrative/summarize 200 in 914ms
+ POST /api/narrative/generate 200 in 1609ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 5147,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1812ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3233,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1263ms
+Using real Gemini client with server-side API key
+🔥 GEMINI API: Making request with prompt length: 3803
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 9601,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+🔥 GEMINI API: Response received, content length: 142
+ POST /api/narrative/summarize 200 in 701ms
+ POST /api/narrative/generate 200 in 1873ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 6051,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 2166ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3403,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1629ms
+Using real Gemini client with server-side API key
+🔥 GEMINI API: Making request with prompt length: 3719
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 2955,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+🔥 GEMINI API: Response received, content length: 159
+ POST /api/narrative/summarize 200 in 907ms
+ POST /api/narrative/generate 200 in 1123ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 9517,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1729ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 6926,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1601ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3711,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1251ms
+Using real Gemini client with server-side API key
+🔥 GEMINI API: Making request with prompt length: 3704
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3491,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+🔥 GEMINI API: Response received, content length: 168
+ POST /api/narrative/summarize 200 in 799ms
+ POST /api/narrative/generate 200 in 1339ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 9502,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1659ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 7593,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1660ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3828,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1120ms
+Using real Gemini client with server-side API key
+🔥 GEMINI API: Making request with prompt length: 3670
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 3993,
+  foundContentRating: '(none detected)',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: '(no match)'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'default',
+  threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+  settingsApplied: '4 categories'
+}
+🔥 GEMINI API: Response received, content length: 139
+ POST /api/narrative/summarize 200 in 708ms
+ POST /api/narrative/generate 200 in 1347ms
+🔒 API SAFETY SETTINGS DEBUG: {
+  promptLength: 9468,
+  foundContentRating: 'pg',
+  extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+  rawMatch: 'PG-RATED CONTENT GUIDELINES'
+}
+🔒 APPLIED SAFETY SETTINGS: {
+  contentRating: 'PG',
+  threshold: 'BLOCK_ONLY_HIGH',
+  settingsApplied: '4 categories'
+}
+ POST /api/narrative/generate 200 in 1711ms
+ ✓ Compiled /characters/[id] in 338ms (1670 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /characters/char_d93ad58e-e48c-41c5-ad9d-eb6d26333358. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 55ms
- ✓ Compiled in 174ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+ GET /characters/char_d93ad58e-e48c-41c5-ad9d-eb6d26333358 200 in 719ms
+ ✓ Compiled /world/[id] in 199ms (1687 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
- ✓ Compiled in 357ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+ GET /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e 200 in 590ms
+ ✓ Compiled in 679ms (1557 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 70ms
- ✓ Compiled in 185ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
+ GET /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e 200 in 126ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
- ✓ Compiled in 207ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 46ms
- ✓ Compiled in 179ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 58ms
- ✓ Compiled in 236ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
- ✓ Compiled in 378ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 78ms
- ✓ Compiled in 193ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 45ms
- ✓ Compiled in 530ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 51ms
- ✓ Compiled in 183ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 53ms
- ✓ Compiled in 206ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 49ms
- ✓ Compiled in 215ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 63ms
- ✓ Compiled in 241ms (1296 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 51ms
- ✓ Compiled in 262ms (512 modules)
- ⚠ Unsupported metadata viewport is configured in metadata export in /characters/create. Please move it to viewport export instead.
-Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
- GET /characters/create?worldId=world_7cebe901-4edd-475a-8874-cf15af09cd94 200 in 41ms
- ✓ Compiled in 457ms (512 modules)
- ✓ Compiled in 124ms (512 modules)
- ✓ Compiled in 226ms (512 modules)
- ✓ Compiled in 114ms (512 modules)
- ✓ Compiled in 463ms (1300 modules)
- ✓ Compiled in 181ms (514 modules)
- ✓ Compiled in 190ms (1302 modules)
- ✓ Compiled in 194ms (1302 modules)
- ✓ Compiled in 138ms (515 modules)
- ✓ Compiled in 127ms (515 modules)
- ✓ Compiled in 188ms (515 modules)
- ✓ Compiled in 119ms (515 modules)
- ✓ Compiled in 114ms (515 modules)
- ✓ Compiled in 129ms (515 modules)
- ✓ Compiled in 126ms (515 modules)
- ✓ Compiled in 144ms (515 modules)
- ✓ Compiled in 308ms (1302 modules)
- ✓ Compiled in 177ms (1302 modules)
- ✓ Compiled in 203ms (1302 modules)
- ✓ Compiled in 204ms (1302 modules)
- ✓ Compiled in 231ms (1302 modules)
- ✓ Compiled in 142ms (515 modules)
- ✓ Compiled in 124ms (515 modules)
- ✓ Compiled in 331ms (1302 modules)
- ✓ Compiled in 176ms (1302 modules)
- ✓ Compiled in 193ms (1302 modules)
- ✓ Compiled in 194ms (1302 modules)
- ✓ Compiled in 494ms (1302 modules)
- ✓ Compiled in 315ms (1302 modules)
- ✓ Compiled in 163ms (515 modules)
- ✓ Compiled in 261ms (1302 modules)
- ✓ Compiled in 187ms (1304 modules)
- ✓ Compiled in 187ms (1304 modules)
- ✓ Compiled in 228ms (1304 modules)
- ✓ Compiled in 172ms (1304 modules)
- ✓ Compiled in 194ms (1304 modules)
- ✓ Compiled in 216ms (1304 modules)
- ✓ Compiled in 257ms (1304 modules)
- ✓ Compiled in 228ms (1304 modules)
- ✓ Compiled in 228ms (1304 modules)
- ✓ Compiled in 184ms (1304 modules)
- ✓ Compiled in 212ms (1304 modules)
- ✓ Compiled in 204ms (1304 modules)
- ✓ Compiled in 259ms (1304 modules)
- ✓ Compiled in 227ms (516 modules)
- ✓ Compiled in 365ms (1304 modules)
- ✓ Compiled in 256ms (1304 modules)
- ✓ Compiled in 112ms (516 modules)
- ✓ Compiled in 129ms (516 modules)
- ✓ Compiled in 119ms (516 modules)
- ✓ Compiled in 122ms (516 modules)
- ✓ Compiled in 150ms (516 modules)
- ✓ Compiled in 277ms (1304 modules)
- ✓ Compiled in 249ms (1304 modules)
- ✓ Compiled in 165ms (1304 modules)
- ✓ Compiled in 176ms (1304 modules)
- ✓ Compiled in 192ms (1304 modules)
- ✓ Compiled in 224ms (516 modules)
- ✓ Compiled in 114ms (516 modules)
- ✓ Compiled in 107ms (516 modules)
- ✓ Compiled in 105ms (516 modules)
- ✓ Compiled in 142ms (516 modules)
- ✓ Compiled in 117ms (516 modules)
- ✓ Compiled in 147ms (516 modules)
- ✓ Compiled in 126ms (516 modules)
- ✓ Compiled in 119ms (516 modules)
- ✓ Compiled in 301ms (516 modules)
- ✓ Compiled in 114ms (516 modules)
- ✓ Compiled in 107ms (516 modules)
- ✓ Compiled in 127ms (516 modules)
- ✓ Compiled in 116ms (516 modules)
- ✓ Compiled in 143ms (516 modules)
- ✓ Compiled in 303ms (1304 modules)
- ✓ Compiled in 112ms (516 modules)
- ✓ Compiled in 105ms (516 modules)
- ✓ Compiled in 121ms (516 modules)
- ✓ Compiled in 244ms (516 modules)
- ✓ Compiled in 419ms (1304 modules)
- ✓ Compiled in 127ms (516 modules)
- ✓ Compiled in 115ms (516 modules)
- ✓ Compiled in 303ms (1304 modules)
- ✓ Compiled in 125ms (516 modules)
- ✓ Compiled in 110ms (516 modules)
- ✓ Compiled in 181ms (516 modules)
- ✓ Compiled in 116ms (516 modules)
- ✓ Compiled in 119ms (516 modules)
- ✓ Compiled in 328ms (1304 modules)
- ✓ Compiled in 189ms (1304 modules)
- ✓ Compiled in 105ms (516 modules)
- ✓ Compiled in 114ms (516 modules)
- ✓ Compiled in 111ms (516 modules)
- ✓ Compiled in 145ms (516 modules)
- ✓ Compiled in 238ms (1304 modules)
- ✓ Compiled in 113ms (516 modules)
- ✓ Compiled in 116ms (516 modules)
- ✓ Compiled in 147ms (516 modules)
- ✓ Compiled in 115ms (516 modules)
- ✓ Compiled in 514ms (1304 modules)
- ✓ Compiled in 173ms (1304 modules)
+ GET /dev/guided-first-time-experience 200 in 59ms
