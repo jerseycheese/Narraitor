@@ -84,6 +84,8 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
   // Test that all theme options are available
   test('displays all available theme options', () => {
     render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
+
+    const themeSelect = screen.getByLabelText(/theme/i);
     
     // Check that all themes from the constant are available as options
     THEMES.forEach(theme => {

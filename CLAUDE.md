@@ -255,6 +255,51 @@ This script will:
 
 See the MCP GitHub tool documentation for complete usage details.
 
+## Guided First-Time Experience System
+
+### Overview
+A comprehensive onboarding system that guides new users through creating their first world and character in just 2 steps plus character creation. Designed to convert first-time visitors into engaged users within minutes.
+
+### Implementation Details
+- **Component**: `src/components/GuidedFirstTimeExperience/GuidedFirstTimeExperience.tsx`
+- **Detection**: Automatically shows when no saved sessions exist and onboarding hasn't been completed
+- **State Management**: Integrated with `sessionStore` for onboarding completion tracking
+- **Wizard Framework**: Uses shared wizard components for consistent UX patterns
+
+### Features
+- **Smart Title Display**: "First time? Quick start:" with proper typography hierarchy
+- **AI-Powered World Creation**: 
+  - Context-aware world name generation based on description (not just theme)
+  - Automatic attributes and skills generation using existing AI analyzer
+  - World image generation in background without blocking flow
+- **Required Field Indicators**: Clear visual indicators for mandatory fields
+- **Responsive Design**: Mobile-optimized placeholder text and layouts
+- **Error Handling**: Standardized error patterns using shared ErrorBlock component
+
+### User Flow
+1. **Welcome Step**: Introduction with accurate "2 steps, then create your character" messaging
+2. **World Concept Step**: User describes their world idea with fictional universe examples
+3. **World Details Step**: Optional name + required theme selection, then "Create world" button
+4. **Automatic World Enhancement**: AI generates contextual name, attributes, skills, and image
+5. **Seamless Transition**: Direct navigation to character creation with pre-selected world
+
+### Technical Integration
+- **Session Detection**: `shouldShowOnboarding()` checks for existing sessions and completion status
+- **AI Integration**: Uses Gemini for world name generation, analysis, and image creation
+- **Persistence**: Onboarding completion persisted to prevent re-showing
+- **Fallback Systems**: Graceful degradation if AI services are unavailable
+
+### Testing & Quality
+- **Storybook Integration**: Complete story coverage for all steps and states
+- **Test Coverage**: 26 comprehensive tests covering all user interactions and edge cases
+- **Three-Stage Verification**: Storybook → Test Harness → System Integration
+- **Mobile Compatibility**: Responsive placeholder system for optimal mobile experience
+
+### Development Endpoints
+- **Main Flow**: `/` (auto-shows if conditions met)
+- **Dev Harness**: `/dev/guided-first-time-experience` 
+- **Storybook**: All steps documented with interactive demos
+
 ## Domain Boundaries
 - World: World configuration, templates, attributes
 - Character: Character creation, sheets, progression
