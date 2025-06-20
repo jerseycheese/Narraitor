@@ -243,7 +243,7 @@ export function GuidedFirstTimeExperience() {
             id="world-name"
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
+            placeholder="E.g., Neo-Tokyo 2049..."
             value={wizard.state.data.name}
             onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
           />
