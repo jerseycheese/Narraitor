@@ -82,7 +82,7 @@ const MockGuidedFirstTimeExperience = () => {
             id="world-name"
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
+            placeholder="E.g., Neo-Tokyo..."
             value={formData.name}
             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           />
@@ -283,7 +283,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
                 id="world-name"
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="E.g., Hogwarts Adventures, Galaxy Far Far Away..."
+                placeholder="E.g., Neo-Tokyo..."
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               />
