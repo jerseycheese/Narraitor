@@ -28,7 +28,7 @@ describe('TemplateGenerator', () => {
             { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
           ],
           skills: [
-            { name: 'Engineering', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'moderate', category: 'Technical' }
+            { name: 'Engineering', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' }
           ],
           explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian aesthetics'
         })
@@ -71,7 +71,7 @@ describe('TemplateGenerator', () => {
           ],
           skills: [
             { name: 'Hacking', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' },
-            { name: 'Quick Draw', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'moderate', category: 'Combat' }
+            { name: 'Quick Draw', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
           ],
           explanation: 'This genre mix combines cyberpunk technology with western frontier themes'
         })
@@ -152,7 +152,7 @@ describe('TemplateGenerator', () => {
           { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
         ],
         skills: [
-          { name: 'Swordplay', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'moderate', category: 'Combat' }
+          { name: 'Swordplay', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
         ],
         explanation: 'Test explanation'
       };

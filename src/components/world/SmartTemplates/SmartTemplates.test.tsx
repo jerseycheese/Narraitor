@@ -19,11 +19,12 @@ const mockSessionStore = {
 };
 
 jest.mock('@/state/sessionStore', () => ({
-  useSessionStore: {
-    getState: () => mockSessionStore,
-    subscribe: jest.fn(),
-    setState: jest.fn(),
-  }
+  useSessionStore: jest.fn((selector) => {
+    if (selector) {
+      return selector(mockSessionStore);
+    }
+    return mockSessionStore;
+  })
 }));
 
 // Mock the useHistory hook
