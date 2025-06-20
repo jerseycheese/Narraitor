@@ -73,21 +73,29 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     try {
       setIsApplying(true);
       
-      // Convert template to world format and create it
+      // Convert template to world format for form population
       const narrativeGenerator = new NarrativeGenerator(geminiClient);
       const worldData = narrativeGenerator.convertTemplateToWorld(template);
       
-      // Create the world using the world store
-      const worldId = useWorldStore.getState().createWorld(worldData);
+      // Update the wizard state with the template data
+      // This will populate the form fields in subsequent steps
+      onUpdate({ 
+        selectedTemplateId: 'smart-template', // Indicate we're using a smart template
+        createOwnWorld: false,
+        // Populate form fields with template data
+        name: worldData.name,
+        description: worldData.description,
+        theme: worldData.theme,
+        attributes: worldData.attributes,
+        skills: worldData.skills,
+        settings: worldData.settings
+      });
       
-      // Mark as not creating own world since we're using a template
-      onUpdate({ selectedTemplateId: worldId, createOwnWorld: false });
-      
-      // Complete the step
+      // Proceed to the next step (Basic Info) so user can review/modify
       onComplete(false);
       
     } catch (error) {
-      console.error('Error creating world from template:', error);
+      console.error('Error processing template:', error);
     } finally {
       setIsApplying(false);
     }
