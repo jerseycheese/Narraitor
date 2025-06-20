@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ThemeSelector } from '@/components/shared/ThemeSelector';
 
 const meta: Meta<typeof ThemeSelector> = {
-  title: 'Shared/ThemeSelector',
+  title: 'Narraitor/Shared/ThemeSelector',
   component: ThemeSelector,
   parameters: {
     layout: 'centered',

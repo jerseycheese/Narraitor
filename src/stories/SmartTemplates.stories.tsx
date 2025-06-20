@@ -232,7 +232,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
 };
 
 const meta: Meta<typeof MockSmartTemplates> = {
-  title: 'World/SmartTemplates',
+  title: 'Narraitor/World/SmartTemplates',
   component: MockSmartTemplates,
   parameters: {
     layout: 'centered',
