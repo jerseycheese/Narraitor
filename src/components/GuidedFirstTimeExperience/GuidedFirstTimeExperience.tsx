@@ -101,21 +101,56 @@ export function GuidedFirstTimeExperience() {
       // Generate a world name if none provided
       let worldName = data.name;
       if (!worldName?.trim()) {
-        // Use a simple fallback name generation based on theme
-        const themeNames = {
-          fantasy: ['Mystical Realm', 'Enchanted Lands', 'Arcane Kingdom'],
-          'sci-fi': ['Stellar Colony', 'Cosmic Frontier', 'Galactic Outpost'],
-          modern: ['Metropolitan Hub', 'Urban Center', 'City State'],
-          historical: ['Ancient Dominion', 'Classical Empire', 'Heritage Lands'],
-          horror: ['Dark Sanctuary', 'Shadow Realm', 'Haunted Territory'],
-          mystery: ['Enigma District', 'Puzzle Grounds', 'Secret Haven'],
-          western: ['Frontier Town', 'Desert Settlement', 'Wild Territory'],
-          cyberpunk: ['Neon City', 'Cyber District', 'Digital Metropolis'],
-          other: ['New World', 'Uncharted Territory', 'Unknown Realm']
-        };
-        const themeKey = data.theme as keyof typeof themeNames || 'other';
-        const nameOptions = themeNames[themeKey] || themeNames.other;
-        worldName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
+        // Use AI to generate a contextually appropriate name based on the world description
+        try {
+          const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+          const aiClient = createDefaultGeminiClient();
+          
+          const namePrompt = `Generate a creative, appropriate world name for this concept: "${data.description || 'A world of endless possibilities'}"
+          
+Theme: ${data.theme}
+
+Requirements:
+- Name should reflect the specific concept/description, not just the theme
+- Keep it concise (1-4 words)
+- Make it memorable and fitting
+- Don't use generic theme words like "realm", "kingdom", "empire" unless they truly fit
+- Return ONLY the name, no quotes or explanations
+
+Examples:
+- "A planet where Chris Farley is king" could be "Farley's Domain" or "Planet Farley"
+- "A cyberpunk city ruled by cats" could be "Neo-Cat City" or "Whisker Metropolis"
+
+World name:`;
+
+          const response = await aiClient.generateContent(namePrompt);
+          const generatedName = response.content?.trim();
+          
+          if (generatedName && generatedName.length > 0 && generatedName.length < 50) {
+            // Clean up the response (remove quotes, extra whitespace, etc.)
+            worldName = generatedName.replace(/['"]/g, '').trim();
+          }
+        } catch (nameError) {
+          console.error('Failed to generate AI world name:', nameError);
+        }
+
+        // Fallback to theme-based names if AI generation fails
+        if (!worldName || !worldName.trim()) {
+          const themeNames = {
+            fantasy: ['Mystical Realm', 'Enchanted Lands', 'Arcane Kingdom'],
+            'sci-fi': ['Stellar Colony', 'Cosmic Frontier', 'Galactic Outpost'],
+            modern: ['Metropolitan Hub', 'Urban Center', 'City State'],
+            historical: ['Ancient Dominion', 'Classical Empire', 'Heritage Lands'],
+            horror: ['Dark Sanctuary', 'Shadow Realm', 'Haunted Territory'],
+            mystery: ['Enigma District', 'Puzzle Grounds', 'Secret Haven'],
+            western: ['Frontier Town', 'Desert Settlement', 'Wild Territory'],
+            cyberpunk: ['Neon City', 'Cyber District', 'Digital Metropolis'],
+            other: ['New World', 'Uncharted Territory', 'Unknown Realm']
+          };
+          const themeKey = data.theme as keyof typeof themeNames || 'other';
+          const nameOptions = themeNames[themeKey] || themeNames.other;
+          worldName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
+        }
       }
 
       // First create the world to get the worldId

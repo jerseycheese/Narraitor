@@ -682,3 +682,14 @@ Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  GET /dev/guided-first-time-experience 200 in 59ms
+ ✓ Compiled in 442ms (1557 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e 200 in 136ms
+ ✓ Compiled in 314ms (1557 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /world/world_6b134595-33f6-4185-b4d4-20c795a11a6e 200 in 115ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/guided-first-time-experience. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/guided-first-time-experience 200 in 73ms
