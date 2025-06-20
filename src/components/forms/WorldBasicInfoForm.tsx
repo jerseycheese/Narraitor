@@ -3,7 +3,7 @@ import { World } from '@/types/world.types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { THEMES, getThemeLabel } from '@/lib/constants/themes';
+import { THEMES } from '@/lib/constants/themes';
 
 interface WorldBasicInfoFormProps {
   world: World;

@@ -4,7 +4,6 @@ import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 
 interface BackgroundStepProps {
   data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -114,7 +113,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
           placeholder="What drives your character?"
         />
         <p className="text-gray-500 text-sm mt-1">
-          Optional field to help define your character's driving force
+          Optional field to help define your character&apos;s driving force
         </p>
       </div>
 

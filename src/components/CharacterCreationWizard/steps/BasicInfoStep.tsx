@@ -5,7 +5,6 @@ import { ErrorBlock } from '@/components/shared';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 import { World } from '@/types/world.types';
 
 interface CharacterWizardData {

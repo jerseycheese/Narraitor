@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
 import React from 'react';
 
 // Create a mock component that demonstrates the UI without complex dependencies
@@ -220,7 +219,7 @@ type Story = StoryObj<typeof meta>;
 
 // Create different starting states by modifying the component
 const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name: string; theme: string; description: string }>) => {
-  return () => {
+  const StoryComponent = () => {
     const MockWithStep = () => {
       const [currentStep, setCurrentStep] = React.useState(initialStep);
       const [formData, setFormData] = React.useState({
@@ -371,6 +370,8 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
     };
     return <MockWithStep />;
   };
+  StoryComponent.displayName = `GuidedExperienceStep${initialStep}`;
+  return StoryComponent;
 };
 
 export const WelcomeStep: Story = {

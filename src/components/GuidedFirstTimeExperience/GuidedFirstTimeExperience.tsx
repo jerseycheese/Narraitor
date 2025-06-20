@@ -52,7 +52,7 @@ function convertSuggestionsToWorldEntities(worldId: string, suggestions: WorldAn
     difficulty: skill.difficulty,
     category: skill.category,
     // Convert linkedAttributeNames to attributeIds
-    attributeIds: skill.linkedAttributeNames?.map((attrName: string) => findAttributeId(attrName)).filter(Boolean) || [],
+    attributeIds: skill.linkedAttributeNames?.map((attrName: string) => findAttributeId(attrName)).filter((id): id is string => id !== undefined) || [],
     baseValue: skill.baseValue,
     minValue: skill.minValue,
     maxValue: skill.maxValue

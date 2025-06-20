@@ -74,13 +74,15 @@ export const LEGACY_THEME_MAPPING: Record<string, string> = {
  */
 export function normalizeTheme(value: string): string {
   // Check if it's already a valid theme
-  if (isValidTheme(value)) {
+  const isValid = THEMES.some(theme => theme.value === value);
+  if (isValid) {
     return value;
   }
   
   // Check legacy mappings
-  if (LEGACY_THEME_MAPPING[value]) {
-    return LEGACY_THEME_MAPPING[value];
+  const legacyMapping = LEGACY_THEME_MAPPING[value];
+  if (legacyMapping) {
+    return legacyMapping;
   }
   
   // Convert to lowercase and replace spaces with hyphens
