@@ -11,7 +11,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { ToggleButton } from '@/components/shared/wizard/components/ToggleButton';
-import { GenreSelector } from '@/components/shared/GenreSelector';
+import { ThemeSelector } from '@/components/shared/ThemeSelector';
 import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplatePreview } from './TemplatePreview';
 
@@ -24,7 +24,7 @@ type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
 export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenerated }) => {
   const [mode, setMode] = useState<TemplateMode>('inspired-by');
   const [userInput, setUserInput] = useState('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
@@ -43,11 +43,11 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     5
   );
 
-  const toggleGenre = useCallback((genre: string) => {
-    setSelectedGenres(prev => 
-      prev.includes(genre) 
-        ? prev.filter(g => g !== genre)
-        : [...prev, genre]
+  const toggleTheme = useCallback((theme: string) => {
+    setSelectedThemes(prev => 
+      prev.includes(theme) 
+        ? prev.filter(t => t !== theme)
+        : [...prev, theme]
     );
   }, []);
 
@@ -59,7 +59,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       const generationContext: TemplateGenerationContext = {
         type: generationMode,
         userInput: generationMode === 'inspired-by' ? userInput : undefined,
-        genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
+        genres: generationMode === 'genre-mix' ? selectedThemes : undefined,
         ...context
       };
 
@@ -84,7 +84,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     } finally {
       setIsGenerating(false);
     }
-  }, [narrativeGenerator, templateHistoryManager, userInput, selectedGenres]);
+  }, [narrativeGenerator, templateHistoryManager, userInput, selectedThemes]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -102,12 +102,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   }, [userInput, generateTemplate]);
 
   const handleGenerateGenreMix = useCallback(() => {
-    if (selectedGenres.length < 2) {
-      setError('Please select at least 2 genres to mix');
+    if (selectedThemes.length < 2) {
+      setError('Please select at least 2 themes to mix');
       return;
     }
     generateTemplate('genre-mix');
-  }, [selectedGenres, generateTemplate]);
+  }, [selectedThemes, generateTemplate]);
 
   const handleSurpriseMe = useCallback(() => {
     generateTemplate('surprise-me');
@@ -190,11 +190,11 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               </div>
             </div>
 
-            {/* Genre Mixer Mode */}
+            {/* Theme Mixer Mode */}
             <div className={`${wizardStyles.card.base} ${mode === 'genre-mix' ? wizardStyles.card.selected : wizardStyles.card.unselected}`}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Genre Mixer</h3>
+                  <h3 className="text-lg font-semibold">Theme Mixer</h3>
                   <ToggleButton
                     isActive={mode === 'genre-mix'}
                     activeLabel="Selected"
@@ -204,21 +204,21 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                 </div>
                 {mode === 'genre-mix' && (
                   <div className="space-y-4">
-                    <p className="text-sm text-gray-600">Select 2 or more genres to blend together</p>
-                    <GenreSelector
-                      selectedGenres={selectedGenres}
-                      onToggleGenre={toggleGenre}
+                    <p className="text-sm text-gray-600">Select 2 or more themes to blend together</p>
+                    <ThemeSelector
+                      selectedThemes={selectedThemes}
+                      onToggleTheme={toggleTheme}
                     />
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">
-                        {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
+                        {selectedThemes.length} theme{selectedThemes.length !== 1 ? 's' : ''} selected
                       </span>
                       <button
                         onClick={handleGenerateGenreMix}
-                        disabled={selectedGenres.length < 2}
+                        disabled={selectedThemes.length < 2}
                         className={wizardStyles.navigation.primaryButton}
                       >
-                        Mix Genres
+                        Mix Themes
                       </button>
                     </div>
                   </div>

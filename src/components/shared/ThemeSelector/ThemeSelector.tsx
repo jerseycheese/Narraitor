@@ -1,39 +1,39 @@
-// src/components/shared/GenreSelector/GenreSelector.tsx
+// src/components/shared/ThemeSelector/ThemeSelector.tsx
 
 import React, { memo } from 'react';
-import { AVAILABLE_GENRES } from '@/lib/constants/genres';
+import { THEMES } from '@/lib/constants/themes';
 
-interface GenreSelectorProps {
-  selectedGenres: string[];
-  onToggleGenre: (genre: string) => void;
+interface ThemeSelectorProps {
+  selectedThemes: string[];
+  onToggleTheme: (theme: string) => void;
   maxSelections?: number;
   className?: string;
   disabled?: boolean;
 }
 
-const GenreSelector: React.FC<GenreSelectorProps> = memo(({
-  selectedGenres,
-  onToggleGenre,
+const ThemeSelector: React.FC<ThemeSelectorProps> = memo(({
+  selectedThemes,
+  onToggleTheme,
   maxSelections,
   className = '',
   disabled = false
 }) => {
-  const isGenreDisabled = (genre: string) => {
+  const isThemeDisabled = (theme: string) => {
     if (disabled) return true;
     if (!maxSelections) return false;
-    return !selectedGenres.includes(genre) && selectedGenres.length >= maxSelections;
+    return !selectedThemes.includes(theme) && selectedThemes.length >= maxSelections;
   };
 
   return (
     <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 ${className}`}>
-      {AVAILABLE_GENRES.map(genre => {
-        const isSelected = selectedGenres.includes(genre);
-        const isDisabled = isGenreDisabled(genre);
+      {THEMES.map(theme => {
+        const isSelected = selectedThemes.includes(theme.label);
+        const isDisabled = isThemeDisabled(theme.label);
         
         return (
           <button
-            key={genre}
-            onClick={() => !isDisabled && onToggleGenre(genre)}
+            key={theme.value}
+            onClick={() => !isDisabled && onToggleTheme(theme.label)}
             disabled={isDisabled}
             className={`px-3 py-2 text-sm rounded-md border transition-colors ${
               isSelected
@@ -42,8 +42,9 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
                   ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                   : 'bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100'
             }`}
+            title={theme.description}
           >
-            {genre}
+            {theme.label}
           </button>
         );
       })}
@@ -51,6 +52,6 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
   );
 });
 
-GenreSelector.displayName = 'GenreSelector';
+ThemeSelector.displayName = 'ThemeSelector';
 
-export { GenreSelector };
+export { ThemeSelector };
