@@ -6,7 +6,7 @@ const mockWorld: World = {
   id: 'world-123',
   name: 'Fantasy Realm',
   description: 'A mystical world filled with magic and adventure',
-  theme: 'fantasy',
+  genre: 'fantasy',
   createdAt: '2023-01-01T00:00:00.000Z',
   updatedAt: '2023-01-01T00:00:00.000Z',
   attributes: [],

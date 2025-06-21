@@ -2,7 +2,7 @@ import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 
 export interface GeneratedWorldData {
   name: string;
-  theme: string;
+  genre: string;
   description: string;
   attributes: Array<Omit<WorldAttribute, 'id' | 'worldId'>>;
   skills: Array<Omit<WorldSkill, 'id' | 'worldId'>>;
@@ -70,12 +70,12 @@ FOR REALISTIC SETTINGS (anything mentioning years like "1970s", "1980s", "1990s"
 - Example: A 1970s diner should have real 1970s equipment, real food, real customers, real workplace issues
 
 FOR FANTASY SETTINGS (mentioning magic, dragons, wizards, etc.):
-- Use Fantasy theme with appropriate magical elements
+- Use Fantasy genre with appropriate magical elements
 
 FOR SCI-FI SETTINGS (mentioning space, future, cyber, etc.):
-- Use Sci-Fi theme with appropriate technological elements
+- Use Sci-Fi genre with appropriate technological elements
 
-CRITICAL: Match the theme to what the name actually suggests. If someone says "1970s Diner Cook" they want a realistic 1970s diner, NOT a magical diner.
+CRITICAL: Match the genre to what the name actually suggests. If someone says "1970s Diner Cook" they want a realistic 1970s diner, NOT a magical diner.
 
 The world should have:
 - Name, geography, and history appropriate to the suggested setting
@@ -96,7 +96,7 @@ ABSOLUTE REQUIREMENTS:
 - Do NOT add fantasy, supernatural, or magical elements unless they actually exist in ${reference}
 - Do NOT invent new magic systems, supernatural powers, or fantastical locations
 - This should be a realistic location that could actually exist in the ${reference} setting
-- The theme MUST exactly match the genre of ${reference}
+- The genre MUST exactly match the genre of ${reference}
 - Use only the actual technology, social structures, and rules that exist in ${reference}
 
 EXAMPLES TO CLARIFY:
@@ -106,7 +106,7 @@ EXAMPLES TO CLARIFY:
 - If ${reference} is "Lord of the Rings": You CAN include magic and fantasy races because they exist in that universe
 
 REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think would make it more interesting!`
-  : `IMPORTANT: Create an ORIGINAL world that captures the essence, themes, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore. Choose an appropriate theme that captures the essence of ${reference}.`
+  : `IMPORTANT: Create an ORIGINAL world that captures the essence, genres, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore. Choose an appropriate genre that captures the essence of ${reference}.`
 }`
   }
 
@@ -119,24 +119,24 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
   }
 
   // Add creative naming guidance based on prompt content
-  const themeHint = prompt.toLowerCase();
+  const genreHint = prompt.toLowerCase();
   let namingGuidance = '';
   
-  if (themeHint.includes('fantasy')) {
+  if (genreHint.includes('fantasy')) {
     namingGuidance = `
 - Use Celtic, Norse, or other cultural linguistics (e.g., "Vryndaal", "Korvathia", "Zhengara")
 - Combine natural elements creatively (e.g., "Thornspire", "Mistholm", "Dragonmere")
 - Use abstract concepts (e.g., "The Sundering", "Whisperlands", "Evermoon")`;
-  } else if (themeHint.includes('sci-fi') || themeHint.includes('cyberpunk')) {
+  } else if (genreHint.includes('sci-fi') || genreHint.includes('cyberpunk')) {
     namingGuidance = `
 - Use technical/scientific terms (e.g., "Nexus Prime", "Quantum Gate", "Neural Collective")
 - Combine numbers/codes (e.g., "Sector 7", "Alpha Station", "Grid 2049")
 - Use corporate/futuristic names (e.g., "Neo Singapore", "CyberCore City", "Titanfall Industries")`;
-  } else if (themeHint.includes('western')) {
+  } else if (genreHint.includes('western')) {
     namingGuidance = `
 - Use frontier/geographic names (e.g., "Copper Canyon", "Deadwater Gulch", "Sunset Ridge")
 - Historical American names (e.g., "Fort Meridian", "Silver Creek", "Tombstone Valley")`;
-  } else if (themeHint.includes('horror')) {
+  } else if (genreHint.includes('horror')) {
     namingGuidance = `
 - Dark, ominous names (e.g., "Ravenshollow", "The Blackmoor", "Grimhaven")
 - Gothic or Victorian names (e.g., "Ashworth Manor", "Bleakshire", "Morrighan's Rest")`;
@@ -154,7 +154,7 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "theme": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the theme to what the name actually indicates.'}",
+  "genre": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
   "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {
@@ -209,7 +209,7 @@ Make the world interesting and playable with concepts appropriate to the setting
     const parsed = JSON.parse(jsonText);
     
     // Validate the response has required fields
-    if (!parsed.name || !parsed.theme || !parsed.description || !parsed.attributes || !parsed.skills) {
+    if (!parsed.name || !parsed.genre || !parsed.description || !parsed.attributes || !parsed.skills) {
       throw new Error('Generated world is missing required fields');
     }
     
@@ -260,7 +260,7 @@ Make the world interesting and playable with concepts appropriate to the setting
     
     return {
       name: worldName,
-      theme: parsed.theme,
+      genre: parsed.genre,
       description: parsed.description,
       attributes,
       skills,

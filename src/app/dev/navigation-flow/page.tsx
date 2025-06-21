@@ -92,7 +92,7 @@ export default function NavigationFlowTestPage() {
                 ) : (
                   worldList.map(world => (
                     <div key={world.id} className="text-gray-600">
-                      {world.name} ({world.theme})
+                      {world.name} ({world.genre})
                     </div>
                   ))
                 )}

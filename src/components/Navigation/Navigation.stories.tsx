@@ -74,7 +74,7 @@ const setupWorlds = () => {
   const fantasyWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Realm of Shadows',
     description: 'A dark fantasy world',
-    theme: 'Dark Fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -88,7 +88,7 @@ const setupWorlds = () => {
   const scifiWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Neo-Tokyo 2185',
     description: 'Cyberpunk future',
-    theme: 'Cyberpunk',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -102,7 +102,7 @@ const setupWorlds = () => {
   const westernWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Dustbowl County',
     description: 'Wild west frontier',
-    theme: 'Western',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {

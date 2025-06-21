@@ -111,7 +111,7 @@ describe('ActiveGameSession', () => {
       id: 'test-world',
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

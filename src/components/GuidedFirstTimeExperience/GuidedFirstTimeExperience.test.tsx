@@ -60,7 +60,7 @@ describe('GuidedFirstTimeExperience', () => {
 
   const mockWizardState = {
     currentStep: 0,
-    data: { name: '', theme: '', description: '' },
+    data: { name: '', genre: 'fantasy', description: '' },
     isProcessing: false,
     errors: {},
     validation: {},
@@ -248,7 +248,7 @@ describe('GuidedFirstTimeExperience', () => {
       const themeSelect = screen.getByLabelText(/theme/i);
       fireEvent.change(themeSelect, { target: { value: 'fantasy' } });
       
-      expect(mockUpdateData).toHaveBeenCalledWith({ theme: 'fantasy' });
+      expect(mockUpdateData).toHaveBeenCalledWith({ genre: 'fantasy' });
     });
 
     it('shows all theme options', () => {

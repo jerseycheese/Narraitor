@@ -100,7 +100,7 @@ export default function WorldsPage() {
       // Create the world initially without an image
       const worldId = useWorldStore.getState().createWorld({
         name: generatedData.name,
-        theme: generatedData.theme,
+        genre: generatedData.genre,
         description: generatedData.description,
         reference: worldReference || undefined,
         relationship: worldRelationship || undefined,

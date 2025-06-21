@@ -49,7 +49,7 @@ export default function ChoiceGeneratorTestPage() {
   const [narrativeContext, setNarrativeContext] = useState<NarrativeContext>(createSampleNarrativeContext());
   const [worldName, setWorldName] = useState('Fantasy World');
   const [worldDescription, setWorldDescription] = useState('A world of magic and adventure');
-  const [worldTheme, setWorldTheme] = useState('fantasy');
+  const [worldGenre, setWorldGenre] = useState('fantasy');
   
   // Initialize a test world in the store if it doesn't exist
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function ChoiceGeneratorTestPage() {
         const newWorldId = useWorldStore.getState().createWorld({
           name: worldName,
           description: worldDescription,
-          theme: worldTheme,
+          genre: worldGenre,
           attributes: [],
           skills: [],
           settings: {
@@ -80,7 +80,7 @@ export default function ChoiceGeneratorTestPage() {
         setError('Failed to create test world');
       }
     }
-  }, [worldId, worldName, worldDescription, worldTheme]);
+  }, [worldId, worldName, worldDescription, worldGenre]);
 
   const generateChoices = async () => {
     setIsGenerating(true);
@@ -92,12 +92,12 @@ export default function ChoiceGeneratorTestPage() {
       if (currentWorld && (
         currentWorld.name !== worldName ||
         currentWorld.description !== worldDescription ||
-        currentWorld.theme !== worldTheme
+        currentWorld.genre !== worldGenre
       )) {
         useWorldStore.getState().updateWorld(worldId, {
           name: worldName,
           description: worldDescription,
-          theme: worldTheme
+          genre: worldGenre
         });
       }
       
@@ -149,7 +149,7 @@ export default function ChoiceGeneratorTestPage() {
       content: '',
       type: 'scene',
       metadata: {
-        tags: [worldTheme],
+        tags: [worldGenre],
         location: narrativeContext.currentLocation || 'Unknown',
       },
       timestamp: new Date(),
@@ -200,10 +200,10 @@ export default function ChoiceGeneratorTestPage() {
             />
           </div>
           <div>
-            <label className="block mb-1">World Theme/Genre:</label>
+            <label className="block mb-1">World Genre:</label>
             <select
-              value={worldTheme}
-              onChange={(e) => setWorldTheme(e.target.value)}
+              value={worldGenre}
+              onChange={(e) => setWorldGenre(e.target.value)}
               className="w-full p-2 border rounded"
             >
               <option value="fantasy">Fantasy</option>

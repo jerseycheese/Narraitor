@@ -97,7 +97,7 @@ export default function PlayPage() {
   }
 
   const pageTitle = currentWorld ? `Playing in ${currentWorld.name}` : 'Game Session';
-  const pageDescription = currentWorld?.theme;
+  const pageDescription = currentWorld?.genre;
 
   return (
     <PageLayout title={pageTitle} description={pageDescription} maxWidth="7xl" className="pb-0">

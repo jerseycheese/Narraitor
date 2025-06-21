@@ -21,7 +21,7 @@ export const testUtils = {
       {
         name: 'Test Medieval Kingdom',
         description: 'A test medieval fantasy kingdom for development purposes',
-        theme: 'fantasy' as const,
+        genre: 'fantasy' as const,
         attributes: [],
         skills: [],
         settings: {
@@ -34,7 +34,7 @@ export const testUtils = {
       {
         name: 'Test Space Colony',
         description: 'A test sci-fi space colony for development purposes',
-        theme: 'sci-fi' as const,
+        genre: 'sci-fi' as const,
         attributes: [],
         skills: [],
         settings: {

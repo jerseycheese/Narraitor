@@ -12,7 +12,7 @@ describe('Store Integration', () => {
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -60,7 +60,7 @@ describe('Store Integration', () => {
       // Create world and character
       const worldId = useWorldStore.getState().createWorld({
         name: 'World to Delete',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -96,7 +96,7 @@ describe('Store Integration', () => {
     test('should handle character deletion with inventory', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -160,7 +160,7 @@ describe('Store Integration', () => {
       // Create a fantasy world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Fantasy Realm',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [
           {
             id: 'str-1',

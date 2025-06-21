@@ -11,7 +11,7 @@ describe('AI Context Types', () => {
         world: {
           id: 'world-1',
           name: 'Western World',
-          theme: 'western',
+          genre: 'western',
           attributes: [],
           skills: [],
           settings: {
@@ -54,7 +54,7 @@ describe('AI Context Types', () => {
         currentObjectives: ['Find the sheriff']
       };
 
-      expect(context.world.theme).toBe('western');
+      expect(context.world.genre).toBe('western');
       expect(context.character.name).toBe('John Doe');
       expect(context.currentObjectives).toHaveLength(1);
     });

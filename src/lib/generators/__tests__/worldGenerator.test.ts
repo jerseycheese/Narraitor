@@ -19,7 +19,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Dunder Mifflin Scranton",
-          theme: "Modern",
+          genre: "Modern",
           description: "A paper supply company branch in Scranton, PA where everyday office life becomes an adventure.",
           attributes: [
             {
@@ -74,8 +74,8 @@ describe('worldGenerator', () => {
       expect(promptArg).toContain('NEVER default to Fantasy');
       
       // Verify the result has Modern theme, not Fantasy
-      expect(result.theme).toBe('Modern');
-      expect(result.theme).not.toBe('Fantasy');
+      expect(result.genre).toBe('Modern');
+      expect(result.genre).not.toBe('Fantasy');
     });
 
     it('should use Sci-Fi theme for Star Wars setting', async () => {
@@ -113,7 +113,7 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      expect(result.theme).toBe('Sci-Fi');
+      expect(result.genre).toBe('Sci-Fi');
     });
 
     it('should allow Fantasy theme for Lord of the Rings setting', async () => {
@@ -151,7 +151,7 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      expect(result.theme).toBe('Fantasy');
+      expect(result.genre).toBe('Fantasy');
     });
   });
 
@@ -160,7 +160,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Corporate Heights",
-          theme: "Modern",
+          genre: "Modern",
           description: "A modern office building where corporate drama unfolds daily.",
           attributes: [
             {

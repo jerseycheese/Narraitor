@@ -10,7 +10,7 @@ const mockWorld: World = {
   id: '1',
   name: 'Test World',
   description: 'This is a test world for testing the Play functionality.',
-  theme: 'Fantasy',
+  genre: 'Fantasy',
   attributes: [],
   skills: [],
   settings: {

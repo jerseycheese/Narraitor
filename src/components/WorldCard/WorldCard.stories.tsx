@@ -8,7 +8,7 @@ const mockWorld: World = {
   id: '1',
   name: 'Mystical Realms of Avaloria',
   description: 'An epic fantasy world filled with magic, dragons, and ancient prophecies. Heroes must band together to face the rising darkness.',
-  theme: 'fantasy',
+  genre: 'fantasy',
   attributes: [],
   skills: [],
   settings: {
@@ -31,7 +31,7 @@ const sciFiWorld: World = {
   id: '2',
   name: 'Neo Tokyo 2185',
   description: 'A cyberpunk dystopia where megacorporations rule and underground hackers fight for freedom in the digital realm.',
-  theme: 'Cyberpunk',
+  genre: 'fantasy',
   attributes: [],
   skills: [],
   settings: {
@@ -54,7 +54,7 @@ const westernWorld: World = {
   id: '3',
   name: 'Dustbowl County',
   description: 'The lawless frontier where outlaws roam and justice comes at the end of a six-shooter.',
-  theme: 'Western',
+  genre: 'fantasy',
   attributes: [],
   skills: [],
   settings: {
@@ -205,7 +205,7 @@ export const MinimalContent: Story = {
       ...mockWorld,
       name: 'Minimal World',
       description: '',
-      theme: '',
+      genre: 'fantasy',
       image: undefined, // No image to test the fallback layout
     },
     onSelect: () => console.log('Selected minimal world'),
@@ -248,7 +248,7 @@ export const SetInWorld: Story = {
       ...mockWorld,
       name: 'Middle-earth Adventure',
       description: 'Journey through the Shire, visit Rivendell, and brave the paths to Mordor in this epic quest through Tolkien\'s beloved world.',
-      theme: 'fantasy',
+      genre: 'fantasy',
       reference: 'Lord of the Rings',
       relationship: 'set_in'
     },
@@ -272,7 +272,7 @@ export const BasedOnWorld: Story = {
       ...sciFiWorld,
       name: 'Chrome Shadows',
       description: 'A neon-soaked metropolis where corporate espionage and street-level hackers clash in a world inspired by classic cyberpunk themes.',
-      theme: 'Cyberpunk',
+      genre: 'fantasy',
       reference: 'Blade Runner',
       relationship: 'based_on'
     },
@@ -296,7 +296,7 @@ export const OriginalWorld: Story = {
       ...westernWorld,
       name: 'Dreamscape Frontier',
       description: 'A completely original world where reality bends to the will of dreamwalkers and nightmares take physical form in the waking world.',
-      theme: 'Surreal Western',
+      genre: 'fantasy',
       // No reference or relationship = original world
     },
     characterCount: 3,

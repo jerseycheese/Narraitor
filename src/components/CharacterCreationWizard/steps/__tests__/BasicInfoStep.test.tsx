@@ -10,7 +10,7 @@ describe.skip('BasicInfoStep', () => {
     id: 'world-1',
     name: 'Test World',
     description: 'Test Description',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {

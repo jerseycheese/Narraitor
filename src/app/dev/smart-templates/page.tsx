@@ -36,7 +36,7 @@ export default function SmartTemplatesTestPage() {
                 <h3 className="text-lg font-semibold">{generatedTemplate.name}</h3>
                 <p className="text-gray-600">{generatedTemplate.description}</p>
                 <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                  {generatedTemplate.theme}
+                  {generatedTemplate.genre}
                 </span>
               </div>
               

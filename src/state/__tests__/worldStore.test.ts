@@ -36,7 +36,7 @@ describe('worldStore', () => {
       expect(worldId).toBeDefined();
       expect(state.worlds[worldId]).toBeDefined();
       expect(state.worlds[worldId].name).toBe('Test World');
-      expect(state.worlds[worldId].theme).toBe('fantasy');
+      expect(state.worlds[worldId].genre).toBe('fantasy');
       expect(state.worlds[worldId].createdAt).toBeDefined();
       expect(state.worlds[worldId].updatedAt).toBeDefined();
     });

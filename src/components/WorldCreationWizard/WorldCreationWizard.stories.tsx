@@ -70,7 +70,7 @@ export const DescriptionStep: Story = {
     initialStep: 2,
     initialData: {
       name: 'Fantasy Kingdom',
-      theme: 'fantasy',
+      genre: 'fantasy',
       settings: {
         maxAttributes: 10,
         maxSkills: 10,
@@ -94,7 +94,7 @@ export const AttributeReviewStep: Story = {
     initialStep: 3,
     initialData: {
       name: 'Fantasy Kingdom',
-      theme: 'fantasy',
+      genre: 'fantasy',
       description: 'A magical world filled with wizards and warriors',
       settings: {
         maxAttributes: 10,
@@ -130,7 +130,7 @@ export const SkillReviewStep: Story = {
     initialStep: 4,
     initialData: {
       name: 'Fantasy Kingdom',
-      theme: 'fantasy',
+      genre: 'fantasy',
       description: 'A magical world filled with wizards and warriors',
       attributes: [
         { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },
@@ -177,7 +177,7 @@ export const FinalizeStep: Story = {
     initialStep: 5,
     initialData: {
       name: 'Fantasy Kingdom',
-      theme: 'fantasy',
+      genre: 'fantasy',
       description: 'A magical world filled with wizards and warriors, ancient forests, and towering castles',
       attributes: [
         { id: 'attr1', worldId: '', name: 'Strength', description: 'Physical power', baseValue: 5, minValue: 1, maxValue: 10 },

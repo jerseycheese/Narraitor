@@ -20,42 +20,42 @@ export class WorldImageGenerator {
     if (world.description && world.description.trim()) {
       subject = world.description.trim();
     } else {
-      subject = `a ${world.theme} world environment`;
+      subject = `a ${world.genre} world environment`;
     }
 
-    // 3. Context/Style based on theme (Google recommends specific style instructions)
-    const themeLC = world.theme.toLowerCase();
-    let themeContext = '';
+    // 3. Context/Style based on genre (Google recommends specific style instructions)
+    const genreLC = world.genre.toLowerCase();
+    let genreContext = '';
     
-    if (themeLC.includes('fantasy')) {
-      themeContext = 'in epic fantasy style, magical atmosphere, mystical lighting';
-    } else if (themeLC.includes('sci-fi') || themeLC.includes('science fiction')) {
-      themeContext = 'in science fiction style, futuristic aesthetic, advanced technology';
-    } else if (themeLC.includes('horror')) {
-      themeContext = 'in horror style, dark ominous atmosphere, dramatic shadows';
-    } else if (themeLC.includes('western')) {
-      themeContext = 'in western style, rugged frontier aesthetic, dusty atmosphere';
-    } else if (themeLC.includes('cyberpunk')) {
-      themeContext = 'in cyberpunk style, neon-lit urban environment, high-tech aesthetic';
-    } else if (themeLC.includes('post-apocalyptic')) {
-      themeContext = 'in post-apocalyptic style, desolate ruins, abandoned structures';
-    } else if (themeLC.includes('historical')) {
-      themeContext = 'in historical style, period-accurate details, authentic atmosphere';
-    } else if (themeLC.includes('steampunk')) {
-      themeContext = 'in steampunk style, brass machinery, steam-powered technology';
-    } else if (themeLC.includes('medieval')) {
-      themeContext = 'in medieval style, historical architecture, period atmosphere';
-    } else if (themeLC.includes('modern') || themeLC.includes('comedy') || themeLC.includes('workplace') || themeLC.includes('crime') || themeLC.includes('drama') || themeLC.includes('contemporary')) {
-      themeContext = 'in modern realistic style, contemporary setting, real-world environment, no fantasy or magical elements';
+    if (genreLC.includes('fantasy')) {
+      genreContext = 'in epic fantasy style, magical atmosphere, mystical lighting';
+    } else if (genreLC.includes('sci-fi') || genreLC.includes('science fiction')) {
+      genreContext = 'in science fiction style, futuristic aesthetic, advanced technology';
+    } else if (genreLC.includes('horror')) {
+      genreContext = 'in horror style, dark ominous atmosphere, dramatic shadows';
+    } else if (genreLC.includes('western')) {
+      genreContext = 'in western style, rugged frontier aesthetic, dusty atmosphere';
+    } else if (genreLC.includes('cyberpunk')) {
+      genreContext = 'in cyberpunk style, neon-lit urban environment, high-tech aesthetic';
+    } else if (genreLC.includes('post-apocalyptic')) {
+      genreContext = 'in post-apocalyptic style, desolate ruins, abandoned structures';
+    } else if (genreLC.includes('historical')) {
+      genreContext = 'in historical style, period-accurate details, authentic atmosphere';
+    } else if (genreLC.includes('steampunk')) {
+      genreContext = 'in steampunk style, brass machinery, steam-powered technology';
+    } else if (genreLC.includes('medieval')) {
+      genreContext = 'in medieval style, historical architecture, period atmosphere';
+    } else if (genreLC.includes('modern') || genreLC.includes('comedy') || genreLC.includes('workplace') || genreLC.includes('crime') || genreLC.includes('drama') || genreLC.includes('contemporary')) {
+      genreContext = 'in modern realistic style, contemporary setting, real-world environment, no fantasy or magical elements';
     } else {
-      themeContext = `in ${world.theme} style`;
+      genreContext = `in ${world.genre} style`;
     }
 
     // 4. Additional technical details (Google recommends these for quality)
     const technicalDetails = 'cinematic composition, professional lighting, environmental storytelling, no people visible, 4K quality';
 
     // Combine following Google's structure
-    return `${styleModifiers} ${subject} ${themeContext}, ${technicalDetails}`;
+    return `${styleModifiers} ${subject} ${genreContext}, ${technicalDetails}`;
   }
 
   /**
@@ -80,11 +80,11 @@ export class WorldImageGenerator {
           default: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8bGluZWFyR3JhZGllbnQgaWQ9ImdyYWQiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzg3Q0VGQSIvPgogICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjRkZFNEQyIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0idXJsKCNncmFkKSIvPgogIDxjaXJjbGUgY3g9IjcwMCIgY3k9IjgwIiByPSI1MCIgZmlsbD0iI0ZGRkYwMCIgb3BhY2l0eT0iMC45Ii8+CiAgPHRleHQgeD0iNDAwIiB5PSIyMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI0OCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgb3BhY2l0eT0iMC4zIj5XT1JMRDwvdGV4dD4KPC9zdmc+'
         };
         
-        const themeLC = world.theme.toLowerCase();
+        const genreLC = world.genre.toLowerCase();
         let mockImage = mockImages.default;
-        if (themeLC.includes('fantasy')) {
+        if (genreLC.includes('fantasy')) {
           mockImage = mockImages.fantasy;
-        } else if (themeLC.includes('cyberpunk')) {
+        } else if (genreLC.includes('cyberpunk')) {
           mockImage = mockImages.cyberpunk;
         }
         

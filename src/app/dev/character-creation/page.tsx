@@ -11,7 +11,7 @@ const testWorlds = {
   fantasy: {
     name: 'Fantasy Test World',
     description: 'A high fantasy world for testing character creation',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [
       { id: 'attr-str', name: 'Strength', description: 'Physical power', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-dex', name: 'Dexterity', description: 'Agility and reflexes', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
@@ -40,7 +40,7 @@ const testWorlds = {
   western: {
     name: 'Western Test World',
     description: 'A wild west world for testing character creation',
-    theme: 'western',
+    genre: 'fantasy',
     attributes: [
       { id: 'attr-grit', name: 'Grit', description: 'Toughness and determination', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-draw', name: 'Quick Draw', description: 'Speed and reflexes', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },

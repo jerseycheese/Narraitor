@@ -26,7 +26,7 @@ export class WorldImageGenerator {
 
     // Core subject - environmental shot
     subject.push('Photorealistic landscape photograph');
-    subject.push(`${world.theme} themed environment`);
+    subject.push(`${world.genre} themed environment`);
 
     // Extract key details from description
     if (world.description) {
@@ -50,33 +50,33 @@ export class WorldImageGenerator {
     }
 
     // Theme-specific enhancements
-    const themeLC = world.theme.toLowerCase();
+    const genreLC = world.genre.toLowerCase();
     
-    if (themeLC.includes('fantasy')) {
+    if (genreLC.includes('fantasy')) {
       context.push('epic fantasy vista');
       context.push('magical atmosphere');
       style.push('fantasy art inspiration');
-    } else if (themeLC.includes('sci-fi') || themeLC.includes('science fiction')) {
+    } else if (genreLC.includes('sci-fi') || genreLC.includes('science fiction')) {
       context.push('futuristic landscape');
       context.push('advanced technology visible');
       style.push('science fiction concept art style');
-    } else if (themeLC.includes('horror')) {
+    } else if (genreLC.includes('horror')) {
       context.push('ominous and foreboding');
       context.push('dark atmospheric lighting');
       style.push('horror atmosphere');
-    } else if (themeLC.includes('western')) {
+    } else if (genreLC.includes('western')) {
       context.push('old west frontier');
       context.push('dusty and weathered');
       style.push('western film cinematography');
-    } else if (themeLC.includes('cyberpunk')) {
+    } else if (genreLC.includes('cyberpunk')) {
       context.push('neon-lit cityscape');
       context.push('high-tech low-life aesthetic');
       style.push('cyberpunk visual style');
-    } else if (themeLC.includes('post-apocalyptic')) {
+    } else if (genreLC.includes('post-apocalyptic')) {
       context.push('ruined civilization');
       context.push('desolate and abandoned');
       style.push('post-apocalyptic atmosphere');
-    } else if (themeLC.includes('historical')) {
+    } else if (genreLC.includes('historical')) {
       context.push('period-accurate environment');
       context.push('historical authenticity');
       style.push('historical photography style');
@@ -119,17 +119,17 @@ export class WorldImageGenerator {
     }
 
     const prompt = this.buildPrompt(world);
-    const themeLC = world.theme.toLowerCase();
+    const genreLC = world.genre.toLowerCase();
     
     // Select appropriate mock image based on theme
     let mockImage = mockWorldImages.default;
-    if (themeLC.includes('fantasy')) {
+    if (genreLC.includes('fantasy')) {
       mockImage = mockWorldImages.fantasy;
-    } else if (themeLC.includes('cyberpunk')) {
+    } else if (genreLC.includes('cyberpunk')) {
       mockImage = mockWorldImages.cyberpunk;
-    } else if (themeLC.includes('horror')) {
+    } else if (genreLC.includes('horror')) {
       mockImage = mockWorldImages.horror;
-    } else if (themeLC.includes('western')) {
+    } else if (genreLC.includes('western')) {
       mockImage = mockWorldImages.western;
     }
     

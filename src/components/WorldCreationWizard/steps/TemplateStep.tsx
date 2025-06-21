@@ -6,9 +6,6 @@ import { SmartTemplates } from '../../world/SmartTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
-import { WorldTemplate } from '@/lib/ai/templateGenerator';
-import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
-import { geminiClient } from '@/lib/ai/geminiClient';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -68,26 +65,16 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   };
   
   // Handler for AI-generated templates
-  const handleSmartTemplateGenerated = async (template: WorldTemplate) => {
+  const handleSmartTemplateGenerated = async () => {
     try {
       setIsApplying(true);
       
-      // Convert template to world format for form population
-      const narrativeGenerator = new NarrativeGenerator(geminiClient);
-      const worldData = narrativeGenerator.convertTemplateToWorld(template);
-      
+      // Template data will be processed later in the wizard flow
       // Update the wizard state with the template data
       // This will populate the form fields in subsequent steps
       onUpdate({ 
         selectedTemplateId: 'smart-template', // Indicate we're using a smart template
-        createOwnWorld: false,
-        // Populate form fields with template data
-        name: worldData.name,
-        description: worldData.description,
-        genre: worldData.genre,
-        attributes: worldData.attributes,
-        skills: worldData.skills,
-        settings: worldData.settings
+        createOwnWorld: false
       });
       
       // Proceed to the next step (Basic Info) so user can review/modify

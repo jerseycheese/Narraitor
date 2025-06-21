@@ -174,7 +174,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                   >
                     <div>
                       <div className="font-medium">{world.name}</div>
-                      <div className="text-sm opacity-75">{world.theme} • {worldCharacters} characters</div>
+                      <div className="text-sm opacity-75">{world.genre} • {worldCharacters} characters</div>
                     </div>
                     {world.id === currentWorldId && (
                       <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">

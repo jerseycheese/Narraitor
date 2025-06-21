@@ -7,7 +7,7 @@ describe('WorldCard', () => {
   const mockWorld = createMockWorld({
     name: 'Fantasy Realm',
     description: 'A magical world of adventure',
-    theme: 'Fantasy',
+    genre: 'fantasy',
   });
 
   // Test case for displaying world data (updated to address all acceptance criteria)
@@ -21,7 +21,7 @@ describe('WorldCard', () => {
     expect(screen.getByTestId('world-card-description')).toHaveTextContent(mockWorld.description);
     
     // Verify genre (theme) is displayed
-    expect(screen.getByTestId('world-card-theme')).toHaveTextContent(mockWorld.theme);
+    expect(screen.getByTestId('world-card-genre')).toHaveTextContent(mockWorld.genre);
     
     // Verify timestamps are displayed
     expect(screen.getByTestId('world-card-createdAt')).toHaveTextContent(`Created: ${new Date(mockWorld.createdAt).toLocaleDateString()}`);
@@ -50,7 +50,7 @@ describe('WorldCard', () => {
   test('handles missing or incomplete data gracefully', () => {
     const incompleteWorld = createMockWorld({
       description: '',
-      theme: '',
+      genre: 'fantasy',
     });
     
     render(<WorldCard world={incompleteWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);

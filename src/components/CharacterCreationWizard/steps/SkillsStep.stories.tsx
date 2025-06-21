@@ -123,7 +123,7 @@ const mockWorldConfig = {
   id: 'world-1',
   name: 'Test World',
   description: 'A test world',
-  theme: 'fantasy',
+  genre: 'fantasy',
   attributes: [
     { id: 'strength', name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5 },
     { id: 'intelligence', name: 'Intelligence', description: 'Mental acuity', minValue: 1, maxValue: 10, baseValue: 5 },

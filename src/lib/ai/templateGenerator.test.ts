@@ -84,7 +84,7 @@ describe('TemplateGenerator', () => {
         type: 'genre-mix'
       });
 
-      expect(result.theme).toBe('Cyberpunk Western');
+      expect(result.genre).toBe('Cyberpunk Western');
       expect(result.attributes).toHaveLength(2);
       expect(result.skills).toHaveLength(2);
       
@@ -116,7 +116,7 @@ describe('TemplateGenerator', () => {
       });
 
       expect(result.name).toBe('Microscopic Empire');
-      expect(result.theme).toBe('Micro Fantasy');
+      expect(result.genre).toBe('Micro Fantasy');
       
       expect(mockAIClient.generateContent).toHaveBeenCalledWith(
         expect.stringContaining('completely unexpected')

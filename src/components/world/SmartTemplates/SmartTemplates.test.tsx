@@ -113,7 +113,7 @@ describe('SmartTemplates', () => {
       const mockTemplate = {
         name: 'Test World',
         description: 'A test world',
-        theme: 'Fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         explanation: 'Test explanation'
@@ -198,7 +198,7 @@ describe('SmartTemplates', () => {
       const mockHistoryEntry = {
         template: {
           name: 'Previous World',
-          theme: 'Sci-Fi',
+          genre: 'fantasy',
           description: 'A sci-fi world',
           attributes: [],
           skills: [],

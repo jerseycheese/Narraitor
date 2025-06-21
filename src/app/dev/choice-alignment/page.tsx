@@ -23,7 +23,7 @@ export default function ChoiceAlignmentTestPage() {
       const newWorldId = useWorldStore.getState().createWorld({
         name: 'Test World',
         description: 'A fantasy world for testing choice alignment',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {

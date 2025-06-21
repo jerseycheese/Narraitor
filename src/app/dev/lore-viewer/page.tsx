@@ -24,7 +24,7 @@ export default function LoreViewerTestPage() {
       const newWorldId = createWorld({
         name: 'Test World',
         description: 'Test world for lore viewer',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {

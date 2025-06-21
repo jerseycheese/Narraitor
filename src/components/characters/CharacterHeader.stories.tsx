@@ -23,7 +23,7 @@ const mockWorld: World = {
   id: 'world-1',
   name: 'Middle Earth',
   description: 'A fantasy world of magic and adventure',
-  theme: 'fantasy',
+  genre: 'fantasy',
   relationship: 'set_in',
   reference: 'Lord of the Rings',
   attributes: [],
@@ -230,7 +230,7 @@ export const SciFiCharacter: Story = {
       ...mockWorld,
       name: 'New Terra',
       description: 'A futuristic colony on a distant planet',
-      theme: 'Sci-Fi',
+      genre: 'fantasy',
     },
   },
 };

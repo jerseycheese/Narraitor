@@ -84,7 +84,7 @@ jest.mock('../../../../state/worldStore', () => {
 jest.mock('../../../world/SmartTemplates', () => ({
   SmartTemplates: ({ onTemplateGenerated }: { onTemplateGenerated: (template: unknown) => void }) => (
     <div data-testid="smart-templates">
-      <button onClick={() => onTemplateGenerated({ name: 'Test', theme: 'Fantasy', description: 'Test', attributes: [], skills: [], explanation: 'Test' })}>
+      <button onClick={() => onTemplateGenerated({ name: 'Test', genre: 'fantasy', description: 'Test', attributes: [], skills: [], explanation: 'Test' })}>
         Generate Template
       </button>
     </div>

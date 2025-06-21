@@ -49,7 +49,7 @@ export default function FinalizeStep({
         id: 'temp',
         name: worldData.name || 'Untitled World',
         description: worldData.description || '',
-        theme: worldData.theme || 'fantasy',
+        genre: worldData.genre || 'fantasy',
         ...worldData
       } as World;
       
@@ -121,7 +121,7 @@ export default function FinalizeStep({
             />
             <DataField 
               label="Genre" 
-              value={<span data-testid="review-world-genre">{worldData.theme}</span>}
+              value={<span data-testid="review-world-genre">{worldData.genre}</span>}
               variant="inline"
               size="md"
             />

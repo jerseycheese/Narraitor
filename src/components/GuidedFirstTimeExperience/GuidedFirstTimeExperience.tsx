@@ -8,7 +8,7 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
-import { THEMES } from '@/lib/constants/themes';
+import { GENRES } from '@/lib/constants/genres';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
@@ -23,7 +23,7 @@ const GUIDED_STEPS = [
 
 interface OnboardingData {
   name: string;
-  theme: string;
+  genre: string;
   description: string;
 }
 
@@ -81,10 +81,10 @@ export function GuidedFirstTimeExperience() {
           touched: true,
         };
       case 2: // Details step
-        const themeError = validateField(data.theme, [
-          (value) => validators.required(value, 'Theme'),
+        const genreError = validateField(data.genre, [
+          (value) => validators.required(value, 'Genre'),
         ]);
-        const errors = [themeError].filter(Boolean) as string[];
+        const errors = [genreError].filter(Boolean) as string[];
         return {
           valid: errors.length === 0,
           errors,
@@ -108,13 +108,13 @@ export function GuidedFirstTimeExperience() {
           
           const namePrompt = `Generate a creative, appropriate world name for this concept: "${data.description || 'A world of endless possibilities'}"
           
-Theme: ${data.theme}
+Genre: ${data.genre}
 
 Requirements:
-- Name should reflect the specific concept/description, not just the theme
+- Name should reflect the specific concept/description, not just the genre
 - Keep it concise (1-4 words)
 - Make it memorable and fitting
-- Don't use generic theme words like "realm", "kingdom", "empire" unless they truly fit
+- Don't use generic genre words like "realm", "kingdom", "empire" unless they truly fit
 - Return ONLY the name, no quotes or explanations
 
 Examples:
@@ -134,9 +134,9 @@ World name:`;
           console.error('Failed to generate AI world name:', nameError);
         }
 
-        // Fallback to theme-based names if AI generation fails
+        // Fallback to genre-based names if AI generation fails
         if (!worldName || !worldName.trim()) {
-          const themeNames = {
+          const genreNames = {
             fantasy: ['Mystical Realm', 'Enchanted Lands', 'Arcane Kingdom'],
             'sci-fi': ['Stellar Colony', 'Cosmic Frontier', 'Galactic Outpost'],
             modern: ['Metropolitan Hub', 'Urban Center', 'City State'],
@@ -147,8 +147,8 @@ World name:`;
             cyberpunk: ['Neon City', 'Cyber District', 'Digital Metropolis'],
             other: ['New World', 'Uncharted Territory', 'Unknown Realm']
           };
-          const themeKey = data.theme as keyof typeof themeNames || 'other';
-          const nameOptions = themeNames[themeKey] || themeNames.other;
+          const genreKey = data.genre as keyof typeof genreNames || 'other';
+          const nameOptions = genreNames[genreKey] || genreNames.other;
           worldName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
         }
       }
@@ -157,7 +157,7 @@ World name:`;
       const worldId = createWorld({
         name: worldName,
         description: data.description || 'A world of endless possibilities',
-        theme: data.theme || 'fantasy',
+        genre: data.genre || 'fantasy',
         attributes: [], // Will be populated with AI suggestions or defaults below
         skills: [], // Will be populated with AI suggestions or defaults below
         settings: {
@@ -191,7 +191,7 @@ World name:`;
               id: worldId,
               name: worldName,
               description: data.description || 'A world of endless possibilities',
-              theme: data.theme || 'fantasy'
+              genre: data.genre || 'fantasy'
             }
           }),
         });
@@ -236,7 +236,7 @@ World name:`;
   // Initialize wizard state
   const wizard = useWizardState({
     steps: GUIDED_STEPS,
-    initialData: { name: '', theme: '', description: '' },
+    initialData: { name: '', genre: 'fantasy', description: '' },
     onComplete: handleComplete,
     onCancel: handleSkip,
     validateStep,
@@ -300,7 +300,7 @@ World name:`;
           World Details
         </h2>
         <p className="text-gray-600">
-          Give your world a name and theme
+          Give your world a name and genre
         </p>
       </div>
       
@@ -320,19 +320,19 @@ World name:`;
         </div>
         
         <div>
-          <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">
-            Theme <span className="text-red-500">*</span>
+          <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+            Genre <span className="text-red-500">*</span>
           </label>
           <select
-            id="world-theme"
+            id="world-genre"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={wizard.state.data.theme}
-            onChange={(e) => wizard.handlers.updateData({ theme: e.target.value })}
+            value={wizard.state.data.genre}
+            onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
           >
-            <option value="">Select a theme</option>
-            {THEMES.map((theme) => (
-              <option key={theme.value} value={theme.value}>
-                {theme.label}
+            <option value="">Select a genre</option>
+            {GENRES.map((genre) => (
+              <option key={genre.value} value={genre.value}>
+                {genre.label}
               </option>
             ))}
           </select>
@@ -347,7 +347,7 @@ World name:`;
         )}
       </div>
     </div>
-  ), [wizard.state.data.name, wizard.state.data.theme, wizard.stepValidation, wizard.handlers]);
+  ), [wizard.state.data.name, wizard.state.data.genre, wizard.stepValidation, wizard.handlers]);
 
   // Render current step
   const renderCurrentStep = useCallback(() => {

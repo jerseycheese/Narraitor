@@ -6,7 +6,7 @@ const MockGuidedFirstTimeExperience = () => {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [formData, setFormData] = React.useState({
     name: '',
-    theme: '',
+    genre: 'fantasy',
     description: '',
   });
 
@@ -68,7 +68,7 @@ const MockGuidedFirstTimeExperience = () => {
           World Details
         </h2>
         <p className="text-gray-600">
-          Give your world a name and theme
+          Give your world a name and genre
         </p>
       </div>
       
@@ -88,16 +88,16 @@ const MockGuidedFirstTimeExperience = () => {
         </div>
         
         <div>
-          <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">
-            Theme <span className="text-red-500">*</span>
+          <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+            Genre <span className="text-red-500">*</span>
           </label>
           <select
-            id="world-theme"
+            id="world-genre"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={formData.theme}
-            onChange={(e) => setFormData(prev => ({ ...prev, theme: e.target.value }))}
+            value={formData.genre}
+            onChange={(e) => setFormData(prev => ({ ...prev, genre: e.target.value }))}
           >
-            <option value="">Select a theme</option>
+            <option value="">Select a genre</option>
             <option value="fantasy">Fantasy</option>
             <option value="sci-fi">Sci-Fi</option>
             <option value="modern">Modern</option>
@@ -123,7 +123,7 @@ const MockGuidedFirstTimeExperience = () => {
     switch (currentStep) {
       case 0: return true;
       case 1: return formData.description.length > 0;
-      case 2: return formData.name.length > 0 && formData.theme.length > 0;
+      case 2: return formData.name.length > 0 && formData.genre.length > 0;
       default: return true;
     }
   };
@@ -221,13 +221,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // Create different starting states by modifying the component
-const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name: string; theme: string; description: string }>) => {
+const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name: string; genre: string; description: string }>) => {
   const StoryComponent = () => {
     const MockWithStep = () => {
       const [currentStep, setCurrentStep] = React.useState(initialStep);
       const [formData, setFormData] = React.useState({
         name: prefilledData?.name || '',
-        theme: prefilledData?.theme || '',
+        genre: prefilledData?.genre || '',
         description: prefilledData?.description || '',
       });
 
@@ -276,7 +276,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
         <div className="max-w-md mx-auto space-y-6">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">World Details</h2>
-            <p className="text-gray-600">Give your world a name and theme</p>
+            <p className="text-gray-600">Give your world a name and genre</p>
           </div>
           <div className="space-y-4">
             <div>
@@ -291,14 +291,14 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
               />
             </div>
             <div>
-              <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">Theme <span className="text-red-500">*</span></label>
+              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">Genre <span className="text-red-500">*</span></label>
               <select
-                id="world-theme"
+                id="world-genre"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.theme}
-                onChange={(e) => setFormData(prev => ({ ...prev, theme: e.target.value }))}
+                value={formData.genre}
+                onChange={(e) => setFormData(prev => ({ ...prev, genre: e.target.value }))}
               >
-                <option value="">Select a theme</option>
+                <option value="">Select a genre</option>
                 <option value="fantasy">Fantasy</option>
                 <option value="sci-fi">Sci-Fi</option>
                 <option value="modern">Modern</option>
@@ -324,7 +324,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
         switch (currentStep) {
           case 0: return true;
           case 1: return formData.description.length > 0;
-          case 2: return formData.name.length > 0 && formData.theme.length > 0;
+          case 2: return formData.name.length > 0 && formData.genre.length > 0;
           default: return true;
         }
       };
@@ -408,7 +408,7 @@ export const DetailsStep: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Step 3: World details form. Users provide name and theme, with validation preventing progression until complete.',
+        story: 'Step 3: World details form. Users provide name and genre, with validation preventing progression until complete.',
       },
     },
   },

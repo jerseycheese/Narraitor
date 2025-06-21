@@ -6,7 +6,7 @@ import { World } from '../../types/world.types';
 import { useWorldStore } from '../../state/worldStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useCharacterStore } from '../../state/characterStore';
-import { getThemeLabel } from '@/lib/constants/themes';
+import { getGenreLabel } from '@/lib/constants/genres';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
@@ -38,14 +38,14 @@ interface WorldCardProps {
 /**
  * WorldCard - Display card for a world with actions and information
  * 
- * Shows world details including name, theme, description, character count,
+ * Shows world details including name, genre, description, character count,
  * and world type (original, set in, inspired by). Provides action buttons
  * for playing, creating characters, viewing, editing, and deleting.
  * Active worlds get special styling and indicate current selection.
  * 
  * Features:
  * - World image display if available
- * - Theme and world type badges
+ * - Genre and world type badges
  * - Character count with navigation to characters list
  * - Smart play button that handles session resume
  * - Make active button for non-active worlds
@@ -183,14 +183,14 @@ const WorldCard: React.FC<WorldCardProps> = ({
               </h2>
             </Link>
             
-            {/* Theme and world type badges */}
+            {/* Genre and world type badges */}
             <div className="flex flex-wrap items-center gap-2">
-              {world.theme && (
+              {world.genre && (
                 <span 
-                  data-testid="world-card-theme" 
+                  data-testid="world-card-genre" 
                   className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
                 >
-                  {getThemeLabel(world.theme)}
+                  {getGenreLabel(world.genre)}
                 </span>
               )}
               

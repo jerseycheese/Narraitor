@@ -10,11 +10,11 @@ export default function TestWorldGeneration() {
   const [error, setError] = useState<string | null>(null);
 
   const testCases = [
-    { reference: 'The Office', relationship: 'set_in' as const, expectedTheme: 'modern' },
-    { reference: 'Star Wars', relationship: 'set_in' as const, expectedTheme: 'Sci-Fi' },
-    { reference: 'Lord of the Rings', relationship: 'set_in' as const, expectedTheme: 'Fantasy' },
-    { reference: 'Breaking Bad', relationship: 'set_in' as const, expectedTheme: 'modern' },
-    { reference: 'The Walking Dead', relationship: 'set_in' as const, expectedTheme: 'Post-Apocalyptic' },
+    { reference: 'The Office', relationship: 'set_in' as const, expectedGenre: 'modern' },
+    { reference: 'Star Wars', relationship: 'set_in' as const, expectedGenre: 'Sci-Fi' },
+    { reference: 'Lord of the Rings', relationship: 'set_in' as const, expectedGenre: 'Fantasy' },
+    { reference: 'Breaking Bad', relationship: 'set_in' as const, expectedGenre: 'modern' },
+    { reference: 'The Walking Dead', relationship: 'set_in' as const, expectedGenre: 'Post-Apocalyptic' },
   ];
 
   const runTest = async (testCase: typeof testCases[0]) => {
@@ -32,9 +32,9 @@ export default function TestWorldGeneration() {
 
       setGeneratedWorld(result);
 
-      // Check if theme matches expected
-      if (result.theme !== testCase.expectedTheme) {
-        setError(`Expected theme &quot;${testCase.expectedTheme}&quot; but got &quot;${result.theme}&quot;`);
+      // Check if genre matches expected
+      if (result.genre !== testCase.expectedGenre) {
+        setError(`Expected genre &quot;${testCase.expectedGenre}&quot; but got &quot;${result.genre}&quot;`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -45,11 +45,11 @@ export default function TestWorldGeneration() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">World Generation Theme Test</h1>
+      <h1 className="text-2xl font-bold mb-6">World Generation Genre Test</h1>
       
       <div className="mb-6">
         <p className="text-gray-600 mb-4">
-          Test that worlds set within non-fantasy universes don&apos;t get fantasy themes or elements.
+          Test that worlds set within non-fantasy universes don&apos;t get fantasy genres or elements.
         </p>
       </div>
 
@@ -64,7 +64,7 @@ export default function TestWorldGeneration() {
               Test &quot;{testCase.reference}&quot;
             </button>
             <span className="text-sm text-gray-600">
-              Expected theme: {testCase.expectedTheme}
+              Expected genre: {testCase.expectedGenre}
             </span>
           </div>
         ))}
@@ -91,9 +91,9 @@ export default function TestWorldGeneration() {
             <div>
               <span className="font-semibold">Name:</span> {generatedWorld.name}
             </div>
-            <div className={`${generatedWorld.theme === 'Fantasy' && !generatedWorld.name.includes('Lord') ? 'text-red-600' : ''}`}>
-              <span className="font-semibold">Theme:</span> {generatedWorld.theme}
-              {generatedWorld.theme === 'Fantasy' && !generatedWorld.name.includes('Lord') && (
+            <div className={`${generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') ? 'text-red-600' : ''}`}>
+              <span className="font-semibold">Genre:</span> {generatedWorld.genre}
+              {generatedWorld.genre === 'Fantasy' && !generatedWorld.name.includes('Lord') && (
                 <span className="ml-2 text-red-600">(❌ Should not be Fantasy!)</span>
               )}
             </div>

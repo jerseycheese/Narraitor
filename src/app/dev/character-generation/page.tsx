@@ -118,7 +118,7 @@ export default function CharacterGenerationTestPage() {
             <option value="">-- Select a World --</option>
             {Object.entries(worlds).map(([id, world]) => (
               <option key={id} value={id}>
-                {world.name} ({world.theme})
+                {world.name} ({world.genre})
               </option>
             ))}
           </select>

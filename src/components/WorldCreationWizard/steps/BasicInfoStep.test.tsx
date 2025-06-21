@@ -7,7 +7,7 @@ describe('BasicInfoStep', () => {
   const mockWorldData: Partial<World> = {
     name: '',
     description: '',
-    theme: 'fantasy',
+    genre: 'fantasy',
   };
 
   const mockOnUpdate = jest.fn();
@@ -100,7 +100,7 @@ describe('BasicInfoStep', () => {
     });
     expect(mockOnUpdate).toHaveBeenCalledWith({
       ...mockWorldData,
-      theme: 'sci-fi',
+      genre: 'fantasy',
     });
   });
 
@@ -110,7 +110,7 @@ describe('BasicInfoStep', () => {
         worldData={{
           name: 'Valid World Name',
           description: 'This is a valid description for our world',
-          theme: 'fantasy',
+          genre: 'fantasy',
         }}
         errors={{}}
         onUpdate={mockOnUpdate}

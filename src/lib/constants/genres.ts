@@ -101,7 +101,7 @@ export const DEFAULT_GENRE: GenreValue = 'fantasy';
 
 // Legacy exports for backward compatibility during migration
 export const THEMES = GENRES;
-export const ThemeOption = GenreOption;
+export type ThemeOption = GenreOption;
 export type ThemeValue = GenreValue;
 export const THEME_LABELS = GENRE_LABELS;
 export const getThemeLabel = getGenreLabel;

@@ -24,7 +24,7 @@ const createTestWorld = () => {
   const testWorld: Omit<World, 'id' | 'createdAt' | 'updatedAt'> = {
     name: 'Storybook Test World',
     description: 'A fantasy world for testing character creation',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [
       { id: 'attr-1', name: 'Strength', description: 'Physical power', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-2', name: 'Intelligence', description: 'Mental acuity', worldId: '', baseValue: 10, minValue: 1, maxValue: 10 },

@@ -180,7 +180,7 @@ export function Navigation() {
                           >
                             <div>
                               <div className="font-medium text-gray-900">{world.name}</div>
-                              <div className="text-sm text-gray-500">{world.theme} • {worldCharacters} characters</div>
+                              <div className="text-sm text-gray-500">{world.genre} • {worldCharacters} characters</div>
                             </div>
                             {world.id === currentWorldId && (
                               <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">

@@ -22,7 +22,7 @@ const mockSuggestions: SkillSuggestion[] = [
 
 const defaultWorldData: Partial<World> = {
   name: 'Test World',
-  theme: 'fantasy',
+  genre: 'fantasy',
   attributes: [
     {
       id: 'attr-1',

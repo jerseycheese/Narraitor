@@ -13,7 +13,7 @@ describe.skip('DescriptionStep', () => {
   const mockWorldData: Partial<World> = {
     name: 'Test World',
     description: '',
-    theme: 'fantasy',
+    genre: 'fantasy',
   };
 
   const mockOnUpdate = jest.fn();

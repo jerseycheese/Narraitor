@@ -13,7 +13,7 @@ const mockTemplateHistory = [
   {
     template: {
       name: 'Cyber Frontier',
-      theme: 'Cyberpunk Western',
+      genre: 'fantasy',
       description: 'A world where high-tech meets the wild west',
       attributes: [
         { name: 'Tech Savvy', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' },
@@ -34,7 +34,7 @@ const mockTemplateHistory = [
 const mockGeneratedTemplate: WorldTemplate = {
   name: 'Generated World',
   description: 'An AI-generated world for testing',
-  theme: 'Fantasy',
+  genre: 'fantasy',
   attributes: [
     { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' },
     { name: 'Intelligence', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' }
@@ -218,7 +218,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-medium">{entry.template.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{entry.template.theme}</p>
+                        <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
                         <p className="text-xs text-gray-500 mt-2">
                           {new Date(entry.generatedAt).toLocaleDateString()}
                         </p>
@@ -307,7 +307,7 @@ export const WithTemplateHistory: Story = {
 const mockTemplate: WorldTemplate = {
   name: 'Neo-Victorian Skyport',
   description: 'A steampunk world of floating cities powered by steam and clockwork, where airship pirates rule the skies and Victorian sensibilities clash with mechanical marvels.',
-  theme: 'Steampunk',
+  genre: 'fantasy',
   attributes: [
     { name: 'Ingenuity', baseValue: 65, minValue: 0, maxValue: 100, category: 'Mental' },
     { name: 'Dexterity', baseValue: 60, minValue: 0, maxValue: 100, category: 'Physical' },

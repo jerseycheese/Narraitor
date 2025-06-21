@@ -42,7 +42,7 @@ describe('contextOverride', () => {
     const result = createTestContext(mockWorld, mockCharacter, mockNarrativeContext, testConfig);
 
     expect(result.world.name).toBe('Custom World Name');
-    expect(result.world.theme).toBe('fantasy'); // Unchanged
+    expect(result.world.genre).toBe('fantasy'); // Unchanged
     expect(result.character.description).toBe('Modified character');
     expect(result.character.name).toBe('Test Character'); // Unchanged
     expect(result.narrativeContext.currentLocation).toBe('Custom location');

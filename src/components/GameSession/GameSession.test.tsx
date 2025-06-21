@@ -69,7 +69,7 @@ describe('GameSession', () => {
     id: 'test-world-id',
     name: 'Test World',
     description: 'Test description',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {

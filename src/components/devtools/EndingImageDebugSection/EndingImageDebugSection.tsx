@@ -243,7 +243,7 @@ export function EndingImageDebugSection() {
               <div><strong>Tone:</strong> {currentEnding.tone}</div>
               <div><strong>Type:</strong> {currentEnding.type}</div>
               <div><strong>Character:</strong> {currentCharacter?.name || 'Unknown'}</div>
-              <div><strong>World:</strong> {currentWorld?.name || 'Unknown'} ({currentWorld?.theme || 'No theme'})</div>
+              <div><strong>World:</strong> {currentWorld?.name || 'Unknown'} ({currentWorld?.genre || 'No genre'})</div>
             </div>
           </div>
         ) : (
@@ -347,7 +347,7 @@ export function EndingImageDebugSection() {
           <h4 className="font-medium mb-2 text-slate-200">Data Summary</h4>
           <div className="text-sm space-y-1 text-slate-300">
             <div><strong>Character:</strong> {currentCharacter?.name || 'No characters available'}</div>
-            <div><strong>World:</strong> {currentWorld?.name || 'No worlds available'} ({currentWorld?.theme || 'No theme'})</div>
+            <div><strong>World:</strong> {currentWorld?.name || 'No worlds available'} ({currentWorld?.genre || 'No genre'})</div>
             <div><strong>Available Characters:</strong> {Object.keys(characters).length}</div>
             <div><strong>Available Worlds:</strong> {Object.keys(worlds).length}</div>
           </div>

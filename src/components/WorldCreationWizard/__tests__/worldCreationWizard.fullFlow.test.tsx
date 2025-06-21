@@ -96,7 +96,7 @@ describe.skip('WorldCreationWizard Integration - Full Flow', () => {
     expect((worldStore as unknown as { getState: () => { createWorld: jest.Mock } }).getState().createWorld).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'My Fantasy World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         // The implementation has been updated, and skills are no longer included in the test data.
       })
     );

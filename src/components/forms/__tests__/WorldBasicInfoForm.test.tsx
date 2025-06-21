@@ -9,7 +9,7 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     id: 'world-123',
     name: 'Test World',
     description: 'A test world description',
-    theme: 'fantasy',
+    genre: 'fantasy',
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],
@@ -40,9 +40,9 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     const descriptionInput = screen.getByLabelText(/description/i);
     expect(descriptionInput).toHaveValue(mockWorld.description);
 
-    // Check if theme field is displayed with current value
-    const themeSelect = screen.getByLabelText(/theme/i);
-    expect(themeSelect).toHaveValue(mockWorld.theme);
+    // Check if genre field is displayed with current value
+    const genreSelect = screen.getByLabelText(/genre/i);
+    expect(genreSelect).toHaveValue(mockWorld.genre);
   });
 
   // Test updating the world name
@@ -77,7 +77,7 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     fireEvent.change(themeSelect, { target: { value: 'sci-fi' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      theme: 'sci-fi',
+      genre: 'fantasy',
     });
   });
 

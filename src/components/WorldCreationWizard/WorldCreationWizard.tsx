@@ -84,8 +84,8 @@ export default function WorldCreationWizard({
         })
         .build(),
       1: createWizardValidator<WorldCreationData>()
-        .field('theme')
-        .required('World theme is required')
+        .field('genre')
+        .required('World genre is required')
         .build(),
       2: createWizardValidator<WorldCreationData>()
         .field('description')
@@ -223,7 +223,7 @@ export default function WorldCreationWizard({
       const worldId = createWorld({
         name: data.name || 'Untitled World',
         description: data.description!,
-        theme: data.theme!,
+        genre: data.genre!,
         attributes: data.attributes || [],
         skills: data.skills || [],
         settings: data.settings!,
@@ -267,7 +267,7 @@ export default function WorldCreationWizard({
         worlds.push({
           id: worldId,
           name: data.name,
-          theme: data.theme,
+          genre: data.genre,
           description: data.description,
           createdAt: new Date().toISOString(),
           attributes: data.attributes || [],
@@ -290,7 +290,7 @@ export default function WorldCreationWizard({
         worlds.push({
           id: worldId,
           name: data.name,
-          theme: data.theme,
+          genre: data.genre,
           description: data.description,
           createdAt: new Date().toISOString(),
           attributes: data.attributes || [],

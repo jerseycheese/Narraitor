@@ -36,7 +36,7 @@ export function GameReadyStep({
           <div>
             <span className="text-sm text-gray-600">World:</span>
             <p className="font-medium text-gray-900">{world?.name}</p>
-            <p className="text-sm text-gray-600">{world?.theme}</p>
+            <p className="text-sm text-gray-600">{world?.genre}</p>
           </div>
           <div className="pt-2 border-t">
             <span className="text-sm text-gray-600">Character:</span>

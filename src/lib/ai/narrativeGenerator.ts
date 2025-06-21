@@ -103,7 +103,7 @@ export class NarrativeGenerator {
       const context = {
         worldName: world.name,
         worldDescription: world.description,
-        genre: world.theme,
+        genre: world.genre,
         tone: toneSettings.narrativeStyle,
         attributes: world.attributes,
         characterIds,
@@ -153,7 +153,7 @@ export class NarrativeGenerator {
       previousContent: from.content,
       previousType: from.type,
       worldName: world.name,
-      genre: world.theme,
+      genre: world.genre,
       tone: 'default',
       newLocation: to.narrativeContext?.currentLocation
     };
@@ -201,7 +201,7 @@ ${playerCharacter.skills.map(skill => {
     return {
       worldName: world.name,
       worldDescription: world.description,
-      genre: world.theme,
+      genre: world.genre,
       tone: toneSettings.narrativeStyle,
       attributes: world.attributes,
       characterIds: request.characterIds,
@@ -343,7 +343,7 @@ ${playerCharacter.skills.map(skill => {
   private getWorldGenre(): string | null {
     try {
       const world = this.getWorld(useWorldStore.getState().currentWorldId || '');
-      return world?.theme?.toLowerCase() || null;
+      return world?.genre?.toLowerCase() || null;
     } catch {
       return null;
     }
@@ -415,7 +415,7 @@ ${playerCharacter.skills.map(skill => {
       
       const context = {
         worldName: world.name,
-        genre: world.theme,
+        genre: world.genre,
         narrativeContext,
         playerCharacterName: playerCharacter?.name,
         skillUsed,

@@ -202,7 +202,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       };
 
       const result = await generator.generatePortrait(mockCharacter, {
-        worldTheme: effectiveWorldConfig?.theme
+        worldGenre: effectiveWorldConfig?.genre
       });
 
       setLastGeneratedImage(result.url);
@@ -248,7 +248,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
             <h4 className="font-medium mb-2 text-slate-200">Character Summary</h4>
             <div className="text-sm space-y-1 text-slate-300">
               <div><strong>Name:</strong> {effectiveCharacterData.name || 'Not set'}</div>
-              <div><strong>World Theme:</strong> {effectiveWorldConfig?.theme || 'Not set'}</div>
+              <div><strong>World Genre:</strong> {effectiveWorldConfig?.genre || 'Not set'}</div>
               <div><strong>Attributes:</strong> {effectiveCharacterData.attributes?.length || 0}</div>
               <div><strong>Skills:</strong> {
                 effectiveCharacterData.skills?.filter((s) => 'isSelected' in s ? s.isSelected : true)?.length || 
