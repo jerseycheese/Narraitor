@@ -56,7 +56,7 @@ export const WithLabel: Story = {
 export const WithError: Story = {
   render: (args) => (
     <div className="space-y-2">
-      <Label htmlFor="error-input">Character Name</Label>
+      <Label htmlFor="error-input">Character Name <span className="text-red-500">*</span></Label>
       <Input 
         id="error-input" 
         {...args} 

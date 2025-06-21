@@ -25,7 +25,7 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="character-name">
-            Character Name
+            Character Name <span className="text-red-500">*</span>
           </Label>
           <Input
             id="character-name"

@@ -150,7 +150,7 @@ export function AttributeEditor({
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="attribute-name">
-            Attribute Name
+            Attribute Name <span className="text-red-500">*</span>
           </Label>
           <Input
             id="attribute-name"
