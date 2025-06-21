@@ -161,7 +161,11 @@ export function WorldTypeSelector({
           {/* Additional Details Field */}
           <div>
             <label htmlFor="additional-details" className={`block ${styles.label} text-gray-700 mb-2`}>
-              {selectedOption.additionalDetailsLabel} <span className="text-red-500">*</span>
+              {selectedOption.additionalDetailsLabel} {value.worldType === 'set_within' ? (
+                <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>
+              ) : (
+                <span className="text-red-500">*</span>
+              )}
             </label>
             <textarea
               id="additional-details"

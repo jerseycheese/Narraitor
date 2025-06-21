@@ -10,15 +10,17 @@
 - Click **"Create World"**
 - ✅ **Verify**: Generated world has Western theme (not sci-fi/fantasy)
 
-### 2. Genre Optional for Set Within/Inspired By Worlds  
+### 2. Smart Field Requirements for Different World Types
 - Start new onboarding flow
-- Choose **"Set Within"** or **"Inspired By"**
-- Enter reference: "Star Wars" 
-- Enter details: "Clone Wars era" 
+- Choose **"Set Within"**
+- Enter reference: "Star Wars"
+- ✅ **Verify**: "Specific Setting/Time" field shows "(optional - will be inferred from your reference)"
 - ✅ **Verify**: Genre field shows "(optional - will be inferred from your reference)"
-- ✅ **Verify**: Can leave genre empty or select override
-- Click **"Create World"**
-- ✅ **Verify**: World generated successfully with appropriate genre
+- ✅ **Verify**: Can proceed without filling additional details
+- Choose **"Inspired By"**
+- Enter reference: "Star Wars"
+- ✅ **Verify**: "Additional Details" field shows red asterisk (required)
+- ✅ **Verify**: Genre field shows "(optional - will be inferred from your reference)"
 
 ### 3. Validation Fixed for Original Worlds
 - Start new onboarding flow  
@@ -30,7 +32,10 @@
 ## Expected Results
 - All user inputs (name, genre, context) influence final world
 - No validation errors for original worlds
-- Genre field optional for "Set Within" and "Inspired By" with auto-inference
+- Smart field requirements based on world type:
+  - **"Original"**: Only name required, genre required
+  - **"Set Within"**: Only reference required, setting/time and genre inferred
+  - **"Inspired By"**: Reference and details required, genre inferred but can be overridden
 - Users can override auto-detected genre if desired
 - Clean onboarding completion
 

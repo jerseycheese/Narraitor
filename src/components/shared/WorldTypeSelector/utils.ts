@@ -16,9 +16,10 @@ export function validateWorldTypeData(data: WorldTypeData): string[] {
     if (!data.worldReference?.trim()) {
       errors.push('Existing setting is required');
     }
-    if (!data.additionalDetails?.trim()) {
-      const label = data.worldType === 'inspired_by' ? 'Additional details' : 'Specific setting/time';
-      errors.push(`${label} is required`);
+    
+    // Only require additional details for "Inspired By" - "Set Within" can infer setting/time from reference
+    if (data.worldType === 'inspired_by' && !data.additionalDetails?.trim()) {
+      errors.push('Additional details are required');
     }
   }
   // Note: 'original' world type requires no additional input - it's completely self-contained
