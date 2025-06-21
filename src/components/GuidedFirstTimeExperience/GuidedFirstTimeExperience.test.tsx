@@ -206,7 +206,8 @@ describe('GuidedFirstTimeExperience', () => {
       expect(mockUpdateData).toHaveBeenCalledWith({
         worldTypeData: expect.objectContaining({
           worldType: 'inspired_by'
-        })
+        }),
+        genre: '' // Auto-detect genre for "Inspired By" and "Set Within" types
       });
     });
 

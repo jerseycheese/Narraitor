@@ -212,7 +212,17 @@ export function GuidedFirstTimeExperience() {
       
       <WorldTypeSelector
         value={wizard.state.data.worldTypeData}
-        onChange={(worldTypeData) => wizard.handlers.updateData({ worldTypeData })}
+        onChange={(worldTypeData) => {
+          // Auto-set genre to empty for "Set Within" and "Inspired By" types (auto-detect)
+          const isSetWithin = worldTypeData.worldType === 'set_within';
+          const isInspiredBy = worldTypeData.worldType === 'inspired_by';
+          const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
+          
+          wizard.handlers.updateData({ 
+            worldTypeData,
+            ...(shouldAutoDetectGenre && { genre: '' })
+          });
+        }}
         size="medium"
       />
 
