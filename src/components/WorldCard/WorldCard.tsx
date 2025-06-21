@@ -197,9 +197,9 @@ const WorldCard: React.FC<WorldCardProps> = ({
               {/* World type badge */}
               {world.relationship && world.reference ? (
                 <EntityBadge
-                  icon={world.relationship === 'set_in' ? '🌍' : '✨'}
-                  text={world.relationship === 'set_in' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
-                  variant={world.relationship === 'set_in' ? 'info' : 'success'}
+                  icon={world.relationship === 'set_within' ? '🌍' : '✨'}
+                  text={world.relationship === 'set_within' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
+                  variant={world.relationship === 'set_within' ? 'info' : 'success'}
                   testId="world-card-type"
                 />
               ) : (

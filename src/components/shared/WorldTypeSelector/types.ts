@@ -19,5 +19,5 @@ export interface WorldTypeOption {
 
 export interface WorldGenerationParams {
   reference?: string;
-  relationship?: 'based_on' | 'set_in';
+  relationship?: 'inspired_by' | 'set_within';
 }

@@ -48,7 +48,7 @@ export function convertToGenerationParams(data: WorldTypeData): ExtendedWorldGen
       reference: additionalDetails 
         ? `${baseReference}. Additional context: ${additionalDetails}`
         : baseReference,
-      relationship: 'based_on',
+      relationship: 'inspired_by', // Direct mapping - no conversion needed
     };
   } else if (data.worldType === 'set_within') {
     const baseReference = data.worldReference || 'an existing fictional universe';
@@ -57,7 +57,7 @@ export function convertToGenerationParams(data: WorldTypeData): ExtendedWorldGen
       reference: additionalDetails 
         ? `${baseReference}. Specific setting/time: ${additionalDetails}`
         : baseReference,
-      relationship: 'set_in',
+      relationship: 'set_within', // Direct mapping - no conversion needed
     };
   }
 

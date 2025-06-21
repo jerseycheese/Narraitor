@@ -28,7 +28,7 @@ export default function WorldGenerationTestPage() {
       const result = await generateWorld({
         method: 'ai',
         reference: worldReference.trim(),
-        relationship: 'based_on',
+        relationship: 'inspired_by',
         existingNames,
         suggestedName: suggestedName.trim() || undefined
       });

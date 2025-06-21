@@ -59,7 +59,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'The Office',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
@@ -109,7 +109,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'Star Wars',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
@@ -147,7 +147,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'Lord of the Rings',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
@@ -193,7 +193,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'The Office',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 

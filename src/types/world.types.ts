@@ -25,7 +25,7 @@ export interface World extends NamedEntity, TimestampedEntity {
   settings: WorldSettings;
   image?: WorldImage;
   reference?: string;
-  relationship?: 'set_in' | 'based_on';
+  relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;
 }
 

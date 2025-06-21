@@ -10,11 +10,11 @@ export default function TestWorldGeneration() {
   const [error, setError] = useState<string | null>(null);
 
   const testCases = [
-    { reference: 'The Office', relationship: 'set_in' as const, expectedGenre: 'modern' },
-    { reference: 'Star Wars', relationship: 'set_in' as const, expectedGenre: 'Sci-Fi' },
-    { reference: 'Lord of the Rings', relationship: 'set_in' as const, expectedGenre: 'Fantasy' },
-    { reference: 'Breaking Bad', relationship: 'set_in' as const, expectedGenre: 'modern' },
-    { reference: 'The Walking Dead', relationship: 'set_in' as const, expectedGenre: 'Post-Apocalyptic' },
+    { reference: 'The Office', relationship: 'set_within' as const, expectedGenre: 'modern' },
+    { reference: 'Star Wars', relationship: 'set_within' as const, expectedGenre: 'Sci-Fi' },
+    { reference: 'Lord of the Rings', relationship: 'set_within' as const, expectedGenre: 'Fantasy' },
+    { reference: 'Breaking Bad', relationship: 'set_within' as const, expectedGenre: 'modern' },
+    { reference: 'The Walking Dead', relationship: 'set_within' as const, expectedGenre: 'Post-Apocalyptic' },
   ];
 
   const runTest = async (testCase: typeof testCases[0]) => {

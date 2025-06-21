@@ -100,8 +100,8 @@ export default function BasicInfoStep({
                 id="relationship-based-on"
                 name="relationship"
                 value="based_on"
-                checked={worldData.relationship === 'based_on'}
-                onChange={() => onUpdate({ ...worldData, relationship: 'based_on' })}
+                checked={worldData.relationship === 'inspired_by'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'inspired_by' })}
                 className="mt-1 text-blue-600 focus:ring-blue-500"
                 data-testid="relationship-based-on-radio"
               />
@@ -121,8 +121,8 @@ export default function BasicInfoStep({
                 id="relationship-set-in"
                 name="relationship"
                 value="set_in"
-                checked={worldData.relationship === 'set_in'}
-                onChange={() => onUpdate({ ...worldData, relationship: 'set_in' })}
+                checked={worldData.relationship === 'set_within'}
+                onChange={() => onUpdate({ ...worldData, relationship: 'set_within' })}
                 className="mt-1 text-blue-600 focus:ring-blue-500"
                 data-testid="relationship-set-in-radio"
               />
@@ -148,7 +148,7 @@ export default function BasicInfoStep({
               testId="world-reference-input"
             />
             <div className="text-sm text-gray-500 mt-1">
-              {worldData.relationship === 'set_in' 
+              {worldData.relationship === 'set_within' 
                 ? 'Enter the fictional universe or real setting where your world exists. Characters and locations will come from this setting.'
                 : 'Enter the fictional universe or real setting that will inspire your world. Your world will have original characters and locations with similar themes.'
               }

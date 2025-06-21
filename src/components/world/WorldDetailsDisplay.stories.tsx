@@ -34,7 +34,7 @@ const mockWorld: World = {
   name: 'Middle Earth',
   description: 'A vast and mystical realm where magic flows through every living thing. Ancient forests hold secrets of the old gods, while towering mountains guard hidden valleys where legendary creatures dwell. This world is filled with wonder and danger in equal measure, where heroes are forged in the crucible of adventure and legends are born from acts of courage.',
   genre: 'fantasy',
-  relationship: 'set_in',
+  relationship: 'set_within',
   reference: 'Lord of the Rings',
   attributes: [
     {
@@ -272,7 +272,7 @@ export const SciFiWorld: Story = {
       name: 'New Tokyo 2087',
       description: 'A cyberpunk metropolis where technology and humanity collide. Neon lights pierce through perpetual smog while corporate towers scrape the polluted sky. In the shadows of this urban jungle, hackers, augmented humans, and AI entities struggle for control of the digital realm.',
       genre: 'fantasy',
-      relationship: 'based_on',
+      relationship: 'inspired_by',
       reference: 'Blade Runner / Ghost in the Shell',
       attributes: [
         {

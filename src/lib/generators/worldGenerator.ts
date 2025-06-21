@@ -15,7 +15,7 @@ export type WorldGenerationMethod = 'template' | 'ai';
 export interface WorldGenerationOptions {
   method: WorldGenerationMethod;
   reference?: string; // For AI generation or specific template selection
-  relationship?: 'based_on' | 'set_in'; // Whether world is set in or based on the reference
+  relationship?: 'inspired_by' | 'set_within'; // Whether world is inspired by or set within the reference
   existingNames?: string[];
   suggestedName?: string;
   genre?: string; // User-selected genre (overrides AI-generated genre)
@@ -92,27 +92,27 @@ The world should have:
   } else {
     // World with reference (inspired by or set within)
     const reference = options.reference!;
-    const isSetIn = options.relationship === 'set_in';
+    const isSetIn = options.relationship === 'set_within';
     
     prompt = `Generate a complete world configuration for a text-based RPG ${isSetIn ? `set within the ${reference} universe` : `inspired by the ${reference} universe`}.
 
 ${isSetIn 
-  ? `CRITICAL: This world must exist WITHIN the actual ${reference} universe and follow its EXACT canon. 
+  ? `CRITICAL: This RPG world is set DIRECTLY IN the ${reference} universe - it is NOT inspired by or similar to ${reference}, but is ACTUALLY WITHIN ${reference}.
 
-ABSOLUTE REQUIREMENTS:
-- Do NOT add fantasy, supernatural, or magical elements unless they actually exist in ${reference}
-- Do NOT invent new magic systems, supernatural powers, or fantastical locations
-- This should be a realistic location that could actually exist in the ${reference} setting
-- The genre MUST exactly match the genre of ${reference}
-- Use only the actual technology, social structures, and rules that exist in ${reference}
+ABSOLUTE REQUIREMENTS FOR "SET WITHIN" WORLDS:
+- This world IS PART OF the ${reference} universe, not a copy or similar world
+- Use the EXACT same rules, technology, magic systems, and social structures as ${reference}
+- The world name should reference actual locations, planets, cities, or regions from ${reference}
+- Characters can interact with canonical ${reference} characters, locations, and events
+- Do NOT create a "similar" world - create an ACTUAL location within the ${reference} universe
 
-EXAMPLES TO CLARIFY:
-- If ${reference} is "The Office": Create a modern office/workplace setting with NO magic, NO fantasy elements
-- If ${reference} is "Breaking Bad": Create a modern crime/drama setting with NO supernatural elements
-- If ${reference} is "Star Wars": You CAN include the Force and space technology because they exist in that universe
-- If ${reference} is "Lord of the Rings": You CAN include magic and fantasy races because they exist in that universe
+EXAMPLES TO CLARIFY THE DIFFERENCE:
+- If ${reference} is "Star Wars": Create a world ON AN ACTUAL Star Wars planet (like Tatooine, Coruscant, or Naboo), not a "space world with lightsabers"
+- If ${reference} is "The Office": Create an ACTUAL branch office of Dunder Mifflin, not just "an office workplace"
+- If ${reference} is "Breaking Bad": Create a world in ACTUAL Albuquerque with the same crime networks, not just "a crime world"
+- If ${reference} is "Lord of the Rings": Create a world in ACTUAL Middle-earth (like Gondor, Rohan, or the Shire), not just "a fantasy world with magic"
 
-REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think would make it more interesting!`
+CRITICAL: This is the ${reference} universe itself, not something inspired by it!`
   : `IMPORTANT: Create an ORIGINAL world that captures the essence, genres, and feeling of ${reference}, but is NOT a direct copy. The world should be inspired by ${reference} but have its own unique name, locations, and lore. Choose an appropriate genre that captures the essence of ${reference}.`
 }`
   }
@@ -168,7 +168,7 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
+  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_within' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
   "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {
@@ -193,7 +193,7 @@ Generate 4-6 attributes that make sense for this world setting.
 Generate 6-10 skills that would be relevant in this world.`;
 
   if (options.reference) {
-    const isSetIn = options.relationship === 'set_in';
+    const isSetIn = options.relationship === 'set_within';
     if (isSetIn) {
       prompt += `\nCRITICAL: Attributes and skills must be realistic and appropriate for the actual ${options.reference} setting. Do NOT include magical, supernatural, or fantasy elements unless they actually exist in ${options.reference}. Focus on real-world skills and attributes that characters would actually have in that universe.`;
     } else {

@@ -21,7 +21,7 @@ export interface UseWorldTypeSelectionReturn {
   };
   generationParams: {
     reference?: string;
-    relationship?: 'based_on' | 'set_in';
+    relationship?: 'inspired_by' | 'set_within';
   };
   reset: () => void;
 }

@@ -131,7 +131,7 @@ describe('WorldCard', () => {
     const setInWorld = createMockWorld({
       name: 'Star Wars Adventure',
       reference: 'Star Wars',
-      relationship: 'set_in'
+      relationship: 'set_within'
     });
     const { rerender } = render(
       <WorldCard 
@@ -149,7 +149,7 @@ describe('WorldCard', () => {
     const basedOnWorld = createMockWorld({
       name: 'Fantasy Adventure',
       reference: 'Lord of the Rings',
-      relationship: 'based_on'
+      relationship: 'inspired_by'
     });
     rerender(
       <WorldCard 

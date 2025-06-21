@@ -3,7 +3,7 @@ import { World } from '@/types/world.types';
 
 export interface GenerateWorldParams {
   worldReference?: string;
-  worldRelationship?: 'based_on' | 'set_in';
+  worldRelationship?: 'inspired_by' | 'set_within';
   existingNames?: string[];
   suggestedName?: string;
 }

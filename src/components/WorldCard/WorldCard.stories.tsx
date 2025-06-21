@@ -250,7 +250,7 @@ export const SetInWorld: Story = {
       description: 'Journey through the Shire, visit Rivendell, and brave the paths to Mordor in this epic quest through Tolkien\'s beloved world.',
       genre: 'fantasy',
       reference: 'Lord of the Rings',
-      relationship: 'set_in'
+      relationship: 'set_within'
     },
     characterCount: 5,
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
@@ -274,7 +274,7 @@ export const BasedOnWorld: Story = {
       description: 'A neon-soaked metropolis where corporate espionage and street-level hackers clash in a world inspired by classic cyberpunk themes.',
       genre: 'fantasy',
       reference: 'Blade Runner',
-      relationship: 'based_on'
+      relationship: 'inspired_by'
     },
     characterCount: 2,
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
