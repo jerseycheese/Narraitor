@@ -77,7 +77,8 @@ export function GuidedFirstTimeExperience() {
         reference,
         relationship,
         existingNames,
-        suggestedName: data.name?.trim() || undefined
+        suggestedName: data.name?.trim() || undefined,
+        genre: data.genre || undefined
       });
 
       // Create the world first without attributes and skills

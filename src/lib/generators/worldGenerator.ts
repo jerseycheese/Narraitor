@@ -17,6 +17,7 @@ export interface WorldGenerationOptions {
   relationship?: 'based_on' | 'set_in'; // Whether world is set in or based on the reference
   existingNames?: string[];
   suggestedName?: string;
+  genre?: string; // User-selected genre (overrides AI-generated genre)
 }
 
 // List of TV/movie universes for AI inspiration
@@ -57,9 +58,9 @@ async function generateWithAI(options: WorldGenerationOptions): Promise<Generate
   
   if (!options.reference && !options.relationship) {
     // Completely original world
-    prompt = `Generate a complete world configuration for a text-based RPG with a completely original setting.
-
-IMPORTANT: Create a world based on the suggested name and setting context. Analyze the suggested name for time period and setting clues:
+    const genreInstruction = options.genre 
+      ? `REQUIRED GENRE: The world MUST be in the "${options.genre}" genre. All world elements, themes, conflicts, and atmosphere must align with this genre.`
+      : `IMPORTANT: Create a world based on the suggested name and setting context. Analyze the suggested name for time period and setting clues:
 
 FOR REALISTIC SETTINGS (anything mentioning years like "1970s", "1980s", "1990s", or real-world jobs like "Diner Cook", "Office Worker", "Taxi Driver"):
 - ABSOLUTELY NO magical, supernatural, fantasy, or sci-fi elements
@@ -75,13 +76,17 @@ FOR FANTASY SETTINGS (mentioning magic, dragons, wizards, etc.):
 FOR SCI-FI SETTINGS (mentioning space, future, cyber, etc.):
 - Use Sci-Fi genre with appropriate technological elements
 
-CRITICAL: Match the genre to what the name actually suggests. If someone says "1970s Diner Cook" they want a realistic 1970s diner, NOT a magical diner.
+CRITICAL: Match the genre to what the name actually suggests. If someone says "1970s Diner Cook" they want a realistic 1970s diner, NOT a magical diner.`;
+
+    prompt = `Generate a complete world configuration for a text-based RPG with a completely original setting.
+
+${genreInstruction}
 
 The world should have:
-- Name, geography, and history appropriate to the suggested setting
-- Completely realistic elements for historical/modern settings
-- Period-appropriate technology and social context
-- Real-world challenges and conflicts, not supernatural ones`
+- Name, geography, and history appropriate to the specified genre
+- Genre-appropriate elements, conflicts, and atmosphere
+- Period-appropriate technology and social context for the genre
+- Challenges and conflicts that fit the genre expectations`
   } else {
     // World with reference (inspired by or set within)
     const reference = options.reference!;
