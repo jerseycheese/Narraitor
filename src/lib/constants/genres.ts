@@ -99,14 +99,4 @@ export const AI_SUPPORTED_GENRES = GENRES.map(genre => genre.value);
  */
 export const DEFAULT_GENRE: GenreValue = 'fantasy';
 
-// Legacy exports for backward compatibility during migration
-export const THEMES = GENRES;
-export type ThemeOption = GenreOption;
-export type ThemeValue = GenreValue;
-export const THEME_LABELS = GENRE_LABELS;
-export const getThemeLabel = getGenreLabel;
-export const isValidTheme = isValidGenre;
-export const LEGACY_THEME_MAPPING = LEGACY_GENRE_MAPPING;
-export const normalizeTheme = normalizeGenre;
-export const AI_SUPPORTED_THEMES = AI_SUPPORTED_GENRES;
-export const DEFAULT_THEME = DEFAULT_GENRE;
+// Note: Removed legacy theme exports - applications should use genre terminology directly
