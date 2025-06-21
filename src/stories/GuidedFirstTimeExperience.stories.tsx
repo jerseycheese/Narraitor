@@ -45,7 +45,7 @@ const MockGuidedFirstTimeExperience = () => {
       <div className="space-y-4">
         <div>
           <label htmlFor="world-concept" className="block text-sm font-medium text-gray-700 mb-2">
-            World Concept
+            World Concept <span className="text-red-500">*</span>
           </label>
           <textarea
             id="world-concept"
@@ -257,7 +257,7 @@ const createStoryWithStep = (initialStep: number, prefilledData?: Partial<{ name
           </div>
           <div className="space-y-4">
             <div>
-              <label htmlFor="world-concept" className="block text-sm font-medium text-gray-700 mb-2">World Concept</label>
+              <label htmlFor="world-concept" className="block text-sm font-medium text-gray-700 mb-2">World Concept <span className="text-red-500">*</span></label>
               <textarea
                 id="world-concept"
                 name="world-concept"

@@ -273,7 +273,7 @@ World name:`;
       <div className="space-y-4">
         <div>
           <label htmlFor="world-concept" className="block text-sm font-medium text-gray-700 mb-2">
-            World Concept
+            World Concept <span className="text-red-500">*</span>
           </label>
           <textarea
             id="world-concept"
