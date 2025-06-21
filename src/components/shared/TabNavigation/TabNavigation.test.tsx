@@ -169,7 +169,7 @@ describe('TabNavigation', () => {
       type Mode = 'inspired-by' | 'genre-mix' | 'surprise-me';
       const modeOptions: TabOption<Mode>[] = [
         { value: 'inspired-by', label: 'I want something like...' },
-        { value: 'genre-mix', label: 'Theme Mixer' },
+        { value: 'genre-mix', label: 'Genre Mixer' },
         { value: 'surprise-me', label: 'Surprise me!' }
       ];
 
@@ -183,8 +183,8 @@ describe('TabNavigation', () => {
         />
       );
 
-      const themeMixerTab = screen.getByRole('button', { name: 'Theme Mixer' });
-      fireEvent.click(themeMixerTab);
+      const genreMixerTab = screen.getByRole('button', { name: 'Genre Mixer' });
+      fireEvent.click(genreMixerTab);
 
       expect(mockModeOnChange).toHaveBeenCalledWith('genre-mix');
     });

@@ -62,7 +62,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
   // Tab navigation options
   const tabOptions: TabOption<TemplateMode>[] = [
     { value: 'inspired-by', label: 'I want something like...' },
-    { value: 'genre-mix', label: 'Theme Mixer' },
+    { value: 'genre-mix', label: 'Genre Mixer' },
     { value: 'surprise-me', label: 'Surprise me!' }
   ];
 
@@ -140,13 +140,13 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
               </div>
             )}
 
-            {/* Theme Mixer Mode */}
+            {/* Genre Mixer Mode */}
             {mode === 'genre-mix' && (
               <div className="border rounded-lg p-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-semibold mb-4">Mix Themes Together</h3>
-                    <p className="text-sm text-gray-600 mb-4">Select 2 or more themes to blend together</p>
+                    <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
+                    <p className="text-sm text-gray-600 mb-4">Select 2 or more genres to blend together</p>
                   </div>
                   <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-2">
@@ -168,14 +168,14 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">
-                        {selectedGenres.length} theme{selectedGenres.length !== 1 ? 's' : ''} selected
+                        {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                       </span>
                       <button
                         onClick={handleGenerate}
                         disabled={selectedGenres.length < 2}
                         className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
                       >
-                        Mix Themes
+                        Mix Genres
                       </button>
                     </div>
                   </div>

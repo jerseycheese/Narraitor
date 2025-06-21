@@ -66,7 +66,7 @@ export const SmartTemplatesExample: Story = {
   args: {
     options: [
       { value: 'inspired-by', label: 'I want something like...' },
-      { value: 'genre-mix', label: 'Theme Mixer' },
+      { value: 'genre-mix', label: 'Genre Mixer' },
       { value: 'surprise-me', label: 'Surprise me!' }
     ],
     activeValue: 'inspired-by'
@@ -104,7 +104,7 @@ export const MobileWrap: Story = {
   args: {
     options: [
       { value: 'inspired-by', label: 'I want something like...' },
-      { value: 'genre-mix', label: 'Theme Mixer' },
+      { value: 'genre-mix', label: 'Genre Mixer' },
       { value: 'surprise-me', label: 'Surprise me!' }
     ],
     activeValue: 'inspired-by',
@@ -127,7 +127,7 @@ export const MobileScroll: Story = {
   args: {
     options: [
       { value: 'inspired-by', label: 'I want something like...' },
-      { value: 'genre-mix', label: 'Theme Mixer' },
+      { value: 'genre-mix', label: 'Genre Mixer' },
       { value: 'surprise-me', label: 'Surprise me!' },
       { value: 'advanced', label: 'Advanced Options' },
       { value: 'templates', label: 'Browse Templates' }
