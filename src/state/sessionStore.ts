@@ -44,7 +44,7 @@ const initialState = {
 /**
  * Session store for managing game session state with persistence
  */
-export const sessionStore = create<SessionStore>()(
+export const useSessionStore = create<SessionStore>()(
   persist(
     (set, get) => ({
   ...initialState,
@@ -417,5 +417,4 @@ export const sessionStore = create<SessionStore>()(
 }
 ));
 
-// Export alias for compatibility with develop branch naming
-export { sessionStore as useSessionStore };
+// Named export for consistent usage

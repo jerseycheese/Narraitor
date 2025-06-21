@@ -51,6 +51,11 @@ export function WorldTypeSelector({
   disabled = false,
   className = '',
 }: WorldTypeSelectorProps) {
+  // Defensive check to prevent crashes if value is undefined
+  if (!value) {
+    return null;
+  }
+  
   const selectedOption = WORLD_TYPE_OPTIONS.find(option => option.id === value.worldType);
 
   const handleTypeChange = (worldType: WorldTypeData['worldType']) => {

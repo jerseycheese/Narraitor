@@ -59,8 +59,14 @@ export function useWizardState<T>(config: WizardConfig<T>) {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          // State restored from persistence
-          return parsed;
+          // Merge saved state with initial data to handle schema migrations
+          // This ensures new fields in initialData are present even if not in saved state
+          const mergedData = { ...initialData, ...parsed.data };
+          // State restored from persistence with migration
+          return {
+            ...parsed,
+            data: mergedData,
+          };
         } catch {
           // Failed to parse saved state, will use initial state
         }
