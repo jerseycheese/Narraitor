@@ -1,4 +1,5 @@
 import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
+import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 
 export interface GeneratedWorldData {
   name: string;
@@ -206,7 +207,12 @@ FOR FANTASY/SCI-FI SETTINGS: Use appropriate magical or technological elements.
 Make the world interesting and playable with concepts appropriate to the setting type.`;
   }
 
-  prompt += `\n\nIMPORTANT: The response must be valid JSON only, with no additional text or formatting.`;
+  prompt += `\n\nCRITICAL JSON REQUIREMENTS:
+- Return ONLY valid JSON with no additional text, explanations, or markdown
+- Ensure all strings are properly escaped and terminated
+- Do not truncate the response - complete all JSON fields
+- Test your JSON syntax before responding
+- If you cannot complete the full response, prioritize the core fields: name, genre, description, attributes, skills`;
 
   try {
     // Import the AI client for server-side usage
@@ -215,29 +221,27 @@ Make the world interesting and playable with concepts appropriate to the setting
     
     // Generate with AI
     const response = await client.generateContent(prompt);
-    const text = response.content.trim();
     
-    // Clean up the response - remove any markdown formatting
-    const jsonText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    const parsed = JSON.parse(jsonText);
+    // Use the existing AI response parser utility
+    const parsed = parseAIJsonResponse<Record<string, unknown>>({ content: response.content }, 'Failed to generate world configuration');
     
     // Validate the response has required fields
-    if (!parsed.name || !parsed.genre || !parsed.description || !parsed.attributes || !parsed.skills) {
-      throw new Error('Generated world is missing required fields');
-    }
+    validateRequiredFields(parsed, ['name', 'genre', 'description', 'attributes', 'skills'], 'world generation response');
+    validateArrayFields(parsed, ['attributes', 'skills'], 'world generation response');
     
     // Use suggested name if provided and AI didn't use it, otherwise ensure unique name
-    let worldName = options.suggestedName || parsed.name;
+    let worldName = options.suggestedName || String(parsed.name);
     
     // If the name already exists, add a suffix
     let suffix = 1;
     while (options.existingNames?.includes(worldName)) {
-      worldName = `${options.suggestedName || parsed.name} ${suffix}`;
+      worldName = `${options.suggestedName || String(parsed.name)} ${suffix}`;
       suffix++;
     }
     
     // Validate and clean attributes
-    const attributes = parsed.attributes.map((attr: unknown) => {
+    const attributesArray = parsed.attributes as unknown[];
+    const attributes = attributesArray.map((attr: unknown) => {
       const attrObj = attr as Record<string, unknown>;
       return {
         name: String(attrObj.name || 'Unknown Attribute'),
@@ -245,12 +249,13 @@ Make the world interesting and playable with concepts appropriate to the setting
         baseValue: Number(attrObj.defaultValue) || 5,
         minValue: Number(attrObj.minValue) || 1,
         maxValue: Number(attrObj.maxValue) || 10,
-        category: attrObj.category || 'General'
+        category: String(attrObj.category || 'General')
       };
     });
     
     // Validate and clean skills
-    const skills = parsed.skills.map((skill: unknown) => {
+    const skillsArray = parsed.skills as unknown[];
+    const skills = skillsArray.map((skill: unknown) => {
       const skillObj = skill as Record<string, unknown>;
       return {
         name: String(skillObj.name || 'Unknown Skill'),
@@ -273,8 +278,8 @@ Make the world interesting and playable with concepts appropriate to the setting
     
     return {
       name: worldName,
-      genre: parsed.genre,
-      description: parsed.description,
+      genre: String(parsed.genre),
+      description: String(parsed.description),
       attributes,
       skills,
       settings
