@@ -44,9 +44,10 @@ export function GuidedFirstTimeExperience() {
           touched: true,
         };
       case 2: // Details step
-        const genreError = validateField(data.genre, [
-          (value) => validators.required(value, 'Genre'),
-        ]);
+        // For "Set Within" worlds, genre is optional since it can be inferred from the universe
+        const isSetWithin = data.worldTypeData.worldType === 'set_within';
+        const genreValidators = isSetWithin ? [] : [(value: string) => validators.required(value, 'Genre')];
+        const genreError = validateField(data.genre, genreValidators);
         const errors = [genreError].filter(Boolean) as string[];
         return {
           valid: errors.length === 0,
@@ -222,61 +223,70 @@ export function GuidedFirstTimeExperience() {
     </div>
   ), [wizard.state.data.worldTypeData, wizard.stepValidation, wizard.handlers]);
 
-  const renderDetailsStep = useMemo(() => (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          World Details
-        </h2>
-        <p className="text-gray-600">
-          Give your world a name and genre
-        </p>
-      </div>
-      
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
-            World Name (optional)
-          </label>
-          <input
-            id="world-name"
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
-            value={wizard.state.data.name}
-            onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
-          />
+  const renderDetailsStep = useMemo(() => {
+    const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
+    const isGenreOptional = isSetWithin;
+    
+    return (
+      <div className="max-w-md mx-auto space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            World Details
+          </h2>
+          <p className="text-gray-600">
+            {isGenreOptional 
+              ? "Give your world a name and optionally specify a genre"
+              : "Give your world a name and genre"
+            }
+          </p>
         </div>
         
-        <div>
-          <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
-            Genre <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="world-genre"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={wizard.state.data.genre}
-            onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
-          >
-            <option value="">Select a genre</option>
-            {GENRES.map((genre) => (
-              <option key={genre.value} value={genre.value}>
-                {genre.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        {wizard.stepValidation?.errors.length > 0 && (
-          <div className="text-sm text-red-600">
-            {wizard.stepValidation.errors.map((error, index) => (
-              <p key={index}>{error}</p>
-            ))}
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
+              World Name (optional)
+            </label>
+            <input
+              id="world-name"
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
+              value={wizard.state.data.name}
+              onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
+            />
           </div>
-        )}
+          
+          <div>
+            <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+              Genre {!isGenreOptional && <span className="text-red-500">*</span>}
+              {isGenreOptional && <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>}
+            </label>
+            <select
+              id="world-genre"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={wizard.state.data.genre}
+              onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+            >
+              <option value="">{isGenreOptional ? "Auto-detect from reference" : "Select a genre"}</option>
+              {GENRES.map((genre) => (
+                <option key={genre.value} value={genre.value}>
+                  {genre.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {wizard.stepValidation?.errors.length > 0 && (
+            <div className="text-sm text-red-600">
+              {wizard.stepValidation.errors.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  ), [wizard.state.data.name, wizard.state.data.genre, wizard.stepValidation, wizard.handlers]);
+    );
+  }, [wizard.state.data.name, wizard.state.data.genre, wizard.state.data.worldTypeData.worldType, wizard.stepValidation, wizard.handlers]);
 
   // Render current step
   const renderCurrentStep = useCallback(() => {

@@ -297,10 +297,62 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      // Check that validation errors are displayed
       validationErrors.forEach(error => {
         expect(screen.getByText(error)).toBeInTheDocument();
       });
+    });
+
+    it('makes genre optional for "Set Within" world types', () => {
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        state: {
+          ...mockWizardState,
+          data: { 
+            ...mockWizardState.data, 
+            worldTypeData: {
+              worldType: 'set_within',
+              worldReference: 'Star Wars',
+              additionalDetails: 'During the Clone Wars'
+            }
+          },
+        },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      // Should show modified text indicating genre is optional
+      expect(screen.getByText(/optionally specify a genre/i)).toBeInTheDocument();
+      expect(screen.getByText(/optional - will be inferred from your reference/i)).toBeInTheDocument();
+      expect(screen.getByText(/auto-detect from reference/i)).toBeInTheDocument();
+      
+      // Should NOT show required asterisk for genre
+      expect(screen.queryByText('*')).not.toBeInTheDocument();
+    });
+
+    it('keeps genre required for original and inspired by world types', () => {
+      // Test original world type
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        state: {
+          ...mockWizardState,
+          data: { 
+            ...mockWizardState.data, 
+            worldTypeData: {
+              worldType: 'original',
+              worldReference: '',
+              additionalDetails: ''
+            }
+          },
+        },
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      // Should show standard text and required asterisk
+      expect(screen.getByText(/give your world a name and genre/i)).toBeInTheDocument();
+      expect(screen.getByText('*')).toBeInTheDocument();
     });
   });
 
