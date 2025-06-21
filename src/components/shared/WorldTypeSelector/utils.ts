@@ -20,11 +20,8 @@ export function validateWorldTypeData(data: WorldTypeData): string[] {
       const label = data.worldType === 'inspired_by' ? 'Additional details' : 'Specific setting/time';
       errors.push(`${label} is required`);
     }
-  } else if (data.worldType === 'original') {
-    if (!data.additionalDetails?.trim()) {
-      errors.push('World concept is required');
-    }
   }
+  // Note: 'original' world type requires no additional input - it's completely self-contained
 
   return errors;
 }
