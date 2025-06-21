@@ -326,7 +326,7 @@ describe('GuidedFirstTimeExperience', () => {
       // Should show modified text and optional genre field
       expect(screen.getByText(/optionally override the genre/i)).toBeInTheDocument();
       expect(screen.getByText(/optional - will be inferred from your reference/i)).toBeInTheDocument();
-      expect(screen.getByText(/auto-detect from reference/i)).toBeInTheDocument();
+      expect(screen.getByText(/auto-detect/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/genre/i)).toBeInTheDocument();
       
       // Should NOT show required asterisk

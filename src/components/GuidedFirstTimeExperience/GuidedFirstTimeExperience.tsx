@@ -282,7 +282,7 @@ export function GuidedFirstTimeExperience() {
                 value={wizard.state.data.genre}
                 onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
               >
-                <option value="">Auto-detect from reference</option>
+                <option value="">Auto-detect</option>
                 {GENRES.map((genre) => (
                   <option key={genre.value} value={genre.value}>
                     {genre.label}
