@@ -17,7 +17,6 @@ describe('World Templates', () => {
       expect(template).toHaveProperty('genre');
       expect(template).toHaveProperty('attributes');
       expect(template).toHaveProperty('skills');
-      expect(template).toHaveProperty('theme');
     });
   });
 

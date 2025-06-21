@@ -5,7 +5,7 @@ import React from 'react';
 import { TemplatePreview } from '@/components/world/SmartTemplates/TemplatePreview';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
-import { THEMES } from '@/lib/constants/themes';
+import { GENRES } from '@/lib/constants/genres';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 // Mock data for Storybook
@@ -27,7 +27,7 @@ const mockTemplateHistory = [
     } as WorldTemplate,
     generatedAt: '2023-01-01',
     generationType: 'genre-mix' as 'inspired-by' | 'genre-mix' | 'surprise-me',
-    genres: [THEMES[7].label, THEMES[6].label] // Cyberpunk, Western
+    genres: [GENRES[7].label, GENRES[6].label] // Cyberpunk, Western
   }
 ];
 

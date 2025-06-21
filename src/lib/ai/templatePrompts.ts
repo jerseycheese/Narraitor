@@ -17,7 +17,7 @@ Response must be valid JSON in this exact format:
 {
   "name": "World Name",
   "description": "Brief world description (2-3 sentences)",
-  "theme": "Primary genre/theme",
+  "genre": "Primary genre/theme",
   "attributes": [
     {"name": "Attribute Name", "baseValue": 50, "minValue": 0, "maxValue": 100, "category": "Physical"}
   ],
