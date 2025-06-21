@@ -406,6 +406,38 @@ describe('GuidedFirstTimeExperience', () => {
       
       expect(screen.getByText('Creating world...')).toBeInTheDocument();
     });
+
+    it('completes world creation successfully when all fields are filled', async () => {
+      // Set up wizard with complete data
+      (useWizardState as jest.Mock).mockReturnValue({
+        ...mockWizard,
+        currentStep: 2,
+        isLastStep: true,
+        stepValidation: { valid: true, errors: [], touched: true },
+        state: {
+          ...mockWizardState,
+          data: {
+            name: 'Test World',
+            genre: 'western',
+            worldTypeData: {
+              worldType: 'original',
+              worldReference: '',
+              additionalDetails: 'A frontier town'
+            }
+          }
+        }
+      });
+
+      render(<GuidedFirstTimeExperience />);
+      
+      // Should show create button enabled
+      const createButton = screen.getByRole('button', { name: /create world/i });
+      expect(createButton).toBeEnabled();
+      
+      // Clicking should call completion handler
+      fireEvent.click(createButton);
+      expect(mockHandleComplete).toHaveBeenCalled();
+    });
   });
 
   describe('Error handling', () => {
