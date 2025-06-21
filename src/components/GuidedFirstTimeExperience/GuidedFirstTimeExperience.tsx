@@ -70,7 +70,7 @@ export function GuidedFirstTimeExperience() {
       const { generateWorld } = await import('@/lib/generators/worldGenerator');
       
       // Use the abstracted conversion function
-      const { reference, relationship } = convertToGenerationParams(data.worldTypeData);
+      const { reference, relationship, additionalContext } = convertToGenerationParams(data.worldTypeData);
 
       const generatedWorldData = await generateWorld({
         method: 'ai',
@@ -78,7 +78,8 @@ export function GuidedFirstTimeExperience() {
         relationship,
         existingNames,
         suggestedName: data.name?.trim() || undefined,
-        genre: data.genre || undefined
+        genre: data.genre || undefined,
+        additionalContext
       });
 
       // Create the world first without attributes and skills

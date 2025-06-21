@@ -18,6 +18,7 @@ export interface WorldGenerationOptions {
   existingNames?: string[];
   suggestedName?: string;
   genre?: string; // User-selected genre (overrides AI-generated genre)
+  additionalContext?: string; // Additional user-provided context for original worlds
 }
 
 // List of TV/movie universes for AI inspiration
@@ -115,33 +116,40 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
 }`
   }
 
-  // Add common constraints
+  // Add user-specified constraints
   if (options.suggestedName) {
-    prompt += `\n\nThe world should be named: "${options.suggestedName}"`;
+    prompt += `\n\nUSER-SPECIFIED NAME: The world should be named: "${options.suggestedName}"`;
+  }
+  if (options.genre) {
+    prompt += `\n\nUSER-SELECTED GENRE: The world MUST be in the "${options.genre}" genre. All world elements, themes, conflicts, and atmosphere must align with this genre choice.`;
+  }
+  if (options.additionalContext) {
+    prompt += `\n\nUSER CONTEXT: ${options.additionalContext}. Incorporate this context into the world design.`;
   }
   if (options.existingNames?.length) {
     prompt += `\n\nExisting worlds to avoid duplicating: ${options.existingNames.join(', ')}`;
   }
 
-  // Add creative naming guidance based on prompt content
-  const genreHint = prompt.toLowerCase();
+  // Add creative naming guidance based on user-selected genre or prompt content
+  const userGenre = options.genre?.toLowerCase() || '';
+  const genreHint = userGenre || prompt.toLowerCase();
   let namingGuidance = '';
   
-  if (genreHint.includes('fantasy')) {
+  if (userGenre.includes('fantasy') || (!userGenre && genreHint.includes('fantasy'))) {
     namingGuidance = `
 - Use Celtic, Norse, or other cultural linguistics (e.g., "Vryndaal", "Korvathia", "Zhengara")
 - Combine natural elements creatively (e.g., "Thornspire", "Mistholm", "Dragonmere")
 - Use abstract concepts (e.g., "The Sundering", "Whisperlands", "Evermoon")`;
-  } else if (genreHint.includes('sci-fi') || genreHint.includes('cyberpunk')) {
+  } else if (userGenre.includes('sci-fi') || userGenre.includes('cyberpunk') || (!userGenre && (genreHint.includes('sci-fi') || genreHint.includes('cyberpunk')))) {
     namingGuidance = `
 - Use technical/scientific terms (e.g., "Nexus Prime", "Quantum Gate", "Neural Collective")
 - Combine numbers/codes (e.g., "Sector 7", "Alpha Station", "Grid 2049")
 - Use corporate/futuristic names (e.g., "Neo Singapore", "CyberCore City", "Titanfall Industries")`;
-  } else if (genreHint.includes('western')) {
+  } else if (userGenre.includes('western') || (!userGenre && genreHint.includes('western'))) {
     namingGuidance = `
 - Use frontier/geographic names (e.g., "Copper Canyon", "Deadwater Gulch", "Sunset Ridge")
 - Historical American names (e.g., "Fort Meridian", "Silver Creek", "Tombstone Valley")`;
-  } else if (genreHint.includes('horror')) {
+  } else if (userGenre.includes('horror') || (!userGenre && genreHint.includes('horror'))) {
     namingGuidance = `
 - Dark, ominous names (e.g., "Ravenshollow", "The Blackmoor", "Grimhaven")
 - Gothic or Victorian names (e.g., "Ashworth Manor", "Bleakshire", "Morrighan's Rest")`;
@@ -159,7 +167,7 @@ REMEMBER: Match the ACTUAL genre and setting of ${reference}, not what you think
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "genre": "${options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
+  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_in' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
   "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {

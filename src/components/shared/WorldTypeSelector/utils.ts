@@ -29,11 +29,16 @@ export function validateWorldTypeData(data: WorldTypeData): string[] {
 /**
  * Converts world type data to world generation parameters
  */
-export function convertToGenerationParams(data: WorldTypeData): WorldGenerationParams {
+export interface ExtendedWorldGenerationParams extends WorldGenerationParams {
+  additionalContext?: string;
+}
+
+export function convertToGenerationParams(data: WorldTypeData): ExtendedWorldGenerationParams {
   if (data.worldType === 'original') {
     return {
-      reference: data.additionalDetails || 'A world of endless possibilities',
+      reference: undefined, // For original worlds, use additionalContext instead
       relationship: undefined,
+      additionalContext: data.additionalDetails || undefined,
     };
   } else if (data.worldType === 'inspired_by') {
     const baseReference = data.worldReference || 'an existing fictional universe';
@@ -57,7 +62,7 @@ export function convertToGenerationParams(data: WorldTypeData): WorldGenerationP
 
   // Fallback
   return {
-    reference: 'A world of endless possibilities',
+    reference: undefined,
     relationship: undefined,
   };
 }
