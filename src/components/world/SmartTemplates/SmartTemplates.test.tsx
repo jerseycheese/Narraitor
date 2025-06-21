@@ -45,16 +45,16 @@ jest.mock('@/components/ui/ErrorDisplay', () => ({
   ErrorDisplay: ({ error }: { error: string }) => <div data-testid="error">{error}</div>
 }));
 
-jest.mock('@/components/shared/ThemeSelector', () => ({
-  ThemeSelector: ({ selectedThemes, onToggleTheme }: { selectedThemes: string[]; onToggleTheme: (theme: string) => void }) => (
-    <div data-testid="theme-selector">
-      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk'].map(theme => (
+jest.mock('@/components/shared/GenreSelector/GenreSelector', () => ({
+  GenreSelector: ({ selectedGenres, onToggleGenre }: { selectedGenres: string[]; onToggleGenre: (genre: string) => void }) => (
+    <div data-testid="genre-selector">
+      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk'].map(genre => (
         <button
-          key={theme}
-          onClick={() => onToggleTheme(theme)}
-          className={selectedThemes.includes(theme) ? 'bg-blue-100 text-blue-700 selected' : 'bg-gray-50'}
+          key={genre}
+          onClick={() => onToggleGenre(genre)}
+          className={selectedGenres.includes(genre) ? 'bg-blue-100 text-blue-700 selected' : 'bg-gray-50'}
         >
-          {theme}
+          {genre}
         </button>
       ))}
     </div>
@@ -90,21 +90,21 @@ describe('SmartTemplates', () => {
       expect(input).toHaveValue('Steampunk Victorian London');
     });
 
-    test('allows theme selection for theme mixer', () => {
+    test('allows genre selection for genre mixer', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
       // Check that we start in "inspired by" mode (default)
       expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
       
-      // Switch to theme mixer mode
-      const themeMixerButton = screen.getByRole('button', { name: /Genre Mixer/i });
-      fireEvent.click(themeMixerButton);
+      // Switch to genre mixer mode
+      const genreMixerButton = screen.getByRole('button', { name: /Genre Mixer/i });
+      fireEvent.click(genreMixerButton);
       
-      // Check that we have a different UI state after clicking theme mixer
+      // Check that we have a different UI state after clicking genre mixer
       // The button text should be "Mix Genres" 
       const generateButton = screen.getByRole('button', { name: /mix genres/i });
       expect(generateButton).toBeInTheDocument();
-      // Note: The button might be disabled until themes are selected, which is expected behavior
+      // Note: The button might be disabled until genres are selected, which is expected behavior
     });
   });
 
