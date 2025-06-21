@@ -92,6 +92,8 @@ export function GuidedFirstTimeExperience() {
         attributes: [], // Will be populated below
         skills: [], // Will be populated below
         settings: generatedWorldData.settings,
+        reference, // Include reference for character generation
+        relationship, // Include relationship for character generation
       });
 
       // Now update the world with the AI-generated attributes and skills that include the worldId

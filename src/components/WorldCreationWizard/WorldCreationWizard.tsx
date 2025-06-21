@@ -231,6 +231,8 @@ export default function WorldCreationWizard({
         settings: data.settings!,
         toneSettings: data.toneSettings || DEFAULT_TONE_SETTINGS,
         image: data.image, // Include any image if already generated
+        reference: data.reference, // Include reference for character generation
+        relationship: data.relationship, // Include relationship for character generation
       });
       
       // Set the newly created world as the active world
