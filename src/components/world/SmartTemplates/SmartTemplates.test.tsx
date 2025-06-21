@@ -77,7 +77,7 @@ describe('SmartTemplates', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
       expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Theme Mixer/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Genre Mixer/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Surprise me!/i })).toBeInTheDocument();
     });
 
@@ -97,12 +97,12 @@ describe('SmartTemplates', () => {
       expect(screen.getByRole('button', { name: /I want something like/i })).toBeInTheDocument();
       
       // Switch to theme mixer mode
-      const themeMixerButton = screen.getByRole('button', { name: /Theme Mixer/i });
+      const themeMixerButton = screen.getByRole('button', { name: /Genre Mixer/i });
       fireEvent.click(themeMixerButton);
       
       // Check that we have a different UI state after clicking theme mixer
-      // The button text should change to "Mix Themes" 
-      const generateButton = screen.getByRole('button', { name: /mix themes/i });
+      // The button text should be "Mix Genres" 
+      const generateButton = screen.getByRole('button', { name: /mix genres/i });
       expect(generateButton).toBeInTheDocument();
       // Note: The button might be disabled until themes are selected, which is expected behavior
     });
@@ -198,7 +198,7 @@ describe('SmartTemplates', () => {
       const mockHistoryEntry = {
         template: {
           name: 'Previous World',
-          genre: 'fantasy',
+          genre: 'sci-fi',
           description: 'A sci-fi world',
           attributes: [],
           skills: [],
@@ -214,7 +214,7 @@ describe('SmartTemplates', () => {
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
       expect(screen.getByText('Previous World')).toBeInTheDocument();
-      expect(screen.getByText('Sci-Fi')).toBeInTheDocument();
+      expect(screen.getByText('sci-fi')).toBeInTheDocument();
     });
 
     test('shows empty state when no history exists', () => {

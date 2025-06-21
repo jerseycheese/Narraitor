@@ -23,7 +23,7 @@ describe('TemplateGenerator', () => {
         content: JSON.stringify({
           name: 'Neo-Victorian Skyport',
           description: 'A steampunk world floating in the clouds',
-          theme: 'Steampunk',
+          genre: 'Steampunk',
           attributes: [
             { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
           ],
@@ -44,7 +44,7 @@ describe('TemplateGenerator', () => {
       expect(result).toEqual({
         name: 'Neo-Victorian Skyport',
         description: 'A steampunk world floating in the clouds',
-        theme: 'Steampunk',
+        genre: 'Steampunk',
         attributes: expect.arrayContaining([
           expect.objectContaining({ name: 'Strength' })
         ]),
@@ -64,7 +64,7 @@ describe('TemplateGenerator', () => {
         content: JSON.stringify({
           name: 'Cyber Frontier',
           description: 'A world where high-tech meets the wild west',
-          theme: 'Cyberpunk Western',
+          genre: 'Cyberpunk Western',
           attributes: [
             { name: 'Tech Savvy', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' },
             { name: 'Grit', baseValue: 70, minValue: 0, maxValue: 100, category: 'Social' }
@@ -98,7 +98,7 @@ describe('TemplateGenerator', () => {
         content: JSON.stringify({
           name: 'Microscopic Empire',
           description: 'A world inside a single drop of water',
-          theme: 'Micro Fantasy',
+          genre: 'Micro Fantasy',
           attributes: [
             { name: 'Surface Tension', baseValue: 40, minValue: 0, maxValue: 100, category: 'Physical' }
           ],
@@ -147,7 +147,7 @@ describe('TemplateGenerator', () => {
       const validTemplate = {
         name: 'Test World',
         description: 'A test world',
-        theme: 'Fantasy',
+        genre: 'Fantasy',
         attributes: [
           { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
         ],

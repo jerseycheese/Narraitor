@@ -130,7 +130,7 @@ describe('Persistence Integration - MVP', () => {
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -188,7 +188,7 @@ describe('Persistence Integration - MVP', () => {
       // Stores should still function without persistence
       const worldId = useWorldStore.getState().createWorld({
         name: 'Fallback World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -218,7 +218,7 @@ describe('Persistence Integration - MVP', () => {
       // Store should still function despite errors
       const worldId = useWorldStore.getState().createWorld({
         name: 'Error Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {

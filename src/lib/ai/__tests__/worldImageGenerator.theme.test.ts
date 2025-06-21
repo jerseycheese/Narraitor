@@ -14,10 +14,10 @@ describe('WorldImageGenerator theme handling', () => {
     generator = new WorldImageGenerator(mockAIClient as AIClient);
   });
 
-  const createMockWorld = (theme: string, description?: string): World => ({
+  const createMockWorld = (genre: string, description?: string): World => ({
     id: generateUniqueId('world'),
     name: 'Test World',
-    theme,
+    genre: genre as World['genre'], // Cast to satisfy type checker
     description: description || 'A test world',
     attributes: [],
     skills: [],

@@ -23,7 +23,7 @@ const mockWorldWithSkills: World = {
   id: 'skill-world',
   name: 'Fantasy Realm',
   description: 'A world with magic and combat',
-  theme: 'fantasy',
+  genre: 'fantasy',
   skills: [
     {
       id: 'athletics',

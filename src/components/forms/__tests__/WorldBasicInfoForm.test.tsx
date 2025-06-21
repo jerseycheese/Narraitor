@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import { World } from '@/types/world.types';
-import { THEMES } from '@/lib/constants/themes';
+import { GENRES } from '@/lib/constants/genres';
 
 describe('WorldBasicInfoForm - MVP Level Tests', () => {
   const mockWorld: World = {
@@ -69,25 +69,25 @@ describe('WorldBasicInfoForm - MVP Level Tests', () => {
     });
   });
 
-  // Test updating the world theme
-  test('calls onChange when theme is updated', () => {
+  // Test updating the world genre
+  test('calls onChange when genre is updated', () => {
     render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
 
-    const themeSelect = screen.getByLabelText(/theme/i);
-    fireEvent.change(themeSelect, { target: { value: 'sci-fi' } });
+    const genreSelect = screen.getByLabelText(/genre/i);
+    fireEvent.change(genreSelect, { target: { value: 'sci-fi' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
-      genre: 'fantasy',
+      genre: 'sci-fi',
     });
   });
 
-  // Test that all theme options are available
-  test('displays all available theme options', () => {
+  // Test that all genre options are available
+  test('displays all available genre options', () => {
     render(<WorldBasicInfoForm world={mockWorld} onChange={mockOnChange} />);
     
-    // Check that all themes from the constant are available as options
-    THEMES.forEach(theme => {
-      expect(screen.getByRole('option', { name: theme.label })).toBeInTheDocument();
+    // Check that all genres from the constant are available as options
+    GENRES.forEach(genre => {
+      expect(screen.getByRole('option', { name: genre.label })).toBeInTheDocument();
     });
   });
 

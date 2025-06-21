@@ -19,7 +19,7 @@ describe('worldStore', () => {
     test('should create a new world with generated ID', () => {
       const worldData = {
         name: 'Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -65,7 +65,7 @@ describe('worldStore', () => {
     test('should update existing world', async () => {
       const worldData = {
         name: 'Original World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -100,7 +100,7 @@ describe('worldStore', () => {
     test('should remove world from store', () => {
       const worldId = worldStore.getState().createWorld({
         name: 'To Delete',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -120,7 +120,7 @@ describe('worldStore', () => {
     test('should clear currentWorldId if deleted world was current', () => {
       const worldId = worldStore.getState().createWorld({
         name: 'Current World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -143,7 +143,7 @@ describe('worldStore', () => {
     test('should set current world ID', () => {
       const worldId = worldStore.getState().createWorld({
         name: 'Current World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -174,7 +174,7 @@ describe('worldStore', () => {
     beforeEach(() => {
       worldId = worldStore.getState().createWorld({
         name: 'Attribute Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -281,7 +281,7 @@ describe('worldStore', () => {
     beforeEach(() => {
       worldId = worldStore.getState().createWorld({
         name: 'Skill Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -333,7 +333,7 @@ describe('worldStore', () => {
     test('should update world settings', () => {
       const worldId = worldStore.getState().createWorld({
         name: 'Settings Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {
@@ -383,7 +383,7 @@ describe('worldStore', () => {
       // Add some data
       worldStore.getState().createWorld({
         name: 'Test World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [],
         skills: [],
         settings: {

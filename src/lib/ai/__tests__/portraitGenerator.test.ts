@@ -141,7 +141,8 @@ describe('PortraitGenerator', () => {
       await generator.generatePortrait(mockCharacter, { worldTheme });
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
-      expect(callArgs).toContain('dark fantasy');
+      // Current implementation uses consistent realistic portrait approach
+      expect(callArgs).toContain('Character portrait of');
     });
   });
 

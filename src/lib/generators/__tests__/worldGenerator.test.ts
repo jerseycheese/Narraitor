@@ -82,7 +82,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Mos Eisley Cantina",
-          theme: "Sci-Fi",
+          genre: "Sci-Fi",
           description: "A notorious spaceport cantina on Tatooine, frequented by smugglers, bounty hunters, and travelers.",
           attributes: [
             {
@@ -120,7 +120,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "The Prancing Pony",
-          theme: "Fantasy",
+          genre: "Fantasy",
           description: "A famous inn in Bree where travelers from all corners of Middle-earth gather.",
           attributes: [
             {

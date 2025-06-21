@@ -39,10 +39,10 @@ describe('AITestingPanel', () => {
     fireEvent.change(worldNameInput, { target: { value: 'Test Fantasy World' } });
     expect(worldNameInput).toHaveValue('Test Fantasy World');
     
-    // Test world theme input
-    const worldThemeInput = screen.getByLabelText(/world theme/i);
-    fireEvent.change(worldThemeInput, { target: { value: 'fantasy' } });
-    expect(worldThemeInput).toHaveValue('fantasy');
+    // Test world genre input (changed from theme to genre)
+    const worldGenreInput = screen.getByLabelText(/world genre/i);
+    fireEvent.change(worldGenreInput, { target: { value: 'fantasy' } });
+    expect(worldGenreInput).toHaveValue('fantasy');
   });
 
   test('allows configuration of custom character settings', () => {

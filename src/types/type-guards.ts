@@ -16,7 +16,7 @@ export function isWorld(obj: unknown): obj is World {
     typeof obj === 'object' &&
     'id' in obj &&
     'name' in obj &&
-    'theme' in obj &&
+    'genre' in obj &&
     'attributes' in obj &&
     'skills' in obj &&
     'settings' in obj &&

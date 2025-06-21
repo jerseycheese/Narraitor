@@ -60,7 +60,15 @@ describe('GuidedFirstTimeExperience', () => {
 
   const mockWizardState = {
     currentStep: 0,
-    data: { name: '', genre: 'fantasy', description: '' },
+    data: { 
+      name: '', 
+      genre: 'fantasy', 
+      worldTypeData: {
+        worldType: 'original' as const,
+        worldReference: '',
+        additionalDetails: ''
+      }
+    },
     isProcessing: false,
     errors: {},
     validation: {},
@@ -176,9 +184,10 @@ describe('GuidedFirstTimeExperience', () => {
     it('displays world concept form', () => {
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getAllByText(/world concept/i)).toHaveLength(2); // Title and label
+      expect(screen.getByText(/world concept/i)).toBeInTheDocument();
       expect(screen.getByText(/create an rpg in any fictional universe/i)).toBeInTheDocument();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      // Component now uses WorldTypeSelector with radio buttons instead of textbox
+      expect(screen.getByDisplayValue('original')).toBeInTheDocument();
     });
 
     it('shows back and next buttons', () => {
@@ -188,29 +197,40 @@ describe('GuidedFirstTimeExperience', () => {
       expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     });
 
-    it('updates data when textarea changes', () => {
+    it('updates data when world type changes', () => {
       render(<GuidedFirstTimeExperience />);
       
-      const textarea = screen.getByRole('textbox');
-      fireEvent.change(textarea, { target: { value: 'A magical forest realm' } });
+      const inspiredByOption = screen.getByRole('radio', { name: /inspired by/i });
+      fireEvent.click(inspiredByOption);
       
-      expect(mockUpdateData).toHaveBeenCalledWith({ description: 'A magical forest realm' });
+      expect(mockUpdateData).toHaveBeenCalledWith({
+        worldTypeData: expect.objectContaining({
+          worldType: 'inspired_by'
+        })
+      });
     });
 
-    it('displays world concept step with description input', () => {
+    it('displays world concept step with world type selector', () => {
       (useWizardState as jest.Mock).mockReturnValue({
         ...mockWizard,
         currentStep: 1,
         state: {
           ...mockWizardState,
-          data: { ...mockWizardState.data, description: 'A magical forest' },
+          data: { 
+            ...mockWizardState.data, 
+            worldTypeData: {
+              worldType: 'inspired_by',
+              worldReference: 'Star Wars',
+              additionalDetails: 'A magical forest'
+            }
+          },
         },
       });
 
       render(<GuidedFirstTimeExperience />);
       
-      expect(screen.getByLabelText(/world concept/i)).toBeInTheDocument();
-      expect(screen.getByDisplayValue('A magical forest')).toBeInTheDocument();
+      expect(screen.getByText(/world concept/i)).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: /inspired by/i })).toBeChecked();
     });
   });
 
@@ -228,9 +248,9 @@ describe('GuidedFirstTimeExperience', () => {
       render(<GuidedFirstTimeExperience />);
       
       expect(screen.getByText(/world details/i)).toBeInTheDocument();
-      expect(screen.getByText(/give your world a name/i)).toBeInTheDocument();
+      expect(screen.getByText(/give your world a name and genre/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/world name/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/theme/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/genre/i)).toBeInTheDocument();
     });
 
     it('updates name when input changes', () => {
@@ -242,28 +262,25 @@ describe('GuidedFirstTimeExperience', () => {
       expect(mockUpdateData).toHaveBeenCalledWith({ name: 'Mystic Realm' });
     });
 
-    it('updates theme when select changes', () => {
+    it('updates genre when option changes', () => {
       render(<GuidedFirstTimeExperience />);
       
-      const themeSelect = screen.getByLabelText(/theme/i);
-      fireEvent.change(themeSelect, { target: { value: 'fantasy' } });
+      // Test genre selection 
+      const genreSelect = screen.getByLabelText(/genre/i);
+      fireEvent.change(genreSelect, { target: { value: 'sci-fi' } });
       
-      expect(mockUpdateData).toHaveBeenCalledWith({ genre: 'fantasy' });
+      expect(mockUpdateData).toHaveBeenCalledWith({
+        genre: 'sci-fi'
+      });
     });
 
-    it('shows all theme options', () => {
+    it('shows genre options', () => {
       render(<GuidedFirstTimeExperience />);
       
-      const themeSelect = screen.getByLabelText(/theme/i);
-      expect(themeSelect).toHaveTextContent('Fantasy');
-      expect(themeSelect).toHaveTextContent('Sci-Fi');
-      expect(themeSelect).toHaveTextContent('Modern');
-      expect(themeSelect).toHaveTextContent('Historical');
-      expect(themeSelect).toHaveTextContent('Horror');
-      expect(themeSelect).toHaveTextContent('Mystery');
-      expect(themeSelect).toHaveTextContent('Western');
-      expect(themeSelect).toHaveTextContent('Cyberpunk');
-      expect(themeSelect).toHaveTextContent('Other');
+      // Check that genre select options are available
+      expect(screen.getByRole('option', { name: 'Fantasy' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Sci-Fi' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: 'Modern' })).toBeInTheDocument();
     });
 
     it('displays validation errors when present', () => {

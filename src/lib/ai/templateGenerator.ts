@@ -48,7 +48,7 @@ export class TemplateGenerator {
   }
 
   validateTemplate(template: unknown): asserts template is WorldTemplate {
-    const requiredFields = ['name', 'description', 'theme', 'attributes', 'skills', 'explanation'];
+    const requiredFields = ['name', 'description', 'genre', 'attributes', 'skills', 'explanation'];
     const arrayFields = ['attributes', 'skills'];
     
     validateRequiredFields(template, requiredFields, 'template structure');

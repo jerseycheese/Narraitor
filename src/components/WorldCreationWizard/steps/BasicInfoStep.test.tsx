@@ -100,7 +100,7 @@ describe('BasicInfoStep', () => {
     });
     expect(mockOnUpdate).toHaveBeenCalledWith({
       ...mockWorldData,
-      genre: 'fantasy',
+      genre: 'sci-fi',
     });
   });
 

@@ -6,9 +6,15 @@ describe('contextOverride', () => {
     id: 'world-1',
     name: 'Test World',
     description: 'A test world',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
+    settings: {
+      maxAttributes: 6,
+      maxSkills: 12,
+      attributePointPool: 27,
+      skillPointPool: 40
+    },
     createdAt: new Date(),
     updatedAt: new Date()
   };

@@ -20,7 +20,7 @@ describe('ChoiceGenerator - Alignment System', () => {
       id: 'test-world',
       name: 'Test World',
       description: 'A test world for alignment testing',
-      theme: 'fantasy',
+      genre: 'fantasy',
       customAttributes: [],
       customSkills: [],
       imageUrl: '',

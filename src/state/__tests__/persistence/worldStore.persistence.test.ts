@@ -39,7 +39,7 @@ jest.mock('zustand/middleware', () => ({
 const createTestWorld = (overrides = {}) => ({
   id: 'test-world-1',
   name: 'Test World',
-  theme: 'fantasy',
+  genre: 'fantasy',
   attributes: [],
   skills: [],
   settings: {
@@ -195,7 +195,7 @@ describe('worldStore persistence', () => {
       // Create full-featured world
       const fullWorld = createTestWorld({
         name: 'Full Featured World',
-        theme: 'sci-fi',
+        genre: 'sci-fi',
         description: 'A complex world with all properties',
         imageUrl: 'https://example.com/world.jpg',
         settings: {

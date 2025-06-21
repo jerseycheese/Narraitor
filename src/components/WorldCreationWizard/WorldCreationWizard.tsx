@@ -34,6 +34,7 @@ interface WorldCreationData extends Partial<World> {
   aiSuggestionsGenerated?: boolean;
   selectedTemplateId?: string | null;
   createOwnWorld?: boolean;
+  worldType?: 'original' | 'inspired_by' | 'set_within';
 }
 
 export interface WorldCreationWizardProps {
@@ -66,6 +67,7 @@ export default function WorldCreationWizard({
     aiSuggestionsGenerated: initialData?.aiSuggestionsGenerated || false,
     selectedTemplateId: initialData?.selectedTemplateId || null,
     createOwnWorld: initialData?.createOwnWorld || false,
+    worldType: initialData?.worldType || 'original',
     // Spread initialData last to ensure external overrides take precedence
     ...initialData,
   }), [initialData]);
