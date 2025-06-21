@@ -302,7 +302,7 @@ describe('GuidedFirstTimeExperience', () => {
       });
     });
 
-    it('makes genre optional for "Set Within" world types', () => {
+    it('hides genre field for "Set Within" world types', () => {
       (useWizardState as jest.Mock).mockReturnValue({
         ...mockWizard,
         currentStep: 2,
@@ -321,16 +321,16 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      // Should show modified text indicating genre is optional
-      expect(screen.getByText(/optionally specify a genre/i)).toBeInTheDocument();
-      expect(screen.getByText(/optional - will be inferred from your reference/i)).toBeInTheDocument();
-      expect(screen.getByText(/auto-detect from reference/i)).toBeInTheDocument();
+      // Should show modified text indicating genre will be auto-detected
+      expect(screen.getByText(/genre will be automatically detected/i)).toBeInTheDocument();
       
-      // Should NOT show required asterisk for genre
+      // Should NOT show genre field at all
+      expect(screen.queryByLabelText(/genre/i)).not.toBeInTheDocument();
       expect(screen.queryByText('*')).not.toBeInTheDocument();
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     });
 
-    it('keeps genre required for original and inspired by world types', () => {
+    it('shows genre field for original and inspired by world types', () => {
       // Test original world type
       (useWizardState as jest.Mock).mockReturnValue({
         ...mockWizard,
@@ -350,8 +350,9 @@ describe('GuidedFirstTimeExperience', () => {
 
       render(<GuidedFirstTimeExperience />);
       
-      // Should show standard text and required asterisk
+      // Should show standard text and genre field with required asterisk
       expect(screen.getByText(/give your world a name and genre/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/genre/i)).toBeInTheDocument();
       expect(screen.getByText('*')).toBeInTheDocument();
     });
   });

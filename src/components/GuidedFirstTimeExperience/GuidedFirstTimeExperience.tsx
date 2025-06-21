@@ -225,7 +225,6 @@ export function GuidedFirstTimeExperience() {
 
   const renderDetailsStep = useMemo(() => {
     const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
-    const isGenreOptional = isSetWithin;
     
     return (
       <div className="max-w-md mx-auto space-y-6">
@@ -234,8 +233,8 @@ export function GuidedFirstTimeExperience() {
             World Details
           </h2>
           <p className="text-gray-600">
-            {isGenreOptional 
-              ? "Give your world a name and optionally specify a genre"
+            {isSetWithin 
+              ? "Give your world a name (genre will be automatically detected)"
               : "Give your world a name and genre"
             }
           </p>
@@ -256,25 +255,26 @@ export function GuidedFirstTimeExperience() {
             />
           </div>
           
-          <div>
-            <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
-              Genre {!isGenreOptional && <span className="text-red-500">*</span>}
-              {isGenreOptional && <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>}
-            </label>
-            <select
-              id="world-genre"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={wizard.state.data.genre}
-              onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
-            >
-              <option value="">{isGenreOptional ? "Auto-detect from reference" : "Select a genre"}</option>
-              {GENRES.map((genre) => (
-                <option key={genre.value} value={genre.value}>
-                  {genre.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {!isSetWithin && (
+            <div>
+              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+                Genre <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="world-genre"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={wizard.state.data.genre}
+                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+              >
+                <option value="">Select a genre</option>
+                {GENRES.map((genre) => (
+                  <option key={genre.value} value={genre.value}>
+                    {genre.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           
           {wizard.stepValidation?.errors.length > 0 && (
             <div className="text-sm text-red-600">
