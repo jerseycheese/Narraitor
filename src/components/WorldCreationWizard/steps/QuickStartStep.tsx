@@ -2,7 +2,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { World } from '@/types/world.types';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
@@ -99,9 +99,12 @@ export default function QuickStartStep({
   };
 
   const existingCharacterNames = useCharacterStore(
-    (state) => Object.values(state.characters)
-      .filter(char => char.worldId === world.id)
-      .map(char => char.name)
+    useMemo(
+      () => (state) => Object.values(state.characters)
+        .filter(char => char.worldId === world.id)
+        .map(char => char.name),
+      [world.id]
+    )
   );
 
   return (
