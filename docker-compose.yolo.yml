@@ -34,7 +34,7 @@ services:
       sh -c "
         echo '🚀 Starting YOLO mode for issue #${ISSUE_NUMBER}' &&
         cd /app &&
-        claude --dangerously-skip-permissions /project:do-issue-auto-noverify ${ISSUE_NUMBER}
+        claude --dangerously-skip-permissions /project:do-issue-auto ${ISSUE_NUMBER}
       "
 
   # Optional: Local API mock service
