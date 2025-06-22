@@ -1,14 +1,25 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
 
 export default function CreateWorldPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [generatedData, setGeneratedData] = useState(null);
+  const [initialStep, setInitialStep] = useState(0);
 
   useEffect(() => {
+    // Check for step parameter in URL
+    const stepParam = searchParams.get('step');
+    if (stepParam) {
+      const step = parseInt(stepParam, 10);
+      if (!isNaN(step)) {
+        setInitialStep(step);
+      }
+    }
+
     // Check for generated world data from AI generation
     const storedData = sessionStorage.getItem('generated-world-data');
     if (storedData) {
@@ -21,7 +32,20 @@ export default function CreateWorldPage() {
         console.error('Failed to parse generated world data:', error);
       }
     }
-  }, []);
+
+    // Check for smart template data from test harness
+    const templateData = sessionStorage.getItem('smart-template-data');
+    if (templateData) {
+      try {
+        const data = JSON.parse(templateData);
+        setGeneratedData(data);
+        // Clear the stored data so it doesn't persist
+        sessionStorage.removeItem('smart-template-data');
+      } catch (error) {
+        console.error('Failed to parse smart template data:', error);
+      }
+    }
+  }, [searchParams]);
 
   const handleComplete = (worldId: string) => {
     router.push(`/world/${worldId}`);
@@ -37,7 +61,7 @@ export default function CreateWorldPage() {
         onComplete={handleComplete}
         onCancel={handleCancel}
         initialData={generatedData || undefined}
-        initialStep={generatedData ? 5 : 0} // Skip to final step if we have generated data
+        initialStep={initialStep} // Use step from URL parameter or default to 0
       />
     </main>
   );

@@ -15,10 +15,33 @@ export default function SmartTemplatesTestPage() {
     console.log('Template generated:', template);
     setGeneratedTemplate(template);
     
-    // Redirect to world creation wizard when template is used
-    // This simulates the real workflow where templates redirect to the wizard
+    // For test harness, redirect to world creation with step parameter
+    // This simulates starting at Basic Info step with template data
     console.log('Redirecting to world creation wizard with template:', template.name);
-    router.push('/world/create');
+    
+    // Store template data for the wizard to use
+    const templateWizardData = {
+      selectedTemplateId: 'smart-template',
+      createOwnWorld: false,
+      name: template.name,
+      description: template.description,
+      genre: template.genre,
+      aiSuggestions: {
+        attributes: template.attributes.map(attr => ({
+          ...attr,
+          accepted: true // Auto-accept template attributes
+        })),
+        skills: template.skills.map(skill => ({
+          ...skill,
+          accepted: true // Auto-accept template skills
+        }))
+      }
+    };
+    
+    sessionStorage.setItem('smart-template-data', JSON.stringify(templateWizardData));
+    
+    // Redirect with step parameter to start at Basic Info
+    router.push('/world/create?step=1');
   };
 
   return (
