@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { World } from '@/types/world.types';
 import { 
   CharacterArchetype, 
@@ -11,7 +11,6 @@ import {
 } from '@/lib/utils/characterArchetypes';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
@@ -48,7 +47,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     } finally {
       setLoading(false);
     }
-  }, [world, existingCharacterNames.join(',')]);
+  }, [world, existingCharacterNames]);
 
   useEffect(() => {
     generateArchetypes();
