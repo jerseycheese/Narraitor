@@ -3,15 +3,22 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { SmartTemplates } from '@/components/world/SmartTemplates';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 
 export default function SmartTemplatesTestPage() {
   const [generatedTemplate, setGeneratedTemplate] = useState<WorldTemplate | null>(null);
+  const router = useRouter();
 
   const handleTemplateGenerated = (template: WorldTemplate) => {
     console.log('Template generated:', template);
     setGeneratedTemplate(template);
+    
+    // Redirect to world creation wizard when template is used
+    // This simulates the real workflow where templates redirect to the wizard
+    console.log('Redirecting to world creation wizard with template:', template.name);
+    router.push('/world/create');
   };
 
   return (
@@ -20,7 +27,8 @@ export default function SmartTemplatesTestPage() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <h1 className="text-3xl font-bold mb-4">SmartTemplates Test Harness</h1>
           <p className="text-gray-600 mb-6">
-            Test the SmartTemplates component with live AI generation and template history.
+            Test the SmartTemplates component with live AI generation and template history. 
+            Clicking &quot;Use This Template&quot; will redirect to the world creation wizard.
           </p>
           
           <div className="border-2 border-blue-200 rounded-lg p-4">
