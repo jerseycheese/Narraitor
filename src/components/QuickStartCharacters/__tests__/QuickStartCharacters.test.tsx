@@ -155,16 +155,17 @@ describe('QuickStartCharacters', () => {
         const warriorCard = screen.getByText('Aelric the Brave').closest('[data-testid="archetype-card"]');
         expect(warriorCard).toBeInTheDocument();
         
-        // Should show high strength
-        expect(warriorCard).toHaveTextContent('Strength: 8');
-        expect(warriorCard).toHaveTextContent('Combat: 7');
+        // Should show high strength and combat (using new Badge format)
+        expect(warriorCard).toHaveTextContent('Strength');
+        expect(warriorCard).toHaveTextContent('8');
+        expect(warriorCard).toHaveTextContent('Combat');
+        expect(warriorCard).toHaveTextContent('7');
       });
     });
   });
 
   describe('User Interactions', () => {
     test('calls onCharacterSelect when Select Character button is clicked', async () => {
-      jest.useFakeTimers();
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
@@ -172,15 +173,12 @@ describe('QuickStartCharacters', () => {
         fireEvent.click(selectButton);
       });
       
-      // Fast-forward past the setTimeout delay
-      jest.advanceTimersByTime(300);
-      
-      expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(mockArchetypes[0]);
-      jest.useRealTimers();
+      await waitFor(() => {
+        expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(mockArchetypes[0]);
+      });
     });
 
     test('calls onCharacterSelect with random archetype when Random Character is clicked', async () => {
-      jest.useFakeTimers();
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
@@ -188,18 +186,16 @@ describe('QuickStartCharacters', () => {
         fireEvent.click(randomButton);
       });
       
-      // Fast-forward past the setTimeout delay
-      jest.advanceTimersByTime(300);
-      
-      expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: expect.any(String),
-          level: 1,
-          attributes: expect.any(Array),
-          skills: expect.any(Array)
-        })
-      );
-      jest.useRealTimers();
+      await waitFor(() => {
+        expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: expect.any(String),
+            level: 1,
+            attributes: expect.any(Array),
+            skills: expect.any(Array)
+          })
+        );
+      });
     });
 
     test('calls onCustomizeClick when Customize Character button is clicked', async () => {
