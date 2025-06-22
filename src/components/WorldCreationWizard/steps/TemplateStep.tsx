@@ -6,10 +6,21 @@ import { SmartTemplates } from '../../world/SmartTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
+import { WorldTemplate } from '@/lib/ai/templateGenerator';
+import { AttributeSuggestion, SkillSuggestion } from '../WizardState';
+import { World } from '@/types/world.types';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: { selectedTemplateId?: string | null; createOwnWorld?: boolean }) => void;
+  onUpdate: (updates: { 
+    selectedTemplateId?: string | null; 
+    createOwnWorld?: boolean;
+    worldData?: Partial<World>;
+    aiSuggestions?: {
+      attributes: AttributeSuggestion[];
+      skills: SkillSuggestion[];
+    };
+  }) => void;
   errors: Record<string, string>;
   onComplete: (createOwnWorld?: boolean) => void;
   onCancel?: () => void;
@@ -65,16 +76,45 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   };
   
   // Handler for AI-generated templates
-  const handleSmartTemplateGenerated = async () => {
+  const handleSmartTemplateGenerated = async (template: WorldTemplate) => {
     try {
       setIsApplying(true);
       
-      // Template data will be processed later in the wizard flow
-      // Update the wizard state with the template data
-      // This will populate the form fields in subsequent steps
+      // Convert template data to wizard format and populate the state
+      const convertedAttributes = template.attributes.map((attr) => ({
+        name: attr.name,
+        description: `${attr.name} attribute for this world`,
+        minValue: attr.minValue,
+        maxValue: attr.maxValue,
+        baseValue: attr.baseValue,
+        category: attr.category || 'General',
+        accepted: true // Auto-accept template attributes
+      }));
+
+      const convertedSkills = template.skills.map((skill) => ({
+        name: skill.name,
+        description: `${skill.name} skill for this world`,
+        difficulty: skill.difficulty,
+        category: skill.category || 'General',
+        baseValue: skill.baseValue,
+        minValue: skill.minValue,
+        maxValue: skill.maxValue,
+        accepted: true // Auto-accept template skills
+      }));
+      
+      // Update the wizard state with template data and AI suggestions
       onUpdate({ 
-        selectedTemplateId: 'smart-template', // Indicate we're using a smart template
-        createOwnWorld: false
+        selectedTemplateId: 'smart-template',
+        createOwnWorld: false,
+        worldData: {
+          name: template.name,
+          description: template.description,
+          genre: template.genre,
+        },
+        aiSuggestions: {
+          attributes: convertedAttributes,
+          skills: convertedSkills
+        }
       });
       
       // Proceed to the next step (Basic Info) so user can review/modify
