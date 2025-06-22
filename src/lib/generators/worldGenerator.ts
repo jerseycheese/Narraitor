@@ -1,5 +1,6 @@
 import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
+import { normalizeGenre } from '@/lib/constants/genres';
 
 export interface GeneratedWorldData {
   name: string;
@@ -162,13 +163,16 @@ CRITICAL: This is the ${reference} universe itself, not something inspired by it
 - Abstract or poetic names`;
   }
 
+  // Get valid genre values for the prompt
+  const genreExamples = 'fantasy, sci-fi, modern, historical, horror, mystery, western, cyberpunk, other';
+
   prompt += `\n\nIMPORTANT: Create a UNIQUE and CREATIVE world name. Avoid overused fantasy names like "Aethelgard", "Eldoria", "Avalon", "Mystara", "Drakmoor", etc. Consider:${namingGuidance}
 - Avoid generic patterns like "[Adjective][Place]" (e.g., "Darklands", "Brightshire")
 
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_within' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST identify and use the correct genre from these options: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, or Other. Examples: The Office = "Modern", Star Wars = "Sci-Fi", Lord of the Rings = "Fantasy", Breaking Bad = "Modern", The Walking Dead = "Post-Apocalyptic", Deadwood = "Western". NEVER default to Fantasy unless the source material is actually fantasy. For contemporary settings like sitcoms, dramas, or workplace comedies, use "Modern".` : 'The appropriate genre/setting based on the suggested name and context. Choose from: Fantasy, Sci-Fi, Modern, Historical, Post-Apocalyptic, Cyberpunk, Western, Other. CRITICAL: Analyze the suggested name for clues - "1990s" suggests Historical, "Diner Cook" suggests Modern, "Medieval" suggests Historical, "Space Station" suggests Sci-Fi. Match the genre to what the name actually indicates.'}",
+  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_within' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST use ONLY these exact values: ${genreExamples}. Examples: The Office = "modern", Star Wars = "sci-fi", Lord of the Rings = "fantasy", Breaking Bad = "modern", Horror movies = "horror", Deadwood = "western". Use lowercase values exactly as shown.` : `The appropriate genre based on the world context. You MUST use ONLY these exact values: ${genreExamples}. Use lowercase values exactly as shown. Examples: magical worlds = "fantasy", futuristic = "sci-fi", contemporary = "modern", past eras = "historical", scary/dark = "horror", crime solving = "mystery", frontier = "western", dystopian tech = "cyberpunk", unique themes = "other".`}",
   "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {
@@ -278,7 +282,7 @@ Make the world interesting and playable with concepts appropriate to the setting
     
     return {
       name: worldName,
-      genre: String(parsed.genre),
+      genre: normalizeGenre(String(parsed.genre)),
       description: String(parsed.description),
       attributes,
       skills,
