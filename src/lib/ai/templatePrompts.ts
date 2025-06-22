@@ -11,13 +11,15 @@ export interface TemplateGenerationContext {
 }
 
 export const generateWorldTemplatePrompt = (context: TemplateGenerationContext): string => {
+  const genreExamples = 'fantasy, sci-fi, modern, historical, horror, mystery, western, cyberpunk, other';
+  
   const basePrompt = `You are a creative world-building assistant. Generate a world template that provides structure but remains fully editable. The world should be cohesive and engaging.
 
 Response must be valid JSON in this exact format:
 {
   "name": "World Name",
   "description": "Brief world description (2-3 sentences)",
-  "genre": "Primary genre/theme",
+  "genre": "Primary genre from these exact values: ${genreExamples}. Use lowercase values exactly as shown.",
   "attributes": [
     {"name": "Attribute Name", "baseValue": 50, "minValue": 0, "maxValue": 100, "category": "Physical"}
   ],
@@ -26,6 +28,12 @@ Response must be valid JSON in this exact format:
   ],
   "explanation": "Brief explanation of why these attributes/skills were suggested for this world"
 }
+
+CRITICAL GENRE REQUIREMENTS:
+- You MUST use ONLY these exact genre values: ${genreExamples}
+- Use lowercase values exactly as shown (e.g., "sci-fi" not "Science Fiction")
+- Never create compound genres like "Cyberpunk Fantasy" - choose the primary genre
+- Examples: magical worlds = "fantasy", futuristic = "sci-fi", contemporary = "modern", scary = "horror"
 
 IMPORTANT: Include 4-6 attributes and 6-8 skills. Use difficulty levels: "trivial", "easy", "moderate", "hard", "extreme".
 `;
