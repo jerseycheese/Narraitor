@@ -49,10 +49,21 @@ export default function SmartTemplatesTestPage() {
       }
     };
     
+    console.log('Storing template data in sessionStorage:', templateWizardData);
     sessionStorage.setItem('smart-template-data', JSON.stringify(templateWizardData));
     
-    // Redirect with step parameter to start at Basic Info
-    router.push('/world/create?step=1');
+    // Verify storage worked
+    const storedData = sessionStorage.getItem('smart-template-data');
+    console.log('Verification - stored data exists:', !!storedData);
+    if (storedData) {
+      console.log('Verification - stored data preview:', JSON.parse(storedData).name);
+    }
+    
+    // Add a small delay to ensure storage is complete before navigation
+    setTimeout(() => {
+      console.log('Navigating to wizard...');
+      router.push('/world/create?step=1');
+    }, 100);
   };
 
   return (

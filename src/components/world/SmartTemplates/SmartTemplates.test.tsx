@@ -217,12 +217,13 @@ describe('SmartTemplates', () => {
       expect(screen.getByText('sci-fi')).toBeInTheDocument();
     });
 
-    test('shows empty state when no history exists', () => {
+    test('does not show recent templates section when no history exists', () => {
       mockSessionStore.templateHistory = [];
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
-      expect(screen.getByText(/no recent templates/i)).toBeInTheDocument();
+      // Recent Templates section should not be visible when no templates exist
+      expect(screen.queryByText(/recent templates/i)).not.toBeInTheDocument();
     });
   });
 

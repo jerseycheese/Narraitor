@@ -56,18 +56,39 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
     
     try {
       setIsApplying(true);
-      // Apply the template to create a new world
-      const worldId = applyWorldTemplate(selectedTemplateId);
+      
+      // Check if this is a recent AI template
+      if (selectedTemplateId.startsWith('ai-template-')) {
+        // For AI templates, check sessionStorage for the data
+        const recentTemplateData = sessionStorage.getItem('recent-template-data');
+        if (recentTemplateData) {
+          try {
+            const templateData = JSON.parse(recentTemplateData);
+            // Apply the AI template data directly to wizard state
+            onUpdate(templateData);
+            console.log('Applied recent AI template:', templateData.name);
+            
+            // Proceed to next step
+            setTimeout(() => {
+              onComplete(false);
+              setIsApplying(false);
+            }, 0);
+            return;
+          } catch (error) {
+            console.error('Failed to apply recent template:', error);
+          }
+        }
+      } else {
+        // Apply traditional template
+        applyWorldTemplate(selectedTemplateId);
+      }
       
       // Proceed to next step
-      // Using setTimeout to ensure state updates complete before navigation
-      // This fixes the test issue by ensuring the callback is executed
       setTimeout(() => {
         onComplete(false);
         setIsApplying(false);
       }, 0);
       
-      return worldId;
     } catch {
       // Error applying template
       setIsApplying(false);
@@ -82,7 +103,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Convert template data to wizard format and populate the state
       const convertedAttributes = template.attributes.map((attr) => ({
         name: attr.name,
-        description: `${attr.name} attribute for this world`,
+        description: attr.description || `${attr.name} represents a core aspect of characters in this world`,
         minValue: attr.minValue,
         maxValue: attr.maxValue,
         baseValue: attr.baseValue,
@@ -92,7 +113,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
 
       const convertedSkills = template.skills.map((skill) => ({
         name: skill.name,
-        description: `${skill.name} skill for this world`,
+        description: skill.description || `${skill.name} is an important skill for characters in this world`,
         difficulty: skill.difficulty,
         category: skill.category || 'General',
         baseValue: skill.baseValue,

@@ -51,7 +51,7 @@ describe('WorldTypeSelector - MVP Tests', () => {
     render(<WorldTypeSelector value={valueWithReference} onChange={mockOnChange} />);
     
     // Check that additional input fields appear for non-original world types
-    expect(screen.getByPlaceholderText(/E.g., Star Wars, The Office, Lord of the Rings/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/e.g., Star Wars, The Office, Breaking Bad/i)).toBeInTheDocument();
   });
 
   test('updates reference when input changes', () => {
@@ -63,7 +63,7 @@ describe('WorldTypeSelector - MVP Tests', () => {
 
     render(<WorldTypeSelector value={valueWithReference} onChange={mockOnChange} />);
     
-    const referenceInput = screen.getByPlaceholderText(/E.g., Star Wars, The Office, Lord of the Rings/i);
+    const referenceInput = screen.getByPlaceholderText(/e.g., Star Wars, The Office, Breaking Bad/i);
     fireEvent.change(referenceInput, { target: { value: 'Star Wars' } });
     
     expect(mockOnChange).toHaveBeenCalledWith(

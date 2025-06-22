@@ -69,13 +69,12 @@ describe('worldGenerator', () => {
       // Verify the prompt includes the correct instructions
       const promptArg = mockGenerateContent.mock.calls[0][0];
       expect(promptArg).toContain('The Office');
-      expect(promptArg).toContain('CRITICAL: You MUST identify and use the correct genre');
-      expect(promptArg).toContain('The Office = "Modern"');
-      expect(promptArg).toContain('NEVER default to Fantasy');
+      expect(promptArg).toContain('CRITICAL: You MUST use ONLY these exact values');
+      expect(promptArg).toContain('The Office = "modern"');
       
-      // Verify the result has Modern theme, not Fantasy
-      expect(result.genre).toBe('Modern');
-      expect(result.genre).not.toBe('Fantasy');
+      // Verify the result has modern theme, not fantasy
+      expect(result.genre).toBe('modern');
+      expect(result.genre).not.toBe('fantasy');
     });
 
     it('should use Sci-Fi theme for Star Wars setting', async () => {
@@ -113,7 +112,7 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      expect(result.genre).toBe('Sci-Fi');
+      expect(result.genre).toBe('sci-fi');
     });
 
     it('should allow Fantasy theme for Lord of the Rings setting', async () => {
@@ -151,7 +150,7 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      expect(result.genre).toBe('Fantasy');
+      expect(result.genre).toBe('fantasy');
     });
   });
 

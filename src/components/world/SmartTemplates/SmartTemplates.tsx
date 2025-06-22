@@ -11,8 +11,8 @@ import { Input } from '@/components/ui/input';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
 import { GenreSelector } from '@/components/shared/GenreSelector/GenreSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
-import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplatePreview } from './TemplatePreview';
+import { RecentTemplates } from '@/components/shared/RecentTemplates';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -35,17 +35,8 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     { value: 'surprise-me', label: 'Surprise me!' }
   ], []);
 
-  // Use proper React hooks for reactivity - memoized selectors for performance
-  const templateHistory = useSessionStore(useCallback(state => state.templateHistory, []));
+  // Use session store for adding templates to history
   const addTemplateToHistory = useSessionStore(useCallback(state => state.addTemplateToHistory, []));
-  const clearTemplateHistory = useSessionStore(useCallback(state => state.clearTemplateHistory, []));
-  
-  const templateHistoryManager = useHistory(
-    templateHistory,
-    addTemplateToHistory,
-    clearTemplateHistory,
-    5
-  );
 
   const toggleGenre = useCallback((genre: string) => {
     setSelectedGenres(prev => 
@@ -92,7 +83,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
         genres: requestBody.genres
       };
       
-      templateHistoryManager.addEntry(historyEntry);
+      addTemplateToHistory(historyEntry);
       
       // Show preview
       setPreviewTemplate(template);
@@ -102,7 +93,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     } finally {
       setIsGenerating(false);
     }
-  }, [templateHistoryManager, userInput, selectedGenres]);
+  }, [addTemplateToHistory, userInput, selectedGenres]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -135,12 +126,6 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     setPreviewTemplate(entry.template);
   }, []);
 
-  const handleHistoryKeyPress = useCallback((event: React.KeyboardEvent, entry: TemplateHistoryEntry) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleHistoryTemplate(entry);
-    }
-  }, [handleHistoryTemplate]);
 
   // Template preview modal
   const templatePreviewModal = previewTemplate && (
@@ -270,46 +255,13 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             )}
           </div>
 
-          {/* Template History */}
-          {!templateHistoryManager.isEmpty && (
-            <div className={wizardStyles.divider}>
-              <h3 className={wizardStyles.subheading}>Recent Templates</h3>
-              <div className="grid gap-4 md:grid-cols-2">
-                {templateHistoryManager.getRecent().map((entry, index) => (
-                  <div 
-                    key={index}
-                    className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    onClick={() => handleHistoryTemplate(entry)}
-                    onKeyPress={(e) => handleHistoryKeyPress(e, entry)}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Use template: ${entry.template.name} (${entry.template.genre})`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-medium">{entry.template.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          {new Date(entry.generatedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary}`}>
-                        {entry.generationType === 'inspired-by' ? 'Inspired' : 
-                         entry.generationType === 'genre-mix' ? 'Mixed' : 'Surprise'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Recent Templates */}
+          <RecentTemplates
+            onTemplateSelect={handleHistoryTemplate}
+            title="Recent Templates"
+            description="Click to preview recently generated templates"
+          />
 
-          {templateHistoryManager.isEmpty && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No recent templates</p>
-              <p className="text-sm">Generate your first template to get started!</p>
-            </div>
-          )}
         </div>
       )}
       </div>
