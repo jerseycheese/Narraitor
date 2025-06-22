@@ -13,21 +13,15 @@ echo -e "${PURPLE}╚═══════════════════�
 
 echo -e "\n${BLUE}Available Automation Modes:${NC}"
 echo -e "┌─────────────────────────────────────────────────────────────┐"
-echo -e "│ ${GREEN}1. Standard Mode${NC} (automated verification)                  │"
+echo -e "│ ${GREEN}1. Standard Mode${NC} (with verification)                       │"
 echo -e "│    └─ ${YELLOW}claude > /project:do-issue-auto 501${NC}                 │"
-echo -e "│    └─ ✅ Runs tests, build, Storybook automatically        │"
 echo -e "│                                                             │"
-echo -e "│ ${GREEN}2. YOLO Mode${NC} (containerized, no network)                  │"
+echo -e "│ ${GREEN}2. No-Verify Mode${NC} (no manual steps)                       │"
+echo -e "│    └─ ${YELLOW}claude > /project:do-issue-auto-noverify 501${NC}       │"
+echo -e "│                                                             │"
+echo -e "│ ${GREEN}3. YOLO Mode${NC} (containerized, no network)                  │"
 echo -e "│    └─ ${YELLOW}./scripts/yolo-mode.sh launch 501${NC}                  │"
-echo -e "│    └─ 🐳 Uses do-issue-auto in Docker container           │"
 echo -e "└─────────────────────────────────────────────────────────────┘"
-
-echo -e "\n${BLUE}Automated Verification Steps:${NC}"
-echo -e "  1️⃣  Storybook build verification"
-echo -e "  2️⃣  Unit test suite execution"
-echo -e "  3️⃣  Production build validation"
-echo -e "  4️⃣  TypeScript/lint checks"
-echo -e "  5️⃣  Critical E2E tests (if available)"
 
 echo -e "\n${BLUE}Current Worktrees:${NC}"
 if command -v tree &> /dev/null; then
@@ -48,7 +42,3 @@ echo -e "  ${GREEN}Batch process:${NC}    ./scripts/weekly-yolo.sh"
 
 echo -e "\n${YELLOW}Pro tip: ${NC}Use YOLO mode for low-risk issues (docs, tests)"
 echo -e "${YELLOW}         ${NC}Use standard mode for complex features"
-echo -e "${YELLOW}         ${NC}Check docs/development/workflows/yolo-safe-issues.md"
-
-echo -e "\n${BLUE}Test Verification:${NC}"
-echo -e "  ${GREEN}Run test:${NC} ./scripts/test-automated-verification.sh"
