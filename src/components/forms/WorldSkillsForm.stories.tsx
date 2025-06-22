@@ -32,9 +32,10 @@ const mockSkills: WorldSkill[] = [
     description: 'Physical prowess and sports',
     attributeIds: ['attr-1'],
     difficulty: DEFAULT_SKILL_DIFFICULTY,
-    baseValue: 5,
+    category: 'Physical',
+    baseValue: 3,
     minValue: 1,
-    maxValue: 10,
+    maxValue: 5,
   },
   {
     id: 'skill-2',
@@ -43,9 +44,10 @@ const mockSkills: WorldSkill[] = [
     description: 'Finding and analyzing information',
     attributeIds: ['attr-2'],
     difficulty: 'easy' as const,
-    baseValue: 5,
+    category: 'Mental',
+    baseValue: 4,
     minValue: 1,
-    maxValue: 10,
+    maxValue: 5,
   },
 ];
 
@@ -84,4 +86,5 @@ export const Empty: Story = {
     worldId: 'world-123',
   },
 };
+
 
