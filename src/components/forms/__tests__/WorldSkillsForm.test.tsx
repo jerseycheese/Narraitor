@@ -128,7 +128,7 @@ describe('WorldSkillsForm - MVP Level Tests', () => {
       />
     );
 
-    const difficultySelect = screen.getByDisplayValue('Medium');
+    const difficultySelect = screen.getByRole('combobox', { name: /difficulty/i });
     fireEvent.change(difficultySelect, { target: { value: 'hard' } });
 
     expect(mockOnChange).toHaveBeenCalledWith([
