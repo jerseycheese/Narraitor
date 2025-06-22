@@ -169,6 +169,42 @@ describe('TemplateGenerator', () => {
       expect(() => templateGenerator.validateTemplate(invalidTemplate as unknown))
         .toThrow('Invalid template structure: missing description');
     });
+
+    test('normalizes genre values correctly', () => {
+      const templateWithCapsGenre = {
+        name: 'Test World',
+        description: 'A test world',
+        genre: 'Fantasy',
+        attributes: [
+          { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' }
+        ],
+        skills: [
+          { name: 'Swordplay', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' }
+        ],
+        explanation: 'Test explanation'
+      };
+
+      templateGenerator.validateTemplate(templateWithCapsGenre);
+      expect(templateWithCapsGenre.genre).toBe('fantasy');
+    });
+
+    test('normalizes mixed case genre values', () => {
+      const templateWithMixedGenre = {
+        name: 'Test World',
+        description: 'A test world',
+        genre: 'Cyberpunk Fantasy',
+        attributes: [
+          { name: 'Tech', baseValue: 50, minValue: 0, maxValue: 100, category: 'Mental' }
+        ],
+        skills: [
+          { name: 'Hacking', baseValue: 25, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' }
+        ],
+        explanation: 'Test explanation'
+      };
+
+      templateGenerator.validateTemplate(templateWithMixedGenre);
+      expect(templateWithMixedGenre.genre).toBe('cyberpunk-fantasy');
+    });
   });
 });
 
@@ -200,5 +236,25 @@ describe('generateWorldTemplatePrompt', () => {
 
     expect(prompt).toContain('completely unexpected');
     expect(prompt).toContain('unique world');
+  });
+
+  test('includes genre constraints in prompt', () => {
+    const prompt = generateWorldTemplatePrompt({
+      userInput: 'Space adventure',
+      type: 'inspired-by'
+    });
+
+    expect(prompt).toContain('fantasy, sci-fi, modern, historical, horror, mystery, western, cyberpunk, other');
+    expect(prompt).toContain('Use lowercase values exactly as shown');
+  });
+
+  test('includes attribute description requirement', () => {
+    const prompt = generateWorldTemplatePrompt({
+      userInput: 'Space adventure',
+      type: 'inspired-by'
+    });
+
+    expect(prompt).toContain('"description": "What this attribute represents"');
+    expect(prompt).toContain('"description": "What this skill allows characters to do"');
   });
 });
