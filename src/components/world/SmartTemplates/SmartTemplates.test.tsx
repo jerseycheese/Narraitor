@@ -172,11 +172,14 @@ describe('SmartTemplates', () => {
     });
 
     test('handles generation errors gracefully', async () => {
-      // Mock failed API response
+      // Mock failed API response with proper response format
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         json: () => Promise.resolve({ error: 'Generation failed' }),
       });
+
+      // Suppress console.error for this test to avoid noise
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       render(<SmartTemplates onTemplateGenerated={mockOnTemplateGenerated} />);
       
@@ -187,9 +190,12 @@ describe('SmartTemplates', () => {
       const generateButton = screen.getByRole('button', { name: /generate random world/i });
       fireEvent.click(generateButton);
       
+      // Wait for error state to appear - the element exists but may be empty
       await waitFor(() => {
         expect(screen.getByTestId('error')).toBeInTheDocument();
       }, { timeout: 3000 });
+
+      consoleSpy.mockRestore();
     });
   });
 

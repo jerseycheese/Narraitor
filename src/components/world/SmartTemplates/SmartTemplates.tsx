@@ -58,8 +58,8 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       // Show preview
       setPreviewTemplate(template);
     },
-    onError: (errorMessage) => {
-      console.error('Template generation failed:', errorMessage);
+    onError: () => {
+      // Error is already handled by the hook's error state
     }
   });
 
@@ -79,7 +79,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     };
 
     await aiGeneration.generate(requestBody);
-  }, [userInput, selectedGenres, aiGeneration.generate]);
+  }, [userInput, selectedGenres, aiGeneration]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
