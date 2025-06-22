@@ -10,8 +10,11 @@ import {
   generateRandomArchetype 
 } from '@/lib/utils/characterArchetypes';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Loader2, Dice6, User, Settings } from 'lucide-react';
 
 export interface QuickStartCharactersProps {
@@ -52,7 +55,10 @@ export function QuickStartCharacters({
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
     setSelectedArchetype(archetype.id);
-    onCharacterSelect(archetype);
+    // Small delay to show selection state before proceeding
+    setTimeout(() => {
+      onCharacterSelect(archetype);
+    }, 300);
   };
 
   const handleRandomSelect = async () => {
@@ -70,28 +76,39 @@ export function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-4" />
-        <p className="text-lg text-gray-600">Generating character options...</p>
-        <p className="text-sm text-gray-500 mt-2">
-          Creating archetypes for your {world.genre} world
-        </p>
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
+          <p className="text-lg text-gray-600 mb-1">
+            Jump straight into your adventure with {world.name}
+          </p>
+        </div>
+        <LoadingSkeleton
+          size="md"
+          skeletonLines={6}
+          message={`Creating archetypes for your ${world.genre} world...`}
+          centered={true}
+          className="py-12"
+        />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-center">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Character Generation Error
-          </h3>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <Button onClick={generateArchetypes} variant="outline">
-            Try Again
-          </Button>
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
         </div>
+        <ErrorDisplay
+          variant="section"
+          severity="error"
+          title="Character Generation Failed"
+          message={error}
+          showRetry={true}
+          onRetry={generateArchetypes}
+          className="py-12"
+        />
       </div>
     );
   }
@@ -115,14 +132,14 @@ export function QuickStartCharacters({
         data-testid="archetypes-grid"
       >
         {archetypes.map((archetype) => (
-          <Card 
-            key={archetype.id} 
-            className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-              selectedArchetype === archetype.id 
-                ? 'ring-2 ring-blue-500 shadow-lg' 
-                : 'hover:ring-1 hover:ring-gray-300'
-            }`}
-            data-testid="archetype-card"
+          <ActiveStateCard
+            key={archetype.id}
+            isActive={selectedArchetype === archetype.id}
+            activeText="Selected Character"
+            onClick={() => handleArchetypeSelect(archetype)}
+            activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400"
+            inactiveClassName="border-gray-300 bg-white hover:shadow-lg"
+            testId="archetype-card"
           >
             <CardHeader className="pb-3">
               <CardTitle className="text-xl font-bold text-gray-900">
@@ -182,14 +199,26 @@ export function QuickStartCharacters({
               {/* Select Button */}
               <Button 
                 className="w-full mt-4"
-                onClick={() => handleArchetypeSelect(archetype)}
-                disabled={loading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleArchetypeSelect(archetype);
+                }}
+                disabled={loading || selectedArchetype === archetype.id}
               >
-                <User className="h-4 w-4 mr-2" />
-                Select Character
+                {selectedArchetype === archetype.id ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Starting Game...
+                  </>
+                ) : (
+                  <>
+                    <User className="h-4 w-4 mr-2" />
+                    Select Character
+                  </>
+                )}
               </Button>
             </CardContent>
-          </Card>
+          </ActiveStateCard>
         ))}
       </div>
 

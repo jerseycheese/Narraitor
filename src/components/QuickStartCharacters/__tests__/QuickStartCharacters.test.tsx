@@ -9,6 +9,7 @@ import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 // Mock the character archetype generation
 jest.mock('@/lib/utils/characterArchetypes', () => ({
   generateCharacterArchetypes: jest.fn(),
+  generateRandomArchetype: jest.fn(),
 }));
 
 // Mock the character store
@@ -19,8 +20,9 @@ jest.mock('@/state/characterStore', () => ({
   }),
 }));
 
-import { generateCharacterArchetypes } from '@/lib/utils/characterArchetypes';
+import { generateCharacterArchetypes, generateRandomArchetype } from '@/lib/utils/characterArchetypes';
 const mockGenerateArchetypes = generateCharacterArchetypes as jest.MockedFunction<typeof generateCharacterArchetypes>;
+const mockGenerateRandomArchetype = generateRandomArchetype as jest.MockedFunction<typeof generateRandomArchetype>;
 
 describe('QuickStartCharacters', () => {
   const mockWorld: World = {
@@ -121,14 +123,17 @@ describe('QuickStartCharacters', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGenerateArchetypes.mockResolvedValue(mockArchetypes);
+    mockGenerateRandomArchetype.mockResolvedValue(mockArchetypes[0]); // Return first archetype for random selection
   });
 
   describe('Component Rendering', () => {
     test('displays quick start title and description', async () => {
       render(<QuickStartCharacters {...defaultProps} />);
       
-      expect(screen.getByText('Quick Start Characters')).toBeInTheDocument();
-      expect(screen.getByText(/Jump straight into your adventure/)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Quick Start Characters')).toBeInTheDocument();
+        expect(screen.getByText(/Jump straight into your adventure/)).toBeInTheDocument();
+      });
     });
 
     test('shows loading state while generating archetypes', () => {
