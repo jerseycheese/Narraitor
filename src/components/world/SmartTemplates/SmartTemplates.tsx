@@ -78,7 +78,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
     };
 
-    await aiGeneration.generate(requestBody);
+    try {
+      await aiGeneration.generate(requestBody);
+    } catch (error) {
+      // Error is already handled by the hook's error state
+      // No need to do anything here - the hook manages the error display
+    }
   }, [userInput, selectedGenres, aiGeneration]);
 
   const handleUseTemplate = useCallback(() => {
