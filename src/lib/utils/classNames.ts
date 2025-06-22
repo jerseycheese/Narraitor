@@ -1,39 +1,19 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 /**
- * Utility for combining class names
- * Filters out falsy values and joins the rest
+ * Enhanced utility for combining class names with Tailwind CSS support
+ * - Uses clsx for flexible className combining (strings, objects, arrays)
+ * - Uses twMerge for intelligent Tailwind class deduplication and merging
+ * - Handles conflicting Tailwind classes (e.g., "bg-red-500 bg-blue-500" → "bg-blue-500")
  */
-export function cn(...inputs: (string | undefined | null | boolean)[]): string {
-  return inputs
-    .filter((input): input is string => typeof input === 'string' && input.length > 0)
-    .join(' ');
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 /**
- * Alternative implementation using clsx pattern
- * Supports objects and arrays
+ * Legacy clsx implementation for backwards compatibility
+ * Use cn() instead for better Tailwind support
+ * @deprecated Use cn() instead
  */
-export function clsx(...inputs: ClassValue[]): string {
-  return inputs
-    .map((input) => {
-      if (!input) return '';
-      
-      if (typeof input === 'string') return input;
-      
-      if (Array.isArray(input)) {
-        return clsx(...input);
-      }
-      
-      if (typeof input === 'object') {
-        return Object.entries(input)
-          .filter(([, value]) => value)
-          .map(([key]) => key)
-          .join(' ');
-      }
-      
-      return '';
-    })
-    .filter(Boolean)
-    .join(' ');
-}
-
-type ClassValue = string | number | null | undefined | ClassValue[] | { [key: string]: unknown };
+export { clsx }
