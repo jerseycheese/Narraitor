@@ -13,6 +13,7 @@ import { GenreSelector } from '@/components/shared/GenreSelector/GenreSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
+import { useAIGeneration } from '@/lib/hooks/useAIGeneration';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -24,8 +25,6 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [mode, setMode] = useState<TemplateMode>('inspired-by');
   const [userInput, setUserInput] = useState('');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
 
   // Tab navigation options - memoized to prevent unnecessary re-renders
@@ -36,7 +35,33 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   ], []);
 
   // Use session store for adding templates to history
-  const addTemplateToHistory = useSessionStore(useCallback(state => state.addTemplateToHistory, []));
+  const addTemplateToHistory = useSessionStore(state => state.addTemplateToHistory);
+
+  // AI generation hook with proper error handling and loading states
+  const aiGeneration = useAIGeneration<
+    { type: TemplateMode; userInput?: string; genres?: string[] },
+    WorldTemplate
+  >({
+    endpoint: '/api/ai/generate-template',
+    onSuccess: (template) => {
+      // Add to history
+      const historyEntry: TemplateHistoryEntry = {
+        template,
+        generatedAt: new Date().toISOString(),
+        generationType: mode,
+        userInput: mode === 'inspired-by' ? userInput : undefined,
+        genres: mode === 'genre-mix' ? selectedGenres : undefined
+      };
+      
+      addTemplateToHistory(historyEntry);
+      
+      // Show preview
+      setPreviewTemplate(template);
+    },
+    onError: (errorMessage) => {
+      console.error('Template generation failed:', errorMessage);
+    }
+  });
 
   const toggleGenre = useCallback((genre: string) => {
     setSelectedGenres(prev => 
@@ -47,53 +72,14 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   }, []);
 
   const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      // Create request payload for secure API
-      const requestBody = {
-        type: generationMode,
-        userInput: generationMode === 'inspired-by' ? userInput : undefined,
-        genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
-      };
+    const requestBody = {
+      type: generationMode,
+      userInput: generationMode === 'inspired-by' ? userInput : undefined,
+      genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
+    };
 
-      // Call the secure API route instead of client-side AI
-      const response = await fetch('/api/ai/generate-template', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate template');
-      }
-
-      const template: WorldTemplate = await response.json();
-      
-      // Add to history
-      const historyEntry: TemplateHistoryEntry = {
-        template,
-        generatedAt: new Date().toISOString(),
-        generationType: generationMode,
-        userInput: requestBody.userInput,
-        genres: requestBody.genres
-      };
-      
-      addTemplateToHistory(historyEntry);
-      
-      // Show preview
-      setPreviewTemplate(template);
-      
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to generate template. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [addTemplateToHistory, userInput, selectedGenres]);
+    await aiGeneration.generate(requestBody);
+  }, [userInput, selectedGenres, aiGeneration.generate]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -104,7 +90,8 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
   const handleGenerateInspiredBy = useCallback(() => {
     if (!userInput.trim()) {
-      setError('Please describe what you want your world to be like');
+      // Using a simple alert for validation errors since they're not async failures
+      alert('Please describe what you want your world to be like');
       return;
     }
     generateTemplate('inspired-by');
@@ -112,7 +99,8 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
   const handleGenerateGenreMix = useCallback(() => {
     if (selectedGenres.length < 2) {
-      setError('Please select at least 2 genres to mix');
+      // Using a simple alert for validation errors since they're not async failures
+      alert('Please select at least 2 genres to mix');
       return;
     }
     generateTemplate('genre-mix');
@@ -148,19 +136,19 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
           <p className="text-gray-600">Get creative starting points for your world with AI assistance</p>
         </div>
 
-      {error && (
+      {aiGeneration.error && (
         <ErrorDisplay 
-          message={error}
-          onDismiss={() => setError(null)}
+          message={aiGeneration.error}
+          onDismiss={aiGeneration.clearError}
           className="mb-6"
         />
       )}
 
-      {isGenerating && (
+      {aiGeneration.isGenerating && (
         <LoadingState message="Generating your world template..." />
       )}
 
-      {!isGenerating && (
+      {!aiGeneration.isGenerating && (
         <div className="space-y-8">
           {/* Mode Selection */}
           <div className="space-y-6">
