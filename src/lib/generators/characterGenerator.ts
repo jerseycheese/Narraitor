@@ -123,7 +123,7 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
       personality: personalities[Math.floor(Math.random() * personalities.length)],
       motivation: motivations[Math.floor(Math.random() * motivations.length)],
       fears: fears[Math.floor(Math.random() * fears.length)],
-      physicalDescription: `${Math.floor(Math.random() * 40) + 20}-year-old human of average height and build with distinctive features befitting the ${world.theme} setting.`
+      physicalDescription: `${Math.floor(Math.random() * 40) + 20}-year-old human of average height and build with distinctive features befitting the ${world.genre} setting.`
     },
     attributes,
     skills: selectedSkills,
@@ -142,7 +142,7 @@ async function generateWithAI(options: CharacterGenerationOptions): Promise<Gene
     worldName: world.name,
     worldReference: world.reference,
     worldRelationship: world.relationship,
-    theme: world.theme,
+    genre: world.genre,
     attributesCount: world.attributes?.length || 0,
     skillsCount: world.skills?.length || 0,
     attributes: world.attributes?.map(a => ({ id: a.id, name: a.name })) || [],
@@ -162,9 +162,9 @@ async function generateWithAI(options: CharacterGenerationOptions): Promise<Gene
   
   try {
     const prompt = `
-You are creating a character for a ${world.theme} themed world${world.reference ? ` based on ${world.reference}` : ''}.
-${world.reference && world.relationship === 'set_in' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
-${world.reference && world.relationship === 'based_on' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
+You are creating a character for a ${world.genre} genre world${world.reference ? ` based on ${world.reference}` : ''}.
+${world.reference && world.relationship === 'set_within' ? `\nIMPORTANT: This world is set within the ${world.reference} universe. Characters must be from ${world.reference}.` : ''}
+${world.reference && world.relationship === 'inspired_by' ? `\nThis world is inspired by ${world.reference} but has original characters.` : ''}
 ${world.description ? `\nWorld Context: ${world.description}` : ''}
 ${suggestedName ? `\nThe character should be named: "${suggestedName}"` : ''}
 ${existingNames.length > 0 ? `\nIMPORTANT: These character names already exist and must NOT be used: ${existingNames.join(', ')}` : ''}

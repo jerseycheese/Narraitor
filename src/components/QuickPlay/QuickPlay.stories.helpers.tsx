@@ -8,7 +8,7 @@ export const mockWorld = {
   id: 'world-1',
   name: 'The Enchanted Realm',
   description: 'A magical world filled with wonder',
-  theme: 'fantasy' as const,
+  genre: 'fantasy' as const,
   attributes: [],
   skills: [],
   settings: {

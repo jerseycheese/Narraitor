@@ -85,7 +85,6 @@ export const LightTheme: Story = {
   args: {
     variant: 'spinner',
     size: 'md',
-    theme: 'light',
     message: 'Loading on light background...',
   },
   decorators: [
@@ -101,7 +100,6 @@ export const DarkTheme: Story = {
   args: {
     variant: 'spinner',
     size: 'md',
-    theme: 'dark',
     message: 'Loading on dark background...',
   },
   decorators: [
@@ -119,7 +117,6 @@ export const Playground: Story = {
   args: {
     variant: 'spinner',
     size: 'md',
-    theme: 'light',
     message: 'Loading...',
     centered: true,
     inline: false,

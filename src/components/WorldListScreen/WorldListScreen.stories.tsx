@@ -10,7 +10,7 @@ const mockWorlds: World[] = [
     id: '1',
     name: 'Fantasy Realm',
     description: 'A magical world full of wonder',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -26,7 +26,7 @@ const mockWorlds: World[] = [
     id: '2',
     name: 'Sci-Fi Universe',
     description: 'A futuristic world of technology',
-    theme: 'Cyberpunk',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -42,7 +42,7 @@ const mockWorlds: World[] = [
     id: '3',
     name: 'Wild West',
     description: 'A lawless frontier',
-    theme: 'Western',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -160,7 +160,7 @@ export const ManyWorlds: Story = {
           id: '4',
           name: 'Post-Apocalyptic Wasteland',
           description: 'A world after the fall',
-          theme: 'Post-Apocalyptic',
+          genre: 'fantasy',
           attributes: [],
           skills: [],
           settings: {
@@ -176,7 +176,7 @@ export const ManyWorlds: Story = {
           id: '5',
           name: 'Medieval Fantasy',
           description: 'Knights and dragons',
-          theme: 'Medieval',
+          genre: 'fantasy',
           attributes: [],
           skills: [],
           settings: {

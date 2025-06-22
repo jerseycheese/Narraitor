@@ -28,7 +28,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     worldId = worldStore.getState().createWorld({
       name: 'Test World',
       description: 'A dramatic fantasy world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {
@@ -120,7 +120,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
     const worldWithoutTone = worldStore.getState().createWorld({
       name: 'Default World',
       description: 'A world without tone settings',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

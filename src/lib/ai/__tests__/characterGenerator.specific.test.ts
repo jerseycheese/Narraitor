@@ -16,7 +16,7 @@ describe('generateCharacter - Specific Character Type', () => {
   const mockWorld: World = {
     id: 'world-1',
     name: 'Middle Earth',
-    theme: 'fantasy',
+    genre: 'fantasy',
     description: 'The world of Lord of the Rings',
     attributes: [
       {

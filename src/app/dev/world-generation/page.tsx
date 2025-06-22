@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
-import { generateWorld, type GeneratedWorldData } from '@/lib/ai/worldGenerator';
+import { generateWorld, type GeneratedWorldData } from '@/lib/generators/worldGenerator';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -25,11 +25,13 @@ export default function WorldGenerationTestPage() {
     
     try {
       const existingNames = Object.values(worlds).map(w => w.name);
-      const result = await generateWorld(
-        worldReference.trim(),
+      const result = await generateWorld({
+        method: 'ai',
+        reference: worldReference.trim(),
+        relationship: 'inspired_by',
         existingNames,
-        suggestedName.trim() || undefined
-      );
+        suggestedName: suggestedName.trim() || undefined
+      });
       
       setGeneratedWorld(result);
     } catch (err) {
@@ -44,7 +46,7 @@ export default function WorldGenerationTestPage() {
     
     createWorld({
       name: generatedWorld.name,
-      theme: generatedWorld.theme,
+      genre: generatedWorld.genre,
       description: generatedWorld.description,
       attributes: generatedWorld.attributes.map((attr) => ({
         ...attr,
@@ -167,8 +169,8 @@ export default function WorldGenerationTestPage() {
               </div>
               
               <div>
-                <h3 className="font-semibold">Theme:</h3>
-                <p>{generatedWorld.theme}</p>
+                <h3 className="font-semibold">Genre:</h3>
+                <p>{generatedWorld.genre}</p>
               </div>
               
               <div>
@@ -242,7 +244,7 @@ export default function WorldGenerationTestPage() {
               <div key={world.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
                 <div>
                   <span className="font-medium">{world.name}</span>
-                  <span className="text-sm text-gray-500 ml-2">({world.theme})</span>
+                  <span className="text-sm text-gray-500 ml-2">({world.genre})</span>
                 </div>
                 <div className="text-sm text-gray-500">
                   {world.attributes.length} attrs, {world.skills.length} skills

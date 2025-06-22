@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { SessionStore } from '../types/game.types';
+import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
 
@@ -28,6 +28,7 @@ const initialState = {
     lastPlayed: string;
     narrativeCount: number;
   }>,
+  templateHistory: [] as TemplateHistoryEntry[],
   // Auto-save state
   autoSave: {
     enabled: true,
@@ -324,6 +325,24 @@ export const useSessionStore = create<SessionStore>()(
     });
   },
 
+  // Template history actions
+  addTemplateToHistory: (entry: TemplateHistoryEntry) => {
+    logger.debug('Adding template to history:', entry.template.name);
+    set(state => {
+      const newHistory = [entry, ...state.templateHistory].slice(0, 5); // Keep only last 5
+      return { templateHistory: newHistory };
+    });
+  },
+
+  getTemplateHistory: () => {
+    return get().templateHistory;
+  },
+
+  clearTemplateHistory: () => {
+    logger.debug('Clearing template history');
+    set({ templateHistory: [] });
+  },
+
   // Auto-save methods
   setAutoSaveEnabled: (enabled: boolean) => {
     logger.debug('Setting auto-save enabled:', enabled);
@@ -382,6 +401,7 @@ export const useSessionStore = create<SessionStore>()(
   // Persist active session state to maintain continuity across browser refreshes
   partialize: (state) => ({ 
     savedSessions: state.savedSessions,
+    templateHistory: state.templateHistory,
     // Persist active session state
     id: state.id,
     characterId: state.characterId,
@@ -396,3 +416,5 @@ export const useSessionStore = create<SessionStore>()(
   }),
 }
 ));
+
+// Named export for consistent usage

@@ -15,7 +15,6 @@ export interface WorldTemplate {
   narrative?: string;
   attributes: AttributeTemplate[];
   skills: SkillTemplate[];
-  theme: ThemeTemplate;
 }
 
 export interface AttributeTemplate {
@@ -37,14 +36,6 @@ export interface SkillTemplate {
   category?: string; // Optional category for the skill
 }
 
-export interface ThemeTemplate {
-  name: string;
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-  fontFamily: string;
-  backgroundStyle: string;
-}
 
 /**
  * Western template
@@ -207,15 +198,7 @@ export const westernTemplate: WorldTemplate = {
       maxValue: 10,
       defaultValue: 3
     }
-  ],
-  theme: {
-    name: 'Western',
-    primaryColor: '#8B4513', // SaddleBrown
-    secondaryColor: '#D2B48C', // Tan
-    accentColor: '#FFD700', // Gold
-    fontFamily: 'serif',
-    backgroundStyle: 'old-paper'
-  }
+  ]
 };
 
 /**
@@ -379,15 +362,7 @@ export const sitcomTemplate: WorldTemplate = {
       maxValue: 10,
       defaultValue: 3
     }
-  ],
-  theme: {
-    name: 'Sitcom',
-    primaryColor: '#FF6B6B', // Coral-like
-    secondaryColor: '#4ECDC4', // Turquoise
-    accentColor: '#FFD166', // Mustard Yellow
-    fontFamily: 'sans-serif',
-    backgroundStyle: 'modern-apartment'
-  }
+  ]
 };
 
 /**
@@ -551,15 +526,7 @@ export const fantasyTemplate: WorldTemplate = {
       maxValue: 10,
       defaultValue: 3
     }
-  ],
-  theme: {
-    name: 'Fantasy',
-    primaryColor: '#5D4037', // Brown
-    secondaryColor: '#7986CB', // Blue-Purple
-    accentColor: '#FFB74D', // Orange
-    fontFamily: 'fantasy',
-    backgroundStyle: 'parchment'
-  }
+  ]
 };
 
 /**

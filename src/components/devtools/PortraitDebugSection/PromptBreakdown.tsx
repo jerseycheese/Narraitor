@@ -106,7 +106,7 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
                 </>
               ) : (
                 <>
-                  <div>• {worldConfig?.theme || 'mystical'} setting</div>
+                  <div>• {worldConfig?.genre || 'mystical'} setting</div>
                   <div>• dramatic lighting</div>
                 </>
               )}
@@ -210,8 +210,8 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
               <span className="ml-2 text-slate-200">{profession || 'No'}</span>
             </div>
             <div>
-              <span className="text-slate-400">World Theme:</span>
-              <span className="ml-2 text-slate-200">{worldConfig?.theme || 'Not set'}</span>
+              <span className="text-slate-400">World Genre:</span>
+              <span className="ml-2 text-slate-200">{worldConfig?.genre || 'Not set'}</span>
             </div>
           </div>
         </div>

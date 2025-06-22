@@ -134,7 +134,7 @@ const mockWorld: World = {
   id: 'world-123',
   name: 'The Realm of Shadows',
   description: 'A dark fantasy world filled with mystery and ancient magic',
-  theme: 'Dark Fantasy',
+  genre: 'fantasy',
   attributes: [
     {
       id: 'attr-1',

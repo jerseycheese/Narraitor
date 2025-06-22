@@ -17,7 +17,7 @@ describe('WorldStore Tone Settings', () => {
     const worldId = worldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {
@@ -37,7 +37,7 @@ describe('WorldStore Tone Settings', () => {
     const worldId = worldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {
@@ -71,7 +71,7 @@ describe('WorldStore Tone Settings', () => {
     const worldId = worldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

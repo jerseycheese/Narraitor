@@ -17,7 +17,7 @@ jest.mock('@/state/worldStore', () => ({
           id: 'world-1',
           name: 'Test World',
           description: 'A test world for unit tests',
-          theme: 'fantasy'
+          genre: 'fantasy'
         }
       },
       currentWorldId: 'world-1'

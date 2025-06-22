@@ -96,7 +96,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     id: 'world-123',
     name: 'Test World',
     description: 'A test world',
-    theme: 'fantasy',
+    genre: 'fantasy',
     createdAt: '2023-01-01T00:00:00.000Z',
     updatedAt: '2023-01-01T00:00:00.000Z',
     attributes: [],

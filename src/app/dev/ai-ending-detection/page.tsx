@@ -73,7 +73,7 @@ export default function AIEndingDetectionTestPage() {
     const testWorldId = createWorld({
       name: 'AI Ending Detection Test World',
       description: 'A world for testing AI-powered ending detection',
-      theme: 'Fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
       settings: {

@@ -4,7 +4,7 @@ import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
 
 interface PortraitGenerationOptions {
-  worldTheme?: string;
+  worldGenre?: string;
   isKnownFigure?: boolean;
   knownFigureContext?: string; // e.g., "historical figure", "fictional character", "celebrity"
   actorName?: string; // For fictional characters played by specific actors
@@ -169,9 +169,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
     const style: string[] = [];
     
     // Determine if this is a fantasy setting (needed for multiple parts of the prompt)
-    const isFantasy = options.worldTheme && 
+    const isFantasy = options.worldGenre && 
       ['fantasy', 'medieval', 'magic', 'mystical', 'epic'].some(term => 
-        options.worldTheme?.toLowerCase().includes(term)
+        options.worldGenre?.toLowerCase().includes(term)
       );
     
     // Extract key visual elements for emphasis
@@ -283,8 +283,8 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           }
           
           // Add world theme styling if provided
-          if (options.worldTheme) {
-            context.push(`${options.worldTheme} style atmosphere`);
+          if (options.worldGenre) {
+            context.push(`${options.worldGenre} style atmosphere`);
           }
         }
         
@@ -333,8 +333,8 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         context.push(`contextual background`);
         
         // Add world theme styling if provided
-        if (options.worldTheme) {
-          context.push(`${options.worldTheme} style atmosphere`);
+        if (options.worldGenre) {
+          context.push(`${options.worldGenre} style atmosphere`);
         }
       }
       
@@ -385,7 +385,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // CONTEXT: Fantasy setting
-        context.push(`${options.worldTheme} world setting`);
+        context.push(`${options.worldGenre} world setting`);
         if (character.background.history && character.background.history.toLowerCase().includes('battle')) {
           context.push(`battle-worn appearance`);
         }
@@ -420,14 +420,14 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // CONTEXT: World-appropriate setting
-        if (options.worldTheme) {
+        if (options.worldGenre) {
           // Only add theme context if it's meaningful for the portrait
-          const themeLC = options.worldTheme.toLowerCase();
-          if (themeLC === 'modern' || themeLC === 'contemporary') {
+          const genreLC = options.worldGenre.toLowerCase();
+          if (genreLC === 'modern' || genreLC === 'contemporary') {
             // Don't add generic "modern setting" - it's not helpful
             // The physical description should provide enough context
           } else {
-            context.push(`${options.worldTheme} world environment`);
+            context.push(`${options.worldGenre} world environment`);
           }
         }
       }

@@ -101,7 +101,7 @@ describe('QuickPlay - Onboarding Integration', () => {
       id: 'world-1',
       name: 'Test World',
       description: 'A test world',
-      theme: 'fantasy' as const,
+      genre: 'fantasy' as const,
       attributes: [],
       skills: [],
       createdAt: new Date().toISOString(),

@@ -274,9 +274,9 @@ export class ChoiceGenerator {
     // Create a contextual decision prompt
     const prompt = `What will you do in ${location}?`;
     
-    // Create generic options based on world theme/genre
+    // Create generic options based on world genre
     const options: DecisionOption[] = [];
-    const theme = (world?.theme || 'fantasy').toLowerCase();
+    const genre = (world?.genre || 'fantasy').toLowerCase();
     
     if (narrativeContext?.currentSituation) {
       // Add a contextual option based on the current situation
@@ -287,8 +287,8 @@ export class ChoiceGenerator {
       });
     }
     
-    // Add theme-appropriate options
-    switch (theme) {
+    // Add genre-appropriate options
+    switch (genre) {
       case 'fantasy':
         options.push(
           { 
@@ -404,7 +404,7 @@ export class ChoiceGenerator {
     const context = {
       worldName: world.name,
       worldDescription: world.description,
-      genre: world.theme,
+      genre: world.genre,
       narrativeContext,
       characterIds,
       worldSkills: world.skills?.map(skill => ({

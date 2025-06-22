@@ -25,7 +25,7 @@ describe.skip('WorldCreationWizard Integration - Existing List', () => {
       const existingWorld: World = {
         id: 'existing-world',
         name: 'Existing World',
-        theme: 'fantasy',
+        genre: 'fantasy',
         description: 'An existing fantasy world',
         attributes: [],
         skills: [],

@@ -3,7 +3,7 @@
 import { EntityID, NamedEntity, TimestampedEntity } from './common.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 import { ToneSettings } from './tone-settings.types';
-import { ThemeValue } from '@/lib/constants/themes';
+import { GenreValue } from '@/lib/constants/genres';
 
 /**
  * World image data
@@ -19,13 +19,13 @@ export interface WorldImage {
  * Represents a game world configuration
  */
 export interface World extends NamedEntity, TimestampedEntity {
-  theme: ThemeValue;
+  genre: GenreValue;
   attributes: WorldAttribute[];
   skills: WorldSkill[];
   settings: WorldSettings;
   image?: WorldImage;
   reference?: string;
-  relationship?: 'set_in' | 'based_on';
+  relationship?: 'set_within' | 'inspired_by';
   toneSettings?: ToneSettings;
 }
 

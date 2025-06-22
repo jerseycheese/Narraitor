@@ -59,7 +59,7 @@ jest.mock('@/state/worldStore', () => ({
         id: 'world-1',
         name: 'Test World',
         description: 'A test world',
-        theme: 'fantasy',
+        genre: 'fantasy',
         attributes: [
           { id: 'attr-1', worldId: 'world-1', name: 'Strength', description: 'Physical power', baseValue: 10, minValue: 1, maxValue: 20, category: 'Physical' }
         ],

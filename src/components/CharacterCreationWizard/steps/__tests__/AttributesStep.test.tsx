@@ -9,7 +9,7 @@ describe.skip('AttributesStep', () => {
     id: 'world-1',
     name: 'Test World',
     description: 'Test Description',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [
       { id: 'attr-1', name: 'Strength', worldId: 'world-1', baseValue: 10, minValue: 1, maxValue: 10 },
       { id: 'attr-2', name: 'Intelligence', worldId: 'world-1', baseValue: 10, minValue: 1, maxValue: 10 },

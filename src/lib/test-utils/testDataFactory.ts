@@ -37,7 +37,7 @@ export function createMockWorld(overrides: Partial<World> = {}): World {
     id: overrides.id || generateUniqueId('world'),
     name: 'Test World',
     description: 'A test world for unit testing',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -253,7 +253,7 @@ export function createMockWorldList(count: number = 3): Record<string, World> {
     const world = createMockWorld({
       id: `world-${i + 1}`,
       name: `Test World ${i + 1}`,
-      theme: ['fantasy', 'sci-fi', 'horror'][i % 3],
+      genre: ['fantasy', 'sci-fi', 'horror'][i % 3],
     });
     worlds[world.id] = world;
   }

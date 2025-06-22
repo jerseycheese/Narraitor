@@ -13,7 +13,7 @@ const mockWorld: World = {
   id: 'world-1',
   name: 'Frontier Legends',
   description: 'A rugged Western world where outlaws and lawmen battle for control of the frontier',
-  theme: 'Western',
+  genre: 'fantasy',
   attributes: [
     { id: 'attr-1', name: 'Grit', description: 'Mental and physical toughness', worldId: 'world-1', baseValue: 7, minValue: 1, maxValue: 10 },
     { id: 'attr-2', name: 'Marksmanship', description: 'Accuracy with firearms', worldId: 'world-1', baseValue: 8, minValue: 1, maxValue: 10 },

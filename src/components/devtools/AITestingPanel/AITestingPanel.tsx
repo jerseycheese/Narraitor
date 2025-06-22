@@ -21,7 +21,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     id: 'test-world',
     name: 'Test World',
     description: 'A world for testing',
-    theme: 'Fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -82,12 +82,12 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
     }));
   };
 
-  const handleWorldThemeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWorldGenreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTestConfig(prev => ({
       ...prev,
       worldOverride: {
         ...prev.worldOverride,
-        theme: e.target.value
+        genre: e.target.value
       }
     }));
   };
@@ -133,32 +133,32 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       // Generate context-aware narrative text
       const worldName = testContext.world.name;
-      const worldTheme = testContext.world.theme;
+      const worldTheme = testContext.world.genre;
       const characterName = testContext.character.name;
       
       const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
 
-      // Generate context-aware choices based on theme
-      const generateChoices = (theme: string = 'Fantasy'): string[] => {
+      // Generate context-aware choices based on genre
+      const generateChoices = (genre: string = 'Fantasy'): string[] => {
         const baseChoices = [
-          `Explore the ${theme.toLowerCase()} landscape ahead`,
+          `Explore the ${genre.toLowerCase()} landscape ahead`,
           `Study the ${worldName} surroundings more carefully`,
           `Call upon ${characterName}'s inner strength`
         ];
 
-        if (theme.toLowerCase().includes('fantasy')) {
+        if (genre.toLowerCase().includes('fantasy')) {
           return [
             'Venture deeper into the magical forest',
             'Seek out the ancient temple ruins',
             'Cast a spell to reveal hidden paths'
           ];
-        } else if (theme.toLowerCase().includes('sci-fi') || theme.toLowerCase().includes('space')) {
+        } else if (genre.toLowerCase().includes('sci-fi') || genre.toLowerCase().includes('space')) {
           return [
             'Scan the area with your tech equipment',
             'Attempt to contact the orbital station',
             'Investigate the strange energy readings'
           ];
-        } else if (theme.toLowerCase().includes('steampunk')) {
+        } else if (genre.toLowerCase().includes('steampunk')) {
           return [
             'Fire up your mechanical contraption',
             'Navigate using the brass compass',
@@ -210,13 +210,13 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             />
           </div>
           <div>
-            <label htmlFor="world-theme" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Theme:</label>
+            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Genre:</label>
             <input
-              id="world-theme"
+              id="world-genre"
               type="text"
-              value={testConfig.worldOverride?.theme || ''}
-              onChange={handleWorldThemeChange}
-              placeholder="Enter world theme"
+              value={testConfig.worldOverride?.genre || ''}
+              onChange={handleWorldGenreChange}
+              placeholder="Enter world genre"
               className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
             />
           </div>

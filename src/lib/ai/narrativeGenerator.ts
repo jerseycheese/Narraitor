@@ -14,15 +14,18 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ToneSettings, DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
+import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
+import { TemplateGenerator, WorldTemplate } from './templateGenerator';
+import { TemplateGenerationContext } from './templatePrompts';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
+  private templateGenerator: TemplateGenerator;
   
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
+    this.templateGenerator = new TemplateGenerator(geminiClient);
   }
 
   /**
@@ -39,14 +42,12 @@ export class NarrativeGenerator {
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
     const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
     
-    
     const detailedInstructions = getDetailedToneInstructions(
       toneSettings.contentRating,
       toneSettings.narrativeStyle,
       toneSettings.languageComplexity,
       toneSettings.customInstructions
     );
-
 
     return prompt + detailedInstructions;
   }
@@ -102,7 +103,7 @@ export class NarrativeGenerator {
       const context = {
         worldName: world.name,
         worldDescription: world.description,
-        genre: world.theme,
+        genre: world.genre,
         tone: toneSettings.narrativeStyle,
         attributes: world.attributes,
         characterIds,
@@ -152,7 +153,7 @@ export class NarrativeGenerator {
       previousContent: from.content,
       previousType: from.type,
       worldName: world.name,
-      genre: world.theme,
+      genre: world.genre,
       tone: 'default',
       newLocation: to.narrativeContext?.currentLocation
     };
@@ -197,11 +198,10 @@ ${playerCharacter.skills.map(skill => {
   return `- ${worldSkill?.name || skill.name}: Level ${skill.level}`;
 }).join('\n')}`;
     }
-    
     return {
       worldName: world.name,
       worldDescription: world.description,
-      genre: world.theme,
+      genre: world.genre,
       tone: toneSettings.narrativeStyle,
       attributes: world.attributes,
       characterIds: request.characterIds,
@@ -343,7 +343,7 @@ ${playerCharacter.skills.map(skill => {
   private getWorldGenre(): string | null {
     try {
       const world = this.getWorld(useWorldStore.getState().currentWorldId || '');
-      return world?.theme?.toLowerCase() || null;
+      return world?.genre?.toLowerCase() || null;
     } catch {
       return null;
     }
@@ -415,7 +415,7 @@ ${playerCharacter.skills.map(skill => {
       
       const context = {
         worldName: world.name,
-        genre: world.theme,
+        genre: world.genre,
         narrativeContext,
         playerCharacterName: playerCharacter?.name,
         skillUsed,
@@ -468,5 +468,19 @@ ${playerCharacter.skills.map(skill => {
         contextSummary: `In ${narrativeContext.currentLocation || 'an unknown location'}, ${narrativeContext.currentSituation || 'making a decision'}.`
       };
     }
+  }
+
+  /**
+   * Generate world template using AI
+   */
+  async generateWorldTemplate(context: TemplateGenerationContext): Promise<WorldTemplate> {
+    return this.templateGenerator.generateWorldTemplate(context);
+  }
+
+  /**
+   * Convert template to world format
+   */
+  convertTemplateToWorld(template: WorldTemplate): Omit<World, 'id' | 'createdAt' | 'updatedAt'> {
+    return this.templateGenerator.convertTemplateToWorld(template);
   }
 }

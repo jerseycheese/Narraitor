@@ -35,7 +35,7 @@ const mockSuggestions: AttributeSuggestion[] = [
 
 const defaultWorldData: Partial<World> = {
   name: 'Test World',
-  theme: 'fantasy',
+  genre: 'fantasy',
   attributes: [],
 };
 

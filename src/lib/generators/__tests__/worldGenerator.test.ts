@@ -19,7 +19,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Dunder Mifflin Scranton",
-          theme: "Modern",
+          genre: "Modern",
           description: "A paper supply company branch in Scranton, PA where everyday office life becomes an adventure.",
           attributes: [
             {
@@ -59,7 +59,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'The Office',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
@@ -69,20 +69,19 @@ describe('worldGenerator', () => {
       // Verify the prompt includes the correct instructions
       const promptArg = mockGenerateContent.mock.calls[0][0];
       expect(promptArg).toContain('The Office');
-      expect(promptArg).toContain('CRITICAL: You MUST identify and use the correct genre');
-      expect(promptArg).toContain('The Office = "Modern"');
-      expect(promptArg).toContain('NEVER default to Fantasy');
+      expect(promptArg).toContain('CRITICAL: You MUST use ONLY these exact values');
+      expect(promptArg).toContain('The Office = "modern"');
       
-      // Verify the result has Modern theme, not Fantasy
-      expect(result.theme).toBe('Modern');
-      expect(result.theme).not.toBe('Fantasy');
+      // Verify the result has modern theme, not fantasy
+      expect(result.genre).toBe('modern');
+      expect(result.genre).not.toBe('fantasy');
     });
 
     it('should use Sci-Fi theme for Star Wars setting', async () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Mos Eisley Cantina",
-          theme: "Sci-Fi",
+          genre: "Sci-Fi",
           description: "A notorious spaceport cantina on Tatooine, frequented by smugglers, bounty hunters, and travelers.",
           attributes: [
             {
@@ -109,18 +108,18 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'Star Wars',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
-      expect(result.theme).toBe('Sci-Fi');
+      expect(result.genre).toBe('sci-fi');
     });
 
     it('should allow Fantasy theme for Lord of the Rings setting', async () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "The Prancing Pony",
-          theme: "Fantasy",
+          genre: "Fantasy",
           description: "A famous inn in Bree where travelers from all corners of Middle-earth gather.",
           attributes: [
             {
@@ -147,11 +146,11 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'Lord of the Rings',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 
-      expect(result.theme).toBe('Fantasy');
+      expect(result.genre).toBe('fantasy');
     });
   });
 
@@ -160,7 +159,7 @@ describe('worldGenerator', () => {
       const mockResponse = {
         content: JSON.stringify({
           name: "Corporate Heights",
-          theme: "Modern",
+          genre: "Modern",
           description: "A modern office building where corporate drama unfolds daily.",
           attributes: [
             {
@@ -193,7 +192,7 @@ describe('worldGenerator', () => {
       const result = await generateWorld({
         method: 'ai',
         reference: 'The Office',
-        relationship: 'set_in',
+        relationship: 'set_within',
         existingNames: []
       });
 

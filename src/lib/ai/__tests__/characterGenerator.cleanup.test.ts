@@ -16,7 +16,7 @@ describe('Character Generator - Cleanup Tests', () => {
   const mockWorld: World = {
     id: 'test-world',
     name: 'Test Fantasy World',
-    theme: 'fantasy',
+    genre: 'fantasy',
     description: 'A magical realm for testing',
     attributes: [
       {

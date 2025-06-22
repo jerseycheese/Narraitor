@@ -8,7 +8,7 @@ const mockWorlds: World[] = [
     id: '1',
     name: 'Fantasy Realm',
     description: 'A magical world full of wonder and dangerous quests',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -24,7 +24,7 @@ const mockWorlds: World[] = [
     id: '2',
     name: 'Cyberpunk 2185',
     description: 'A neon-lit dystopia where corporations rule and hackers fight back',
-    theme: 'Cyberpunk',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {
@@ -40,7 +40,7 @@ const mockWorlds: World[] = [
     id: '3',
     name: 'Wild West Adventures',
     description: 'Lawless frontiers where gunslinging and frontier justice reign',
-    theme: 'Western',
+    genre: 'fantasy',
     attributes: [],
     skills: [],
     settings: {

@@ -222,7 +222,7 @@ export function SkillEditor({
       <form onSubmit={handleSubmit} role="form" className="space-y-6">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="skill-name">Skill Name</Label>
+            <Label htmlFor="skill-name">Skill Name <span className="text-red-500">*</span></Label>
             <Input
               id="skill-name"
               type="text"
@@ -235,7 +235,7 @@ export function SkillEditor({
           </div>
 
           <div>
-            <Label htmlFor="skill-description">Description</Label>
+            <Label htmlFor="skill-description">Description <span className="text-red-500">*</span></Label>
             <Textarea
               id="skill-description"
               value={formData.description || ''}

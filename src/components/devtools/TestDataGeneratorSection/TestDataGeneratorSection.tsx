@@ -37,7 +37,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-        randomRelationship = 'set_in';
+        randomRelationship = 'set_within';
         console.log(`[DevTools] Generating "set in" world for ${randomReference} (canonical theme will be applied)...`);
       } else {
         // 34% - "Based on" worlds (inspired by existing universe)
@@ -47,7 +47,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
         ];
         randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-        randomRelationship = 'based_on';
+        randomRelationship = 'inspired_by';
         console.log(`[DevTools] Generating "based on" world inspired by ${randomReference}...`);
       }
       
@@ -166,7 +166,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-          randomRelationship = 'set_in';
+          randomRelationship = 'set_within';
           console.log(`[DevTools] Generating "set in" world ${i + 1}/5 for ${randomReference} (canonical theme will be applied)...`);
         } else {
           // 34% - "Based on" worlds (inspired by existing universe)
@@ -176,7 +176,7 @@ export const TestDataGeneratorSection: React.FC = () => {
             'Black Mirror', 'The Matrix', 'Mad Max', 'Westworld', 'Star Trek', 'Dune'
           ];
           randomReference = tvMovieUniverses[Math.floor(Math.random() * tvMovieUniverses.length)];
-          randomRelationship = 'based_on';
+          randomRelationship = 'inspired_by';
           console.log(`[DevTools] Generating "based on" world ${i + 1}/5 inspired by ${randomReference}...`);
         }
         
@@ -372,10 +372,10 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         // Smart character type selection based on world relationship (my enhancement)
         let characterType: 'known' | 'original';
-        if (currentWorld.relationship === 'set_in') {
+        if (currentWorld.relationship === 'set_within') {
           // 100% known figures for "set in" worlds - all characters from that universe
           characterType = 'known';
-        } else if (currentWorld.relationship === 'based_on') {
+        } else if (currentWorld.relationship === 'inspired_by') {
           // 100% original characters for "based on" worlds - inspired by but not from that universe
           characterType = 'original';
         } else {

@@ -8,7 +8,7 @@ describe('World Types', () => {
         id: 'world-1',
         name: 'Western World',
         description: 'A wild west themed world',
-        theme: 'western',
+        genre: 'western',
         attributes: [],
         skills: [],
         settings: {
@@ -22,7 +22,7 @@ describe('World Types', () => {
       };
 
       expect(world.id).toBe('world-1');
-      expect(world.theme).toBe('western');
+      expect(world.genre).toBe('western');
       expect(world.settings.maxAttributes).toBe(6);
     });
 

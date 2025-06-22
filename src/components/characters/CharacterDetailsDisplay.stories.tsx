@@ -41,8 +41,8 @@ const mockWorld: World = {
   id: 'world-1',
   name: 'Middle Earth',
   description: 'A fantasy world of magic and adventure',
-  theme: 'fantasy',
-  relationship: 'set_in',
+  genre: 'fantasy',
+  relationship: 'set_within',
   reference: 'Lord of the Rings',
   attributes: [
     {

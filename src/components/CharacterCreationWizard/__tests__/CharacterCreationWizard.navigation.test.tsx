@@ -27,7 +27,7 @@ describe('CharacterCreationWizard - Navigation to Game Session', () => {
     id: 'world-1',
     name: 'Test World',
     description: 'A test world',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [
       { 
         id: 'attr-1',

@@ -59,7 +59,7 @@ describe('PortraitStep Component', () => {
   };
 
   const mockWorldConfig = {
-    theme: 'fantasy'
+    genre: 'fantasy'
   };
 
   const mockOnUpdate = jest.fn();
@@ -165,7 +165,7 @@ describe('Character Creation Wizard with Portrait Integration', () => {
   const mockWorld = {
     id: 'world-1',
     name: 'Fantasy World',
-    theme: 'fantasy',
+    genre: 'fantasy',
     description: 'A world of magic',
     attributes: [
       { id: 'strength', name: 'Strength', category: 'physical', min: 1, max: 20, defaultValue: 10 }

@@ -12,7 +12,7 @@ export default function PortraitPromptTestPage() {
   const [personality, setPersonality] = useState('Neurotic but lovable patient with multiple phobias and an endearing personality');
   const [physicalDescription, setPhysicalDescription] = useState('Middle-aged man with messy hair, anxious expression, wearing casual vacation clothes');
   const [history, setHistory] = useState('A psychiatric patient who follows his therapist on vacation');
-  const [worldTheme, setWorldTheme] = useState('comedy');
+  const [worldGenre, setWorldGenre] = useState('comedy');
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export default function PortraitPromptTestPage() {
 
       // Generate the portrait which includes detection and prompt generation
       const result = await generator.generatePortrait(testCharacter, {
-        worldTheme
+        worldGenre
       });
       
       // The actual prompt used is returned in the result
@@ -124,49 +124,49 @@ export default function PortraitPromptTestPage() {
         setPhysicalDescription('Middle-aged man with messy hair, anxious expression, wearing casual vacation clothes');
         setPersonality('Neurotic but lovable patient with multiple phobias and an endearing personality');
         setHistory('A psychiatric patient who follows his therapist on vacation');
-        setWorldTheme('comedy');
+        setWorldGenre('comedy');
         break;
       case 'judy-gemstone':
         setCharacterName('Judy Gemstone');
         setPhysicalDescription('Southern belle with big blonde hair, heavy makeup, wearing designer clothes and jewelry');
         setPersonality('Rebellious preacher\'s daughter with a wild streak and sharp tongue');
         setHistory('Member of the Gemstone family from The Righteous Gemstones TV series');
-        setWorldTheme('dark comedy');
+        setWorldGenre('dark comedy');
         break;
       case 'sloth':
         setCharacterName('Sloth');
         setPhysicalDescription('Large deformed man with severely misshapen face, one eye higher than the other, bald head, missing teeth, wearing Superman t-shirt');
         setPersonality('Gentle giant with childlike innocence who loves candy and making friends');
         setHistory('Character from The Goonies movie who helps the kids escape from the Fratelli crime family');
-        setWorldTheme('adventure');
+        setWorldGenre('adventure');
         break;
       case 'nathan-fielder':
         setCharacterName('Nathan Fielder');
         setPhysicalDescription('Awkward man with deadpan expression, wearing business casual attire');
         setPersonality('Socially awkward business consultant with unconventional ideas');
         setHistory('Graduated from one of Canada\'s top business schools with really good grades');
-        setWorldTheme('comedy documentary');
+        setWorldGenre('comedy documentary');
         break;
       case 'gizmo':
         setCharacterName('Gizmo');
         setPhysicalDescription('Small furry creature with large ears, big eyes, brown and white fur');
         setPersonality('Sweet, gentle mogwai who loves to sing and is afraid of bright lights');
         setHistory('A mogwai who must not be fed after midnight or get wet');
-        setWorldTheme('horror comedy');
+        setWorldGenre('horror comedy');
         break;
       case 'arthur-morgan':
         setCharacterName('Arthur Morgan');
         setPhysicalDescription('Rugged outlaw with stubble, wearing cowboy hat, leather vest, and gun holster');
         setPersonality('Tough but honorable outlaw with a complex moral code');
         setHistory('Senior member of the Van der Linde gang in the dying days of the Wild West');
-        setWorldTheme('western');
+        setWorldGenre('western');
         break;
       case 'ryan-howard':
         setCharacterName('Ryan Howard');
         setPhysicalDescription('Young ambitious office worker with styled hair and trendy business casual attire');
         setPersonality('Ambitious, self-centered, trendy, and opportunistic with a superiority complex');
         setHistory('Started as a temp at Dunder Mifflin but climbed the corporate ladder through manipulation');
-        setWorldTheme('office comedy');
+        setWorldGenre('office comedy');
         break;
     }
   };
@@ -296,16 +296,16 @@ export default function PortraitPromptTestPage() {
                 />
               </div>
               
-              {/* World Theme */}
+              {/* World Genre */}
               <div className="mb-4">
-                <label htmlFor="world-theme" className="block text-sm font-medium mb-2 text-gray-300">
-                  World Theme:
+                <label htmlFor="world-genre" className="block text-sm font-medium mb-2 text-gray-300">
+                  World Genre:
                 </label>
                 <input
-                  id="world-theme"
+                  id="world-genre"
                   type="text"
-                    value={worldTheme}
-                    onChange={(e) => setWorldTheme(e.target.value)}
+                    value={worldGenre}
+                    onChange={(e) => setWorldGenre(e.target.value)}
                     className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     placeholder="e.g., fantasy, cyberpunk, medieval"
                   />

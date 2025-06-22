@@ -34,6 +34,7 @@ interface WorldCreationData extends Partial<World> {
   aiSuggestionsGenerated?: boolean;
   selectedTemplateId?: string | null;
   createOwnWorld?: boolean;
+  worldType?: 'original' | 'inspired_by' | 'set_within';
 }
 
 export interface WorldCreationWizardProps {
@@ -66,6 +67,7 @@ export default function WorldCreationWizard({
     aiSuggestionsGenerated: initialData?.aiSuggestionsGenerated || false,
     selectedTemplateId: initialData?.selectedTemplateId || null,
     createOwnWorld: initialData?.createOwnWorld || false,
+    worldType: initialData?.worldType || 'original',
     // Spread initialData last to ensure external overrides take precedence
     ...initialData,
   }), [initialData]);
@@ -84,8 +86,8 @@ export default function WorldCreationWizard({
         })
         .build(),
       1: createWizardValidator<WorldCreationData>()
-        .field('theme')
-        .required('World theme is required')
+        .field('genre')
+        .required('World genre is required')
         .build(),
       2: createWizardValidator<WorldCreationData>()
         .field('description')
@@ -223,12 +225,14 @@ export default function WorldCreationWizard({
       const worldId = createWorld({
         name: data.name || 'Untitled World',
         description: data.description!,
-        theme: data.theme!,
+        genre: data.genre!,
         attributes: data.attributes || [],
         skills: data.skills || [],
         settings: data.settings!,
         toneSettings: data.toneSettings || DEFAULT_TONE_SETTINGS,
         image: data.image, // Include any image if already generated
+        reference: data.reference, // Include reference for character generation
+        relationship: data.relationship, // Include relationship for character generation
       });
       
       // Set the newly created world as the active world
@@ -267,7 +271,7 @@ export default function WorldCreationWizard({
         worlds.push({
           id: worldId,
           name: data.name,
-          theme: data.theme,
+          genre: data.genre,
           description: data.description,
           createdAt: new Date().toISOString(),
           attributes: data.attributes || [],
@@ -290,7 +294,7 @@ export default function WorldCreationWizard({
         worlds.push({
           id: worldId,
           name: data.name,
-          theme: data.theme,
+          genre: data.genre,
           description: data.description,
           createdAt: new Date().toISOString(),
           attributes: data.attributes || [],

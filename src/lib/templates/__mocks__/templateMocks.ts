@@ -46,15 +46,7 @@ export const mockTemplate: WorldTemplate = {
       maxValue: 10,
       defaultValue: 3
     }
-  ],
-  theme: {
-    name: 'Test Theme',
-    primaryColor: '#000000',
-    secondaryColor: '#FFFFFF',
-    accentColor: '#FF0000',
-    fontFamily: 'sans-serif',
-    backgroundStyle: 'none'
-  }
+  ]
 };
 
 /**

@@ -61,7 +61,7 @@ export default function WorldViewPage() {
   ];
 
   return (
-    <PageLayout title={world.name} description={world.theme}>
+    <PageLayout title={world.name} description={world.genre}>
       <div className="mb-6 -mt-8">
         <BackNavigation href="/worlds" label="Back to Worlds" />
       </div>

@@ -91,7 +91,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           {generationType === 'specific' && (
             <div className="space-y-2">
               <Label>
-                Character Name
+                Character Name <span className="text-red-500">*</span>
               </Label>
               <Input
                 type="text"

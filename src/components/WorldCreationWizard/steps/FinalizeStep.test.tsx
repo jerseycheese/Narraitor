@@ -7,7 +7,7 @@ describe.skip('FinalizeStep', () => {
   const mockWorldData: Partial<World> = {
     name: 'Test World',
     description: 'A test world description',
-    theme: 'fantasy',
+    genre: 'fantasy',
     attributes: [
       {
         id: 'attr1',
@@ -91,7 +91,7 @@ describe.skip('FinalizeStep', () => {
     const emptyWorldData: Partial<World> = {
       name: 'Empty World',
       description: 'An empty world',
-      theme: 'fantasy',
+      genre: 'fantasy',
       attributes: [],
       skills: [],
     };

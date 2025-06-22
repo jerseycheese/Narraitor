@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { templates, WorldTemplate } from '../../../lib/templates/worldTemplates';
+import { RecentTemplates } from '@/components/shared/RecentTemplates';
+import { TemplateHistoryEntry } from '@/types/game.types';
+import { convertHistoryEntryToWizardData, storeTemplateDataForWizard } from '@/lib/utils/templateHelpers';
 
 export interface TemplateSelectorProps {
   /**
@@ -35,6 +38,13 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   const handleSelectTemplate = (templateId: string) => {
     onSelect(templateId);
   };
+
+  // Handler for using recent templates (converts AI template to traditional template selection)
+  const handleHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
+    const templateData = convertHistoryEntryToWizardData(entry);
+    storeTemplateDataForWizard(templateData);
+    onSelect(templateData.selectedTemplateId!);
+  }, [onSelect]);
   
   const selectedTemplate = displayTemplates.find(t => t.id === selectedTemplateId);
 
@@ -43,7 +53,9 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       className="space-y-6"
       data-testid="template-selector"
     >
+      {/* Traditional Templates */}
       <div>
+        <h3 className="text-lg font-semibold mb-4">Pre-built Templates</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {displayTemplates.map((template) => (
             <div
@@ -75,6 +87,14 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Recent Templates */}
+      <RecentTemplates
+        onTemplateSelect={handleHistoryTemplate}
+        selectedTemplateId={selectedTemplateId}
+        title="Recent Templates"
+        description="Recently generated AI templates you can reuse"
+      />
 
       {/* Show preview for selected template in a separate section */}
       {selectedTemplate && (

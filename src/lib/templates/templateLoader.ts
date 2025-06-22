@@ -72,7 +72,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
       id: worldId,
       name: worldName || template.name,
       description: template.description,
-      theme: template.theme.name,
+      genre: template.genre,
       attributes,
       skills,
       settings: {

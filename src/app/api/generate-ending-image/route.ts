@@ -24,7 +24,7 @@ interface GenerateEndingImageRequest {
 
 // Generate a detailed image prompt based on ending characteristics
 function generateImagePrompt(ending: StoryEnding, world?: World, character?: Character, recentNarrative?: string[]): string {
-  const theme = world?.theme?.toLowerCase() || 'fantasy';
+  const genre = world?.genre?.toLowerCase() || 'fantasy';
   const worldName = world?.name || 'Unknown Realm';
   const characterName = character?.name || 'The Hero';
   const tone = ending.tone;
@@ -54,9 +54,9 @@ function generateImagePrompt(ending: StoryEnding, world?: World, character?: Cha
       toneGuidance = 'Reflective ending atmosphere with dramatic lighting and emotional depth.';
   }
   
-  // Add theme-specific style guidance
+  // Add genre-specific style guidance
   let styleGuidance = '';
-  switch(theme) {
+  switch(genre) {
     case 'fantasy':
       styleGuidance = 'Epic fantasy setting with magical elements, ancient architecture, mystical lighting. Style: high fantasy art, detailed digital painting, cinematic composition.';
       break;
@@ -202,7 +202,7 @@ Requirements:
 - Professional game/film concept art
 - Rich atmospheric lighting and emotional depth
 - ${body.ending.tone} tone and mood
-- ${body.world?.theme || 'fantasy'} theme elements
+- ${body.world?.genre || 'fantasy'} genre elements
 - Focus on the end of the journey or its aftermath
 - No text, logos, or watermarks
 - Landscape orientation suitable for story ending imagery`;

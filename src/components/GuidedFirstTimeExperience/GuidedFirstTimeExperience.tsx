@@ -8,12 +8,10 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
-import { THEMES } from '@/lib/constants/themes';
+import { GENRES } from '@/lib/constants/genres';
 import { generateUniqueId } from '@/lib/utils/generateId';
-import { WorldAttribute, WorldSkill } from '@/types/world.types';
-import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
-import { WorldAnalysisResult } from '@/lib/ai/worldAnalyzer';
 import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
+import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -23,43 +21,10 @@ const GUIDED_STEPS = [
 
 interface OnboardingData {
   name: string;
-  theme: string;
-  description: string;
+  genre: string;
+  worldTypeData: WorldTypeData;
 }
 
-// Helper function to convert AI suggestions to world entities
-function convertSuggestionsToWorldEntities(worldId: string, suggestions: WorldAnalysisResult): { attributes: WorldAttribute[], skills: WorldSkill[] } {
-  // Create world attributes from suggestions
-  const attributes: WorldAttribute[] = suggestions.attributes.map(attr => ({
-    id: generateUniqueId('attribute'),
-    name: attr.name,
-    description: attr.description,
-    worldId,
-    baseValue: attr.baseValue,
-    minValue: attr.minValue,
-    maxValue: attr.maxValue
-  }));
-
-  // Helper to find attribute ID by name
-  const findAttributeId = (name: string) => attributes.find(a => a.name === name)?.id;
-
-  // Create world skills from suggestions
-  const skills: WorldSkill[] = suggestions.skills.map(skill => ({
-    id: generateUniqueId('skill'),
-    name: skill.name,
-    description: skill.description,
-    worldId,
-    difficulty: skill.difficulty,
-    category: skill.category,
-    // Convert linkedAttributeNames to attributeIds
-    attributeIds: skill.linkedAttributeNames?.map((attrName: string) => findAttributeId(attrName)).filter((id): id is string => id !== undefined) || [],
-    baseValue: skill.baseValue,
-    minValue: skill.minValue,
-    maxValue: skill.maxValue
-  }));
-
-  return { attributes, skills };
-}
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
@@ -72,19 +37,20 @@ export function GuidedFirstTimeExperience() {
       case 0: // Welcome step - always valid
         return { valid: true, errors: [], touched: true };
       case 1: // Concept step
-        const conceptError = validateField(data.description, [
-          (value) => validators.required(value, 'World concept'),
-        ]);
+        const conceptErrors = validateWorldTypeData(data.worldTypeData);
         return {
-          valid: !conceptError,
-          errors: conceptError ? [conceptError] : [],
+          valid: conceptErrors.length === 0,
+          errors: conceptErrors,
           touched: true,
         };
       case 2: // Details step
-        const themeError = validateField(data.theme, [
-          (value) => validators.required(value, 'Theme'),
-        ]);
-        const errors = [themeError].filter(Boolean) as string[];
+        // For "Set Within" and "Inspired By" worlds, genre is optional since it can be inferred from the universe
+        const isSetWithin = data.worldTypeData.worldType === 'set_within';
+        const isInspiredBy = data.worldTypeData.worldType === 'inspired_by';
+        const isGenreOptional = isSetWithin || isInspiredBy;
+        const genreValidators = isGenreOptional ? [] : [(value: string) => validators.required(value, 'Genre')];
+        const genreError = validateField(data.genre, genreValidators);
+        const errors = [genreError].filter(Boolean) as string[];
         return {
           valid: errors.length === 0,
           errors,
@@ -98,86 +64,53 @@ export function GuidedFirstTimeExperience() {
   // Complete onboarding and create world
   const handleComplete = useCallback(async (data: OnboardingData) => {
     try {
-      // Generate a world name if none provided
-      let worldName = data.name;
-      if (!worldName?.trim()) {
-        // Use AI to generate a contextually appropriate name based on the world description
-        try {
-          const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-          const aiClient = createDefaultGeminiClient();
-          
-          const namePrompt = `Generate a creative, appropriate world name for this concept: "${data.description || 'A world of endless possibilities'}"
-          
-Theme: ${data.theme}
+      // Get existing world names to avoid duplicates
+      const { worlds } = useWorldStore.getState();
+      const existingNames = Object.values(worlds).map(world => world.name);
 
-Requirements:
-- Name should reflect the specific concept/description, not just the theme
-- Keep it concise (1-4 words)
-- Make it memorable and fitting
-- Don't use generic theme words like "realm", "kingdom", "empire" unless they truly fit
-- Return ONLY the name, no quotes or explanations
+      // Use the AI world generator to create a complete world from the concept
+      const { generateWorld } = await import('@/lib/generators/worldGenerator');
+      
+      // Use the abstracted conversion function
+      const { reference, relationship, additionalContext } = convertToGenerationParams(data.worldTypeData);
 
-Examples:
-- "A planet where Chris Farley is king" could be "Farley's Domain" or "Planet Farley"
-- "A cyberpunk city ruled by cats" could be "Neo-Cat City" or "Whisker Metropolis"
-
-World name:`;
-
-          const response = await aiClient.generateContent(namePrompt);
-          const generatedName = response.content?.trim();
-          
-          if (generatedName && generatedName.length > 0 && generatedName.length < 50) {
-            // Clean up the response (remove quotes, extra whitespace, etc.)
-            worldName = generatedName.replace(/['"]/g, '').trim();
-          }
-        } catch (nameError) {
-          console.error('Failed to generate AI world name:', nameError);
-        }
-
-        // Fallback to theme-based names if AI generation fails
-        if (!worldName || !worldName.trim()) {
-          const themeNames = {
-            fantasy: ['Mystical Realm', 'Enchanted Lands', 'Arcane Kingdom'],
-            'sci-fi': ['Stellar Colony', 'Cosmic Frontier', 'Galactic Outpost'],
-            modern: ['Metropolitan Hub', 'Urban Center', 'City State'],
-            historical: ['Ancient Dominion', 'Classical Empire', 'Heritage Lands'],
-            horror: ['Dark Sanctuary', 'Shadow Realm', 'Haunted Territory'],
-            mystery: ['Enigma District', 'Puzzle Grounds', 'Secret Haven'],
-            western: ['Frontier Town', 'Desert Settlement', 'Wild Territory'],
-            cyberpunk: ['Neon City', 'Cyber District', 'Digital Metropolis'],
-            other: ['New World', 'Uncharted Territory', 'Unknown Realm']
-          };
-          const themeKey = data.theme as keyof typeof themeNames || 'other';
-          const nameOptions = themeNames[themeKey] || themeNames.other;
-          worldName = nameOptions[Math.floor(Math.random() * nameOptions.length)];
-        }
-      }
-
-      // First create the world to get the worldId
-      const worldId = createWorld({
-        name: worldName,
-        description: data.description || 'A world of endless possibilities',
-        theme: data.theme || 'fantasy',
-        attributes: [], // Will be populated with AI suggestions or defaults below
-        skills: [], // Will be populated with AI suggestions or defaults below
-        settings: {
-          maxAttributes: 6,
-          maxSkills: 12, // Increased to match our 12 default skills
-          attributePointPool: 27,
-          skillPointPool: 40,
-        },
+      const generatedWorldData = await generateWorld({
+        method: 'ai',
+        reference,
+        relationship,
+        existingNames,
+        suggestedName: data.name?.trim() || undefined,
+        genre: data.genre || undefined,
+        additionalContext
       });
 
-      // Use the existing AI analyzer which will generate smart suggestions based on the 
-      // world description or fall back to comprehensive defaults if AI is unavailable
-      const suggestions = await analyzeWorldDescriptionClient(data.description || 'A world of endless possibilities');
-      
-      // Convert AI suggestions to world entities
-      const { attributes, skills } = convertSuggestionsToWorldEntities(worldId, suggestions);
-      
-      // Update the world with the generated attributes and skills
+      // Create the world first without attributes and skills
+      const worldId = createWorld({
+        name: generatedWorldData.name,
+        description: generatedWorldData.description,
+        genre: data.genre || generatedWorldData.genre,
+        attributes: [], // Will be populated below
+        skills: [], // Will be populated below
+        settings: generatedWorldData.settings,
+        reference, // Include reference for character generation
+        relationship, // Include relationship for character generation
+      });
+
+      // Now update the world with the AI-generated attributes and skills that include the worldId
       const { updateWorld } = useWorldStore.getState();
-      updateWorld(worldId, { attributes, skills });
+      updateWorld(worldId, {
+        attributes: generatedWorldData.attributes.map(attr => ({
+          ...attr,
+          id: generateUniqueId('attribute'),
+          worldId
+        })),
+        skills: generatedWorldData.skills.map(skill => ({
+          ...skill,
+          id: generateUniqueId('skill'),
+          worldId,
+          attributeIds: []
+        }))
+      });
 
       // Generate world image in the background
       try {
@@ -189,9 +122,9 @@ World name:`;
           body: JSON.stringify({ 
             world: {
               id: worldId,
-              name: worldName,
-              description: data.description || 'A world of endless possibilities',
-              theme: data.theme || 'fantasy'
+              name: generatedWorldData.name,
+              description: generatedWorldData.description,
+              genre: generatedWorldData.genre
             }
           }),
         });
@@ -199,6 +132,7 @@ World name:`;
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
           // Update the world with the generated image
+          const { updateWorld } = useWorldStore.getState();
           updateWorld(worldId, { 
             image: {
               type: imageData.aiGenerated ? 'ai-generated' : 'placeholder',
@@ -236,7 +170,15 @@ World name:`;
   // Initialize wizard state
   const wizard = useWizardState({
     steps: GUIDED_STEPS,
-    initialData: { name: '', theme: '', description: '' },
+    initialData: { 
+      name: '', 
+      genre: 'fantasy', 
+      worldTypeData: { 
+        worldType: 'original', 
+        worldReference: '', 
+        additionalDetails: '' 
+      } 
+    },
     onComplete: handleComplete,
     onCancel: handleSkip,
     validateStep,
@@ -270,84 +212,118 @@ World name:`;
         </p>
       </div>
       
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="world-concept" className="block text-sm font-medium text-gray-700 mb-2">
-            World Concept
-          </label>
-          <textarea
-            id="world-concept"
-            name="world-concept"
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="E.g., The world of Harry Potter, Star Wars galaxy, Middle-earth from LOTR, The Office workplace, or your own original fantasy realm..."
-            value={wizard.state.data.description}
-            onChange={(e) => wizard.handlers.updateData({ description: e.target.value })}
-          />
+      <WorldTypeSelector
+        value={wizard.state.data.worldTypeData}
+        onChange={(worldTypeData) => {
+          // Auto-set genre to empty for "Set Within" and "Inspired By" types (auto-detect)
+          const isSetWithin = worldTypeData.worldType === 'set_within';
+          const isInspiredBy = worldTypeData.worldType === 'inspired_by';
+          const shouldAutoDetectGenre = isSetWithin || isInspiredBy;
+          
+          wizard.handlers.updateData({ 
+            worldTypeData,
+            ...(shouldAutoDetectGenre && { genre: '' })
+          });
+        }}
+        size="medium"
+      />
+
+      {/* Validation Errors */}
+      {wizard.stepValidation?.errors.length > 0 && (
+        <div className="space-y-1">
+          {wizard.stepValidation.errors.map((error, index) => (
+            <p key={index} className="text-sm text-red-600">{error}</p>
+          ))}
+        </div>
+      )}
+    </div>
+  ), [wizard.state.data.worldTypeData, wizard.stepValidation, wizard.handlers]);
+
+  const renderDetailsStep = useMemo(() => {
+    const isSetWithin = wizard.state.data.worldTypeData.worldType === 'set_within';
+    const isInspiredBy = wizard.state.data.worldTypeData.worldType === 'inspired_by';
+    const isGenreOptional = isSetWithin || isInspiredBy;
+    
+    return (
+      <div className="max-w-md mx-auto space-y-6">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            World Details
+          </h2>
+          <p className="text-gray-600">
+            {isGenreOptional 
+              ? "Give your world a name and optionally override the genre"
+              : "Give your world a name and genre"
+            }
+          </p>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
+              World Name (optional)
+            </label>
+            <input
+              id="world-name"
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
+              value={wizard.state.data.name}
+              onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
+            />
+          </div>
+          
+          {isGenreOptional ? (
+            <div>
+              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+                Genre <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>
+              </label>
+              <select
+                id="world-genre"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={wizard.state.data.genre}
+                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+              >
+                <option value="">Auto-detect</option>
+                {GENRES.map((genre) => (
+                  <option key={genre.value} value={genre.value}>
+                    {genre.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+                Genre <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="world-genre"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={wizard.state.data.genre}
+                onChange={(e) => wizard.handlers.updateData({ genre: e.target.value })}
+              >
+                <option value="">Select a genre</option>
+                {GENRES.map((genre) => (
+                  <option key={genre.value} value={genre.value}>
+                    {genre.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          
           {wizard.stepValidation?.errors.length > 0 && (
-            <p className="text-sm text-red-600 mt-1">{wizard.stepValidation.errors[0]}</p>
+            <div className="text-sm text-red-600">
+              {wizard.stepValidation.errors.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
           )}
         </div>
-        
       </div>
-    </div>
-  ), [wizard.state.data.description, wizard.stepValidation, wizard.handlers]);
-
-  const renderDetailsStep = useMemo(() => (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          World Details
-        </h2>
-        <p className="text-gray-600">
-          Give your world a name and theme
-        </p>
-      </div>
-      
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
-            World Name (optional)
-          </label>
-          <input
-            id="world-name"
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={getResponsivePlaceholder(RESPONSIVE_PLACEHOLDERS.worldName)}
-            value={wizard.state.data.name}
-            onChange={(e) => wizard.handlers.updateData({ name: e.target.value })}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="world-theme" className="block text-sm font-medium text-gray-700 mb-2">
-            Theme <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="world-theme"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={wizard.state.data.theme}
-            onChange={(e) => wizard.handlers.updateData({ theme: e.target.value })}
-          >
-            <option value="">Select a theme</option>
-            {THEMES.map((theme) => (
-              <option key={theme.value} value={theme.value}>
-                {theme.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        {wizard.stepValidation?.errors.length > 0 && (
-          <div className="text-sm text-red-600">
-            {wizard.stepValidation.errors.map((error, index) => (
-              <p key={index}>{error}</p>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  ), [wizard.state.data.name, wizard.state.data.theme, wizard.stepValidation, wizard.handlers]);
+    );
+  }, [wizard.state.data.name, wizard.state.data.genre, wizard.state.data.worldTypeData.worldType, wizard.stepValidation, wizard.handlers]);
 
   // Render current step
   const renderCurrentStep = useCallback(() => {

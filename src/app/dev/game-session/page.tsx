@@ -14,7 +14,7 @@ const mockWorld: World = {
   id: 'world-1',
   name: 'Fantasy Realm',
   description: 'A high fantasy world of magic and adventure',
-  theme: 'Fantasy',
+  genre: 'fantasy',
   attributes: [
     {
       id: 'strength',

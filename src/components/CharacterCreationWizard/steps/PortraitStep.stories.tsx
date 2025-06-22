@@ -61,7 +61,7 @@ const defaultData = {
 };
 
 const mockWorldConfig = {
-  theme: 'fantasy',
+  genre: 'fantasy',
   name: 'Test World',
 };
 

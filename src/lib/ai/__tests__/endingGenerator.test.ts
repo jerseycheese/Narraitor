@@ -101,7 +101,7 @@ describe('endingGenerator', () => {
     id: 'world-123',
     name: 'Epic Fantasy Realm',
     description: 'A land of magic and adventure',
-    theme: 'fantasy',
+    genre: 'fantasy',
     settings: {
       magicLevel: 'high',
       technologyLevel: 'medieval',
