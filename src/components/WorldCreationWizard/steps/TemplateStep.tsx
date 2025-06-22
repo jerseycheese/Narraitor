@@ -12,10 +12,9 @@ import { World } from '@/types/world.types';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
-  onUpdate: (updates: { 
+  onUpdate: (updates: Partial<World> & { 
     selectedTemplateId?: string | null; 
     createOwnWorld?: boolean;
-    worldData?: Partial<World>;
     aiSuggestions?: {
       attributes: AttributeSuggestion[];
       skills: SkillSuggestion[];
@@ -103,19 +102,20 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       }));
       
       // Update the wizard state with template data and AI suggestions
-      onUpdate({ 
+      const updateData = { 
         selectedTemplateId: 'smart-template',
         createOwnWorld: false,
-        worldData: {
-          name: template.name,
-          description: template.description,
-          genre: template.genre,
-        },
+        // World data fields go at the top level (not nested under worldData)
+        name: template.name,
+        description: template.description,
+        genre: template.genre,
         aiSuggestions: {
           attributes: convertedAttributes,
           skills: convertedSkills
         }
-      });
+      };
+      
+      onUpdate(updateData);
       
       // Proceed to the next step (Basic Info) so user can review/modify
       onComplete(false);
