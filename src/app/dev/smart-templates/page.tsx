@@ -28,11 +28,22 @@ export default function SmartTemplatesTestPage() {
       genre: template.genre,
       aiSuggestions: {
         attributes: template.attributes.map(attr => ({
-          ...attr,
+          name: attr.name,
+          description: attr.description || `${attr.name} represents a core aspect of characters in this world`,
+          minValue: attr.minValue,
+          maxValue: attr.maxValue,
+          baseValue: attr.baseValue,
+          category: attr.category,
           accepted: true // Auto-accept template attributes
         })),
         skills: template.skills.map(skill => ({
-          ...skill,
+          name: skill.name,
+          description: skill.description || `${skill.name} is an important skill for characters in this world`,
+          difficulty: skill.difficulty,
+          category: skill.category,
+          baseValue: skill.baseValue,
+          minValue: skill.minValue,
+          maxValue: skill.maxValue,
           accepted: true // Auto-accept template skills
         }))
       }

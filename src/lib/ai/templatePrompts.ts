@@ -21,10 +21,10 @@ Response must be valid JSON in this exact format:
   "description": "Brief world description (2-3 sentences)",
   "genre": "Primary genre from these exact values: ${genreExamples}. Use lowercase values exactly as shown.",
   "attributes": [
-    {"name": "Attribute Name", "baseValue": 50, "minValue": 0, "maxValue": 100, "category": "Physical"}
+    {"name": "Attribute Name", "description": "What this attribute represents", "baseValue": 50, "minValue": 0, "maxValue": 100, "category": "Physical"}
   ],
   "skills": [
-    {"name": "Skill Name", "baseValue": 25, "minValue": 0, "maxValue": 100, "difficulty": "moderate", "category": "Combat"}
+    {"name": "Skill Name", "description": "What this skill allows characters to do", "baseValue": 25, "minValue": 0, "maxValue": 100, "difficulty": "moderate", "category": "Combat"}
   ],
   "explanation": "Brief explanation of why these attributes/skills were suggested for this world"
 }
