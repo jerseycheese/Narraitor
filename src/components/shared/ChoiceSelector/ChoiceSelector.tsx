@@ -200,7 +200,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           
           return {
             requirement: req,
-            skillName: skillData?.name,
+            skillName: skillData?.name || 'Unknown Skill',
             isAvailable
           };
         }) || [];

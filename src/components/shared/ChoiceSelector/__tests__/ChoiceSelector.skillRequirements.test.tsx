@@ -196,9 +196,9 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
     expect(screen.getByText('Try to reason with them')).toBeInTheDocument();
 
     // Check that skill requirement badges are displayed
-    expect(screen.getByText('[Intimidation 6+]')).toBeInTheDocument();
-    expect(screen.getByText('[Stealth 5+]')).toBeInTheDocument();
-    expect(screen.getByText('[Persuasion 4+]')).toBeInTheDocument();
+    expect(screen.getByText('Intimidation 6+')).toBeInTheDocument();
+    expect(screen.getByText('Stealth 5+')).toBeInTheDocument();
+    expect(screen.getByText('Persuasion 4+')).toBeInTheDocument();
 
     // Check hints are displayed
     expect(screen.getByText('Use your commanding presence')).toBeInTheDocument();
@@ -233,13 +233,12 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
       />
     );
 
-    const badge = screen.getByText('[Intimidation 6+]');
+    const badge = screen.getByText('Intimidation 6+');
     expect(badge).toBeInTheDocument();
     
-    // Should have green styling for available skill
+    // Should have available variant styling
     expect(badge).toHaveClass('bg-green-100');
     expect(badge).toHaveClass('text-green-800');
-    expect(badge).toHaveClass('border-green-200');
   });
 
   it('should show unavailable skill requirements with gray styling', () => {
@@ -269,13 +268,12 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
       />
     );
 
-    const badge = screen.getByText('[Stealth 7+]');
+    const badge = screen.getByText('Stealth 7+');
     expect(badge).toBeInTheDocument();
     
-    // Should have gray styling for unavailable skill
-    expect(badge).toHaveClass('bg-gray-100');
-    expect(badge).toHaveClass('text-gray-500');
-    expect(badge).toHaveClass('border-gray-200');
+    // Should have unavailable variant styling
+    expect(badge).toHaveClass('bg-red-100');
+    expect(badge).toHaveClass('text-red-800');
   });
 
   it('should handle unknown skills gracefully', () => {
@@ -305,12 +303,12 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
       />
     );
 
-    const badge = screen.getByText('[Unknown Skill 5+]');
+    const badge = screen.getByText('Unknown Skill 5+');
     expect(badge).toBeInTheDocument();
     
-    // Should show as unavailable (gray styling)
-    expect(badge).toHaveClass('bg-gray-100');
-    expect(badge).toHaveClass('text-gray-500');
+    // Should show as unavailable (red styling)
+    expect(badge).toHaveClass('bg-red-100');
+    expect(badge).toHaveClass('text-red-800');
   });
 
   it('should allow selection of choices regardless of skill requirements', async () => {
@@ -385,8 +383,8 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
     );
 
     // Both skill requirements should be displayed
-    expect(screen.getByText('[Intimidation 6+]')).toBeInTheDocument();
-    expect(screen.getByText('[Persuasion 5+]')).toBeInTheDocument();
+    expect(screen.getByText('Intimidation 6+')).toBeInTheDocument();
+    expect(screen.getByText('Persuasion 5+')).toBeInTheDocument();
   });
 
   it('should work without character or world skills (graceful degradation)', () => {
@@ -419,6 +417,6 @@ describe('ChoiceSelector - Skill Requirements Integration', () => {
     expect(screen.getByText('Use skill')).toBeInTheDocument();
     
     // Should show skill requirement but as unavailable
-    expect(screen.getByText('[Unknown Skill 6+]')).toBeInTheDocument();
+    expect(screen.getByText('Unknown Skill 6+')).toBeInTheDocument();
   });
 });

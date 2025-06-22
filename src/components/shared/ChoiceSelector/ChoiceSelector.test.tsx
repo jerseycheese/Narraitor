@@ -453,8 +453,8 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      expect(screen.getByText('[Intimidation 5+]')).toBeInTheDocument();
-      expect(screen.getByText('[Unknown Skill 5+]')).toBeInTheDocument(); // stealth not in worldSkills
+      expect(screen.getByText('Intimidation 5+')).toBeInTheDocument();
+      expect(screen.getByText('Unknown Skill 5+')).toBeInTheDocument(); // stealth not in worldSkills
     });
 
     it('shows available state for met requirements', () => {
@@ -467,7 +467,7 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      const intimidationBadge = screen.getByText('[Intimidation 5+]');
+      const intimidationBadge = screen.getByText('Intimidation 5+');
       expect(intimidationBadge).toHaveClass('bg-green-100', 'text-green-800');
     });
 
@@ -481,8 +481,8 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      const stealthBadge = screen.getByText('[Unknown Skill 5+]');
-      expect(stealthBadge).toHaveClass('bg-gray-100', 'text-gray-500');
+      const stealthBadge = screen.getByText('Unknown Skill 5+');
+      expect(stealthBadge).toHaveClass('bg-red-100', 'text-red-800');
     });
   });
 });
