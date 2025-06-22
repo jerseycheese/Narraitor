@@ -1,7 +1,7 @@
 // src/components/shared/GenreSelector/GenreSelector.tsx
 
 import React, { memo } from 'react';
-import { GENRES } from '@/lib/constants/genres';
+import { GENRES, MIXABLE_GENRES } from '@/lib/constants/genres';
 
 interface GenreSelectorProps {
   selectedGenres: string[];
@@ -9,6 +9,8 @@ interface GenreSelectorProps {
   maxSelections?: number;
   className?: string;
   disabled?: boolean;
+  /** If true, excludes 'other' genre for use in genre mixing scenarios */
+  excludeOther?: boolean;
 }
 
 const GenreSelector: React.FC<GenreSelectorProps> = memo(({
@@ -16,7 +18,8 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
   onToggleGenre,
   maxSelections,
   className = '',
-  disabled = false
+  disabled = false,
+  excludeOther = false
 }) => {
   const isGenreDisabled = (genre: string) => {
     if (disabled) return true;
@@ -24,9 +27,12 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
     return !selectedGenres.includes(genre) && selectedGenres.length >= maxSelections;
   };
 
+  // Choose which genres to display based on excludeOther prop
+  const genresToDisplay = excludeOther ? MIXABLE_GENRES : GENRES;
+
   return (
     <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 ${className}`}>
-      {GENRES.map(genre => {
+      {genresToDisplay.map(genre => {
         const isSelected = selectedGenres.includes(genre.label);
         const isDisabled = isGenreDisabled(genre.label);
         

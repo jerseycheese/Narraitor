@@ -99,4 +99,10 @@ export const AI_SUPPORTED_GENRES = GENRES.map(genre => genre.value);
  */
 export const DEFAULT_GENRE: GenreValue = 'fantasy';
 
+/**
+ * Genres available for mixing in the Genre Mixer
+ * Excludes 'other' since it requires specific definition to be useful for blending
+ */
+export const MIXABLE_GENRES = GENRES.filter(genre => genre.value !== 'other');
+
 // Note: Removed legacy theme exports - applications should use genre terminology directly

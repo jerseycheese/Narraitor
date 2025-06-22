@@ -148,7 +148,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                   </div>
                   <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-2">
-                      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery'].map(genre => (
+                      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery', 'Modern', 'Historical'].map(genre => (
                         <button
                           key={genre}
                           onClick={() => setSelectedGenres(prev => 

@@ -228,6 +228,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                   <GenreSelector
                     selectedGenres={selectedGenres}
                     onToggleGenre={toggleGenre}
+                    excludeOther={true}
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">
