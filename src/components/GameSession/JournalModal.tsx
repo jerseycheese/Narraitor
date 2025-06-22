@@ -3,7 +3,7 @@
 import React from 'react';
 import { useJournalStore } from '@/state/journalStore';
 import { EntityID } from '@/types/common.types';
-import { EntityBadge } from '@/components/shared/cards/EntityBadge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
@@ -84,11 +84,12 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                       state={entry.significance as 'critical' | 'major' | 'minor'}
                       label={entry.significance.charAt(0).toUpperCase() + entry.significance.slice(1)}
                     />
-                    <EntityBadge 
-                      text={entry.type.replace('_', ' ')}
+                    <Badge 
                       variant="info"
                       size="sm"
-                    />
+                    >
+                      {entry.type.replace('_', ' ')}
+                    </Badge>
                   </div>
                 </Card>
               ))}

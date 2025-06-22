@@ -10,9 +10,9 @@ import { getGenreLabel } from '@/lib/constants/genres';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
-  CardActionGroup, 
-  EntityBadge 
+  CardActionGroup
 } from '../shared/cards';
+import { Badge } from '@/components/ui/badge';
 
 interface WorldCardProps {
   /** The world data to display */
@@ -196,19 +196,21 @@ const WorldCard: React.FC<WorldCardProps> = ({
               
               {/* World type badge */}
               {world.relationship && world.reference ? (
-                <EntityBadge
+                <Badge
                   icon={world.relationship === 'set_within' ? '🌍' : '✨'}
-                  text={world.relationship === 'set_within' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
                   variant={world.relationship === 'set_within' ? 'info' : 'success'}
-                  testId="world-card-type"
-                />
+                  data-testid="world-card-type"
+                >
+                  {world.relationship === 'set_within' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
+                </Badge>
               ) : (
-                <EntityBadge
+                <Badge
                   icon="⚡"
-                  text="Original World"
-                  variant="primary"
-                  testId="world-card-type"
-                />
+                  variant="default"
+                  data-testid="world-card-type"
+                >
+                  Original World
+                </Badge>
               )}
             </div>
           

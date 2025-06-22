@@ -11,5 +11,3 @@ export type { MakeActiveButtonProps } from './MakeActiveButton';
 export { CardActionGroup } from './CardActionGroup';
 export type { CardActionGroupProps, CardAction } from './CardActionGroup';
 
-export { EntityBadge } from './EntityBadge';
-export type { EntityBadgeProps, EntityType, BadgeVariant } from './EntityBadge';

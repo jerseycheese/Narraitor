@@ -7,9 +7,9 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
-  CardActionGroup, 
-  EntityBadge 
+  CardActionGroup
 } from '@/components/shared/cards';
+import { Badge } from '@/components/ui/badge';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -92,11 +92,12 @@ export function CharacterCard({
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm text-gray-500">Level {character.level || 1}</span>
             {character.background?.isKnownFigure !== undefined && (
-              <EntityBadge
+              <Badge
                 icon={character.background.isKnownFigure ? '⭐' : '➕'}
-                text={character.background.isKnownFigure ? 'Known Figure' : 'Original'}
-                variant={character.background.isKnownFigure ? 'warning' : 'primary'}
-              />
+                variant={character.background.isKnownFigure ? 'warning' : 'default'}
+              >
+                {character.background.isKnownFigure ? 'Known Figure' : 'Original'}
+              </Badge>
             )}
           </div>
           <p className="text-gray-600 text-sm leading-snug">

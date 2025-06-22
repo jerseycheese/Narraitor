@@ -14,7 +14,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from '@/component
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
-import { TopAttributesBadges, TopSkillsBadges } from '@/components/shared/AttributeSkillBadges';
+import { Badge } from '@/components/ui/badge';
 import { Loader2, Dice6, User, Settings } from 'lucide-react';
 
 export interface QuickStartCharactersProps {
@@ -161,21 +161,41 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               {/* Top Attributes */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Key Attributes</h4>
-                <TopAttributesBadges
-                  items={archetype.attributes}
-                  maxItems={3}
-                  showRemainingCount={false}
-                />
+                <div className="flex flex-wrap gap-1">
+                  {archetype.attributes
+                    .sort((a, b) => (b.value || 0) - (a.value || 0))
+                    .slice(0, 3)
+                    .map((attr) => (
+                      <Badge 
+                        key={attr.id} 
+                        variant="secondary" 
+                        count={attr.value}
+                        className="text-xs"
+                      >
+                        {attr.name}
+                      </Badge>
+                    ))}
+                </div>
               </div>
 
               {/* Top Skills */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Best Skills</h4>
-                <TopSkillsBadges
-                  items={archetype.skills}
-                  maxItems={3}
-                  showRemainingCount={false}
-                />
+                <div className="flex flex-wrap gap-1">
+                  {archetype.skills
+                    .sort((a, b) => (b.level || 0) - (a.level || 0))
+                    .slice(0, 3)
+                    .map((skill) => (
+                      <Badge 
+                        key={skill.id} 
+                        variant="outline" 
+                        count={skill.level}
+                        className="text-xs"
+                      >
+                        {skill.name}
+                      </Badge>
+                    ))}
+                </div>
               </div>
 
               {/* Motivation */}
