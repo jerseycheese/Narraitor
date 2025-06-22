@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 import { TemplatePreview } from '@/components/world/SmartTemplates/TemplatePreview';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
+import { LoadingState } from '@/components/ui/LoadingState';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { GENRES } from '@/lib/constants/genres';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
@@ -93,10 +94,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
       )}
 
       {isGenerating && (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Generating your world template...</p>
-        </div>
+        <LoadingState message="Generating your world template..." />
       )}
 
       {!isGenerating && (
