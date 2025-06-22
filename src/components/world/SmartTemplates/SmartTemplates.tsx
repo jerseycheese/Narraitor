@@ -80,7 +80,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
     try {
       await aiGeneration.generate(requestBody);
-    } catch (error) {
+    } catch {
       // Error is already handled by the hook's error state
       // No need to do anything here - the hook manages the error display
     }
