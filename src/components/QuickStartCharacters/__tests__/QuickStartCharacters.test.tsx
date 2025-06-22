@@ -140,7 +140,7 @@ describe('QuickStartCharacters', () => {
       mockGenerateArchetypes.mockReturnValue(new Promise(() => {})); // Never resolves
       render(<QuickStartCharacters {...defaultProps} />);
       
-      expect(screen.getByText('Generating character options...')).toBeInTheDocument();
+      expect(screen.getByText(/Creating archetypes for your fantasy world/)).toBeInTheDocument();
     });
 
     test('displays archetype cards after generation', async () => {
@@ -170,6 +170,7 @@ describe('QuickStartCharacters', () => {
 
   describe('User Interactions', () => {
     test('calls onCharacterSelect when Select Character button is clicked', async () => {
+      jest.useFakeTimers();
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
@@ -177,16 +178,24 @@ describe('QuickStartCharacters', () => {
         fireEvent.click(selectButton);
       });
       
+      // Fast-forward past the setTimeout delay
+      jest.advanceTimersByTime(300);
+      
       expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(mockArchetypes[0]);
+      jest.useRealTimers();
     });
 
     test('calls onCharacterSelect with random archetype when Random Character is clicked', async () => {
+      jest.useFakeTimers();
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
         const randomButton = screen.getByText('Random Character');
         fireEvent.click(randomButton);
       });
+      
+      // Fast-forward past the setTimeout delay
+      jest.advanceTimersByTime(300);
       
       expect(defaultProps.onCharacterSelect).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -196,6 +205,7 @@ describe('QuickStartCharacters', () => {
           skills: expect.any(Array)
         })
       );
+      jest.useRealTimers();
     });
 
     test('calls onCustomizeClick when Customize Character button is clicked', async () => {
@@ -244,7 +254,8 @@ describe('QuickStartCharacters', () => {
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
-        expect(screen.getByText(/Unable to generate character options/)).toBeInTheDocument();
+        expect(screen.getByText('Character Generation Failed')).toBeInTheDocument();
+        expect(screen.getByText('Unable to generate character options. Please try again.')).toBeInTheDocument();
         expect(screen.getByText('Try Again')).toBeInTheDocument();
       });
     });

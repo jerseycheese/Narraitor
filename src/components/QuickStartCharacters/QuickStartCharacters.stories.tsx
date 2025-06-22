@@ -235,7 +235,7 @@ export const Interactive: Story = {
       },
     },
   },
-  play: async ({ canvasElement }) => {
+  play: async () => {
     // This story is meant for manual interaction testing
     console.log('Interactive story loaded. Test the following features:');
     console.log('1. Click on character cards to see selection state');

@@ -81,7 +81,7 @@ describe('WorldCreationWizard Quick Start Integration', () => {
     
     // Basic smoke test to ensure the wizard renders with quick start integration
     expect(screen.getByText('Create New World')).toBeInTheDocument();
-    expect(screen.getByText('Choose Template')).toBeInTheDocument();
+    expect(screen.getAllByText('Choose Template')).toHaveLength(2); // Step indicator and button
   });
 
   test('mock stores are properly configured', () => {
