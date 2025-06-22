@@ -1,4 +1,6 @@
 // src/components/shared/AttributeSkillBadges.tsx
+// DEPRECATED: Use Badge from @/components/ui/badge directly instead
+// This component will be removed in a future version
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -56,8 +58,8 @@ export function AttributeSkillBadges({
       {topItems.map((item) => {
         const displayValue = type === 'attributes' ? item.value : item.level;
         return (
-          <Badge key={item.id} variant={variant} className="text-xs">
-            {item.name}: {displayValue}
+          <Badge key={item.id} variant={variant} count={displayValue} className="text-xs">
+            {item.name}
           </Badge>
         );
       })}

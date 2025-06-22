@@ -1,4 +1,8 @@
 import React from 'react';
+import { Badge } from '@/components/ui/badge';
+
+// DEPRECATED: Use Badge from @/components/ui/badge directly instead
+// This component will be removed in a future version
 
 export type EntityType = 'world' | 'character' | 'item' | 'location' | 'custom';
 export type BadgeVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
@@ -61,19 +65,14 @@ export const EntityBadge: React.FC<EntityBadgeProps> = ({
   size = 'sm',
   testId
 }) => {
-  const sizeClasses = {
-    sm: 'text-xs px-2 py-1',
-    md: 'text-sm px-3 py-1.5',
-    lg: 'text-base px-4 py-2'
-  };
-
-  const variantClasses = {
-    primary: 'bg-blue-100 text-blue-800',
-    secondary: 'bg-gray-100 text-gray-800',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-amber-100 text-amber-800',
-    danger: 'bg-red-100 text-red-800',
-    info: 'bg-purple-100 text-purple-800'
+  // Map old variants to new Badge variants
+  const variantMap = {
+    primary: 'default' as const,
+    secondary: 'secondary' as const,
+    success: 'success' as const,
+    warning: 'warning' as const,
+    danger: 'destructive' as const,
+    info: 'info' as const
   };
 
   // Default icons for entity types
@@ -86,19 +85,18 @@ export const EntityBadge: React.FC<EntityBadgeProps> = ({
   };
 
   const displayIcon = icon || (type && defaultIcons[type]) || null;
+  const badgeVariant = variantMap[variant];
 
   return (
-    <span
+    <Badge
       data-testid={testId}
-      className={`${sizeClasses[size]} ${variantClasses[variant]} rounded-full font-medium inline-flex items-center gap-1 ${className}`}
+      variant={badgeVariant}
+      size={size}
+      icon={displayIcon}
+      className={className}
     >
-      {displayIcon && (
-        <span className="inline-flex items-center">
-          {typeof displayIcon === 'string' ? displayIcon : displayIcon}
-        </span>
-      )}
       {text}
-    </span>
+    </Badge>
   );
 };
 

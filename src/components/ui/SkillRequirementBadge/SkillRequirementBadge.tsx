@@ -1,6 +1,9 @@
 import React from 'react';
-import StatusBadge from '../StatusBadge';
+import { Badge } from '../badge';
 import { DecisionRequirement } from '@/types/narrative.types';
+
+// DEPRECATED: Use Badge from @/components/ui/badge directly instead
+// This component will be removed in a future version
 
 export interface SkillRequirementBadgeProps {
   requirement: DecisionRequirement;
@@ -21,17 +24,17 @@ const SkillRequirementBadge: React.FC<SkillRequirementBadgeProps> = ({
   const displayValue = requirement.value;
   const operatorSuffix = requirement.operator === 'gte' ? '+' : '';
   
-  const label = `[${displayName} ${displayValue}${operatorSuffix}]`;
-  const state = isAvailable ? 'available' : 'unavailable';
+  const label = `${displayName} ${displayValue}${operatorSuffix}`;
+  const variant = isAvailable ? 'available' : 'unavailable';
 
   return (
-    <StatusBadge
-      variant="skill-requirement"
-      state={state}
-      label={label}
+    <Badge
+      variant={variant}
       className={className}
-      testId={testId}
-    />
+      data-testid={testId}
+    >
+      {label}
+    </Badge>
   );
 };
 
