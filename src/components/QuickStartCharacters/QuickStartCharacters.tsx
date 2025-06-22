@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { World } from '@/types/world.types';
 import { 
   CharacterArchetype, 
@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
+import { TopAttributesBadges, TopSkillsBadges } from '@/components/shared/AttributeSkillBadges';
 import { Loader2, Dice6, User, Settings } from 'lucide-react';
 
 export interface QuickStartCharactersProps {
@@ -24,7 +25,7 @@ export interface QuickStartCharactersProps {
   existingCharacterNames?: string[];
 }
 
-export function QuickStartCharacters({
+export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   world,
   onCharacterSelect,
   onCustomizeClick,
@@ -35,11 +36,7 @@ export function QuickStartCharacters({
   const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
 
-  useEffect(() => {
-    generateArchetypes();
-  }, [world]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const generateArchetypes = async () => {
+  const generateArchetypes = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -51,7 +48,11 @@ export function QuickStartCharacters({
     } finally {
       setLoading(false);
     }
-  };
+  }, [world, existingCharacterNames.join(',')]);
+
+  useEffect(() => {
+    generateArchetypes();
+  }, [generateArchetypes]);
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
     setSelectedArchetype(archetype.id);
@@ -161,31 +162,21 @@ export function QuickStartCharacters({
               {/* Top Attributes */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Key Attributes</h4>
-                <div className="flex flex-wrap gap-1">
-                  {archetype.attributes
-                    .sort((a, b) => b.value - a.value)
-                    .slice(0, 3)
-                    .map((attr) => (
-                      <Badge key={attr.id} variant="secondary" className="text-xs">
-                        {attr.name}: {attr.value}
-                      </Badge>
-                    ))}
-                </div>
+                <TopAttributesBadges
+                  items={archetype.attributes}
+                  maxItems={3}
+                  showRemainingCount={false}
+                />
               </div>
 
               {/* Top Skills */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Best Skills</h4>
-                <div className="flex flex-wrap gap-1">
-                  {archetype.skills
-                    .sort((a, b) => b.level - a.level)
-                    .slice(0, 3)
-                    .map((skill) => (
-                      <Badge key={skill.id} variant="outline" className="text-xs">
-                        {skill.name}: {skill.level}
-                      </Badge>
-                    ))}
-                </div>
+                <TopSkillsBadges
+                  items={archetype.skills}
+                  maxItems={3}
+                  showRemainingCount={false}
+                />
               </div>
 
               {/* Motivation */}
@@ -260,4 +251,4 @@ export function QuickStartCharacters({
       </div>
     </div>
   );
-}
+});
