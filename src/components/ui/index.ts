@@ -3,3 +3,5 @@ export { Input } from './input';
 export { Textarea } from './textarea';
 export { Label } from './label';
 export { Checkbox } from './checkbox';
+export { Badge } from './badge';
+export { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';

@@ -19,6 +19,7 @@ import DescriptionStep from './steps/DescriptionStep';
 import AttributeReviewStep from './steps/AttributeReviewStep';
 import SkillReviewStep from './steps/SkillReviewStep';
 import FinalizeStep from './steps/FinalizeStep';
+import QuickStartStep from './steps/QuickStartStep';
 import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardState';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
@@ -35,6 +36,7 @@ interface WorldCreationData extends Partial<World> {
   selectedTemplateId?: string | null;
   createOwnWorld?: boolean;
   worldType?: 'original' | 'inspired_by' | 'set_within';
+  createdWorldId?: string;
 }
 
 export interface WorldCreationWizardProps {
@@ -121,6 +123,7 @@ export default function WorldCreationWizard({
         })
         .build(),
       5: createWizardValidator<WorldCreationData>().build(), // Finalize step is always valid
+      6: createWizardValidator<WorldCreationData>().build(), // Quick start step is always valid
     };
   }, []);
 
@@ -220,6 +223,13 @@ export default function WorldCreationWizard({
 
   const handleComplete = useCallback(async () => {
     const data = wizard.state.data;
+    
+    // If we already have a created world, just proceed to quick start
+    if (data.createdWorldId) {
+      wizard.goNext(); // Move to quick start step
+      return;
+    }
+    
     try {
       // Create the world first
       const worldId = createWorld({
@@ -239,6 +249,9 @@ export default function WorldCreationWizard({
       const { setCurrentWorld } = useWorldStore.getState();
       setCurrentWorld(worldId);
       console.log('[WorldCreationWizard] Set newly created world as active:', worldId);
+      
+      // Store the world ID in wizard state
+      wizard.updateData({ createdWorldId: worldId });
       
       // Generate world image asynchronously after creation (only if no image was already generated)
       if (!data.image?.url) {
@@ -281,11 +294,8 @@ export default function WorldCreationWizard({
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
       
-      if (onComplete) {
-        onComplete(worldId);
-      } else {
-        router.push('/worlds');
-      }
+      // Move to quick start step instead of completing
+      wizard.goNext();
     } catch {
       // Fallback error handling
       const worldId = `world-${Date.now()}`;
@@ -304,13 +314,11 @@ export default function WorldCreationWizard({
         localStorage.setItem('worlds', JSON.stringify(worlds));
       }
       
-      if (onComplete) {
-        onComplete(worldId);
-      } else {
-        router.push('/worlds');
-      }
+      // Store the world ID and move to quick start
+      wizard.updateData({ createdWorldId: worldId });
+      wizard.goNext();
     }
-  }, [wizard.state.data, createWorld, onComplete, router]);
+  }, [wizard, createWorld]);
 
   const updateWorldData = useCallback((updates: Partial<World>) => {
     wizard.updateData(updates);
@@ -325,6 +333,22 @@ export default function WorldCreationWizard({
     errors: wizard.state.errors || {},
     onUpdate: updateWorldData,
   };
+
+  const handleQuickStartComplete = useCallback(() => {
+    const worldId = wizard.state.data.createdWorldId;
+    if (onComplete && worldId) {
+      onComplete(worldId);
+    } else {
+      router.push('/worlds');
+    }
+  }, [wizard.state.data.createdWorldId, onComplete, router]);
+
+  const handleCustomizeCharacter = useCallback(() => {
+    const worldId = wizard.state.data.createdWorldId;
+    if (worldId) {
+      router.push(`/characters/create?worldId=${worldId}`);
+    }
+  }, [wizard.state.data.createdWorldId, router]);
 
   const renderCurrentStep = () => {
     switch (wizard.state.currentStep) {
@@ -371,6 +395,32 @@ export default function WorldCreationWizard({
             onUpdateWorldData={updateWorldData}
           />
         );
+      case 6:
+        // Quick Start Step
+        const createdWorld = wizard.state.data.createdWorldId 
+          ? useWorldStore.getState().worlds[wizard.state.data.createdWorldId]
+          : null;
+        
+        if (!createdWorld) {
+          // Fallback if world not found
+          return (
+            <div className="text-center py-12">
+              <p className="text-red-600">Error: World not found. Please try creating the world again.</p>
+              <button onClick={handleBack} className="mt-4 text-blue-600 hover:underline">
+                Go Back
+              </button>
+            </div>
+          );
+        }
+        
+        return (
+          <QuickStartStep
+            world={createdWorld}
+            onBack={handleBack}
+            onComplete={handleQuickStartComplete}
+            onCustomizeCharacter={handleCustomizeCharacter}
+          />
+        );
       default:
         return null;
     }
@@ -398,8 +448,8 @@ export default function WorldCreationWizard({
           </div>
         </WizardStep>
         
-        {/* Hide main navigation on template step (0) and finalize step (5) since they have their own navigation */}
-        {wizard.state.currentStep > 0 && wizard.state.currentStep < WIZARD_STEPS.length - 1 && (
+        {/* Hide main navigation on template step (0), finalize step (5), and quick start step (6) since they have their own navigation */}
+        {wizard.state.currentStep > 0 && wizard.state.currentStep < WIZARD_STEPS.length - 2 && (
           <WizardNavigation
             onCancel={handleCancel}
             onBack={wizard.canGoBack ? handleBack : undefined}
