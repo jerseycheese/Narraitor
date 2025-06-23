@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge"
  * - Uses twMerge for intelligent Tailwind class deduplication and merging
  * - Handles conflicting Tailwind classes (e.g., "bg-red-500 bg-blue-500" → "bg-blue-500")
  */
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 

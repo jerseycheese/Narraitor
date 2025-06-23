@@ -18,6 +18,8 @@ import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 
+const SELECTION_DELAY_MS = 300;
+
 export interface QuickStartCharactersProps {
   world: World;
   onCharacterSelect: (archetype: CharacterArchetype) => void;
@@ -67,7 +69,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     // Small delay to show selection state before proceeding
     setTimeout(() => {
       onCharacterSelect(archetype);
-    }, 300);
+    }, SELECTION_DELAY_MS);
   };
 
   const handleRandomSelect = async () => {
