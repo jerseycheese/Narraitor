@@ -25,6 +25,9 @@ describe('Journal Store Persistence', () => {
       updatedAt: new Date().toISOString()
     });
 
+    // Wait to ensure different timestamps
+    await new Promise(resolve => setTimeout(resolve, 2));
+
     const entryId2 = addEntry('session-1', {
       worldId: 'world-1', 
       characterId: 'char-1',
