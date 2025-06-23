@@ -7,6 +7,7 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import { LoadingPulse } from '../ui/LoadingState';
 import { SectionError } from '../ui/ErrorDisplay';
 import { World } from '../../types/world.types';
+import { useAsyncState, useModal } from '@/hooks';
 
 interface WorldListScreenProps {
   _router?: {
@@ -20,33 +21,41 @@ interface WorldListScreenProps {
 const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions }) => {
   const [worlds, setWorlds] = useState<World[]>([]);
   const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
+  
+  // Async state management using hooks
+  const worldsLoadingState = useAsyncState<void>();
+  
+  // Modal state management using hooks
+  const deleteConfirmationModal = useModal();
 
   useEffect(() => {
-    try {
-      const state = useWorldStore.getState();
-      setWorlds(Object.values(state.worlds || {}));
-      setCurrentWorldId(state.currentWorldId);
-      setLoading(state.loading);
-      setError(state.error);
-      
-      const unsubscribe = useWorldStore.subscribe(() => {
-        const newState = useWorldStore.getState();
-        setWorlds(Object.values(newState.worlds || {}));
-        setCurrentWorldId(newState.currentWorldId);
-        setLoading(newState.loading);
-        setError(newState.error);
+    const loadWorlds = async () => {
+      await worldsLoadingState.execute(async () => {
+        try {
+          const state = useWorldStore.getState();
+          setWorlds(Object.values(state.worlds || {}));
+          setCurrentWorldId(state.currentWorldId);
+          
+          const unsubscribe = useWorldStore.subscribe(() => {
+            const newState = useWorldStore.getState();
+            setWorlds(Object.values(newState.worlds || {}));
+            setCurrentWorldId(newState.currentWorldId);
+          });
+          
+          // Store unsubscribe function for cleanup
+          return () => unsubscribe();
+        } catch (err) {
+          throw new Error(err instanceof Error ? err.message : 'Unknown error');
+        }
       });
-      
-      return () => unsubscribe();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      setLoading(false);
-    }
-  }, []);
+    };
+    
+    loadWorlds();
+    
+    // Note: The unsubscribe function from the store subscription
+    // is handled by the async state execution
+  }, [worldsLoadingState]);
 
   const handleSelectWorld = (worldId: string) => {
     useWorldStore.setState((state) => ({
@@ -57,11 +66,11 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   const handleDeleteClick = (worldId: string) => {
     setWorldToDeleteId(worldId);
-    setIsDeleteDialogOpen(true);
+    deleteConfirmationModal.open();
   };
 
   const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
+    deleteConfirmationModal.close();
     setWorldToDeleteId(null);
   };
 
@@ -85,7 +94,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     ? `Are you sure you want to delete the world "${worldToDelete.name}"?`
     : 'Are you sure you want to delete this world?';
 
-  if (loading) {
+  if (worldsLoadingState.isLoading) {
     return (
       <section className="p-8" data-testid="world-list-screen-loading-indicator">
         <LoadingPulse message="Loading your worlds..." skeletonLines={3} />
@@ -93,12 +102,12 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     );
   }
 
-  if (error) {
+  if (worldsLoadingState.error) {
     return (
       <section className="p-6" data-testid="world-list-screen-error-message">
         <SectionError
           title="Error Loading Worlds"
-          message={error}
+          message={worldsLoadingState.error}
           severity="error"
         />
       </section>
@@ -116,7 +125,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
         _storeActions={_storeActions}
       />
       <DeleteConfirmationDialog
-        isOpen={isDeleteDialogOpen}
+        {...deleteConfirmationModal.modalProps}
         onClose={handleCloseDeleteDialog}
         onConfirm={handleConfirmDelete}
         title="Delete World"
