@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 import { useWorldStore } from '../../state/worldStore';
 import WorldList from '../WorldList/WorldList';
 import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
@@ -19,9 +20,14 @@ interface WorldListScreenProps {
 }
 
 const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeActions }) => {
-  const [worlds, setWorlds] = useState<World[]>([]);
-  const [currentWorldId, setCurrentWorldId] = useState<string | null>(null);
-  const [worldToDeleteId, setWorldToDeleteId] = useState<string | null>(null);
+  // Form state management using hooks
+  const worldListState = useFormState({
+    initialData: {
+      worlds: [] as World[],
+      currentWorldId: null as string | null,
+      worldToDeleteId: null as string | null
+    }
+  });
   
   // Async state management using hooks
   const worldsLoadingState = useAsyncState<void>();
@@ -34,13 +40,19 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
       await worldsLoadingState.execute(async () => {
         try {
           const state = useWorldStore.getState();
-          setWorlds(Object.values(state.worlds || {}));
-          setCurrentWorldId(state.currentWorldId);
+          worldListState.updateData({
+            worlds: Object.values(state.worlds || {}),
+            currentWorldId: state.currentWorldId,
+            worldToDeleteId: null
+          });
           
           const unsubscribe = useWorldStore.subscribe(() => {
             const newState = useWorldStore.getState();
-            setWorlds(Object.values(newState.worlds || {}));
-            setCurrentWorldId(newState.currentWorldId);
+            worldListState.updateData({
+              ...worldListState.data,
+              worlds: Object.values(newState.worlds || {}),
+              currentWorldId: newState.currentWorldId
+            });
           });
           
           // Store unsubscribe function for cleanup
@@ -65,31 +77,31 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   };
 
   const handleDeleteClick = (worldId: string) => {
-    setWorldToDeleteId(worldId);
+    worldListState.updateField('worldToDeleteId', worldId);
     deleteConfirmationModal.open();
   };
 
   const handleCloseDeleteDialog = () => {
     deleteConfirmationModal.close();
-    setWorldToDeleteId(null);
+    worldListState.updateField('worldToDeleteId', null);
   };
 
   const handleConfirmDelete = () => {
-    if (worldToDeleteId) {
+    if (worldListState.data.worldToDeleteId) {
       useWorldStore.setState((state) => {
         const newWorlds = { ...state.worlds };
-        delete newWorlds[worldToDeleteId];
+        delete newWorlds[worldListState.data.worldToDeleteId!];
         return {
           ...state,
           worlds: newWorlds,
-          currentWorldId: state.currentWorldId === worldToDeleteId ? null : state.currentWorldId
+          currentWorldId: state.currentWorldId === worldListState.data.worldToDeleteId ? null : state.currentWorldId
         };
       });
     }
     handleCloseDeleteDialog();
   };
 
-  const worldToDelete = worlds.find((world) => world.id === worldToDeleteId);
+  const worldToDelete = worldListState.data.worlds.find((world) => world.id === worldListState.data.worldToDeleteId);
   const deleteMessage = worldToDelete
     ? `Are you sure you want to delete the world "${worldToDelete.name}"?`
     : 'Are you sure you want to delete this world?';
@@ -117,8 +129,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   return (
     <main>
       <WorldList 
-        worlds={worlds} 
-        currentWorldId={currentWorldId}
+        worlds={worldListState.data.worlds} 
+        currentWorldId={worldListState.data.currentWorldId}
         onSelectWorld={handleSelectWorld} 
         onDeleteWorld={handleDeleteClick}
         _router={_router}

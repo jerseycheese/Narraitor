@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNarrativeStore } from '../../state/narrativeStore';
 import { useCharacterStore } from '../../state/characterStore';
@@ -14,7 +14,7 @@ import { SectionWrapper } from '../shared/SectionWrapper';
 import { CardActionGroup, type CardAction } from '../shared/cards/CardActionGroup';
 import { AchievementDialog } from '@/components/AchievementDialog';
 import Image from 'next/image';
-import { useAsyncState, useModal } from '@/hooks';
+import { useAsyncState, useModal, useFormState } from '@/hooks';
 
 /**
  * EndingScreen displays the story ending with narrative closure
@@ -35,19 +35,25 @@ export function EndingScreen() {
   const { worlds } = useWorldStore();
   
   // State for ending image generation
-  const [endingImage, setEndingImage] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
   
   // Async state management using new hooks
   const imageGenerationState = useAsyncState<string>();
   
+  // Form state management using hooks
+  const endingScreenState = useFormState({
+    initialData: {
+      endingImage: null as string | null,
+      selectedAchievement: null as {
+        title: string;
+        description: string;
+        originalText: string;
+      } | null
+    }
+  });
+  
   // Modal state management
   const achievementModal = useModal();
-  const [selectedAchievement, setSelectedAchievement] = useState<{
-    title: string;
-    description: string;
-    originalText: string;
-  } | null>(null);
 
   // Handle achievement click to show detailed dialog
   const handleAchievementClick = (achievement: string) => {
@@ -55,7 +61,7 @@ export function EndingScreen() {
     const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
     const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : 'Achievement unlocked during your adventure.';
     
-    setSelectedAchievement({
+    endingScreenState.updateField('selectedAchievement', {
       title,
       description,
       originalText: achievement,
@@ -102,7 +108,7 @@ export function EndingScreen() {
     });
 
     if (imageUrl) {
-      setEndingImage(imageUrl);
+      endingScreenState.updateField('endingImage', imageUrl);
     } else {
       // Reset on error so user can retry
       generatedForEndingRef.current = null;
@@ -117,14 +123,14 @@ export function EndingScreen() {
     const isTest = process.env.NODE_ENV === 'test';
     
     if (currentEnding && 
-        !endingImage && 
+        !endingScreenState.data.endingImage && 
         !imageGenerationState.isLoading && 
         !isStorybook &&
         !isTest &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }
-  }, [currentEnding, endingImage, imageGenerationState.isLoading, generateEndingImage]); // Include all dependencies
+  }, [currentEnding, endingScreenState.data.endingImage, imageGenerationState.isLoading, generateEndingImage]); // Include all dependencies
 
   // Note: Removed automatic cleanup to prevent clearing ending during development re-renders
   // The ending should be cleared manually when navigating away
@@ -266,9 +272,9 @@ export function EndingScreen() {
                   </p>
                 </div>
               </div>
-            ) : endingImage ? (
+            ) : endingScreenState.data.endingImage ? (
               <Image 
-                src={endingImage} 
+                src={endingScreenState.data.endingImage} 
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={800}
                 height={400}
@@ -368,16 +374,16 @@ export function EndingScreen() {
       </PageLayout>
 
       {/* Achievement Detail Dialog */}
-      {selectedAchievement && (
+      {endingScreenState.data.selectedAchievement && (
         <AchievementDialog
           {...achievementModal.modalProps}
           onClose={() => {
             achievementModal.close();
-            setSelectedAchievement(null);
+            endingScreenState.updateField('selectedAchievement', null);
           }}
           title="Achievement Unlocked!"
-          description={selectedAchievement.description}
-          achievement={selectedAchievement.title}
+          description={endingScreenState.data.selectedAchievement.description}
+          achievement={endingScreenState.data.selectedAchievement.title}
           type="milestone"
           icon="🏆"
           buttonText="Continue"

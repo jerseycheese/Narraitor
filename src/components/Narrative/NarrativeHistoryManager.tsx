@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 import { NarrativeHistory } from './NarrativeHistory';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { NarrativeSegment } from '@/types/narrative.types';
@@ -16,10 +17,15 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
   sessionId,
   className
 }) => {
-  const [segments, setSegments] = useState<NarrativeSegment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  // We define error state but don't currently use setError - this is for future error handling
-  const [error] = useState<string | null>(null);
+  // Form state management using hooks
+  const narrativeHistoryState = useFormState({
+    initialData: {
+      segments: [] as NarrativeSegment[],
+      isLoading: false,
+      error: null as string | null,
+      stabilized: false
+    }
+  });
   
   // Get segments from the store
   const getSegments = useNarrativeStore(state => state.getSessionSegments);
@@ -42,7 +48,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
       }
       
       // Set state with final deduplicated segments
-      setSegments(uniqueSegments);
+      narrativeHistoryState.updateField('segments', uniqueSegments);
     };
     
     // Load initial segments
@@ -100,40 +106,45 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     return uniqueSegments;
   };
 
-  // State to track if we've stabilized the segments (no more deduplication needed)
-  const [stabilized, setStabilized] = useState(false);
+  // State to track if we've stabilized the segments is now in narrativeHistoryState
   
   // Show loading state until segments are stabilized
   useEffect(() => {
     // Always start in loading state when segments change
-    setIsLoading(true);
+    narrativeHistoryState.updateField('isLoading', true);
     
     // Create debounced stabilization (prevents flashing during load and deduplication)
     const stabilizeTimer = setTimeout(() => {
-      setStabilized(true);
-      setIsLoading(false);
+      narrativeHistoryState.updateData({
+        ...narrativeHistoryState.data,
+        stabilized: true,
+        isLoading: false
+      });
     }, 100);  // Reduced from 1000ms to 100ms for faster response
     
     // Cleanup timer on unmount or when segments change again
     return () => {
       clearTimeout(stabilizeTimer);
     };
-  }, [sessionId, segments.length]);
+  }, [sessionId, narrativeHistoryState.data.segments.length, narrativeHistoryState]);
   
   // Reset stabilized state when session changes
   useEffect(() => {
-    setStabilized(false);
-    setIsLoading(true);
-  }, [sessionId]);
+    narrativeHistoryState.updateData({
+      ...narrativeHistoryState.data,
+      stabilized: false,
+      isLoading: true
+    });
+  }, [sessionId, narrativeHistoryState]);
 
   return (
     <div className={`narrative-history-manager ${className || ''}`}>
       <NarrativeHistory 
         // Only show segments when they've stabilized
-        segments={stabilized ? segments : []}
+        segments={narrativeHistoryState.data.stabilized ? narrativeHistoryState.data.segments : []}
         // Always show loading animation until stabilized, regardless of whether we have segments
-        isLoading={isLoading || !stabilized}
-        error={error || undefined}
+        isLoading={narrativeHistoryState.data.isLoading || !narrativeHistoryState.data.stabilized}
+        error={narrativeHistoryState.data.error || undefined}
       />
     </div>
   );
