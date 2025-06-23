@@ -1,6 +1,7 @@
 // src/components/devtools/EndingImageDebugSection/EndingImageDebugSection.tsx
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useFormState, useAsyncState } from '@/hooks';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { useNarrativeStore } from '../../../state/narrativeStore';
@@ -9,21 +10,28 @@ import { useWorldStore } from '../../../state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '../../../types/narrative.types';
 
 export function EndingImageDebugSection() {
-  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
-  const [selectedTone, setSelectedTone] = useState<EndingTone>('hopeful');
-  const [customEpilogue, setCustomEpilogue] = useState('');
-  const [customLegacy, setCustomLegacy] = useState('');
-  const [customWorldImpact, setCustomWorldImpact] = useState('');
-  const [lastGenerationResult, setLastGenerationResult] = useState<{ 
-    tone?: string; 
-    prompt?: string; 
-    imageUrl?: string;
-    aiGenerated?: boolean;
-    service?: string;
-    placeholder?: boolean;
-  } | null>(null);
+  // Form state management using hooks
+  const endingDebugState = useFormState({
+    initialData: {
+      generatedPrompt: '',
+      lastGeneratedImage: null as string | null,
+      selectedTone: 'hopeful' as EndingTone,
+      customEpilogue: '',
+      customLegacy: '',
+      customWorldImpact: '',
+      lastGenerationResult: null as { 
+        tone?: string; 
+        prompt?: string; 
+        imageUrl?: string;
+        aiGenerated?: boolean;
+        service?: string;
+        placeholder?: boolean;
+      } | null
+    }
+  });
+  
+  // Async state management using hooks
+  const generationState = useAsyncState<string>();
   
   // Get data from stores
   const { currentEnding, getSessionSegments } = useNarrativeStore();
@@ -43,10 +51,10 @@ export function EndingImageDebugSection() {
       characterId: mockCharacter?.id || 'debug-character',
       worldId: mockWorld?.id || 'debug-world',
       type: 'player-choice' as EndingType,
-      tone: selectedTone,
-      epilogue: customEpilogue || 'The hero stood at the edge of the realm, looking back at all they had accomplished. The journey had been long and filled with challenges, but in the end, they had found what they were searching for. The story comes to a close with a sense of completion and new beginnings on the horizon.',
-      characterLegacy: customLegacy || 'The hero will be remembered as a beacon of hope and courage. Their actions inspired others to follow in their footsteps, creating a lasting impact that would echo through generations.',
-      worldImpact: customWorldImpact || 'The world was forever changed by the hero\'s actions. Peace was restored to the land, and the people could once again look toward the future with optimism.',
+      tone: endingDebugState.data.selectedTone,
+      epilogue: endingDebugState.data.customEpilogue || 'The hero stood at the edge of the realm, looking back at all they had accomplished. The journey had been long and filled with challenges, but in the end, they had found what they were searching for. The story comes to a close with a sense of completion and new beginnings on the horizon.',
+      characterLegacy: endingDebugState.data.customLegacy || 'The hero will be remembered as a beacon of hope and courage. Their actions inspired others to follow in their footsteps, creating a lasting impact that would echo through generations.',
+      worldImpact: endingDebugState.data.customWorldImpact || 'The world was forever changed by the hero\'s actions. Peace was restored to the land, and the people could once again look toward the future with optimism.',
       timestamp: new Date(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -59,9 +67,7 @@ export function EndingImageDebugSection() {
   };
 
   const generatePromptPreview = async () => {
-    setIsGenerating(true);
-    
-    try {
+    await generationState.execute(async () => {
       const mockEnding = currentEnding || createMockEnding();
       const character = characters[mockEnding.characterId] || Object.values(characters)[0];
       const world = worlds[mockEnding.worldId] || Object.values(worlds)[0];
@@ -109,25 +115,22 @@ export function EndingImageDebugSection() {
       console.log('API response result:', result);
       
       const prompt = result.prompt || result.imageGenerationPrompt || 'No prompt returned';
-      setGeneratedPrompt(prompt);
-      setLastGenerationResult(result);
+      endingDebugState.updateField('generatedPrompt', prompt);
+      endingDebugState.updateField('lastGenerationResult', result);
       
       // If an image was generated, show it
       if (result.imageUrl && !result.placeholder) {
-        setLastGeneratedImage(result.imageUrl);
+        endingDebugState.updateField('lastGeneratedImage', result.imageUrl);
       }
       
-    } catch (error) {
-      setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setIsGenerating(false);
-    }
+      return prompt;
+    }).catch(error => {
+      endingDebugState.updateField('generatedPrompt', `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    });
   };
 
   const testFullGeneration = async () => {
-    setIsGenerating(true);
-    
-    try {
+    await generationState.execute(async () => {
       const mockEnding = currentEnding || createMockEnding();
       const character = characters[mockEnding.characterId] || Object.values(characters)[0];
       const world = worlds[mockEnding.worldId] || Object.values(worlds)[0];
@@ -172,19 +175,18 @@ export function EndingImageDebugSection() {
       
       const result = await response.json();
       
-      setGeneratedPrompt(result.imageGenerationPrompt || result.prompt || 'No prompt returned');
-      setLastGeneratedImage(result.imageUrl);
-      setLastGenerationResult(result);
+      endingDebugState.updateField('generatedPrompt', result.imageGenerationPrompt || result.prompt || 'No prompt returned');
+      endingDebugState.updateField('lastGeneratedImage', result.imageUrl);
+      endingDebugState.updateField('lastGenerationResult', result);
       
-    } catch (error) {
-      setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setIsGenerating(false);
-    }
+      return result.imageUrl;
+    }).catch(error => {
+      endingDebugState.updateField('generatedPrompt', `Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    });
   };
 
   const copyPromptToClipboard = () => {
-    navigator.clipboard.writeText(generatedPrompt);
+    navigator.clipboard.writeText(endingDebugState.data.generatedPrompt);
   };
 
   // Helper function to get CSS class for tone (from EndingScreen component)
@@ -294,8 +296,8 @@ export function EndingImageDebugSection() {
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-200">Ending Tone:</label>
                 <select
-                  value={selectedTone}
-                  onChange={(e) => setSelectedTone(e.target.value as EndingTone)}
+                  value={endingDebugState.data.selectedTone}
+                  onChange={(e) => endingDebugState.updateField('selectedTone', e.target.value as EndingTone)}
                   className="w-full px-3 py-1 bg-slate-800 text-slate-200 border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {toneOptions.map((tone) => (
@@ -309,8 +311,8 @@ export function EndingImageDebugSection() {
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-200">Custom Epilogue (optional):</label>
                 <textarea
-                  value={customEpilogue}
-                  onChange={(e) => setCustomEpilogue(e.target.value)}
+                  value={endingDebugState.data.customEpilogue}
+                  onChange={(e) => endingDebugState.updateField('customEpilogue', e.target.value)}
                   placeholder="Leave empty to use default mock epilogue..."
                   className="w-full px-3 py-2 bg-slate-800 text-slate-200 border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   rows={3}
@@ -320,8 +322,8 @@ export function EndingImageDebugSection() {
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-200">Custom Character Legacy (optional):</label>
                 <textarea
-                  value={customLegacy}
-                  onChange={(e) => setCustomLegacy(e.target.value)}
+                  value={endingDebugState.data.customLegacy}
+                  onChange={(e) => endingDebugState.updateField('customLegacy', e.target.value)}
                   placeholder="Leave empty to use default mock legacy..."
                   className="w-full px-3 py-2 bg-slate-800 text-slate-200 border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   rows={2}
@@ -331,8 +333,8 @@ export function EndingImageDebugSection() {
               <div>
                 <label className="block text-sm font-medium mb-1 text-slate-200">Custom World Impact (optional):</label>
                 <textarea
-                  value={customWorldImpact}
-                  onChange={(e) => setCustomWorldImpact(e.target.value)}
+                  value={endingDebugState.data.customWorldImpact}
+                  onChange={(e) => endingDebugState.updateField('customWorldImpact', e.target.value)}
                   placeholder="Leave empty to use default mock world impact..."
                   className="w-full px-3 py-2 bg-slate-800 text-slate-200 border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   rows={2}
@@ -359,18 +361,18 @@ export function EndingImageDebugSection() {
             <button
               onClick={generatePromptPreview}
               className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
-              disabled={isGenerating}
+              disabled={generationState.isLoading}
             >
-              {isGenerating ? 'Generating...' : 'Generate Prompt Preview'}
+              {generationState.isLoading ? 'Generating...' : 'Generate Prompt Preview'}
             </button>
             <button
               onClick={testFullGeneration}
               className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-              disabled={isGenerating}
+              disabled={generationState.isLoading}
             >
-              {isGenerating ? 'Generating...' : 'Test Full Generation'}
+              {generationState.isLoading ? 'Generating...' : 'Test Full Generation'}
             </button>
-            {generatedPrompt && (
+            {endingDebugState.data.generatedPrompt && (
               <button
                 onClick={copyPromptToClipboard}
                 className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
@@ -380,38 +382,38 @@ export function EndingImageDebugSection() {
             )}
           </div>
 
-          {generatedPrompt && (
+          {endingDebugState.data.generatedPrompt && (
             <div className="bg-slate-700 p-3 rounded border border-slate-600">
               <h4 className="font-medium mb-2 text-slate-200">Generated Prompt:</h4>
               <pre className="text-sm whitespace-pre-wrap break-words bg-slate-800 p-2 rounded border border-slate-600 text-slate-300 max-h-96 overflow-y-auto">
-                {generatedPrompt}
+                {endingDebugState.data.generatedPrompt}
               </pre>
             </div>
           )}
         </div>
 
         {/* Last Generation Results */}
-        {lastGenerationResult && (
+        {endingDebugState.data.lastGenerationResult && (
           <div className="bg-slate-700 p-3 rounded border border-slate-600">
             <h4 className="font-medium mb-2 text-slate-200">Last Generation Results:</h4>
             <div className="space-y-3">
               
               {/* Tone Information */}
-              {lastGenerationResult.tone && (
+              {endingDebugState.data.lastGenerationResult.tone && (
                 <div className="text-sm space-y-1 text-slate-300">
-                  <div><strong>Generated with Tone:</strong> <span className="font-mono bg-slate-800 px-2 py-1 rounded">{lastGenerationResult.tone}</span></div>
-                  <div><strong>Would use CSS:</strong> <span className="font-mono bg-slate-800 px-2 py-1 rounded">{getEndingCSSClass(lastGenerationResult.tone as EndingTone)}</span></div>
+                  <div><strong>Generated with Tone:</strong> <span className="font-mono bg-slate-800 px-2 py-1 rounded">{endingDebugState.data.lastGenerationResult.tone}</span></div>
+                  <div><strong>Would use CSS:</strong> <span className="font-mono bg-slate-800 px-2 py-1 rounded">{getEndingCSSClass(endingDebugState.data.lastGenerationResult.tone as EndingTone)}</span></div>
                   
                   {/* Tone Match Check */}
-                  {currentEnding && currentEnding.tone !== lastGenerationResult.tone && (
+                  {currentEnding && currentEnding.tone !== endingDebugState.data.lastGenerationResult.tone && (
                     <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-700">
                       <div className="text-red-300 text-xs">
-                        ⚠️ <strong>Tone Mismatch!</strong> Current ending tone ({currentEnding.tone}) doesn&apos;t match last generation ({lastGenerationResult.tone})
+                        ⚠️ <strong>Tone Mismatch!</strong> Current ending tone ({currentEnding.tone}) doesn&apos;t match last generation ({endingDebugState.data.lastGenerationResult.tone})
                       </div>
                     </div>
                   )}
                   
-                  {currentEnding && currentEnding.tone === lastGenerationResult.tone && (
+                  {currentEnding && currentEnding.tone === endingDebugState.data.lastGenerationResult.tone && (
                     <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-700">
                       <div className="text-green-300 text-xs">
                         ✅ Tone matches current ending
@@ -423,18 +425,18 @@ export function EndingImageDebugSection() {
               
               {/* API Response Details */}
               <div className="text-xs text-slate-400 space-y-1">
-                <div><strong>AI Generated:</strong> {lastGenerationResult.aiGenerated ? 'Yes' : 'No (fallback used)'}</div>
-                <div><strong>Service:</strong> {lastGenerationResult.service || 'Unknown'}</div>
-                <div><strong>Placeholder:</strong> {lastGenerationResult.placeholder ? 'Yes' : 'No'}</div>
+                <div><strong>AI Generated:</strong> {endingDebugState.data.lastGenerationResult.aiGenerated ? 'Yes' : 'No (fallback used)'}</div>
+                <div><strong>Service:</strong> {endingDebugState.data.lastGenerationResult.service || 'Unknown'}</div>
+                <div><strong>Placeholder:</strong> {endingDebugState.data.lastGenerationResult.placeholder ? 'Yes' : 'No'}</div>
               </div>
               
               {/* Generated Image */}
-              {lastGeneratedImage && (
+              {endingDebugState.data.lastGeneratedImage && (
                 <div>
                   <div className="text-sm font-medium text-slate-200 mb-2">Generated Image:</div>
                   <div className="relative w-64 h-48">
                     <Image
-                      src={lastGeneratedImage}
+                      src={endingDebugState.data.lastGeneratedImage}
                       alt="Generated ending scene"
                       fill
                       className="rounded border border-slate-500 object-cover"

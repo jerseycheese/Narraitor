@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
+import { useFormState } from '@/hooks';
 
 /**
  * DevTools context interface
@@ -44,22 +45,27 @@ export const DevToolsProvider = ({
   children, 
   initialIsOpen = false 
 }: DevToolsProviderProps) => {
-  const [isOpen, setIsOpen] = useState(initialIsOpen);
-  const [isDev, setIsDev] = useState(false);
+  // Form state management using hooks
+  const devToolsState = useFormState({
+    initialData: {
+      isOpen: initialIsOpen,
+      isDev: false
+    }
+  });
   
   // Set client-side flag and check environment
   useEffect(() => {
-    setIsDev(process.env.NODE_ENV === 'development');
-  }, [initialIsOpen]);
+    devToolsState.updateField('isDev', process.env.NODE_ENV === 'development');
+  }, [initialIsOpen, devToolsState]);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {
-    setIsOpen(prev => !prev);
+    devToolsState.updateField('isOpen', !devToolsState.data.isOpen);
   };
 
   // Always render children, but only provide DevTools functionality in dev
   return (
-    <DevToolsContext.Provider value={{ isOpen: isDev ? isOpen : false, toggleDevTools }}>
+    <DevToolsContext.Provider value={{ isOpen: devToolsState.data.isDev ? devToolsState.data.isOpen : false, toggleDevTools }}>
       {children}
     </DevToolsContext.Provider>
   );

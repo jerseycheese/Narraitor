@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 import { useDevTools } from '../DevToolsContext';
 import { StateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
@@ -13,15 +14,20 @@ import { EndingImageDebugSection } from '../EndingImageDebugSection';
  * Environment info component for the DevTools panel
  */
 const EnvironmentInfo = () => {
-  const [mounted, setMounted] = useState(false);
-  const [location, setLocation] = useState('N/A');
+  // Form state management using hooks
+  const envState = useFormState({
+    initialData: {
+      mounted: false,
+      location: 'N/A'
+    }
+  });
   
   useEffect(() => {
-    setMounted(true);
+    envState.updateField('mounted', true);
     if (typeof window !== 'undefined') {
-      setLocation(window.location.pathname);
+      envState.updateField('location', window.location.pathname);
     }
-  }, []);
+  }, [envState]);
   
   // Static values that don't change between server and client
   const nodeEnv = process.env.NODE_ENV || 'unknown';
@@ -31,9 +37,9 @@ const EnvironmentInfo = () => {
     <div className="devtools-panel mb-4 text-xs bg-slate-700 p-2 rounded border border-slate-600">
       <h3 className="devtools-panel font-bold mb-1 text-slate-200">Environment Info:</h3>
       <div className="devtools-panel text-slate-300">NODE_ENV: {nodeEnv}</div>
-      <div className="devtools-panel text-slate-300">Is Client: {String(mounted)}</div>
+      <div className="devtools-panel text-slate-300">Is Client: {String(envState.data.mounted)}</div>
       <div className="devtools-panel text-slate-300">Is Development: {String(isDev)}</div>
-      <div className="devtools-panel text-slate-300">Window Location: {location}</div>
+      <div className="devtools-panel text-slate-300">Window Location: {envState.data.location}</div>
     </div>
   );
 };
@@ -61,26 +67,32 @@ const EnvironmentInfo = () => {
  */
 export const DevToolsPanel = () => {
   const { isOpen, toggleDevTools } = useDevTools();
-  const [mounted, setMounted] = useState(false);
-  const [isTestPage, setIsTestPage] = useState(false);
+  
+  // Form state management using hooks
+  const panelState = useFormState({
+    initialData: {
+      mounted: false,
+      isTestPage: false
+    }
+  });
   
   // Set mounted flag and check if we're on the test page after mount
   useEffect(() => {
-    setMounted(true);
+    panelState.updateField('mounted', true);
     
     // Check if we're on the test page
     if (typeof window !== 'undefined') {
-      setIsTestPage(window.location.pathname.includes('/dev/devtools-test'));
+      panelState.updateField('isTestPage', window.location.pathname.includes('/dev/devtools-test'));
     }
-  }, []);
+  }, [panelState]);
 
   // Don't render anything on the server to avoid hydration issues
-  if (!mounted) {
+  if (!panelState.data.mounted) {
     return null;
   }
 
   // Only render in development environment or on test page
-  if (process.env.NODE_ENV !== 'development' && !isTestPage) {
+  if (process.env.NODE_ENV !== 'development' && !panelState.data.isTestPage) {
     return null;
   }
 
@@ -98,7 +110,7 @@ export const DevToolsPanel = () => {
       >
         <div className="text-sm font-medium text-slate-200">
           Narraitor DevTools
-          {isTestPage && ' (Test Page Mode)'}
+          {panelState.data.isTestPage && ' (Test Page Mode)'}
         </div>
         <button
           data-testid="devtools-panel-toggle"
