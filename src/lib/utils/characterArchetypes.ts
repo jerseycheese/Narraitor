@@ -461,32 +461,54 @@ export async function generateCharacterArchetypes(
   world: World, 
   existingNames: string[] = []
 ): Promise<CharacterArchetype[]> {
+  // Validate world data
+  if (!world) {
+    throw new Error('World data is required');
+  }
+  
+  if (!world.genre) {
+    throw new Error('World genre is required');
+  }
+  
+  if (!Array.isArray(world.attributes) || world.attributes.length === 0) {
+    throw new Error('World must have attributes array with at least one attribute');
+  }
+  
+  if (!Array.isArray(world.skills) || world.skills.length === 0) {
+    throw new Error('World must have skills array with at least one skill');
+  }
+  
   const templates = getArchetypeTemplatesForGenre(world.genre);
   const archetypes: CharacterArchetype[] = [];
   
   for (const template of templates) {
-    const name = generateCharacterName(template, [...existingNames, ...archetypes.map(a => a.name)]);
-    const personality = template.personalities[Math.floor(Math.random() * template.personalities.length)];
-    const motivation = template.motivations[Math.floor(Math.random() * template.motivations.length)];
-    const fears = template.fears[Math.floor(Math.random() * template.fears.length)];
-    
-    const archetype: CharacterArchetype = {
-      id: generateUniqueId('archetype'),
-      name,
-      description: template.description,
-      level: 1, // All quick start characters are level 1
-      attributes: distributeAttributes(world.attributes, template),
-      skills: distributeSkills(world.skills, template),
-      background: {
-        description: `${template.description} who has found their way to ${world.name}. ${personality}`,
-        personality,
-        motivation,
-        fears,
-        physicalDescription: generatePhysicalDescription(template, world.genre, world.name)
-      }
-    };
-    
-    archetypes.push(archetype);
+    try {
+      const name = generateCharacterName(template, [...existingNames, ...archetypes.map(a => a.name)]);
+      const personality = template.personalities[Math.floor(Math.random() * template.personalities.length)];
+      const motivation = template.motivations[Math.floor(Math.random() * template.motivations.length)];
+      const fears = template.fears[Math.floor(Math.random() * template.fears.length)];
+      
+      const archetype: CharacterArchetype = {
+        id: generateUniqueId('archetype'),
+        name,
+        description: template.description,
+        level: 1, // All quick start characters are level 1
+        attributes: distributeAttributes(world.attributes, template),
+        skills: distributeSkills(world.skills, template),
+        background: {
+          description: `${template.description} who has found their way to ${world.name}. ${personality}`,
+          personality,
+          motivation,
+          fears,
+          physicalDescription: generatePhysicalDescription(template, world.genre, world.name)
+        }
+      };
+      
+      archetypes.push(archetype);
+    } catch (error) {
+      console.error(`Failed to generate archetype for template ${template.name}:`, error);
+      throw new Error(`Failed to generate archetype for ${template.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
   
   return archetypes;
