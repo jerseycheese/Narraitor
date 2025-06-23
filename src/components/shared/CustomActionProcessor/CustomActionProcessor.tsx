@@ -100,20 +100,15 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   const analyzeSkills = useCallback(async (text: string) => {
     if (!text.trim()) {
       setSkillCheckResults([]);
-      setAnalysisError(null);
+      analysisState.clearError();
       return;
     }
 
-    setIsAnalyzing(true);
-    setAnalysisError(null);
-
-    try {
+    const skillChecks = await analysisState.execute(async () => {
       const result = await skillDetectionService.detectSkills(text, availableSkills());
       
       if (result.error) {
-        setAnalysisError(result.error);
-        setSkillCheckResults([]);
-        return;
+        throw new Error(result.error);
       }
 
       // Convert detected skills to skill check results
@@ -161,15 +156,15 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         requirement: DecisionRequirement;
       }>;
 
+      return skillChecks;
+    });
+
+    if (skillChecks) {
       setSkillCheckResults(skillChecks);
-    } catch (error) {
-      console.error('Skill analysis error:', error);
-      setAnalysisError(error instanceof Error ? error.message : 'Analysis failed');
+    } else {
       setSkillCheckResults([]);
-    } finally {
-      setIsAnalyzing(false);
     }
-  }, [character, availableSkills]);
+  }, [character, availableSkills, analysisState]);
 
   // Debounce the analysis
   useEffect(() => {
@@ -183,8 +178,8 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   const clear = useCallback(() => {
     setActionText('');
     setSkillCheckResults([]);
-    setAnalysisError(null);
-  }, []);
+    analysisState.clearError();
+  }, [analysisState]);
 
   const handleSubmit = () => {
     if (!actionText.trim()) return;
@@ -226,7 +221,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         />
         
         {/* Loading state */}
-        {isAnalyzing && (
+        {analysisState.isLoading && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <LoadingState variant="dots" size="sm" />
             <span>Analyzing skills...</span>
@@ -234,14 +229,14 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         )}
 
         {/* Analysis error */}
-        {analysisError && (
+        {analysisState.error && (
           <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
-            Error: {analysisError}
+            Error: {analysisState.error}
           </div>
         )}
 
         {/* Display skill check previews */}
-        {skillCheckResults.length > 0 && !isAnalyzing && (
+        {skillCheckResults.length > 0 && !analysisState.isLoading && (
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
               <span className="text-sm text-gray-600 font-medium">Detected Skills:</span>
