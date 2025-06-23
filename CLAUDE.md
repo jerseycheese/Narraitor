@@ -37,8 +37,7 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 Advanced automation capabilities for accelerated development:
 
 ### Automation Modes
-- **Standard Mode**: `claude > /project:do-issue-auto 501` - Automated with verification checkpoints
-- **No-Verify Mode**: `claude > /project:do-issue-auto-noverify 501` - Fully autonomous implementation
+- **Standard Mode**: `claude > /project:do-issue-auto 501` - Automated with verification via tests
 - **YOLO Mode**: `./scripts/yolo-mode.sh launch 501` - Containerized, network-isolated automation
 
 ### Worktree System
