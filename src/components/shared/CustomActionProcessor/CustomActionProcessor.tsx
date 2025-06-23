@@ -21,7 +21,7 @@
  * />
  */
 
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { skillDetectionService } from '@/lib/ai/skillDetectionService';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { DecisionRequirement } from '@/types/narrative.types';
-import { useAsyncState } from '@/hooks';
+import { useAsyncState, useFormState } from '@/hooks';
 
 // Local character type definition that matches the actual store structure
 // to avoid type mismatches with the main Character type
@@ -72,17 +72,22 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   placeholder = "Describe your action...",
   className = ""
 }) => {
-  const [actionText, setActionText] = useState('');
-  const [skillCheckResults, setSkillCheckResults] = useState<Array<{
-    skillId: string;
-    skillName: string;
-    success: boolean;
-    current: number;
-    required: number;
-    confidence: number;
-    reasoning: string;
-    requirement: DecisionRequirement;
-  }>>([]);
+  // Form state management using hooks
+  const actionFormState = useFormState({
+    initialData: {
+      actionText: '',
+      skillCheckResults: [] as Array<{
+        skillId: string;
+        skillName: string;
+        success: boolean;
+        current: number;
+        required: number;
+        confidence: number;
+        reasoning: string;
+        requirement: DecisionRequirement;
+      }>
+    }
+  });
   
   // Async state management using new hooks
   const analysisState = useAsyncState();
@@ -99,7 +104,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
   // Analyze skills using AI service
   const analyzeSkills = useCallback(async (text: string) => {
     if (!text.trim()) {
-      setSkillCheckResults([]);
+      actionFormState.updateField('skillCheckResults', []);
       analysisState.clearError();
       return;
     }
@@ -160,33 +165,33 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
     });
 
     if (skillChecks) {
-      setSkillCheckResults(skillChecks);
+      actionFormState.updateField('skillCheckResults', skillChecks);
     } else {
-      setSkillCheckResults([]);
+      actionFormState.updateField('skillCheckResults', []);
     }
-  }, [character, availableSkills, analysisState]);
+  }, [character, availableSkills, analysisState, actionFormState]);
 
   // Debounce the analysis
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      analyzeSkills(actionText);
+      analyzeSkills(actionFormState.data.actionText);
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
-  }, [actionText, analyzeSkills]);
+  }, [actionFormState.data.actionText, analyzeSkills]);
 
   const clear = useCallback(() => {
-    setActionText('');
-    setSkillCheckResults([]);
+    actionFormState.updateField('actionText', '');
+    actionFormState.updateField('skillCheckResults', []);
     analysisState.clearError();
-  }, [analysisState]);
+  }, [analysisState, actionFormState]);
 
   const handleSubmit = () => {
-    if (!actionText.trim()) return;
+    if (!actionFormState.data.actionText.trim()) return;
     
     const result: CustomActionResult = {
-      text: actionText,
-      skillChecks: skillCheckResults.map(result => ({
+      text: actionFormState.data.actionText,
+      skillChecks: actionFormState.data.skillCheckResults.map(result => ({
         skillId: result.skillId,
         skillName: result.skillName,
         success: result.success,
@@ -212,8 +217,8 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
     <div className={`space-y-3 ${className}`}>
       <div className="space-y-2">
         <Textarea
-          value={actionText}
-          onChange={(e) => setActionText(e.target.value)}
+          value={actionFormState.data.actionText}
+          onChange={(e) => actionFormState.updateField('actionText', e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder={placeholder}
           className="min-h-[80px] resize-vertical"
@@ -236,11 +241,11 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         )}
 
         {/* Display skill check previews */}
-        {skillCheckResults.length > 0 && !analysisState.isLoading && (
+        {actionFormState.data.skillCheckResults.length > 0 && !analysisState.isLoading && (
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
               <span className="text-sm text-gray-600 font-medium">Detected Skills:</span>
-              {skillCheckResults.map((result, index) => {
+              {actionFormState.data.skillCheckResults.map((result, index) => {
                 const operatorSuffix = result.requirement.operator === 'gte' ? '+' : '';
                 const label = `${result.skillName} ${result.requirement.value}${operatorSuffix}`;
                 const variant = result.success ? 'available' : 'unavailable';
@@ -257,9 +262,9 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
               })}
             </div>
             {/* Show AI reasoning for the first detected skill */}
-            {skillCheckResults.length > 0 && skillCheckResults[0].reasoning && (
+            {actionFormState.data.skillCheckResults.length > 0 && actionFormState.data.skillCheckResults[0].reasoning && (
               <div className="text-xs text-gray-500 italic">
-                AI detected: {skillCheckResults[0].reasoning}
+                AI detected: {actionFormState.data.skillCheckResults[0].reasoning}
               </div>
             )}
           </div>
@@ -268,7 +273,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
       
       <Button 
         onClick={handleSubmit}
-        disabled={!actionText.trim()}
+        disabled={!actionFormState.data.actionText.trim()}
         className="w-full"
       >
         Submit Action

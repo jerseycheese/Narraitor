@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -7,7 +7,7 @@ import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 import WorldImageForm from '@/components/forms/WorldImageForm';
-import { useAsyncState } from '@/hooks';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface WorldEditorProps {
   worldId: string;
@@ -15,7 +15,13 @@ interface WorldEditorProps {
 
 const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const router = useRouter();
-  const [world, setWorld] = useState<World | null>(null);
+  
+  // Form state management using hooks
+  const worldFormState = useFormState({
+    initialData: {
+      world: null as World | null
+    }
+  });
   
   // Async state management using new hooks
   const loadingState = useAsyncState<World>();
@@ -31,7 +37,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         throw new Error('World not found');
       }
       
-      setWorld(worldData);
+      worldFormState.updateField('world', worldData);
       return worldData;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,11 +45,11 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   
   // Handle saving all world changes
   const handleSave = async () => {
-    if (!world) return;
+    if (!worldFormState.data.world) return;
     
     await saveState.execute(async () => {
       const { updateWorld } = useWorldStore.getState();
-      updateWorld(worldId, world);
+      updateWorld(worldId, worldFormState.data.world!);
       
       // Small delay to show save state
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -59,8 +65,8 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   
   // Update world state when form sections change
   const handleWorldChange = (updates: Partial<World>) => {
-    if (!world) return;
-    setWorld({ ...world, ...updates });
+    if (!worldFormState.data.world) return;
+    worldFormState.updateField('world', { ...worldFormState.data.world, ...updates });
   };
   
   if (loadingState.isLoading) {
@@ -71,7 +77,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     );
   }
   
-  if (loadingState.error || !world) {
+  if (loadingState.error || !worldFormState.data.world) {
     return (
       <div className="p-4">
         <div className="text-red-600">{loadingState.error || 'World not found'}</div>
@@ -88,33 +94,33 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   return (
     <div className="space-y-8">
       <WorldBasicInfoForm 
-        world={world} 
+        world={worldFormState.data.world} 
         onChange={handleWorldChange} 
       />
       
       <WorldImageForm
-        world={world}
+        world={worldFormState.data.world}
         onChange={handleWorldChange}
       />
       
       <WorldAttributesForm 
-        attributes={world.attributes} 
-        skills={world.skills}
+        attributes={worldFormState.data.world.attributes} 
+        skills={worldFormState.data.world.skills}
         worldId={worldId} 
-        maxAttributes={world.settings.maxAttributes}
+        maxAttributes={worldFormState.data.world.settings.maxAttributes}
         onChange={(attributes) => handleWorldChange({ attributes })} 
       />
       
       <WorldSkillsForm 
-        skills={world.skills} 
-        attributes={world.attributes} 
+        skills={worldFormState.data.world.skills} 
+        attributes={worldFormState.data.world.attributes} 
         worldId={worldId} 
         onChange={(skills) => handleWorldChange({ skills })} 
       />
       
       <WorldSettingsForm 
-        settings={world.settings} 
-        toneSettings={world.toneSettings}
+        settings={worldFormState.data.world.settings} 
+        toneSettings={worldFormState.data.world.toneSettings}
         onChange={(settings) => handleWorldChange({ settings })} 
         onToneSettingsChange={(toneSettings) => handleWorldChange({ toneSettings })}
       />
