@@ -29,6 +29,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { DecisionRequirement } from '@/types/narrative.types';
+import { useAsyncState } from '@/hooks';
 
 // Local character type definition that matches the actual store structure
 // to avoid type mismatches with the main Character type
@@ -82,8 +83,9 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
     reasoning: string;
     requirement: DecisionRequirement;
   }>>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  
+  // Async state management using new hooks
+  const analysisState = useAsyncState();
 
   // Convert character skills to the format expected by the AI service
   const availableSkills = useCallback(() => {

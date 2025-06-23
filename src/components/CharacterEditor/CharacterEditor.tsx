@@ -12,6 +12,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
+import { useAsyncState, useModal } from '@/hooks';
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
@@ -22,46 +23,46 @@ interface CharacterEditorProps {
 
 const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const router = useRouter();
+  
+  // Character and world data state
   const [character, setCharacter] = useState<Character | null>(null);
   const [world, setWorld] = useState<World | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [generatingPortrait, setGeneratingPortrait] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Error and loading state management using new hooks
+  const loadingState = useAsyncState<{ character: Character; world: World }>();
+  const saveState = useAsyncState();
+  const portraitState = useAsyncState<string>();
+  
+  // Modal state management
+  const deleteModal = useModal();
   
   // Load character data on mount
   useEffect(() => {
-    try {
+    loadingState.execute(async () => {
       const { characters } = useCharacterStore.getState();
       const characterData = characters[characterId];
       
       if (!characterData) {
-        setError('Character not found');
-        setLoading(false);
-        return;
+        throw new Error('Character not found');
       }
       
       // Load world data for attribute/skill limits
       const { worlds } = useWorldStore.getState();
       const worldData = worlds[characterData.worldId];
-      setWorld(worldData);
       
       setCharacter(characterData);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load character data');
-      setLoading(false);
-      console.error('Error loading character:', err);
-    }
+      setWorld(worldData);
+      
+      return { character: characterData, world: worldData };
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [characterId]);
   
   // Handle saving all character changes
   const handleSave = async () => {
     if (!character) return;
     
-    setSaving(true);
-    try {
+    await saveState.execute(async () => {
       const { updateCharacter } = useCharacterStore.getState();
       updateCharacter(characterId, character);
       
@@ -69,12 +70,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push(`/characters/${characterId}`); // Navigate back to character view
-    } catch (err) {
-      setError('Failed to save character');
-      console.error('Error saving character:', err);
-    } finally {
-      setSaving(false);
-    }
+    });
   };
   
   // Handle canceling edits
@@ -92,8 +88,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const handleGeneratePortrait = async (customDescription?: string) => {
     if (!character || !world) return;
     
-    setGeneratingPortrait(true);
-    try {
+    const newPortrait = await portraitState.execute(async () => {
       // Use the portrait generation API route
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
@@ -148,29 +143,27 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
 
       const { portrait } = await response.json();
-      
+      return portrait;
+    });
+
+    if (newPortrait) {
       // Update character with new portrait
-      setCharacter({ ...character, portrait });
+      setCharacter({ ...character, portrait: newPortrait });
       
       // Also update the character store
-      useCharacterStore.getState().updateCharacter(characterId, { portrait });
-    } catch (error) {
-      console.error('Failed to generate portrait:', error);
-      setError('Failed to generate portrait. Please try again.');
-    } finally {
-      setGeneratingPortrait(false);
+      useCharacterStore.getState().updateCharacter(characterId, { portrait: newPortrait });
     }
   };
   
-  if (loading) {
+  if (loadingState.isLoading) {
     return <LoadingState message="Loading character data..." />;
   }
   
-  if (error || !character || !world) {
+  if (loadingState.error || !character || !world) {
     return (
       <PageError
         title="Character Not Found"
-        message={error || 'The requested character could not be found or loaded.'}
+        message={loadingState.error || 'The requested character could not be found or loaded.'}
         showRetry={true}
         onRetry={() => router.push('/characters')}
       />
@@ -183,7 +176,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       <PortraitSection
         portrait={character.portrait}
         characterName={character.name}
-        generatingPortrait={generatingPortrait}
+        generatingPortrait={portraitState.isLoading}
         onGeneratePortrait={handleGeneratePortrait}
         onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
       />
@@ -259,9 +252,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       {/* Action Buttons */}
       <div className="flex justify-between pt-4 border-t">
         <button 
-          onClick={() => setShowDeleteDialog(true)}
+          onClick={deleteModal.open}
           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
-          disabled={saving}
+          disabled={saveState.isLoading}
         >
           Delete Character
         </button>
@@ -269,16 +262,16 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           <button 
             onClick={handleCancel}
             className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
-            disabled={saving}
+            disabled={saveState.isLoading}
           >
             Cancel
           </button>
           <button 
             onClick={handleSave}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
-            disabled={saving}
+            disabled={saveState.isLoading}
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saveState.isLoading ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -286,8 +279,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       {/* Delete Confirmation Dialog */}
       {character && (
         <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
+          {...deleteModal.modalProps}
           onConfirm={handleDelete}
           title="Delete Character"
           description={`Are you sure you want to delete "${character.name}"? This action cannot be undone.`}
