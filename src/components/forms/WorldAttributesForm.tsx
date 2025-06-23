@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
+import { useModal } from '@/hooks';
 
 // Constants
 const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -45,11 +46,13 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   maxAttributes,
   onChange 
 }) => {
-  // Component state
-  const [editingAttribute, setEditingAttribute] = useState<EntityID | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [attributeToDelete, setAttributeToDelete] = useState<WorldAttribute | null>(null);
+  // Modal state management
+  const createModal = useModal();
+  const deleteModal = useModal();
+  
+  // Component state for editing and deletion
+  const [editingAttribute, setEditingAttribute] = React.useState<EntityID | null>(null);
+  const [attributeToDelete, setAttributeToDelete] = React.useState<WorldAttribute | null>(null);
   
   // Computed values
   const isLimitReached = useMemo(() => 
@@ -63,8 +66,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
    */
   const handleCreateAttribute = useCallback((newAttribute: WorldAttribute) => {
     onChange([...attributes, { ...newAttribute, worldId }]);
-    setShowCreateModal(false);
-  }, [attributes, worldId, onChange]);
+    createModal.close();
+  }, [attributes, worldId, onChange, createModal]);
   
   /**
    * Handles updating an existing attribute and closing the editor
@@ -93,8 +96,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
    */
   const handleDeleteClick = useCallback((attribute: WorldAttribute) => {
     setAttributeToDelete(attribute);
-    setShowDeleteDialog(true);
-  }, []);
+    deleteModal.open();
+  }, [deleteModal]);
   
   /**
    * Gets skills that are linked to a specific attribute
@@ -110,9 +113,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     if (attributeToDelete) {
       handleDeleteAttribute(attributeToDelete.id);
     }
-    setShowDeleteDialog(false);
+    deleteModal.close();
     setAttributeToDelete(null);
-  }, [attributeToDelete, handleDeleteAttribute]);
+  }, [attributeToDelete, handleDeleteAttribute, deleteModal]);
   
   /**
    * Generates the description text for the delete confirmation dialog
@@ -138,7 +141,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         <h2 className="text-xl font-semibold">Attributes</h2>
         <div className="flex flex-col items-end">
           <Button
-            onClick={() => setShowCreateModal(true)}
+            onClick={createModal.open}
             disabled={isLimitReached}
             variant="default"
             size="sm"
@@ -203,14 +206,14 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       )}
       
       {/* Create Modal */}
-      {showCreateModal && (
+      {createModal.isOpen && (
         <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="create-attribute-title">
           <div className={MODAL_CONTENT_CLASSES}>
             <AttributeEditor
               worldId={worldId as EntityID}
               mode="create"
               onSave={handleCreateAttribute}
-              onCancel={() => setShowCreateModal(false)}
+              onCancel={createModal.close}
               existingAttributes={attributes}
               existingSkills={skills}
               maxAttributes={maxAttributes}
@@ -239,9 +242,9 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmationDialog
-        isOpen={showDeleteDialog}
+        {...deleteModal.modalProps}
         onClose={() => {
-          setShowDeleteDialog(false);
+          deleteModal.close();
           setAttributeToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}

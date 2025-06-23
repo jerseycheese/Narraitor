@@ -7,6 +7,7 @@ import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 import WorldImageForm from '@/components/forms/WorldImageForm';
+import { useAsyncState } from '@/hooks';
 
 interface WorldEditorProps {
   worldId: string;
@@ -15,36 +16,32 @@ interface WorldEditorProps {
 const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const router = useRouter();
   const [world, setWorld] = useState<World | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  
+  // Async state management using new hooks
+  const loadingState = useAsyncState<World>();
+  const saveState = useAsyncState();
   
   // Load world data on mount
   useEffect(() => {
-    try {
+    loadingState.execute(async () => {
       const { worlds } = useWorldStore.getState();
       const worldData = worlds[worldId];
       
       if (!worldData) {
-        setError('World not found');
-        setLoading(false);
-        return;
+        throw new Error('World not found');
       }
       
       setWorld(worldData);
-      setLoading(false);
-    } catch {
-      setError('Failed to load world data');
-      setLoading(false);
-    }
+      return worldData;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worldId]);
   
   // Handle saving all world changes
   const handleSave = async () => {
     if (!world) return;
     
-    setSaving(true);
-    try {
+    await saveState.execute(async () => {
       const { updateWorld } = useWorldStore.getState();
       updateWorld(worldId, world);
       
@@ -52,11 +49,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push('/worlds'); // Navigate back to worlds list
-    } catch {
-      setError('Failed to save world');
-    } finally {
-      setSaving(false);
-    }
+    });
   };
   
   // Handle canceling edits
@@ -70,7 +63,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     setWorld({ ...world, ...updates });
   };
   
-  if (loading) {
+  if (loadingState.isLoading) {
     return (
       <div className="flex justify-center items-center p-8">
         <div className="text-lg text-gray-600">Loading world data...</div>
@@ -78,10 +71,10 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     );
   }
   
-  if (error || !world) {
+  if (loadingState.error || !world) {
     return (
       <div className="p-4">
-        <div className="text-red-600">{error || 'World not found'}</div>
+        <div className="text-red-600">{loadingState.error || 'World not found'}</div>
         <button 
           onClick={() => router.push('/worlds')}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -130,16 +123,16 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         <button 
           onClick={handleCancel}
           className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
-          disabled={saving}
+          disabled={saveState.isLoading}
         >
           Cancel
         </button>
         <button 
           onClick={handleSave}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-          disabled={saving}
+          disabled={saveState.isLoading}
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saveState.isLoading ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>
