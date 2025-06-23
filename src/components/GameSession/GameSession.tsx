@@ -13,6 +13,7 @@ import GameSessionError from './GameSessionError';
 import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
 import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { useAsyncState } from '@/hooks';
 
 interface GameSessionProps {
   worldId: string;
@@ -44,19 +45,26 @@ const GameSession: React.FC<GameSessionProps> = ({
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isClient, setIsClient] = useState(false);
+  
+  // Client-side mounting state using hooks
+  const clientMountState = useAsyncState<boolean>();
+  const [hasAutoResumed, setHasAutoResumed] = useState(false);
   
   // Use provided router or real router
   const actualRouter = _router || router;
   
   // Check for auto-resume parameter
   const autoResume = searchParams?.get('autoResume') === 'true';
-  const [hasAutoResumed, setHasAutoResumed] = useState(false);
   
-  // Set isClient to true once component mounts
+  // Set client state once component mounts
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    clientMountState.execute(async () => {
+      // Simulate the client mounting process
+      return true;
+    });
+  }, [clientMountState]);
+  
+  const isClient = clientMountState.data || false;
   
   // Use the custom hook for state management
   const {
@@ -151,12 +159,16 @@ const GameSession: React.FC<GameSessionProps> = ({
     }
   }, [stableSessionId]);
   
-  // Focus management for state transitions
+  // Focus management for state transitions using async state
+  const focusManagementState = useAsyncState<void>();
+  
   useEffect(() => {
     if (!isClient) return;
     
-    // Create a small delay to allow rendering to complete
-    const focusTimeout = setTimeout(() => {
+    focusManagementState.execute(async () => {
+      // Create a small delay to allow rendering to complete
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Handle focus when transitioning from loading to active
       if (prevStatusRef.current === 'loading' && sessionState.status === 'active') {
         // Focus on the first player choice if available
@@ -176,12 +188,8 @@ const GameSession: React.FC<GameSessionProps> = ({
       
       // Update previous status reference
       prevStatusRef.current = sessionState.status ?? 'initializing';
-    }, 50);
-    
-    return () => {
-      clearTimeout(focusTimeout);
-    };
-  }, [sessionState.status, sessionState.error, isClient, prevStatusRef]);
+    });
+  }, [sessionState.status, sessionState.error, isClient, prevStatusRef, focusManagementState]);
   
   // Create a screen reader announcer for important state changes
   useEffect(() => {

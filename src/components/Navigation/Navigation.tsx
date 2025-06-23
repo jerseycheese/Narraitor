@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
@@ -12,6 +12,7 @@ import { RecentPagesDropdown } from './RecentPagesDropdown';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { useModal } from '@/hooks';
 
 /**
  * Navigation - Main application navigation component
@@ -39,7 +40,9 @@ export function Navigation() {
   const { characters } = useCharacterStore();
   const { navigateWithLoading } = useNavigationLoadingContext();
   const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
-  const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
+  
+  // Modal state management for world switcher dropdown
+  const worldSwitcherModal = useModal();
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
@@ -54,19 +57,19 @@ export function Navigation() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowWorldSwitcher(false);
+        worldSwitcherModal.close();
       }
     };
     
-    if (showWorldSwitcher) {
+    if (worldSwitcherModal.isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [showWorldSwitcher]);
+  }, [worldSwitcherModal.isOpen, worldSwitcherModal]);
   
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
-    setShowWorldSwitcher(false);
+    worldSwitcherModal.close();
     // Navigate to the selected world's view page with loading state
     const worldName = worlds[worldId]?.name || 'world';
     navigateWithLoading(`/world/${worldId}`, `Loading ${worldName}...`);
@@ -144,7 +147,7 @@ export function Navigation() {
               {Object.keys(worlds).length > 0 && (
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
+                    onClick={worldSwitcherModal.toggle}
                     className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +166,7 @@ export function Navigation() {
                     </svg>
                   </button>
                   
-                  {showWorldSwitcher && (
+                  {worldSwitcherModal.isOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto">
                       {Object.values(worlds).map(world => {
                         const worldCharacters = Object.values(characters).filter(
@@ -195,7 +198,7 @@ export function Navigation() {
                         <Link
                           href="/worlds"
                           className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-blue-600 hover:text-blue-700"
-                          onClick={() => setShowWorldSwitcher(false)}
+                          onClick={worldSwitcherModal.close}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
