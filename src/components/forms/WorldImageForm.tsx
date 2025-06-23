@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { World, WorldImage } from '@/types/world.types';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
+import { useAsyncState } from '@/hooks';
 
 interface WorldImageFormProps {
   world: World;
@@ -11,22 +12,19 @@ interface WorldImageFormProps {
 }
 
 const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
+  // Async state management using hooks
+  const imageGenerationState = useAsyncState<WorldImage>();
 
   const handleGenerateImage = async (customPrompt?: string) => {
-    setIsGenerating(true);
-
-    try {
+    const image = await imageGenerationState.execute(async () => {
       const aiClient = createAIClient();
       const imageGenerator = new WorldImageGenerator(aiClient);
       
-      const image = await imageGenerator.generateWorldImage(world, customPrompt);
-      
+      return await imageGenerator.generateWorldImage(world, customPrompt);
+    });
+
+    if (image) {
       onChange({ image });
-    } catch (err) {
-      throw err; // Let ImageGenerationSection handle the error display
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -48,7 +46,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       currentImageType={world.image?.type}
       generatedAt={world.image?.generatedAt}
       currentPrompt={world.image?.prompt}
-      isGenerating={isGenerating}
+      isGenerating={imageGenerationState.isLoading}
       onGenerate={handleGenerateImage}
       onRemove={handleRemoveImage}
       customPromptLabel="Customize description for world image generation"

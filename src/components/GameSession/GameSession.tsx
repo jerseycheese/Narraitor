@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
 import { useSessionStore } from '@/state/sessionStore';
@@ -13,7 +13,7 @@ import GameSessionError from './GameSessionError';
 import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
 import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
-import { useAsyncState } from '@/hooks';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface GameSessionProps {
   worldId: string;
@@ -48,7 +48,13 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Client-side mounting state using hooks
   const clientMountState = useAsyncState<boolean>();
-  const [hasAutoResumed, setHasAutoResumed] = useState(false);
+  
+  // Session state management using hooks
+  const gameSessionState = useFormState({
+    initialData: {
+      hasAutoResumed: false
+    }
+  });
   
   // Use provided router or real router
   const actualRouter = _router || router;
@@ -256,11 +262,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Handle auto-resume - MUST be before any conditional returns
   useEffect(() => {
-    if (autoResume && savedSession && !hasAutoResumed && isClient && sessionState.status === 'initializing' && !disableAutoResume) {
-      setHasAutoResumed(true);
+    if (autoResume && savedSession && !gameSessionState.data.hasAutoResumed && isClient && sessionState.status === 'initializing' && !disableAutoResume) {
+      gameSessionState.updateField('hasAutoResumed', true);
       handleResumeSession();
     }
-  }, [autoResume, savedSession, hasAutoResumed, isClient, sessionState.status, handleResumeSession, disableAutoResume]);
+  }, [autoResume, savedSession, gameSessionState.data.hasAutoResumed, isClient, sessionState.status, handleResumeSession, disableAutoResume, gameSessionState]);
   
   // For server-side rendering and initial client render, show a simple loading state
   if (!isClient) {
@@ -288,7 +294,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     // Check if there's a saved session to resume
     if (savedSession && !sessionState.id) {
       // Show loading if auto-resuming
-      if (autoResume && (hasAutoResumed || !isClient)) {
+      if (autoResume && (gameSessionState.data.hasAutoResumed || !isClient)) {
         return <GameSessionLoading />;
       }
       
