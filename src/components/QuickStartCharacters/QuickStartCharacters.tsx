@@ -45,6 +45,11 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Unable to generate character options: ${errorMessage}`);
       console.error('Failed to generate archetypes:', err);
+      console.error('Error details:', {
+        error: err,
+        message: errorMessage,
+        stack: err instanceof Error ? err.stack : undefined
+      });
       console.error('World data:', world);
       console.error('Existing names:', existingCharacterNames);
     } finally {
