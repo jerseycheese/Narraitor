@@ -38,11 +38,11 @@ describe('Journal Store Persistence', () => {
       updatedAt: new Date().toISOString()
     });
 
-    // Verify entries were created
+    // Verify entries were created (newest first due to chronological sorting)
     const entriesBeforePersist = getSessionEntries('session-1');
     expect(entriesBeforePersist).toHaveLength(2);
-    expect(entriesBeforePersist[0].content).toBe('Test journal entry 1');
-    expect(entriesBeforePersist[1].content).toBe('Test journal entry 2');
+    expect(entriesBeforePersist[0].content).toBe('Test journal entry 2'); // newest first
+    expect(entriesBeforePersist[1].content).toBe('Test journal entry 1');
     
     // Wait for persistence (zustand persist happens asynchronously)
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -53,10 +53,10 @@ describe('Journal Store Persistence', () => {
     
     // Verify entries persisted
     expect(entriesAfterPersist).toHaveLength(2);
-    expect(entriesAfterPersist[0].id).toBe(entryId1);
-    expect(entriesAfterPersist[1].id).toBe(entryId2);
-    expect(entriesAfterPersist[0].content).toBe('Test journal entry 1');
-    expect(entriesAfterPersist[1].content).toBe('Test journal entry 2');
+    expect(entriesAfterPersist[0].id).toBe(entryId2); // newest first
+    expect(entriesAfterPersist[1].id).toBe(entryId1);
+    expect(entriesAfterPersist[0].content).toBe('Test journal entry 2');
+    expect(entriesAfterPersist[1].content).toBe('Test journal entry 1');
   });
 
   it('should not require titles for journal entries', () => {

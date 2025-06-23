@@ -1,5 +1,4 @@
 import { useJournalStore } from '../journalStore';
-import { JournalEntryType } from '../../types/journal.types';
 
 describe('journalStore', () => {
   beforeEach(() => {
