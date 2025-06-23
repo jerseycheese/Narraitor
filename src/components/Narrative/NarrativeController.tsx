@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { NarrativeHistory } from './NarrativeHistory';
 import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
-import { useAsyncState } from '@/hooks';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -31,9 +31,17 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   className,
   generateChoices = true
 }) => {
-  const [segments, setSegments] = useState<NarrativeSegment[]>([]);
+  // Form state for narrative session management using hooks
+  const narrativeSessionState = useFormState({
+    initialData: {
+      segments: [] as NarrativeSegment[],
+      sessionKey: '',
+      initialGenerationCompleted: false,
+      processedChoices: new Set<string>()
+    }
+  });
   
-  // Async state management using new hooks
+  // Async state management using hooks
   const narrativeGenerationState = useAsyncState<NarrativeSegment>();
   const choiceGenerationState = useAsyncState<Decision>();
   
@@ -41,11 +49,6 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   const addSegment = useNarrativeStore(state => state.addSegment);
   const getSessionSegments = useNarrativeStore(state => state.getSessionSegments);
   const narrativeGenerator = useMemo(() => new NarrativeGenerator(createDefaultGeminiClient()), []);
-
-  // Track if we've already generated a narrative for this session
-  const [sessionKey, setSessionKey] = useState('');
-  const [initialGenerationCompleted, setInitialGenerationCompleted] = useState(false);
-  const [processedChoices, setProcessedChoices] = useState<Set<string>>(new Set());
   const mountedRef = useRef(false);
   const generateCount = useRef(0);
   // Use a ref to track if we've initiated generation in this component instance
@@ -59,19 +62,19 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
   useEffect(() => {
     // Create a unique session key to track this instance
     const instanceKey = `${sessionId}-${Date.now()}`;
-    setSessionKey(instanceKey);
+    narrativeSessionState.updateField('sessionKey', instanceKey);
     
     // Initialize controller for the session
     
     // Reset state when session changes
-    setProcessedChoices(new Set());
+    narrativeSessionState.updateField('processedChoices', new Set<string>());
     narrativeGenerationState.clearError();
     choiceGenerationState.clearError();
     generateCount.current = 0;
     
     // Load segments for the current session
     const existingSegments = getSessionSegments(sessionId);
-    setSegments(existingSegments);
+    narrativeSessionState.updateField('segments', existingSegments);
     
     // Check if we already have an initial scene - more precise than just checking if any segments exist
     const hasInitialScene = existingSegments.some(segment => 
@@ -80,7 +83,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     
     // Critical: mark initial generation as completed if we already have an initial scene
     // This MUST be done before any effect that might trigger generation
-    setInitialGenerationCompleted(hasInitialScene);
+    narrativeSessionState.updateField('initialGenerationCompleted', hasInitialScene);
     
     if (hasInitialScene) {
       initialGenerationInitiated.current = true; // Prevent any attempt to generate an initial scene
@@ -95,7 +98,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
-  }, [sessionId, getSessionSegments]);
+  }, [sessionId, getSessionSegments, narrativeSessionState]);
 
   /**
    * Pure AI-based ending detection - analyzes narrative context for natural conclusions
@@ -144,7 +147,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
     if (endingSuggestedRef.current || !onEndingSuggested) return;
     
     // Skip if we don't have enough narrative context (less than 3 segments)
-    const allSegments = [...segments, newSegment];
+    const allSegments = [...narrativeSessionState.data.segments, newSegment];
     if (allSegments.length < 3) return;
     
     try {
@@ -235,6 +238,7 @@ Respond with JSON format:
 
   // Deduplicate segments by ID to ensure we don't have duplicates in localStorage
   useEffect(() => {
+    const segments = narrativeSessionState.data.segments;
     if (segments.length > 0) {
       // Check for duplicates
       const ids = new Set();
@@ -257,10 +261,10 @@ Respond with JSON format:
         }
         
         // Update local state with deduplicated segments
-        setSegments(uniqueSegments);
+        narrativeSessionState.updateField('segments', uniqueSegments);
       }
     }
-  }, [segments, sessionKey]);
+  }, [narrativeSessionState.data.segments, narrativeSessionState.data.sessionKey, narrativeSessionState]);
 
   // Primary generation effect
   useEffect(() => {
@@ -269,10 +273,14 @@ Respond with JSON format:
     
     // Generate narrative when triggered
     if (triggerGeneration && !narrativeGenerationState.isLoading) {
+      const segments = narrativeSessionState.data.segments;
+      const initialGenerationCompleted = narrativeSessionState.data.initialGenerationCompleted;
+      const processedChoices = narrativeSessionState.data.processedChoices;
+      
       // Initial narrative generation (only if we have no segments and haven't generated one yet)
       if (segments.length === 0 && !initialGenerationCompleted && !initialGenerationInitiated.current) {
         // Set both state and refs to prevent duplicate generation
-        setInitialGenerationCompleted(true);
+        narrativeSessionState.updateField('initialGenerationCompleted', true);
         initialGenerationInitiated.current = true;
         
         generateCount.current += 1;
@@ -282,11 +290,9 @@ Respond with JSON format:
       else if (choiceId && !processedChoices.has(choiceId)) {
         // Mark this choice as processed BEFORE generating
         // This prevents multiple generations from triggering
-        setProcessedChoices(prev => {
-          const updated = new Set(prev);
-          updated.add(choiceId);
-          return updated;
-        });
+        const updatedChoices = new Set(processedChoices);
+        updatedChoices.add(choiceId);
+        narrativeSessionState.updateField('processedChoices', updatedChoices);
         
         generateCount.current += 1;
         generateNextSegment(choiceId);
@@ -295,7 +301,7 @@ Respond with JSON format:
       // (No action needed for other cases)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [triggerGeneration, choiceId, segments.length, narrativeGenerationState.isLoading, sessionId, sessionKey]);
+  }, [triggerGeneration, choiceId, narrativeSessionState.data.segments.length, narrativeGenerationState.isLoading, sessionId, narrativeSessionState.data.sessionKey, narrativeSessionState]);
 
   /**
    * Generate player choices based on current narrative context
@@ -462,7 +468,7 @@ Respond with JSON format:
     
     // If we have ANY segments, this is a resumed session - don't generate initial narrative
     if (hasAnySegments) {
-      setInitialGenerationCompleted(true);
+      narrativeSessionState.updateField('initialGenerationCompleted', true);
       return;
     }
     
@@ -504,7 +510,7 @@ Respond with JSON format:
     };
     
     // Add to local state
-    setSegments(prev => [...prev, newSegment]);
+    narrativeSessionState.updateField('segments', [...narrativeSessionState.data.segments, newSegment]);
     
     // Add to store
     addSegment(sessionId, {
@@ -533,6 +539,7 @@ Respond with JSON format:
   };
 
   const generateNextSegment = async (triggeringChoiceId: string) => {
+    const segments = narrativeSessionState.data.segments;
     
     if (segments.length === 0) {
       return;
@@ -608,7 +615,7 @@ Respond with JSON format:
     };
     
     // Add to local state
-    setSegments(prev => [...prev, newSegment]);
+    narrativeSessionState.updateField('segments', [...narrativeSessionState.data.segments, newSegment]);
     
     // Add to store
     addSegment(sessionId, {
@@ -647,16 +654,17 @@ Respond with JSON format:
     narrativeGenerationState.clearError();
     choiceGenerationState.clearError();
     
+    const segments = narrativeSessionState.data.segments;
+    const processedChoices = narrativeSessionState.data.processedChoices;
+    
     // If we have no segments, retry initial generation
     if (segments.length === 0) {
       generateInitialNarrative();
     } else if (choiceId && processedChoices.has(choiceId)) {
       // If we were trying to generate from a choice, remove it from processed and retry
-      setProcessedChoices(prev => {
-        const updated = new Set(prev);
-        updated.delete(choiceId);
-        return updated;
-      });
+      const updatedChoices = new Set(processedChoices);
+      updatedChoices.delete(choiceId);
+      narrativeSessionState.updateField('processedChoices', updatedChoices);
       generateNextSegment(choiceId);
     }
   };
@@ -664,7 +672,7 @@ Respond with JSON format:
   return (
     <div className={`narrative-controller ${className || ''}`}>
       <NarrativeHistory 
-        segments={segments}
+        segments={narrativeSessionState.data.segments}
         isLoading={narrativeGenerationState.isLoading || choiceGenerationState.isLoading}
         error={narrativeGenerationState.error || choiceGenerationState.error || undefined}
         onRetry={handleRetry}

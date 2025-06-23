@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { World } from '@/types/world.types';
 import { 
   CharacterArchetype, 
@@ -17,7 +17,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
-import { useAsyncState } from '@/hooks';
+import { useAsyncState, useFormState } from '@/hooks';
 
 const SELECTION_DELAY_MS = 300;
 
@@ -34,8 +34,13 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   onCustomizeClick,
   existingCharacterNames = []
 }: QuickStartCharactersProps) {
-  const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
-  const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
+  // Form state management using hooks
+  const quickStartFormState = useFormState({
+    initialData: {
+      archetypes: [] as CharacterArchetype[],
+      selectedArchetype: null as string | null
+    }
+  });
   
   // Async state management using new hooks
   const archetypeGenerationState = useAsyncState<CharacterArchetype[]>();
@@ -48,16 +53,16 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     });
 
     if (generated) {
-      setArchetypes(generated);
+      quickStartFormState.updateField('archetypes', generated);
     }
-  }, [world, existingCharacterNames, archetypeGenerationState]);
+  }, [world, existingCharacterNames, archetypeGenerationState, quickStartFormState]);
 
   useEffect(() => {
     generateArchetypes();
   }, [generateArchetypes]);
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
-    setSelectedArchetype(archetype.id);
+    quickStartFormState.updateField('selectedArchetype', archetype.id);
     // Small delay to show selection state before proceeding
     setTimeout(() => {
       onCharacterSelect(archetype);
@@ -74,7 +79,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }
   };
 
-  if (archetypeGenerationState.isLoading && archetypes.length === 0) {
+  if (archetypeGenerationState.isLoading && quickStartFormState.data.archetypes.length === 0) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-8">
@@ -131,10 +136,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
         data-testid="archetypes-grid"
       >
-        {archetypes.map((archetype) => (
+        {quickStartFormState.data.archetypes.map((archetype) => (
           <ActiveStateCard
             key={archetype.id}
-            isActive={selectedArchetype === archetype.id}
+            isActive={quickStartFormState.data.selectedArchetype === archetype.id}
             activeText="Selected Character"
             onClick={() => handleArchetypeSelect(archetype)}
             activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400"
@@ -213,9 +218,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                   e.stopPropagation();
                   handleArchetypeSelect(archetype);
                 }}
-                disabled={archetypeGenerationState.isLoading || randomGenerationState.isLoading || selectedArchetype === archetype.id}
+                disabled={archetypeGenerationState.isLoading || randomGenerationState.isLoading || quickStartFormState.data.selectedArchetype === archetype.id}
               >
-                {selectedArchetype === archetype.id ? (
+                {quickStartFormState.data.selectedArchetype === archetype.id ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Starting Game...

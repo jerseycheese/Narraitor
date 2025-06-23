@@ -4,7 +4,7 @@ import { EntityID } from '@/types/common.types';
 import { AttributeEditor } from '@/components/world/AttributeEditor';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Button } from '@/components/ui/button';
-import { useModal } from '@/hooks';
+import { useModal, useFormState } from '@/hooks';
 
 // Constants
 const MODAL_CLASSES = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
@@ -50,9 +50,13 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   const createModal = useModal();
   const deleteModal = useModal();
   
-  // Component state for editing and deletion
-  const [editingAttribute, setEditingAttribute] = React.useState<EntityID | null>(null);
-  const [attributeToDelete, setAttributeToDelete] = React.useState<WorldAttribute | null>(null);
+  // Form state management using hooks
+  const formState = useFormState({
+    initialData: {
+      editingAttribute: null as EntityID | null,
+      attributeToDelete: null as WorldAttribute | null
+    }
+  });
   
   // Computed values
   const isLimitReached = useMemo(() => 
@@ -79,8 +83,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       updatedAttributes[index] = { ...updatedAttribute, worldId };
       onChange(updatedAttributes);
     }
-    setEditingAttribute(null);
-  }, [attributes, worldId, onChange]);
+    formState.updateField('editingAttribute', null);
+  }, [attributes, worldId, onChange, formState]);
   
   /**
    * Handles deleting an attribute by ID
@@ -88,16 +92,16 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
   const handleDeleteAttribute = useCallback((attributeId: EntityID) => {
     const updatedAttributes = attributes.filter(attr => attr.id !== attributeId);
     onChange(updatedAttributes);
-    setEditingAttribute(null);
-  }, [attributes, onChange]);
+    formState.updateField('editingAttribute', null);
+  }, [attributes, onChange, formState]);
   
   /**
    * Initiates delete process by showing confirmation dialog
    */
   const handleDeleteClick = useCallback((attribute: WorldAttribute) => {
-    setAttributeToDelete(attribute);
+    formState.updateField('attributeToDelete', attribute);
     deleteModal.open();
-  }, [deleteModal]);
+  }, [deleteModal, formState]);
   
   /**
    * Gets skills that are linked to a specific attribute
@@ -110,22 +114,22 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
    * Confirms deletion and cleans up dialog state
    */
   const handleDeleteConfirm = useCallback(() => {
-    if (attributeToDelete) {
-      handleDeleteAttribute(attributeToDelete.id);
+    if (formState.data.attributeToDelete) {
+      handleDeleteAttribute(formState.data.attributeToDelete.id);
     }
     deleteModal.close();
-    setAttributeToDelete(null);
-  }, [attributeToDelete, handleDeleteAttribute, deleteModal]);
+    formState.updateField('attributeToDelete', null);
+  }, [formState.data.attributeToDelete, handleDeleteAttribute, deleteModal, formState]);
   
   /**
    * Generates the description text for the delete confirmation dialog
    */
   const deleteDescription = useMemo(() => {
-    if (!attributeToDelete) {
+    if (!formState.data.attributeToDelete) {
       return "Are you sure you want to delete this attribute? This action cannot be undone.";
     }
     
-    const linkedSkills = getLinkedSkills(attributeToDelete.id);
+    const linkedSkills = getLinkedSkills(formState.data.attributeToDelete.id);
     if (linkedSkills.length === 0) {
       return "Are you sure you want to delete this attribute? This action cannot be undone.";
     }
@@ -133,7 +137,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     const skillNames = linkedSkills.map(s => s.name).join(', ');
     const skillText = linkedSkills.length > 1 ? 's' : '';
     return `WARNING: This attribute is linked to ${linkedSkills.length} skill${skillText}: ${skillNames}. Deleting this attribute will affect these skills. This action cannot be undone.`;
-  }, [attributeToDelete, getLinkedSkills]);
+  }, [formState.data.attributeToDelete, getLinkedSkills]);
   
   return (
     <section className="p-4 bg-white rounded shadow">
@@ -171,7 +175,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
                 <h3 className="font-medium">{attribute.name}</h3>
                 <div className="flex gap-2">
                   <Button
-                    onClick={() => setEditingAttribute(attribute.id)}
+                    onClick={() => formState.updateField('editingAttribute', attribute.id)}
                     variant="ghost"
                     size="sm"
                   >
@@ -223,16 +227,16 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
       )}
       
       {/* Edit Modal */}
-      {editingAttribute && (
+      {formState.data.editingAttribute && (
         <div className={MODAL_CLASSES} role="dialog" aria-modal="true" aria-labelledby="edit-attribute-title">
           <div className={MODAL_CONTENT_CLASSES}>
             <AttributeEditor
               worldId={worldId as EntityID}
               mode="edit"
-              attributeId={editingAttribute}
+              attributeId={formState.data.editingAttribute}
               onSave={handleSaveAttribute}
               onDelete={handleDeleteAttribute}
-              onCancel={() => setEditingAttribute(null)}
+              onCancel={() => formState.updateField('editingAttribute', null)}
               existingAttributes={attributes}
               existingSkills={skills}
             />
@@ -245,12 +249,12 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         {...deleteModal.modalProps}
         onClose={() => {
           deleteModal.close();
-          setAttributeToDelete(null);
+          formState.updateField('attributeToDelete', null);
         }}
         onConfirm={handleDeleteConfirm}
         title="Delete Attribute"
         description={deleteDescription}
-        itemName={attributeToDelete?.name || 'this attribute'}
+        itemName={formState.data.attributeToDelete?.name || 'this attribute'}
         confirmButtonText="Delete Attribute"
         cancelButtonText="Cancel"
       />
