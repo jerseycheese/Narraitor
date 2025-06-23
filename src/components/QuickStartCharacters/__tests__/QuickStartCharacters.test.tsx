@@ -178,11 +178,11 @@ describe('QuickStartCharacters', () => {
       });
     });
 
-    test('calls onCharacterSelect with random archetype when Random Character is clicked', async () => {
+    test('calls onCharacterSelect with random archetype when Generate New Random Character is clicked', async () => {
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
-        const randomButton = screen.getByText('Random Character');
+        const randomButton = screen.getByText('Generate New Random Character');
         fireEvent.click(randomButton);
       });
       
@@ -198,11 +198,11 @@ describe('QuickStartCharacters', () => {
       });
     });
 
-    test('calls onCustomizeClick when Customize Character button is clicked', async () => {
+    test('calls onCustomizeClick when Create Custom Character button is clicked', async () => {
       render(<QuickStartCharacters {...defaultProps} />);
       
       await waitFor(() => {
-        const customizeButton = screen.getByText('Customize Character');
+        const customizeButton = screen.getByText('Create Custom Character');
         fireEvent.click(customizeButton);
       });
       
