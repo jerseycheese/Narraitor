@@ -1,8 +1,9 @@
 #!/bin/bash
 # Narraitor Worktree Helper Script
 
-NARRAITOR_MAIN="/Users/jackhaas/Projects/narraitor"
-WORKTREE_DIR="/Users/jackhaas/Projects/narraitor-worktrees"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKTREE_DIR="${NARRAITOR_MAIN}-worktrees"
 
 # Source color functions if available
 if [ -f "$NARRAITOR_MAIN/scripts/utils/colors.sh" ]; then
