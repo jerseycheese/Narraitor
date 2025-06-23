@@ -159,7 +159,10 @@ export const useJournalStore = create<JournalStore>()(
   getSessionEntries: (sessionId) => {
     const state = get();
     const entryIds = state.sessionEntries[sessionId] || [];
-    return entryIds.map((id) => state.entries[id]).filter(Boolean);
+    return entryIds
+      .map((id) => state.entries[id])
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
   // Get entries by type
