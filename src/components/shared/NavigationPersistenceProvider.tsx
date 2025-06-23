@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigationPersistence } from '@/hooks/useNavigationPersistence';
+import { useFormState } from '@/hooks';
 import Logger from '@/lib/utils/logger';
 
 /**
@@ -24,7 +25,12 @@ interface NavigationPersistenceProviderProps {
  * - Manages navigation state persistence across browser sessions
  */
 export function NavigationPersistenceProvider({ children }: NavigationPersistenceProviderProps) {
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Navigation state management using hooks
+  const navigationState = useFormState({
+    initialData: {
+      isInitialized: false
+    }
+  });
   const { isHydrated } = useNavigationPersistence();
 
   /**
@@ -34,11 +40,11 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
    * the navigation store has been properly hydrated from storage.
    */
   useEffect(() => {
-    if (isHydrated && !isInitialized) {
+    if (isHydrated && !navigationState.data.isInitialized) {
       logger.debug('Navigation persistence initialized');
-      setIsInitialized(true);
+      navigationState.updateField('isInitialized', true);
     }
-  }, [isHydrated, isInitialized]);
+  }, [isHydrated, navigationState.data.isInitialized, navigationState]);
 
   /**
    * Safety timeout to prevent stuck loading states
@@ -49,18 +55,18 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
    */
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (!isInitialized) {
+      if (!navigationState.data.isInitialized) {
         logger.warn('Navigation initialization timed out, forcing initialization');
-        setIsInitialized(true);
+        navigationState.updateField('isInitialized', true);
       }
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [isInitialized]);
+  }, [navigationState.data.isInitialized, navigationState]);
 
   // Show loading state until navigation is fully hydrated
   // This prevents flash of incorrect navigation state
-  if (!isInitialized) {
+  if (!navigationState.data.isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-sm text-gray-600">
