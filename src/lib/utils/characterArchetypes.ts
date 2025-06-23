@@ -264,6 +264,79 @@ export function getArchetypeTemplatesForGenre(genre: GenreValue): ArchetypeTempl
         }
       ];
 
+    case 'western':
+      return [
+        {
+          name: 'Gunslinger',
+          description: 'A skilled marksman and quick-draw artist',
+          primaryAttributes: ['Agility', 'Dexterity', 'Perception'],
+          secondaryAttributes: ['Constitution', 'Charisma'],
+          preferredSkills: ['Shooting', 'Quick Draw', 'Intimidation', 'Survival'],
+          personalities: [
+            'Cool and calculated, never loses composure',
+            'Independent and self-reliant, trusts only themselves',
+            'Honorable and fair, believes in a code of conduct'
+          ],
+          motivations: [
+            'To prove they are the fastest gun in the west',
+            'To protect the innocent from outlaws',
+            'To uphold justice in lawless lands'
+          ],
+          fears: [
+            ['Being outdraw', 'Losing their edge'],
+            ['Innocent casualties', 'Collateral damage'],
+            ['Becoming like the outlaws they hunt', 'Losing their code']
+          ],
+          nameTemplates: ['Colt', 'Jesse', 'Wyatt', 'Doc', 'Belle', 'Cassidy']
+        },
+        {
+          name: 'Sheriff',
+          description: 'A lawman dedicated to keeping the peace',
+          primaryAttributes: ['Constitution', 'Charisma', 'Wisdom'],
+          secondaryAttributes: ['Strength', 'Intelligence'],
+          preferredSkills: ['Law Enforcement', 'Leadership', 'Investigation', 'Negotiation'],
+          personalities: [
+            'Steadfast and reliable, stands firm for justice',
+            'Diplomatic and fair, seeks peaceful solutions',
+            'Brave and protective, puts others before themselves'
+          ],
+          motivations: [
+            'To bring law and order to frontier towns',
+            'To protect citizens from dangerous criminals',
+            'To be a beacon of justice in the wilderness'
+          ],
+          fears: [
+            ['Failing to protect the town', 'Innocent deaths'],
+            ['Corruption', 'Becoming what they fight against'],
+            ['Overwhelming criminal forces', 'Being outnumbered']
+          ],
+          nameTemplates: ['Marshal', 'Buck', 'Clay', 'Ruth', 'Jake', 'Liberty']
+        },
+        {
+          name: 'Cowboy',
+          description: 'A cattle herder and horseman of the open range',
+          primaryAttributes: ['Constitution', 'Strength', 'Survival'],
+          secondaryAttributes: ['Agility', 'Perception'],
+          preferredSkills: ['Riding', 'Animal Handling', 'Survival', 'Roping'],
+          personalities: [
+            'Rugged and independent, thrives in the wilderness',
+            'Loyal and hardworking, values honest labor',
+            'Free-spirited and adventurous, loves the open range'
+          ],
+          motivations: [
+            'To live free under the open sky',
+            'To build something lasting on the frontier',
+            'To protect their herd and livelihood'
+          ],
+          fears: [
+            ['Being fenced in', 'Loss of freedom'],
+            ['Rustlers and bandits', 'Losing their cattle'],
+            ['Drought and hardship', 'Natural disasters']
+          ],
+          nameTemplates: ['Tex', 'Dusty', 'Bronco', 'Sage', 'Maverick', 'Dakota']
+        }
+      ];
+
     default:
       // Generic archetypes for unknown genres
       return [
@@ -530,6 +603,9 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
     'Detective': ['observant', 'weathered', 'sharp-eyed', 'experienced'],
     'Athlete': ['powerful', 'toned', 'graceful', 'energetic'],
     'Scholar': ['thoughtful', 'bookish', 'contemplative', 'wise'],
+    'Gunslinger': ['lean', 'quick', 'sharp-eyed', 'weathered'],
+    'Sheriff': ['sturdy', 'commanding', 'reliable', 'authoritative'],
+    'Cowboy': ['rugged', 'sun-weathered', 'tough', 'hardy'],
     'Balanced': ['average', 'well-proportioned', 'approachable', 'steady'],
     'Specialist': ['focused', 'intense', 'precise', 'dedicated'],
     'Versatile': ['adaptable', 'dynamic', 'expressive', 'changeable']
@@ -542,6 +618,8 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
     ? ['piercing eyes', 'weathered hands', 'distinctive scars', 'noble bearing']
     : genre === 'sci-fi'
     ? ['cybernetic implants', 'radiation-resistant skin', 'zero-g adapted build', 'tech-enhanced features']
+    : genre === 'western'
+    ? ['sun-weathered skin', 'calloused hands', 'steely gaze', 'worn leather boots']
     : ['expressive eyes', 'confident posture', 'street-smart appearance', 'modern style'];
   
   const selectedFeature = features[Math.floor(Math.random() * features.length)];

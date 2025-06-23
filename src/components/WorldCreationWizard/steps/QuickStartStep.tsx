@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { World } from '@/types/world.types';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
@@ -98,13 +98,11 @@ export default function QuickStartStep({
     onCustomizeCharacter();
   };
 
+  // Fix infinite loop by using a stable selector pattern
   const existingCharacterNames = useCharacterStore(
-    useMemo(
-      () => (state) => Object.values(state.characters)
-        .filter(char => char.worldId === world.id)
-        .map(char => char.name),
-      [world.id]
-    )
+    (state) => Object.values(state.characters)
+      .filter(char => char.worldId === world.id)
+      .map(char => char.name)
   );
 
   return (
