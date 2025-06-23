@@ -16,7 +16,7 @@ import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Dice6, User, Settings } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export interface QuickStartCharactersProps {
   world: World;
@@ -230,10 +230,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                     Starting Game...
                   </>
                 ) : (
-                  <>
-                    <User className="h-4 w-4 mr-2" />
-                    Select Character
-                  </>
+                  'Select Character'
                 )}
               </Button>
             </CardContent>
@@ -251,15 +248,14 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               onClick: handleRandomSelect,
               variant: 'outline',
               size: 'lg',
-              icon: loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Dice6 className="h-4 w-4" />,
+              icon: loading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined,
               disabled: loading
             },
             {
               label: 'Create Custom Character',
               onClick: onCustomizeClick,
               variant: 'ghost',
-              size: 'lg',
-              icon: <Settings className="h-4 w-4" />
+              size: 'lg'
             }
           ]}
         />
