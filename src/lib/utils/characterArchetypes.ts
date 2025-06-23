@@ -337,6 +337,298 @@ export function getArchetypeTemplatesForGenre(genre: GenreValue): ArchetypeTempl
         }
       ];
 
+    case 'historical':
+      return [
+        {
+          name: 'Knight',
+          description: 'A noble warrior bound by chivalry and honor',
+          primaryAttributes: ['Strength', 'Constitution', 'Honor'],
+          secondaryAttributes: ['Charisma', 'Wisdom'],
+          preferredSkills: ['Swordsmanship', 'Horsemanship', 'Chivalry', 'Leadership'],
+          personalities: [
+            'Noble and honorable, lives by a strict code',
+            'Brave and selfless, protects the innocent',
+            'Loyal and devoted, serves with distinction'
+          ],
+          motivations: [
+            'To uphold the code of chivalry',
+            'To protect the realm from threats',
+            'To serve their lord with honor'
+          ],
+          fears: [
+            ['Dishonor', 'Breaking their oath'],
+            ['Failing their duty', 'Innocent suffering'],
+            ['Cowardice', 'Being seen as weak']
+          ],
+          nameTemplates: ['Gareth', 'Roland', 'Percival', 'Guinevere', 'Lancelot', 'Galahad']
+        },
+        {
+          name: 'Scholar',
+          description: 'A learned person dedicated to knowledge and wisdom',
+          primaryAttributes: ['Intelligence', 'Wisdom', 'Memory'],
+          secondaryAttributes: ['Perception', 'Patience'],
+          preferredSkills: ['Research', 'Languages', 'History', 'Writing'],
+          personalities: [
+            'Intellectual and curious, seeks knowledge',
+            'Patient and methodical, studies deeply',
+            'Wise and thoughtful, values learning'
+          ],
+          motivations: [
+            'To preserve knowledge for future generations',
+            'To understand the world through study',
+            'To educate others and spread wisdom'
+          ],
+          fears: [
+            ['Ignorance', 'Lost knowledge'],
+            ['Book burning', 'Destruction of learning'],
+            ['Being wrong', 'Spreading misinformation']
+          ],
+          nameTemplates: ['Thomas', 'Albertus', 'Hildegard', 'Roger', 'Duns', 'Aquinas']
+        },
+        {
+          name: 'Merchant',
+          description: 'A trader who travels far and wide for profit',
+          primaryAttributes: ['Charisma', 'Intelligence', 'Perception'],
+          secondaryAttributes: ['Constitution', 'Wisdom'],
+          preferredSkills: ['Negotiation', 'Appraisal', 'Languages', 'Travel'],
+          personalities: [
+            'Shrewd and calculating, sees opportunity',
+            'Charming and persuasive, makes deals',
+            'Adventurous and bold, takes risks'
+          ],
+          motivations: [
+            'To build wealth and prosperity',
+            'To explore new markets and opportunities',
+            'To provide valuable goods to communities'
+          ],
+          fears: [
+            ['Bankruptcy', 'Losing investments'],
+            ['Bandits', 'Theft of goods'],
+            ['Market collapse', 'Economic ruin']
+          ],
+          nameTemplates: ['Marco', 'Giovanni', 'Isabella', 'Heinrich', 'Jacques', 'Medici']
+        }
+      ];
+
+    case 'horror':
+      return [
+        {
+          name: 'Investigator',
+          description: 'A seeker of truth in dark and dangerous places',
+          primaryAttributes: ['Intelligence', 'Perception', 'Willpower'],
+          secondaryAttributes: ['Constitution', 'Wisdom'],
+          preferredSkills: ['Investigation', 'Occult', 'Psychology', 'Research'],
+          personalities: [
+            'Determined and relentless, pursues the truth',
+            'Skeptical yet open-minded, questions everything',
+            'Brave but cautious, knows when to retreat'
+          ],
+          motivations: [
+            'To uncover the truth behind supernatural events',
+            'To protect others from otherworldly threats',
+            'To understand the mysteries of the unknown'
+          ],
+          fears: [
+            ['Losing sanity', 'Cosmic horror'],
+            ['Becoming what they hunt', 'Corruption'],
+            ['Failing to warn others', 'Innocent victims']
+          ],
+          nameTemplates: ['Vincent', 'Arkham', 'Blackwood', 'Raven', 'Salem', 'Midnight']
+        },
+        {
+          name: 'Survivor',
+          description: 'One who has faced horror and lived to tell the tale',
+          primaryAttributes: ['Constitution', 'Willpower', 'Survival'],
+          secondaryAttributes: ['Agility', 'Perception'],
+          preferredSkills: ['Survival', 'Stealth', 'First Aid', 'Courage'],
+          personalities: [
+            'Resilient and tough, refuses to give up',
+            'Paranoid and cautious, always alert',
+            'Protective and loyal, shields others'
+          ],
+          motivations: [
+            'To survive against all odds',
+            'To protect loved ones from danger',
+            'To escape the nightmare alive'
+          ],
+          fears: [
+            ['The dark', 'Unknown threats'],
+            ['Being alone', 'Isolation'],
+            ['Losing control', 'Helplessness']
+          ],
+          nameTemplates: ['Ash', 'Ripley', 'Sidney', 'Laurie', 'Final', 'Last']
+        },
+        {
+          name: 'Occultist',
+          description: 'A student of forbidden knowledge and dark arts',
+          primaryAttributes: ['Intelligence', 'Willpower', 'Occult Knowledge'],
+          secondaryAttributes: ['Wisdom', 'Perception'],
+          preferredSkills: ['Occult', 'Ritual', 'Ancient Languages', 'Forbidden Lore'],
+          personalities: [
+            'Curious and driven, seeks forbidden knowledge',
+            'Mysterious and secretive, guards their secrets',
+            'Powerful but dangerous, walks a dark path'
+          ],
+          motivations: [
+            'To master the secrets of the supernatural',
+            'To gain power over otherworldly forces',
+            'To understand the true nature of reality'
+          ],
+          fears: [
+            ['Losing control', 'Dark forces turning'],
+            ['Being discovered', 'Persecution'],
+            ['Madness', 'Price of knowledge']
+          ],
+          nameTemplates: ['Crowley', 'Dee', 'Lavey', 'Blavatsky', 'Magus', 'Cipher']
+        }
+      ];
+
+    case 'mystery':
+      return [
+        {
+          name: 'Private Detective',
+          description: 'An independent investigator who solves cases',
+          primaryAttributes: ['Intelligence', 'Perception', 'Intuition'],
+          secondaryAttributes: ['Charisma', 'Wisdom'],
+          preferredSkills: ['Investigation', 'Deduction', 'Interrogation', 'Research'],
+          personalities: [
+            'Sharp and observant, notices every detail',
+            'Persistent and determined, never gives up',
+            'Independent and resourceful, works alone'
+          ],
+          motivations: [
+            'To solve the unsolvable mysteries',
+            'To bring justice to victims',
+            'To uncover the truth no matter the cost'
+          ],
+          fears: [
+            ['Unsolved cases', 'Missing evidence'],
+            ['Wrong conclusions', 'Innocent suffering'],
+            ['Being outsmarted', 'Criminal escape']
+          ],
+          nameTemplates: ['Holmes', 'Poirot', 'Marple', 'Spade', 'Marlowe', 'Columbo']
+        },
+        {
+          name: 'Forensic Expert',
+          description: 'A scientific investigator who reads the evidence',
+          primaryAttributes: ['Intelligence', 'Perception', 'Technical Skill'],
+          secondaryAttributes: ['Patience', 'Precision'],
+          preferredSkills: ['Forensics', 'Science', 'Analysis', 'Technology'],
+          personalities: [
+            'Methodical and precise, follows the evidence',
+            'Analytical and logical, thinks scientifically',
+            'Patient and thorough, misses nothing'
+          ],
+          motivations: [
+            'To let the evidence speak the truth',
+            'To apply science to solve crimes',
+            'To provide closure through facts'
+          ],
+          fears: [
+            ['Contaminated evidence', 'False conclusions'],
+            ['Technology failure', 'Missing clues'],
+            ['Bias affecting judgment', 'Rushed analysis']
+          ],
+          nameTemplates: ['Grissom', 'Scully', 'Brennan', 'Quincy', 'Lab', 'Evidence']
+        },
+        {
+          name: 'Reporter',
+          description: 'A journalist investigating stories and uncovering truth',
+          primaryAttributes: ['Charisma', 'Intelligence', 'Persistence'],
+          secondaryAttributes: ['Perception', 'Courage'],
+          preferredSkills: ['Investigation', 'Writing', 'Networking', 'Research'],
+          personalities: [
+            'Inquisitive and bold, asks tough questions',
+            'Determined and fearless, pursues the story',
+            'Ethical and principled, seeks the truth'
+          ],
+          motivations: [
+            'To expose corruption and wrongdoing',
+            'To inform the public of important truths',
+            'To give voice to the voiceless'
+          ],
+          fears: [
+            ['Censorship', 'Being silenced'],
+            ['False information', 'Misleading public'],
+            ['Retaliation', 'Dangerous sources']
+          ],
+          nameTemplates: ['Lois', 'Clark', 'Woodward', 'Bernstein', 'Murrow', 'Press']
+        }
+      ];
+
+    case 'cyberpunk':
+      return [
+        {
+          name: 'Hacker',
+          description: 'A digital warrior who fights in cyberspace',
+          primaryAttributes: ['Intelligence', 'Technical Skill', 'Reflexes'],
+          secondaryAttributes: ['Perception', 'Logic'],
+          preferredSkills: ['Hacking', 'Programming', 'Cybersecurity', 'Electronics'],
+          personalities: [
+            'Brilliant and rebellious, fights the system',
+            'Paranoid and careful, trusts no one',
+            'Independent and resourceful, relies on skill'
+          ],
+          motivations: [
+            'To bring down corporate oppression',
+            'To free information from control',
+            'To protect privacy and freedom'
+          ],
+          fears: [
+            ['Corporate retaliation', 'Being traced'],
+            ['System failure', 'Losing connection'],
+            ['AI takeover', 'Being replaced']
+          ],
+          nameTemplates: ['Neo', 'Trinity', 'Zero', 'Cipher', 'Ghost', 'Matrix']
+        },
+        {
+          name: 'Street Samurai',
+          description: 'A cybernetically enhanced warrior for hire',
+          primaryAttributes: ['Strength', 'Reflexes', 'Cybernetics'],
+          secondaryAttributes: ['Constitution', 'Agility'],
+          preferredSkills: ['Combat', 'Weapons', 'Cybernetics', 'Intimidation'],
+          personalities: [
+            'Disciplined and honorable, follows a code',
+            'Enhanced and deadly, precision fighter',
+            'Professional and reliable, completes contracts'
+          ],
+          motivations: [
+            'To honor their cybernetic upgrades',
+            'To protect clients and complete missions',
+            'To maintain their reputation and code'
+          ],
+          fears: [
+            ['System malfunction', 'Cybernetic failure'],
+            ['Obsolescence', 'Better models'],
+            ['Loss of humanity', 'Becoming machine']
+          ],
+          nameTemplates: ['Blade', 'Chrome', 'Steel', 'Razor', 'Wire', 'Edge']
+        },
+        {
+          name: 'Corporate Agent',
+          description: 'A company operative navigating corporate warfare',
+          primaryAttributes: ['Charisma', 'Intelligence', 'Resources'],
+          secondaryAttributes: ['Perception', 'Networking'],
+          preferredSkills: ['Business', 'Negotiation', 'Espionage', 'Technology'],
+          personalities: [
+            'Ambitious and calculating, climbs the ladder',
+            'Professional and polished, represents the corp',
+            'Ruthless and efficient, gets results'
+          ],
+          motivations: [
+            'To advance their corporate career',
+            'To increase company profits and power',
+            'To outmaneuver rival corporations'
+          ],
+          fears: [
+            ['Corporate betrayal', 'Being expendable'],
+            ['Market collapse', 'Economic failure'],
+            ['Hostile takeover', 'Losing position']
+          ],
+          nameTemplates: ['Executive', 'Suit', 'Corporate', 'Business', 'Profit', 'Success']
+        }
+      ];
+
     default:
       // Generic archetypes for unknown genres
       return [
@@ -606,6 +898,17 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
     'Gunslinger': ['lean', 'quick', 'sharp-eyed', 'weathered'],
     'Sheriff': ['sturdy', 'commanding', 'reliable', 'authoritative'],
     'Cowboy': ['rugged', 'sun-weathered', 'tough', 'hardy'],
+    'Knight': ['noble', 'armored', 'imposing', 'chivalrous'],
+    'Merchant': ['well-dressed', 'prosperous', 'traveled', 'shrewd'],
+    'Investigator': ['intense', 'focused', 'determined', 'haunted'],
+    'Survivor': ['scarred', 'resilient', 'alert', 'battle-worn'],
+    'Occultist': ['mysterious', 'pale', 'otherworldly', 'secretive'],
+    'Private Detective': ['sharp', 'perceptive', 'streetwise', 'experienced'],
+    'Forensic Expert': ['precise', 'analytical', 'methodical', 'scientific'],
+    'Reporter': ['energetic', 'inquisitive', 'persistent', 'well-informed'],
+    'Hacker': ['cyber-enhanced', 'tech-savvy', 'wired', 'digital'],
+    'Street Samurai': ['enhanced', 'cybernetic', 'deadly', 'precise'],
+    'Corporate Agent': ['polished', 'professional', 'ambitious', 'calculating'],
     'Balanced': ['average', 'well-proportioned', 'approachable', 'steady'],
     'Specialist': ['focused', 'intense', 'precise', 'dedicated'],
     'Versatile': ['adaptable', 'dynamic', 'expressive', 'changeable']
@@ -620,6 +923,14 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
     ? ['cybernetic implants', 'radiation-resistant skin', 'zero-g adapted build', 'tech-enhanced features']
     : genre === 'western'
     ? ['sun-weathered skin', 'calloused hands', 'steely gaze', 'worn leather boots']
+    : genre === 'historical'
+    ? ['period-appropriate clothing', 'calloused hands', 'weathered features', 'traditional bearing']
+    : genre === 'horror'
+    ? ['haunted eyes', 'nervous demeanor', 'pale complexion', 'scarred features']
+    : genre === 'mystery'
+    ? ['sharp eyes', 'observant demeanor', 'professional appearance', 'analytical gaze']
+    : genre === 'cyberpunk'
+    ? ['neural interfaces', 'chrome augmentations', 'neon-lit tattoos', 'corporate modifications']
     : ['expressive eyes', 'confident posture', 'street-smart appearance', 'modern style'];
   
   const selectedFeature = features[Math.floor(Math.random() * features.length)];
