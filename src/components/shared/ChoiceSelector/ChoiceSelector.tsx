@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
 // Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
 import { Badge } from '@/components/ui/badge';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
+import { useFormState } from '@/hooks';
 
 // Local character type definition that matches the actual store structure
 // to avoid type mismatches with the main Character type
@@ -169,9 +170,13 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   character,
   worldSkills = [],
 }) => {
-  // Custom input state
-  const [customInputText, setCustomInputText] = useState('');
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  // Form state for custom input and selection using hooks
+  const choiceFormState = useFormState({
+    initialData: {
+      customInputText: '',
+      selectedOptionId: null as string | null
+    }
+  });
   
   // Ref for auto-focusing input
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -209,7 +214,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           id: opt.id,
           text: opt.text,
           hint: opt.hint,
-          isSelected: opt.id === decision.selectedOptionId || opt.id === selectedOptionId,
+          isSelected: opt.id === decision.selectedOptionId || opt.id === choiceFormState.data.selectedOptionId,
           alignment: opt.alignment,
           skillRequirements
         };
@@ -217,7 +222,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
     : (choices || []).map(choice => ({
         id: choice.id,
         text: choice.text,
-        isSelected: choice.isSelected || choice.id === selectedOptionId,
+        isSelected: choice.isSelected || choice.id === choiceFormState.data.selectedOptionId,
         alignment: 'neutral' as ChoiceAlignment, // Default for simple choices
         skillRequirements: []
       }));
@@ -237,18 +242,18 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
 
   // Handle option selection
   const handleOptionSelect = useCallback((optionId: string) => {
-    setSelectedOptionId(optionId);
+    choiceFormState.updateField('selectedOptionId', optionId);
     onSelect(optionId);
-  }, [onSelect]);
+  }, [onSelect, choiceFormState]);
 
   // Handle custom input submission
   const handleCustomSubmit = useCallback(() => {
-    const trimmedText = customInputText.trim();
+    const trimmedText = choiceFormState.data.customInputText.trim();
     if (trimmedText && onCustomSubmit) {
       onCustomSubmit(trimmedText);
-      setCustomInputText('');
+      choiceFormState.updateField('customInputText', '');
     }
-  }, [customInputText, onCustomSubmit]);
+  }, [choiceFormState, onCustomSubmit]);
 
   // Handle Enter key in textarea
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -262,12 +267,12 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     if (value.length <= maxCustomLength) {
-      setCustomInputText(value);
+      choiceFormState.updateField('customInputText', value);
     }
-  }, [maxCustomLength]);
+  }, [maxCustomLength, choiceFormState]);
 
   // Calculate character count styling
-  const characterCount = customInputText.length;
+  const characterCount = choiceFormState.data.customInputText.length;
   const characterCountClass = characterCount >= maxCustomLength 
     ? 'text-red-600' 
     : characterCount >= maxCustomLength * 0.8 
@@ -317,7 +322,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           <textarea
             id="custom-input"
             ref={inputRef}
-            value={customInputText}
+            value={choiceFormState.data.customInputText}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder={customInputPlaceholder}
@@ -332,7 +337,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             </span>
             <button
               onClick={handleCustomSubmit}
-              disabled={isDisabled || !customInputText.trim()}
+              disabled={isDisabled || !choiceFormState.data.customInputText.trim()}
               className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit
