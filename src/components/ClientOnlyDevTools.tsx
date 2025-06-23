@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 import { DevMockState } from '@/components/devtools/DevMockState';
 import { DevToolsPanel } from '@/components/devtools';
 
@@ -8,13 +9,18 @@ import { DevToolsPanel } from '@/components/devtools';
  * Client-only wrapper for development tools to prevent hydration mismatches
  */
 export function ClientOnlyDevTools() {
-  const [isClient, setIsClient] = useState(false);
+  // Client-side state management using hooks
+  const devToolsState = useFormState({
+    initialData: {
+      isClient: false
+    }
+  });
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    devToolsState.updateField('isClient', true);
+  }, [devToolsState]);
 
-  if (!isClient) {
+  if (!devToolsState.data.isClient) {
     return null;
   }
 

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
+import { useFormState } from '@/hooks';
 
 /**
  * JsonViewer props
@@ -22,8 +23,12 @@ interface JsonViewerProps {
  * between server and client rendering of complex JSON structures.
  */
 export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
-  // State to track if the component is mounted (client-side only)
-  const [isMounted, setIsMounted] = useState(false);
+  // JSON viewer state management using hooks
+  const jsonViewerState = useFormState({
+    initialData: {
+      isMounted: false
+    }
+  });
   
 // Format the JSON string with indentation
   const formattedJson = useMemo(() => {
@@ -61,14 +66,14 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
 
   // Style the JSON with syntax highlighting using CSS classes
   const styledJson = useMemo(() => {
-    if (!isMounted) return ''; // Return empty content if not mounted
+    if (!jsonViewerState.data.isMounted) return ''; // Return empty content if not mounted
     return syntaxHighlight(formattedJson);
-  }, [formattedJson, isMounted]);
+  }, [formattedJson, jsonViewerState.data.isMounted]);
 
   // Set mounted state after component mounts on the client
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    jsonViewerState.updateField('isMounted', true);
+  }, [jsonViewerState]);
 
   // Render a simple pre element during server-side rendering
   // and replace with highlighted content on the client
@@ -78,7 +83,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
       className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 ${className}`}
       style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', boxShadow: 'var(--shadow-sm)' }}
     >
-      {!isMounted ? (
+      {!jsonViewerState.data.isMounted ? (
         // Simple content for server-side rendering
         'Loading JSON...'
       ) : (
