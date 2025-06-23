@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useFormState, useModal } from '@/hooks';
 
 export interface SkillEditorProps {
   worldId: EntityID;
@@ -62,111 +63,110 @@ export function SkillEditor({
   existingAttributes,
   maxSkills,
 }: SkillEditorProps) {
-  const [formData, setFormData] = useState<Partial<WorldSkill>>({
-    name: '',
-    description: '',
-    attributeIds: [],
-    difficulty: DEFAULT_SKILL_DIFFICULTY,
-    baseValue: 5,
-    minValue: 1,
-    maxValue: 10,
+  // Form state management with validation
+  const form = useFormState({
+    initialData: {
+      name: '',
+      description: '',
+      attributeIds: [] as EntityID[],
+      difficulty: DEFAULT_SKILL_DIFFICULTY,
+      baseValue: 5,
+      minValue: 1,
+      maxValue: 10,
+    },
+    validate: (data) => {
+      const validationErrors: string[] = [];
+      const trimmedName = data.name?.trim() || '';
+      const trimmedDescription = data.description?.trim() || '';
+
+      // Required field validation
+      if (!trimmedName) {
+        validationErrors.push('Skill name is required');
+      }
+
+      if (!trimmedDescription) {
+        validationErrors.push('Description is required');
+      }
+
+      // Length validation
+      if (trimmedName.length > 100) {
+        validationErrors.push('Skill name must be 100 characters or less');
+      }
+
+      if (trimmedDescription.length > 500) {
+        validationErrors.push('Description must be 500 characters or less');
+      }
+
+      // Duplicate name validation (only for create mode or different skill in edit mode)
+      if (trimmedName) {
+        const isDuplicate = existingSkills.some(skill => 
+          skill.name.toLowerCase() === trimmedName.toLowerCase() && 
+          (mode === 'create' || skill.id !== skillId)
+        );
+        if (isDuplicate) {
+          validationErrors.push(`Skill name "${trimmedName}" already exists`);
+        }
+      }
+
+      // Attribute selection validation
+      if (!data.attributeIds || data.attributeIds.length === 0) {
+        validationErrors.push('At least one attribute must be selected');
+      }
+
+      return validationErrors;
+    },
+    clearErrorsOnChange: true,
   });
-  const [errors, setErrors] = useState<string[]>([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Modal state management
+  const deleteModal = useModal();
 
   // Load existing skill data in edit mode
   useEffect(() => {
     if (mode === 'edit' && skillId) {
       const existingSkill = existingSkills.find(skill => skill.id === skillId);
       if (existingSkill) {
-        setFormData({
-          ...existingSkill,
+        form.setData({
+          name: existingSkill.name,
+          description: existingSkill.description,
           attributeIds: existingSkill.attributeIds || [],
+          difficulty: existingSkill.difficulty,
+          baseValue: existingSkill.baseValue,
+          minValue: existingSkill.minValue,
+          maxValue: existingSkill.maxValue,
         });
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, skillId, existingSkills]);
-
-  // Clear errors when form data changes
-  useEffect(() => {
-    if (errors.length > 0) {
-      const newErrors = validateForm();
-      setErrors(newErrors);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.name, formData.description, formData.attributeIds, errors.length, existingSkills, mode, skillId]);
-
-  const validateForm = (): string[] => {
-    const validationErrors: string[] = [];
-    const trimmedName = formData.name?.trim() || '';
-    const trimmedDescription = formData.description?.trim() || '';
-
-    // Required field validation
-    if (!trimmedName) {
-      validationErrors.push('Skill name is required');
-    }
-
-    if (!trimmedDescription) {
-      validationErrors.push('Description is required');
-    }
-
-    // Length validation
-    if (trimmedName.length > 100) {
-      validationErrors.push('Skill name must be 100 characters or less');
-    }
-
-    if (trimmedDescription.length > 500) {
-      validationErrors.push('Description must be 500 characters or less');
-    }
-
-    // Duplicate name validation (only for create mode or different skill in edit mode)
-    if (trimmedName) {
-      const isDuplicate = existingSkills.some(skill => 
-        skill.name.toLowerCase() === trimmedName.toLowerCase() && 
-        (mode === 'create' || skill.id !== skillId)
-      );
-      if (isDuplicate) {
-        validationErrors.push(`Skill name "${trimmedName}" already exists`);
-      }
-    }
-
-    // Attribute selection validation
-    if (!formData.attributeIds || formData.attributeIds.length === 0) {
-      validationErrors.push('At least one attribute must be selected');
-    }
-
-    return validationErrors;
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const validationErrors = validateForm();
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+    if (!form.isValid()) {
       return;
     }
 
-    const trimmedName = formData.name?.trim() || '';
-    const trimmedDescription = formData.description?.trim() || '';
+    const trimmedName = form.data.name?.trim() || '';
+    const trimmedDescription = form.data.description?.trim() || '';
 
     const skillData: WorldSkill = {
       id: mode === 'edit' ? skillId! : generateUniqueId(),
       name: trimmedName,
       description: trimmedDescription,
       worldId,
-      attributeIds: formData.attributeIds || [],
-      difficulty: formData.difficulty || DEFAULT_SKILL_DIFFICULTY,
-      baseValue: formData.baseValue || 5,
-      minValue: formData.minValue || 1,
-      maxValue: formData.maxValue || 10,
+      attributeIds: form.data.attributeIds || [],
+      difficulty: form.data.difficulty || DEFAULT_SKILL_DIFFICULTY,
+      baseValue: form.data.baseValue || 5,
+      minValue: form.data.minValue || 1,
+      maxValue: form.data.maxValue || 10,
     };
 
     onSave(skillData);
   };
 
   const handleAttributeToggle = (attributeId: EntityID) => {
-    const currentAttributeIds = formData.attributeIds || [];
+    const currentAttributeIds = form.data.attributeIds || [];
     const isSelected = currentAttributeIds.includes(attributeId);
     
     let newAttributeIds: EntityID[];
@@ -176,10 +176,7 @@ export function SkillEditor({
       newAttributeIds = [...currentAttributeIds, attributeId];
     }
     
-    setFormData(prev => ({
-      ...prev,
-      attributeIds: newAttributeIds,
-    }));
+    form.updateField('attributeIds', newAttributeIds);
   };
 
   const handleDelete = () => {
@@ -209,9 +206,9 @@ export function SkillEditor({
         </div>
       )}
 
-      {errors.length > 0 && (
+      {form.hasErrors && (
         <div className="space-y-2">
-          {errors.map((error, index) => (
+          {form.errors.map((error, index) => (
             <div key={index} className="text-sm text-red-600" role="alert">
               {error}
             </div>
@@ -226,8 +223,8 @@ export function SkillEditor({
             <Input
               id="skill-name"
               type="text"
-              value={formData.name || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              value={form.data.name || ''}
+              onChange={(e) => form.updateField('name', e.target.value)}
               placeholder="Enter skill name"
               disabled={!canCreateSkill}
               className="mt-1"
@@ -238,8 +235,8 @@ export function SkillEditor({
             <Label htmlFor="skill-description">Description <span className="text-red-500">*</span></Label>
             <Textarea
               id="skill-description"
-              value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              value={form.data.description || ''}
+              onChange={(e) => form.updateField('description', e.target.value)}
               placeholder="Describe what this skill represents"
               disabled={!canCreateSkill}
               rows={3}
@@ -258,7 +255,7 @@ export function SkillEditor({
                   <input
                     type="checkbox"
                     id={`attribute-${attribute.id}`}
-                    checked={formData.attributeIds?.includes(attribute.id) || false}
+                    checked={form.data.attributeIds?.includes(attribute.id) || false}
                     onChange={() => handleAttributeToggle(attribute.id)}
                     disabled={!canCreateSkill}
                     className="rounded border-gray-300 focus:ring-blue-500"
@@ -306,7 +303,7 @@ export function SkillEditor({
           {mode === 'edit' && onDelete && (
             <Button
               type="button"
-              onClick={() => setShowDeleteDialog(true)}
+              onClick={deleteModal.open}
               variant="destructive"
               size="sm"
             >
@@ -317,12 +314,11 @@ export function SkillEditor({
       </form>
 
       <DeleteConfirmationDialog
-        isOpen={showDeleteDialog}
+        {...deleteModal.modalProps}
         title="Delete Skill"
         description="Are you sure you want to delete this skill?"
-        itemName={formData.name || 'this skill'}
+        itemName={form.data.name || 'this skill'}
         onConfirm={handleDelete}
-        onClose={() => setShowDeleteDialog(false)}
       />
     </div>
   );
