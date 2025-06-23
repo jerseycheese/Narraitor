@@ -1,6 +1,6 @@
 import { cn, clsx } from '../classNames';
 
-describe('cn utility', () => {
+describe('cn utility (enhanced with Tailwind merge)', () => {
   test('combines multiple class names', () => {
     expect(cn('foo', 'bar', 'baz')).toBe('foo bar baz');
   });
@@ -18,9 +18,27 @@ describe('cn utility', () => {
   test('handles single class', () => {
     expect(cn('foo')).toBe('foo');
   });
+
+  test('supports objects (clsx functionality)', () => {
+    expect(cn({ foo: true, bar: false, baz: true })).toBe('foo baz');
+  });
+
+  test('supports arrays (clsx functionality)', () => {
+    expect(cn(['foo', 'bar'], 'baz')).toBe('foo bar baz');
+  });
+
+  test('merges conflicting Tailwind classes (twMerge functionality)', () => {
+    expect(cn('bg-red-500', 'bg-blue-500')).toBe('bg-blue-500');
+    expect(cn('p-4', 'px-6')).toBe('p-4 px-6'); // px overrides horizontal padding
+    expect(cn('text-sm', 'text-lg')).toBe('text-lg');
+  });
+
+  test('handles mixed complex inputs', () => {
+    expect(cn('foo', { bar: true, baz: false }, ['qux', null], 'bg-red-500', 'bg-blue-500')).toBe('foo bar qux bg-blue-500');
+  });
 });
 
-describe('clsx utility', () => {
+describe('clsx utility (legacy export)', () => {
   test('combines strings', () => {
     expect(clsx('foo', 'bar')).toBe('foo bar');
   });

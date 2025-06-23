@@ -24,7 +24,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { skillDetectionService } from '@/lib/ai/skillDetectionService';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
-import SkillRequirementBadge from '@/components/ui/SkillRequirementBadge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { LoadingState } from '@/components/ui/LoadingState';
@@ -243,15 +243,21 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
               <span className="text-sm text-gray-600 font-medium">Detected Skills:</span>
-              {skillCheckResults.map((result, index) => (
-                <SkillRequirementBadge
-                  key={`${result.skillId}-${index}`}
-                  requirement={result.requirement}
-                  skillName={result.skillName}
-                  isAvailable={result.success}
-                  testId={`skill-badge-${result.skillId}`}
-                />
-              ))}
+              {skillCheckResults.map((result, index) => {
+                const operatorSuffix = result.requirement.operator === 'gte' ? '+' : '';
+                const label = `${result.skillName} ${result.requirement.value}${operatorSuffix}`;
+                const variant = result.success ? 'available' : 'unavailable';
+                
+                return (
+                  <Badge
+                    key={`${result.skillId}-${index}`}
+                    variant={variant}
+                    data-testid={`skill-badge-${result.skillId}`}
+                  >
+                    {label}
+                  </Badge>
+                );
+              })}
             </div>
             {/* Show AI reasoning for the first detected skill */}
             {skillCheckResults.length > 0 && skillCheckResults[0].reasoning && (

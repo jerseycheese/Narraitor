@@ -45,4 +45,5 @@ export const WIZARD_STEPS = [
   { id: 'attributes', label: 'Review Attributes' },
   { id: 'skills', label: 'Review Skills' },
   { id: 'finalize', label: 'Finalize' },
+  { id: 'quick-start', label: 'Quick Start' },
 ];

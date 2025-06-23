@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
 // Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
-import SkillRequirementBadge from '@/components/ui/SkillRequirementBadge';
+import { Badge } from '@/components/ui/badge';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 
@@ -200,7 +200,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           
           return {
             requirement: req,
-            skillName: skillData?.name,
+            skillName: skillData?.name || 'Unknown Skill',
             isAvailable
           };
         }) || [];
@@ -380,14 +380,20 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             )}
             {option.skillRequirements && option.skillRequirements.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
-                {option.skillRequirements.map((skillReq, index) => (
-                  <SkillRequirementBadge
-                    key={`${option.id}-skill-${index}`}
-                    requirement={skillReq.requirement}
-                    skillName={skillReq.skillName}
-                    isAvailable={skillReq.isAvailable}
-                  />
-                ))}
+                {option.skillRequirements.map((skillReq, index) => {
+                  const operatorSuffix = skillReq.requirement.operator === 'gte' ? '+' : '';
+                  const label = `${skillReq.skillName} ${skillReq.requirement.value}${operatorSuffix}`;
+                  const variant = skillReq.isAvailable ? 'available' : 'unavailable';
+                  
+                  return (
+                    <Badge
+                      key={`${option.id}-skill-${index}`}
+                      variant={variant}
+                    >
+                      {label}
+                    </Badge>
+                  );
+                })}
               </div>
             )}
           </button>
