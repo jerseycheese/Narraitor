@@ -254,7 +254,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           ) : (
             <Dice6 className="h-4 w-4 mr-2" />
           )}
-          Random Character
+          Generate New Random Character
         </Button>
 
         <div className="text-sm text-gray-500 hidden sm:block">or</div>
@@ -266,14 +266,20 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           className="w-full sm:w-auto"
         >
           <Settings className="h-4 w-4 mr-2" />
-          Customize Character
+          Create Custom Character
         </Button>
       </div>
 
       {/* Additional Info */}
-      <div className="mt-8 text-center">
-        <p className="text-xs text-gray-500">
-          You can customize any character later through the character editor
+      <div className="mt-8 text-center space-y-2">
+        <p className="text-sm text-gray-600">
+          <strong>Generate New Random Character:</strong> Creates a completely new random character for this world
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong>Create Custom Character:</strong> Build your own character from scratch with full customization
+        </p>
+        <p className="text-xs text-gray-500 mt-4">
+          You can always edit any character later through the character editor
         </p>
       </div>
     </div>
