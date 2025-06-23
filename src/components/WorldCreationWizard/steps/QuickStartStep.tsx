@@ -99,12 +99,10 @@ export default function QuickStartStep({
   };
 
   const existingCharacterNames = useCharacterStore(
-    useMemo(
-      () => (state) => Object.values(state.characters)
-        .filter(char => char.worldId === world.id)
-        .map(char => char.name),
-      [world.id]
-    )
+    (state) => Object.values(state.characters)
+      .filter(char => char.worldId === world.id)
+      .map(char => char.name),
+    (a, b) => JSON.stringify(a) === JSON.stringify(b) // shallow equal check
   );
 
   return (
