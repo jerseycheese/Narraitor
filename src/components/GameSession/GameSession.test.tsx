@@ -60,6 +60,16 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
+// Mock the useAsyncState hook
+jest.mock('@/hooks', () => ({
+  useAsyncState: jest.fn(() => ({
+    data: true, // Client is mounted
+    isLoading: false,
+    error: null,
+    execute: jest.fn(),
+  })),
+}));
+
 // Import the mocked hook
 import { useGameSessionState } from './hooks/useGameSessionState';
 const mockedUseGameSessionState = useGameSessionState as jest.MockedFunction<typeof useGameSessionState>;

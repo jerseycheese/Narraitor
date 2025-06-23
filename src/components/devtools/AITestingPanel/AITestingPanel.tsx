@@ -1,20 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import type { AITestConfig, AIResponse } from '../../../types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '../../../lib/ai/contextOverride';
 import { requestLogger } from '../../../lib/ai/requestLogger';
+import { useAsyncState, useFormState } from '@/hooks';
+
+// Form-compatible type for test configuration
+interface TestConfigFormData {
+  worldOverride?: {
+    name?: string;
+    genre?: string;
+  };
+  characterOverride?: {
+    name?: string;
+  };
+  [key: string]: unknown;
+}
 
 interface AITestingPanelProps {
   className?: string;
 }
 
 export function AITestingPanel({ className = '' }: AITestingPanelProps) {
-  const [testConfig, setTestConfig] = useState<AITestConfig>({});
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [result, setResult] = useState<AIResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Form state for test configuration using hooks
+  const testConfigForm = useFormState<TestConfigFormData>({
+    initialData: {}
+  });
+
+  // Async state for narrative generation using hooks
+  const narrativeGenerationState = useAsyncState<AIResponse>();
 
   // Mock base data for testing
   const mockWorld = {
@@ -73,48 +89,47 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   };
 
   const handleWorldNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
-      ...prev,
+    const currentData = testConfigForm.data;
+    testConfigForm.updateData({
+      ...currentData,
       worldOverride: {
-        ...prev.worldOverride,
+        ...currentData.worldOverride,
         name: e.target.value
       }
-    }));
+    });
   };
 
   const handleWorldGenreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
-      ...prev,
+    const currentData = testConfigForm.data;
+    testConfigForm.updateData({
+      ...currentData,
       worldOverride: {
-        ...prev.worldOverride,
+        ...currentData.worldOverride,
         genre: e.target.value
       }
-    }));
+    });
   };
 
   const handleCharacterNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTestConfig(prev => ({
-      ...prev,
+    const currentData = testConfigForm.data;
+    testConfigForm.updateData({
+      ...currentData,
       characterOverride: {
-        ...prev.characterOverride,
+        ...currentData.characterOverride,
         name: e.target.value
       }
-    }));
+    });
   };
 
 
   const handleGenerateNarrative = async () => {
-    setIsGenerating(true);
-    setError(null);
-    setResult(null);
-
-    try {
+    await narrativeGenerationState.execute(async () => {
       // Create test context with overrides
       const testContext = createTestContext(
         mockWorld,
         mockCharacter,
         mockNarrativeContext,
-        testConfig
+        testConfigForm.data as AITestConfig
       );
 
       // Start request logging
@@ -122,7 +137,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
         'test-template',
         'Test prompt for narrative generation',
         testContext.narrativeContext,
-        testConfig
+        testConfigForm.data as AITestConfig
       );
 
       const startTime = Date.now();
@@ -181,13 +196,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       // Complete request log
       requestLogger.completeRequest(logId, response, responseTime);
 
-      setResult(response);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-    } finally {
-      setIsGenerating(false);
-    }
+      return response;
+    });
   };
 
   return (
@@ -203,7 +213,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             <input
               id="world-name"
               type="text"
-              value={testConfig.worldOverride?.name || ''}
+              value={testConfigForm.data.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
               className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
@@ -214,7 +224,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
             <input
               id="world-genre"
               type="text"
-              value={testConfig.worldOverride?.genre || ''}
+              value={testConfigForm.data.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
               className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
@@ -231,7 +241,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
           <input
             id="character-name"
             type="text"
-            value={testConfig.characterOverride?.name || ''}
+            value={testConfigForm.data.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
             className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
@@ -243,41 +253,41 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       <div className="mt-3">
         <button
           onClick={handleGenerateNarrative}
-          disabled={isGenerating}
+          disabled={narrativeGenerationState.isLoading}
           className={`devtools-panel w-full transition-colors ${
-            isGenerating 
+            narrativeGenerationState.isLoading 
               ? '!bg-slate-500 cursor-not-allowed' 
               : '!bg-blue-600 hover:!bg-blue-500 cursor-pointer'
           }`}
         >
-          {isGenerating ? 'Generating...' : 'Generate Narrative'}
+          {narrativeGenerationState.isLoading ? 'Generating...' : 'Generate Narrative'}
         </button>
       </div>
 
       {/* Results Section */}
-      {isGenerating && (
+      {narrativeGenerationState.isLoading && (
         <div className="bg-yellow-900 bg-opacity-30 p-2 rounded border border-yellow-600">
           <p className="devtools-panel !text-xs text-yellow-200 !my-0">Generating narrative...</p>
         </div>
       )}
 
-      {error && (
+      {narrativeGenerationState.error && (
         <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-600">
-          <p className="devtools-panel !text-xs text-red-200 !my-0">Error: {error}</p>
+          <p className="devtools-panel !text-xs text-red-200 !my-0">Error: {narrativeGenerationState.error}</p>
         </div>
       )}
 
-      {result && (
+      {narrativeGenerationState.data && (
         <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-600">
           <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-green-200">Generated Results</h4>
           <div className="mb-2">
-            <p className="devtools-panel !text-xs text-green-100 !my-0">{result.text}</p>
+            <p className="devtools-panel !text-xs text-green-100 !my-0">{narrativeGenerationState.data.text}</p>
           </div>
-          {result.choices && result.choices.length > 0 && (
+          {narrativeGenerationState.data.choices && narrativeGenerationState.data.choices.length > 0 && (
             <div>
               <h5 className="devtools-panel !text-xs !font-medium !my-0 !mb-1 text-green-200">Choices:</h5>
               <ul className="text-xs text-green-100 my-0 p-0 list-none space-y-1">
-                {result.choices.map((choice, index) => (
+                {narrativeGenerationState.data.choices.map((choice, index) => (
                   <li key={index} className="pl-2 border-l-2 border-green-400 text-xs">• {choice}</li>
                 ))}
               </ul>
