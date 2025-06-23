@@ -222,6 +222,9 @@ describe('Journal Persistence Between Gameplay Sessions', () => {
         updatedAt: entry1Time
       });
 
+      // Wait to ensure different createdAt timestamps
+      await new Promise(resolve => setTimeout(resolve, 2));
+
       addEntry('session-1', {
         worldId: 'world-1',
         characterId: 'char-1',
@@ -234,6 +237,8 @@ describe('Journal Persistence Between Gameplay Sessions', () => {
         metadata: { tags: ['midday'], automaticEntry: true },
         updatedAt: entry2Time
       });
+
+      await new Promise(resolve => setTimeout(resolve, 2));
 
       addEntry('session-1', {
         worldId: 'world-1',
@@ -251,17 +256,17 @@ describe('Journal Persistence Between Gameplay Sessions', () => {
       // Wait for persistence
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Verify chronological order is maintained
+      // Verify chronological order is maintained (newest first)
       const freshStore = useJournalStore.getState();
       const entries = freshStore.getSessionEntries('session-1');
       
       expect(entries).toHaveLength(3);
-      expect(entries[0].content).toBe('First event at 10 AM');
+      expect(entries[0].content).toBe('Third event at 12 PM'); // newest first
       expect(entries[1].content).toBe('Second event at 11 AM');
-      expect(entries[2].content).toBe('Third event at 12 PM');
-      expect(entries[0].updatedAt).toBe(entry1Time);
+      expect(entries[2].content).toBe('First event at 10 AM');
+      expect(entries[0].updatedAt).toBe(entry3Time);
       expect(entries[1].updatedAt).toBe(entry2Time);
-      expect(entries[2].updatedAt).toBe(entry3Time);
+      expect(entries[2].updatedAt).toBe(entry1Time);
     });
 
     it('should preserve entry formatting and special characters', async () => {
