@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import TemplateSelector from '../../world/TemplateSelector';
 import { SmartTemplates } from '../../world/SmartTemplates';
 import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
@@ -9,6 +9,7 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { AttributeSuggestion, SkillSuggestion } from '../WizardState';
 import { World } from '@/types/world.types';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -34,8 +35,15 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
   onComplete,
   onCancel,
 }) => {
-  const [isApplying, setIsApplying] = useState(false);
-  const [currentMode, setCurrentMode] = useState<TemplateMode>('traditional');
+  // Template processing state using hooks
+  const templateProcessingState = useAsyncState<void>();
+  
+  // Mode selection state using form hook
+  const modeFormState = useFormState({
+    initialData: {
+      currentMode: 'traditional' as TemplateMode
+    }
+  });
 
   // Tab navigation options
   const tabOptions: TabOption<TemplateMode>[] = [
@@ -54,9 +62,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       return;
     }
     
-    try {
-      setIsApplying(true);
-      
+    await templateProcessingState.execute(async () => {
       // Check if this is a recent AI template
       if (selectedTemplateId.startsWith('ai-template-')) {
         // For AI templates, check sessionStorage for the data
@@ -71,11 +77,11 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
             // Proceed to next step
             setTimeout(() => {
               onComplete(false);
-              setIsApplying(false);
             }, 0);
             return;
           } catch (error) {
             console.error('Failed to apply recent template:', error);
+            throw error;
           }
         }
       } else {
@@ -86,20 +92,13 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       // Proceed to next step
       setTimeout(() => {
         onComplete(false);
-        setIsApplying(false);
       }, 0);
-      
-    } catch {
-      // Error applying template
-      setIsApplying(false);
-    }
+    });
   };
   
   // Handler for AI-generated templates
   const handleSmartTemplateGenerated = async (template: WorldTemplate) => {
-    try {
-      setIsApplying(true);
-      
+    await templateProcessingState.execute(async () => {
       // Convert template data to wizard format and populate the state
       const convertedAttributes = template.attributes.map((attr) => ({
         name: attr.name,
@@ -140,12 +139,7 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       
       // Proceed to the next step (Basic Info) so user can review/modify
       onComplete(false);
-      
-    } catch (error) {
-      console.error('Error processing template:', error);
-    } finally {
-      setIsApplying(false);
-    }
+    });
   };
 
   // Handler for creating a blank world
@@ -167,14 +161,14 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
         <div className="mb-6">
           <TabNavigation
             options={tabOptions}
-            activeValue={currentMode}
-            onChange={setCurrentMode}
+            activeValue={modeFormState.data.currentMode}
+            onChange={(value) => modeFormState.updateField('currentMode', value)}
             className="mb-4"
           />
         </div>
 
         {/* Content based on mode */}
-        {currentMode === 'traditional' ? (
+        {modeFormState.data.currentMode === 'traditional' ? (
           <TemplateSelector
             onSelect={handleSelectTemplate}
             selectedTemplateId={selectedTemplateId}
@@ -212,17 +206,17 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
             Create My Own World
           </button>
           
-          {currentMode === 'traditional' && (
+          {modeFormState.data.currentMode === 'traditional' && (
             <button
               type="button"
               onClick={handleApplyTemplate}
-              disabled={!selectedTemplateId || isApplying}
+              disabled={!selectedTemplateId || templateProcessingState.isLoading}
               className={`${wizardStyles.navigation.primaryButton} ${
-                (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
+                (!selectedTemplateId || templateProcessingState.isLoading) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
               }`}
               data-testid="next-button"
             >
-              {isApplying ? 'Applying Template...' : 'Use Selected Template'}
+              {templateProcessingState.isLoading ? 'Applying Template...' : 'Use Selected Template'}
             </button>
           )}
         </div>
