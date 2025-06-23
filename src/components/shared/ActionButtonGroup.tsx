@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 export interface ActionButton {
   label: string;
   onClick: () => void;
-  variant?: 'primary' | 'success' | 'danger';
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | 'primary' | 'success' | 'danger';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
   icon?: React.ReactNode;
+  disabled?: boolean;
 }
 
 interface ActionButtonGroupProps {
@@ -15,25 +18,32 @@ interface ActionButtonGroupProps {
 }
 
 export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroupProps) {
-  const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700',
-    success: 'bg-green-600 hover:bg-green-700',
-    danger: 'bg-red-600 hover:bg-red-700'
+  // Map legacy variants to shadcn/ui variants
+  const mapVariant = (variant: string | undefined) => {
+    switch (variant) {
+      case 'primary': return 'default';
+      case 'success': return 'default'; // Could be customized with className
+      case 'danger': return 'destructive';
+      default: return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive' | undefined;
+    }
   };
 
   return (
     <div className={`flex gap-3 ${className}`}>
       {actions.map((action, index) => (
-        <button
+        <Button
           key={index}
           onClick={action.onClick}
-          className={`px-4 py-3 text-white rounded-md font-medium transition-colors ${
-            variantClasses[action.variant || 'primary']
+          variant={mapVariant(action.variant)}
+          size={action.size || 'default'}
+          disabled={action.disabled}
+          className={`flex items-center gap-2 ${
+            action.variant === 'success' ? 'bg-green-600 hover:bg-green-700 text-white' : ''
           }`}
         >
-          {action.icon && <span className="mr-2">{action.icon}</span>}
+          {action.icon}
           {action.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

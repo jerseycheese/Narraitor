@@ -9,6 +9,7 @@ import {
   generateCharacterArchetypes, 
   generateRandomArchetype 
 } from '@/lib/utils/characterArchetypes';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
@@ -242,32 +243,26 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={handleRandomSelect}
-          disabled={loading}
-          className="w-full sm:w-auto"
-        >
-          {loading ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Dice6 className="h-4 w-4 mr-2" />
-          )}
-          Generate New Random Character
-        </Button>
-
-        <div className="text-sm text-gray-500 hidden sm:block">or</div>
-
-        <Button
-          variant="ghost"
-          size="lg"
-          onClick={onCustomizeClick}
-          className="w-full sm:w-auto"
-        >
-          <Settings className="h-4 w-4 mr-2" />
-          Create Custom Character
-        </Button>
+        <ActionButtonGroup
+          className="flex-col sm:flex-row w-full sm:w-auto"
+          actions={[
+            {
+              label: loading ? 'Generating...' : 'Generate New Random Character',
+              onClick: handleRandomSelect,
+              variant: 'outline',
+              size: 'lg',
+              icon: loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Dice6 className="h-4 w-4" />,
+              disabled: loading
+            },
+            {
+              label: 'Create Custom Character',
+              onClick: onCustomizeClick,
+              variant: 'ghost',
+              size: 'lg',
+              icon: <Settings className="h-4 w-4" />
+            }
+          ]}
+        />
       </div>
 
       {/* Additional Info */}
