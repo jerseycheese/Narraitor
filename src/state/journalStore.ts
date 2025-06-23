@@ -162,7 +162,14 @@ export const useJournalStore = create<JournalStore>()(
     return entryIds
       .map((id) => state.entries[id])
       .filter(Boolean)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort((a, b) => {
+        const dateDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        if (dateDiff !== 0) {
+          return dateDiff;
+        }
+        // Fallback to ID comparison for stable sorting when timestamps are identical
+        return a.id.localeCompare(b.id);
+      });
   },
 
   // Get entries by type

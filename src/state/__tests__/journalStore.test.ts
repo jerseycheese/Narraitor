@@ -89,10 +89,11 @@ describe('journalStore', () => {
 
       // Should return entries even with same timestamp
       expect(entries).toHaveLength(2);
-      // When timestamps are equal, stable sort maintains original array order
-      // Since we add entries to the end of sessionEntries array, first added comes first
-      expect(entries[0].id).toBe(firstId); // First added maintains position when timestamps equal
-      expect(entries[1].id).toBe(secondId);
+      // When timestamps are equal, entries are sorted by ID (stable sort fallback)
+      // Since ID comparison is lexicographic, ordering depends on generated IDs
+      const sortedIds = [firstId, secondId].sort();
+      expect(entries[0].id).toBe(sortedIds[0]);
+      expect(entries[1].id).toBe(sortedIds[1]);
 
       // Restore original Date
       global.Date = originalDate;
