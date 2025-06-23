@@ -17,6 +17,7 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
+import { useAsyncState } from '@/hooks';
 
 const SELECTION_DELAY_MS = 300;
 
@@ -34,31 +35,22 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   existingCharacterNames = []
 }: QuickStartCharactersProps) {
   const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
+  
+  // Async state management using new hooks
+  const archetypeGenerationState = useAsyncState<CharacterArchetype[]>();
+  const randomGenerationState = useAsyncState<CharacterArchetype>();
 
   const generateArchetypes = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+    const generated = await archetypeGenerationState.execute(async () => {
+      const result = await generateCharacterArchetypes(world, existingCharacterNames);
+      return result;
+    });
+
+    if (generated) {
       setArchetypes(generated);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Unable to generate character options: ${errorMessage}`);
-      console.error('Failed to generate archetypes:', err);
-      console.error('Error details:', {
-        error: err,
-        message: errorMessage,
-        stack: err instanceof Error ? err.stack : undefined
-      });
-      console.error('World data:', world);
-      console.error('Existing names:', existingCharacterNames);
-    } finally {
-      setLoading(false);
     }
-  }, [world, existingCharacterNames]);
+  }, [world, existingCharacterNames, archetypeGenerationState]);
 
   useEffect(() => {
     generateArchetypes();
@@ -73,19 +65,16 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   };
 
   const handleRandomSelect = async () => {
-    try {
-      setLoading(true);
-      const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
+    const randomArchetype = await randomGenerationState.execute(async () => {
+      return await generateRandomArchetype(world, existingCharacterNames);
+    });
+
+    if (randomArchetype) {
       handleArchetypeSelect(randomArchetype);
-    } catch (err) {
-      setError('Failed to generate random character. Please try again.');
-      console.error('Failed to generate random archetype:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading && archetypes.length === 0) {
+  if (archetypeGenerationState.isLoading && archetypes.length === 0) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-8">
@@ -105,7 +94,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     );
   }
 
-  if (error) {
+  if (archetypeGenerationState.error) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-8">
@@ -115,7 +104,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           variant="section"
           severity="error"
           title="Character Generation Failed"
-          message={error}
+          message={archetypeGenerationState.error}
           showRetry={true}
           onRetry={generateArchetypes}
           className="py-12"
@@ -224,7 +213,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                   e.stopPropagation();
                   handleArchetypeSelect(archetype);
                 }}
-                disabled={loading || selectedArchetype === archetype.id}
+                disabled={archetypeGenerationState.isLoading || randomGenerationState.isLoading || selectedArchetype === archetype.id}
               >
                 {selectedArchetype === archetype.id ? (
                   <>
@@ -246,12 +235,12 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
           className="flex-col sm:flex-row w-full sm:w-auto"
           actions={[
             {
-              label: loading ? 'Generating...' : 'Generate New Random Character',
+              label: randomGenerationState.isLoading ? 'Generating...' : 'Generate New Random Character',
               onClick: handleRandomSelect,
               variant: 'outline',
               size: 'lg',
-              icon: loading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined,
-              disabled: loading
+              icon: randomGenerationState.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : undefined,
+              disabled: archetypeGenerationState.isLoading || randomGenerationState.isLoading
             },
             {
               label: 'Create Custom Character',
