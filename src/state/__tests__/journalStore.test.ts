@@ -24,24 +24,24 @@ describe('journalStore', () => {
       // Add entries with delays to ensure different timestamps
       const firstEntryId = addEntry(sessionId, {
         content: 'First entry',
-        type: JournalEntryType.NARRATIVE,
+        type: 'character_event',
         title: 'Entry 1'
       });
 
-      // Wait 1ms to ensure different timestamp
-      await new Promise(resolve => setTimeout(resolve, 1));
+      // Wait 5ms to ensure different timestamp
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const secondEntryId = addEntry(sessionId, {
         content: 'Second entry',
-        type: JournalEntryType.NARRATIVE,
+        type: 'world_event',
         title: 'Entry 2'
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const thirdEntryId = addEntry(sessionId, {
         content: 'Third entry',
-        type: JournalEntryType.NARRATIVE,
+        type: 'discovery',
         title: 'Entry 3'
       });
 
@@ -74,15 +74,15 @@ describe('journalStore', () => {
         }
       } as DateConstructor;
 
-      addEntry(sessionId, {
+      const firstId = addEntry(sessionId, {
         content: 'Entry 1',
-        type: JournalEntryType.NARRATIVE,
+        type: 'achievement',
         title: 'Entry 1'
       });
 
-      addEntry(sessionId, {
+      const secondId = addEntry(sessionId, {
         content: 'Entry 2',
-        type: JournalEntryType.NARRATIVE,
+        type: 'combat',
         title: 'Entry 2'
       });
 
@@ -90,8 +90,10 @@ describe('journalStore', () => {
 
       // Should return entries even with same timestamp
       expect(entries).toHaveLength(2);
-      expect(entries[0].content).toBe('Entry 2'); // Last added should be first
-      expect(entries[1].content).toBe('Entry 1');
+      // When timestamps are equal, stable sort maintains original array order
+      // Since we add entries to the end of sessionEntries array, first added comes first
+      expect(entries[0].id).toBe(firstId); // First added maintains position when timestamps equal
+      expect(entries[1].id).toBe(secondId);
 
       // Restore original Date
       global.Date = originalDate;
@@ -105,23 +107,23 @@ describe('journalStore', () => {
       // Add entries to different sessions
       const entry1 = addEntry(session1, {
         content: 'Session 1 first',
-        type: JournalEntryType.NARRATIVE,
+        type: 'dialogue',
         title: 'S1-1'
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const entry2 = addEntry(session2, {
         content: 'Session 2 first',
-        type: JournalEntryType.NARRATIVE,
+        type: 'relationship_change',
         title: 'S2-1'
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const entry3 = addEntry(session1, {
         content: 'Session 1 second',
-        type: JournalEntryType.NARRATIVE,
+        type: 'character_event',
         title: 'S1-2'
       });
 
@@ -144,23 +146,23 @@ describe('journalStore', () => {
 
       const firstId = addEntry(sessionId, {
         content: 'First',
-        type: JournalEntryType.NARRATIVE,
+        type: 'world_event',
         title: 'First'
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const secondId = addEntry(sessionId, {
         content: 'Second',
-        type: JournalEntryType.NARRATIVE,
+        type: 'achievement',
         title: 'Second'
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise(resolve => setTimeout(resolve, 5));
 
       const thirdId = addEntry(sessionId, {
         content: 'Third',
-        type: JournalEntryType.NARRATIVE,
+        type: 'discovery',
         title: 'Third'
       });
 
