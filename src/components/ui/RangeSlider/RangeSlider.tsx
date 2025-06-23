@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 
 /**
  * Level description interface for displaying additional context with range values
@@ -98,12 +99,17 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   isConstrained = false,
   effectiveMax,
 }) => {
-  const [value, setValue] = useState(initialValue);
+  // Slider state management using hooks
+  const sliderState = useFormState({
+    initialData: {
+      value: initialValue
+    }
+  });
   
   // Keep internal state in sync with prop value
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    sliderState.updateField('value', initialValue);
+  }, [initialValue, sliderState]);
 
   // Determine if we should use visual scale mapping
   const useVisualScale = min === 8 && max === 18;
@@ -138,12 +144,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     const maxBound = effectiveMax !== undefined ? effectiveMax : max;
     const clampedValue = Math.max(min, Math.min(maxBound, actualValue));
     
-    setValue(clampedValue);
+    sliderState.updateField('value', clampedValue);
     onChange(clampedValue);
   };
 
   // Find the level description for the current value
-  const currentLevelDescription = levelDescriptions.find(level => level.value === value);
+  const currentLevelDescription = levelDescriptions.find(level => level.value === sliderState.data.value);
 
   // Get the visual range for the slider - always use original max for consistency
   const getVisualRange = () => {
@@ -214,19 +220,19 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
               min={visualRange.min}
               max={visualRange.max}
               step={1}
-              value={valueToScale(value)}
+              value={valueToScale(sliderState.data.value)}
               onChange={handleChange}
               disabled={disabled}
               className={`w-full m-0 appearance-none bg-transparent cursor-pointer h-6 flex items-center 
                 [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-full
                 [&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-full
-                ${isConstrained && effectiveMax !== undefined && value === effectiveMax 
+                ${isConstrained && effectiveMax !== undefined && sliderState.data.value === effectiveMax 
                   ? '[&::-webkit-slider-runnable-track]:bg-orange-300 [&::-moz-range-track]:bg-orange-300' 
                   : '[&::-webkit-slider-runnable-track]:bg-gray-200 [&::-moz-range-track]:bg-gray-200'
                 }
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
                 [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:mt-0
-                ${isConstrained && effectiveMax !== undefined && value === effectiveMax
+                ${isConstrained && effectiveMax !== undefined && sliderState.data.value === effectiveMax
                   ? '[&::-webkit-slider-thumb]:bg-orange-500 [&::-moz-range-thumb]:bg-orange-500'
                   : '[&::-webkit-slider-thumb]:bg-blue-500 [&::-moz-range-thumb]:bg-blue-500'
                 }`}

@@ -1,6 +1,6 @@
 // src/components/world/SmartTemplates/SmartTemplates.tsx
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { useSessionStore } from '@/state/sessionStore';
 import { TemplateHistoryEntry } from '@/types/game.types';
@@ -14,7 +14,7 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
 import { useAIGeneration } from '@/lib/hooks/useAIGeneration';
-import { useModal } from '@/hooks';
+import { useModal, useFormState } from '@/hooks';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -23,10 +23,15 @@ interface SmartTemplatesProps {
 type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
 
 export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenerated }) => {
-  const [mode, setMode] = useState<TemplateMode>('inspired-by');
-  const [userInput, setUserInput] = useState('');
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
+  // Template state management using hooks
+  const smartTemplatesState = useFormState({
+    initialData: {
+      mode: 'inspired-by' as TemplateMode,
+      userInput: '',
+      selectedGenres: [] as string[],
+      previewTemplate: null as WorldTemplate | null
+    }
+  });
   
   // Modal state management using hooks
   const templatePreviewModal = useModal();
@@ -52,15 +57,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       const historyEntry: TemplateHistoryEntry = {
         template,
         generatedAt: new Date().toISOString(),
-        generationType: mode,
-        userInput: mode === 'inspired-by' ? userInput : undefined,
-        genres: mode === 'genre-mix' ? selectedGenres : undefined
+        generationType: smartTemplatesState.data.mode,
+        userInput: smartTemplatesState.data.mode === 'inspired-by' ? smartTemplatesState.data.userInput : undefined,
+        genres: smartTemplatesState.data.mode === 'genre-mix' ? smartTemplatesState.data.selectedGenres : undefined
       };
       
       addTemplateToHistory(historyEntry);
       
       // Show preview
-      setPreviewTemplate(template);
+      smartTemplatesState.updateField('previewTemplate', template);
       templatePreviewModal.open();
     },
     onError: () => {
@@ -69,18 +74,18 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   });
 
   const toggleGenre = useCallback((genre: string) => {
-    setSelectedGenres(prev => 
-      prev.includes(genre) 
-        ? prev.filter(g => g !== genre)
-        : [...prev, genre]
-    );
-  }, []);
+    const currentGenres = smartTemplatesState.data.selectedGenres;
+    const updatedGenres = currentGenres.includes(genre) 
+      ? currentGenres.filter(g => g !== genre)
+      : [...currentGenres, genre];
+    smartTemplatesState.updateField('selectedGenres', updatedGenres);
+  }, [smartTemplatesState]);
 
   const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
     const requestBody = {
       type: generationMode,
-      userInput: generationMode === 'inspired-by' ? userInput : undefined,
-      genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
+      userInput: generationMode === 'inspired-by' ? smartTemplatesState.data.userInput : undefined,
+      genres: generationMode === 'genre-mix' ? smartTemplatesState.data.selectedGenres : undefined,
     };
 
     try {
@@ -89,56 +94,56 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       // Error is already handled by the hook's error state
       // No need to do anything here - the hook manages the error display
     }
-  }, [userInput, selectedGenres, aiGeneration]);
+  }, [smartTemplatesState.data.userInput, smartTemplatesState.data.selectedGenres, aiGeneration]);
 
   const handleUseTemplate = useCallback(() => {
-    if (previewTemplate) {
-      onTemplateGenerated(previewTemplate);
-      setPreviewTemplate(null);
+    if (smartTemplatesState.data.previewTemplate) {
+      onTemplateGenerated(smartTemplatesState.data.previewTemplate);
+      smartTemplatesState.updateField('previewTemplate', null);
       templatePreviewModal.close();
     }
-  }, [previewTemplate, onTemplateGenerated, templatePreviewModal]);
+  }, [smartTemplatesState.data.previewTemplate, onTemplateGenerated, templatePreviewModal, smartTemplatesState]);
 
   const handleGenerateInspiredBy = useCallback(() => {
-    if (!userInput.trim()) {
+    if (!smartTemplatesState.data.userInput.trim()) {
       // Using a simple alert for validation errors since they're not async failures
       alert('Please describe what you want your world to be like');
       return;
     }
     generateTemplate('inspired-by');
-  }, [userInput, generateTemplate]);
+  }, [smartTemplatesState.data.userInput, generateTemplate]);
 
   const handleGenerateGenreMix = useCallback(() => {
-    if (selectedGenres.length < 2) {
+    if (smartTemplatesState.data.selectedGenres.length < 2) {
       // Using a simple alert for validation errors since they're not async failures
       alert('Please select at least 2 genres to mix');
       return;
     }
     generateTemplate('genre-mix');
-  }, [selectedGenres, generateTemplate]);
+  }, [smartTemplatesState.data.selectedGenres, generateTemplate]);
 
   const handleSurpriseMe = useCallback(() => {
     generateTemplate('surprise-me');
   }, [generateTemplate]);
 
   const handleHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
-    setPreviewTemplate(entry.template);
+    smartTemplatesState.updateField('previewTemplate', entry.template);
     templatePreviewModal.open();
-  }, [templatePreviewModal]);
+  }, [templatePreviewModal, smartTemplatesState]);
 
 
   // Template preview modal component
   const handleClosePreview = useCallback(() => {
-    setPreviewTemplate(null);
+    smartTemplatesState.updateField('previewTemplate', null);
     templatePreviewModal.close();
-  }, [templatePreviewModal]);
+  }, [templatePreviewModal, smartTemplatesState]);
 
   return (
     <>
       {/* Template Preview Modal */}
-      {previewTemplate && (
+      {smartTemplatesState.data.previewTemplate && (
         <TemplatePreview
-          template={previewTemplate}
+          template={smartTemplatesState.data.previewTemplate}
           {...templatePreviewModal.modalProps}
           onUse={handleUseTemplate}
           onBack={handleClosePreview}
@@ -171,14 +176,14 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             <div className="mb-6">
               <TabNavigation
                 options={tabOptions}
-                activeValue={mode}
-                onChange={setMode}
+                activeValue={smartTemplatesState.data.mode}
+                onChange={(newMode) => smartTemplatesState.updateField('mode', newMode)}
                 className="mb-6"
               />
             </div>
 
             {/* Inspired By Mode */}
-            {mode === 'inspired-by' && (
+            {smartTemplatesState.data.mode === 'inspired-by' && (
             <div className={wizardStyles.card.base}>
               <div className="space-y-4">
                 <div>
@@ -188,12 +193,12 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                   <Input
                     type="text"
                     placeholder="Steampunk Victorian London, Space pirates, etc."
-                    value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
+                    value={smartTemplatesState.data.userInput}
+                    onChange={(e) => smartTemplatesState.updateField('userInput', e.target.value)}
                   />
                   <Button
                     onClick={handleGenerateInspiredBy}
-                    disabled={!userInput.trim()}
+                    disabled={!smartTemplatesState.data.userInput.trim()}
                     variant="default"
                     size="default"
                   >
@@ -205,7 +210,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             )}
 
             {/* Genre Mixer Mode */}
-            {mode === 'genre-mix' && (
+            {smartTemplatesState.data.mode === 'genre-mix' && (
             <div className={wizardStyles.card.base}>
               <div className="space-y-4">
                 <div>
@@ -214,17 +219,17 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                 </div>
                 <div className="space-y-4">
                   <GenreSelector
-                    selectedGenres={selectedGenres}
+                    selectedGenres={smartTemplatesState.data.selectedGenres}
                     onToggleGenre={toggleGenre}
                     excludeOther={true}
                   />
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">
-                      {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
+                      {smartTemplatesState.data.selectedGenres.length} genre{smartTemplatesState.data.selectedGenres.length !== 1 ? 's' : ''} selected
                     </span>
                     <Button
                       onClick={handleGenerateGenreMix}
-                      disabled={selectedGenres.length < 2}
+                      disabled={smartTemplatesState.data.selectedGenres.length < 2}
                       variant="default"
                       size="default"
                     >
@@ -237,7 +242,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
             )}
 
             {/* Surprise Me Mode */}
-            {mode === 'surprise-me' && (
+            {smartTemplatesState.data.mode === 'surprise-me' && (
             <div className={wizardStyles.card.base}>
               <div className="space-y-4">
                 <div>
