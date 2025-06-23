@@ -21,6 +21,7 @@ import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { useAsyncState, useModal } from '@/hooks';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -59,16 +60,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
-  // Ending suggestion state
-  const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
+  // Ending suggestion state using hooks
+  const endingSuggestionModal = useModal();
   const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
   const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
   
-  // Manual end story confirmation
-  const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
+  // Manual end story confirmation using hooks
+  const endConfirmationModal = useModal();
   
-  // Journal modal state (Issue #278)
-  const [showJournalModal, setShowJournalModal] = React.useState(false);
+  // Journal modal state using hooks (Issue #278)
+  const journalModal = useModal();
   
   // Get character ID from session store
   const characterId = useSessionStore(state => state.characterId);
@@ -81,6 +82,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
   const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  
+  // Async state management for journal summary generation
+  const journalSummaryState = useAsyncState<{summary: string, entryType: string, significance: string}>();
   
   // Get journal store for auto-creating entries
   const { addEntry } = useJournalStore();
@@ -159,9 +163,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     };
   }, [sessionId, worldId, controllerKey]);
 
-  // Helper function to generate AI summary for journal entries
+  // Helper function to generate AI summary for journal entries using hooks
   const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
-    try {
+    const result = await journalSummaryState.execute(async () => {
       const response = await fetch('/api/narrative/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,8 +188,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           };
         }
       }
-    } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
+      
+      throw new Error('Failed to generate AI summary');
+    });
+    
+    if (result) {
+      return result;
     }
     
     // Return fallback values using decision weight for significance
@@ -457,12 +465,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleEndingSuggested = (reason: string, endingType: EndingType) => {
     setEndingSuggestionReason(reason);
     setSuggestedEndingType(endingType);
-    setShowEndingSuggestion(true);
+    endingSuggestionModal.open();
   };
   
   // Accept AI ending suggestion
   const handleAcceptEndingSuggestion = async () => {
-    setShowEndingSuggestion(false);
+    endingSuggestionModal.close();
     if (!characterId || !world) return;
     
     try {
@@ -478,17 +486,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Reject AI ending suggestion
   const handleRejectEndingSuggestion = () => {
-    setShowEndingSuggestion(false);
+    endingSuggestionModal.close();
   };
   
   // Handle manual end story button click
   const handleEndStoryClick = () => {
-    setShowEndConfirmation(true);
+    endConfirmationModal.open();
   };
   
   // Confirm manual end story
   const handleConfirmEndStory = () => {
-    setShowEndConfirmation(false);
+    endConfirmationModal.close();
     handleEndStory();
   };
 
@@ -651,7 +659,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Ending Suggestion Dialog */}
       <StoryEndingDialog
-        isOpen={showEndingSuggestion}
+        {...endingSuggestionModal.modalProps}
         onClose={handleRejectEndingSuggestion}
         onContinue={handleAcceptEndingSuggestion}
         title="Story Ending Suggested"
@@ -673,9 +681,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Manual End Story Confirmation */}
       <ConfirmationDialog
-        isOpen={showEndConfirmation}
+        {...endConfirmationModal.modalProps}
         onConfirm={handleConfirmEndStory}
-        onClose={() => setShowEndConfirmation(false)}
+        onClose={endConfirmationModal.close}
         title="End Story"
         message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
         variant="warning"
@@ -685,15 +693,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Journal Modal - Issue #278: AC2,AC4,AC5 */}
       <JournalModal
-        isOpen={showJournalModal}
-        onClose={() => setShowJournalModal(false)}
+        {...journalModal.modalProps}
+        onClose={journalModal.close}
         sessionId={sessionId}
       />
 
       {/* Journal Floating Button - Issue #562 */}
       {character && (
         <JournalFloatingButton
-          onClick={() => setShowJournalModal(true)}
+          onClick={journalModal.open}
         />
       )}
     </div>

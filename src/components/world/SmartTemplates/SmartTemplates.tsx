@@ -14,6 +14,7 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
 import { useAIGeneration } from '@/lib/hooks/useAIGeneration';
+import { useModal } from '@/hooks';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -26,6 +27,9 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const [userInput, setUserInput] = useState('');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [previewTemplate, setPreviewTemplate] = useState<WorldTemplate | null>(null);
+  
+  // Modal state management using hooks
+  const templatePreviewModal = useModal();
 
   // Tab navigation options - memoized to prevent unnecessary re-renders
   const tabOptions: TabOption<TemplateMode>[] = useMemo(() => [
@@ -57,6 +61,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       
       // Show preview
       setPreviewTemplate(template);
+      templatePreviewModal.open();
     },
     onError: () => {
       // Error is already handled by the hook's error state
@@ -90,8 +95,9 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     if (previewTemplate) {
       onTemplateGenerated(previewTemplate);
       setPreviewTemplate(null);
+      templatePreviewModal.close();
     }
-  }, [previewTemplate, onTemplateGenerated]);
+  }, [previewTemplate, onTemplateGenerated, templatePreviewModal]);
 
   const handleGenerateInspiredBy = useCallback(() => {
     if (!userInput.trim()) {
@@ -117,23 +123,27 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
 
   const handleHistoryTemplate = useCallback((entry: TemplateHistoryEntry) => {
     setPreviewTemplate(entry.template);
-  }, []);
+    templatePreviewModal.open();
+  }, [templatePreviewModal]);
 
 
-  // Template preview modal
-  const templatePreviewModal = previewTemplate && (
-    <TemplatePreview
-      template={previewTemplate}
-      isOpen={!!previewTemplate}
-      onUse={handleUseTemplate}
-      onBack={() => setPreviewTemplate(null)}
-    />
-  );
+  // Template preview modal component
+  const handleClosePreview = useCallback(() => {
+    setPreviewTemplate(null);
+    templatePreviewModal.close();
+  }, [templatePreviewModal]);
 
   return (
     <>
       {/* Template Preview Modal */}
-      {templatePreviewModal}
+      {previewTemplate && (
+        <TemplatePreview
+          template={previewTemplate}
+          {...templatePreviewModal.modalProps}
+          onUse={handleUseTemplate}
+          onBack={handleClosePreview}
+        />
+      )}
       
       <div className={wizardStyles.container}>
         <div className={wizardStyles.header}>
