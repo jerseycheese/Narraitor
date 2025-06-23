@@ -155,7 +155,7 @@ export const useJournalStore = create<JournalStore>()(
     };
   }),
 
-  // Get session entries
+  // Get session entries in reverse chronological order (newest first)
   getSessionEntries: (sessionId) => {
     const state = get();
     const entryIds = state.sessionEntries[sessionId] || [];
