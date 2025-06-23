@@ -1,6 +1,7 @@
 // src/components/devtools/PortraitDebugSection/PortraitDebugSection.tsx
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useFormState, useAsyncState } from '@/hooks';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
@@ -18,16 +19,23 @@ interface PortraitDebugSectionProps {
 }
 
 export function PortraitDebugSection({ characterData, worldConfig }: PortraitDebugSectionProps) {
-  const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
-  const [showBreakdown, setShowBreakdown] = useState(false);
+  // Form state management using hooks
+  const portraitDebugState = useFormState({
+    initialData: {
+      generatedPrompt: '',
+      lastGeneratedImage: null as string | null,
+      selectedCharacterId: '',
+      showBreakdown: false
+    }
+  });
+  
+  // Async state management using hooks
+  const generationState = useAsyncState<string>();
   
   // Get characters from store
   const characters = useCharacterStore((state) => state.characters);
   const charactersArray = Object.values(characters);
-  const selectedCharacter = selectedCharacterId ? characters[selectedCharacterId] : null;
+  const selectedCharacter = portraitDebugState.data.selectedCharacterId ? characters[portraitDebugState.data.selectedCharacterId] : null;
   
   // Get worlds from store
   const worlds = useWorldStore((state) => state.worlds);
@@ -57,7 +65,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     console.log('generatePromptPreview called');
     if (!effectiveCharacterData) {
       console.log('No effective character data');
-      setGeneratedPrompt('No character data available. Please select a character or provide character data.');
+      portraitDebugState.updateField('generatedPrompt', 'No character data available. Please select a character or provide character data.');
       return;
     }
 
@@ -141,18 +149,17 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       const prompt = result.prompt || result.portrait?.prompt;
       console.log('Extracted prompt:', prompt);
 
-      setGeneratedPrompt(prompt);
+      portraitDebugState.updateField('generatedPrompt', prompt);
       console.log('Prompt set successfully');
     } catch (error) {
-      setGeneratedPrompt(`Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      portraitDebugState.updateField('generatedPrompt', `Error generating prompt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const testPromptGeneration = async () => {
     if (!effectiveCharacterData) return;
 
-    setIsGenerating(true);
-    try {
+    await generationState.execute(async () => {
       const aiClient = createAIClient();
       const generator = new PortraitGenerator(aiClient);
       
@@ -201,21 +208,21 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         updatedAt: new Date().toISOString()
       };
 
-      const result = await generator.generatePortrait(mockCharacter, {
+      const generationResult = await generator.generatePortrait(mockCharacter, {
         worldGenre: effectiveWorldConfig?.genre
       });
 
-      setLastGeneratedImage(result.url);
-      setGeneratedPrompt(result.prompt || 'No prompt returned');
-    } catch (error) {
-      setGeneratedPrompt(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setIsGenerating(false);
-    }
+      portraitDebugState.updateField('lastGeneratedImage', generationResult.url);
+      portraitDebugState.updateField('generatedPrompt', generationResult.prompt || 'No prompt returned');
+      
+      return generationResult.url;
+    });
+    
+    // Result is available here if successful, errors are handled by useAsyncState
   };
 
   const copyPromptToClipboard = () => {
-    navigator.clipboard.writeText(generatedPrompt);
+    navigator.clipboard.writeText(portraitDebugState.data.generatedPrompt);
   };
 
   return (
@@ -228,8 +235,8 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
               Select Character:
             </label>
             <select
-              value={selectedCharacterId}
-              onChange={(e) => setSelectedCharacterId(e.target.value)}
+              value={portraitDebugState.data.selectedCharacterId}
+              onChange={(e) => portraitDebugState.updateField('selectedCharacterId', e.target.value)}
               className="w-full px-3 py-1 bg-slate-800 text-slate-200 border border-slate-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">-- Select a character --</option>
@@ -272,11 +279,11 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
             <button
               onClick={testPromptGeneration}
               className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
-              disabled={!effectiveCharacterData || isGenerating}
+              disabled={!effectiveCharacterData || generationState.isLoading}
             >
-              {isGenerating ? 'Generating...' : 'Test Full Generation'}
+              {generationState.isLoading ? 'Generating...' : 'Test Full Generation'}
             </button>
-            {generatedPrompt && (
+            {portraitDebugState.data.generatedPrompt && (
               <>
                 <button
                   onClick={copyPromptToClipboard}
@@ -285,41 +292,41 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
                   Copy Prompt
                 </button>
                 <button
-                  onClick={() => setShowBreakdown(!showBreakdown)}
+                  onClick={() => portraitDebugState.updateField('showBreakdown', !portraitDebugState.data.showBreakdown)}
                   className="px-3 py-1 bg-purple-500 text-white rounded text-sm hover:bg-purple-600"
                 >
-                  {showBreakdown ? 'Hide' : 'Show'} Breakdown
+                  {portraitDebugState.data.showBreakdown ? 'Hide' : 'Show'} Breakdown
                 </button>
               </>
             )}
           </div>
 
-          {generatedPrompt && (
+          {portraitDebugState.data.generatedPrompt && (
             <div className="bg-slate-700 p-3 rounded border border-slate-600">
               <h4 className="font-medium mb-2 text-slate-200">Generated Prompt:</h4>
               <pre className="text-sm whitespace-pre-wrap break-words bg-slate-800 p-2 rounded border border-slate-600 text-slate-300">
-                {generatedPrompt}
+                {portraitDebugState.data.generatedPrompt}
               </pre>
             </div>
           )}
         </div>
 
         {/* Prompt Breakdown */}
-        {showBreakdown && generatedPrompt && (
+        {portraitDebugState.data.showBreakdown && portraitDebugState.data.generatedPrompt && (
           <PromptBreakdown
             characterData={effectiveCharacterData as Partial<Character> | undefined}
             worldConfig={effectiveWorldConfig}
-            prompt={generatedPrompt}
+            prompt={portraitDebugState.data.generatedPrompt}
           />
         )}
 
         {/* Last Generated Image */}
-        {lastGeneratedImage && (
+        {portraitDebugState.data.lastGeneratedImage && (
           <div className="bg-slate-700 p-3 rounded border border-slate-600">
             <h4 className="font-medium mb-2 text-slate-200">Last Generated Image:</h4>
             <div className="relative w-32 h-32">
               <Image
-                src={lastGeneratedImage}
+                src={portraitDebugState.data.lastGeneratedImage}
                 alt="Generated portrait"
                 fill
                 className="rounded border border-slate-500 object-cover"
