@@ -9,15 +9,10 @@ import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 // Mock the abstraction hooks to simulate the actual hooks behavior
 jest.mock('@/hooks', () => ({
   useFormState: jest.fn((options) => {
-    // Store initial data outside of React state to avoid infinite loops in tests
-    const initialData = options?.initialData || {
+    const [data, setData] = React.useState(options?.initialData || {
       archetypes: [],
       selectedArchetype: null
-    };
-    
-    // For tests that need to see archetypes, we need to simulate the async loading
-    // This will be set by the component when it calls updateField('archetypes', generated)
-    const [data, setData] = React.useState(initialData);
+    });
     
     return {
       data,
@@ -37,8 +32,8 @@ jest.mock('@/hooks', () => ({
     };
   }),
   useAsyncState: jest.fn(() => {
-    const [isLoading, setIsLoading] = React.useState(false);
     const [data, setData] = React.useState(null);
+    const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
     
     return {
@@ -61,10 +56,20 @@ jest.mock('@/hooks', () => ({
           return null;
         }
       }),
-      reset: jest.fn(),
-      setData: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn()
+      reset: jest.fn(() => {
+        setData(null);
+        setIsLoading(false);
+        setError(null);
+      }),
+      setData: jest.fn((newData) => {
+        setData(newData);
+      }),
+      setError: jest.fn((newError) => {
+        setError(newError);
+      }),
+      clearError: jest.fn(() => {
+        setError(null);
+      })
     };
   })
 }));
@@ -275,6 +280,33 @@ describe('QuickStartCharacters', () => {
 
   describe('Error Handling', () => {
     test('shows error message when archetype generation fails', async () => {
+      // Set up the first async state instance (archetype generation) to have an error
+      const mockUseAsyncState = require('@/hooks').useAsyncState;
+      
+      // Override the mock for this test to return an error state
+      mockUseAsyncState.mockImplementationOnce(() => ({
+        data: null,
+        isLoading: false,
+        error: 'Generation failed',
+        status: 'error',
+        execute: jest.fn(),
+        reset: jest.fn(),
+        setData: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn()
+      })).mockImplementationOnce(() => ({
+        // Second useAsyncState call (for random generation) - normal state
+        data: null,
+        isLoading: false,
+        error: null,
+        status: 'idle',
+        execute: jest.fn(),
+        reset: jest.fn(),
+        setData: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn()
+      }));
+      
       mockGenerateArchetypes.mockRejectedValue(new Error('Generation failed'));
       render(<QuickStartCharacters {...defaultProps} />);
       
