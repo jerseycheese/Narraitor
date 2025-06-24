@@ -129,11 +129,6 @@ type WorldStoreFunction = {
 (jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction).getState = mockGetState;
 
 // Mock the hooks used by WorldListScreen with dynamic behavior
-let mockFormStateData = {
-  worlds: [],
-  currentWorldId: null,
-  worldToDeleteId: null
-};
 
 jest.mock('../../../hooks', () => ({
   useFormState: jest.fn(() => {
