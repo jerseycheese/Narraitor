@@ -5,7 +5,7 @@ import { AttributeSuggestion } from '../WorldCreationWizard';
 import { World } from '@/types/world.types';
 
 // Mock the hooks for AttributeReviewStep with dynamic processed suggestions
-let mockSuggestionState = {
+const mockSuggestionState = {
   localSuggestions: [
     {
       name: 'Strength',

@@ -281,7 +281,7 @@ describe('QuickStartCharacters', () => {
   describe('Error Handling', () => {
     test('shows error message when archetype generation fails', async () => {
       // Set up the first async state instance (archetype generation) to have an error
-      const mockUseAsyncState = require('@/hooks').useAsyncState;
+      const { useAsyncState: mockUseAsyncState } = jest.requireMock('@/hooks');
       
       // Override the mock for this test to return an error state
       mockUseAsyncState.mockImplementationOnce(() => ({

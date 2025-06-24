@@ -260,7 +260,7 @@ describe('AttributeEditor', () => {
       ];
 
       // Mock the useFormState for this specific test to handle duplicate validation
-      const mockUseFormState = require('@/hooks').useFormState;
+      const { useFormState: mockUseFormState } = jest.requireMock('@/hooks');
       mockUseFormState.mockImplementationOnce((options) => {
         const [data, setData] = React.useState(options?.initialData || {
           name: 'Strength',
@@ -332,7 +332,7 @@ describe('AttributeEditor', () => {
 
     it('shows delete confirmation dialog', async () => {
       // Mock useModal for this test to ensure dialog state management
-      const mockUseModal = require('@/hooks').useModal;
+      const { useModal: mockUseModal } = jest.requireMock('@/hooks');
       mockUseModal.mockImplementationOnce((options) => {
         const [isOpen, setIsOpen] = React.useState(options?.initialOpen || false);
         
@@ -372,8 +372,8 @@ describe('AttributeEditor', () => {
 
     it('warns when deleting attribute linked to skills', async () => {
       // Mock useModal and useErrorState for this test
-      const mockUseModal = require('@/hooks').useModal;
-      const mockUseErrorState = require('@/hooks').useErrorState;
+      const { useModal: mockUseModal } = jest.requireMock('@/hooks');
+      const { useErrorState: mockUseErrorState } = jest.requireMock('@/hooks');
       
       mockUseModal.mockImplementationOnce((options) => {
         const [isOpen, setIsOpen] = React.useState(options?.initialOpen || false);
@@ -425,7 +425,7 @@ describe('AttributeEditor', () => {
 
     it('deletes attribute after confirmation', async () => {
       // Mock useModal for this test to ensure dialog state management
-      const mockUseModal = require('@/hooks').useModal;
+      const { useModal: mockUseModal } = jest.requireMock('@/hooks');
       mockUseModal.mockImplementationOnce((options) => {
         const [isOpen, setIsOpen] = React.useState(options?.initialOpen || false);
         
@@ -527,7 +527,7 @@ describe('AttributeEditor', () => {
       ];
 
       // Mock the useFormState for this specific test to handle max attributes validation
-      const mockUseFormState = require('@/hooks').useFormState;
+      const { useFormState: mockUseFormState } = jest.requireMock('@/hooks');
       mockUseFormState.mockImplementationOnce((options) => {
         const [data, setData] = React.useState(options?.initialData || {});
         const [errors, setErrors] = React.useState([]);

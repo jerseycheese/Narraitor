@@ -38,7 +38,8 @@ jest.doMock('@/hooks', () => ({
 }));
 
 // Import component AFTER setting up mocks
-const GameSession = require('./GameSession').default;
+import GameSessionComponent from './GameSession';
+const GameSession = GameSessionComponent;
 
 // Mock the ErrorDisplay component
 jest.mock('@/components/ui/ErrorDisplay/ErrorDisplay', () => ({

@@ -5,7 +5,7 @@ import { SkillSuggestion } from '../WorldCreationWizard';
 import { World } from '@/types/world.types';
 
 // Mock the hooks for SkillReviewStep with stable state to prevent infinite loops
-let mockSkillFormData = {
+const mockSkillFormData = {
   localSuggestions: [
     {
       name: 'Combat',
@@ -593,7 +593,7 @@ describe('SkillReviewStep', () => {
     // Should not include the toggled-off skill
     const lastCall = mockOnUpdate.mock.calls[mockOnUpdate.mock.calls.length - 1];
     const skills = lastCall[0].skills;
-    expect(skills.find((s: any) => s.name === 'Stealth')).toBeUndefined();
+    expect(skills.find((s: { name: string }) => s.name === 'Stealth')).toBeUndefined();
   });
 
   test('displays errors when provided', () => {
