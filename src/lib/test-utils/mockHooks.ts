@@ -6,7 +6,7 @@
  * consistent behavior across tests.
  */
 
-import React from 'react';
+// Import React type definitions for component typing
 
 // Type definitions for configuration objects
 export interface MockFormStateConfig {
@@ -258,7 +258,7 @@ export const createMockModal = (config: MockModalConfig = {}) => {
       };
 
       if (includeModalProps) {
-        (mockReturn as any).modalProps = {
+        (mockReturn as typeof mockReturn & { modalProps: { isOpen: boolean; onClose: jest.Mock } }).modalProps = {
           isOpen,
           onClose: jest.fn()
         };
@@ -278,7 +278,7 @@ export const createMockModal = (config: MockModalConfig = {}) => {
     };
 
     if (includeModalProps) {
-      (mockReturn as any).modalProps = {
+      (mockReturn as typeof mockReturn & { modalProps: { isOpen: boolean; onClose: jest.Mock } }).modalProps = {
         get isOpen() { return mockIsOpen; },
         onClose: jest.fn(() => { mockIsOpen = false; })
       };

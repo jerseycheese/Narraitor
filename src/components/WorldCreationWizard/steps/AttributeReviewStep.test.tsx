@@ -41,7 +41,6 @@ const mockSuggestionState = {
 };
 
 // Mock update function that updates both the mock state and calls the actual onUpdate
-let mockUpdateField = jest.fn();
 let mockOnUpdate = jest.fn();
 
 jest.mock('@/hooks', () => {
