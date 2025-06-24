@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 /**
  * Configuration options for useFormState hook
@@ -154,9 +154,29 @@ export function useFormState<T extends Record<string, unknown>>(
     return validationErrors.length === 0;
   }, [validate]);
 
-  // Compute derived state
+  // Compute derived state with optimized dirty checking
   const hasErrors = errors.length > 0;
-  const isDirty = JSON.stringify(data) !== JSON.stringify(initialDataSnapshot);
+  
+  // Use memoized shallow comparison instead of JSON.stringify for better performance
+  const isDirty = useMemo(() => {
+    // For objects with few properties, use shallow comparison
+    const dataKeys = Object.keys(data);
+    const initialKeys = Object.keys(initialDataSnapshot);
+    
+    // Quick check: different number of keys means dirty
+    if (dataKeys.length !== initialKeys.length) {
+      return true;
+    }
+    
+    // Check each key for changes (shallow comparison)
+    for (const key of dataKeys) {
+      if (data[key] !== initialDataSnapshot[key]) {
+        return true;
+      }
+    }
+    
+    return false;
+  }, [data, initialDataSnapshot]);
 
   return {
     data,

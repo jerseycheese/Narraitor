@@ -109,7 +109,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   // Keep internal state in sync with prop value
   useEffect(() => {
     sliderState.updateField('value', initialValue);
-  }, [initialValue, sliderState]);
+  }, [initialValue, sliderState.updateField]);
 
   // Determine if we should use visual scale mapping
   const useVisualScale = min === 8 && max === 18;

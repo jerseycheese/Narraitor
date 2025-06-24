@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
  * Configuration options for useErrorState hook
@@ -64,20 +64,42 @@ export function useErrorState(
   const { initialError = null, autoClearMs } = options;
   
   const [error, setErrorState] = useState<string | null>(initialError);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear timeout on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Set error with optional auto-clear
   const setError = useCallback((errorMessage: string | null) => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    
     setErrorState(errorMessage);
     
     if (errorMessage && autoClearMs) {
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         setErrorState(null);
+        timeoutRef.current = null;
       }, autoClearMs);
     }
   }, [autoClearMs]);
 
   // Clear error
   const clearError = useCallback(() => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     setErrorState(null);
   }, []);
 
