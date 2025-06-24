@@ -24,7 +24,8 @@ export const useAsyncState = jest.fn(() => ({
   execute: jest.fn(),
   reset: jest.fn(),
   setData: jest.fn(),
-  setError: jest.fn()
+  setError: jest.fn(),
+  clearError: jest.fn()
 }));
 
 export const useModal = jest.fn(() => ({
