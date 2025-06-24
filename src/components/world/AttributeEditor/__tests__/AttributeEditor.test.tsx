@@ -4,32 +4,23 @@ import { AttributeEditor } from '../AttributeEditor';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 
-// Mock the abstraction hooks
+// Mock the abstraction hooks to pass through to real validation
 jest.mock('@/hooks', () => ({
   useFormState: jest.fn((options) => {
     const [data, setData] = React.useState(options?.initialData || {});
     const [errors, setErrors] = React.useState([]);
     
+    // Use the real validation function passed from the component
     const validate = jest.fn(() => {
-      const validationErrors = [];
-      
-      // Basic required field validation
-      if (!data.name || !data.name.trim()) {
-        validationErrors.push('Attribute name is required');
+      if (options?.validate) {
+        const validationErrors = options.validate(data);
+        setErrors(validationErrors);
+        return validationErrors;
       }
-      
-      // Range validation
-      if (data.minValue !== undefined && data.maxValue !== undefined && 
-          data.minValue >= data.maxValue) {
-        validationErrors.push('Maximum value must be greater than minimum value');
-      }
-      
-      setErrors(validationErrors);
-      return validationErrors;
+      return [];
     });
     
     const isValid = jest.fn(() => {
-      // Call validate to ensure errors are set
       const currentErrors = validate();
       return currentErrors.length === 0;
     });
@@ -60,7 +51,11 @@ jest.mock('@/hooks', () => ({
       isOpen,
       open: jest.fn(() => setIsOpen(true)),
       close: jest.fn(() => setIsOpen(false)),
-      toggle: jest.fn(() => setIsOpen(prev => !prev))
+      toggle: jest.fn(() => setIsOpen(prev => !prev)),
+      modalProps: {
+        isOpen,
+        onClose: jest.fn(() => setIsOpen(false))
+      }
     };
   }),
   useErrorState: jest.fn(() => {
