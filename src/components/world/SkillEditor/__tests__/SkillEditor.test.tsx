@@ -5,101 +5,47 @@ import { SkillEditor } from '../SkillEditor';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 // Note: SkillDifficulty type is used implicitly in WorldSkill interface
 
-// Mock the hooks used by SkillEditor with working validation
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setDataState] = React.useState(options?.initialData || {});
-    const [errors, setErrorsState] = React.useState([]);
-    
-    // Mock validation function that mimics the real validation logic
-    const validate = jest.fn(() => {
-      const validationErrors = [];
-      
-      // Required fields validation
-      if (!data.name || !data.name.trim()) {
-        validationErrors.push('Skill name is required');
+// Mock the hooks used by SkillEditor using the new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets, createMockFormState } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: createMockFormState({
+      behavior: 'validation',
+      customValidation: (data) => {
+        const validationErrors = [];
+        
+        // Required fields validation
+        if (!data.name || !(data.name).trim()) {
+          validationErrors.push('Skill name is required');
+        }
+        if (!data.description || !(data.description).trim()) {
+          validationErrors.push('Description is required');
+        }
+        
+        // Length validation
+        if (data.name && (data.name).length > 100) {
+          validationErrors.push('Skill name must be 100 characters or less');
+        }
+        if (data.description && (data.description).length > 500) {
+          validationErrors.push('Description must be 500 characters or less');
+        }
+        
+        // Duplicate name check (simple mock - assumes test provides existing skills)
+        if (data.name === 'Swordsmanship') {
+          validationErrors.push('Skill name "Swordsmanship" already exists');
+        }
+        
+        // Attribute selection validation
+        if (!data.attributeIds || (data.attributeIds).length === 0) {
+          validationErrors.push('At least one attribute must be selected');
+        }
+        
+        return validationErrors;
       }
-      if (!data.description || !data.description.trim()) {
-        validationErrors.push('Description is required');
-      }
-      
-      // Length validation (adding missing validations from the test)
-      if (data.name && data.name.length > 100) {
-        validationErrors.push('Skill name must be 100 characters or less');
-      }
-      if (data.description && data.description.length > 500) {
-        validationErrors.push('Description must be 500 characters or less');
-      }
-      
-      // Duplicate name check (simple mock - assumes test provides existing skills)
-      if (data.name === 'Swordsmanship') {
-        validationErrors.push('Skill name "Swordsmanship" already exists');
-      }
-      
-      // Attribute selection validation
-      if (!data.attributeIds || data.attributeIds.length === 0) {
-        validationErrors.push('At least one attribute must be selected');
-      }
-      
-      setErrorsState(validationErrors);
-      return validationErrors;
-    });
-    
-    const isValid = jest.fn(() => validate().length === 0);
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setDataState(prev => {
-          const newData = { ...prev, [field]: value };
-          // Clear errors when field is updated (simulating real behavior)
-          if (value && value.toString().trim()) {
-            setErrorsState([]);
-          }
-          return newData;
-        });
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn((newData) => {
-        setDataState(newData);
-      }),
-      reset: jest.fn(),
-      errors,
-      hasErrors: errors.length > 0,
-      isDirty: false,
-      setErrors: setErrorsState,
-      clearErrors: jest.fn(() => setErrorsState([])),
-      validate,
-      isValid
-    };
-  }),
-  useModal: jest.fn(() => {
-    const [isOpen, setIsOpen] = React.useState(false);
-    
-    const openFn = jest.fn(() => {
-      setIsOpen(true);
-    });
-    
-    const closeFn = jest.fn(() => {
-      setIsOpen(false);
-    });
-    
-    const toggleFn = jest.fn(() => {
-      setIsOpen(prev => !prev);
-    });
-    
-    return {
-      isOpen,
-      open: openFn,
-      close: closeFn,
-      toggle: toggleFn,
-      modalProps: {
-        isOpen,
-        onClose: closeFn
-      }
-    };
-  })
-}));
+    }),
+    modal: mockHookPresets.modal.withProps()
+  });
+});
 
 // Mock components
 jest.mock('@/components/DeleteConfirmationDialog', () => {

@@ -2,39 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DevToolsContext, DevToolsProvider } from './DevToolsContext';
 
-// Mock the useFormState hook for DevToolsContext tests
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const initialData = options?.initialData || {};
-    const isDev = process.env.NODE_ENV === 'development';
-    
-    // Use actual React state to handle toggles properly
-    const [isOpen, setIsOpen] = React.useState(initialData.isOpen || false);
-    
-    return {
-      data: {
-        ...initialData,
-        isDev,
-        isOpen
-      },
-      updateField: jest.fn((field, value) => {
-        if (field === 'isOpen' && typeof value === 'boolean') {
-          setIsOpen(value);
-        }
-      }),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      updateData: jest.fn(),
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  })
-}));
+// Mock the hooks using new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful()
+  });
+});
 
 // Using a function component instead of consumer pattern
 const TestConsumer = () => {

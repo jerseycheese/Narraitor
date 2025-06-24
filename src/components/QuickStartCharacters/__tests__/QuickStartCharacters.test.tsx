@@ -6,73 +6,14 @@ import { QuickStartCharacters } from '../QuickStartCharacters';
 import { World } from '@/types/world.types';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 
-// Mock the abstraction hooks to simulate the actual hooks behavior
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {
-      archetypes: [],
-      selectedArchetype: null
-    });
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  }),
-  useAsyncState: jest.fn(() => {
-    const [data, setData] = React.useState(null);
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [error, setError] = React.useState(null);
-    
-    return {
-      data,
-      isLoading,
-      error,
-      status: isLoading ? 'loading' : (error ? 'error' : 'idle'),
-      execute: jest.fn(async (fn) => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const result = await fn();
-          setData(result);
-          setIsLoading(false);
-          return result;
-        } catch (err) {
-          const errorMessage = err instanceof Error ? err.message : String(err);
-          setError(errorMessage);
-          setIsLoading(false);
-          return null;
-        }
-      }),
-      reset: jest.fn(() => {
-        setData(null);
-        setIsLoading(false);
-        setError(null);
-      }),
-      setData: jest.fn((newData) => {
-        setData(newData);
-      }),
-      setError: jest.fn((newError) => {
-        setError(newError);
-      }),
-      clearError: jest.fn(() => {
-        setError(null);
-      })
-    };
-  })
-}));
+// Mock the abstraction hooks using the new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    asyncState: mockHookPresets.asyncState.withExecution()
+  });
+});
 
 // Mock the character archetype generation
 jest.mock('@/lib/utils/characterArchetypes', () => ({

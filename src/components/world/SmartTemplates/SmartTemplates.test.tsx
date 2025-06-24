@@ -4,35 +4,14 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SmartTemplates } from './SmartTemplates';
 
-// Mock the hooks used by SmartTemplates for proper state handling
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {});
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  }),
-  useModal: jest.fn(() => ({
-    isOpen: false,
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn()
-  }))
-}));
+// Mock the hooks used by SmartTemplates using new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    modal: mockHookPresets.modal.closed()
+  });
+});
 
 // Mock fetch for API calls
 global.fetch = jest.fn();

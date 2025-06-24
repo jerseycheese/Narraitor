@@ -4,63 +4,14 @@ import CustomActionProcessor from './CustomActionProcessor';
 import * as skillDetectionService from '@/lib/ai/skillDetectionService';
 import * as requirementEvaluator from '@/lib/utils/requirementEvaluator';
 
-// Mock the abstraction hooks
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {
-      actionText: '',
-      skillCheckResults: []
-    });
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  }),
-  useAsyncState: jest.fn(() => {
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [data, setData] = React.useState(null);
-    const [error, setError] = React.useState(null);
-    
-    return {
-      data,
-      isLoading,
-      error,
-      status: isLoading ? 'loading' : 'idle',
-      execute: jest.fn(async (fn) => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const result = await fn();
-          setData(result);
-          return result;
-        } catch (err) {
-          const errorMessage = err instanceof Error ? err.message : String(err);
-          setError(errorMessage);
-          return null;
-        } finally {
-          setIsLoading(false);
-        }
-      }),
-      reset: jest.fn(),
-      setData: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn()
-    };
-  })
-}));
+// Mock the abstraction hooks using new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    asyncState: mockHookPresets.asyncState.withExecution()
+  });
+});
 
 // Mock the AI skill detection service
 jest.mock('@/lib/ai/skillDetectionService');

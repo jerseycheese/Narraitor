@@ -2,40 +2,14 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { World } from '@/types/world.types';
 
-// Mock the hooks module before importing the component
-const mockUseFormState = jest.fn((options) => ({
-  data: options?.initialData || { hasAutoResumed: false },
-  updateField: jest.fn(),
-  setData: jest.fn(),
-  reset: jest.fn(),
-  errors: [],
-  hasErrors: false,
-  isDirty: false,
-  updateData: jest.fn(),
-  setErrors: jest.fn(),
-  clearErrors: jest.fn(),
-  validate: jest.fn(() => []),
-  isValid: jest.fn(() => true)
-}));
-
-// Create a more specific mock for useAsyncState that the component can use properly
-const mockExecute = jest.fn();
-const mockUseAsyncState = jest.fn(() => ({
-  data: true, // Client is mounted
-  isLoading: false,
-  error: null,
-  execute: mockExecute,
-  reset: jest.fn(),
-  setData: jest.fn(),
-  setError: jest.fn(),
-  clearError: jest.fn()
-}));
-
-// Mock the module at runtime
-jest.doMock('@/hooks', () => ({
-  useFormState: mockUseFormState,
-  useAsyncState: mockUseAsyncState
-}));
+// Mock the hooks module using new mock utilities
+jest.doMock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    asyncState: mockHookPresets.asyncState.withExecution()
+  });
+});
 
 // Import component AFTER setting up mocks
 import GameSessionComponent from './GameSession';

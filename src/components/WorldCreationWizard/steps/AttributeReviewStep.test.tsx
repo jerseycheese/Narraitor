@@ -44,29 +44,12 @@ const mockSuggestionState = {
 let mockUpdateField = jest.fn();
 let mockOnUpdate = jest.fn();
 
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn(() => {
-    return {
-      data: {
-        customAttributes: [],
-        isCreatingCustomAttribute: false,
-        editingCustomAttributeId: null,
-        ...mockSuggestionState
-      },
-      updateField: mockUpdateField,
-      updateData: jest.fn(),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  })
-}));
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful()
+  });
+});
 
 
 const mockSuggestions: AttributeSuggestion[] = [

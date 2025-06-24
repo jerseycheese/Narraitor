@@ -2,29 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CollapsibleSection } from './CollapsibleSection';
 
-// Mock the hooks used by CollapsibleSection for proper state handling
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {});
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn(),
-      reset: jest.fn(),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  })
-}));
+// Mock the hooks using new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful()
+  });
+});
 
 describe('CollapsibleSection', () => {
   beforeEach(() => {

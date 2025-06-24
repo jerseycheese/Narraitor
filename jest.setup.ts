@@ -8,55 +8,15 @@ if (process.env.DEBUG_JEST_SETUP === 'true') {
 // Mock the worldStore module
 jest.mock('@/state/worldStore');
 
-// Mock the abstraction hooks globally
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => ({
-    data: options?.initialData || {},
-    updateField: jest.fn(),
-    setData: jest.fn(),
-    reset: jest.fn(),
-    errors: [],
-    hasErrors: false,
-    isDirty: false,
-    updateData: jest.fn(),
-    setErrors: jest.fn(),
-    clearErrors: jest.fn(),
-    validate: jest.fn(() => []),
-    isValid: jest.fn(() => true)
-  })),
-  useAsyncState: jest.fn(() => ({
-    data: null,
-    isLoading: false,
-    error: null,
-    status: 'idle',
-    execute: jest.fn(),
-    reset: jest.fn(),
-    setData: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn()
-  })),
-  useModal: jest.fn(() => ({
-    isOpen: false,
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn()
-  })),
-  useErrorState: jest.fn(() => ({
-    error: null,
-    hasError: false,
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setErrorFromCatch: jest.fn()
-  })),
-  // Re-export other hooks that might be imported
-  useCharacterCreationAutoSave: jest.fn(),
-  useNavigationFlow: jest.fn(),
-  useNavigationLoading: jest.fn(),
-  useNavigationPersistence: jest.fn(),
-  usePointPoolManager: jest.fn(),
-  useWizardState: jest.fn(),
-  useAutoSave: jest.fn()
-}));
+// Mock the abstraction hooks globally using the new mock utilities
+jest.mock('@/hooks', () => {
+  // Import the mock utilities
+  const { quickMockSetups } = require('./src/lib/test-utils/mockHooks');
+  
+  // Use the simple testing setup for global mocks
+  // This provides static mocks that are suitable for most basic component tests
+  return quickMockSetups.simpleTesting();
+});
 
 // DIAGNOSTIC: Check if the mock was registered
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -25,66 +25,15 @@ const mockSkillFormData = {
   editingCustomSkillId: null
 };
 
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn(() => {
-    return {
-      data: mockSkillFormData,
-      updateField: jest.fn((field, value) => {
-        // Update the mock data without triggering re-renders
-        if (field === 'localSuggestions') {
-          mockSkillFormData.localSuggestions = value;
-        } else if (field === 'customSkills') {
-          mockSkillFormData.customSkills = value;
-        } else if (field === 'editingCustomSkillId') {
-          mockSkillFormData.editingCustomSkillId = value;
-        }
-        // Don't call any setState to prevent infinite loops
-      }),
-      updateData: jest.fn((newData) => {
-        Object.assign(mockSkillFormData, newData);
-      }),
-      setData: jest.fn((newData) => {
-        Object.assign(mockSkillFormData, newData);
-      }),
-      reset: jest.fn(() => {
-        mockSkillFormData.localSuggestions = [];
-        mockSkillFormData.customSkills = [];
-        mockSkillFormData.editingCustomSkillId = null;
-      }),
-      errors: [],
-      hasErrors: false,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate: jest.fn(() => []),
-      isValid: jest.fn(() => true)
-    };
-  }),
-  useModal: jest.fn(() => ({
-    isOpen: false,
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn()
-  })),
-  useAsyncState: jest.fn(() => ({
-    data: null,
-    isLoading: false,
-    error: null,
-    status: 'idle',
-    execute: jest.fn(),
-    reset: jest.fn(),
-    setData: jest.fn(),
-    setError: jest.fn(),
-    clearError: jest.fn()
-  })),
-  useErrorState: jest.fn(() => ({
-    error: null,
-    hasError: false,
-    setError: jest.fn(),
-    clearError: jest.fn(),
-    setErrorFromCatch: jest.fn()
-  }))
-}));
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    modal: mockHookPresets.modal.closed(),
+    asyncState: mockHookPresets.asyncState.idle(),
+    errorState: mockHookPresets.errorState.clean()
+  });
+});
 
 const mockOnUpdate = jest.fn();
 

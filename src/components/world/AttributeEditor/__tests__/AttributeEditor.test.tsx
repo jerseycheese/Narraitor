@@ -4,71 +4,15 @@ import { AttributeEditor } from '../AttributeEditor';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 
-// Mock the abstraction hooks to pass through to real validation
-jest.mock('@/hooks', () => ({
-  useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {});
-    const [errors, setErrors] = React.useState([]);
-    
-    // Use the real validation function passed from the component
-    const validate = jest.fn(() => {
-      if (options?.validate) {
-        const validationErrors = options.validate(data);
-        setErrors(validationErrors);
-        return validationErrors;
-      }
-      return [];
-    });
-    
-    const isValid = jest.fn(() => {
-      const currentErrors = validate();
-      return currentErrors.length === 0;
-    });
-    
-    return {
-      data,
-      updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
-      }),
-      updateData: jest.fn(),
-      setData: jest.fn((newData) => {
-        setData(newData);
-      }),
-      reset: jest.fn(),
-      errors,
-      hasErrors: errors.length > 0,
-      isDirty: false,
-      setErrors: jest.fn(),
-      clearErrors: jest.fn(),
-      validate,
-      isValid
-    };
-  }),
-  useModal: jest.fn((options) => {
-    const [isOpen, setIsOpen] = React.useState(options?.initialOpen || false);
-    
-    return {
-      isOpen,
-      open: jest.fn(() => setIsOpen(true)),
-      close: jest.fn(() => setIsOpen(false)),
-      toggle: jest.fn(() => setIsOpen(prev => !prev)),
-      modalProps: {
-        isOpen,
-        onClose: jest.fn(() => setIsOpen(false))
-      }
-    };
-  }),
-  useErrorState: jest.fn(() => {
-    const [error, setError] = React.useState(null);
-    
-    return {
-      error,
-      setError: jest.fn((err) => setError(err)),
-      clearError: jest.fn(() => setError(null)),
-      hasError: !!error
-    };
-  })
-}));
+// Mock the abstraction hooks using the new mock utilities
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.withValidation(), // Supports custom validation from component
+    modal: mockHookPresets.modal.withProps(),
+    errorState: mockHookPresets.errorState.clean()
+  });
+});
 
 describe('AttributeEditor', () => {
   const mockOnSave = jest.fn();
