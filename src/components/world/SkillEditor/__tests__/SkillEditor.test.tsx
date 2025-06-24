@@ -8,8 +8,8 @@ import { WorldSkill, WorldAttribute } from '@/types/world.types';
 // Mock the hooks used by SkillEditor with working validation
 jest.mock('@/hooks', () => ({
   useFormState: jest.fn((options) => {
-    const [data, setData] = React.useState(options?.initialData || {});
-    const [errors, setErrors] = React.useState([]);
+    const [data, setDataState] = React.useState(options?.initialData || {});
+    const [errors, setErrorsState] = React.useState([]);
     
     // Mock validation function that mimics the real validation logic
     const validate = jest.fn(() => {
@@ -23,6 +23,14 @@ jest.mock('@/hooks', () => ({
         validationErrors.push('Description is required');
       }
       
+      // Length validation (adding missing validations from the test)
+      if (data.name && data.name.length > 100) {
+        validationErrors.push('Skill name must be 100 characters or less');
+      }
+      if (data.description && data.description.length > 500) {
+        validationErrors.push('Description must be 500 characters or less');
+      }
+      
       // Duplicate name check (simple mock - assumes test provides existing skills)
       if (data.name === 'Swordsmanship') {
         validationErrors.push('Skill name "Swordsmanship" already exists');
@@ -33,7 +41,7 @@ jest.mock('@/hooks', () => ({
         validationErrors.push('At least one attribute must be selected');
       }
       
-      setErrors(validationErrors);
+      setErrorsState(validationErrors);
       return validationErrors;
     });
     
@@ -42,28 +50,55 @@ jest.mock('@/hooks', () => ({
     return {
       data,
       updateField: jest.fn((field, value) => {
-        setData(prev => ({ ...prev, [field]: value }));
+        setDataState(prev => {
+          const newData = { ...prev, [field]: value };
+          // Clear errors when field is updated (simulating real behavior)
+          if (value && value.toString().trim()) {
+            setErrorsState([]);
+          }
+          return newData;
+        });
       }),
       updateData: jest.fn(),
       setData: jest.fn((newData) => {
-        setData(newData);
+        setDataState(newData);
       }),
       reset: jest.fn(),
       errors,
       hasErrors: errors.length > 0,
       isDirty: false,
-      setErrors,
-      clearErrors: jest.fn(() => setErrors([])),
+      setErrors: setErrorsState,
+      clearErrors: jest.fn(() => setErrorsState([])),
       validate,
       isValid
     };
   }),
-  useModal: jest.fn(() => ({
-    isOpen: false,
-    open: jest.fn(),
-    close: jest.fn(),
-    toggle: jest.fn()
-  }))
+  useModal: jest.fn(() => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    
+    const openFn = jest.fn(() => {
+      setIsOpen(true);
+    });
+    
+    const closeFn = jest.fn(() => {
+      setIsOpen(false);
+    });
+    
+    const toggleFn = jest.fn(() => {
+      setIsOpen(prev => !prev);
+    });
+    
+    return {
+      isOpen,
+      open: openFn,
+      close: closeFn,
+      toggle: toggleFn,
+      modalProps: {
+        isOpen,
+        onClose: closeFn
+      }
+    };
+  })
 }));
 
 // Mock components
