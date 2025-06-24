@@ -172,7 +172,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         choiceGenerationTimeoutRef.current = null;
       }
     };
-  }, [sessionId, worldId, controllerKey]);
+  }, [sessionId, worldId, controllerKey, gameSessionState]);
 
   // Helper function to generate AI summary for journal entries using hooks
   const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {

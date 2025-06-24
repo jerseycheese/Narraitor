@@ -61,7 +61,7 @@ export const NarrativeHistoryManager: React.FC<NarrativeHistoryManagerProps> = (
     return () => {
       unsubscribe();
     };
-  }, [sessionId, getSegments]);
+  }, [sessionId, getSegments, narrativeHistoryState]);
   
   // Remove duplicate segments based on content and type
   // This is a more aggressive deduplication to fix the multiple initial segments issue

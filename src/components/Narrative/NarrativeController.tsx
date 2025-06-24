@@ -98,7 +98,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       initialGenerationInitiated.current = false; // Reset generation init flag
       choiceGenerationInProgress.current = false; // Reset choice generation flag
     };
-  }, [sessionId, getSessionSegments, narrativeSessionState]);
+  }, [sessionId, getSessionSegments, narrativeSessionState, choiceGenerationState, narrativeGenerationState]);
 
   /**
    * Pure AI-based ending detection - analyzes narrative context for natural conclusions

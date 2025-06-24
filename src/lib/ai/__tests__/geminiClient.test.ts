@@ -6,8 +6,7 @@ import { AIServiceConfig } from '../types';
 // Mock the module before importing
 jest.mock('@google/genai');
 
-// Import after mocking - disable ESLint for this line only
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// Import after mocking
 const { GoogleGenAI } = require('@google/genai');
 
 describe('GeminiClient', () => {

@@ -108,7 +108,7 @@ export function useFormState<T extends Record<string, unknown>>(
       setErrors([]);
     }
     prevDataRef.current = data;
-  }, [data, clearErrorsOnChange]);
+  }, [data, clearErrorsOnChange, errors.length]);
 
   // Update a single field
   const updateField = useCallback((field: keyof T, value: T[keyof T]) => {

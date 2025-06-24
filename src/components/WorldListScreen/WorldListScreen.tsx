@@ -67,7 +67,7 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     
     // Note: The unsubscribe function from the store subscription
     // is handled by the async state execution
-  }, [worldsLoadingState]);
+  }, [worldsLoadingState, worldListState]);
 
   const handleSelectWorld = (worldId: string) => {
     useWorldStore.setState((state) => ({

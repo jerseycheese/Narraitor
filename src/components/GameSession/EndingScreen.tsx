@@ -113,7 +113,7 @@ export function EndingScreen() {
       // Reset on error so user can retry
       generatedForEndingRef.current = null;
     }
-  }, [currentEnding, imageGenerationState, characters, worlds, getSessionSegments]);
+  }, [currentEnding, imageGenerationState, characters, worlds, getSessionSegments, endingScreenState]);
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {

@@ -119,7 +119,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
     }
     deleteModal.close();
     formState.updateField('attributeToDelete', null);
-  }, [formState.data.attributeToDelete, handleDeleteAttribute, deleteModal, formState]);
+  }, [handleDeleteAttribute, deleteModal, formState]);
   
   /**
    * Generates the description text for the delete confirmation dialog

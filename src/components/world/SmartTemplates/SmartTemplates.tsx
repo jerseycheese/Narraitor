@@ -79,7 +79,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       ? currentGenres.filter(g => g !== genre)
       : [...currentGenres, genre];
     smartTemplatesState.updateField('selectedGenres', updatedGenres);
-  }, [smartTemplatesState.data.selectedGenres, smartTemplatesState.updateField]);
+  }, [smartTemplatesState]);
 
   const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
     const requestBody = {
@@ -102,7 +102,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       smartTemplatesState.updateField('previewTemplate', null);
       templatePreviewModal.close();
     }
-  }, [smartTemplatesState.data.previewTemplate, onTemplateGenerated, templatePreviewModal, smartTemplatesState]);
+  }, [onTemplateGenerated, templatePreviewModal, smartTemplatesState]);
 
   const handleGenerateInspiredBy = useCallback(() => {
     if (!smartTemplatesState.data.userInput.trim()) {
