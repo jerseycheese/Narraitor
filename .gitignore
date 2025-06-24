@@ -25,7 +25,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 dev_server.log
-nextjs.log
 
 # local env files
 .env*.local
@@ -70,6 +69,3 @@ docs/development/workflows
 .claude/*
 .claude-workflow/
 .clauderc
-
-# Personal paths (security)
-**/Users/*/

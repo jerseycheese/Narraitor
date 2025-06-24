@@ -5,8 +5,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKTREE_DIR="${NARRAITOR_MAIN}-worktrees"
+NARRAITOR_MAIN="/Users/jackhaas/Projects/narraitor"
+WORKTREE_DIR="/Users/jackhaas/Projects/narraitor-worktrees"
 
 # Colors
 GREEN='\033[0;32m'
