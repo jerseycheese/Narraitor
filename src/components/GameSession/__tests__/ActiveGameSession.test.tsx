@@ -2,9 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 
-// Mock the abstraction hooks
-jest.mock('@/hooks');
-
 // Mock the NarrativeController with simpler implementation
 jest.mock('@/components/Narrative/NarrativeController', () => ({
   NarrativeController: jest.fn(() => {

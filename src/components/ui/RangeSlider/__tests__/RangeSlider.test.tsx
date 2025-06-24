@@ -2,9 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import RangeSlider, { LevelDescription } from '../RangeSlider';
 
-// Mock the abstraction hooks
-jest.mock('@/hooks');
-
 describe('RangeSlider', () => {
   const mockOnChange = jest.fn();
   

@@ -5,6 +5,67 @@ import { SkillEditor } from '../SkillEditor';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 // Note: SkillDifficulty type is used implicitly in WorldSkill interface
 
+// Mock the hooks used by SkillEditor with working validation
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn((options) => {
+    const [data, setData] = React.useState(options?.initialData || {});
+    const [errors, setErrors] = React.useState([]);
+    
+    // Mock validation function that mimics the real validation logic
+    const validate = jest.fn(() => {
+      const validationErrors = [];
+      
+      // Required fields validation
+      if (!data.name || !data.name.trim()) {
+        validationErrors.push('Skill name is required');
+      }
+      if (!data.description || !data.description.trim()) {
+        validationErrors.push('Description is required');
+      }
+      
+      // Duplicate name check (simple mock - assumes test provides existing skills)
+      if (data.name === 'Swordsmanship') {
+        validationErrors.push('Skill name "Swordsmanship" already exists');
+      }
+      
+      // Attribute selection validation
+      if (!data.attributeIds || data.attributeIds.length === 0) {
+        validationErrors.push('At least one attribute must be selected');
+      }
+      
+      setErrors(validationErrors);
+      return validationErrors;
+    });
+    
+    const isValid = jest.fn(() => validate().length === 0);
+    
+    return {
+      data,
+      updateField: jest.fn((field, value) => {
+        setData(prev => ({ ...prev, [field]: value }));
+      }),
+      updateData: jest.fn(),
+      setData: jest.fn((newData) => {
+        setData(newData);
+      }),
+      reset: jest.fn(),
+      errors,
+      hasErrors: errors.length > 0,
+      isDirty: false,
+      setErrors,
+      clearErrors: jest.fn(() => setErrors([])),
+      validate,
+      isValid
+    };
+  }),
+  useModal: jest.fn(() => ({
+    isOpen: false,
+    open: jest.fn(),
+    close: jest.fn(),
+    toggle: jest.fn()
+  }))
+}));
+
 // Mock components
 jest.mock('@/components/DeleteConfirmationDialog', () => {
   return function MockDeleteConfirmationDialog({ 

@@ -11,6 +11,60 @@ jest.mock('../../../../lib/ai/contextOverride', () => ({
   }))
 }));
 
+// Mock the hooks used by AITestingPanel
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn(() => {
+    const [data, setData] = React.useState({});
+    
+    return {
+      data,
+      updateData: jest.fn((newData) => {
+        setData(newData);
+      }),
+      updateField: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useAsyncState: jest.fn(() => {
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [data, setData] = React.useState(null);
+    const [error, setError] = React.useState(null);
+    
+    return {
+      data,
+      isLoading,
+      error,
+      status: isLoading ? 'loading' : 'idle',
+      execute: jest.fn(async (fn) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const result = await fn();
+          setData(result);
+          return result;
+        } catch (err) {
+          setError(err.message);
+          throw err;
+        } finally {
+          setIsLoading(false);
+        }
+      }),
+      reset: jest.fn(),
+      setData: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn()
+    };
+  })
+}));
+
 describe('AITestingPanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();

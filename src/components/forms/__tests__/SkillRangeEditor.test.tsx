@@ -7,6 +7,8 @@ import {
   MAX_SKILL_VALUE as SKILL_MAX_VALUE
 } from '@/lib/constants/skillLevelDescriptions';
 
+// SkillRangeEditor doesn't use abstraction hooks, so no mocking needed
+
 describe('SkillRangeEditor', () => {
   const mockSkill: WorldSkill = {
     id: 'test-skill-1',
@@ -167,13 +169,24 @@ describe('SkillRangeEditor', () => {
   });
 
   it('updates level description when value changes', () => {
-    render(
-      <SkillRangeEditor 
-        skill={mockSkill} 
-        onChange={mockOnChange}
-        showLevelDescriptions={true}
-      />
-    );
+    const TestWrapper = () => {
+      const [skill, setSkill] = React.useState(mockSkill);
+      
+      const handleChange = (updates: Partial<WorldSkill>) => {
+        setSkill(prev => ({ ...prev, ...updates }));
+        mockOnChange(updates);
+      };
+      
+      return (
+        <SkillRangeEditor 
+          skill={skill} 
+          onChange={handleChange}
+          showLevelDescriptions={true}
+        />
+      );
+    };
+
+    render(<TestWrapper />);
 
     // Initial level for value 3 is "Competent"
     expect(screen.getByTestId('skill-range-editor-level-label')).toHaveTextContent('Competent');

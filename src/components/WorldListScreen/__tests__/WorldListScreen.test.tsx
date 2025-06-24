@@ -128,6 +128,73 @@ type WorldStoreFunction = {
 // Mock getState for the store
 (jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction).getState = mockGetState;
 
+// Mock the hooks used by WorldListScreen with dynamic behavior
+let mockFormStateData = {
+  worlds: [],
+  currentWorldId: null,
+  worldToDeleteId: null
+};
+
+jest.mock('../../../hooks', () => ({
+  useFormState: jest.fn(() => {
+    // Get current worlds from the mock store and populate form state
+    const currentState = mockGetState();
+    const worldsArray = Object.values(currentState.worlds || {});
+    
+    const [formData, setFormData] = React.useState({
+      worlds: worldsArray,
+      currentWorldId: currentState.currentWorldId,
+      worldToDeleteId: null
+    });
+    
+    return {
+      data: formData,
+      updateField: jest.fn((field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+      }),
+      updateData: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useAsyncState: jest.fn(() => ({
+    data: null,
+    isLoading: false, // Not loading by default for tests
+    error: null,
+    status: 'idle',
+    execute: jest.fn(async (fn) => {
+      // Execute the function immediately for tests
+      const result = await fn();
+      return result;
+    }),
+    reset: jest.fn(),
+    setData: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn()
+  })),
+  useModal: jest.fn(() => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    
+    return {
+      isOpen,
+      open: jest.fn(() => setIsOpen(true)),
+      close: jest.fn(() => setIsOpen(false)),
+      toggle: jest.fn(() => setIsOpen(prev => !prev)),
+      modalProps: {
+        isOpen,
+        onClose: jest.fn(() => setIsOpen(false))
+      }
+    };
+  })
+}));
+
 // Import after mocks are set up
 import WorldListScreen from '../WorldListScreen';
 
@@ -145,6 +212,13 @@ describe('WorldListScreen', () => {
       fetchWorlds: mockFetchWorlds,
       setCurrentWorld: mockSetCurrentWorld,
       deleteWorld: mockDeleteWorld,
+    };
+    
+    // Reset mock form state data
+    mockFormStateData = {
+      worlds: [],
+      currentWorldId: null,
+      worldToDeleteId: null
     };
     
     // Setup getState to return current mock state
