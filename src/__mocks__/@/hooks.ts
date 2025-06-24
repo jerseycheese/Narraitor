@@ -1,8 +1,8 @@
 // Mock implementations for abstraction hooks
 // This file provides Jest mocks for the abstraction hooks to prevent test failures
 
-export const useFormState = jest.fn(() => ({
-  data: {},
+export const useFormState = jest.fn((options) => ({
+  data: options?.initialData || {},
   updateField: jest.fn(),
   setData: jest.fn(),
   reset: jest.fn(),
