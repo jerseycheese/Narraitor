@@ -3,7 +3,15 @@ import { render, screen } from '@testing-library/react';
 import FinalizeStep from './FinalizeStep';
 import { World } from '@/types/world.types';
 
-describe.skip('FinalizeStep', () => {
+// Mock the hooks for FinalizeStep using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.static()
+  });
+});
+
+describe('FinalizeStep', () => {
   const mockWorldData: Partial<World> = {
     name: 'Test World',
     description: 'A test world description',

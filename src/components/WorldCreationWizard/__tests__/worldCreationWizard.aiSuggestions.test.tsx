@@ -4,6 +4,17 @@ import WorldCreationWizard from '../WorldCreationWizard';
 import { analyzeWorldDescription } from '@/lib/ai/worldAnalyzer';
 import { worldStore } from '@/state/worldStore';
 
+// Mock the hooks for WorldCreationWizard using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    asyncState: mockHookPresets.asyncState.idle(),
+    modal: mockHookPresets.modal.closed(),
+    errorState: mockHookPresets.errorState.clean()
+  });
+});
+
 // Mock the dependencies
 jest.mock('@/lib/ai/worldAnalyzer');
 jest.mock('@/state/worldStore', () => ({

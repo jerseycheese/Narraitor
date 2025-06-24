@@ -4,11 +4,33 @@ import { World } from '@/types/world.types';
 
 // Mock the hooks module using new mock utilities
 jest.doMock('@/hooks', () => {
-  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
-  return createHookMockModule({
-    formState: mockHookPresets.formState.stateful(),
-    asyncState: mockHookPresets.asyncState.withExecution()
+  const { createMockAsyncState, createMockFormState } = require('@/lib/test-utils/mockHooks');
+  
+  // Create mock that simulates client being mounted (isClient = true)
+  const mockAsyncState = createMockAsyncState({ 
+    status: 'success', 
+    data: true,  // This makes isClient = true
+    enableExecution: true 
   });
+  
+  const mockFormState = createMockFormState({ behavior: 'stateful' });
+  
+  return {
+    useAsyncState: mockAsyncState,
+    useFormState: mockFormState,
+    useModal: jest.fn(() => ({
+      isOpen: false,
+      open: jest.fn(),
+      close: jest.fn(),
+      toggle: jest.fn()
+    })),
+    useErrorState: jest.fn(() => ({
+      error: null,
+      hasError: false,
+      setError: jest.fn(),
+      clearError: jest.fn()
+    }))
+  };
 });
 
 // Import component AFTER setting up mocks
@@ -41,24 +63,9 @@ jest.mock('./ActiveGameSession', () => {
   };
 });
 
-// Mock the custom hook
+// Mock the custom hook - use jest.fn() without default implementation to allow mockReturnValue
 jest.mock('./hooks/useGameSessionState', () => ({
-  useGameSessionState: jest.fn(() => ({
-    sessionState: { status: 'initializing' },
-    error: null,
-    worldExists: true,
-    world: undefined,
-    worldCharacters: [],
-    savedSession: undefined,
-    handleRetry: jest.fn(),
-    handleDismissError: jest.fn(),
-    startSession: jest.fn(),
-    handleSelectChoice: jest.fn(),
-    handleResumeSession: jest.fn(),
-    handleNewSession: jest.fn(),
-    handleEndSession: jest.fn(),
-    prevStatusRef: { current: 'initializing' },
-  }))
+  useGameSessionState: jest.fn()
 }));
 
 // Mock dependencies
@@ -97,17 +104,7 @@ describe('GameSession', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset mocks to default state where client is mounted
-    mockUseAsyncState.mockReturnValue({
-      data: true, // Client is mounted by default
-      isLoading: false,
-      error: null,
-      execute: mockExecute,
-      reset: jest.fn(),
-      setData: jest.fn(),
-      setError: jest.fn(),
-      clearError: jest.fn()
-    });
+    // Mock reset is handled by the mock abstraction system
   });
 
   test('renders initializing state with no characters', () => {

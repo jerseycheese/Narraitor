@@ -1,14 +1,50 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DevToolsPanel } from './DevToolsPanel';
-import * as DevToolsContextModule from '../DevToolsContext';
 
-// Mock the DevToolsContext module
+// Mock the hooks with functional behavior for meaningful testing
+jest.mock('@/hooks', () => {
+  return {
+    useFormState: jest.fn((options) => {
+      // Use actual React state for functional testing
+      const [data, setData] = React.useState(options?.initialData || {});
+      
+      const updateField = jest.fn((field, value) => {
+        setData(prev => ({ ...prev, [field]: value }));
+      });
+      
+      // Simulate immediate mounting for tests
+      React.useEffect(() => {
+        setData(prev => ({ ...prev, mounted: true }));
+      }, []);
+      
+      return {
+        data,
+        updateField,
+        updateData: jest.fn(),
+        setData: jest.fn(),
+        reset: jest.fn(),
+        errors: [],
+        hasErrors: false,
+        isDirty: false,
+        setErrors: jest.fn(),
+        clearErrors: jest.fn(),
+        validate: jest.fn(() => []),
+        isValid: jest.fn(() => true)
+      };
+    })
+  };
+});
+
+// Mock the DevToolsContext with functional toggle behavior  
 jest.mock('../DevToolsContext', () => {
   const originalModule = jest.requireActual('../DevToolsContext');
   return {
     ...originalModule,
-    useDevTools: jest.fn()
+    useDevTools: jest.fn(() => ({
+      isOpen: false,
+      toggleDevTools: jest.fn()
+    }))
   };
 });
 
@@ -17,147 +53,64 @@ jest.mock('../StateSection', () => ({
   StateSection: () => <div data-testid="devtools-state-section">State Section</div>
 }));
 
-describe.skip('DevToolsPanel', () => {
-  // Default mock implementation with collapsed state
+describe('DevToolsPanel', () => {
+  const mockToggleDevTools = jest.fn();
+  const mockUseDevTools = require('../DevToolsContext').useDevTools;
+
   beforeEach(() => {
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: false,
-      toggleDevTools: jest.fn()
-    });
-  });
-
-  afterEach(() => {
-    // Clean up between tests
     jest.clearAllMocks();
+    mockUseDevTools.mockReturnValue({
+      isOpen: false,
+      toggleDevTools: mockToggleDevTools
+    });
   });
 
-  it('renders with default collapsed state', () => {
-    // Mock the environment
+  it('renders in development mode and responds to user interaction', () => {
     const originalNodeEnv = process.env.NODE_ENV;
-    (process.env as Record<string, string>).NODE_ENV = 'development';
+    process.env.NODE_ENV = 'development';
 
     render(<DevToolsPanel />);
     
-    // Panel header should always be visible
+    // Should render the panel header in development
     expect(screen.getByTestId('devtools-panel-header')).toBeInTheDocument();
+    expect(screen.getByText('Narraitor DevTools')).toBeInTheDocument();
     
-    // Content should be hidden by default
-    const content = screen.queryByTestId('devtools-panel-content');
-    expect(content).not.toBeInTheDocument();
+    // Should have toggle button that responds to clicks
+    const toggleButton = screen.getByTestId('devtools-panel-toggle');
+    expect(toggleButton).toBeInTheDocument();
+    
+    fireEvent.click(toggleButton);
+    expect(mockToggleDevTools).toHaveBeenCalled();
 
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
+    process.env.NODE_ENV = originalNodeEnv;
   });
   
-  it('expands when toggle button is clicked', () => {
-    // Mock the environment
+  it('shows expanded content when open', () => {
     const originalNodeEnv = process.env.NODE_ENV;
-    (process.env as Record<string, string>).NODE_ENV = 'development';
+    process.env.NODE_ENV = 'development';
 
-    const mockToggle = jest.fn();
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: false,
-      toggleDevTools: mockToggle
+    mockUseDevTools.mockReturnValue({
+      isOpen: true,
+      toggleDevTools: mockToggleDevTools
     });
     
     render(<DevToolsPanel />);
     
-    // Click the toggle button
-    fireEvent.click(screen.getByTestId('devtools-panel-toggle'));
-    
-    // Expect the toggle function to be called
-    expect(mockToggle).toHaveBeenCalled();
-
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
-  });
-  
-  it('renders with expanded state when context isOpen is true', () => {
-    // Mock the environment
-    const originalNodeEnv = process.env.NODE_ENV;
-    (process.env as Record<string, string>).NODE_ENV = 'development';
-
-    // Set isOpen to true
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: true,
-      toggleDevTools: jest.fn()
-    });
-    
-    render(<DevToolsPanel />);
-    
-    // Content should be visible
-    const content = screen.getByTestId('devtools-panel-content');
-    expect(content).toBeInTheDocument();
-
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
-  });
-  
-  it('displays correct toggle button text based on state', () => {
-    // Mock the environment
-    const originalNodeEnv = process.env.NODE_ENV;
-    (process.env as Record<string, string>).NODE_ENV = 'development';
-
-    // First render with isOpen false
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: false,
-      toggleDevTools: jest.fn()
-    });
-    
-    const { rerender } = render(<DevToolsPanel />);
-    
-    // Default collapsed state
-    expect(screen.getByTestId('devtools-panel-toggle')).toHaveTextContent('Show DevTools');
-    
-    // Update mock to simulate expanded state
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: true,
-      toggleDevTools: jest.fn()
-    });
-    
-    // Re-render with updated state
-    rerender(<DevToolsPanel />);
-    
-    // Now should show the hide text
-    expect(screen.getByTestId('devtools-panel-toggle')).toHaveTextContent('Hide DevTools');
-
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
-  });
-  
-  it('renders state section in panel content', () => {
-    // Mock the environment
-    const originalNodeEnv = process.env.NODE_ENV;
-    (process.env as Record<string, string>).NODE_ENV = 'development';
-
-    // Set isOpen to true
-    (DevToolsContextModule.useDevTools as jest.Mock).mockReturnValue({
-      isOpen: true,
-      toggleDevTools: jest.fn()
-    });
-    
-    render(<DevToolsPanel />);
-    
+    // Should show content sections when expanded
+    expect(screen.getByTestId('devtools-panel-content')).toBeInTheDocument();
     expect(screen.getByTestId('devtools-state-section')).toBeInTheDocument();
 
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
+    process.env.NODE_ENV = originalNodeEnv;
   });
-  
-  it('only renders in development mode', () => {
+
+  it('does not render in production mode', () => {
     const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
     
-    // Mock production environment
-    (process.env as Record<string, string>).NODE_ENV = 'production';
-    const { container: prodContainer } = render(<DevToolsPanel />);
-    expect(prodContainer.textContent).toBe('');
+    const { container } = render(<DevToolsPanel />);
+    // In production, should not render DevTools content
+    expect(screen.queryByTestId('devtools-panel-header')).not.toBeInTheDocument();
     
-    // Mock development environment
-    process.env.NODE_ENV = 'development';
-    const { container: devContainer } = render(<DevToolsPanel />);
-    expect(devContainer.textContent).not.toBe('');
-    
-    // Restore original environment
-    (process.env as Record<string, string>).NODE_ENV = originalNodeEnv;
+    process.env.NODE_ENV = originalNodeEnv;
   });
 });

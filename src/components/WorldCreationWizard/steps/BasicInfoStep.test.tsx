@@ -3,6 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import BasicInfoStep from './BasicInfoStep';
 import { World } from '@/types/world.types';
 
+// Mock the hooks for BasicInfoStep using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.static()
+  });
+});
+
 describe('BasicInfoStep', () => {
   const mockWorldData: Partial<World> = {
     name: '',

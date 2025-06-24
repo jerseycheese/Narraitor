@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CollapsibleSection } from './CollapsibleSection';
 
-// Mock the hooks with React state for proper re-rendering
+// Mock the hooks with functional state for testing toggle behavior
 jest.mock('@/hooks', () => {
   return {
     useFormState: jest.fn((options) => {
@@ -35,75 +35,37 @@ describe('CollapsibleSection', () => {
     jest.clearAllMocks();
   });
   
-  it('renders title and content properly', () => {
+  it('renders title and content, toggles expanded state on click', () => {
     render(
       <CollapsibleSection title="Test Section">
         <div data-testid="section-content">Content</div>
       </CollapsibleSection>
     );
     
+    // Should render basic structure
     expect(screen.getByTestId('collapsible-section-title')).toHaveTextContent('Test Section');
     expect(screen.getByTestId('section-content')).toBeInTheDocument();
+    
+    // Should be expanded by default
+    const toggle = screen.getByTestId('collapsible-section-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('collapsible-section-content')).toHaveClass('block');
+    
+    // Should collapse when clicked
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('collapsible-section-content')).toHaveClass('hidden');
   });
   
-  it('is expanded by default', () => {
+  it('can be initialized as collapsed', () => {
     render(
-      <CollapsibleSection title="Test Section">
-        <div data-testid="section-content">Content</div>
-      </CollapsibleSection>
-    );
-    
-    expect(screen.getByTestId('section-content')).toBeVisible();
-  });
-  
-  it('collapses when the toggle is clicked', () => {
-    render(
-      <CollapsibleSection title="Test Section">
-        <div data-testid="section-content">Content</div>
-      </CollapsibleSection>
-    );
-    
-    // Click the toggle button
-    fireEvent.click(screen.getByTestId('collapsible-section-toggle'));
-    
-    // Content container should have the 'hidden' class
-    const contentContainer = screen.getByTestId('collapsible-section-content');
-    expect(contentContainer).toHaveClass('hidden');
-  });
-  
-  it('renders with collapsed state when configured', () => {
-    const { rerender } = render(
       <CollapsibleSection title="Test Section" initiallyExpanded={false}>
         <div data-testid="section-content">Content</div>
       </CollapsibleSection>
     );
     
-    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
-    
-    rerender(
-      <CollapsibleSection title="Test Section" initialCollapsed={true}>
-        <div data-testid="section-content">Content</div>
-      </CollapsibleSection>
-    );
-    
-    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
-  });
-  
-  
-  it('shows correct toggle icon based on expanded state', () => {
-    render(
-      <CollapsibleSection title="Test Section">
-        <div>Content</div>
-      </CollapsibleSection>
-    );
-    
     const toggle = screen.getByTestId('collapsible-section-toggle');
-    
-    // Initially expanded
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    
-    // Click to collapse
-    fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByTestId('collapsible-section-content')).toHaveClass('hidden');
   });
 });

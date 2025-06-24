@@ -1,5 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+
+// Mock the hooks module using new mock utilities
+jest.doMock('@/hooks', () => {
+  const { quickMockSetups } = require('@/lib/test-utils/mockHooks');
+  return quickMockSetups.simpleTesting();
+});
+
 import ActiveGameSession from '../ActiveGameSession';
 
 // Mock the NarrativeController with simpler implementation
@@ -159,8 +166,4 @@ describe('ActiveGameSession', () => {
     expect(screen.getByText('End Session')).toBeInTheDocument();
   });
 
-  it('renders without crashing', () => {
-    const { container } = render(<ActiveGameSession {...mockProps} />);
-    expect(container).toBeInTheDocument();
-  });
 });

@@ -127,7 +127,7 @@ export default function AttributeReviewStep({
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestions, attributeReviewState]); // Only depend on suggestions, not worldData.attributes
+  }, [suggestions]); // Only depend on suggestions, not worldData.attributes or attributeReviewState
 
   const handleToggleAttribute = (index: number) => {
     // Toggle the state in a new array

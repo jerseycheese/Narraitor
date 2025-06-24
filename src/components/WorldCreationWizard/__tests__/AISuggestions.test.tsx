@@ -3,6 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { AISuggestions } from '../AISuggestions';
 import { AttributeSuggestion, SkillSuggestion } from '../WorldCreationWizard';
 
+// Mock the hooks for AISuggestions using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.static()
+  });
+});
+
 describe('AISuggestions', () => {
   const mockOnAcceptAttribute = jest.fn();
   const mockOnRejectAttribute = jest.fn();

@@ -9,7 +9,17 @@ jest.mock('@/lib/ai/worldAnalyzer', () => ({
   analyzeWorldDescription: jest.fn(),
 }));
 
-describe.skip('DescriptionStep', () => {
+// Mock the hooks for DescriptionStep using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.static(),
+    asyncState: mockHookPresets.asyncState.idle(),
+    errorState: mockHookPresets.errorState.clean()
+  });
+});
+
+describe('DescriptionStep', () => {
   const mockWorldData: Partial<World> = {
     name: 'Test World',
     description: '',

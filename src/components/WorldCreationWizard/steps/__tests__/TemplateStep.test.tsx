@@ -3,8 +3,6 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import TemplateStep from '../TemplateStep';
 import { templates } from '../../../../lib/templates/worldTemplates';
 import { applyWorldTemplate } from '../../../../lib/templates/templateLoader';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { createMockWorldStore } from '../../../../lib/test-utils/mockStore';
 
 // Mock the generateUniqueId function
 jest.mock('../../../../lib/utils/generateId', () => ({
@@ -45,6 +43,15 @@ jest.mock('../../../world/TemplateSelector', () => {
       </div>
     );
   };
+});
+
+// Mock the hooks for TemplateStep using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.static(),
+    asyncState: mockHookPresets.asyncState.idle()
+  });
 });
 
 // Mock the worldStore
@@ -91,7 +98,7 @@ jest.mock('../../../world/SmartTemplates', () => ({
   )
 }));
 
-describe.skip('TemplateStep', () => {
+describe('TemplateStep', () => {
   const mockOnNext = jest.fn();
   const mockOnBack = jest.fn();
   const mockOnCancel = jest.fn();

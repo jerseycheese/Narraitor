@@ -133,6 +133,20 @@ All implementations must go through the Three-Stage Verification process:
 
 This verification process is MANDATORY - the workflow will not proceed until verification is complete.
 
+## Testing Standards and Documentation
+
+### Mock Abstraction System
+The project uses a standardized mock abstraction system for React component tests:
+- **Mock Abstraction Migration Guide**: `/docs/development/testing/mock-abstraction-migration-guide.md`
+- **Testing Patterns Standard**: `/docs/development/testing/testing-patterns-standard.md`
+- **Mock Presets Reference**: `/docs/development/testing/mock-presets-reference.md`
+
+### Key Testing Guidelines
+- Use mock abstraction system for all React components that use custom hooks
+- DO NOT use mock abstraction for store tests, utility tests, or service tests
+- Follow standardized patterns for consistent test structure
+- Migrate from manual hook mocking to preset-based mocking
+
 ## Testing Principles
 - Focus on testing WHAT the feature does, not HOW it does it
 - Test acceptance criteria and core functionality directly

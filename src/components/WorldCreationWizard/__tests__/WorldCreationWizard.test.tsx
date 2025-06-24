@@ -10,6 +10,17 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
+// Mock the hooks for WorldCreationWizard using mock abstraction
+jest.mock('@/hooks', () => {
+  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
+  return createHookMockModule({
+    formState: mockHookPresets.formState.stateful(),
+    asyncState: mockHookPresets.asyncState.idle(),
+    modal: mockHookPresets.modal.closed(),
+    errorState: mockHookPresets.errorState.clean()
+  });
+});
+
 // Mock the world store
 jest.mock('@/state/worldStore', () => ({
   worldStore: {
@@ -39,6 +50,31 @@ jest.mock('@/state/worldStore', () => ({
     subscribe: jest.fn(),
     destroy: jest.fn(),
   },
+  useWorldStore: jest.fn((selector) => {
+    const state = {
+      worlds: {},
+      currentWorldId: null,
+      error: null,
+      loading: false,
+      createWorld: jest.fn().mockReturnValue('mock-world-id'),
+      updateWorld: jest.fn(),
+      deleteWorld: jest.fn(),
+      setCurrentWorld: jest.fn(),
+      fetchWorlds: jest.fn(),
+      addAttribute: jest.fn(),
+      updateAttribute: jest.fn(),
+      removeAttribute: jest.fn(),
+      addSkill: jest.fn(),
+      updateSkill: jest.fn(),
+      removeSkill: jest.fn(),
+      updateSettings: jest.fn(),
+      reset: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn(),
+      setLoading: jest.fn(),
+    };
+    return selector ? selector(state) : state;
+  }),
 }));
 
 // Mock the template loader
@@ -49,7 +85,7 @@ jest.mock('@/lib/templates/templateLoader', () => ({
   }),
 }));
 
-describe.skip('WorldCreationWizard', () => {
+describe('WorldCreationWizard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -1,5 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+// Mock the hooks module using new mock utilities for consistency
+jest.doMock('@/hooks', () => {
+  const { quickMockSetups } = require('@/lib/test-utils/mockHooks');
+  return quickMockSetups.simpleTesting();
+});
+
 import GameSessionError from './GameSessionError';
 
 describe('GameSessionError', () => {

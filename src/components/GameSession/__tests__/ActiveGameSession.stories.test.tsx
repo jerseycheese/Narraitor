@@ -3,6 +3,12 @@ import { render } from '@testing-library/react';
 import * as stories from '../ActiveGameSession.stories';
 import { composeStories } from '@storybook/react';
 
+// Mock the hooks module using new mock utilities
+jest.doMock('@/hooks', () => {
+  const { quickMockSetups } = require('@/lib/test-utils/mockHooks');
+  return quickMockSetups.simpleTesting();
+});
+
 // Mock scrollTo to avoid errors in tests
 beforeAll(() => {
   Element.prototype.scrollTo = jest.fn();
