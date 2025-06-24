@@ -1,10 +1,6 @@
 #!/bin/bash
 # Quick status and help for Narraitor automation
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKTREE_DIR="${NARRAITOR_MAIN}-worktrees"
-
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -35,9 +31,9 @@ echo -e "  5️⃣  Critical E2E tests (if available)"
 
 echo -e "\n${BLUE}Current Worktrees:${NC}"
 if command -v tree &> /dev/null; then
-    tree -L 1 -d "$WORKTREE_DIR" 2>/dev/null | head -10
+    tree -L 1 -d /Users/jackhaas/Projects/narraitor-worktrees 2>/dev/null | head -10
 else
-    ls -la "$WORKTREE_DIR" 2>/dev/null | grep "^d" | head -10
+    ls -la /Users/jackhaas/Projects/narraitor-worktrees 2>/dev/null | grep "^d" | head -10
 fi
 
 echo -e "\n${BLUE}Active YOLO Containers:${NC}"

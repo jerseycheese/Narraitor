@@ -2,7 +2,7 @@
 # Setup Claude configuration for worktrees to access main project commands
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/.." && pwd)"
+NARRAITOR_MAIN="/Users/jackhaas/Projects/narraitor"
 
 # Function to setup Claude configuration in a worktree
 setup_claude_worktree() {

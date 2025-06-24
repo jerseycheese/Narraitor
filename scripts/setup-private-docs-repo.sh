@@ -3,8 +3,7 @@
 # Script to set up private documentation repository
 # This moves personal workflow docs to a separate private repo
 
-# Use environment variable or default to parent directory
-PRIVATE_DOCS_DIR="${PRIVATE_DOCS_DIR:-$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")/Docs}"
+PRIVATE_DOCS_DIR="/Users/jackhaas/Projects/Docs"
 NARRAITOR_DOCS="$PRIVATE_DOCS_DIR/narraitor"
 
 echo "Setting up private documentation repository..."

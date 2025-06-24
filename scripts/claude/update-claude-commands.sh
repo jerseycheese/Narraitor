@@ -3,11 +3,9 @@
 # Script to update the Claude Code commands to use batched commits
 # Usage: ./scripts/update-claude-commands.sh
 
-# Use dynamic paths
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/../.." && pwd)"
-CLAUDE_COMMANDS_DIR="$NARRAITOR_MAIN/.claude/commands"
-BACKUP_DIR="$CLAUDE_COMMANDS_DIR/backup-$(date +%Y%m%d-%H%M%S)"
+# Use absolute paths
+CLAUDE_COMMANDS_DIR="/Users/jackhaas/Projects/narraitor/.claude/commands"
+BACKUP_DIR="/Users/jackhaas/Projects/narraitor/.claude/commands/backup-$(date +%Y%m%d-%H%M%S)"
 
 # Create backup directory
 mkdir -p "$BACKUP_DIR"

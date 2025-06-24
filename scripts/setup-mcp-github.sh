@@ -2,8 +2,7 @@
 # setup-mcp-github.sh - Set up MCP GitHub tool for Claude Code
 
 # Configuration
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="/Users/jackhaas/Projects/narraitor"
 CLAUDE_DIR="$PROJECT_ROOT/.claude"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 MCP_CONFIG="$PROJECT_ROOT/.mcp.json"
