@@ -1,10 +1,36 @@
+// Mock the abstraction hooks explicitly BEFORE imports
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn((options) => ({
+    data: options?.initialData || {},
+    updateField: jest.fn(),
+    setData: jest.fn(),
+    reset: jest.fn(),
+    errors: [],
+    hasErrors: false,
+    isDirty: false,
+    updateData: jest.fn(),
+    setErrors: jest.fn(),
+    clearErrors: jest.fn(),
+    validate: jest.fn(() => []),
+    isValid: jest.fn(() => true)
+  })),
+  useAsyncState: jest.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    status: 'idle',
+    execute: jest.fn(),
+    reset: jest.fn(),
+    setData: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn()
+  }))
+}));
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import GameSession from './GameSession';
 import { World } from '@/types/world.types';
-
-// Mock the abstraction hooks
-jest.mock('@/hooks');
 
 // Mock the ErrorDisplay component
 jest.mock('@/components/ui/ErrorDisplay/ErrorDisplay', () => ({
