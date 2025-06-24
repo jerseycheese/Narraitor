@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 /**
  * Configuration options for useFormState hook
@@ -99,11 +99,15 @@ export function useFormState<T extends Record<string, unknown>>(
     return validationErrors;
   }, [data, validateFn]);
 
-  // Auto-clear errors when data changes
+  // Auto-clear errors when data changes (but avoid infinite loops)
+  // Only clear when data actually changes, not when errors change
+  const prevDataRef = useRef<T>(initialData);
   useEffect(() => {
-    if (clearErrorsOnChange && errors.length > 0) {
+    const dataChanged = JSON.stringify(data) !== JSON.stringify(prevDataRef.current);
+    if (clearErrorsOnChange && errors.length > 0 && dataChanged) {
       setErrors([]);
     }
+    prevDataRef.current = data;
   }, [data, clearErrorsOnChange]);
 
   // Update a single field
@@ -112,12 +116,8 @@ export function useFormState<T extends Record<string, unknown>>(
       ...prev,
       [field]: value,
     }));
-
-    // Clear errors if configured to do so
-    if (clearErrorsOnChange && errors.length > 0) {
-      setErrors([]);
-    }
-  }, [clearErrorsOnChange, errors.length]);
+    // Error clearing is handled by useEffect above
+  }, []);
 
   // Update multiple fields
   const updateData = useCallback((updates: Partial<T>) => {
@@ -125,12 +125,8 @@ export function useFormState<T extends Record<string, unknown>>(
       ...prev,
       ...updates,
     }));
-
-    // Clear errors if configured to do so
-    if (clearErrorsOnChange && errors.length > 0) {
-      setErrors([]);
-    }
-  }, [clearErrorsOnChange, errors.length]);
+    // Error clearing is handled by useEffect above
+  }, []);
 
   // Set entire form data
   const setData = useCallback((newData: T) => {
