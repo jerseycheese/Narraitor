@@ -9,6 +9,61 @@ import { worldStore } from '../../../state/worldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 // Removed AI client imports - using API routes instead
 
+// Mock the hooks used by PortraitStep for proper state handling
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn((options) => {
+    const [data, setData] = React.useState(options?.initialData || {});
+    
+    return {
+      data,
+      updateField: jest.fn((field, value) => {
+        setData(prev => ({ ...prev, [field]: value }));
+      }),
+      updateData: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useAsyncState: jest.fn(() => {
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [data, setData] = React.useState(null);
+    const [error, setError] = React.useState(null);
+    
+    return {
+      data,
+      isLoading,
+      error,
+      status: isLoading ? 'loading' : 'idle',
+      execute: jest.fn(async (fn) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const result = await fn();
+          setData(result);
+          return result;
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          setError(errorMessage);
+          return null;
+        } finally {
+          setIsLoading(false);
+        }
+      }),
+      reset: jest.fn(),
+      setData: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn()
+    };
+  })
+}));
+
 // Mock the dependencies
 jest.mock('../../../state/characterStore');
 jest.mock('../../../state/worldStore');
@@ -67,7 +122,8 @@ describe('PortraitStep Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Set up fetch mock for API routes
+    // Reset and set up fetch mock for API routes
+    mockFetch.mockReset();
     global.fetch = mockFetch;
   });
 
@@ -130,7 +186,7 @@ describe('PortraitStep Component', () => {
     const user = userEvent.setup();
     
     // Mock failed API response
-    mockFetch.mockRejectedValue(new Error('API error'));
+    mockFetch.mockImplementation(() => Promise.reject(new Error('API error')));
 
     render(
       <PortraitStep 

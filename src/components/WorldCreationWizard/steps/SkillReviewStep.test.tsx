@@ -4,6 +4,88 @@ import SkillReviewStep from './SkillReviewStep';
 import { SkillSuggestion } from '../WorldCreationWizard';
 import { World } from '@/types/world.types';
 
+// Mock the hooks for SkillReviewStep with stable state to prevent infinite loops
+let mockFormData = {
+  localSuggestions: [
+    {
+      name: 'Combat',
+      description: 'Ability to fight in battle',
+      difficulty: 'medium',
+      category: 'Combat',
+      linkedAttributeNames: ['Strength'],
+      accepted: true, // Component defaults to true for all suggestions
+      baseValue: 3,
+      minValue: 1,
+      maxValue: 5,
+      showDetails: true,
+      selectedAttributeNames: ['Strength']
+    }
+  ],
+  customSkills: [],
+  editingCustomSkillId: null
+};
+
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn(() => {
+    return {
+      data: mockFormData,
+      updateField: jest.fn((field, value) => {
+        // Update the mock data without triggering re-renders
+        if (field === 'localSuggestions') {
+          mockFormData.localSuggestions = value;
+        } else if (field === 'customSkills') {
+          mockFormData.customSkills = value;
+        } else if (field === 'editingCustomSkillId') {
+          mockFormData.editingCustomSkillId = value;
+        }
+        // Don't call any setState to prevent infinite loops
+      }),
+      updateData: jest.fn((newData) => {
+        Object.assign(mockFormData, newData);
+      }),
+      setData: jest.fn((newData) => {
+        Object.assign(mockFormData, newData);
+      }),
+      reset: jest.fn(() => {
+        mockFormData.localSuggestions = [];
+        mockFormData.customSkills = [];
+        mockFormData.editingCustomSkillId = null;
+      }),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useModal: jest.fn(() => ({
+    isOpen: false,
+    open: jest.fn(),
+    close: jest.fn(),
+    toggle: jest.fn()
+  })),
+  useAsyncState: jest.fn(() => ({
+    data: null,
+    isLoading: false,
+    error: null,
+    status: 'idle',
+    execute: jest.fn(),
+    reset: jest.fn(),
+    setData: jest.fn(),
+    setError: jest.fn(),
+    clearError: jest.fn()
+  })),
+  useErrorState: jest.fn(() => ({
+    error: null,
+    hasError: false,
+    setError: jest.fn(),
+    clearError: jest.fn(),
+    setErrorFromCatch: jest.fn()
+  }))
+}));
+
 const mockOnUpdate = jest.fn();
 
 const mockSuggestions: SkillSuggestion[] = [
@@ -49,6 +131,25 @@ const defaultWorldData: Partial<World> = {
 describe('SkillReviewStep', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Reset mock form data to prevent infinite loops
+    mockFormData.localSuggestions = [
+      {
+        name: 'Combat',
+        description: 'Ability to fight in battle',
+        difficulty: 'medium',
+        category: 'Combat',
+        linkedAttributeNames: ['Strength'],
+        accepted: true, // Component defaults to true for all suggestions
+        baseValue: 3,
+        minValue: 1,
+        maxValue: 5,
+        showDetails: true,
+        selectedAttributeNames: ['Strength']
+      }
+    ];
+    mockFormData.customSkills = [];
+    mockFormData.editingCustomSkillId = null;
   });
 
   test('renders all suggested skills', () => {
@@ -75,7 +176,7 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    // First, check that it starts as Selected
+    // First, check that it starts as Selected (default for all suggestions)
     const toggleButton = screen.getByTestId('skill-toggle-0');
     expect(toggleButton).toHaveTextContent('Selected');
     

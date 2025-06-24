@@ -3,9 +3,6 @@ import { render } from '@testing-library/react';
 import * as stories from '../ActiveGameSession.stories';
 import { composeStories } from '@storybook/react';
 
-// Mock the abstraction hooks
-jest.mock('@/hooks');
-
 // Mock scrollTo to avoid errors in tests
 beforeAll(() => {
   Element.prototype.scrollTo = jest.fn();

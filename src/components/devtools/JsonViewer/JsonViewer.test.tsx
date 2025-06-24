@@ -2,6 +2,24 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { JsonViewer } from './JsonViewer';
 
+// Mock the useFormState hook to always return mounted state for JsonViewer
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn(() => ({
+    data: { isMounted: true }, // Always mounted for tests
+    updateField: jest.fn(),
+    setData: jest.fn(),
+    reset: jest.fn(),
+    errors: [],
+    hasErrors: false,
+    isDirty: false,
+    updateData: jest.fn(),
+    setErrors: jest.fn(),
+    clearErrors: jest.fn(),
+    validate: jest.fn(() => []),
+    isValid: jest.fn(() => true)
+  }))
+}));
+
 
 describe('JsonViewer', () => {
   const testData = {

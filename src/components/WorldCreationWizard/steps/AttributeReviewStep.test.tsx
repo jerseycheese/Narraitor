@@ -4,7 +4,70 @@ import AttributeReviewStep from './AttributeReviewStep';
 import { AttributeSuggestion } from '../WorldCreationWizard';
 import { World } from '@/types/world.types';
 
-const mockOnUpdate = jest.fn();
+// Mock the hooks for AttributeReviewStep with dynamic processed suggestions
+let mockSuggestionState = {
+  localSuggestions: [
+    {
+      name: 'Strength',
+      description: 'Physical power and endurance',
+      minValue: 1,
+      maxValue: 10,
+      category: 'Physical',
+      accepted: false,
+      showDetails: true,
+      baseValue: 5
+    },
+    {
+      name: 'Intelligence',
+      description: 'Mental capacity and reasoning',
+      minValue: 1,
+      maxValue: 10,
+      category: 'Mental',
+      accepted: false,
+      showDetails: false,
+      baseValue: 5
+    },
+    {
+      name: 'Agility',
+      description: 'Speed and dexterity',
+      minValue: 1,
+      maxValue: 10,
+      category: 'Physical',
+      accepted: false,
+      showDetails: false,
+      baseValue: 5
+    }
+  ]
+};
+
+// Mock update function that updates both the mock state and calls the actual onUpdate
+let mockUpdateField = jest.fn();
+let mockOnUpdate = jest.fn();
+
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn(() => {
+    return {
+      data: {
+        customAttributes: [],
+        isCreatingCustomAttribute: false,
+        editingCustomAttributeId: null,
+        ...mockSuggestionState
+      },
+      updateField: mockUpdateField,
+      updateData: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  })
+}));
+
 
 const mockSuggestions: AttributeSuggestion[] = [
   {
@@ -42,6 +105,48 @@ const defaultWorldData: Partial<World> = {
 describe('AttributeReviewStep', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Reset mock suggestion state
+    mockSuggestionState.localSuggestions = [
+      {
+        name: 'Strength',
+        description: 'Physical power and endurance',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: false, // Start as false so toggle test can set it to true
+        showDetails: true,
+        baseValue: 5
+      },
+      {
+        name: 'Intelligence',
+        description: 'Mental capacity and reasoning',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Mental',
+        accepted: false,
+        showDetails: false,
+        baseValue: 5
+      },
+      {
+        name: 'Agility',
+        description: 'Speed and dexterity',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: false,
+        showDetails: false,
+        baseValue: 5
+      }
+    ];
+    
+    // Reset mock functions
+    mockUpdateField = jest.fn((field, value) => {
+      if (field === 'localSuggestions') {
+        mockSuggestionState.localSuggestions = value;
+      }
+    });
+    mockOnUpdate = jest.fn();
   });
 
   test('renders all suggested attributes', () => {
@@ -137,6 +242,40 @@ describe('AttributeReviewStep', () => {
       }],
     };
 
+    // Set up the mock state to reflect the accepted attribute
+    mockSuggestionState.localSuggestions = [
+      {
+        name: 'Strength',
+        description: 'Physical power and endurance',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: true, // This one is accepted
+        showDetails: true,
+        baseValue: 5
+      },
+      {
+        name: 'Intelligence',
+        description: 'Mental capacity and reasoning',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Mental',
+        accepted: false,
+        showDetails: false,
+        baseValue: 5
+      },
+      {
+        name: 'Agility',
+        description: 'Speed and dexterity',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: false,
+        showDetails: false,
+        baseValue: 5
+      }
+    ];
+
     render(
       <AttributeReviewStep
         worldData={worldDataWithSelection}
@@ -190,6 +329,40 @@ describe('AttributeReviewStep', () => {
       ],
     };
 
+    // Set up the mock state to reflect the selected attributes
+    mockSuggestionState.localSuggestions = [
+      {
+        name: 'Strength',
+        description: 'Physical power and endurance',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: true, // Selected
+        showDetails: true,
+        baseValue: 5
+      },
+      {
+        name: 'Intelligence',
+        description: 'Mental capacity and reasoning',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Mental',
+        accepted: true, // Selected
+        showDetails: false,
+        baseValue: 5
+      },
+      {
+        name: 'Agility',
+        description: 'Speed and dexterity',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: false, // Not selected
+        showDetails: false,
+        baseValue: 5
+      }
+    ];
+
     render(
       <AttributeReviewStep
         worldData={worldDataWithSelection}
@@ -225,6 +398,18 @@ describe('AttributeReviewStep', () => {
         category: 'General',
       })),
     };
+
+    // Set up the mock state to reflect all 8 attributes as accepted
+    mockSuggestionState.localSuggestions = Array.from({ length: 8 }, (_, i) => ({
+      name: `Attribute ${i}`,
+      description: `Description ${i}`,
+      minValue: 1,
+      maxValue: 10,
+      category: 'General',
+      accepted: true,
+      showDetails: i === 0,
+      baseValue: 5
+    }));
 
     render(
       <AttributeReviewStep
@@ -356,6 +541,40 @@ describe('AttributeReviewStep', () => {
         },
       ],
     };
+
+    // Set up the mock state to reflect the persistent selections
+    mockSuggestionState.localSuggestions = [
+      {
+        name: 'Strength',
+        description: 'Physical power and endurance',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: true, // Selected (index 0)
+        showDetails: true,
+        baseValue: 5
+      },
+      {
+        name: 'Intelligence',
+        description: 'Mental capacity and reasoning',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Mental',
+        accepted: false, // Not selected (index 1)
+        showDetails: false,
+        baseValue: 5
+      },
+      {
+        name: 'Agility',
+        description: 'Speed and dexterity',
+        minValue: 1,
+        maxValue: 10,
+        category: 'Physical',
+        accepted: true, // Selected (index 2)
+        showDetails: false,
+        baseValue: 5
+      }
+    ];
 
     render(
       <AttributeReviewStep

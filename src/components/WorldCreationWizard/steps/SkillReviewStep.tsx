@@ -149,11 +149,17 @@ export default function SkillReviewStep({
   };
 
 
+  // Use a ref to track initialization and prevent infinite loops
+  const initializationRef = React.useRef(false);
+  const suggestionsHashRef = React.useRef('');
+  
   // Update form state only on initial load or when suggestions change
   useEffect(() => {
-    // This should only run on initial mount or when suggestions change from parent
-    // Not on every worldData update to prevent overriding user toggles
-    if (suggestions.length > 0) {
+    // Create a hash of suggestions to detect actual changes
+    const suggestionsHash = JSON.stringify(suggestions.map(s => ({ name: s.name, accepted: s.accepted })));
+    
+    // This should only run on initial mount or when suggestions actually change
+    if (suggestions.length > 0 && (!initializationRef.current || suggestionsHashRef.current !== suggestionsHash)) {
       const newSuggestions = suggestions.map((suggestion, index) => {
         // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -204,9 +210,13 @@ export default function SkillReviewStep({
           acceptedCount: acceptedSkills.length
         });
       }
+      
+      // Mark as initialized and save the hash to prevent re-running
+      initializationRef.current = true;
+      suggestionsHashRef.current = suggestionsHash;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestions, skillFormState]); // Only depend on suggestions, not worldData.skills
+  }, [suggestions]); // Only depend on suggestions, not skillFormState or worldData.skills
 
   const handleToggleSkill = (index: number) => {
     // Toggle the state in a new array
