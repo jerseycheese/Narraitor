@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useNarrativeStore } from '../../state/narrativeStore';
 import { useCharacterStore } from '../../state/characterStore';
@@ -14,6 +14,7 @@ import { SectionWrapper } from '../shared/SectionWrapper';
 import { CardActionGroup, type CardAction } from '../shared/cards/CardActionGroup';
 import { AchievementDialog } from '@/components/AchievementDialog';
 import Image from 'next/image';
+import { useAsyncState, useModal, useFormState } from '@/hooks';
 
 /**
  * EndingScreen displays the story ending with narrative closure
@@ -34,17 +35,25 @@ export function EndingScreen() {
   const { worlds } = useWorldStore();
   
   // State for ending image generation
-  const [endingImage, setEndingImage] = useState<string | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
-
-  // State for achievement dialog
-  const [selectedAchievement, setSelectedAchievement] = useState<{
-    title: string;
-    description: string;
-    originalText: string;
-  } | null>(null);
+  
+  // Async state management using new hooks
+  const imageGenerationState = useAsyncState<string>();
+  
+  // Form state management using hooks
+  const endingScreenState = useFormState({
+    initialData: {
+      endingImage: null as string | null,
+      selectedAchievement: null as {
+        title: string;
+        description: string;
+        originalText: string;
+      } | null
+    }
+  });
+  
+  // Modal state management
+  const achievementModal = useModal();
 
   // Handle achievement click to show detailed dialog
   const handleAchievementClick = (achievement: string) => {
@@ -52,23 +61,22 @@ export function EndingScreen() {
     const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
     const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : 'Achievement unlocked during your adventure.';
     
-    setSelectedAchievement({
+    endingScreenState.updateField('selectedAchievement', {
       title,
       description,
       originalText: achievement,
     });
+    achievementModal.open();
   };
 
   const generateEndingImage = useCallback(async () => {
-    if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
+    if (!currentEnding || imageGenerationState.isLoading || generatedForEndingRef.current === currentEnding.id) {
       return; // Prevent multiple simultaneous requests or duplicate generation
     }
     
     generatedForEndingRef.current = currentEnding.id; // Mark this ending as being processed
-    setIsGeneratingImage(true);
-    setImageError(null);
     
-    try {
+    const imageUrl = await imageGenerationState.execute(async () => {
       const character = characters[currentEnding.characterId];
       const world = worlds[currentEnding.worldId];
       
@@ -96,15 +104,16 @@ export function EndingScreen() {
       }
 
       const data = await response.json();
-      setEndingImage(data.imageUrl);
-    } catch (error) {
-      console.error('Failed to generate ending image:', error);
-      setImageError('Failed to generate ending image');
-      generatedForEndingRef.current = null; // Reset on error so user can retry
-    } finally {
-      setIsGeneratingImage(false);
+      return data.imageUrl;
+    });
+
+    if (imageUrl) {
+      endingScreenState.updateField('endingImage', imageUrl);
+    } else {
+      // Reset on error so user can retry
+      generatedForEndingRef.current = null;
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments]);
+  }, [currentEnding, imageGenerationState, characters, worlds, getSessionSegments]);
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
@@ -114,14 +123,14 @@ export function EndingScreen() {
     const isTest = process.env.NODE_ENV === 'test';
     
     if (currentEnding && 
-        !endingImage && 
-        !isGeneratingImage && 
+        !endingScreenState.data.endingImage && 
+        !imageGenerationState.isLoading && 
         !isStorybook &&
         !isTest &&
         generatedForEndingRef.current !== currentEnding.id) {
       generateEndingImage();
     }
-  }, [currentEnding, endingImage, isGeneratingImage, generateEndingImage]); // Include all dependencies
+  }, [currentEnding, endingScreenState.data.endingImage, imageGenerationState.isLoading, generateEndingImage]); // Include all dependencies
 
   // Note: Removed automatic cleanup to prevent clearing ending during development re-renders
   // The ending should be cleared manually when navigating away
@@ -254,7 +263,7 @@ export function EndingScreen() {
         <div className="space-y-6">
           {/* Ending Image */}
           <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-            {isGeneratingImage ? (
+            {imageGenerationState.isLoading ? (
               <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
                 <div className="text-center">
                   <LoadingState message="Generating ending image..." />
@@ -263,15 +272,15 @@ export function EndingScreen() {
                   </p>
                 </div>
               </div>
-            ) : endingImage ? (
+            ) : endingScreenState.data.endingImage ? (
               <Image 
-                src={endingImage} 
+                src={endingScreenState.data.endingImage} 
                 alt={`${currentEnding.tone} ending for ${character?.name || 'the hero'}'s story`}
                 width={800}
                 height={400}
                 className="w-full h-48 md:h-64 lg:h-80 object-cover"
               />
-            ) : imageError ? (
+            ) : imageGenerationState.error ? (
               <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
                 <div className="text-center text-gray-500">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,13 +374,16 @@ export function EndingScreen() {
       </PageLayout>
 
       {/* Achievement Detail Dialog */}
-      {selectedAchievement && (
+      {endingScreenState.data.selectedAchievement && (
         <AchievementDialog
-          isOpen={!!selectedAchievement}
-          onClose={() => setSelectedAchievement(null)}
+          {...achievementModal.modalProps}
+          onClose={() => {
+            achievementModal.close();
+            endingScreenState.updateField('selectedAchievement', null);
+          }}
           title="Achievement Unlocked!"
-          description={selectedAchievement.description}
-          achievement={selectedAchievement.title}
+          description={endingScreenState.data.selectedAchievement.description}
+          achievement={endingScreenState.data.selectedAchievement.title}
           type="milestone"
           icon="🏆"
           buttonText="Continue"

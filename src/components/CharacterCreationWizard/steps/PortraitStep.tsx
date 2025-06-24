@@ -1,6 +1,6 @@
 // src/components/CharacterCreationWizard/steps/PortraitStep.tsx
 
-import React, { useState } from 'react';
+import React from 'react';
 import { CharacterPortrait } from '../../CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
 // Removed direct AI client imports - using API routes instead
@@ -8,6 +8,7 @@ import { Character } from '../../../types/character.types';
 import { World } from '../../../types/world.types';
 import { LoadingState } from '../../ui/LoadingState';
 import { PortraitCustomizationSection } from '../../shared';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface CharacterFormData {
   name: string;
@@ -35,14 +36,16 @@ interface PortraitStepProps {
 }
 
 export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Form state for portrait customization fields using hooks
+  const portraitFormState = useFormState({
+    initialData: {
+      localPhysicalDescription: data.characterData.background?.physicalDescription || '',
+      environmentHint: ''
+    }
+  });
   
-  // Local state for prompt-affecting fields
-  const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
-    data.characterData.background?.physicalDescription || ''
-  );
-  const [environmentHint, setEnvironmentHint] = useState('');
+  // Async state for portrait generation using hooks
+  const portraitGenerationState = useAsyncState<{ portrait: CharacterPortraitType }>();
 
   const portrait: CharacterPortraitType = data.characterData.portrait || {
     type: 'placeholder',
@@ -50,10 +53,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
   };
 
   const handleGeneratePortrait = async () => {
-    setIsGenerating(true);
-    setError(null);
-
-    try {
+    await portraitGenerationState.execute(async () => {
       // Create a character object for the API
       const characterForGeneration: Character = {
         id: 'temp',
@@ -73,9 +73,9 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             isActive: true
           })),
         background: {
-          history: data.characterData.background.history + (environmentHint ? ` ${environmentHint}` : ''),
+          history: data.characterData.background.history + (portraitFormState.data.environmentHint ? ` ${portraitFormState.data.environmentHint}` : ''),
           personality: data.characterData.background.personality,
-          physicalDescription: localPhysicalDescription || data.characterData.background.physicalDescription,
+          physicalDescription: portraitFormState.data.localPhysicalDescription || data.characterData.background.physicalDescription,
           goals: data.characterData.background.goals,
           fears: [],
           relationships: []
@@ -95,7 +95,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         body: JSON.stringify({
           character: characterForGeneration,
           world: worldConfig,
-          customDescription: localPhysicalDescription
+          customDescription: portraitFormState.data.localPhysicalDescription
         }),
       });
 
@@ -104,16 +104,15 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         throw new Error(errorData.error || 'Failed to generate portrait');
       }
 
-      const { portrait: generatedPortrait } = await response.json();
-
+      const result = await response.json();
+      
+      // Update parent component with the generated portrait
       onUpdate({
-        portrait: generatedPortrait
+        portrait: result.portrait
       });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate portrait');
-    } finally {
-      setIsGenerating(false);
-    }
+      
+      return result;
+    });
   };
 
   const handleRemovePortrait = () => {
@@ -123,7 +122,6 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         url: null
       }
     });
-    setError(null);
   };
 
   return (
@@ -141,16 +139,16 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       {/* Portrait customization fields */}
       {portrait.type === 'placeholder' && (
         <PortraitCustomizationSection
-          physicalDescription={localPhysicalDescription}
-          setPhysicalDescription={setLocalPhysicalDescription}
-          environmentHint={environmentHint}
-          setEnvironmentHint={setEnvironmentHint}
+          physicalDescription={portraitFormState.data.localPhysicalDescription}
+          setPhysicalDescription={(value) => portraitFormState.updateField('localPhysicalDescription', value)}
+          environmentHint={portraitFormState.data.environmentHint}
+          setEnvironmentHint={(value) => portraitFormState.updateField('environmentHint', value)}
           className="max-w-md mx-auto"
         />
       )}
 
       <div className="flex flex-col items-center space-y-4">
-        {isGenerating ? (
+        {portraitGenerationState.isLoading ? (
           <div className="w-32 h-32 flex items-center justify-center">
             <LoadingState 
               variant="spinner" 
@@ -163,7 +161,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             portrait={portrait}
             characterName={data.characterData.name}
             size="xlarge"
-            error={error}
+            error={portraitGenerationState.error}
           />
         )}
 
@@ -171,7 +169,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           <button
             type="button"
             onClick={handleGeneratePortrait}
-            disabled={isGenerating}
+            disabled={portraitGenerationState.isLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Generate Portrait
@@ -185,7 +183,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
-                disabled={isGenerating}
+                disabled={portraitGenerationState.isLoading}
                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Regenerate Portrait

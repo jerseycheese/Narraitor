@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
+import { useModal } from '@/hooks';
 
 interface RecentPagesDropdownProps {
   className?: string;
@@ -23,7 +24,8 @@ interface RecentPagesDropdownProps {
  * @returns Dropdown component with recent pages
  */
 export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps) {
-  const [showRecentPages, setShowRecentPages] = useState(false);
+  // Modal state for dropdown visibility using hooks
+  const recentPagesDropdown = useModal();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { navigateWithLoading } = useNavigationLoadingContext();
   
@@ -38,15 +40,15 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowRecentPages(false);
+        recentPagesDropdown.close();
       }
     };
     
-    if (showRecentPages) {
+    if (recentPagesDropdown.isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [showRecentPages]);
+  }, [recentPagesDropdown]);
 
   // Don't show if recent pages are disabled in preferences
   if (!preferences.showRecentPages) {
@@ -64,7 +66,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
   }
 
   const handleNavigateToPage = (path: string, title?: string) => {
-    setShowRecentPages(false);
+    recentPagesDropdown.close();
     navigateWithLoading(path, title ? `Loading ${title}...` : 'Loading...');
   };
 
@@ -124,7 +126,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
-        onClick={() => setShowRecentPages(!showRecentPages)}
+        onClick={recentPagesDropdown.toggle}
         className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors text-gray-300 hover:text-white"
         aria-label="Recent pages"
       >
@@ -137,7 +139,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
         </span>
       </button>
       
-      {showRecentPages && (
+      {recentPagesDropdown.isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto border">
           <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
@@ -193,7 +195,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
               <Link
                 href="/recent"
                 className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm"
-                onClick={() => setShowRecentPages(false)}
+                onClick={recentPagesDropdown.close}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

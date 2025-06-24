@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { World, WorldSkill } from '@/types/world.types';
 import { SkillSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -23,6 +23,7 @@ import {
   WizardTextArea,
   WizardSelect
 } from '@/components/shared/wizard';
+import { useFormState, useModal } from '@/hooks';
 
 interface ExtendedSkillSuggestion extends SkillSuggestion {
   showDetails?: boolean;
@@ -83,6 +84,37 @@ export default function SkillReviewStep({
       .filter(Boolean) as string[];
   };
 
+  // Form state for complex skill management using hooks
+  const skillFormState = useFormState({
+    initialData: {
+      // Initialize local suggestions with all skills accepted by default
+      localSuggestions: suggestions.map((suggestion, index) => {
+        const initialAttributeNames = suggestion.linkedAttributeNames || [];
+        
+        return {
+          ...suggestion,
+          accepted: suggestion.accepted !== undefined ? suggestion.accepted : true,
+          showDetails: index === 0, // Show details only for the first one
+          selectedAttributeNames: initialAttributeNames
+        };
+      }) as ExtendedSkillSuggestion[],
+      
+      // Initialize custom skills from existing world data when editing
+      customSkills: (() => {
+        if (worldData.skills && worldData.skills.length > 0) {
+          const suggestionNames = new Set(suggestions.map(s => s.name));
+          return worldData.skills.filter(skill => !suggestionNames.has(skill.name));
+        }
+        return [];
+      })() as WorldSkill[],
+      
+      editingCustomSkillId: null as string | null
+    }
+  });
+  
+  // Modal states for skill creation and editing using hooks
+  const customSkillCreationModal = useModal();
+
   /**
    * Helper function to merge accepted AI skills with custom skills
    * 
@@ -93,7 +125,7 @@ export default function SkillReviewStep({
    * @param customSkillsList - Custom skills to merge (defaults to current state)
    * @returns Combined array of accepted AI skills and custom skills
    */
-  const mergeAllSkills = (acceptedSuggestions: ExtendedSkillSuggestion[], customSkillsList = customSkills): WorldSkill[] => {
+  const mergeAllSkills = (acceptedSuggestions: ExtendedSkillSuggestion[], customSkillsList = skillFormState.data.customSkills): WorldSkill[] => {
     const acceptedAISkills: WorldSkill[] = acceptedSuggestions
       .filter(s => s.accepted)
       .map(s => {
@@ -116,52 +148,18 @@ export default function SkillReviewStep({
     return [...acceptedAISkills, ...customSkillsList];
   };
 
-  // Custom skill management state - initialize from existing world data when editing
-  const [customSkills, setCustomSkills] = useState<WorldSkill[]>(() => {
-    // When editing, identify existing custom skills (those not in AI suggestions)
-    if (worldData.skills && worldData.skills.length > 0) {
-      const suggestionNames = new Set(suggestions.map(s => s.name));
-      return worldData.skills.filter(skill => !suggestionNames.has(skill.name));
-    }
-    return [];
-  });
-  const [isCreatingCustomSkill, setIsCreatingCustomSkill] = useState(false);
-  const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
 
-  /**
-   * Initialize local suggestions state with all skills accepted by default
-   * 
-   * This provides a better UX by starting with all AI suggestions selected,
-   * allowing users to deselect what they don't want rather than having to
-   * manually select everything they do want.
-   */
-  const [localSuggestions, setLocalSuggestions] = useState<ExtendedSkillSuggestion[]>(() => {
-    // Start with all suggestions accepted by default for better UX
-    return suggestions.map((suggestion, index) => {
-      // If we have existing skills in worldData, match them to suggestions
-      // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
-      
-      // Initialize with multi-attribute support
-      const initialAttributeNames = suggestion.linkedAttributeNames || [];
-      
-      return {
-        ...suggestion,
-        // Use the suggestion's accepted value, defaulting to true if not specified
-        accepted: suggestion.accepted !== undefined ? suggestion.accepted : true,
-        showDetails: index === 0, // Show details only for the first one
-        selectedAttributeNames: initialAttributeNames
-      };
-    });
-  });
-
-
-  // Update local state only on initial load or when suggestions change
+  // Use a ref to track initialization and prevent infinite loops
+  const initializationRef = React.useRef(false);
+  const suggestionsHashRef = React.useRef('');
+  
+  // Update form state only on initial load or when suggestions change
   useEffect(() => {
-    // This should only run on initial mount or when suggestions change from parent
-    // Not on every worldData update to prevent overriding user toggles
-    if (suggestions.length > 0) {
+    // Create a hash of suggestions to detect actual changes
+    const suggestionsHash = JSON.stringify(suggestions.map(s => ({ name: s.name, accepted: s.accepted })));
+    
+    // This should only run on initial mount or when suggestions actually change
+    if (suggestions.length > 0 && (!initializationRef.current || suggestionsHashRef.current !== suggestionsHash)) {
       const newSuggestions = suggestions.map((suggestion, index) => {
         // Note: We're always setting accepted to true, but we check for existing skill for future flexibility
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -180,7 +178,7 @@ export default function SkillReviewStep({
         };
       });
       
-      setLocalSuggestions(newSuggestions);
+      skillFormState.updateField('localSuggestions', newSuggestions);
       
       // Automatically save the initially selected skills to parent state
       const acceptedSkills = newSuggestions
@@ -212,38 +210,42 @@ export default function SkillReviewStep({
           acceptedCount: acceptedSkills.length
         });
       }
+      
+      // Mark as initialized and save the hash to prevent re-running
+      initializationRef.current = true;
+      suggestionsHashRef.current = suggestionsHash;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestions]); // Only depend on suggestions, not worldData.skills
+  }, [suggestions]); // Only depend on suggestions, not skillFormState or worldData.skills
 
   const handleToggleSkill = (index: number) => {
     // Toggle the state in a new array
-    const updatedSuggestions = [...localSuggestions];
+    const updatedSuggestions = [...skillFormState.data.localSuggestions];
     updatedSuggestions[index] = {
       ...updatedSuggestions[index],
       accepted: !updatedSuggestions[index].accepted
     };
     
-    // Update local state
-    setLocalSuggestions(updatedSuggestions);
+    // Update form state
+    skillFormState.updateField('localSuggestions', updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
+    const allSkills = mergeAllSkills(updatedSuggestions, skillFormState.data.customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
   const handleModifySkill = (index: number, field: keyof SkillSuggestion, value: string) => {
-    const updatedSuggestions = [...localSuggestions];
+    const updatedSuggestions = [...skillFormState.data.localSuggestions];
     updatedSuggestions[index] = { ...updatedSuggestions[index], [field]: value };
-    setLocalSuggestions(updatedSuggestions);
+    skillFormState.updateField('localSuggestions', updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
+    const allSkills = mergeAllSkills(updatedSuggestions, skillFormState.data.customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
   const handleAttributeToggle = (skillIndex: number, attributeName: string) => {
-    const updatedSuggestions = [...localSuggestions];
+    const updatedSuggestions = [...skillFormState.data.localSuggestions];
     const currentAttributes = updatedSuggestions[skillIndex].selectedAttributeNames || [];
     
     let newAttributes: string[];
@@ -260,60 +262,62 @@ export default function SkillReviewStep({
       selectedAttributeNames: newAttributes
     };
     
-    setLocalSuggestions(updatedSuggestions);
+    skillFormState.updateField('localSuggestions', updatedSuggestions);
     
     // Calculate and update world skills immediately
-    const allSkills = mergeAllSkills(updatedSuggestions, customSkills);
+    const allSkills = mergeAllSkills(updatedSuggestions, skillFormState.data.customSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
   // Custom skill handlers
   const handleAddCustomSkill = () => {
-    setIsCreatingCustomSkill(true);
-    setEditingCustomSkillId(null);
+    customSkillCreationModal.open();
+    skillFormState.updateField('editingCustomSkillId', null);
   };
 
   const handleSaveCustomSkill = (skill: WorldSkill) => {
     let updatedCustomSkills: WorldSkill[];
     
-    if (editingCustomSkillId) {
+    if (skillFormState.data.editingCustomSkillId) {
       // Edit existing custom skill
-      updatedCustomSkills = customSkills.map(s => s.id === editingCustomSkillId ? skill : s);
+      updatedCustomSkills = skillFormState.data.customSkills.map(s => 
+        s.id === skillFormState.data.editingCustomSkillId ? skill : s
+      );
     } else {
       // Add new custom skill
-      updatedCustomSkills = [...customSkills, skill];
+      updatedCustomSkills = [...skillFormState.data.customSkills, skill];
     }
     
-    setCustomSkills(updatedCustomSkills);
-    setIsCreatingCustomSkill(false);
-    setEditingCustomSkillId(null);
+    skillFormState.updateField('customSkills', updatedCustomSkills);
+    customSkillCreationModal.close();
+    skillFormState.updateField('editingCustomSkillId', null);
     
     // Recalculate world skills
-    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
+    const allSkills = mergeAllSkills(skillFormState.data.localSuggestions, updatedCustomSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
   const handleEditCustomSkill = (skillId: string) => {
-    setEditingCustomSkillId(skillId);
-    setIsCreatingCustomSkill(true);
+    skillFormState.updateField('editingCustomSkillId', skillId);
+    customSkillCreationModal.open();
   };
 
   const handleDeleteCustomSkill = (skillId: string) => {
-    const updatedCustomSkills = customSkills.filter(s => s.id !== skillId);
-    setCustomSkills(updatedCustomSkills);
+    const updatedCustomSkills = skillFormState.data.customSkills.filter(s => s.id !== skillId);
+    skillFormState.updateField('customSkills', updatedCustomSkills);
     
     // Recalculate world skills
-    const allSkills = mergeAllSkills(localSuggestions, updatedCustomSkills);
+    const allSkills = mergeAllSkills(skillFormState.data.localSuggestions, updatedCustomSkills);
     onUpdate({ ...worldData, skills: allSkills });
   };
 
   const handleCancelCustomSkill = () => {
-    setIsCreatingCustomSkill(false);
-    setEditingCustomSkillId(null);
+    customSkillCreationModal.close();
+    skillFormState.updateField('editingCustomSkillId', null);
   };
 
 
-  const acceptedCount = localSuggestions.filter(s => s.accepted).length + customSkills.length;
+  const acceptedCount = skillFormState.data.localSuggestions.filter(s => s.accepted).length + skillFormState.data.customSkills.length;
 
   return (
     <div data-testid="skill-review-step">
@@ -323,13 +327,13 @@ export default function SkillReviewStep({
       >
 
       <div className="space-y-4 my-4">
-        {localSuggestions.length === 0 ? (
+        {skillFormState.data.localSuggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">No skill suggestions available</p>
             <p className="text-sm">You can add skills to your world later in the world editor.</p>
           </div>
         ) : (
-          localSuggestions.map((suggestion, index) => (
+          skillFormState.data.localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
             className={wizardStyles.card.base} 
@@ -360,12 +364,12 @@ export default function SkillReviewStep({
                   className="text-sm text-blue-600 hover:underline focus:outline-none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    const newSuggestions = [...localSuggestions];
+                    const newSuggestions = [...skillFormState.data.localSuggestions];
                     newSuggestions[index] = {
                       ...newSuggestions[index],
                       showDetails: !newSuggestions[index].showDetails
                     };
-                    setLocalSuggestions(newSuggestions);
+                    skillFormState.updateField('localSuggestions', newSuggestions);
                   }}
                 >
                   {suggestion.showDetails ? 'Hide details' : 'Customize'}
@@ -520,7 +524,7 @@ export default function SkillReviewStep({
             </button>
           </div>
           
-          {customSkills.length === 0 && !isCreatingCustomSkill ? (
+          {skillFormState.data.customSkills.length === 0 && !customSkillCreationModal.isOpen ? (
             <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
               <p className="text-sm text-gray-600 mb-2">No custom skills yet</p>
               <p className="text-xs text-gray-500">
@@ -532,7 +536,7 @@ export default function SkillReviewStep({
             </div>
           ) : (
             <div className="space-y-4">
-              {customSkills.map((skill) => (
+              {skillFormState.data.customSkills.map((skill) => (
                 <div
                   key={skill.id}
                   className={`${wizardStyles.card.base} border-l-4 border-l-blue-500`}
@@ -587,17 +591,17 @@ export default function SkillReviewStep({
           )}
           
           {/* Custom Skill Editor */}
-          {isCreatingCustomSkill && (
+          {customSkillCreationModal.isOpen && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border" data-testid="custom-skill-editor">
               <SkillEditor
                 worldId={worldData.id || ''}
-                mode={editingCustomSkillId ? 'edit' : 'create'}
-                skillId={editingCustomSkillId || undefined}
-                existingSkills={[...customSkills, ...(worldData.skills || [])]}
+                mode={skillFormState.data.editingCustomSkillId ? 'edit' : 'create'}
+                skillId={skillFormState.data.editingCustomSkillId || undefined}
+                existingSkills={[...skillFormState.data.customSkills, ...(worldData.skills || [])]}
                 existingAttributes={worldData.attributes || []}
                 maxSkills={12}
                 onSave={handleSaveCustomSkill}
-                onDelete={editingCustomSkillId ? handleDeleteCustomSkill : undefined}
+                onDelete={skillFormState.data.editingCustomSkillId ? handleDeleteCustomSkill : undefined}
                 onCancel={handleCancelCustomSkill}
               />
             </div>

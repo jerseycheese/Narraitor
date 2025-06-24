@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useModal, useFormState } from '@/hooks';
 
 interface ImageGenerationSectionProps {
   title: string;
@@ -39,21 +40,32 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   imageComponent,
   className = ""
 }) => {
-  // Initialize state based on whether there's an existing prompt
-  const [showCustomPrompt, setShowCustomPrompt] = useState(!!currentPrompt);
-  const [customPrompt, setCustomPrompt] = useState(currentPrompt || '');
+  // Modal state for custom prompt visibility using hooks
+  const customPromptModal = useModal({
+    initialOpen: !!currentPrompt
+  });
+  
+  // Form state for custom prompt content using hooks
+  const promptFormState = useFormState({
+    initialData: {
+      customPrompt: currentPrompt || ''
+    }
+  });
 
   const handleGenerate = () => {
-    onGenerate(showCustomPrompt && customPrompt ? customPrompt : undefined);
+    const prompt = customPromptModal.isOpen && promptFormState.data.customPrompt 
+      ? promptFormState.data.customPrompt 
+      : undefined;
+    onGenerate(prompt);
   };
 
-  // Update local state when currentPrompt changes from props
+  // Update form state when currentPrompt changes from props
   React.useEffect(() => {
     if (currentPrompt) {
-      setCustomPrompt(currentPrompt);
-      setShowCustomPrompt(true);
+      promptFormState.updateField('customPrompt', currentPrompt);
+      customPromptModal.open();
     }
-  }, [currentPrompt]);
+  }, [currentPrompt, promptFormState, customPromptModal]);
 
   const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
 
@@ -74,8 +86,8 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={showCustomPrompt}
-                onChange={(e) => setShowCustomPrompt(e.target.checked)}
+                checked={customPromptModal.isOpen}
+                onChange={customPromptModal.toggle}
                 className="rounded border-gray-300"
               />
               <span>{customPromptLabel}</span>
@@ -83,11 +95,11 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           </div>
           
           {/* Custom prompt textarea */}
-          {showCustomPrompt && (
+          {customPromptModal.isOpen && (
             <div className="mb-4">
               <textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
+                value={promptFormState.data.customPrompt}
+                onChange={(e) => promptFormState.updateField('customPrompt', e.target.value)}
                 placeholder={customPromptPlaceholder}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"

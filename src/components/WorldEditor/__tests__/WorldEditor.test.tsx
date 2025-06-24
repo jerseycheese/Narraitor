@@ -3,6 +3,73 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useWorldStore } from '@/state/worldStore';
 import WorldEditor from '../WorldEditor';
 
+// Mock the abstraction hooks
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn((options) => {
+    const [data, setData] = React.useState(options?.initialData || {
+      world: null
+    });
+    
+    return {
+      data,
+      updateField: jest.fn((field, value) => {
+        setData(prev => ({ ...prev, [field]: value }));
+      }),
+      updateData: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useAsyncState: jest.fn(() => {
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [data, setData] = React.useState(null);
+    const [error, setError] = React.useState(null);
+    
+    return {
+      data,
+      isLoading,
+      error,
+      status: isLoading ? 'loading' : (error ? 'error' : 'idle'),
+      execute: jest.fn(async (fn) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const result = await fn();
+          setData(result);
+          setIsLoading(false);
+          return result;
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          setError(errorMessage);
+          setIsLoading(false);
+          return null;
+        }
+      }),
+      reset: jest.fn(),
+      setData: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn()
+    };
+  }),
+  useModal: jest.fn((options) => {
+    const [isOpen, setIsOpen] = React.useState(options?.initialOpen || false);
+    
+    return {
+      isOpen,
+      open: jest.fn(() => setIsOpen(true)),
+      close: jest.fn(() => setIsOpen(false)),
+      toggle: jest.fn(() => setIsOpen(prev => !prev))
+    };
+  })
+}));
+
 // Mock Next.js router
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({

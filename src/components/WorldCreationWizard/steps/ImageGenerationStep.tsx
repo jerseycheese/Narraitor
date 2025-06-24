@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { World, WorldImage } from '@/types/world.types';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
@@ -8,6 +8,7 @@ import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { useAsyncState, useFormState } from '@/hooks';
 
 interface ImageGenerationStepProps {
   worldData: Partial<World>;
@@ -26,36 +27,36 @@ export default function ImageGenerationStep({
   onCancel,
   skipGeneration = false
 }: ImageGenerationStepProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [generatedImage, setGeneratedImage] = useState<WorldImage | null>(worldData.image || null);
+  // Form state management using hooks
+  const imageGenState = useFormState({
+    initialData: {
+      generatedImage: worldData.image || null as WorldImage | null
+    }
+  });
+  
+  // Async state management using new hooks
+  const imageGenerationState = useAsyncState<WorldImage>();
 
   const generateImage = useCallback(async () => {
-    setIsGenerating(true);
-    setError(null);
-
-    try {
+    const image = await imageGenerationState.execute(async () => {
       const aiClient = createAIClient();
       const imageGenerator = new WorldImageGenerator(aiClient);
       
-      const image = await imageGenerator.generateWorldImage(worldData as World);
-      
-      setGeneratedImage(image);
+      return await imageGenerator.generateWorldImage(worldData as World);
+    });
+
+    if (image) {
+      imageGenState.updateField('generatedImage', image);
       onUpdate({ image });
-    } catch (err) {
-      console.error('Failed to generate world image:', err);
-      setError(err instanceof Error ? err.message : 'Failed to generate image');
-    } finally {
-      setIsGenerating(false);
     }
-  }, [worldData, onUpdate]);
+  }, [worldData, onUpdate, imageGenerationState, imageGenState]);
 
   useEffect(() => {
     // Auto-generate image when component mounts if we don't have one
-    if (!generatedImage && !skipGeneration && !isGenerating) {
+    if (!imageGenState.data.generatedImage && !skipGeneration && !imageGenerationState.isLoading) {
       generateImage();
     }
-  }, [generatedImage, skipGeneration, isGenerating, generateImage]);
+  }, [imageGenState.data.generatedImage, skipGeneration, imageGenerationState.isLoading, generateImage]);
 
   const handleSkip = () => {
     // Set a placeholder image
@@ -74,8 +75,8 @@ export default function ImageGenerationStep({
   };
 
   const handleContinue = () => {
-    if (generatedImage) {
-      onUpdate({ image: generatedImage });
+    if (imageGenState.data.generatedImage) {
+      onUpdate({ image: imageGenState.data.generatedImage });
     }
     onComplete();
   };
@@ -89,13 +90,13 @@ export default function ImageGenerationStep({
         <div className="space-y-6 my-4">
           {/* Preview Area */}
           <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-            {isGenerating ? (
+            {imageGenerationState.isLoading ? (
               <div className="h-full flex items-center justify-center">
                 <LoadingState message="Generating world image..." />
               </div>
-            ) : generatedImage?.url ? (
+            ) : imageGenState.data.generatedImage?.url ? (
               <Image 
-                src={generatedImage.url} 
+                src={imageGenState.data.generatedImage.url} 
                 alt={`${worldData.name} world`}
                 width={600}
                 height={337}
@@ -114,27 +115,27 @@ export default function ImageGenerationStep({
           </div>
 
           {/* Error Display */}
-          {error && (
+          {imageGenerationState.error && (
             <ErrorDisplay 
-              message={error} 
+              message={imageGenerationState.error} 
               onRetry={handleRetry}
               className="mt-4"
             />
           )}
 
           {/* Image Details */}
-          {generatedImage && !isGenerating && (
+          {imageGenState.data.generatedImage && !imageGenerationState.isLoading && (
             <div className="bg-gray-50 p-4 rounded-lg">
               <h4 className="font-medium mb-2">Image Details</h4>
               <dl className="text-sm space-y-1">
                 <div>
                   <dt className="inline font-medium">Type:</dt>
-                  <dd className="inline ml-2">{generatedImage.type === 'ai-generated' ? 'AI Generated' : 'Placeholder'}</dd>
+                  <dd className="inline ml-2">{imageGenState.data.generatedImage.type === 'ai-generated' ? 'AI Generated' : 'Placeholder'}</dd>
                 </div>
-                {generatedImage.generatedAt && (
+                {imageGenState.data.generatedImage.generatedAt && (
                   <div>
                     <dt className="inline font-medium">Generated:</dt>
-                    <dd className="inline ml-2">{new Date(generatedImage.generatedAt).toLocaleString()}</dd>
+                    <dd className="inline ml-2">{new Date(imageGenState.data.generatedImage.generatedAt).toLocaleString()}</dd>
                   </div>
                 )}
               </dl>
@@ -150,7 +151,7 @@ export default function ImageGenerationStep({
             type="button"
             onClick={onCancel || (() => window.history.back())}
             className={wizardStyles.navigation.cancelButton}
-            disabled={isGenerating}
+            disabled={imageGenerationState.isLoading}
           >
             Cancel
           </button>
@@ -160,7 +161,7 @@ export default function ImageGenerationStep({
               type="button"
               onClick={onBack}
               className={wizardStyles.navigation.secondaryButton}
-              disabled={isGenerating}
+              disabled={imageGenerationState.isLoading}
             >
               Back
             </button>
@@ -168,7 +169,7 @@ export default function ImageGenerationStep({
         </div>
         
         <div className="flex gap-2">
-          {!generatedImage && !isGenerating && (
+          {!imageGenState.data.generatedImage && !imageGenerationState.isLoading && (
             <button
               type="button"
               onClick={handleSkip}
@@ -178,7 +179,7 @@ export default function ImageGenerationStep({
             </button>
           )}
           
-          {generatedImage && !isGenerating && (
+          {imageGenState.data.generatedImage && !imageGenerationState.isLoading && (
             <button
               type="button"
               onClick={generateImage}
@@ -192,9 +193,9 @@ export default function ImageGenerationStep({
             type="button"
             onClick={handleContinue}
             className={wizardStyles.navigation.primaryButton}
-            disabled={isGenerating || (!generatedImage && !skipGeneration)}
+            disabled={imageGenerationState.isLoading || (!imageGenState.data.generatedImage && !skipGeneration)}
           >
-            {generatedImage ? 'Continue' : 'Skip & Continue'}
+            {imageGenState.data.generatedImage ? 'Continue' : 'Skip & Continue'}
           </button>
         </div>
       </div>

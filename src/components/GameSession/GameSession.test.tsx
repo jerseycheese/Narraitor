@@ -1,7 +1,44 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GameSession from './GameSession';
 import { World } from '@/types/world.types';
+
+// Mock the hooks module before importing the component
+const mockUseFormState = jest.fn((options) => ({
+  data: options?.initialData || { hasAutoResumed: false },
+  updateField: jest.fn(),
+  setData: jest.fn(),
+  reset: jest.fn(),
+  errors: [],
+  hasErrors: false,
+  isDirty: false,
+  updateData: jest.fn(),
+  setErrors: jest.fn(),
+  clearErrors: jest.fn(),
+  validate: jest.fn(() => []),
+  isValid: jest.fn(() => true)
+}));
+
+// Create a more specific mock for useAsyncState that the component can use properly
+const mockExecute = jest.fn();
+const mockUseAsyncState = jest.fn(() => ({
+  data: true, // Client is mounted
+  isLoading: false,
+  error: null,
+  execute: mockExecute,
+  reset: jest.fn(),
+  setData: jest.fn(),
+  setError: jest.fn(),
+  clearError: jest.fn()
+}));
+
+// Mock the module at runtime
+jest.doMock('@/hooks', () => ({
+  useFormState: mockUseFormState,
+  useAsyncState: mockUseAsyncState
+}));
+
+// Import component AFTER setting up mocks
+const GameSession = require('./GameSession').default;
 
 // Mock the ErrorDisplay component
 jest.mock('@/components/ui/ErrorDisplay/ErrorDisplay', () => ({
@@ -60,6 +97,7 @@ jest.mock('next/navigation', () => ({
   notFound: jest.fn(),
 }));
 
+
 // Import the mocked hook
 import { useGameSessionState } from './hooks/useGameSessionState';
 const mockedUseGameSessionState = useGameSessionState as jest.MockedFunction<typeof useGameSessionState>;
@@ -84,15 +122,26 @@ describe('GameSession', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset mocks to default state where client is mounted
+    mockUseAsyncState.mockReturnValue({
+      data: true, // Client is mounted by default
+      isLoading: false,
+      error: null,
+      execute: mockExecute,
+      reset: jest.fn(),
+      setData: jest.fn(),
+      setError: jest.fn(),
+      clearError: jest.fn()
+    });
   });
 
-  test('renders initializing state', () => {
+  test('renders initializing state with no characters', () => {
     mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: 'initializing' },
       error: null,
       worldExists: true,
       world: undefined,
-      worldCharacters: [],
+      worldCharacters: [], // Empty array should trigger no-characters state
       savedSession: undefined,
       handleRetry: jest.fn(),
       handleDismissError: jest.fn(),

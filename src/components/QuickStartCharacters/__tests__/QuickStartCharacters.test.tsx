@@ -6,6 +6,74 @@ import { QuickStartCharacters } from '../QuickStartCharacters';
 import { World } from '@/types/world.types';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 
+// Mock the abstraction hooks to simulate the actual hooks behavior
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn((options) => {
+    const [data, setData] = React.useState(options?.initialData || {
+      archetypes: [],
+      selectedArchetype: null
+    });
+    
+    return {
+      data,
+      updateField: jest.fn((field, value) => {
+        setData(prev => ({ ...prev, [field]: value }));
+      }),
+      updateData: jest.fn(),
+      setData: jest.fn(),
+      reset: jest.fn(),
+      errors: [],
+      hasErrors: false,
+      isDirty: false,
+      setErrors: jest.fn(),
+      clearErrors: jest.fn(),
+      validate: jest.fn(() => []),
+      isValid: jest.fn(() => true)
+    };
+  }),
+  useAsyncState: jest.fn(() => {
+    const [data, setData] = React.useState(null);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState(null);
+    
+    return {
+      data,
+      isLoading,
+      error,
+      status: isLoading ? 'loading' : (error ? 'error' : 'idle'),
+      execute: jest.fn(async (fn) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const result = await fn();
+          setData(result);
+          setIsLoading(false);
+          return result;
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : String(err);
+          setError(errorMessage);
+          setIsLoading(false);
+          return null;
+        }
+      }),
+      reset: jest.fn(() => {
+        setData(null);
+        setIsLoading(false);
+        setError(null);
+      }),
+      setData: jest.fn((newData) => {
+        setData(newData);
+      }),
+      setError: jest.fn((newError) => {
+        setError(newError);
+      }),
+      clearError: jest.fn(() => {
+        setError(null);
+      })
+    };
+  })
+}));
+
 // Mock the character archetype generation
 jest.mock('@/lib/utils/characterArchetypes', () => ({
   generateCharacterArchetypes: jest.fn(),
@@ -212,6 +280,33 @@ describe('QuickStartCharacters', () => {
 
   describe('Error Handling', () => {
     test('shows error message when archetype generation fails', async () => {
+      // Set up the first async state instance (archetype generation) to have an error
+      const mockUseAsyncState = require('@/hooks').useAsyncState;
+      
+      // Override the mock for this test to return an error state
+      mockUseAsyncState.mockImplementationOnce(() => ({
+        data: null,
+        isLoading: false,
+        error: 'Generation failed',
+        status: 'error',
+        execute: jest.fn(),
+        reset: jest.fn(),
+        setData: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn()
+      })).mockImplementationOnce(() => ({
+        // Second useAsyncState call (for random generation) - normal state
+        data: null,
+        isLoading: false,
+        error: null,
+        status: 'idle',
+        execute: jest.fn(),
+        reset: jest.fn(),
+        setData: jest.fn(),
+        setError: jest.fn(),
+        clearError: jest.fn()
+      }));
+      
       mockGenerateArchetypes.mockRejectedValue(new Error('Generation failed'));
       render(<QuickStartCharacters {...defaultProps} />);
       

@@ -21,6 +21,7 @@ import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { useAsyncState, useModal, useFormState } from '@/hooks';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -52,23 +53,26 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   triggerGeneration = false,
   selectedChoiceId,
 }) => {
-  const [isGenerating, setIsGenerating] = React.useState(true);
-  const [initialized, setInitialized] = React.useState(false);
-  const [currentDecision, setCurrentDecision] = React.useState<Decision | null>(null);
-  const [localSelectedChoiceId, setLocalSelectedChoiceId] = React.useState<string | undefined>();
-  const [shouldTriggerGeneration, setShouldTriggerGeneration] = React.useState(false);
+  // Game session state management using hooks
+  const gameSessionState = useFormState({
+    initialData: {
+      isGenerating: true,
+      initialized: false,
+      currentDecision: null as Decision | null,
+      localSelectedChoiceId: undefined as string | undefined,
+      shouldTriggerGeneration: false,
+      endingSuggestionReason: '',
+      suggestedEndingType: 'story-complete' as EndingType,
+      isGeneratingChoices: false
+    }
+  });
+  
   const choiceGenerationTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   
-  // Ending suggestion state
-  const [showEndingSuggestion, setShowEndingSuggestion] = React.useState(false);
-  const [endingSuggestionReason, setEndingSuggestionReason] = React.useState('');
-  const [suggestedEndingType, setSuggestedEndingType] = React.useState<EndingType>('story-complete');
-  
-  // Manual end story confirmation
-  const [showEndConfirmation, setShowEndConfirmation] = React.useState(false);
-  
-  // Journal modal state (Issue #278)
-  const [showJournalModal, setShowJournalModal] = React.useState(false);
+  // Modal state management using hooks
+  const endingSuggestionModal = useModal();
+  const endConfirmationModal = useModal();
+  const journalModal = useModal();
   
   // Get character ID from session store
   const characterId = useSessionStore(state => state.characterId);
@@ -80,7 +84,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();
-  const [isGeneratingChoices, setIsGeneratingChoices] = React.useState(false);
+  
+  // Async state management for journal summary generation
+  const journalSummaryState = useAsyncState<{summary: string, entryType: string, significance: string}>();
   
   // Get journal store for auto-creating entries
   const { addEntry } = useJournalStore();
@@ -97,7 +103,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     let isMounted = true;
     
     // Set initial loading state
-    setIsGenerating(true);
+    gameSessionState.updateField('isGenerating', true);
     
     // Function to check existing narrative and set up if needed
     const setupNarrative = async () => {
@@ -122,25 +128,34 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         // If we have existing decisions, use the latest one
         if (existingDecisions.length > 0) {
           const latestDecision = existingDecisions[existingDecisions.length - 1];
-          setCurrentDecision(latestDecision);
+          gameSessionState.updateField('currentDecision', latestDecision);
         }
         
         if (hasInitialScene || existingSegments.length > 0) {
           // If we have any segments at all, use them
           // Don't clear existing narrative history
-          setInitialized(true);
-          setIsGenerating(false);
+          gameSessionState.updateData({
+            ...gameSessionState.data,
+            initialized: true,
+            isGenerating: false
+          });
         }
         else {
           // No segments at all - normal case for new session
           // No existing segments found, will generate initial scene
-          setInitialized(true);
-          setIsGenerating(false);
+          gameSessionState.updateData({
+            ...gameSessionState.data,
+            initialized: true,
+            isGenerating: false
+          });
         }
       } catch {
         // Error setting up narrative, continue with initialization
-        setInitialized(true);
-        setIsGenerating(false);
+        gameSessionState.updateData({
+          ...gameSessionState.data,
+          initialized: true,
+          isGenerating: false
+        });
       }
     };
     
@@ -159,9 +174,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     };
   }, [sessionId, worldId, controllerKey]);
 
-  // Helper function to generate AI summary for journal entries
+  // Helper function to generate AI summary for journal entries using hooks
   const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
-    try {
+    const result = await journalSummaryState.execute(async () => {
       const response = await fetch('/api/narrative/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -184,8 +199,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           };
         }
       }
-    } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
+      
+      throw new Error('Failed to generate AI summary');
+    });
+    
+    if (result) {
+      return result;
     }
     
     // Return fallback values using decision weight for significance
@@ -293,15 +312,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
   const handleNarrativeGenerated = (segment: NarrativeSegment) => {
     // Narrative segment was successfully generated
-    setIsGenerating(false);
-    setShouldTriggerGeneration(false); // Reset trigger
-    // Start generating choices
-    setIsGeneratingChoices(true);
+    gameSessionState.updateData({
+      ...gameSessionState.data,
+      isGenerating: false,
+      shouldTriggerGeneration: false, // Reset trigger
+      isGeneratingChoices: true // Start generating choices
+    });
     
     // Auto-create journal entry for significant narrative events
     if (characterId && segment.content) {
       // Use the current decision weight to determine journal significance
-      const decisionWeight = currentDecision?.decisionWeight;
+      const decisionWeight = gameSessionState.data.currentDecision?.decisionWeight;
       createJournalEntryFromSegment(segment, decisionWeight);
     }
     
@@ -309,26 +330,26 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Use a ref to track this timeout so we can clear it if AI choices arrive
     const timeoutId = setTimeout(() => {
       // If we're still generating choices after 15 seconds, create fallback choices
-      setIsGeneratingChoices(prev => {
-        if (prev && !currentDecision) {
-          const fallbackId = `decision-timeout-${Date.now()}`;
-          const fallbackDecision: Decision = {
-            id: fallbackId,
-            prompt: "What will you do?",
-            options: [
-              { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
-              { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
-              { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
-            ],
-            decisionWeight: 'minor',
-            contextSummary: 'Waiting for player action (timeout fallback).'
-          };
-          
-          setCurrentDecision(fallbackDecision);
-          return false; // Stop generating
-        }
-        return prev;
-      });
+      if (gameSessionState.data.isGeneratingChoices && !gameSessionState.data.currentDecision) {
+        const fallbackId = `decision-timeout-${Date.now()}`;
+        const fallbackDecision: Decision = {
+          id: fallbackId,
+          prompt: "What will you do?",
+          options: [
+            { id: `option-${fallbackId}-1`, text: "Investigate further", alignment: 'neutral' },
+            { id: `option-${fallbackId}-2`, text: "Talk to nearby characters", alignment: 'lawful' },
+            { id: `option-${fallbackId}-3`, text: "Move to a new location", alignment: 'neutral' }
+          ],
+          decisionWeight: 'minor',
+          contextSummary: 'Waiting for player action (timeout fallback).'
+        };
+        
+        gameSessionState.updateData({
+          ...gameSessionState.data,
+          currentDecision: fallbackDecision,
+          isGeneratingChoices: false
+        });
+      }
     }, 15000); // 15 second timeout (increased from 10)
     
     // Store timeout ID for potential cleanup
@@ -342,18 +363,19 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     }
     
     // Player choice was selected
-    setIsGenerating(true);
-    setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(choiceId);
-    setShouldTriggerGeneration(true); // Trigger narrative generation
+    gameSessionState.updateData({
+      ...gameSessionState.data,
+      isGenerating: true,
+      isGeneratingChoices: true, // Start generating new choices
+      localSelectedChoiceId: choiceId,
+      shouldTriggerGeneration: true, // Trigger narrative generation
+      currentDecision: null // Clear current decision to prevent showing stale choices during generation
+    });
     
     // If we have a current decision, update its selected option
-    if (currentDecision) {
-      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
+    if (gameSessionState.data.currentDecision) {
+      useNarrativeStore.getState().selectDecisionOption(gameSessionState.data.currentDecision.id, choiceId);
     }
-    
-    // Clear current decision to prevent showing stale choices during generation
-    setCurrentDecision(null);
     
     onChoiceSelected(choiceId);
     
@@ -371,7 +393,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     const customChoiceId = generateUniqueId('custom');
     
     // Create a custom decision option and add it to the current decision in the store
-    if (currentDecision) {
+    if (gameSessionState.data.currentDecision) {
       const customOption = {
         id: customChoiceId,
         text: customText,
@@ -380,20 +402,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       };
       
       // Update the decision in the store with the new custom option and select it
-      useNarrativeStore.getState().updateDecision(currentDecision.id, {
-        options: [...currentDecision.options, customOption],
+      useNarrativeStore.getState().updateDecision(gameSessionState.data.currentDecision.id, {
+        options: [...gameSessionState.data.currentDecision.options, customOption],
         selectedOptionId: customChoiceId
       });
     }
     
-    // Clear current decision to prevent showing stale choices during generation
-    setCurrentDecision(null);
-    
     // Trigger narrative generation with the custom choice
-    setIsGenerating(true);
-    setIsGeneratingChoices(true); // Start generating new choices
-    setLocalSelectedChoiceId(customChoiceId);
-    setShouldTriggerGeneration(true);
+    gameSessionState.updateData({
+      ...gameSessionState.data,
+      isGenerating: true,
+      isGeneratingChoices: true, // Start generating new choices
+      localSelectedChoiceId: customChoiceId,
+      shouldTriggerGeneration: true,
+      currentDecision: null // Clear current decision to prevent showing stale choices during generation
+    });
     
     onChoiceSelected(customChoiceId);
   };
@@ -402,7 +425,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const handleChoicesGenerated = (decision: Decision) => {
     
     if (!decision || !decision.options || decision.options.length === 0) {
-      setIsGeneratingChoices(false);
+      gameSessionState.updateField('isGeneratingChoices', false);
       return;
     }
     
@@ -422,10 +445,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       contextSummary: decision.contextSummary,
     };
     
-    // Update the current decision state with the copy
-    setCurrentDecision(decisionCopy);
-    // Stop the choice generation loading state
-    setIsGeneratingChoices(false);
+    // Update the current decision state with the copy and stop the choice generation loading state
+    gameSessionState.updateData({
+      ...gameSessionState.data,
+      currentDecision: decisionCopy,
+      isGeneratingChoices: false
+    });
     
     // Convert AI-generated decision to player choices format for the session
     const playerChoices = decision.options.map(option => ({
@@ -455,18 +480,21 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Handle ending suggestion from AI
   const handleEndingSuggested = (reason: string, endingType: EndingType) => {
-    setEndingSuggestionReason(reason);
-    setSuggestedEndingType(endingType);
-    setShowEndingSuggestion(true);
+    gameSessionState.updateData({
+      ...gameSessionState.data,
+      endingSuggestionReason: reason,
+      suggestedEndingType: endingType
+    });
+    endingSuggestionModal.open();
   };
   
   // Accept AI ending suggestion
   const handleAcceptEndingSuggestion = async () => {
-    setShowEndingSuggestion(false);
+    endingSuggestionModal.close();
     if (!characterId || !world) return;
     
     try {
-      await generateEnding(suggestedEndingType, {
+      await generateEnding(gameSessionState.data.suggestedEndingType, {
         sessionId,
         characterId,
         worldId: world.id
@@ -478,17 +506,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Reject AI ending suggestion
   const handleRejectEndingSuggestion = () => {
-    setShowEndingSuggestion(false);
+    endingSuggestionModal.close();
   };
   
   // Handle manual end story button click
   const handleEndStoryClick = () => {
-    setShowEndConfirmation(true);
+    endConfirmationModal.open();
   };
   
   // Confirm manual end story
   const handleConfirmEndStory = () => {
-    setShowEndConfirmation(false);
+    endConfirmationModal.close();
     handleEndStory();
   };
 
@@ -553,8 +581,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               worldId={worldId}
               sessionId={sessionId}
               characterId={characterId || undefined}
-              triggerGeneration={triggerGeneration || !initialized || shouldTriggerGeneration} // Trigger on choice or initialization
-              choiceId={localSelectedChoiceId || selectedChoiceId}
+              triggerGeneration={triggerGeneration || !gameSessionState.data.initialized || gameSessionState.data.shouldTriggerGeneration} // Trigger on choice or initialization
+              choiceId={gameSessionState.data.localSelectedChoiceId || selectedChoiceId}
               onNarrativeGenerated={handleNarrativeGenerated}
               onChoicesGenerated={handleChoicesGenerated}
               onEndingSuggested={handleEndingSuggested}
@@ -566,19 +594,19 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         {/* Choices Column */}
         <div className="lg:row-span-1 lg:self-stretch">
           {/* Show AI-generated choices, loading state, or fallback */}
-          {currentDecision ? (
+          {gameSessionState.data.currentDecision ? (
             <div className="player-choices-container">
               <ChoiceSelector
-                decision={currentDecision}
+                decision={gameSessionState.data.currentDecision}
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                isDisabled={status !== 'active' || gameSessionState.data.isGenerating || isSessionEnded(sessionId)}
                 character={character}
                 worldSkills={world?.skills || []}
               />
             </div>
-          ) : isGeneratingChoices ? (
+          ) : gameSessionState.data.isGeneratingChoices ? (
             <div className="player-choices-container">
               <LoadingState message="Thinking up some options..." />
             </div>
@@ -589,7 +617,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                isDisabled={status !== 'active' || gameSessionState.data.isGenerating || isSessionEnded(sessionId)}
                 character={character}
                 worldSkills={world?.skills || []}
               />
@@ -602,7 +630,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 onSelect={handleChoiceSelected}
                 onCustomSubmit={handleCustomSubmit}
                 enableCustomInput={true}
-                isDisabled={status !== 'active' || isGenerating || isSessionEnded(sessionId)}
+                isDisabled={status !== 'active' || gameSessionState.data.isGenerating || isSessionEnded(sessionId)}
                 character={character}
                 worldSkills={world?.skills || []}
               />
@@ -651,16 +679,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Ending Suggestion Dialog */}
       <StoryEndingDialog
-        isOpen={showEndingSuggestion}
+        {...endingSuggestionModal.modalProps}
         onClose={handleRejectEndingSuggestion}
         onContinue={handleAcceptEndingSuggestion}
         title="Story Ending Suggested"
         content={
           <div className="space-y-3">
             <p>The AI has detected that your story might be ready to conclude based on natural story progression.</p>
-            {endingSuggestionReason && (
+            {gameSessionState.data.endingSuggestionReason && (
               <p className="text-sm text-gray-600 italic">
-                Reason: {endingSuggestionReason}
+                Reason: {gameSessionState.data.endingSuggestionReason}
               </p>
             )}
             <p>Would you like to generate an ending now, or continue your adventure?</p>
@@ -673,9 +701,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Manual End Story Confirmation */}
       <ConfirmationDialog
-        isOpen={showEndConfirmation}
+        {...endConfirmationModal.modalProps}
         onConfirm={handleConfirmEndStory}
-        onClose={() => setShowEndConfirmation(false)}
+        onClose={endConfirmationModal.close}
         title="End Story"
         message="Are you sure you want to end your story? This will write a final ending based on your current progress and cannot be undone."
         variant="warning"
@@ -685,15 +713,15 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {/* Journal Modal - Issue #278: AC2,AC4,AC5 */}
       <JournalModal
-        isOpen={showJournalModal}
-        onClose={() => setShowJournalModal(false)}
+        {...journalModal.modalProps}
+        onClose={journalModal.close}
         sessionId={sessionId}
       />
 
       {/* Journal Floating Button - Issue #562 */}
       {character && (
         <JournalFloatingButton
-          onClick={() => setShowJournalModal(true)}
+          onClick={journalModal.open}
         />
       )}
     </div>

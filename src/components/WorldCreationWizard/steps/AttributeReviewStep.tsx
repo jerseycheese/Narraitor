@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { World, WorldAttribute } from '@/types/world.types';
 import { AttributeSuggestion } from '../WorldCreationWizard';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -13,6 +13,7 @@ import {
   WizardTextField,
   WizardTextArea
 } from '@/components/shared/wizard';
+import { useFormState } from '@/hooks';
 
 interface AttributeReviewStepProps {
   worldData: Partial<World>;
@@ -27,17 +28,23 @@ export default function AttributeReviewStep({
   errors,
   onUpdate,
 }: AttributeReviewStepProps) {
-  // Custom attribute management state - initialize from existing world data when editing
-  const [customAttributes, setCustomAttributes] = useState<WorldAttribute[]>(() => {
-    // When editing, identify existing custom attributes (those not in AI suggestions)
-    if (worldData.attributes && worldData.attributes.length > 0) {
-      const suggestionNames = new Set(suggestions.map(s => s.name));
-      return worldData.attributes.filter(attr => !suggestionNames.has(attr.name));
+  // Attribute review state management using hooks
+  const attributeReviewState = useFormState({
+    initialData: {
+      // Custom attribute management state - initialize from existing world data when editing
+      customAttributes: (() => {
+        // When editing, identify existing custom attributes (those not in AI suggestions)
+        if (worldData.attributes && worldData.attributes.length > 0) {
+          const suggestionNames = new Set(suggestions.map(s => s.name));
+          return worldData.attributes.filter(attr => !suggestionNames.has(attr.name));
+        }
+        return [];
+      })() as WorldAttribute[],
+      isCreatingCustomAttribute: false,
+      editingCustomAttributeId: null as string | null,
+      localSuggestions: [] as (AttributeSuggestion & { accepted: boolean; showDetails: boolean; baseValue: number })[]
     }
-    return [];
   });
-  const [isCreatingCustomAttribute, setIsCreatingCustomAttribute] = useState(false);
-  const [editingCustomAttributeId, setEditingCustomAttributeId] = useState<string | null>(null);
 
   /**
    * Helper function to merge accepted AI attributes with custom attributes
@@ -49,7 +56,7 @@ export default function AttributeReviewStep({
    * @param customAttributesList - Custom attributes to merge (defaults to current state)
    * @returns Combined array of accepted AI attributes and custom attributes
    */
-  const mergeAllAttributes = (acceptedSuggestions: AttributeSuggestion[], customAttributesList = customAttributes): WorldAttribute[] => {
+  const mergeAllAttributes = (acceptedSuggestions: AttributeSuggestion[], customAttributesList = attributeReviewState.data.customAttributes): WorldAttribute[] => {
     const acceptedAttributes: WorldAttribute[] = acceptedSuggestions.map(s => {
       // Use stable ID based on attribute name to prevent unnecessary re-renders
       const existingAttribute = worldData.attributes?.find(attr => attr.name === s.name);
@@ -67,27 +74,8 @@ export default function AttributeReviewStep({
     
     return [...acceptedAttributes, ...customAttributesList];
   };
-  // Initialize state based on existing selections
-  const [localSuggestions, setLocalSuggestions] = useState(() => {
-    // If we have existing attributes in worldData, match them to suggestions
-    if (worldData.attributes && worldData.attributes.length > 0) {
-      return suggestions.map(suggestion => {
-        const existingAttr = worldData.attributes?.find(attr => attr.name === suggestion.name);
-        return {
-          ...suggestion,
-          accepted: suggestion.accepted !== undefined ? suggestion.accepted : true, // Use suggestion's accepted value, default to true
-          showDetails: suggestions.indexOf(suggestion) === 0, // Show details for the first one
-          baseValue: existingAttr?.baseValue ?? Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
-        };
-      });
-    }
-    return suggestions.map((suggestion, index) => ({
-      ...suggestion,
-      baseValue: Math.floor((suggestion.minValue + suggestion.maxValue) / 2),
-      accepted: suggestion.accepted !== undefined ? suggestion.accepted : true, // Use suggestion's accepted value, default to true
-      showDetails: index === 0, // Show details only for the first one
-    }));
-  });
+  
+  // Initialize local suggestions and update state when suggestions change
 
   // Update local state only on initial load or when suggestions change
   useEffect(() => {
@@ -107,7 +95,7 @@ export default function AttributeReviewStep({
         };
       });
       
-      setLocalSuggestions(newSuggestions);
+      attributeReviewState.updateField('localSuggestions', newSuggestions);
       
       // Automatically save the initially selected attributes to parent state
       const acceptedAttributes = newSuggestions
@@ -139,18 +127,18 @@ export default function AttributeReviewStep({
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestions]); // Only depend on suggestions, not worldData.attributes
+  }, [suggestions, attributeReviewState]); // Only depend on suggestions, not worldData.attributes
 
   const handleToggleAttribute = (index: number) => {
     // Toggle the state in a new array
-    const updatedSuggestions = [...localSuggestions];
+    const updatedSuggestions = [...attributeReviewState.data.localSuggestions];
     updatedSuggestions[index] = {
       ...updatedSuggestions[index],
       accepted: !updatedSuggestions[index].accepted
     };
     
     // Update local state
-    setLocalSuggestions(updatedSuggestions);
+    attributeReviewState.updateField('localSuggestions', updatedSuggestions);
     
     // Convert to WorldAttribute objects for the store
     const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
@@ -159,9 +147,9 @@ export default function AttributeReviewStep({
   };
 
   const handleModifyAttribute = (index: number, field: keyof AttributeSuggestion, value: string | number) => {
-    const updatedSuggestions = [...localSuggestions];
+    const updatedSuggestions = [...attributeReviewState.data.localSuggestions];
     updatedSuggestions[index] = { ...updatedSuggestions[index], [field]: value };
-    setLocalSuggestions(updatedSuggestions);
+    attributeReviewState.updateField('localSuggestions', updatedSuggestions);
     
     // Re-calculate accepted attributes
     const acceptedSuggestions = updatedSuggestions.filter(s => s.accepted);
@@ -170,53 +158,56 @@ export default function AttributeReviewStep({
   };
 
 
-  const acceptedCount = localSuggestions.filter(s => s.accepted).length + customAttributes.length;
+  const acceptedCount = attributeReviewState.data.localSuggestions.filter(s => s.accepted).length + attributeReviewState.data.customAttributes.length;
 
   // Custom attribute handlers
   const handleAddCustomAttribute = () => {
-    setIsCreatingCustomAttribute(true);
-    setEditingCustomAttributeId(null);
+    attributeReviewState.updateField('isCreatingCustomAttribute', true);
+    attributeReviewState.updateField('editingCustomAttributeId', null);
   };
 
   const handleSaveCustomAttribute = (attribute: WorldAttribute) => {
     let updatedCustomAttributes: WorldAttribute[];
     
-    if (editingCustomAttributeId) {
+    if (attributeReviewState.data.editingCustomAttributeId) {
       // Edit existing custom attribute
-      updatedCustomAttributes = customAttributes.map(a => a.id === editingCustomAttributeId ? attribute : a);
+      updatedCustomAttributes = attributeReviewState.data.customAttributes.map(a => a.id === attributeReviewState.data.editingCustomAttributeId ? attribute : a);
     } else {
       // Add new custom attribute
-      updatedCustomAttributes = [...customAttributes, attribute];
+      updatedCustomAttributes = [...attributeReviewState.data.customAttributes, attribute];
     }
     
-    setCustomAttributes(updatedCustomAttributes);
-    setIsCreatingCustomAttribute(false);
-    setEditingCustomAttributeId(null);
+    attributeReviewState.updateData({
+      ...attributeReviewState.data,
+      customAttributes: updatedCustomAttributes,
+      isCreatingCustomAttribute: false,
+      editingCustomAttributeId: null
+    });
     
     // Recalculate world attributes
-    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
+    const acceptedSuggestions = attributeReviewState.data.localSuggestions.filter(s => s.accepted);
     const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
   const handleEditCustomAttribute = (attributeId: string) => {
-    setEditingCustomAttributeId(attributeId);
-    setIsCreatingCustomAttribute(true);
+    attributeReviewState.updateField('editingCustomAttributeId', attributeId);
+    attributeReviewState.updateField('isCreatingCustomAttribute', true);
   };
 
   const handleDeleteCustomAttribute = (attributeId: string) => {
-    const updatedCustomAttributes = customAttributes.filter(a => a.id !== attributeId);
-    setCustomAttributes(updatedCustomAttributes);
+    const updatedCustomAttributes = attributeReviewState.data.customAttributes.filter(a => a.id !== attributeId);
+    attributeReviewState.updateField('customAttributes', updatedCustomAttributes);
     
     // Recalculate world attributes
-    const acceptedSuggestions = localSuggestions.filter(s => s.accepted);
+    const acceptedSuggestions = attributeReviewState.data.localSuggestions.filter(s => s.accepted);
     const allAttributes = mergeAllAttributes(acceptedSuggestions, updatedCustomAttributes);
     onUpdate({ ...worldData, attributes: allAttributes });
   };
 
   const handleCancelCustomAttribute = () => {
-    setIsCreatingCustomAttribute(false);
-    setEditingCustomAttributeId(null);
+    attributeReviewState.updateField('isCreatingCustomAttribute', false);
+    attributeReviewState.updateField('editingCustomAttributeId', null);
   };
 
   return (
@@ -227,13 +218,13 @@ export default function AttributeReviewStep({
       >
 
       <div className="space-y-4 my-4">
-        {localSuggestions.length === 0 ? (
+        {attributeReviewState.data.localSuggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-lg mb-2">No attribute suggestions available</p>
             <p className="text-sm">You can add attributes to your world later in the world editor.</p>
           </div>
         ) : (
-          localSuggestions.map((suggestion, index) => (
+          attributeReviewState.data.localSuggestions.map((suggestion, index) => (
           <div 
             key={index} 
             className={wizardStyles.card.base} 
@@ -257,12 +248,12 @@ export default function AttributeReviewStep({
                   className="text-sm text-blue-600 hover:underline focus:outline-none"
                   onClick={(e) => {
                     e.stopPropagation();
-                    const newSuggestions = [...localSuggestions];
+                    const newSuggestions = [...attributeReviewState.data.localSuggestions];
                     newSuggestions[index] = {
                       ...newSuggestions[index],
                       showDetails: !newSuggestions[index].showDetails
                     };
-                    setLocalSuggestions(newSuggestions);
+                    attributeReviewState.updateField('localSuggestions', newSuggestions);
                   }}
                 >
                   {suggestion.showDetails ? 'Hide details' : 'Customize'}
@@ -351,7 +342,7 @@ export default function AttributeReviewStep({
             </button>
           </div>
           
-          {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
+          {attributeReviewState.data.customAttributes.length === 0 && !attributeReviewState.data.isCreatingCustomAttribute ? (
             <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
               <p className="text-sm text-gray-600 mb-2">No custom attributes yet</p>
               <p className="text-xs text-gray-500">
@@ -363,7 +354,7 @@ export default function AttributeReviewStep({
             </div>
           ) : (
             <div className="space-y-4">
-              {customAttributes.map((attribute) => (
+              {attributeReviewState.data.customAttributes.map((attribute) => (
                 <div
                   key={attribute.id}
                   className={`${wizardStyles.card.base} border-l-4 border-l-green-500`}
@@ -409,16 +400,16 @@ export default function AttributeReviewStep({
           )}
           
           {/* Custom Attribute Editor */}
-          {isCreatingCustomAttribute && (
+          {attributeReviewState.data.isCreatingCustomAttribute && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border" data-testid="custom-attribute-editor">
               <AttributeEditor
                 worldId={worldData.id || ''}
-                mode={editingCustomAttributeId ? 'edit' : 'create'}
-                attributeId={editingCustomAttributeId || undefined}
-                existingAttributes={[...customAttributes, ...(worldData.attributes || [])]}
+                mode={attributeReviewState.data.editingCustomAttributeId ? 'edit' : 'create'}
+                attributeId={attributeReviewState.data.editingCustomAttributeId || undefined}
+                existingAttributes={[...attributeReviewState.data.customAttributes, ...(worldData.attributes || [])]}
                 maxAttributes={6}
                 onSave={handleSaveCustomAttribute}
-                onDelete={editingCustomAttributeId ? handleDeleteCustomAttribute : undefined}
+                onDelete={attributeReviewState.data.editingCustomAttributeId ? handleDeleteCustomAttribute : undefined}
                 onCancel={handleCancelCustomAttribute}
               />
             </div>

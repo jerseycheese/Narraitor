@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { WorldAttribute, WorldSkill } from '@/types/world.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -6,6 +6,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useFormState, useModal, useErrorState } from '@/hooks';
 
 export interface AttributeEditorProps {
   worldId: EntityID;
@@ -33,25 +34,58 @@ export function AttributeEditor({
 }: AttributeEditorProps) {
   const linkedSkills = existingSkills;
 
-  const [formData, setFormData] = useState<Partial<WorldAttribute>>({
-    name: '',
-    description: '',
-    minValue: 1,
-    maxValue: 10,
+  // Form state management with validation
+  const form = useFormState({
+    initialData: {
+      name: '',
+      description: '',
+      minValue: 1,
+      maxValue: 10,
+    },
+    validate: (data) => {
+      const validationErrors: string[] = [];
+      
+      // Basic validation
+      if (!data.name?.trim()) {
+        validationErrors.push('Attribute name is required');
+      }
+      
+      // Check for duplicate names
+      const isDuplicate = existingAttributes.some(
+        attr => attr.name.toLowerCase() === data.name?.toLowerCase() && attr.id !== attributeId
+      );
+      if (isDuplicate) {
+        validationErrors.push('An attribute with this name already exists');
+      }
+      
+      // Range validation
+      if (data.minValue !== undefined && data.maxValue !== undefined && 
+          data.minValue >= data.maxValue) {
+        validationErrors.push('Maximum value must be greater than minimum value');
+      }
+      
+      // Check maxAttributes limit in create mode
+      if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
+        validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
+      }
+
+      return validationErrors;
+    },
+    clearErrorsOnChange: true,
   });
-  const [errors, setErrors] = useState<string[]>([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleteWarnings, setDeleteWarnings] = useState<string[]>([]);
+
+  // Modal state management
+  const deleteModal = useModal();
+  
+  // Delete warnings state
+  const deleteWarnings = useErrorState();
 
   // Load existing attribute data in edit mode
   useEffect(() => {
     if (mode === 'edit' && attributeId) {
-      // In a real implementation, this would fetch from the store
-      // For now, we'll use the attributes passed via props
       const attribute = existingAttributes.find(attr => attr.id === attributeId);
       if (attribute) {
-        setFormData({
-          id: attribute.id,
+        form.setData({
           name: attribute.name,
           description: attribute.description,
           minValue: attribute.minValue,
@@ -59,59 +93,27 @@ export function AttributeEditor({
         });
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, attributeId, existingAttributes]);
 
   const handleChange = (field: keyof WorldAttribute, value: string | number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: field === 'minValue' || field === 'maxValue' ? Number(value) : value,
-    }));
-    // Clear errors when user starts typing
-    if (errors.length > 0) {
-      setErrors([]);
-    }
+    const processedValue = field === 'minValue' || field === 'maxValue' ? Number(value) : value;
+    form.updateField(field as keyof typeof form.data, processedValue);
   };
 
   const handleSave = () => {
-    const validationErrors: string[] = [];
-    
-    // Basic validation
-    if (!formData.name?.trim()) {
-      validationErrors.push('Attribute name is required');
-    }
-    
-    // Check for duplicate names
-    const isDuplicate = existingAttributes.some(
-      attr => attr.name.toLowerCase() === formData.name?.toLowerCase() && attr.id !== attributeId
-    );
-    if (isDuplicate) {
-      validationErrors.push('An attribute with this name already exists');
-    }
-    
-    // Range validation
-    if (formData.minValue !== undefined && formData.maxValue !== undefined && 
-        formData.minValue >= formData.maxValue) {
-      validationErrors.push('Maximum value must be greater than minimum value');
-    }
-    
-    // Check maxAttributes limit in create mode
-    if (mode === 'create' && maxAttributes !== undefined && existingAttributes.length >= maxAttributes) {
-      validationErrors.push(`Cannot create more attributes. Maximum of ${maxAttributes} attributes allowed.`);
-    }
-
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+    if (!form.isValid()) {
       return;
     }
 
-    const minVal = formData.minValue ?? 1;
-    const maxVal = formData.maxValue ?? 10;
+    const minVal = form.data.minValue ?? 1;
+    const maxVal = form.data.maxValue ?? 10;
     
     const attribute: WorldAttribute = {
       id: mode === 'edit' && attributeId ? attributeId : generateUniqueId('attr'),
       worldId: worldId,
-      name: formData.name?.trim() || '',
-      description: formData.description?.trim() || '',
+      name: form.data.name?.trim() || '',
+      description: form.data.description?.trim() || '',
       minValue: minVal,
       maxValue: maxVal,
       baseValue: Math.floor((minVal + maxVal) / 2),
@@ -126,19 +128,20 @@ export function AttributeEditor({
     // Check for linked skills
     const skillsLinked = linkedSkills.filter(skill => skill.attributeIds?.includes(attributeId));
     if (skillsLinked.length > 0) {
-      setDeleteWarnings([
-        `This attribute is linked to ${skillsLinked.length} skill${skillsLinked.length > 1 ? 's' : ''}`,
-        'Deleting this attribute will affect these skills'
-      ]);
+      deleteWarnings.setError(
+        `This attribute is linked to ${skillsLinked.length} skill${skillsLinked.length > 1 ? 's' : ''}. Deleting this attribute will affect these skills.`
+      );
+    } else {
+      deleteWarnings.clearError();
     }
-    setShowDeleteDialog(true);
+    deleteModal.open();
   };
 
   const handleDeleteConfirm = () => {
     if (onDelete && attributeId) {
       onDelete(attributeId);
     }
-    setShowDeleteDialog(false);
+    deleteModal.close();
   };
 
   return (
@@ -155,7 +158,7 @@ export function AttributeEditor({
           <Input
             id="attribute-name"
             type="text"
-            value={formData.name}
+            value={form.data.name}
             onChange={(e) => handleChange('name', e.target.value)}
             placeholder="e.g., Strength, Intelligence"
           />
@@ -167,7 +170,7 @@ export function AttributeEditor({
           </Label>
           <Textarea
             id="attribute-description"
-            value={formData.description}
+            value={form.data.description}
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Describe what this attribute represents"
           />
@@ -181,7 +184,7 @@ export function AttributeEditor({
             <Input
               id="min-value"
               type="number"
-              value={formData.minValue}
+              value={form.data.minValue}
               onChange={(e) => handleChange('minValue', e.target.value)}
               min={-999}
               max={999}
@@ -195,7 +198,7 @@ export function AttributeEditor({
             <Input
               id="max-value"
               type="number"
-              value={formData.maxValue}
+              value={form.data.maxValue}
               onChange={(e) => handleChange('maxValue', e.target.value)}
               min={-999}
               max={999}
@@ -203,9 +206,9 @@ export function AttributeEditor({
           </div>
         </div>
 
-        {errors.length > 0 && (
+        {form.hasErrors && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
-            {errors.map((error, index) => (
+            {form.errors.map((error, index) => (
               <p key={index} className="text-sm text-red-600">
                 {error}
               </p>
@@ -243,23 +246,20 @@ export function AttributeEditor({
         </div>
       </div>
 
-      {showDeleteDialog && (
-        <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Attribute"
-          description={
-            deleteWarnings.length > 0 
-              ? deleteWarnings.join('. ') + '. This action cannot be undone.'
-              : 'This action cannot be undone.'
-          }
-          itemName={formData.name || 'this attribute'}
-          confirmButtonText="Delete Attribute"
-          cancelButtonText="Cancel"
-          isDeleting={false}
-        />
-      )}
+      <DeleteConfirmationDialog
+        {...deleteModal.modalProps}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Attribute"
+        description={
+          deleteWarnings.hasError 
+            ? deleteWarnings.error + '. This action cannot be undone.'
+            : 'This action cannot be undone.'
+        }
+        itemName={form.data.name || 'this attribute'}
+        confirmButtonText="Delete Attribute"
+        cancelButtonText="Cancel"
+        isDeleting={false}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import { useFormState } from '@/hooks';
 
 /**
  * CollapsibleSection props
@@ -36,10 +37,15 @@ export const CollapsibleSection = ({
     ? !initialCollapsed 
     : initiallyExpanded;
     
-  const [isExpanded, setIsExpanded] = useState(startExpanded);
+  // Form state management using hooks
+  const sectionState = useFormState({
+    initialData: {
+      isExpanded: startExpanded
+    }
+  });
 
   const toggleExpanded = () => {
-    setIsExpanded(prev => !prev);
+    sectionState.updateField('isExpanded', !sectionState.data.isExpanded);
   };
 
   return (
@@ -64,15 +70,15 @@ export const CollapsibleSection = ({
             e.stopPropagation(); // Prevent double toggle when clicking button
             toggleExpanded();
           }}
-          aria-expanded={isExpanded}
+          aria-expanded={sectionState.data.isExpanded}
           className="focus-visible text-base font-bold ml-2 bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-slate-200 px-2 py-1 rounded border border-gray-300 dark:border-slate-500 cursor-pointer hover:bg-gray-300 dark:hover:bg-slate-500 transition-colors"
         >
-          {isExpanded ? '−' : '+'}
+          {sectionState.data.isExpanded ? '−' : '+'}
         </button>
       </div>
       <div 
         data-testid="collapsible-section-content"
-        className={`p-2 ${isExpanded ? 'block' : 'hidden'}`}
+        className={`p-2 ${sectionState.data.isExpanded ? 'block' : 'hidden'}`}
       >
         {children}
       </div>

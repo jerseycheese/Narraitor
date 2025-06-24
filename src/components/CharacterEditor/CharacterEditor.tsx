@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useFormState } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -12,6 +13,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
+import { useAsyncState, useModal } from '@/hooks';
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
@@ -22,59 +24,60 @@ interface CharacterEditorProps {
 
 const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const router = useRouter();
-  const [character, setCharacter] = useState<Character | null>(null);
-  const [world, setWorld] = useState<World | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [generatingPortrait, setGeneratingPortrait] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
+  // Character and world data state using hooks
+  const characterEditorState = useFormState({
+    initialData: {
+      character: null as Character | null,
+      world: null as World | null
+    }
+  });
+  
+  // Error and loading state management using new hooks
+  const loadingState = useAsyncState<{ character: Character; world: World }>();
+  const saveState = useAsyncState();
+  const portraitState = useAsyncState<string>();
+  
+  // Modal state management
+  const deleteModal = useModal();
   
   // Load character data on mount
   useEffect(() => {
-    try {
+    loadingState.execute(async () => {
       const { characters } = useCharacterStore.getState();
       const characterData = characters[characterId];
       
       if (!characterData) {
-        setError('Character not found');
-        setLoading(false);
-        return;
+        throw new Error('Character not found');
       }
       
       // Load world data for attribute/skill limits
       const { worlds } = useWorldStore.getState();
       const worldData = worlds[characterData.worldId];
-      setWorld(worldData);
       
-      setCharacter(characterData);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load character data');
-      setLoading(false);
-      console.error('Error loading character:', err);
-    }
+      characterEditorState.updateData({
+        character: characterData,
+        world: worldData
+      });
+      
+      return { character: characterData, world: worldData };
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [characterId]);
   
   // Handle saving all character changes
   const handleSave = async () => {
-    if (!character) return;
+    if (!characterEditorState.data.character) return;
     
-    setSaving(true);
-    try {
+    await saveState.execute(async () => {
       const { updateCharacter } = useCharacterStore.getState();
-      updateCharacter(characterId, character);
+      updateCharacter(characterId, characterEditorState.data.character!);
       
       // Small delay to show save state
       await new Promise(resolve => setTimeout(resolve, 500));
       
       router.push(`/characters/${characterId}`); // Navigate back to character view
-    } catch (err) {
-      setError('Failed to save character');
-      console.error('Error saving character:', err);
-    } finally {
-      setSaving(false);
-    }
+    });
   };
   
   // Handle canceling edits
@@ -90,10 +93,9 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   
   // Handle portrait generation
   const handleGeneratePortrait = async (customDescription?: string) => {
-    if (!character || !world) return;
+    if (!characterEditorState.data.character || !characterEditorState.data.world) return;
     
-    setGeneratingPortrait(true);
-    try {
+    const newPortrait = await portraitState.execute(async () => {
       // Use the portrait generation API route
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
@@ -103,21 +105,21 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         body: JSON.stringify({
           character: {
             id: characterId,
-            name: character.name,
-            worldId: character.worldId,
+            name: characterEditorState.data.character!.name,
+            worldId: characterEditorState.data.character!.worldId,
             background: {
-              history: character.background.history,
-              personality: character.background.personality,
-              physicalDescription: customDescription || character.background.physicalDescription || '',
-              goals: character.background.goals || [],
-              fears: character.background.fears || [],
+              history: characterEditorState.data.character!.background.history,
+              personality: characterEditorState.data.character!.background.personality,
+              physicalDescription: customDescription || characterEditorState.data.character!.background.physicalDescription || '',
+              goals: characterEditorState.data.character!.background.goals || [],
+              fears: characterEditorState.data.character!.background.fears || [],
               relationships: []
             },
-            attributes: character.attributes.map(attr => ({
+            attributes: characterEditorState.data.character!.attributes.map(attr => ({
               attributeId: attr.id,
               value: attr.modifiedValue
             })),
-            skills: character.skills.map(skill => ({
+            skills: characterEditorState.data.character!.skills.map(skill => ({
               skillId: skill.id,
               level: skill.level,
               experience: 0,
@@ -130,14 +132,14 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
               categories: []
             },
             status: {
-              health: character.status.health,
-              maxHealth: character.status.maxHealth,
-              conditions: character.status.conditions
+              health: characterEditorState.data.character!.status.health,
+              maxHealth: characterEditorState.data.character!.status.maxHealth,
+              conditions: characterEditorState.data.character!.status.conditions
             },
-            createdAt: character.createdAt,
-            updatedAt: character.updatedAt
+            createdAt: characterEditorState.data.character!.createdAt,
+            updatedAt: characterEditorState.data.character!.updatedAt
           },
-          world: world,
+          world: characterEditorState.data.world,
           customDescription: customDescription
         }),
       });
@@ -148,29 +150,30 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
 
       const { portrait } = await response.json();
-      
+      return portrait;
+    });
+
+    if (newPortrait) {
       // Update character with new portrait
-      setCharacter({ ...character, portrait });
+      characterEditorState.updateField('character', { 
+        ...characterEditorState.data.character!, 
+        portrait: newPortrait 
+      });
       
       // Also update the character store
-      useCharacterStore.getState().updateCharacter(characterId, { portrait });
-    } catch (error) {
-      console.error('Failed to generate portrait:', error);
-      setError('Failed to generate portrait. Please try again.');
-    } finally {
-      setGeneratingPortrait(false);
+      useCharacterStore.getState().updateCharacter(characterId, { portrait: newPortrait });
     }
   };
   
-  if (loading) {
+  if (loadingState.isLoading) {
     return <LoadingState message="Loading character data..." />;
   }
   
-  if (error || !character || !world) {
+  if (loadingState.error || !characterEditorState.data.character || !characterEditorState.data.world) {
     return (
       <PageError
         title="Character Not Found"
-        message={error || 'The requested character could not be found or loaded.'}
+        message={loadingState.error || 'The requested character could not be found or loaded.'}
         showRetry={true}
         onRetry={() => router.push('/characters')}
       />
@@ -181,36 +184,48 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
     <div className="space-y-8 p-4">
       {/* Portrait Section */}
       <PortraitSection
-        portrait={character.portrait}
-        characterName={character.name}
-        generatingPortrait={generatingPortrait}
+        portrait={characterEditorState.data.character!.portrait}
+        characterName={characterEditorState.data.character!.name}
+        generatingPortrait={portraitState.isLoading}
         onGeneratePortrait={handleGeneratePortrait}
-        onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
+        onRemovePortrait={() => characterEditorState.updateField('character', { 
+          ...characterEditorState.data.character!, 
+          portrait: undefined 
+        })}
       />
       
       {/* Basic Info Section */}
       <BasicInfoForm
-        name={character.name}
-        level={character.level}
-        isPlayer={character.isPlayer}
-        onNameChange={(name) => setCharacter({ ...character, name })}
-        onLevelChange={(level) => setCharacter({ ...character, level })}
-        onPlayerTypeChange={(isPlayer) => setCharacter({ ...character, isPlayer })}
+        name={characterEditorState.data.character!.name}
+        level={characterEditorState.data.character!.level}
+        isPlayer={characterEditorState.data.character!.isPlayer}
+        onNameChange={(name) => characterEditorState.updateField('character', { 
+          ...characterEditorState.data.character!, 
+          name 
+        })}
+        onLevelChange={(level) => characterEditorState.updateField('character', { 
+          ...characterEditorState.data.character!, 
+          level 
+        })}
+        onPlayerTypeChange={(isPlayer) => characterEditorState.updateField('character', { 
+          ...characterEditorState.data.character!, 
+          isPlayer 
+        })}
       />
       
       {/* Background Section */}
       <BackgroundForm
         background={{
-          history: character.background.history,
-          personality: character.background.personality,
-          goals: character.background.goals,
-          fears: character.background.fears,
-          physicalDescription: character.background.physicalDescription
+          history: characterEditorState.data.character!.background.history,
+          personality: characterEditorState.data.character!.background.personality,
+          goals: characterEditorState.data.character!.background.goals,
+          fears: characterEditorState.data.character!.background.fears,
+          physicalDescription: characterEditorState.data.character!.background.physicalDescription
         }}
-        onBackgroundChange={(background) => setCharacter({ 
-          ...character, 
+        onBackgroundChange={(background) => characterEditorState.updateField('character', { 
+          ...characterEditorState.data.character!, 
           background: {
-            ...character.background,
+            ...characterEditorState.data.character!.background,
             ...background
           }
         })}
@@ -218,50 +233,56 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Attributes Section */}
       <AttributesForm
-        attributes={character.attributes.map(attr => ({
-          attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
+        attributes={characterEditorState.data.character!.attributes.map(attr => ({
+          attributeId: characterEditorState.data.world!.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
           value: attr.baseValue
         }))}
-        world={world}
+        world={characterEditorState.data.world!}
         onAttributesChange={(formAttributes) => {
-          const updatedAttributes = character.attributes.map(attr => {
+          const updatedAttributes = characterEditorState.data.character!.attributes.map(attr => {
             const formAttr = formAttributes.find(fa => {
-              const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
+              const worldAttr = characterEditorState.data.world!.attributes.find(wa => wa.id === fa.attributeId);
               return worldAttr?.name === attr.name;
             });
             return formAttr ? { ...attr, baseValue: formAttr.value, modifiedValue: formAttr.value } : attr;
           });
-          setCharacter({ ...character, attributes: updatedAttributes });
+          characterEditorState.updateField('character', { 
+            ...characterEditorState.data.character!, 
+            attributes: updatedAttributes 
+          });
         }}
       />
       
       {/* Skills Section */}
       <SkillsForm
-        skills={character.skills.map(skill => ({
-          skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
+        skills={characterEditorState.data.character!.skills.map(skill => ({
+          skillId: characterEditorState.data.world!.skills.find(ws => ws.name === skill.name)?.id || skill.id,
           level: skill.level,
           experience: 0,
           isActive: true
         }))}
-        world={world}
+        world={characterEditorState.data.world!}
         onSkillsChange={(formSkills) => {
-          const updatedSkills = character.skills.map(skill => {
+          const updatedSkills = characterEditorState.data.character!.skills.map(skill => {
             const formSkill = formSkills.find(fs => {
-              const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
+              const worldSkill = characterEditorState.data.world!.skills.find(ws => ws.id === fs.skillId);
               return worldSkill?.name === skill.name;
             });
             return formSkill ? { ...skill, level: formSkill.level } : skill;
           });
-          setCharacter({ ...character, skills: updatedSkills });
+          characterEditorState.updateField('character', { 
+            ...characterEditorState.data.character!, 
+            skills: updatedSkills 
+          });
         }}
       />
       
       {/* Action Buttons */}
       <div className="flex justify-between pt-4 border-t">
         <button 
-          onClick={() => setShowDeleteDialog(true)}
+          onClick={deleteModal.open}
           className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
-          disabled={saving}
+          disabled={saveState.isLoading}
         >
           Delete Character
         </button>
@@ -269,29 +290,28 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           <button 
             onClick={handleCancel}
             className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
-            disabled={saving}
+            disabled={saveState.isLoading}
           >
             Cancel
           </button>
           <button 
             onClick={handleSave}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
-            disabled={saving}
+            disabled={saveState.isLoading}
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saveState.isLoading ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
       
       {/* Delete Confirmation Dialog */}
-      {character && (
+      {characterEditorState.data.character && (
         <DeleteConfirmationDialog
-          isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
+          {...deleteModal.modalProps}
           onConfirm={handleDelete}
           title="Delete Character"
-          description={`Are you sure you want to delete "${character.name}"? This action cannot be undone.`}
-          itemName={character.name}
+          description={`Are you sure you want to delete "${characterEditorState.data.character!.name}"? This action cannot be undone.`}
+          itemName={characterEditorState.data.character!.name}
           confirmButtonText="Delete"
           cancelButtonText="Cancel"
         />
