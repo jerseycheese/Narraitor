@@ -1,8 +1,9 @@
 #!/bin/bash
 # Update all existing worktrees with Claude configuration
 
-WORKTREE_DIR="/Users/jackhaas/Projects/narraitor-worktrees"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NARRAITOR_MAIN="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKTREE_DIR="${NARRAITOR_MAIN}-worktrees"
 
 echo "🔄 Updating Claude configuration for all existing worktrees..."
 
