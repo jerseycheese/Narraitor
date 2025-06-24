@@ -79,7 +79,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       ? currentGenres.filter(g => g !== genre)
       : [...currentGenres, genre];
     smartTemplatesState.updateField('selectedGenres', updatedGenres);
-  }, [smartTemplatesState]);
+  }, [smartTemplatesState.data.selectedGenres, smartTemplatesState.updateField]);
 
   const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
     const requestBody = {
