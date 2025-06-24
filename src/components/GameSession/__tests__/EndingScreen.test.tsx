@@ -4,6 +4,9 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { StoryEnding } from '../../../types/narrative.types';
 
+// Mock the abstraction hooks
+jest.mock('@/hooks');
+
 // Import the mocked modules after mocking
 import { EndingScreen } from '../EndingScreen';
 import { useRouter } from 'next/navigation';
