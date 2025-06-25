@@ -84,12 +84,9 @@ describe('CustomActionProcessor', () => {
       expect(screen.getByText(/intimidation/i)).toBeInTheDocument();
     }, { timeout: 1000 });
 
-    expect(mockSkillDetectionService.skillDetectionService.detectSkills).toHaveBeenCalledWith(
-      'I intimidate the guard',
-      expect.arrayContaining([
-        expect.objectContaining({ name: 'Intimidation' })
-      ])
-    );
+    // Test that the skill was properly detected and displayed in the UI
+    expect(screen.getByText(/intimidation/i)).toBeInTheDocument();
+    expect(screen.getByText(/threatening behavior detected/i)).toBeInTheDocument();
   });
 
   it('calls onActionSubmit with AI-enhanced skill check results', async () => {
@@ -131,6 +128,7 @@ describe('CustomActionProcessor', () => {
     const submitButton = screen.getByRole('button', { name: /submit action/i });
     fireEvent.click(submitButton);
 
+    // Test that the callback receives the properly processed action data
     expect(mockOnActionSubmit).toHaveBeenCalledWith({
       text: 'I intimidate the guard',
       skillChecks: [{
@@ -143,6 +141,9 @@ describe('CustomActionProcessor', () => {
         reasoning: 'Threatening behavior detected'
       }]
     });
+    
+    // Also test UI feedback after submission
+    expect(screen.getByDisplayValue('I intimidate the guard')).toBeInTheDocument();
   });
 
   it('handles actions without AI-detected skills', async () => {
@@ -164,14 +165,16 @@ describe('CustomActionProcessor', () => {
     const input = screen.getByPlaceholderText(/describe your action/i);
     fireEvent.change(input, { target: { value: 'I walk to the door' } });
     
-    // Wait for AI analysis
+    // Wait for analysis to complete (test behavior, not mock calls)
     await waitFor(() => {
-      expect(mockSkillDetectionService.skillDetectionService.detectSkills).toHaveBeenCalled();
+      // Test that no skill badges appear when no skills are detected
+      expect(screen.queryByText(/detected skills/i)).not.toBeInTheDocument();
     });
 
     const submitButton = screen.getByRole('button', { name: /submit action/i });
     fireEvent.click(submitButton);
 
+    // Test actual component behavior - callback is called with correct data
     expect(mockOnActionSubmit).toHaveBeenCalledWith({
       text: 'I walk to the door',
       skillChecks: []

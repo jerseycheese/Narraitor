@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { AITestingPanel } from '../AITestingPanel';
 
 // Mock the context override utilities
@@ -11,14 +11,7 @@ jest.mock('../../../../lib/ai/contextOverride', () => ({
   }))
 }));
 
-// Mock the hooks using simple mock abstraction
-jest.mock('@/hooks', () => {
-  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
-  return createHookMockModule({
-    formState: mockHookPresets.formState.static(),
-    asyncState: mockHookPresets.asyncState.static()
-  });
-});
+// No hook mocking needed - test with real component behavior
 
 describe('AITestingPanel', () => {
   beforeEach(() => {

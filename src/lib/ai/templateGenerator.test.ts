@@ -41,22 +41,27 @@ describe('TemplateGenerator', () => {
         type: 'inspired-by'
       });
 
+      // Test actual behavior: template should be generated with correct structure and content
       expect(result).toEqual({
         name: 'Neo-Victorian Skyport',
         description: 'A steampunk world floating in the clouds',
         genre: 'steampunk',
         attributes: expect.arrayContaining([
-          expect.objectContaining({ name: 'Strength' })
+          expect.objectContaining({ 
+            name: 'Strength',
+            baseValue: 50,
+            category: 'Physical'
+          })
         ]),
         skills: expect.arrayContaining([
-          expect.objectContaining({ name: 'Engineering' })
+          expect.objectContaining({ 
+            name: 'Engineering',
+            difficulty: 'medium',
+            category: 'Technical'
+          })
         ]),
         explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian aesthetics'
       });
-
-      expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('inspired by: "Steampunk flying cities"')
-      );
     });
 
     test('generates template for genre mixing mode', async () => {
@@ -84,13 +89,17 @@ describe('TemplateGenerator', () => {
         type: 'genre-mix'
       });
 
+      // Test actual behavior: should generate genre mix with appropriate attributes and skills
       expect(result.genre).toBe('cyberpunk-western');
+      expect(result.name).toBe('Cyber Frontier');
+      expect(result.description).toBe('A world where high-tech meets the wild west');
       expect(result.attributes).toHaveLength(2);
       expect(result.skills).toHaveLength(2);
-      
-      expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('Cyberpunk + Western')
-      );
+      expect(result.attributes[0].name).toBe('Tech Savvy');
+      expect(result.attributes[1].name).toBe('Grit');
+      expect(result.skills[0].name).toBe('Hacking');
+      expect(result.skills[1].name).toBe('Quick Draw');
+      expect(result.explanation).toBe('This genre mix combines cyberpunk technology with western frontier themes');
     });
 
     test('generates surprise template', async () => {
@@ -115,12 +124,15 @@ describe('TemplateGenerator', () => {
         type: 'surprise-me'
       });
 
+      // Test actual behavior: should generate creative unexpected template with unique content
       expect(result.name).toBe('Microscopic Empire');
+      expect(result.description).toBe('A world inside a single drop of water');
       expect(result.genre).toBe('micro-fantasy');
-      
-      expect(mockAIClient.generateContent).toHaveBeenCalledWith(
-        expect.stringContaining('completely unexpected')
-      );
+      expect(result.attributes).toHaveLength(1);
+      expect(result.skills).toHaveLength(1);
+      expect(result.attributes[0].name).toBe('Surface Tension');
+      expect(result.skills[0].name).toBe('Bubble Navigation');
+      expect(result.explanation).toBe('An unexpected microscopic world with unique physics and challenges');
     });
 
     test('handles invalid JSON response gracefully', async () => {

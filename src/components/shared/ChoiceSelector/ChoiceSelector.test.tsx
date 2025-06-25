@@ -6,13 +6,7 @@ import { Decision } from '@/types/narrative.types';
 // Using local character interface to match store structure
 import { WorldSkill } from '@/types/world.types';
 
-// Mock the hooks used by ChoiceSelector using new mock utilities
-jest.mock('@/hooks', () => {
-  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
-  return createHookMockModule({
-    formState: mockHookPresets.formState.stateful()
-  });
-});
+// No mocking needed - test with real hooks for authentic component behavior
 
 // Local character interface matching the store structure
 interface Character {
@@ -70,12 +64,19 @@ describe('ChoiceSelector', () => {
       expect(screen.getByText('Safe option')).toBeInTheDocument();
     });
 
-    it('calls onSelect when choice is clicked', async () => {
+    it('allows selecting choices through click interaction', async () => {
       const user = userEvent.setup();
       render(<ChoiceSelector choices={simpleChoices} onSelect={mockOnSelect} />);
       
-      await user.click(screen.getByText('Go north'));
+      const choiceButton = screen.getByText('Go north');
+      expect(choiceButton).toBeEnabled();
+      
+      await user.click(choiceButton);
+      
+      // Verify the callback was triggered (some callback verification is necessary for interaction testing)
       expect(mockOnSelect).toHaveBeenCalledWith('choice-1');
+      // Focus more on component behavior: the choice should remain clickable
+      expect(choiceButton).toBeInTheDocument();
     });
   });
 
@@ -224,9 +225,16 @@ describe('ChoiceSelector', () => {
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, 'My custom action');
-      await user.click(screen.getByRole('button', { name: /submit/i }));
       
+      const submitButton = screen.getByRole('button', { name: /submit/i });
+      expect(submitButton).toBeEnabled();
+      
+      await user.click(submitButton);
+      
+      // Verify callback and UI behavior
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('My custom action');
+      // Component should clear the input after submission
+      expect(input).toHaveValue('');
     });
 
     it('submits custom input when Enter key is pressed', async () => {
@@ -244,7 +252,10 @@ describe('ChoiceSelector', () => {
       
       await user.type(input, 'My custom action{enter}');
       
+      // Verify callback and UI state change
       expect(mockOnCustomSubmit).toHaveBeenCalledWith('My custom action');
+      // Input should be cleared after Enter key submission
+      expect(input).toHaveValue('');
     });
 
     it('creates newline when Shift+Enter is pressed without submitting', async () => {
@@ -279,9 +290,17 @@ describe('ChoiceSelector', () => {
         />
       );
       
-      await user.click(screen.getByRole('button', { name: /submit/i }));
+      const input = screen.getByPlaceholderText('Type your custom response...');
+      const submitButton = screen.getByRole('button', { name: /submit/i });
       
+      // Verify empty input state
+      expect(input).toHaveValue('');
+      
+      await user.click(submitButton);
+      
+      // Should not submit and input should remain empty
       expect(mockOnCustomSubmit).not.toHaveBeenCalled();
+      expect(input).toHaveValue('');
     });
 
     it('does not submit whitespace-only custom input', async () => {
@@ -298,9 +317,13 @@ describe('ChoiceSelector', () => {
       const input = screen.getByPlaceholderText('Type your custom response...');
       
       await user.type(input, '   ');
+      expect(input).toHaveValue('   '); // Verify whitespace was entered
+      
       await user.click(screen.getByRole('button', { name: /submit/i }));
       
+      // Should not submit whitespace-only content and should maintain input value
       expect(mockOnCustomSubmit).not.toHaveBeenCalled();
+      expect(input).toHaveValue('   '); // Whitespace should still be in input
     });
 
     it('clears input field after successful submission', async () => {

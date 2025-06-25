@@ -231,17 +231,17 @@ describe('endingGenerator', () => {
 
       const result = await endingGenerator.generateEnding(mockRequest);
 
+      // Test actual behavior: should generate complete ending with all fields populated
       expect(result).toMatchObject({
-        epilogue: expect.any(String),
-        characterLegacy: expect.any(String),
-        worldImpact: expect.any(String),
+        epilogue: 'As the sun set over the kingdom, Aria stood victorious...',
+        characterLegacy: 'Aria Stormblade would be remembered as the hero who saved the realm...',
+        worldImpact: 'The defeat of the dark lord brought peace to the land for generations...',
         tone: 'triumphant',
-        achievements: expect.arrayContaining(['Dragon Slayer'])
+        achievements: ['Dragon Slayer', 'Savior of the Realm', 'Master Warrior']
       });
-
-      expect(mockContextManager.buildEndingContext).toHaveBeenCalledWith(mockRequest);
-      expect(mockPromptTemplateManager.getTemplate).toHaveBeenCalledWith('ending');
-      expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+      expect(result.epilogue).toContain('Aria stood victorious');
+      expect(result.characterLegacy).toContain('hero who saved the realm');
+      expect(result.worldImpact).toContain('peace to the land');
     });
 
     it('should use desired tone when provided', async () => {
@@ -368,9 +368,14 @@ describe('endingGenerator', () => {
         }` });
       });
 
-      await endingGenerator.generateEnding(mockRequest);
+      const result = await endingGenerator.generateEnding(mockRequest);
 
-      expect(mockGeminiClient.generateContent).toHaveBeenCalled();
+      // Test actual behavior: should generate ending with custom prompt content reflected
+      expect(result.epilogue).toBe('Aria retired to a peaceful cottage...');
+      expect(result.characterLegacy).toBe('Known for choosing peace over glory...');
+      expect(result.worldImpact).toBe('Inspired others to seek peaceful lives...');
+      expect(result.tone).toBe('hopeful');
+      expect(result.achievements).toEqual(['Peaceful Retirement']);
     });
 
     it('should generate appropriate endings for each ending type', async () => {
@@ -451,8 +456,12 @@ describe('endingGenerator', () => {
 
       const result = await endingGenerator.generateEnding(mockRequest);
 
-      expect(result.epilogue).toContain('Success after retry');
-      expect(mockGeminiClient.generateContent).toHaveBeenCalledTimes(2);
+      // Test actual behavior: should successfully generate ending after retry and include retry-specific content
+      expect(result.epilogue).toBe('Success after retry...');
+      expect(result.characterLegacy).toBe('A persistent hero...');
+      expect(result.worldImpact).toBe('Changed through determination...');
+      expect(result.tone).toBe('triumphant');
+      expect(result.achievements).toEqual(['Never Give Up']);
     });
   });
 });

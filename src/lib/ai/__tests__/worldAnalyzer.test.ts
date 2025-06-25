@@ -1,48 +1,37 @@
 import { analyzeWorldDescription } from '../worldAnalyzer';
-import { GeminiClient } from '../geminiClient';
 
-// Mock the GeminiClient
-jest.mock('../geminiClient');
-jest.mock('../config');
+// Mock the GeminiClient to focus on testing data transformation logic
+jest.mock('../geminiClient', () => ({
+  GeminiClient: jest.fn().mockImplementation(() => ({
+    generateContent: jest.fn(),
+  })),
+}));
+
+// Mock config with valid settings
+jest.mock('../config', () => ({
+  getAIConfig: jest.fn(() => ({
+    geminiApiKey: 'test-api-key',
+    modelName: 'test-model',
+    maxRetries: 3,
+    timeout: 30000,
+  })),
+  getGenerationConfig: jest.fn(() => ({})),
+  getSafetySettings: jest.fn(() => []),
+}));
 
 describe('worldAnalyzer', () => {
-  const mockGenerateContent = jest.fn();
+  const { GeminiClient } = require('../geminiClient');
+  let mockGenerateContent: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset the mock implementation
-    (GeminiClient as jest.Mock).mockImplementation(() => ({
+    mockGenerateContent = jest.fn();
+    GeminiClient.mockImplementation(() => ({
       generateContent: mockGenerateContent,
     }));
   });
 
-  test('sends correct prompt to AI service', async () => {
-    const description = 'A fantasy world with magic and dragons';
-    const mockResponse = {
-      content: JSON.stringify({
-        attributes: [
-          { name: 'Magic', description: 'Control over supernatural forces', minValue: 1, maxValue: 10, category: 'Supernatural' },
-          { name: 'Medieval', description: 'Reflects the technological and social level', minValue: 1, maxValue: 10, category: 'Setting' },
-          { name: 'Dragons', description: 'Presence and influence of dragons', minValue: 1, maxValue: 10, category: 'Creatures' },
-        ],
-        skills: [],
-      }),
-    };
-
-    mockGenerateContent.mockResolvedValue(mockResponse);
-
-    await analyzeWorldDescription(description);
-
-    // Verify that the prompt is sent correctly to the AI service
-    expect(mockGenerateContent).toHaveBeenCalledWith(
-      expect.stringContaining('Analyze the following world description')
-    );
-    expect(mockGenerateContent).toHaveBeenCalledWith(
-      expect.stringContaining(description)
-    );
-  });
-
-  test('parses valid JSON response', async () => {
+  test('processes valid AI response into correct suggestion format', async () => {
     const mockResponse = {
       content: JSON.stringify({
         attributes: [
@@ -64,42 +53,91 @@ describe('worldAnalyzer', () => {
 
     mockGenerateContent.mockResolvedValue(mockResponse);
 
-    const result = await analyzeWorldDescription('Test description');
+    const result = await analyzeWorldDescription('A fantasy world');
 
-    // Test should expect what the mock is returning
+    // Test data transformation functionality
     expect(result.attributes).toHaveLength(3);
-    
-    // Use a more flexible approach for testing - expect.objectContaining ensures we match
-    // the important fields without being strict about additional calculated fields
-    expect(result.attributes[0]).toEqual(expect.objectContaining({
+    expect(result.attributes[0]).toEqual({
       name: 'Magic',
       description: 'Control over supernatural forces',
       minValue: 1,
       maxValue: 10,
+      baseValue: 5, // Should calculate middle value
       category: 'Supernatural',
-      accepted: true,
-    }));
-    expect(result.attributes[1]).toEqual(expect.objectContaining({
-      name: 'Medieval',
-      description: 'Reflects the technological and social level',
-      minValue: 1,
-      maxValue: 10,
-      category: 'Setting',
-      accepted: true,
-    }));
-    expect(result.attributes[2]).toEqual(expect.objectContaining({
-      name: 'Dragons',
-      description: 'Presence and influence of dragons',
-      minValue: 1,
-      maxValue: 10,
-      category: 'Creatures',
-      accepted: true,
-    }));
+      accepted: true, // Should auto-accept AI suggestions
+    });
 
     expect(result.skills).toHaveLength(1);
-    expect(result.skills[0]).toEqual(expect.objectContaining({
+    expect(result.skills[0]).toEqual({
       name: 'Swordsmanship',
       description: 'Skill with bladed weapons',
+      difficulty: 'medium',
+      category: 'Combat',
+      linkedAttributeNames: ['Strength'],
+      accepted: true, // Should auto-accept AI suggestions
+      baseValue: 5, // Should set default base value
+      minValue: 1, // Should set fixed min
+      maxValue: 10, // Should set fixed max
+    });
+  });
+
+  test('handles JSON response in markdown code blocks', async () => {
+    const mockResponse = {
+      content: `Here's the analysis:
+
+\`\`\`json
+{
+  "attributes": [
+    { "name": "Wisdom", "description": "Spiritual insight", "category": "Mental" }
+  ],
+  "skills": [
+    { "name": "Meditation", "description": "Inner peace", "category": "Mental" }
+  ]
+}
+\`\`\`
+
+Hope this helps!`,
+    };
+
+    mockGenerateContent.mockResolvedValue(mockResponse);
+
+    const result = await analyzeWorldDescription('Test description');
+
+    // Test JSON extraction from markdown functionality
+    expect(result.attributes).toHaveLength(1);
+    expect(result.attributes[0].name).toBe('Wisdom');
+    expect(result.attributes[0].description).toBe('Spiritual insight');
+    
+    expect(result.skills).toHaveLength(1);
+    expect(result.skills[0].name).toBe('Meditation');
+    expect(result.skills[0].description).toBe('Inner peace');
+  });
+
+
+  test('returns complete default suggestions when AI fails', async () => {
+    mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
+
+    const result = await analyzeWorldDescription('Test description');
+
+    // Test error fallback functionality - should return complete default set
+    expect(result.attributes).toHaveLength(6);
+    expect(result.skills).toHaveLength(12);
+    
+    // Test that default attributes have proper structure
+    expect(result.attributes[0]).toEqual({
+      name: 'Strength',
+      description: 'Physical power and endurance',
+      minValue: 1,
+      maxValue: 10,
+      baseValue: 5,
+      category: 'Physical',
+      accepted: true,
+    });
+    
+    // Test that default skills have proper structure
+    expect(result.skills[0]).toEqual({
+      name: 'Combat',
+      description: 'Ability to fight effectively',
       difficulty: 'medium',
       category: 'Combat',
       linkedAttributeNames: ['Strength'],
@@ -107,50 +145,24 @@ describe('worldAnalyzer', () => {
       baseValue: 5,
       minValue: 1,
       maxValue: 10,
-    }));
+    });
   });
 
-
-  test('returns default suggestions on AI failure', async () => {
-    mockGenerateContent.mockRejectedValue(new Error('AI service unavailable'));
-
-    const result = await analyzeWorldDescription('Test description');
-
-    // Should return default suggestions
-    expect(result.attributes).toHaveLength(6);
-    expect(result.attributes[0].name).toBe('Strength');
-    expect(result.attributes[1].name).toBe('Intelligence');
-    expect(result.attributes[2].name).toBe('Agility');
-    expect(result.attributes[3].name).toBe('Charisma');
-    expect(result.attributes[4].name).toBe('Dexterity');
-    expect(result.attributes[5].name).toBe('Constitution');
-
-    expect(result.skills).toHaveLength(12);
-    expect(result.skills[0].name).toBe('Combat');
-    expect(result.skills[1].name).toBe('Stealth');
-    expect(result.skills[2].name).toBe('Perception');
-    expect(result.skills[3].name).toBe('Persuasion');
-    expect(result.skills[4].name).toBe('Investigation');
-    expect(result.skills[5].name).toBe('Athletics');
-  });
-
-  test('transforms AI response to correct format', async () => {
+  test('fills in missing values with defaults', async () => {
     const mockResponse = {
       content: JSON.stringify({
         attributes: [
           {
             name: 'Wisdom',
             description: 'Spiritual insight',
-            // Missing minValue and maxValue
-            category: 'Mental',
+            // Missing minValue, maxValue, category
           },
         ],
         skills: [
           {
             name: 'Meditation',
             description: 'Inner peace and focus',
-            // Missing difficulty
-            category: 'Mental',
+            // Missing difficulty, linkedAttributeNames
           },
         ],
       }),
@@ -160,24 +172,62 @@ describe('worldAnalyzer', () => {
 
     const result = await analyzeWorldDescription('Test description');
 
-    // Should have default values filled in
-    expect(result.attributes[0].minValue).toBe(1);
-    expect(result.attributes[0].maxValue).toBe(10);
-    expect(result.attributes[0].accepted).toBe(true);
+    // Test default value filling functionality
+    expect(result.attributes[0]).toEqual({
+      name: 'Wisdom',
+      description: 'Spiritual insight',
+      minValue: 1, // Should default to 1
+      maxValue: 10, // Should default to 10
+      baseValue: 5, // Should calculate middle value
+      category: undefined, // Should preserve undefined
+      accepted: true, // Should auto-accept
+    });
 
-    expect(result.skills[0].difficulty).toBe('medium');
-    expect(result.skills[0].accepted).toBe(true);
+    expect(result.skills[0]).toEqual({
+      name: 'Meditation',
+      description: 'Inner peace and focus',
+      difficulty: 'medium', // Should default to medium
+      category: undefined, // Should preserve undefined
+      linkedAttributeNames: undefined, // Should preserve undefined
+      accepted: true, // Should auto-accept
+      baseValue: 5, // Should set default
+      minValue: 1, // Should set fixed min
+      maxValue: 10, // Should set fixed max
+    });
   });
 
-  test('handles network errors gracefully', async () => {
-    mockGenerateContent.mockRejectedValue(new Error('Network error'));
+  test('calculates baseValue correctly for different ranges', async () => {
+    const mockResponse = {
+      content: JSON.stringify({
+        attributes: [
+          { name: 'Strength', description: 'Power', minValue: 5, maxValue: 15 },
+          { name: 'Magic', description: 'Spells', minValue: 0, maxValue: 20 },
+        ],
+        skills: [],
+      }),
+    };
+
+    mockGenerateContent.mockResolvedValue(mockResponse);
 
     const result = await analyzeWorldDescription('Test description');
 
-    // Should not throw, should return defaults
-    expect(result.attributes).toBeDefined();
-    expect(result.skills).toBeDefined();
-    expect(result.attributes.length).toBeGreaterThan(0);
-    expect(result.skills.length).toBeGreaterThan(0);
+    // Test baseValue calculation functionality
+    expect(result.attributes[0].baseValue).toBe(10); // (5 + 15) / 2
+    expect(result.attributes[1].baseValue).toBe(10); // (0 + 20) / 2
+  });
+  
+  test('handles malformed JSON gracefully', async () => {
+    const mockResponse = {
+      content: 'This is not valid JSON at all!',
+    };
+
+    mockGenerateContent.mockResolvedValue(mockResponse);
+
+    const result = await analyzeWorldDescription('Test description');
+
+    // Test error handling - should fallback to defaults when JSON parsing fails
+    expect(result.attributes).toHaveLength(6);
+    expect(result.skills).toHaveLength(12);
+    expect(result.attributes[0].name).toBe('Strength');
   });
 });

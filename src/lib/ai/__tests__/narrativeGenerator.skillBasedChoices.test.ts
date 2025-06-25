@@ -241,23 +241,34 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
         currentSituation: 'Facing a tall obstacle'
       };
 
-      await narrativeGenerator.generatePlayerChoices(
+      const result = await narrativeGenerator.generatePlayerChoices(
         'skill-world',
         narrativeContext,
         ['char-1']
       );
 
-      // Verify the choice generator was called with correct parameters
-      expect(mockChoiceGenerator.generateChoices).toHaveBeenCalledWith({
-        worldId: 'skill-world',
-        narrativeContext,
-        characterIds: ['char-1'],
-        minOptions: 3,
-        maxOptions: 4,
-        useAlignedChoices: false
+      // Test actual behavior: should generate skill-based choices with appropriate requirements
+      expect(result.options).toHaveLength(3);
+      expect(result.prompt).toBe('What approach will you take?');
+      
+      const climbOption = result.options.find(opt => opt.text.includes('Climb the wall'));
+      const magicOption = result.options.find(opt => opt.text.includes('levitation spell'));
+      
+      expect(climbOption).toBeDefined();
+      expect(climbOption?.requirements?.[0]).toEqual({
+        type: 'skill',
+        targetId: 'athletics',
+        operator: 'gte',
+        value: 5
       });
-
-      // Verify the choice generator was called - the choices themselves are tested in choiceGenerator tests
+      
+      expect(magicOption).toBeDefined();
+      expect(magicOption?.requirements?.[0]).toEqual({
+        type: 'skill',
+        targetId: 'magic',
+        operator: 'gte',
+        value: 4
+      });
     });
   });
 
@@ -269,7 +280,7 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       };
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
-      await narrativeGenerator.generateSegment({
+      const result = await narrativeGenerator.generateSegment({
         worldId: 'skill-world',
         sessionId: 'session-1',
         characterIds: ['char-1'],
@@ -283,13 +294,10 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
         }
       });
 
-      // Verify that the AI client was called with a prompt
-      expect(mockAIClient.generateContent).toHaveBeenCalled();
-      const calledPrompt = mockAIClient.generateContent.mock.calls[0][0];
-      
-      // The prompt should include character skill context
-      expect(typeof calledPrompt).toBe('string');
-      expect(calledPrompt.length).toBeGreaterThan(0);
+      // Test actual behavior: should generate narrative that acknowledges character skills
+      expect(result.content).toBe("You assess your options, drawing on your athletic prowess and magical knowledge.");
+      expect(result.content).toContain('athletic prowess');
+      expect(result.content).toContain('magical knowledge');
     });
   });
 

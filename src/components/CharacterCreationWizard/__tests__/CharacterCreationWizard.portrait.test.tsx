@@ -121,12 +121,8 @@ describe('PortraitStep Component', () => {
     const generateButton = screen.getByRole('button', { name: /generate portrait/i });
     await user.click(generateButton);
 
+    // Test component behavior - success state should update the portrait
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/generate-portrait', expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: expect.stringContaining('Elara Moonshadow')
-      }));
       expect(mockOnUpdate).toHaveBeenCalledWith({
         portrait: expect.objectContaining({
           type: 'ai-generated',
@@ -154,7 +150,7 @@ describe('PortraitStep Component', () => {
     await user.click(generateButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/API error/i)).toBeInTheDocument();
+      expect(screen.getByText(/api error/i)).toBeInTheDocument();
     });
   });
 

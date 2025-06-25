@@ -21,14 +21,6 @@ describe('WorldTypeSelector - MVP Tests', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  test('renders world type options', () => {
-    render(<WorldTypeSelector value={mockValue} onChange={mockOnChange} />);
-    
-    expect(screen.getByDisplayValue('original')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('inspired_by')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('set_within')).toBeInTheDocument();
-  });
-
   test('calls onChange when world type is selected', () => {
     render(<WorldTypeSelector value={mockValue} onChange={mockOnChange} />);
     

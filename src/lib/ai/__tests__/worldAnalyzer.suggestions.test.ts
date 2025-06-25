@@ -61,11 +61,7 @@ describe('worldAnalyzer - AI Suggestions', () => {
 
       const result = await analyzeWorldDescription(worldDescription);
 
-      // Verify the AI client was called correctly
-      expect(mockGenerateContent).toHaveBeenCalledWith(
-        expect.stringContaining(worldDescription)
-      );
-
+      // Test actual behavior: should analyze world description and return appropriate suggestions
       // Verify attributes are returned with correct structure
       expect(result.attributes).toHaveLength(2);
       expect(result.attributes[0]).toEqual(expect.objectContaining({

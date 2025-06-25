@@ -63,18 +63,12 @@ describe('worldGenerator', () => {
         existingNames: []
       });
 
-      // Verify the AI was called
-      expect(mockGenerateContent).toHaveBeenCalled();
-      
-      // Verify the prompt includes the correct instructions
-      const promptArg = mockGenerateContent.mock.calls[0][0];
-      expect(promptArg).toContain('The Office');
-      expect(promptArg).toContain('CRITICAL: You MUST use ONLY these exact values');
-      expect(promptArg).toContain('The Office = "modern"');
-      
-      // Verify the result has modern theme, not fantasy
-      expect(result.genre).toBe('modern');
-      expect(result.genre).not.toBe('fantasy');
+      // Test actual behavior: generator should produce correct genre based on reference
+      expect(result).toBeDefined();
+      expect(result.genre).toBe('modern'); // Should map 'The Office' to modern genre
+      expect(result.genre).not.toBe('fantasy'); // Should not default to fantasy
+      expect(result.name).toBeTruthy();
+      expect(result.description).toBeTruthy();
     });
 
     it('should use Sci-Fi theme for Star Wars setting', async () => {

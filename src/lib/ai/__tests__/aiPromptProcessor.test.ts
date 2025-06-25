@@ -87,13 +87,11 @@ describe('AIPromptProcessor with formatting', () => {
       // Act
       const result = await processor.processAndSend(templateId, variables);
 
-      // Assert
-      expect(mockFormatter.getFormattingOptionsForTemplate).toHaveBeenCalledWith(templateId);
-      expect(mockFormatter.format).toHaveBeenCalledWith(
-        aiResponse,
-        { formatDialogue: true, enableItalics: true }
-      );
+      // Assert - Test actual behavior: result should contain formatted narrative content
       expect(result.formattedContent).toBe('The tavern was bustling.');
+      expect(result.formattingOptions).toEqual({ formatDialogue: true, enableItalics: true });
+      expect(result.content).toBe('The tavern was bustling.');
+      expect(result.finishReason).toBe('STOP');
     });
 
     test('should format dialogue responses differently', async () => {
@@ -119,12 +117,10 @@ describe('AIPromptProcessor with formatting', () => {
       // Act  
       const result = await processor.processAndSend(templateId, variables);
 
-      // Assert
-      expect(mockFormatter.format).toHaveBeenCalledWith(
-        aiResponse,
-        { formatDialogue: true, enableItalics: false }
-      );
+      // Assert - Test actual behavior: result should contain formatted dialogue content
+      expect(result.formattedContent).toBe('The merchant said, "Welcome!"');
       expect(result.formattingOptions).toEqual({ formatDialogue: true, enableItalics: false });
+      expect(result.content).toBe('The merchant said, Welcome!');
     });
 
     test('should format journal entries', async () => {
@@ -149,12 +145,10 @@ describe('AIPromptProcessor with formatting', () => {
       // Act
       const result = await processor.processAndSend(templateId, variables);
 
-      // Assert
-      expect(mockFormatter.format).toHaveBeenCalledWith(
-        aiResponse,
-        { enableItalics: true }
-      );
+      // Assert - Test actual behavior: result should contain formatted journal content
+      expect(result.formattedContent).toBe('Quest completed successfully.');
       expect(result.formattingOptions).toEqual({ enableItalics: true });
+      expect(result.content).toBe('Quest completed successfully.');
     });
 
     test('should handle formatting errors gracefully', async () => {

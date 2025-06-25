@@ -144,12 +144,14 @@ describe('narrativeStore - Ending functionality', () => {
         customPrompt: 'The character retires to a peaceful cottage'
       });
 
-      expect(endingGenerator.generateEnding).toHaveBeenCalledWith({
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        endingType: 'character-retirement',
-        customPrompt: 'The character retires to a peaceful cottage'
+      // Test the actual ending generation results  
+      const updatedState = useNarrativeStore.getState();
+      expect(updatedState.currentEnding).toMatchObject({
+        type: 'character-retirement',
+        epilogue: 'Custom ending...',
+        characterLegacy: 'Custom legacy...',
+        worldImpact: 'Custom impact...',
+        tone: 'mysterious'
       });
     });
 
@@ -174,12 +176,13 @@ describe('narrativeStore - Ending functionality', () => {
         desiredTone: 'bittersweet'
       });
 
-      expect(endingGenerator.generateEnding).toHaveBeenCalledWith({
-        sessionId: 'session-123',
-        characterId: 'char-456',
-        worldId: 'world-789',
-        endingType: 'player-choice',
-        desiredTone: 'bittersweet'
+      // Test the actual ending content reflects the desired tone
+      const updatedState = useNarrativeStore.getState();
+      expect(updatedState.currentEnding).toMatchObject({
+        tone: 'bittersweet',
+        epilogue: 'Bittersweet ending...',
+        characterLegacy: 'Mixed legacy...',
+        worldImpact: 'Complex impact...'
       });
     });
   });

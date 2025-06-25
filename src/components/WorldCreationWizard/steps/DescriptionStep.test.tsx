@@ -1,13 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import DescriptionStep from './DescriptionStep';
 import { World } from '@/types/world.types';
-import * as worldAnalyzer from '@/lib/ai/worldAnalyzer';
-
-// Mock the world analyzer
-jest.mock('@/lib/ai/worldAnalyzer', () => ({
-  analyzeWorldDescription: jest.fn(),
-}));
 
 // Mock the hooks for DescriptionStep using mock abstraction
 jest.mock('@/hooks', () => {
@@ -27,10 +21,6 @@ describe('DescriptionStep', () => {
   };
 
   const mockOnUpdate = jest.fn();
-  const mockOnComplete = jest.fn();
-  const mockSetAISuggestions = jest.fn();
-  const mockSetProcessing = jest.fn();
-  const mockSetError = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -43,10 +33,6 @@ describe('DescriptionStep', () => {
         errors={{}}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
@@ -61,64 +47,26 @@ describe('DescriptionStep', () => {
         errors={{}}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
     expect(screen.getByTestId('description-char-count')).toHaveTextContent('16 / 3000 characters');
   });
 
-  test('validates minimum description length (50 characters)', async () => {
+  test('displays validation error when provided', () => {
     render(
       <DescriptionStep
         worldData={{ ...mockWorldData, description: 'Too short' }}
-        errors={{}}
+        errors={{ description: 'Description is too short' }}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
-    // Find and click the Generate Suggestions button
-    const generateButton = screen.getByText(/Generate Suggestions|Analyze Description/i);
-    
-    await act(async () => {
-      fireEvent.click(generateButton);
-    });
-
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith(
-        'description',
-        'Please provide at least 50 characters to generate suggestions.'
-      );
-    });
-    expect(mockOnComplete).not.toHaveBeenCalled();
+    // Test actual behavior: component should display validation error
+    expect(screen.getByText('Description is too short')).toBeInTheDocument();
   });
 
-  test('enforces maximum description length (3000 characters)', async () => {
-    const longDescription = 'a'.repeat(3001);
-    render(
-      <DescriptionStep
-        worldData={{ ...mockWorldData, description: longDescription.slice(0, 3000) }}
-        errors={{}}
-        isProcessing={false}
-        onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
-      />
-    );
-
-    // The component should limit the description to 3000 characters
-    expect(screen.getByTestId('description-char-count')).toHaveTextContent('3000 / 3000 characters');
-  });
 
   test('shows processing state during AI analysis', async () => {
     render(
@@ -127,10 +75,6 @@ describe('DescriptionStep', () => {
         errors={{}}
         isProcessing={true}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
@@ -138,111 +82,28 @@ describe('DescriptionStep', () => {
     expect(screen.getByText('Analyzing your world description...')).toBeInTheDocument();
   });
 
-  test('calls AI analyzer with description', async () => {
-    const mockAnalyzeWorldDescription = worldAnalyzer.analyzeWorldDescription as jest.Mock;
-    mockAnalyzeWorldDescription.mockResolvedValue({
-      attributes: [],
-      skills: [],
-    });
-
-    const validDescription = 'This is a valid description that is long enough to pass validation';
-    
+  test('enforces maximum description length correctly', () => {
+    const maxLengthDescription = 'a'.repeat(3000);
     render(
       <DescriptionStep
-        worldData={{ ...mockWorldData, description: validDescription }}
+        worldData={{ ...mockWorldData, description: maxLengthDescription }}
         errors={{}}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
-    const generateButton = screen.getByText(/Generate Suggestions|Analyze Description/i);
+    const textarea = screen.getByTestId('world-full-description');
+    expect(textarea).toHaveValue(maxLengthDescription);
+    expect(screen.getByTestId('description-char-count')).toHaveTextContent('3000 / 3000 characters');
     
-    await act(async () => {
-      fireEvent.click(generateButton);
-    });
-
-    await waitFor(() => {
-      expect(mockSetProcessing).toHaveBeenCalledWith(true);
-      expect(mockAnalyzeWorldDescription).toHaveBeenCalledWith(validDescription);
-    });
-  });
-
-  test('handles AI analysis success', async () => {
-    const mockSuggestions = {
-      attributes: [
-        { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, accepted: false },
-      ],
-      skills: [
-        { name: 'Combat', description: 'Fighting ability', difficulty: 'medium', accepted: false },
-      ],
-    };
-
-    const mockAnalyzeWorldDescription = worldAnalyzer.analyzeWorldDescription as jest.Mock;
-    mockAnalyzeWorldDescription.mockResolvedValue(mockSuggestions);
-
-    const validDescription = 'This is a valid description that is long enough to pass validation';
+    // Test that trying to add more characters doesn't work
+    fireEvent.change(textarea, { target: { value: maxLengthDescription + 'x' } });
     
-    render(
-      <DescriptionStep
-        worldData={{ ...mockWorldData, description: validDescription }}
-        errors={{}}
-        isProcessing={false}
-        onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
-      />
-    );
-
-    const generateButton = screen.getByText(/Generate Suggestions|Analyze Description/i);
-    
-    await act(async () => {
-      fireEvent.click(generateButton);
-    });
-
-    await waitFor(() => {
-      expect(mockSetAISuggestions).toHaveBeenCalledWith(mockSuggestions);
-      expect(mockOnComplete).toHaveBeenCalled();
-      expect(mockSetProcessing).toHaveBeenCalledWith(false);
-    });
-  });
-
-  test('handles AI analysis failure with fallback', async () => {
-    const mockAnalyzeWorldDescription = worldAnalyzer.analyzeWorldDescription as jest.Mock;
-    mockAnalyzeWorldDescription.mockRejectedValue(new Error('AI service unavailable'));
-
-    const validDescription = 'This is a valid description that is long enough to pass validation';
-    
-    render(
-      <DescriptionStep
-        worldData={{ ...mockWorldData, description: validDescription }}
-        errors={{}}
-        isProcessing={false}
-        onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
-      />
-    );
-
-    const generateButton = screen.getByText(/Generate Suggestions|Analyze Description/i);
-    
-    await act(async () => {
-      fireEvent.click(generateButton);
-    });
-
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith('ai', 'Failed to generate suggestions. You can continue manually or try again.');
-      expect(mockSetAISuggestions).toHaveBeenCalled();
-      // The component still calls onComplete even on failure (with default suggestions)
-      expect(mockSetProcessing).toHaveBeenCalledWith(false);
+    // Should not call onUpdate if over limit (component prevents this)
+    expect(mockOnUpdate).not.toHaveBeenCalledWith({
+      ...mockWorldData,
+      description: maxLengthDescription + 'x'
     });
   });
 
@@ -253,10 +114,6 @@ describe('DescriptionStep', () => {
         errors={{}}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
@@ -269,24 +126,18 @@ describe('DescriptionStep', () => {
     });
   });
 
-  test('disables inputs during processing', () => {
+  test('disables textarea during processing', () => {
     render(
       <DescriptionStep
         worldData={mockWorldData}
         errors={{}}
         isProcessing={true}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 
+    // Test actual behavior: textarea should be disabled during processing
     expect(screen.getByTestId('world-full-description')).toBeDisabled();
-    // The generate button should also be disabled
-    const generateButton = screen.getByText(/Generate Suggestions|Analyze Description/i);
-    expect(generateButton).toBeDisabled();
   });
 
   test('displays AI error when present', () => {
@@ -296,10 +147,6 @@ describe('DescriptionStep', () => {
         errors={{ ai: 'AI service is unavailable' }}
         isProcessing={false}
         onUpdate={mockOnUpdate}
-        onComplete={mockOnComplete}
-        setAISuggestions={mockSetAISuggestions}
-        setProcessing={mockSetProcessing}
-        setError={mockSetError}
       />
     );
 

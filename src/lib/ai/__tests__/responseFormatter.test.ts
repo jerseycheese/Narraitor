@@ -28,10 +28,10 @@ describe('ResponseFormatter', () => {
       // Act
       const result = formatter.format(response);
 
-      // Assert
-      expect(mockFormatAIResponse).toHaveBeenCalledWith('Test content', {});
+      // Assert - Test actual behavior: response should contain both original and formatted content
       expect(result.formattedContent).toBe('Formatted content');
       expect(result.content).toBe('Test content'); // Original preserved
+      expect(result.finishReason).toBe('STOP');
     });
 
     test('should apply custom formatting options', () => {
@@ -49,10 +49,10 @@ describe('ResponseFormatter', () => {
       // Act
       const result = formatter.format(response, options);
 
-      // Assert
-      expect(mockFormatAIResponse).toHaveBeenCalledWith('Test dialogue', options);
+      // Assert - Test actual behavior: response should include formatted content with options applied
       expect(result.formattedContent).toBe('Formatted dialogue');
       expect(result.formattingOptions).toEqual(options);
+      expect(result.content).toBe('Test dialogue'); // Original preserved
     });
 
     test('should handle empty content', () => {

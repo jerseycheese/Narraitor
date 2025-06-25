@@ -213,21 +213,26 @@ Options:
         currentLocation: 'Dark Alley'
       };
 
-      await choiceGenerator.generateChoices({
+      const result = await choiceGenerator.generateChoices({
         worldId: 'skill-world',
         narrativeContext,
         characterIds: ['char-1']
       });
 
-      // Verify AI was called with appropriate context
-      expect(mockAIClient.generateContent).toHaveBeenCalled();
-      const calledPrompt = mockAIClient.generateContent.mock.calls[0][0];
+      // Test actual behavior: should generate choices with skill-aware content and requirements
+      expect(result.options).toHaveLength(3);
+      expect(result.decisionWeight).toBe('minor');
+      expect(result.contextSummary).toBe('Exploring the area quietly.');
       
-      // The prompt should include world skills information
-      expect(calledPrompt).toContain('AVAILABLE SKILLS');
-      expect(calledPrompt).toContain('Stealth: Move unseen');
-      expect(calledPrompt).toContain('Persuasion: Convince others');
-      expect(calledPrompt).toContain('Lockpicking: Open locks');
+      const stealthChoice = result.options.find(opt => opt.text.includes('Sneak closer'));
+      expect(stealthChoice).toBeDefined();
+      expect(stealthChoice?.requirements).toBeDefined();
+      expect(stealthChoice?.requirements?.[0]).toEqual({
+        type: 'skill',
+        targetId: 'stealth',
+        operator: 'gte',
+        value: 5
+      });
     });
   });
 

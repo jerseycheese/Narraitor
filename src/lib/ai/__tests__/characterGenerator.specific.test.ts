@@ -118,8 +118,11 @@ describe('generateCharacter - Specific Character Type', () => {
     expect(result.isKnownFigure).toBe(true);
     expect(result.characterType).toBe('protagonist');
 
-    // Verify AI client was called
-    expect(mockGenerateContent).toHaveBeenCalledWith(expect.stringContaining(characterName));
+    // Verify the character data was properly parsed and validated
+    expect(result.attributes).toHaveLength(2);
+    expect(result.skills).toHaveLength(2);
+    expect(result.attributes[0]).toEqual(expect.objectContaining({ id: 'attr-1', value: 6 }));
+    expect(result.attributes[1]).toEqual(expect.objectContaining({ id: 'attr-2', value: 10 }));
   });
 
   it('should generate an original character when using original type', async () => {
@@ -155,8 +158,10 @@ describe('generateCharacter - Specific Character Type', () => {
     expect(result.isKnownFigure).toBe(false);
     expect(result.characterType).toBe('original');
 
-    // Verify AI client was called
-    expect(mockGenerateContent).toHaveBeenCalled();
+    // Verify the character data was properly processed
+    expect(result.name).toBe('Thorin Oakenshield III');
+    expect(result.level).toBe(8);
+    expect(result.background.personality).toBe('Proud and honorable');
   });
 
   it('should handle specific character generation with existing names', async () => {
@@ -193,7 +198,9 @@ describe('generateCharacter - Specific Character Type', () => {
     expect(result.name).toBe(characterName);
     expect(result.isKnownFigure).toBe(true);
 
-    // Verify AI client was called with the existing names in the prompt
-    expect(mockGenerateContent).toHaveBeenCalledWith(expect.stringContaining('Aragorn, Legolas, Gimli'));
+    // Verify character data integrity with existing names context
+    expect(result.background.description).toBe('A wizard of Middle Earth');
+    expect(result.background.fears).toEqual(['Corruption', 'The Dark']);
+    expect(result.skills[1].level).toBe(10); // High lore skill for Gandalf
   });
 });

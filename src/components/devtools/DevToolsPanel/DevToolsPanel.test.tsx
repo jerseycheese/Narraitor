@@ -107,7 +107,7 @@ describe('DevToolsPanel', () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
     
-    const { container } = render(<DevToolsPanel />);
+    render(<DevToolsPanel />);
     // In production, should not render DevTools content
     expect(screen.queryByTestId('devtools-panel-header')).not.toBeInTheDocument();
     
