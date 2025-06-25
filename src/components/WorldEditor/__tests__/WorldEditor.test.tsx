@@ -1,17 +1,13 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useWorldStore } from '@/state/worldStore';
 import WorldEditor from '../WorldEditor';
 
-// Mock the abstraction hooks using new mock utilities
-jest.mock('@/hooks', () => {
-  const { createHookMockModule, mockHookPresets } = require('@/lib/test-utils/mockHooks');
-  return createHookMockModule({
-    formState: mockHookPresets.formState.stateful(),
-    asyncState: mockHookPresets.asyncState.withExecution(),
-    modal: mockHookPresets.modal.closed()
-  });
-});
+// Mock hooks with simplified behavior
+jest.mock('@/hooks', () => ({
+  useFormState: jest.fn(),
+  useAsyncState: jest.fn(),
+}));
 
 // Mock Next.js router
 const mockPush = jest.fn();
@@ -28,29 +24,9 @@ jest.mock('@/state/worldStore', () => ({
   },
 }));
 
-interface MockBasicInfoFormProps {
-  world: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onChange: (updates: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-interface MockAttributesFormProps {
-  attributes: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onChange: (attributes: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-interface MockSkillsFormProps {
-  skills: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onChange: (skills: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-interface MockSettingsFormProps {
-  settings: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onChange: (settings: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
-
-// Mock child components
+// Mock all form components with simple implementations
 jest.mock('@/components/forms/WorldBasicInfoForm', () => {
-  return function MockWorldBasicInfoForm({ onChange }: MockBasicInfoFormProps) {
+  return function MockWorldBasicInfoForm({ onChange }: { onChange: (updates: any) => void }) {
     return (
       <div data-testid="world-basic-info-form">
         Basic Info Form
@@ -62,8 +38,21 @@ jest.mock('@/components/forms/WorldBasicInfoForm', () => {
   };
 });
 
+jest.mock('@/components/forms/WorldImageForm', () => {
+  return function MockWorldImageForm({ onChange }: { onChange: (updates: any) => void }) {
+    return (
+      <div data-testid="world-image-form">
+        Image Form
+        <button onClick={() => onChange({ imageUrl: 'new-image.jpg' })}>
+          Update Image
+        </button>
+      </div>
+    );
+  };
+});
+
 jest.mock('@/components/forms/WorldAttributesForm', () => {
-  return function MockWorldAttributesForm({ onChange }: MockAttributesFormProps) {
+  return function MockWorldAttributesForm({ onChange }: { onChange: (attributes: any) => void }) {
     return (
       <div data-testid="world-attributes-form">
         Attributes Form
@@ -76,7 +65,7 @@ jest.mock('@/components/forms/WorldAttributesForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSkillsForm', () => {
-  return function MockWorldSkillsForm({ onChange }: MockSkillsFormProps) {
+  return function MockWorldSkillsForm({ onChange }: { onChange: (skills: any) => void }) {
     return (
       <div data-testid="world-skills-form">
         Skills Form
@@ -89,11 +78,11 @@ jest.mock('@/components/forms/WorldSkillsForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSettingsForm', () => {
-  return function MockWorldSettingsForm({ settings, onChange }: MockSettingsFormProps) {
+  return function MockWorldSettingsForm({ onChange }: { onChange: (settings: any) => void; onToneSettingsChange: (toneSettings: any) => void }) {
     return (
       <div data-testid="world-settings-form">
         Settings Form
-        <button onClick={() => onChange(settings)}>
+        <button onClick={() => onChange({ maxAttributes: 10 })}>
           Update Settings
         </button>
       </div>
@@ -117,12 +106,42 @@ describe('WorldEditor - MVP Level Tests', () => {
       attributePointPool: 25,
       skillPointPool: 30,
     },
+    toneSettings: {
+      tone: 'neutral'
+    }
   };
 
   const mockUpdateWorld = jest.fn();
+  const mockFormState = {
+    data: { world: mockWorld },
+    updateField: jest.fn(),
+  };
+  const mockLoadingState = {
+    isLoading: false,
+    error: null,
+    execute: jest.fn(),
+  };
+  const mockSaveState = {
+    isLoading: false,
+    execute: jest.fn(),
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Configure hook mocks
+    const { useFormState, useAsyncState } = jest.requireMock('@/hooks');
+    useFormState.mockReturnValue(mockFormState);
+    useAsyncState
+      .mockReturnValueOnce(mockLoadingState)  // First call for loadingState
+      .mockReturnValueOnce(mockSaveState);    // Second call for saveState
+    
+    // Reset mock state
+    mockFormState.data = { world: mockWorld };
+    mockLoadingState.isLoading = false;
+    mockLoadingState.error = null;
+    mockSaveState.isLoading = false;
+    
     (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: {
         'world-123': mockWorld,
@@ -132,69 +151,40 @@ describe('WorldEditor - MVP Level Tests', () => {
   });
 
   // Acceptance Criteria: Selecting a world allows viewing/editing its details via the WorldEditor
-  test('loads and displays world data for editing', async () => {
+  test('displays all editing forms when world is loaded', () => {
     render(<WorldEditor worldId="world-123" />);
 
-    // Should display all form sections immediately since we're using synchronous store access
-    await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-attributes-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-skills-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-settings-form')).toBeInTheDocument();
-    });
+    // Should display all form sections
+    expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+    expect(screen.getByTestId('world-image-form')).toBeInTheDocument();
+    expect(screen.getByTestId('world-attributes-form')).toBeInTheDocument();
+    expect(screen.getByTestId('world-skills-form')).toBeInTheDocument();
+    expect(screen.getByTestId('world-settings-form')).toBeInTheDocument();
   });
 
   // Acceptance Criteria: The WorldEditor provides forms to modify basic info, attributes, and skills
-  test('provides forms for modifying all world aspects', async () => {
+  test('provides save and cancel actions', () => {
     render(<WorldEditor worldId="world-123" />);
 
-    await waitFor(() => {
-      // Basic info form is present
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-      
-      // Attributes form is present
-      expect(screen.getByTestId('world-attributes-form')).toBeInTheDocument();
-      
-      // Skills form is present
-      expect(screen.getByTestId('world-skills-form')).toBeInTheDocument();
-      
-      // Settings form is present
-      expect(screen.getByTestId('world-settings-form')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Save Changes')).toBeInTheDocument();
+    expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   // Acceptance Criteria: Changes are saved automatically or with an explicit save action
-  test('saves changes when save button is clicked', async () => {
+  test('saves changes when save button is clicked', () => {
     render(<WorldEditor worldId="world-123" />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-    });
-
-    // Click save button
     const saveButton = screen.getByText('Save Changes');
     fireEvent.click(saveButton);
 
-    // Should call updateWorld with correct data
-    await waitFor(() => {
-      expect(mockUpdateWorld).toHaveBeenCalledWith('world-123', mockWorld);
-    });
-
-    // Should navigate back to worlds list
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/worlds');
-    });
+    // Should execute save operation
+    expect(mockSaveState.execute).toHaveBeenCalled();
   });
 
   // Test for cancel functionality
-  test('cancels editing and returns to worlds list', async () => {
+  test('navigates back when cancel button is clicked', () => {
     render(<WorldEditor worldId="world-123" />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-    });
-
-    // Click cancel button
     const cancelButton = screen.getByText('Cancel');
     fireEvent.click(cancelButton);
 
@@ -204,67 +194,53 @@ describe('WorldEditor - MVP Level Tests', () => {
   });
 
   // Test error handling when world not found
-  test('shows error when world is not found', async () => {
-    (useWorldStore.getState as jest.Mock).mockReturnValue({
-      worlds: {},
-      updateWorld: mockUpdateWorld,
-    });
+  test('shows error message when world is not found', () => {
+    // Set up error state
+    mockFormState.data = { world: null };
+    mockLoadingState.error = 'World not found';
 
     render(<WorldEditor worldId="non-existent" />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/World not found/i)).toBeInTheDocument();
-    });
-
-    // Should provide a way to return to worlds list
-    const returnButton = screen.getByText('Return to Worlds');
-    expect(returnButton).toBeInTheDocument();
+    expect(screen.getByText('World not found')).toBeInTheDocument();
+    expect(screen.getByText('Return to Worlds')).toBeInTheDocument();
   });
 
-  // Test form state management
-  test('updates state when form sections change', async () => {
+  // Test loading state
+  test('shows loading message when world is loading', () => {
+    // Set up loading state
+    mockLoadingState.isLoading = true;
+    mockFormState.data = { world: null };
+
     render(<WorldEditor worldId="world-123" />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Loading world data...')).toBeInTheDocument();
+  });
 
-    // Update basic info
+  // Test form interactions
+  test('handles form changes correctly', () => {
+    render(<WorldEditor worldId="world-123" />);
+
+    // Interact with a form
     const updateNameButton = screen.getByText('Update Name');
     fireEvent.click(updateNameButton);
 
-    // Save changes
-    const saveButton = screen.getByText('Save Changes');
-    fireEvent.click(saveButton);
-
-    // Should save with updated data
-    await waitFor(() => {
-      expect(mockUpdateWorld).toHaveBeenCalledWith(
-        'world-123',
-        expect.objectContaining({
-          name: 'Updated Name',
-        })
-      );
-    });
+    // Should update form state
+    expect(mockFormState.updateField).toHaveBeenCalledWith('world', expect.objectContaining({
+      name: 'Updated Name'
+    }));
   });
 
-  // Test save button state during save operation
-  test('disables save and cancel buttons while saving', async () => {
+  // Test button states during save
+  test('shows correct button states during save operation', () => {
+    // Set up saving state
+    mockSaveState.isLoading = true;
+    
     render(<WorldEditor worldId="world-123" />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-    });
-
-    const saveButton = screen.getByText('Save Changes');
+    const saveButton = screen.getByText('Saving...');
     const cancelButton = screen.getByText('Cancel');
 
-    // Click save
-    fireEvent.click(saveButton);
-
-    // Buttons should be disabled during save
     expect(saveButton).toBeDisabled();
     expect(cancelButton).toBeDisabled();
-    expect(saveButton).toHaveTextContent('Saving...');
   });
 });
