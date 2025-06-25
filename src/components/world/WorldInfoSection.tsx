@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { DataField } from '@/components/shared/DataField';
 import { World } from '@/types/world.types';
 

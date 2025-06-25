@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { AITestingPanel } from '../../../components/devtools/AITestingPanel';
 
 /**

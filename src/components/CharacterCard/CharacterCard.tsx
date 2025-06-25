@@ -1,4 +1,3 @@
-import React from 'react';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
 

@@ -1,6 +1,5 @@
 // src/components/shared/TabNavigation/TabNavigation.test.tsx
 
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TabNavigation, TabOption } from './TabNavigation';
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function Logo({ size = 'medium', showText = true, textSize = 'auto', className = '' }) {
   const logoSizes = {
     small: 'w-8 h-8',

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { World } from '@/types/world.types';
 import { WorldAttributesList } from './WorldAttributesList';
 import { WorldSkillsList } from './WorldSkillsList';

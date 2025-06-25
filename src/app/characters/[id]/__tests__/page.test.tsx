@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { useRouter, useParams } from 'next/navigation';
 import '@testing-library/jest-dom';

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
 
 interface WorldSkillsListProps {

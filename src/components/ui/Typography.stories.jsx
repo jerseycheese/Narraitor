@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography } from './Typography.jsx';
 
 export default {

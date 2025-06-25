@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import SkillDifficulty from '../SkillDifficulty';
 import { SKILL_DIFFICULTIES } from '@/lib/constants/skillDifficultyLevels';

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { WorldAttribute } from '@/types/world.types';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 
