@@ -33,7 +33,7 @@ describe('AttributeRangeEditor', () => {
     expect(rangeInput).toHaveValue('5');
   });
 
-  test('updates when slider is moved', () => {
+  test('calls onChange when slider is moved', () => {
     render(
       <AttributeRangeEditor 
         attribute={mockAttribute} 
@@ -44,8 +44,8 @@ describe('AttributeRangeEditor', () => {
     const rangeInput = screen.getByRole('slider');
     fireEvent.change(rangeInput, { target: { value: '7' } });
 
-    // Test actual behavior: range input should accept valid values
-    expect(rangeInput).toHaveValue('7');
+    // Test actual behavior: onChange should be called with new value
+    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 7 });
     expect(rangeInput).not.toBeDisabled();
   });
 

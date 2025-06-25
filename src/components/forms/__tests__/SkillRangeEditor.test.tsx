@@ -59,7 +59,7 @@ describe('SkillRangeEditor', () => {
     expect(slider).toHaveValue('3');
   });
 
-  it('changes value when slider is moved', () => {
+  it('calls onChange when slider is moved', () => {
     render(
       <SkillRangeEditor 
         skill={mockSkill} 
@@ -70,8 +70,8 @@ describe('SkillRangeEditor', () => {
     const slider = screen.getByTestId('skill-range-editor-slider');
     fireEvent.change(slider, { target: { value: '4' } });
 
-    // Test actual behavior: slider should accept valid values
-    expect(slider).toHaveValue('4');
+    // Test actual behavior: onChange should be called with new value
+    expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 4 });
     expect(slider).toHaveAttribute('min', '1');
     expect(slider).toHaveAttribute('max', '5');
   });

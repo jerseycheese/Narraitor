@@ -57,9 +57,10 @@ describe('ToneSettingsForm', () => {
     const contentRatingSelect = screen.getByRole('combobox', { name: /content rating/i });
     await user.selectOptions(contentRatingSelect, 'PG-13');
 
-    // Test actual behavior: form field should update to selected value
-    expect(contentRatingSelect).toHaveValue('PG-13');
-    expect(screen.getByDisplayValue('PG-13')).toBeInTheDocument();
+    // Test actual behavior: onChange should be called with updated settings
+    expect(mockOnToneSettingsChange).toHaveBeenCalledWith(
+      expect.objectContaining({ contentRating: 'PG-13' })
+    );
   });
 
   test('calls onToneSettingsChange when narrative style changes', async () => {
@@ -75,9 +76,10 @@ describe('ToneSettingsForm', () => {
     const narrativeStyleSelect = screen.getByRole('combobox', { name: /narrative style/i });
     await user.selectOptions(narrativeStyleSelect, 'dramatic');
 
-    // Test actual behavior: form field should update to selected value
-    expect(narrativeStyleSelect).toHaveValue('dramatic');
-    expect(screen.getByDisplayValue('dramatic')).toBeInTheDocument();
+    // Test actual behavior: onChange should be called with updated settings
+    expect(mockOnToneSettingsChange).toHaveBeenCalledWith(
+      expect.objectContaining({ narrativeStyle: 'dramatic' })
+    );
   });
 
   test('calls onToneSettingsChange when language complexity changes', async () => {
@@ -93,9 +95,10 @@ describe('ToneSettingsForm', () => {
     const languageComplexitySelect = screen.getByRole('combobox', { name: /language complexity/i });
     await user.selectOptions(languageComplexitySelect, 'advanced');
 
-    // Test actual behavior: form field should update to selected value
-    expect(languageComplexitySelect).toHaveValue('advanced');
-    expect(screen.getByDisplayValue('advanced')).toBeInTheDocument();
+    // Test actual behavior: onChange should be called with updated settings
+    expect(mockOnToneSettingsChange).toHaveBeenCalledWith(
+      expect.objectContaining({ languageComplexity: 'advanced' })
+    );
   });
 
   test('calls onToneSettingsChange when custom instructions change', async () => {
