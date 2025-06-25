@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CharactersPage from '../page';
 import { useCharacterStore } from '@/state/characterStore';
