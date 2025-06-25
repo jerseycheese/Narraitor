@@ -26,7 +26,7 @@ jest.mock('@/state/worldStore', () => ({
 
 // Mock all form components with simple implementations
 jest.mock('@/components/forms/WorldBasicInfoForm', () => {
-  return function MockWorldBasicInfoForm({ onChange }: { onChange: (updates: any) => void }) {
+  return function MockWorldBasicInfoForm({ onChange }: { onChange: (updates: Record<string, unknown>) => void }) {
     return (
       <div data-testid="world-basic-info-form">
         Basic Info Form
@@ -39,7 +39,7 @@ jest.mock('@/components/forms/WorldBasicInfoForm', () => {
 });
 
 jest.mock('@/components/forms/WorldImageForm', () => {
-  return function MockWorldImageForm({ onChange }: { onChange: (updates: any) => void }) {
+  return function MockWorldImageForm({ onChange }: { onChange: (updates: Record<string, unknown>) => void }) {
     return (
       <div data-testid="world-image-form">
         Image Form
@@ -52,7 +52,7 @@ jest.mock('@/components/forms/WorldImageForm', () => {
 });
 
 jest.mock('@/components/forms/WorldAttributesForm', () => {
-  return function MockWorldAttributesForm({ onChange }: { onChange: (attributes: any) => void }) {
+  return function MockWorldAttributesForm({ onChange }: { onChange: (attributes: unknown[]) => void }) {
     return (
       <div data-testid="world-attributes-form">
         Attributes Form
@@ -65,7 +65,7 @@ jest.mock('@/components/forms/WorldAttributesForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSkillsForm', () => {
-  return function MockWorldSkillsForm({ onChange }: { onChange: (skills: any) => void }) {
+  return function MockWorldSkillsForm({ onChange }: { onChange: (skills: unknown[]) => void }) {
     return (
       <div data-testid="world-skills-form">
         Skills Form
@@ -78,7 +78,7 @@ jest.mock('@/components/forms/WorldSkillsForm', () => {
 });
 
 jest.mock('@/components/forms/WorldSettingsForm', () => {
-  return function MockWorldSettingsForm({ onChange }: { onChange: (settings: any) => void; onToneSettingsChange: (toneSettings: any) => void }) {
+  return function MockWorldSettingsForm({ onChange }: { onChange: (settings: Record<string, unknown>) => void; onToneSettingsChange: (toneSettings: Record<string, unknown>) => void }) {
     return (
       <div data-testid="world-settings-form">
         Settings Form

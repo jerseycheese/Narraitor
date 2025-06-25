@@ -2,24 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import type { World } from '../../../types/world.types';
 
-// Create test data
-const createMockWorld = (id: string, name: string): World => ({
-  id,
-  name,
-  description: `Description for ${name}`,
-  genre: 'fantasy',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 10,
-    maxSkills: 10,
-    attributePointPool: 100,
-    skillPointPool: 100,
-  },
-  createdAt: '2023-01-01T10:00:00Z',
-  updatedAt: '2023-01-01T10:00:00Z',
-});
-
 // Mock the child components with simple implementations
 jest.mock('../../WorldList/WorldList', () => {
   return {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SkillEditor } from '../SkillEditor';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
@@ -90,9 +90,9 @@ const mockProps = {
 };
 
 describe('SkillEditor', () => {
-  let mockFormData: any;
-  let mockFormState: any;
-  let mockModalState: any;
+  let mockFormData: Record<string, unknown>;
+  let mockFormState: Record<string, unknown>;
+  let mockModalState: Record<string, unknown>;
   
   beforeEach(() => {
     jest.clearAllMocks();
@@ -113,11 +113,11 @@ describe('SkillEditor', () => {
     // Set up form state mock
     mockFormState = {
       data: mockFormData,
-      updateField: jest.fn((field: string, value: any) => {
+      updateField: jest.fn((field: string, value: unknown) => {
         mockFormData[field] = value;
         formErrors = [];
       }),
-      setData: jest.fn((newData: any) => {
+      setData: jest.fn((newData: Record<string, unknown>) => {
         Object.assign(mockFormData, newData);
       }),
       get errors() { return formErrors; },

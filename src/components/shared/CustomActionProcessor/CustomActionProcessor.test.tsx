@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import CustomActionProcessor from './CustomActionProcessor';
 import * as skillDetectionService from '@/lib/ai/skillDetectionService';
-import * as requirementEvaluator from '@/lib/utils/requirementEvaluator';
 
 // Mock the abstraction hooks using new mock utilities
 jest.mock('@/hooks', () => {
@@ -19,7 +18,6 @@ const mockSkillDetectionService = skillDetectionService as jest.Mocked<typeof sk
 
 // Mock the requirement evaluator
 jest.mock('@/lib/utils/requirementEvaluator');
-const mockRequirementEvaluator = requirementEvaluator as jest.Mocked<typeof requirementEvaluator>;
 
 const mockCharacter = {
   skills: [
