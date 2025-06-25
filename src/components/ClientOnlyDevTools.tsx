@@ -18,7 +18,7 @@ export function ClientOnlyDevTools() {
 
   useEffect(() => {
     devToolsState.updateField('isClient', true);
-  }, [devToolsState]);
+  }, [devToolsState.updateField]);
 
   if (!devToolsState.data.isClient) {
     return null;

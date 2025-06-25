@@ -84,7 +84,7 @@ export const DevToolsPanel = () => {
     if (typeof window !== 'undefined') {
       panelState.updateField('isTestPage', window.location.pathname.includes('/dev/devtools-test'));
     }
-  }, [panelState]);
+  }, [panelState.updateField]);
 
   // Don't render anything on the server to avoid hydration issues
   if (!panelState.data.mounted) {

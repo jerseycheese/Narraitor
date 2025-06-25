@@ -56,7 +56,7 @@ export const DevToolsProvider = ({
   // Set client-side flag and check environment
   useEffect(() => {
     devToolsState.updateField('isDev', process.env.NODE_ENV === 'development');
-  }, [initialIsOpen, devToolsState]);
+  }, [initialIsOpen, devToolsState.updateField]);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {
