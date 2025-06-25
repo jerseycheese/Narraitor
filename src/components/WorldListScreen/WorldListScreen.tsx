@@ -39,28 +39,26 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     let unsubscribe: (() => void) | null = null;
     
     const loadWorlds = async () => {
-      await worldsLoadingState.execute(async () => {
-        try {
-          const state = useWorldStore.getState();
+      try {
+        const state = useWorldStore.getState();
+        worldListState.updateData({
+          worlds: Object.values(state.worlds || {}),
+          currentWorldId: state.currentWorldId,
+          worldToDeleteId: null
+        });
+        
+        // Set up subscription and store cleanup function
+        unsubscribe = useWorldStore.subscribe(() => {
+          const newState = useWorldStore.getState();
           worldListState.updateData({
-            worlds: Object.values(state.worlds || {}),
-            currentWorldId: state.currentWorldId,
-            worldToDeleteId: null
+            worlds: Object.values(newState.worlds || {}),
+            currentWorldId: newState.currentWorldId,
+            worldToDeleteId: null // Reset this field on subscription updates
           });
-          
-          // Set up subscription and store cleanup function
-          unsubscribe = useWorldStore.subscribe(() => {
-            const newState = useWorldStore.getState();
-            worldListState.updateData({
-              ...worldListState.data,
-              worlds: Object.values(newState.worlds || {}),
-              currentWorldId: newState.currentWorldId
-            });
-          });
-        } catch (err) {
-          throw new Error(err instanceof Error ? err.message : 'Unknown error');
-        }
-      });
+        });
+      } catch (err) {
+        console.error('Failed to load worlds:', err);
+      }
     };
     
     loadWorlds();
@@ -71,7 +69,9 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
         unsubscribe();
       }
     };
-  }, [worldsLoadingState, worldListState]);
+    // worldListState.updateData should be stable due to useCallback in useFormState
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [worldListState.updateData]);
 
   const handleSelectWorld = (worldId: string) => {
     useWorldStore.setState((state) => ({
