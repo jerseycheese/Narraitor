@@ -218,80 +218,104 @@ Make the world interesting and playable with concepts appropriate to the setting
 - Test your JSON syntax before responding
 - If you cannot complete the full response, prioritize the core fields: name, genre, description, attributes, skills`;
 
-  try {
-    // Import the AI client for server-side usage
-    const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
-    const client = createDefaultGeminiClient();
-    
-    // Generate with AI
-    const response = await client.generateContent(prompt);
-    
-    // Use the existing AI response parser utility
-    const parsed = parseAIJsonResponse<Record<string, unknown>>({ content: response.content }, 'Failed to generate world configuration');
-    
-    // Validate the response has required fields
-    validateRequiredFields(parsed, ['name', 'genre', 'description', 'attributes', 'skills'], 'world generation response');
-    validateArrayFields(parsed, ['attributes', 'skills'], 'world generation response');
-    
-    // Use suggested name if provided and AI didn't use it, otherwise ensure unique name
-    let worldName = options.suggestedName || String(parsed.name);
-    
-    // If the name already exists, add a suffix
-    let suffix = 1;
-    while (options.existingNames?.includes(worldName)) {
-      worldName = `${options.suggestedName || String(parsed.name)} ${suffix}`;
-      suffix++;
+  // Retry logic for JSON parsing failures
+  const MAX_RETRIES = 3;
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      // Import the AI client for server-side usage
+      const { createDefaultGeminiClient } = await import('@/lib/ai/defaultGeminiClient');
+      const client = createDefaultGeminiClient();
+      
+      // Add retry context to prompt for subsequent attempts
+      const retryPrompt = attempt > 1 
+        ? `${prompt}\n\nIMPORTANT: This is retry attempt ${attempt}/${MAX_RETRIES}. The previous attempt failed due to malformed JSON. Please ensure your response is valid, complete JSON without any truncation or syntax errors.`
+        : prompt;
+      
+      // Generate with AI
+      const response = await client.generateContent(retryPrompt);
+      
+      // Use the existing AI response parser utility
+      const parsed = parseAIJsonResponse<Record<string, unknown>>({ content: response.content }, 'Failed to generate world configuration');
+      
+      // Validate the response has required fields
+      validateRequiredFields(parsed, ['name', 'genre', 'description', 'attributes', 'skills'], 'world generation response');
+      validateArrayFields(parsed, ['attributes', 'skills'], 'world generation response');
+      
+      // If we get here, parsing was successful, continue with the rest of the function
+      lastError = null;
+      
+      // Use suggested name if provided and AI didn't use it, otherwise ensure unique name
+      let worldName = options.suggestedName || String(parsed.name);
+      
+      // If the name already exists, add a suffix
+      let suffix = 1;
+      while (options.existingNames?.includes(worldName)) {
+        worldName = `${options.suggestedName || String(parsed.name)} ${suffix}`;
+        suffix++;
+      }
+      
+      // Validate and clean attributes
+      const attributesArray = parsed.attributes as unknown[];
+      const attributes = attributesArray.map((attr: unknown) => {
+        const attrObj = attr as Record<string, unknown>;
+        return {
+          name: String(attrObj.name || 'Unknown Attribute'),
+          description: String(attrObj.description || ''),
+          baseValue: Number(attrObj.defaultValue) || 5,
+          minValue: Number(attrObj.minValue) || 1,
+          maxValue: Number(attrObj.maxValue) || 10,
+          category: String(attrObj.category || 'General')
+        };
+      });
+      
+      // Validate and clean skills
+      const skillsArray = parsed.skills as unknown[];
+      const skills = skillsArray.map((skill: unknown) => {
+        const skillObj = skill as Record<string, unknown>;
+        return {
+          name: String(skillObj.name || 'Unknown Skill'),
+          description: String(skillObj.description || ''),
+          difficulty: ['easy', 'medium', 'hard'].includes(skillObj.difficulty as string) ? skillObj.difficulty as 'easy' | 'medium' | 'hard' : 'medium',
+          category: (skillObj.category as string) || 'General',
+          baseValue: 1,
+          minValue: 1,
+          maxValue: 5,
+        };
+      });
+      
+      // Ensure settings have proper defaults
+      const settings: WorldSettings = {
+        maxAttributes: attributes.length,
+        maxSkills: skills.length,
+        attributePointPool: 30,
+        skillPointPool: 50
+      };
+      
+      return {
+        name: worldName,
+        genre: normalizeGenre(String(parsed.genre)),
+        description: String(parsed.description),
+        attributes,
+        skills,
+        settings
+      };
+      
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('Unknown error during world generation');
+      console.error(`World generation attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+      
+      // If this is not the last attempt, continue to retry
+      if (attempt < MAX_RETRIES) {
+        continue;
+      }
     }
-    
-    // Validate and clean attributes
-    const attributesArray = parsed.attributes as unknown[];
-    const attributes = attributesArray.map((attr: unknown) => {
-      const attrObj = attr as Record<string, unknown>;
-      return {
-        name: String(attrObj.name || 'Unknown Attribute'),
-        description: String(attrObj.description || ''),
-        baseValue: Number(attrObj.defaultValue) || 5,
-        minValue: Number(attrObj.minValue) || 1,
-        maxValue: Number(attrObj.maxValue) || 10,
-        category: String(attrObj.category || 'General')
-      };
-    });
-    
-    // Validate and clean skills
-    const skillsArray = parsed.skills as unknown[];
-    const skills = skillsArray.map((skill: unknown) => {
-      const skillObj = skill as Record<string, unknown>;
-      return {
-        name: String(skillObj.name || 'Unknown Skill'),
-        description: String(skillObj.description || ''),
-        difficulty: ['easy', 'medium', 'hard'].includes(skillObj.difficulty as string) ? skillObj.difficulty as 'easy' | 'medium' | 'hard' : 'medium',
-        category: (skillObj.category as string) || 'General',
-        baseValue: 1,
-        minValue: 1,
-        maxValue: 5,
-      };
-    });
-    
-    // Ensure settings have proper defaults
-    const settings: WorldSettings = {
-      maxAttributes: attributes.length,
-      maxSkills: skills.length,
-      attributePointPool: 30,
-      skillPointPool: 50
-    };
-    
-    return {
-      name: worldName,
-      genre: normalizeGenre(String(parsed.genre)),
-      description: String(parsed.description),
-      attributes,
-      skills,
-      settings
-    };
-  } catch (error) {
-    console.error('Failed to generate world:', error);
-    throw new Error('Failed to generate world configuration. Please try again.');
   }
+  
+  // If we get here, all retries failed
+  console.error('Failed to generate world after all retries:', lastError);
+  throw new Error('Failed to generate world configuration. Please try again.');
 }
 
 // Convenience functions for backward compatibility

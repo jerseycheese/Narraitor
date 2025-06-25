@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { World } from '@/types/world.types';
 import { 
   CharacterArchetype, 
@@ -38,7 +38,42 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
 
-  const generateArchetypes = useCallback(async () => {
+  useEffect(() => {
+    const generateArchetypes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+        setArchetypes(generated);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Unable to generate character options: ${errorMessage}`);
+        console.error('Failed to generate archetypes:', err);
+        console.error('Error details:', {
+          error: err,
+          message: errorMessage,
+          stack: err instanceof Error ? err.stack : undefined
+        });
+        console.error('World data:', world);
+        console.error('Existing names:', existingCharacterNames);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generateArchetypes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
+
+  const handleArchetypeSelect = (archetype: CharacterArchetype) => {
+    setSelectedArchetype(archetype.id);
+    // Small delay to show selection state before proceeding
+    setTimeout(() => {
+      onCharacterSelect(archetype);
+    }, SELECTION_DELAY_MS);
+  };
+
+  const generateArchetypes = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -48,28 +83,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Unable to generate character options: ${errorMessage}`);
       console.error('Failed to generate archetypes:', err);
-      console.error('Error details:', {
-        error: err,
-        message: errorMessage,
-        stack: err instanceof Error ? err.stack : undefined
-      });
-      console.error('World data:', world);
-      console.error('Existing names:', existingCharacterNames);
     } finally {
       setLoading(false);
     }
-  }, [world, existingCharacterNames]);
-
-  useEffect(() => {
-    generateArchetypes();
-  }, [generateArchetypes]);
-
-  const handleArchetypeSelect = (archetype: CharacterArchetype) => {
-    setSelectedArchetype(archetype.id);
-    // Small delay to show selection state before proceeding
-    setTimeout(() => {
-      onCharacterSelect(archetype);
-    }, SELECTION_DELAY_MS);
   };
 
   const handleRandomSelect = async () => {

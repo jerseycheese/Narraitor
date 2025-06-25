@@ -43,12 +43,19 @@ This document provides simple manual verification steps to ensure no regressions
    - Verify form validation on empty fields
    - Click "Next" → should advance to attributes step
 4. **Attributes Configuration**:
-   - Add 2-3 attributes with different ranges
-   - Try deleting an attribute → should remove from list
+   - Verify AI-suggested attributes display correctly
+   - Select/deselect attributes using "Selected ✓" / "Excluded" buttons
+   - Try "Customize" on an attribute → should allow editing name, description, base value
+   - Try "Add Custom Attribute" → should open attribute editor
+   - Verify attribute slot limit (6 total attributes maximum)
    - Click "Next" → should advance to skills step
 5. **Skills Configuration**:
-   - Add 2-3 skills with different difficulties
-   - Link skills to attributes → dropdown should populate
+   - Verify AI-suggested skills display correctly
+   - Select/deselect skills using "Selected ✓" / "Excluded" buttons  
+   - Try "Add Custom Skill" → should open skill editor
+   - Link skills to attributes using checkboxes
+   - Try deleting a custom skill → should remove from list
+   - Verify skill limit (12 total skills maximum)
    - Click "Next" → should advance to final step
 6. **Review & Create**:
    - Verify all entered data appears correctly
