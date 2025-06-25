@@ -96,15 +96,12 @@ export function AchievementDialog({
           <DialogDescription
             id="achievement-description"
             className="text-base text-gray-700"
-            asChild
           >
-            <div>
-              {typeof description === 'string' ? (
-                <p>{description}</p>
-              ) : (
-                description
-              )}
-            </div>
+            {typeof description === 'string' ? (
+              description
+            ) : (
+              description
+            )}
           </DialogDescription>
         </DialogHeader>
 

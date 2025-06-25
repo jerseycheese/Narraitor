@@ -83,27 +83,24 @@ export function ConfirmationDialog({
         aria-labelledby="confirmation-title"
         aria-describedby="confirmation-message"
       >
+        <DialogTitle
+          id="confirmation-title"
+          className={title ? "text-lg font-semibold" : "sr-only"}
+        >
+          {title || "Confirmation"}
+        </DialogTitle>
         <DialogHeader>
-          <DialogTitle
-            id="confirmation-title"
-            className={title ? "text-lg font-semibold" : "sr-only"}
-          >
-            {title || "Confirmation"}
-          </DialogTitle>
         </DialogHeader>
         
         <DialogDescription
           id="confirmation-message"
           className="text-sm text-gray-700 py-4"
-          asChild
         >
-          <div>
-            {typeof message === 'string' ? (
-              <p>{message}</p>
-            ) : (
-              message
-            )}
-          </div>
+          {typeof message === 'string' ? (
+            message
+          ) : (
+            message
+          )}
         </DialogDescription>
         
         <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
