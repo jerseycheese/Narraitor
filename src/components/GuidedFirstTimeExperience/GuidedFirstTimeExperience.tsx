@@ -28,7 +28,8 @@ interface OnboardingData {
 
 export function GuidedFirstTimeExperience() {
   const router = useRouter();
-  const { setOnboardingCompleted, shouldShowOnboarding } = useSessionStore();
+  const setOnboardingCompleted = useSessionStore(state => state.setOnboardingCompleted);
+  const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const { createWorld, setCurrentWorld } = useWorldStore();
 
   // Validation function for wizard steps
