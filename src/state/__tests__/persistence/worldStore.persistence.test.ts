@@ -194,37 +194,30 @@ describe('worldStore persistence', () => {
         name: 'Full Featured World',
         genre: 'sci-fi',
         description: 'A complex world with all properties',
-        imageUrl: 'https://example.com/world.jpg',
+        image: {
+          type: 'ai-generated',
+          url: 'https://example.com/world.jpg'
+        },
         settings: {
           maxAttributes: 8,
           maxSkills: 10,
           attributePointPool: 32,
-          skillPointPool: 25,
-          difficultyLevel: 'hard'
+          skillPointPool: 25
         }
       });
 
-      // Manually simulate persistence
-      mockSetItem('narraitor-world-store', JSON.stringify({
-        state: {
-          worlds: {
-            'test-world-1': fullWorld
-          },
-          currentWorldId: null,
-          error: null,
-          loading: false
-        },
-        version: 0
-      }));
+      // Actually create the world in the store
+      worldStore.getState().createWorld(fullWorld);
 
       // Test actual behavior: all world properties should be preserved in state
       const state = worldStore.getState();
       const world = Object.values(state.worlds)[0];
+      expect(world).toBeDefined();
       expect(world.name).toBe('Full Featured World');
       expect(world.genre).toBe('sci-fi');
       expect(world.description).toBeTruthy();
-      expect(world.imageUrl).toBeTruthy();
-      expect(world.settings?.difficultyLevel).toBeTruthy();
+      expect(world.image?.url).toBeTruthy();
+      expect(world.settings?.maxAttributes).toBe(8);
     });
   });
 

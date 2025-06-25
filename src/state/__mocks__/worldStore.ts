@@ -30,7 +30,7 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
   }
   
   // Actually create the world in our mock state
-  const worldId = 'mock-world-id';
+  const worldId = worldData.id || 'mock-world-id';
   const newWorld: World = {
     id: worldId,
     name: worldData.name,
@@ -45,6 +45,9 @@ const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
       skillPointPool: 20
     },
     toneSettings: worldData.toneSettings,
+    image: worldData.image,
+    reference: worldData.reference,
+    relationship: worldData.relationship,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
