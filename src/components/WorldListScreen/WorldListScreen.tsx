@@ -36,6 +36,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
   const deleteConfirmationModal = useModal();
 
   useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+    
     const loadWorlds = async () => {
       await worldsLoadingState.execute(async () => {
         try {
@@ -46,7 +48,8 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
             worldToDeleteId: null
           });
           
-          const unsubscribe = useWorldStore.subscribe(() => {
+          // Set up subscription and store cleanup function
+          unsubscribe = useWorldStore.subscribe(() => {
             const newState = useWorldStore.getState();
             worldListState.updateData({
               ...worldListState.data,
@@ -54,9 +57,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
               currentWorldId: newState.currentWorldId
             });
           });
-          
-          // Store unsubscribe function for cleanup
-          return () => unsubscribe();
         } catch (err) {
           throw new Error(err instanceof Error ? err.message : 'Unknown error');
         }
@@ -65,8 +65,12 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
     
     loadWorlds();
     
-    // Note: The unsubscribe function from the store subscription
-    // is handled by the async state execution
+    // Return cleanup function for useEffect
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [worldsLoadingState, worldListState]);
 
   const handleSelectWorld = (worldId: string) => {
