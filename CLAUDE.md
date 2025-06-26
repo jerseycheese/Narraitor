@@ -193,7 +193,8 @@ New documentation should follow these guidelines for consistency and AI-readabil
 
 ### File Organization
 - **Consolidate related topics**: Don't create separate docs for closely related concepts
-- **Archive completed implementation plans**: Move to `/archive/` after feature completion
+- **Delete completed implementation plans**: Remove outdated docs after feature completion (git history preserves them)
+- **No archive directories**: Delete outdated files rather than archiving (use git history for reference)
 - **Use consistent naming**: `[feature]-[type].md` (e.g., `character-creation-guide.md`)
 - **Update frontmatter**: Keep `updated` dates current, remove unused metadata
 
