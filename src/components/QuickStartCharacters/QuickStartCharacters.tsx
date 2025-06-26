@@ -71,7 +71,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       setLoading(true);
       const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
       handleArchetypeSelect(randomArchetype);
-    } catch (err) {
+    } catch {
       setError('Failed to generate random character. Please try again.');
     } finally {
       setLoading(false);
