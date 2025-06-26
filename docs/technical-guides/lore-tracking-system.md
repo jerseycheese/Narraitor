@@ -1,171 +1,61 @@
 ---
-title: "Lore Tracking System"
-type: guide
-category: narrative
-tags: [lore, tracking, ai, narrative-consistency]
+title: Lore Tracking System
+tags: [lore, narrative, ai, consistency]
 created: 2025-05-28
-updated: 2025-06-08
+updated: 2025-06-26
 ---
 
 # Lore Tracking System
 
-## Overview
-The lore tracking system provides AI-driven narrative consistency by automatically extracting and storing key story facts during gameplay. This ensures narrative coherence and prevents contradictions in AI-generated content.
+AI-driven narrative consistency through automatic fact extraction and storage.
 
-## Key Features
-- **Automatic Fact Extraction**: AI-powered extraction of characters, locations, events, and rules from narrative segments
-- **Session-Scoped Filtering**: View facts from current session or all-time for flexible context management
-- **Category Organization**: Facts are organized into characters, locations, events, and rules
-- **World-Scoped Storage**: Each world maintains its own independent lore database
-- **Manual Fact Addition**: Players and developers can manually add important story elements
+## Core Features
+
+**Automatic Extraction**: AI extracts characters, locations, events, and rules from narrative
+**Session Filtering**: View facts from current session or all-time
+**World Scoping**: Each world maintains independent lore database
+**Manual Addition**: Players can add important story elements
 
 ## Architecture
 
-### Core Components
-- **LoreStore** (`/src/state/loreStore.ts`): Zustand store managing fact storage and retrieval
-- **LoreViewer** (`/src/components/LoreViewer/`): React component for displaying and filtering facts
-- **StructuredLoreExtractor** (`/src/lib/ai/structuredLoreExtractor.ts`): AI service for extracting facts from narrative text
-
-### Data Structure
 ```typescript
 interface LoreFact {
   id: string;
-  key: string;           // Unique identifier within category
-  value: string;         // The actual fact content
-  category: LoreCategory; // 'characters', 'locations', 'events', 'rules'
+  key: string;
+  value: string;
+  category: 'characters' | 'locations' | 'events' | 'rules';
   source: 'narrative' | 'manual' | 'ai_extraction';
-  worldId: EntityID;     // World scope
-  sessionId?: EntityID;  // Optional session association
-  timestamp: string;     // Creation timestamp
-  metadata?: LoreMetadata; // Additional AI-extracted context
+  worldId: EntityID;
+  sessionId?: EntityID;
+  timestamp: string;
 }
 ```
 
 ## Usage
 
-### Integration with Narrative Generation
-The lore system automatically integrates with the narrative generation process:
-
 ```typescript
-import { getLoreContextForPrompt } from '@/state/loreStore';
-import { narrativeGenerator } from '@/lib/ai/narrativeGenerator';
-
-// Enhance prompts with relevant lore context
-const prompt = "Continue the story...";
-const loreContext = getLoreContextForPrompt(worldId);
-const enhancedPrompt = prompt + loreContext;
-
-const narrative = await narrativeGenerator.generateNarrative(enhancedPrompt, worldId);
-```
-
-### Manual Fact Addition
-```typescript
-import { useLoreStore } from '@/state/loreStore';
-
+// Add facts manually
 const { addFact } = useLoreStore();
+addFact('hero_name', 'Marcus the Brave', 'characters', 'manual', worldId);
 
-// Add a manual fact
-addFact(
-  'hero_name',           // key
-  'Marcus the Brave',    // value
-  'characters',          // category
-  'manual',             // source
-  worldId,              // world scope
-  sessionId             // optional session
-);
-```
-
-### Session Filtering
-```typescript
-import { useLoreStore } from '@/state/loreStore';
-
+// Get facts with filtering
 const { getFacts } = useLoreStore();
-
-// Get all facts for a world
 const allFacts = getFacts({ worldId });
-
-// Get only facts from current session
 const sessionFacts = getFacts({ worldId, sessionId });
-```
 
-## AI Integration
-
-### Structured Extraction
-The system uses AI to extract structured lore from narrative text:
-
-```typescript
-import { extractStructuredLore } from '@/lib/ai/structuredLoreExtractor';
-
+// AI extraction from narrative
 const narrative = "You meet Sir Gareth in the tavern of Goldenhaven...";
-const structuredLore = await extractStructuredLore(narrative);
-
-// Automatically adds facts with rich metadata:
-// - Character: "Sir Gareth" (role: knight, importance: secondary)
-// - Location: "tavern" (type: social, context: meeting place)
-// - Location: "Goldenhaven" (type: settlement, scale: city)
+const facts = await extractStructuredLore(narrative);
+// Automatically extracts: Sir Gareth (character), tavern (location), Goldenhaven (location)
 ```
 
-### Error Handling
-The system includes robust error handling for AI failures:
-- Graceful degradation when AI services are unavailable
-- Fallback to manual fact extraction
-- No corrupt data - better no extraction than bad extraction
+## Integration
+
+**Narrative Generation**: Lore context automatically enhances AI prompts for consistency
+**Session Scoping**: Facts can be filtered by session or world-wide
+**Error Handling**: Graceful degradation when AI services unavailable
 
 ## Testing
 
-### Test Harness
-Use the lore viewer test harness at `/dev/lore-viewer` to:
-- Test AI-powered fact extraction
-- Verify session filtering functionality  
-- Add sample facts for development
-- Test error handling scenarios
-
-### Unit Tests
-```bash
-npm test -- loreStore.test.ts
-npm test -- structuredLoreExtractor.test.ts
-```
-
-## Performance Considerations
-
-### Token Management
-- Facts are prioritized by relevance and recency for AI context
-- Token budget management prevents context overflow
-- Only relevant facts included in narrative generation prompts
-
-### Storage Efficiency
-- IndexedDB persistence for client-side storage
-- Efficient fact retrieval with world and session scoping
-- Cleanup utilities for removing outdated facts
-
-## Configuration
-
-### Environment Variables
-```env
-# AI service configuration
-GOOGLE_AI_API_KEY=your_api_key_here
-
-# Development mode (uses mock extraction)
-NODE_ENV=development
-```
-
-### Store Configuration
-The lore store follows standard Zustand patterns with CRUD operations:
-- `addFact()` - Add individual facts
-- `addStructuredLore()` - Add AI-extracted facts in batch
-- `getFacts()` - Retrieve facts with filtering
-- `updateFact()` - Modify existing facts
-- `deleteFact()` - Remove facts
-- `clearFacts()` - Clear all facts for a world
-
-## Future Enhancements
-- Advanced contradiction detection
-- Fact importance scoring
-- Cross-reference validation
-- Narrative coherence metrics
-- Export/import functionality
-
-## Related Documentation
-- [AI Service Integration](./ai-service-api.md)
-- [State Management Usage](./state-management-usage.md)
-- [Narrative Generation Usage](./narrative-generator-usage.md)
+Development harness: `/dev/lore-viewer`
+Unit tests: `npm test -- loreStore.test.ts`

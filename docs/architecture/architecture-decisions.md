@@ -1,131 +1,46 @@
 ---
 title: Architecture Decisions
-aliases: [ADRs, Architecture Design Records]
-tags: [narraitor, documentation, architecture]
+tags: [architecture, decisions, adr]
 created: 2025-04-28
-updated: 2025-04-28
+updated: 2025-06-26
 ---
 
 # Architecture Decisions
 
-This document records the key architectural decisions made for the Narraitor project.
+Key architectural decisions for the Narraitor project.
 
-## 1. Next.js App Router
+## Frontend Architecture
 
-**Decision**: Use Next.js 14+ with App Router for the frontend framework.
+**Next.js 15+ App Router**: Modern React framework with server/client components, nested layouts, and optimized routing.
 
-**Context**: The project requires a modern, maintainable frontend with server and client components.
+**Domain-Driven Design**: Code organized by business domains (World, Character, Narrative, etc.) rather than technical layers.
 
-**Consequences**:
-- Better support for nested layouts (important for the game interface)
-- Improved data loading and state management
-- Better performance through server components
-- More flexible routing patterns for dynamic game sessions
+**Zustand State Management**: Lightweight state management with domain-specific stores replacing React Context pattern.
 
-## 2. Domain-Driven Design
+**TypeScript**: Full type safety with strict mode enabled.
 
-**Decision**: Organize code by business domains rather than technical concerns.
+## Data & Styling
 
-**Context**: The application has clearly defined domain boundaries.
+**IndexedDB Persistence**: Client-side storage for complex data structures, offline support, and scalable capacity.
 
-**Consequences**:
-- Keeps related functionality together
-- Aligns code structure with business domains
-- Makes it easier to understand responsibilities
-- Supports future modularity if needed
+**Tailwind CSS v4**: Utility-first styling with theme support and performance optimization.
 
-## 3. State Management with Context API
+**shadcn/ui Components**: Accessible, themeable component library built on Radix UI primitives.
 
-**Decision**: Use React Context API with useReducer pattern for state management.
+## Development Practices
 
-**Context**: The application requires manageable state across multiple domains.
+**Storybook-First Development**: UI components developed in isolation with comprehensive stories and documentation.
 
-**Consequences**:
-- Simpler than Redux for a single-developer project
-- Follows React's built-in patterns
-- Domain-specific contexts limit complexity
-- Easier to test and maintain
+**Test-Driven Development**: Jest and React Testing Library with focus on behavior testing over implementation details.
 
-## 4. IndexedDB for Persistence
+**Three-Stage Verification**: Storybook → Test Harness → System Integration for all features.
 
-**Decision**: Use IndexedDB for client-side data persistence.
+## Product Decisions
 
-**Context**: The application needs to store complex data structures locally.
+**Single Player Focus**: MVP designed for single-player experience to reduce complexity and focus on core narrative features.
 
-**Consequences**:
-- Better performance than localStorage for complex data
-- Supports offline functionality
-- No server requirements for MVP
-- Scalable storage capacity
+**300-Line File Limit**: Strict limit enforces separation of concerns and maintainability.
 
-## 5. Tailwind CSS for Styling
+**Google Gemini AI**: Secure server-side integration with rate limiting and request validation.
 
-**Decision**: Use Tailwind CSS for component styling.
-
-**Context**: The application requires a maintainable styling approach with theme support.
-
-**Consequences**:
-- Utility-first approach reduces CSS complexity
-- Easy theming for different world types
-- Consistent design system
-- Good performance characteristics
-
-## 6. Component-First Development
-
-**Decision**: Use a Storybook-first approach for UI component development.
-
-**Context**: The application has many UI components that should be developed in isolation.
-
-**Consequences**:
-- Better component isolation during development
-- Improved testing of component states
-- Self-documenting component API
-- Parallel development of UI and logic
-
-## 7. Test-Driven Development
-
-**Decision**: Follow a TDD approach with Jest and React Testing Library.
-
-**Context**: The application requires high reliability and maintainability.
-
-**Consequences**:
-- Better code quality
-- Clear acceptance criteria
-- Regression prevention
-- Documentation of expected behavior
-
-## 8. Single Player Focus
-
-**Decision**: Design as a single-player experience for MVP.
-
-**Context**: Simplifying scope for initial implementation.
-
-**Consequences**:
-- Reduced complexity in state management
-- No need for real-time synchronization
-- Simpler authentication requirements
-- Focus on core narrative experience
-
-## 9. File Size Limits
-
-**Decision**: Implement a strict 300-line limit per file.
-
-**Context**: Maintaining clean, focused code modules.
-
-**Consequences**:
-- Improved readability
-- Forces proper separation of concerns
-- Better testability
-- Easier maintenance and review
-
-## 10. AI Integration Abstraction
-
-**Decision**: Create an abstraction layer for AI integration to support multiple providers.
-
-**Context**: Flexibility in AI model selection is important for future development.
-
-**Consequences**:
-- Easier to switch between AI providers
-- Consistent interface for narrative generation
-- Simplified testing with mocks
-- Ability to implement fallbacks
+**Security-First API Design**: All API keys server-side only, request sanitization, and no client-side exposure of sensitive data.

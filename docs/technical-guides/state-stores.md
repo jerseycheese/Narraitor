@@ -1,37 +1,33 @@
 ---
-title: "State Store Implementation Guide"
-type: guide
-category: state-management
-tags: [state, zustand, stores, implementation]
+title: State Store Implementation
+tags: [state, zustand, stores]
 created: 2025-05-13
 updated: 2025-06-08
 ---
 
-# State Store Implementation Guide
+# State Store Implementation
 
-This guide provides detailed information about the Zustand store implementations in the Narraitor project.
+Zustand store implementations for domain-driven state management in Narraitor.
 
 ## Store Overview
 
-The Narraitor application uses 7 distinct Zustand stores, each managing a specific domain:
-
-1. **World Store** - Game worlds and their configurations
-2. **Character Store** - Player and NPC characters
+**7 Domain Stores:**
+1. **World Store** - Game worlds and configurations
+2. **Character Store** - Player and NPC characters  
 3. **Inventory Store** - Character items and equipment
 4. **Narrative Store** - Story segments and progression
 5. **Journal Store** - Journal entries and quest tracking
 6. **Session Store** - Active game sessions
 7. **AI Context Store** - AI prompt contexts and constraints
 
-## Implementation Details
+## Common Patterns
 
-### Common Patterns
-
-All stores follow these consistent patterns:
+### Store Interface
+All stores follow consistent structure:
 
 ```typescript
 interface StoreInterface {
-  // State properties
+  // State
   entities: Record<EntityID, Entity>;
   currentEntityId: EntityID | null;
   error: string | null;
@@ -51,18 +47,15 @@ interface StoreInterface {
 ```
 
 ### Error Handling
-
-Each store implements consistent error handling:
+Consistent error handling across stores:
 
 ```typescript
-// Example from characterStore
 addSkill: (characterId, skillData) => set((state) => {
   const character = state.characters[characterId];
   if (!character) {
     return { error: 'Character not found' };
   }
 
-  // Check max skills limit
   if (character.skills.length >= 2) {
     return { error: 'Maximum skills limit reached' };
   }
@@ -72,22 +65,19 @@ addSkill: (characterId, skillData) => set((state) => {
 ```
 
 ### Validation
-
-All stores include input validation:
+Input validation for all operations:
 
 ```typescript
 createWorld: (worldData) => {
   if (!worldData.name || worldData.name.trim() === '') {
     throw new Error('World name is required');
   }
-  
   // ... continue with creation
 };
 ```
 
 ### ID Generation
-
-All entities use a consistent ID generation pattern:
+Consistent ID generation:
 
 ```typescript
 import { generateUniqueId } from '../lib/utils/generateId';
@@ -96,8 +86,6 @@ const worldId = generateUniqueId('world');
 const characterId = generateUniqueId('char');
 const itemId = generateUniqueId('item');
 ```
-
-## Store-Specific Features
 
 ### World Store
 - Manages world attributes and skills
