@@ -1,26 +1,26 @@
 ---
-title: React Best Practices (KISS)
-tags: [react, best-practices, kiss, development]
+title: React Best Practices
+tags: [react, best-practices, development]
 created: 2025-06-26
 updated: 2025-06-26
 ---
 
-# React Best Practices (KISS)
+# React Best Practices
 
-Keep It Simple, Stupid: Practical React patterns that prioritize simplicity and maintainability.
+KISS principle: Keep components simple, predictable, and focused on single responsibilities.
 
 ## Core Principles
 
 1. **Simple Props** - Minimal, well-typed interfaces
-2. **Simple State** - Flat, predictable state management
-3. **Simple JSX** - Readable, declarative markup
-4. **Simple Effects** - Clear dependencies and cleanup
+2. **Flat State** - Predictable state management
+3. **Clear JSX** - Readable, declarative markup
+4. **Focused Effects** - Single concerns with clear dependencies
 
 ## Component Design
 
 ### Props Interface
 ```typescript
-// ✅ Good: Focused, minimal props
+// ✅ Good: Focused interface
 interface CharacterCardProps {
   character: Character;
   onEdit: (id: string) => void;
@@ -32,29 +32,25 @@ interface CharacterCardProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   showStats?: boolean;
-  showInventory?: boolean;
   theme?: 'light' | 'dark';
   size?: 'sm' | 'md' | 'lg';
 }
 ```
 
-### Component Structure
+### Single Responsibility
 ```typescript
-// ✅ Good: Single responsibility
-const CharacterCard = ({ character, onEdit }: CharacterCardProps) => {
-  return (
-    <div className="character-card">
-      <h3>{character.name}</h3>
-      <p>{character.description}</p>
-      <button onClick={() => onEdit(character.id)}>Edit</button>
-    </div>
-  );
-};
+// ✅ Good: One clear purpose
+const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
+  <div className="character-card">
+    <h3>{character.name}</h3>
+    <p>{character.description}</p>
+    <button onClick={() => onEdit(character.id)}>Edit</button>
+  </div>
+);
 
 // ❌ Bad: Multiple responsibilities
 const CharacterManager = ({ characters, onEdit, onDelete, onAdd }) => {
   // Handles display, editing, deletion, creation, filtering, sorting...
-  // Too much responsibility in one component
 };
 ```
 
@@ -67,16 +63,9 @@ const [character, setCharacter] = useState<Character | null>(null);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 
-// ❌ Bad: Nested, complex state
+// ❌ Bad: Nested state
 const [state, setState] = useState({
-  character: {
-    data: null,
-    meta: {
-      loading: false,
-      error: null,
-      lastUpdated: null
-    }
-  }
+  character: { data: null, meta: { loading: false, error: null } }
 });
 ```
 
@@ -97,21 +86,12 @@ const CharacterList = () => {
     </div>
   );
 };
-
-// ❌ Bad: Unnecessary abstraction
-const CharacterList = () => {
-  const characterData = useCharacterData(); // Custom hook that wraps store
-  const { items, meta } = useListState(characterData); // Another abstraction
-  
-  return <ComplexListRenderer data={items} meta={meta} />;
-};
 ```
 
 ## Effect Management
 
-### Simple Effects
 ```typescript
-// ✅ Good: Clear dependencies and purpose
+// ✅ Good: Single concern per effect
 useEffect(() => {
   if (characterId) {
     loadCharacter(characterId);
@@ -119,39 +99,23 @@ useEffect(() => {
 }, [characterId]);
 
 useEffect(() => {
-  return () => {
-    // Cleanup when component unmounts
-    cancelPendingRequests();
-  };
+  return () => cancelPendingRequests();
 }, []);
 
-// ❌ Bad: Complex effect with multiple concerns
+// ❌ Bad: Multiple concerns in one effect
 useEffect(() => {
-  if (characterId) {
-    loadCharacter(characterId);
-  }
-  
-  if (worldId && !world) {
-    loadWorld(worldId);
-  }
-  
-  const interval = setInterval(() => {
-    autosave();
-  }, 30000);
-  
-  return () => {
-    clearInterval(interval);
-    cancelRequests();
-    cleanup();
-  };
-}, [characterId, worldId, world, character]); // Too many dependencies
+  if (characterId) loadCharacter(characterId);
+  if (worldId && !world) loadWorld(worldId);
+  const interval = setInterval(autosave, 30000);
+  return () => { clearInterval(interval); cleanup(); };
+}, [characterId, worldId, world, character]);
 ```
 
 ## JSX Patterns
 
 ### Conditional Rendering
 ```typescript
-// ✅ Good: Clear, readable conditions
+// ✅ Good: Early returns for clarity
 const CharacterView = ({ character }: { character: Character | null }) => {
   if (!character) {
     return <div>No character selected</div>;
@@ -160,83 +124,28 @@ const CharacterView = ({ character }: { character: Character | null }) => {
   return (
     <div>
       <h1>{character.name}</h1>
-      {character.description && (
-        <p>{character.description}</p>
-      )}
+      {character.description && <p>{character.description}</p>}
     </div>
   );
 };
-
-// ❌ Bad: Complex nested ternaries
-const CharacterView = ({ character }) => (
-  <div>
-    {character ? (
-      character.name ? (
-        <h1>{character.name}</h1>
-      ) : (
-        <h1>Unnamed Character</h1>
-      )
-    ) : (
-      <div>No character</div>
-    )}
-    {character?.description ? character.description : null}
-  </div>
-);
 ```
 
 ### List Rendering
 ```typescript
-// ✅ Good: Simple mapping with proper keys
+// ✅ Good: Simple mapping
 const CharacterList = ({ characters }: { characters: Character[] }) => (
   <div>
     {characters.map(character => (
-      <CharacterCard 
-        key={character.id} 
-        character={character}
-      />
+      <CharacterCard key={character.id} character={character} />
     ))}
-  </div>
-);
-
-// ❌ Bad: Complex rendering logic
-const CharacterList = ({ characters }) => (
-  <div>
-    {characters.reduce((acc, character, index) => {
-      if (character.visible) {
-        acc.push(
-          <CharacterCard 
-            key={`${character.id}-${index}`}
-            character={character}
-            isEven={index % 2 === 0}
-          />
-        );
-      }
-      return acc;
-    }, [])}
   </div>
 );
 ```
 
 ## Common Patterns
 
-### Error Boundaries
+### Loading Pattern
 ```typescript
-// Simple error boundary for specific components
-const CharacterErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ErrorBoundary
-      fallback={<div>Error loading character data</div>}
-      onError={(error) => console.error('Character error:', error)}
-    >
-      {children}
-    </ErrorBoundary>
-  );
-};
-```
-
-### Loading States
-```typescript
-// Simple loading pattern
 const useCharacterData = (characterId: string) => {
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(true);
@@ -250,12 +159,11 @@ const useCharacterData = (characterId: string) => {
         const data = await fetchCharacter(characterId);
         setCharacter(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load character');
+        setError(err instanceof Error ? err.message : 'Failed to load');
       } finally {
         setLoading(false);
       }
     };
-
     loadData();
   }, [characterId]);
 
@@ -265,7 +173,6 @@ const useCharacterData = (characterId: string) => {
 
 ### Form Handling
 ```typescript
-// Simple controlled form
 const CharacterForm = ({ character, onSave }: CharacterFormProps) => {
   const [name, setName] = useState(character?.name || '');
   const [description, setDescription] = useState(character?.description || '');
@@ -293,95 +200,61 @@ const CharacterForm = ({ character, onSave }: CharacterFormProps) => {
 };
 ```
 
-## Anti-Patterns to Avoid
+## Anti-Patterns
 
 ### Over-Abstraction
 ```typescript
-// ❌ Don't create unnecessary abstractions
+// ❌ Unnecessary complexity
 const useAdvancedCharacterState = (config: ComplexConfig) => {
   // 50 lines of complex logic
 };
 
-// ✅ Use simple, direct approaches
+// ✅ Direct approach
 const [character, setCharacter] = useState<Character | null>(null);
 ```
 
 ### Premature Optimization
 ```typescript
-// ❌ Don't optimize before it's needed
-const MemoizedCharacterCard = React.memo(CharacterCard, (prev, next) => {
-  return deepEqual(prev.character, next.character) && 
-         prev.theme === next.theme &&
-         prev.size === next.size;
-});
+// ❌ Don't optimize until needed
+const MemoizedCard = React.memo(CharacterCard, deepEqualComparison);
 
-// ✅ Start simple, optimize when needed
+// ✅ Start simple
 const CharacterCard = ({ character }: CharacterCardProps) => {
   // Simple implementation
 };
 ```
 
-### Complex Component Composition
-```typescript
-// ❌ Avoid complex render prop patterns
-<DataProvider>
-  {({ data, loading, error }) => (
-    <StateProvider>
-      {({ state, dispatch }) => (
-        <ComplexRenderer 
-          data={data} 
-          state={state} 
-          dispatch={dispatch}
-        />
-      )}
-    </StateProvider>
-  )}
-</DataProvider>
+## When Complexity is Justified
 
-// ✅ Use simple component composition
-<CharacterProvider characterId="123">
-  <CharacterCard />
-</CharacterProvider>
-```
+1. **Performance bottlenecks** - Measured performance issues
+2. **Repeated patterns** - 3+ similar implementations
+3. **Type safety** - Complex types prevent runtime errors
+4. **Accessibility** - Complex patterns for better a11y
 
-## When to Break KISS
-
-Sometimes complexity is justified:
-
-1. **Performance bottlenecks** - Add optimization when measurements show need
-2. **Repeated patterns** - Extract after seeing 3+ similar implementations
-3. **Type safety** - Complex types are better than runtime errors
-4. **Accessibility** - Complex patterns for better a11y are worth it
-
-## Testing Simple Components
+## Testing
 
 ```typescript
-test('CharacterCard displays character name', () => {
+test('displays character name', () => {
   const character = { id: '1', name: 'Test Character' };
-  
   render(<CharacterCard character={character} onEdit={jest.fn()} />);
-  
   expect(screen.getByText('Test Character')).toBeInTheDocument();
 });
 
-test('CharacterCard calls onEdit when edit button clicked', async () => {
-  const character = { id: '1', name: 'Test Character' };
+test('calls onEdit when clicked', async () => {
+  const character = { id: '1', name: 'Test' };
   const onEdit = jest.fn();
-  
   render(<CharacterCard character={character} onEdit={onEdit} />);
-  
   await user.click(screen.getByText('Edit'));
-  
   expect(onEdit).toHaveBeenCalledWith('1');
 });
 ```
 
 ## Key Takeaways
 
-1. **Start simple** - Add complexity only when needed
-2. **Single responsibility** - Components should do one thing well
-3. **Predictable state** - Flat, simple state is easier to debug
-4. **Clear interfaces** - Minimal props with clear purposes
-5. **Readable JSX** - Code should read like the UI it describes
+- **Start simple** - Add complexity only when needed
+- **Single responsibility** - One clear purpose per component
+- **Predictable state** - Flat state is easier to debug
+- **Clear interfaces** - Minimal props with obvious purposes
+- **Early optimization is evil** - Measure before optimizing
 
-Remember: The best code is code that doesn't need to exist. The second best is code that's easy to understand and change.
+The best code is code that doesn't need to exist. The second best is code that's easy to understand and change.

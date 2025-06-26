@@ -1,24 +1,18 @@
 ---
-title: "Shared Wizard Component System"
-type: architecture
-category: components
-tags: [wizard, components, shared, reusable]
+title: Shared Wizard System
+tags: [wizard, components, reusable]
 created: 2025-05-24
 updated: 2025-06-08
 ---
 
-# Shared Wizard Component System
+# Shared Wizard System
 
-## Overview
+Reusable multi-step wizard components with consistent styling and behavior. Extracted from WorldCreationWizard for use across the application.
 
-The shared wizard system provides a reusable set of components for creating multi-step wizards with consistent styling and behavior across the application. It was extracted from the WorldCreationWizard to enable reuse in the CharacterCreationWizard and future wizard implementations.
+## Core Components
 
-## Architecture
-
-### Core Components
-
-#### WizardContainer
-The main wrapper component that provides the wizard layout structure.
+### WizardContainer
+Main wrapper providing layout structure.
 
 ```typescript
 interface WizardContainerProps {
@@ -27,12 +21,10 @@ interface WizardContainerProps {
 }
 ```
 
-- Provides consistent max-width and spacing
-- Centers content with responsive padding
-- Applies background styling
+Provides consistent max-width, spacing, and background styling.
 
-#### WizardProgress
-Visual progress indicator showing current step and total steps.
+### WizardProgress
+Visual progress indicator.
 
 ```typescript
 interface WizardProgressProps {
@@ -42,12 +34,10 @@ interface WizardProgressProps {
 }
 ```
 
-- Shows step numbers and optional labels
-- Highlights completed and current steps
-- Provides visual feedback for navigation
+Shows step numbers, labels, and highlights completed/current steps.
 
-#### WizardNavigation
-Navigation controls for moving between wizard steps.
+### WizardNavigation
+Step navigation controls.
 
 ```typescript
 interface WizardNavigationProps {
@@ -63,13 +53,10 @@ interface WizardNavigationProps {
 }
 ```
 
-- Previous/Next/Cancel buttons
-- Disables navigation based on validation state
-- Shows loading state during submission
-- Customizable button labels
+Handles Previous/Next/Cancel buttons with validation states and loading indicators.
 
-#### WizardStep
-Individual step container with consistent styling.
+### WizardStep
+Individual step container.
 
 ```typescript
 interface WizardStepProps {
@@ -79,26 +66,15 @@ interface WizardStepProps {
 }
 ```
 
-- Provides step header with title and description
-- Consistent spacing and typography
-- Flexible content area
+Provides consistent step header and content area styling.
 
-### Form Components
+## Form Components
 
-#### WizardFormSection
-Consistent form section wrapper with heading support.
+### WizardFormSection
+Form section wrapper with optional title and description.
 
-```typescript
-interface WizardFormSectionProps {
-  title?: string;
-  description?: string;
-  children: React.ReactNode;
-  className?: string;
-}
-```
-
-#### CollapsibleCard
-Expandable/collapsible card for organizing content.
+### CollapsibleCard
+Expandable card for organizing content.
 
 ```typescript
 interface CollapsibleCardProps {
@@ -109,8 +85,8 @@ interface CollapsibleCardProps {
 }
 ```
 
-#### ToggleButton
-Toggle switch component for boolean options.
+### ToggleButton
+Boolean toggle switch component.
 
 ```typescript
 interface ToggleButtonProps {
@@ -121,10 +97,10 @@ interface ToggleButtonProps {
 }
 ```
 
-### Hooks
+## Hooks
 
-#### useWizardState
-State management hook for wizard data and navigation.
+### useWizardState
+Primary state management hook.
 
 ```typescript
 interface UseWizardStateOptions<T> {
@@ -136,36 +112,21 @@ interface UseWizardStateOptions<T> {
 }
 ```
 
-Features:
+**Features:**
 - Step navigation with bounds checking
 - Data persistence to sessionStorage
 - Validation integration
 - Async completion handling
 
-#### useWizardValidation
-Validation logic for wizard steps.
+### useWizardValidation
+Step-by-step validation logic.
 
-```typescript
-interface UseWizardValidationOptions<T> {
-  data: T;
-  rules: ValidationRules<T>;
-  currentStep: number;
-}
-```
-
-#### useWizardAI
-AI integration for generating suggestions.
-
-```typescript
-interface UseWizardAIOptions {
-  worldAnalyzer?: any;
-  debounceMs?: number;
-}
-```
+### useWizardAI
+AI integration for generating suggestions with debouncing.
 
 ## Styling System
 
-All wizard components use a centralized styling system defined in `wizardStyles.ts`:
+Centralized styling in `wizardStyles.ts`:
 
 ```typescript
 export const wizardStyles = {
@@ -178,16 +139,11 @@ export const wizardStyles = {
     label: "block text-sm font-medium text-gray-700 mb-2",
     input: "w-full px-3 py-2 border border-gray-300 rounded-md...",
     error: "mt-1 text-sm text-red-600",
-  },
-  // ... more styles
+  }
 };
 ```
 
-Benefits:
-- Single source of truth for styling
-- Consistent look across all wizards
-- Easy theme updates
-- Type-safe style references
+Benefits: Single source of truth, consistent styling, easy theme updates.
 
 ## Usage Example
 
@@ -209,7 +165,6 @@ function MyWizard() {
     previousStep,
     canProceed,
     isSubmitting,
-    complete,
   } = useWizardState({
     initialData: { name: '', email: '' },
     totalSteps: 3,
@@ -243,53 +198,45 @@ function MyWizard() {
 
 ## Best Practices
 
-1. **State Management**
-   - Use `useWizardState` for all wizard state
-   - Enable persistence for better UX
-   - Implement proper validation rules
+### State Management
+- Use `useWizardState` for all wizard state
+- Enable persistence for better UX
+- Implement proper validation rules per step
 
-2. **Styling**
-   - Always use `wizardStyles` for consistency
-   - Extend styles through className props when needed
-   - Avoid inline styles
+### Styling
+- Always use `wizardStyles` for consistency
+- Extend through className props when needed
+- Avoid inline styles
 
-3. **Validation**
-   - Define validation rules per step
-   - Show errors inline with form fields
-   - Prevent navigation when invalid
-
-4. **Accessibility**
-   - All form inputs must have labels
-   - Error messages must be associated with inputs
-   - Navigation must be keyboard accessible
+### Accessibility
+- All form inputs must have labels
+- Associate error messages with inputs
+- Ensure keyboard navigation support
 
 ## Testing
 
-The shared wizard components include comprehensive test coverage:
-
+Test coverage includes:
 - Unit tests for each component
 - Integration tests for hooks
 - Storybook stories for visual testing
 
-Run tests:
 ```bash
+# Run tests
 npm test src/components/shared/wizard
-```
 
-View in Storybook:
-```bash
+# View in Storybook
 npm run storybook
 # Navigate to Shared/Wizard section
 ```
 
 ## Migration Guide
 
-To migrate an existing wizard to use shared components:
+To migrate existing wizards:
 
 1. Replace custom container with `WizardContainer`
 2. Replace progress indicators with `WizardProgress`
-3. Replace navigation buttons with `WizardNavigation`
+3. Replace navigation with `WizardNavigation`
 4. Update styling to use `wizardStyles`
-5. Migrate state management to `useWizardState`
+5. Migrate state to `useWizardState`
 
-See the CharacterCreationWizard migration as an example.
+See CharacterCreationWizard migration as reference example.

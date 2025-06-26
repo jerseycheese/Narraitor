@@ -1,65 +1,53 @@
 ---
-title: "Custom Player Input Feature"
-type: feature
-category: player-interaction
+title: Custom Player Input
 tags: [player-input, choices, interaction]
 created: 2025-05-31
 updated: 2025-06-08
 ---
 
-# Custom Player Input Feature
+# Custom Player Input
 
-## Overview
+Allows players to type custom actions instead of being limited to AI-generated choices. Enhances player agency while maintaining narrative coherence.
 
-The Custom Player Input feature allows players to type their own custom actions instead of being limited to AI-generated choices. This enhances player agency and creativity while maintaining narrative coherence.
+## User Interface
 
-## User Experience
+### Input Design
+- **Prominent textarea**: Always visible at top of choice interface
+- **Character limit**: 250 characters (configurable)
+- **Live counter**: Shows "23/250" with color feedback (amber near limit, red at limit)
+- **Validation**: Prevents empty/whitespace-only submissions
+- **Submission**: Submit button or Enter key
+- **Auto-clear**: Input clears after successful submission
 
-### Interface Design
-- **Custom input field**: Large, prominent textarea at the top of the choice interface
-- **No button barrier**: Input field is immediately visible without requiring a button click
-- **Visual hierarchy**: Custom input is larger and more prominent than suggested actions
-- **Clear labeling**: Suggested actions appear below with "Or choose a suggested action:" header
-
-### Input Features
-- **Character limit**: 250 characters by default (configurable)
-- **Visual feedback**: Live character counter (e.g., "23/250")
-- **Warning colors**: Counter turns amber near limit, red at limit
-- **Validation**: Prevents empty or whitespace-only submissions
-- **Multiple submission methods**: Submit button or Enter key
-- **Auto-clear**: Input field clears after successful submission
+### Visual Hierarchy
+- Custom input field is larger and more prominent than suggested actions
+- Suggested actions appear below with "Or choose a suggested action:" header
 
 ## Technical Implementation
 
-### Core Components
+### ChoiceSelector Component
+`src/components/shared/ChoiceSelector/ChoiceSelector.tsx`
 
-#### ChoiceSelector Component
-**Location**: `src/components/shared/ChoiceSelector/ChoiceSelector.tsx`
-
-**Key Props**:
 ```typescript
 interface ChoiceSelectorProps {
-  enableCustomInput?: boolean;           // Enable custom input functionality
-  onCustomSubmit?: (text: string) => void; // Callback for custom input
-  customInputPlaceholder?: string;       // Placeholder text
-  maxCustomLength?: number;              // Character limit (default: 250)
+  enableCustomInput?: boolean;
+  onCustomSubmit?: (text: string) => void;
+  customInputPlaceholder?: string;
+  maxCustomLength?: number;              // Default: 250
 }
 ```
 
-**Features**:
+**Features:**
 - Always-visible custom input when enabled
 - Character counting with visual feedback
 - Input validation and sanitization
-- Keyboard navigation support
-- Accessibility compliance (ARIA labels)
+- Keyboard navigation and accessibility support
 
-#### ActiveGameSession Integration
-**Location**: `src/components/GameSession/ActiveGameSession.tsx`
+### Integration with ActiveGameSession
+`src/components/GameSession/ActiveGameSession.tsx`
 
-**Implementation**:
 ```typescript
 const handleCustomSubmit = (customText: string) => {
-  // Create custom decision option
   const customOption = {
     id: generateUniqueId('custom'),
     text: customText,
@@ -71,32 +59,11 @@ const handleCustomSubmit = (customText: string) => {
   // Trigger narrative generation
 }
 ```
-
-### Narrative Integration
-
-#### Choice Processing
-**Location**: `src/components/Narrative/NarrativeController.tsx`
-
-**Flow**:
-1. Custom input creates a decision option with `isCustomInput: true`
-2. Option is stored in narrative store alongside predefined choices
-3. When narrative generates, custom text is retrieved and used
-4. AI prompt receives: `Player chose: "custom text here"`
-
-#### Choice Generation Timing
-- **After predefined choice**: New choices appear in ~0.5 seconds
-- **After custom input**: New choices appear in ~2 seconds (allows processing)
-- **Prevents overwriting**: Delay ensures custom option isn't lost
-
-#### Prompt Template Integration
-**Location**: `src/lib/promptTemplates/templates/narrative/sceneTemplate.ts`
-
-**Context Passing**:
-```typescript
-${narrativeContext?.currentSituation ? `PLAYER ACTION: ${narrativeContext.currentSituation}` : ''}
-```
-
-The current situation includes the exact custom text: `Player chose: "do a cartwheel"`
+### Processing Flow
+1. Custom input creates decision option with `isCustomInput: true`
+2. Option stored in narrative store alongside predefined choices
+3. AI prompt receives: `Player chose: "custom text here"`
+4. New choices appear after ~2 second delay (vs ~0.5s for predefined choices)
 
 ## Usage Examples
 
@@ -112,171 +79,43 @@ The current situation includes the exact custom text: `Player chose: "do a cartw
 />
 ```
 
-### Game Session Usage
+### Game Session
 ```tsx
 <ActiveGameSession
   worldId={worldId}
   sessionId={sessionId}
   onChoiceSelected={handleSelectChoice}
-  // Custom input is automatically enabled in game sessions
+  // Custom input automatically enabled
 />
 ```
 
-## Configuration Options
+## Configuration
 
 ### Character Limits
-- **Default**: 250 characters
-- **Configurable**: Pass `maxCustomLength` prop
-- **Visual feedback**: Live counter with color coding
-- **Enforcement**: Hard limit prevents typing beyond maximum
+- Default: 250 characters (configurable via `maxCustomLength`)
+- Visual feedback with live counter and color coding
+- Hard limit enforcement
 
-### Placeholder Text
-- **Default**: "Type your custom response..."
-- **Customizable**: Pass `customInputPlaceholder` prop
-- **Context-aware**: Different placeholders for different scenarios
+### Validation
+- Empty/whitespace-only input prevented
+- Special characters allowed for creative expression
+- Input sanitized for XSS prevention
 
-### Validation Rules
-- **Empty input**: Prevented from submission
-- **Whitespace only**: Stripped and prevented if empty
-- **Character limit**: Enforced during typing
-- **Special characters**: Allowed (for creative expression)
+## Accessibility
 
-## Accessibility Features
-
-### Keyboard Navigation
-- **Tab order**: Custom input -> Submit button -> Predefined choices
-- **Enter key**: Submits custom input (Shift+Enter for line breaks)
-- **Escape key**: Clears input field
-- **Arrow keys**: Navigate between predefined choices
-
-### Screen Reader Support
-- **ARIA labels**: "Custom response input"
-- **Role definitions**: Proper radiogroup and radio roles
-- **Live regions**: Character count announcements
-- **Focus management**: Logical tab order
-
-### Visual Accessibility
-- **High contrast**: Clear distinction between input and choices
-- **Large target areas**: Easy-to-click submit button
-- **Color coding**: Character limit warnings use color + text
-- **Font sizing**: Readable text throughout interface
+- **Keyboard**: Tab order, Enter to submit, Escape to clear
+- **Screen readers**: ARIA labels, live regions for character count
+- **Visual**: High contrast, large targets, color + text for warnings
 
 ## Testing
 
-### Unit Tests
-**Location**: `src/components/shared/ChoiceSelector/ChoiceSelector.test.tsx`
-
-**Coverage**:
-- ✅ Custom input field visibility
-- ✅ Character counting and limits
-- ✅ Input validation (empty, whitespace)
-- ✅ Submission methods (button, Enter key)
-- ✅ Field clearing after submission
-- ✅ Disabled state behavior
-- ✅ Accessibility attributes
-
-### Integration Tests
-- ✅ Custom input with game session flow
-- ✅ Narrative incorporation of custom actions
-- ✅ Choice regeneration after custom input
-- ✅ Mixed usage (custom + predefined choices)
-
-### Manual Testing Scenarios
-1. **Creative Actions**: "I examine the door for traps"
-2. **Combat Actions**: "I draw my sword and charge"
-3. **Social Actions**: "I attempt to bribe the guard"
-4. **Long Input**: Test 250+ character limit enforcement
-5. **Edge Cases**: Empty input, whitespace only, special characters
-
-## Performance Considerations
-
-### Debouncing
-- **Character counting**: Updates on every keystroke (no debouncing needed)
-- **Validation**: Real-time feedback without performance impact
-- **Submission**: Single API call per submission
-
-### Memory Management
-- **Input state**: Cleared after submission to prevent memory leaks
-- **Decision storage**: Custom options added to existing decisions
-- **Cleanup**: Old decisions cleaned up by narrative store
-
-### Network Optimization
-- **Batch operations**: Custom option added to existing decision
-- **Minimal payload**: Only text and metadata sent
-- **Caching**: Decisions cached in narrative store
-
-## Error Handling
-
-### User Input Errors
-- **Empty submission**: Visual feedback, submission prevented
-- **Network errors**: Graceful degradation, retry options
-- **Character limit**: Soft enforcement with visual warnings
-
-### System Errors
-- **Store failures**: Fallback to local state
-- **Generation failures**: Error messages with retry options
-- **Invalid responses**: Sanitization and validation
-
-## Future Enhancements
-
-### Potential Features
-- **Input history**: Arrow keys to cycle through previous inputs
-- **Autocomplete**: Suggest completions based on context
-- **Rich text**: Basic formatting options (bold, italic)
-- **Voice input**: Speech-to-text integration
-- **Collaborative**: Multiple players contributing to custom actions
-
-### Performance Improvements
-- **Smart caching**: Cache common custom actions
-- **Predictive loading**: Pre-generate likely continuations
-- **Compression**: Optimize storage of custom text
-
-## Migration Guide
-
-### Enabling for Existing Components
-1. Add `enableCustomInput={true}` prop to ChoiceSelector
-2. Provide `onCustomSubmit` callback handler
-3. Update parent component to handle custom choice IDs
-4. Test integration with narrative generation
-
-### Upgrading from Previous Versions
-- **Breaking changes**: None (feature is additive)
-- **New dependencies**: None (uses existing infrastructure)
-- **Configuration**: All options have sensible defaults
+Comprehensive test coverage includes:
+- Unit tests for input validation and character limits
+- Integration tests for narrative flow
+- Manual scenarios: creative actions, combat, social interactions
 
 ## Troubleshooting
 
-### Common Issues
-
-**Custom input not appearing**:
-- ✅ Verify `enableCustomInput={true}` prop
-- ✅ Check that `onCustomSubmit` callback is provided
-- ✅ Ensure parent component is not overriding visibility
-
-**Custom actions not in narrative**:
-- ✅ Check that custom option is being stored in narrative store
-- ✅ Verify choice ID matching in narrative generation
-- ✅ Confirm AI prompt includes custom action text
-
-**Choices not regenerating**:
-- ✅ Verify 2-second delay after custom input
-- ✅ Check that choice generation is enabled
-- ✅ Confirm no errors in narrative generation
-
-### Debug Information
-Enable console logging in development to see:
-- Custom option creation and storage
-- Choice ID matching during narrative generation
-- Timing of choice regeneration cycles
-
-## Security Considerations
-
-### Input Sanitization
-- **XSS Prevention**: All user input escaped before rendering
-- **Length Limits**: Hard character limits prevent abuse
-- **Content Filtering**: Future enhancement for inappropriate content
-
-### Data Storage
-- **Local Storage**: Custom actions stored locally only
-- **No Persistence**: Custom text not sent to external services
-- **Privacy**: User actions remain private to their session
+**Input not appearing**: Check `enableCustomInput={true}` and `onCustomSubmit` callback
+**Actions not in narrative**: Verify option storage and choice ID matching
+**Choices not regenerating**: Confirm 2-second delay and no generation errors
