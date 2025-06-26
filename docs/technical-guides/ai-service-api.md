@@ -378,9 +378,16 @@ This implementation uses the new `@google/genai` SDK (currently in preview) whic
 - Client initialization: `new GoogleGenAI({ apiKey })`
 - Content generation: `genAI.models.generateContent()`
 
+## Error Handling Enhancements
+
+The AI service includes robust JSON parsing with automatic repair capabilities:
+- Automatic bracket balancing for malformed JSON responses
+- Retry logic with exponential backoff for transient failures
+- Fallback mechanisms for complete generation failures
+- Enhanced error messages for better debugging
+
 ## Related Documentation
 
-- [AI Response Parser Improvements](../fixes/ai-response-parser-improvements.md) - Detailed JSON parsing enhancements and error recovery
 - [Error Handling Guide](./error-handling.md) - General error handling patterns
 
 ## Future Enhancements

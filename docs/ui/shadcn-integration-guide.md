@@ -153,14 +153,13 @@ src/
 - **Next Steps**: #501 (Command Palette), #502 (Dialogs), #503 (Form Migration)
 
 ## Accessibility
-For comprehensive accessibility implementation guidance, especially for dialog components, see:
-- [Dialog Accessibility Improvements](../fixes/dialog-accessibility-improvements.md) - WCAG-compliant dialog implementation
-- [WCAG Compliance Guidelines](../fixes/dialog-accessibility-improvements.md#wcag-compliance) - Detailed accessibility standards
+Dialog components built with shadcn/ui must follow WCAG accessibility standards:
+- DialogTitle must be a direct child of DialogContent (not nested in DialogHeader)
+- Proper ARIA labeling with aria-labelledby and aria-describedby
+- Keyboard navigation support and focus management
+- Screen reader compatibility with proper announcements
 
 ## Resources
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [Tailwind CSS v4 Documentation](https://tailwindcss.com/docs)
 - [Radix UI Documentation](https://www.radix-ui.com/)
-
-## Related Documentation
-- [Dialog Accessibility Improvements](../fixes/dialog-accessibility-improvements.md) - Accessibility implementation for dialog components
