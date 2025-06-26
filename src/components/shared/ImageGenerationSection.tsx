@@ -41,21 +41,32 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   className = "",
   defaultCustomPromptChecked = !!currentPrompt
 }) => {
-  // Initialize state based on the default prop or existing prompt
+  // Separate user input from API-returned prompts
   const [showCustomPrompt, setShowCustomPrompt] = useState(defaultCustomPromptChecked);
-  const [customPrompt, setCustomPrompt] = useState(currentPrompt || '');
+  const [userCustomPrompt, setUserCustomPrompt] = useState(''); // Only user input, never auto-populated
+  const [hasUserCustomization, setHasUserCustomization] = useState(false); // Track if user has made customizations
 
   const handleGenerate = () => {
-    onGenerate(showCustomPrompt && customPrompt ? customPrompt : undefined);
+    onGenerate(showCustomPrompt && userCustomPrompt ? userCustomPrompt : undefined);
   };
 
-  // Update local state when currentPrompt changes from props
-  React.useEffect(() => {
-    if (currentPrompt) {
-      setCustomPrompt(currentPrompt);
-      setShowCustomPrompt(true);
+  const handleUndoCustomization = () => {
+    setUserCustomPrompt('');
+    setShowCustomPrompt(false);
+    setHasUserCustomization(false);
+  };
+
+  const handleCustomPromptChange = (value: string) => {
+    setUserCustomPrompt(value);
+    setHasUserCustomization(value.length > 0);
+  };
+
+  const handleCustomPromptToggle = (checked: boolean) => {
+    setShowCustomPrompt(checked);
+    if (checked && userCustomPrompt.length > 0) {
+      setHasUserCustomization(true);
     }
-  }, [currentPrompt]);
+  };
 
   const hasImage = currentImageType === 'ai-generated' && currentImageUrl;
 
@@ -73,23 +84,35 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           
           {/* Custom prompt toggle */}
           <div className="mb-4">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={showCustomPrompt}
-                onChange={(e) => setShowCustomPrompt(e.target.checked)}
-                className="rounded border-gray-300"
-              />
-              <span>{customPromptLabel}</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={showCustomPrompt}
+                  onChange={(e) => handleCustomPromptToggle(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <span>{customPromptLabel}</span>
+              </label>
+              {/* Undo button - only show if user has made customizations */}
+              {hasUserCustomization && (
+                <button
+                  onClick={handleUndoCustomization}
+                  className="text-xs text-blue-600 hover:text-blue-800 underline"
+                  type="button"
+                >
+                  Undo customizations
+                </button>
+              )}
+            </div>
           </div>
           
           {/* Custom prompt textarea */}
           {showCustomPrompt && (
             <div className="mb-4">
               <textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
+                value={userCustomPrompt}
+                onChange={(e) => handleCustomPromptChange(e.target.value)}
                 placeholder={customPromptPlaceholder}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
