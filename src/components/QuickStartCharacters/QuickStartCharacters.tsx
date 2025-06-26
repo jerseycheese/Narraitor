@@ -38,29 +38,21 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
 
-  useEffect(() => {
-    const generateArchetypes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const generated = await generateCharacterArchetypes(world, existingCharacterNames);
-        setArchetypes(generated);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(`Unable to generate character options: ${errorMessage}`);
-        console.error('Failed to generate archetypes:', err);
-        console.error('Error details:', {
-          error: err,
-          message: errorMessage,
-          stack: err instanceof Error ? err.stack : undefined
-        });
-        console.error('World data:', world);
-        console.error('Existing names:', existingCharacterNames);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const generateArchetypes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const generated = await generateCharacterArchetypes(world, existingCharacterNames);
+      setArchetypes(generated);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Unable to generate character options: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     generateArchetypes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
@@ -73,20 +65,6 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }, SELECTION_DELAY_MS);
   };
 
-  const generateArchetypes = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const generated = await generateCharacterArchetypes(world, existingCharacterNames);
-      setArchetypes(generated);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Unable to generate character options: ${errorMessage}`);
-      console.error('Failed to generate archetypes:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleRandomSelect = async () => {
     try {
@@ -95,7 +73,6 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       handleArchetypeSelect(randomArchetype);
     } catch (err) {
       setError('Failed to generate random character. Please try again.');
-      console.error('Failed to generate random archetype:', err);
     } finally {
       setLoading(false);
     }

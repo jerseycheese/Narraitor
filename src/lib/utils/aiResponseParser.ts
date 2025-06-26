@@ -82,12 +82,6 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
       }
     } catch (parseError) {
       const originalError = parseError instanceof Error ? parseError.message : 'Unknown parsing error';
-      console.error('AI Response parsing failed:', {
-        originalError,
-        contentLength: response.content?.length,
-        contentPreview: response.content?.substring(0, 200),
-        contentSuffix: response.content?.substring(Math.max(0, response.content.length - 200))
-      });
       throw new Error(`${errorMessage}. Original error: ${originalError}. Content: ${response.content?.substring(0, 100)}...`);
     }
   }
