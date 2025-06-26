@@ -1,0 +1,248 @@
+---
+title: GitHub Integration Guide
+tags: [github, sync, automation, workflow]
+created: 2025-06-26
+updated: 2025-06-26
+---
+
+# GitHub Integration Guide
+
+Synchronization between GitHub issues and project documentation.
+
+## Quick Start
+
+### Setup GitHub Token
+```bash
+# Set up GitHub token
+export GITHUB_TOKEN=your_github_token
+
+# Verify access
+gh auth status
+```
+
+### Basic Sync Commands
+```bash
+# Sync CSV user stories to GitHub issues
+npm run sync-user-stories
+
+# Validate consistency
+npm run validate-user-stories
+
+# Update issue priorities
+npm run update-priorities
+```
+
+## Core Scripts
+
+### User Story Synchronization
+```bash
+# scripts/update-user-stories.js
+node scripts/update-user-stories.js
+
+# What it does:
+# - Reads CSV files from scripts/user-stories/
+# - Creates GitHub issues for new user stories
+# - Updates existing issues with CSV data
+# - Ensures complexity and priority match
+```
+
+### Issue Validation
+```bash
+# scripts/validate-user-stories.js
+node scripts/validate-user-stories.js
+
+# Checks:
+# - CSV stories have corresponding GitHub issues
+# - Issue data matches CSV data
+# - No duplicate issues exist
+# - Implementation links are valid
+```
+
+## Workflow Integration
+
+### CSV to GitHub Issues
+1. **Update CSV files** in `scripts/user-stories/`
+2. **Run sync script** to create/update issues
+3. **Validate** synchronization was successful
+4. **Commit changes** to both CSV and any generated files
+
+### GitHub Issues to Documentation
+1. **Update issues** in GitHub interface
+2. **Export issue data** if needed for documentation
+3. **Update CSV files** to reflect changes
+4. **Re-sync** to ensure consistency
+
+## Configuration
+
+### Script Configuration
+```javascript
+// scripts/config.js
+const config = {
+  github: {
+    owner: 'jerseycheese',
+    repo: 'Narraitor',
+    apiVersion: '2022-11-28'
+  },
+  csv: {
+    userStoriesPath: './scripts/user-stories/',
+    outputPath: './scripts/output/'
+  }
+};
+```
+
+### CSV File Format
+```csv
+Domain,Title,Description,Complexity,Priority,GitHub Issue
+Character,Create Character,As a player I want to create a character,5,High,#123
+World,World Setup,As a player I want to set up a world,8,High,#124
+```
+
+## Issue Management
+
+### Issue Templates
+GitHub issues use templates from `.github/ISSUE_TEMPLATE/`:
+- **Feature Request** - New functionality
+- **Bug Report** - Issues and fixes
+- **User Story** - From CSV synchronization
+
+### Labels and Organization
+- **Domain labels**: `character`, `world`, `narrative`, `journal`
+- **Priority labels**: `priority/high`, `priority/medium`, `priority/low`
+- **Type labels**: `feature`, `bug`, `enhancement`, `documentation`
+
+### Project Boards
+Issues are automatically organized into project boards:
+- **Backlog** - Planned but not started
+- **In Progress** - Currently being worked on
+- **Review** - Ready for review
+- **Done** - Completed
+
+## Automation
+
+### GitHub Actions
+```yaml
+# .github/workflows/sync-issues.yml
+name: Sync User Stories
+on:
+  push:
+    paths: ['scripts/user-stories/*.csv']
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Sync user stories
+        run: npm run sync-user-stories
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Webhook Integration
+For real-time synchronization:
+```javascript
+// api/webhooks/github.js
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    const { action, issue } = req.body;
+    
+    if (action === 'opened' || action === 'edited') {
+      await updateCSVFromIssue(issue);
+    }
+    
+    res.status(200).json({ success: true });
+  }
+}
+```
+
+## Data Flow
+
+### CSV → GitHub Issues
+1. Script reads CSV files
+2. Matches existing issues by title or ID
+3. Creates new issues for missing stories
+4. Updates existing issues with CSV data
+5. Applies appropriate labels and milestones
+
+### GitHub Issues → CSV
+1. Export issues via GitHub API
+2. Match issues to CSV entries
+3. Update CSV with current issue status
+4. Sync priority and complexity changes
+5. Generate reports on discrepancies
+
+## Common Tasks
+
+### Adding New User Stories
+1. Add row to appropriate CSV file
+2. Run `npm run sync-user-stories`
+3. Verify issue was created in GitHub
+4. Commit CSV changes
+
+### Bulk Issue Updates
+```bash
+# Update all issue priorities from CSV
+node scripts/bulk-update-priorities.js
+
+# Close completed issues
+node scripts/close-completed-issues.js
+
+# Update milestones
+node scripts/update-milestones.js
+```
+
+### Reporting
+```bash
+# Generate sync report
+node scripts/generate-sync-report.js
+
+# Check for inconsistencies
+node scripts/check-consistency.js
+
+# Export issue data
+node scripts/export-issues.js
+```
+
+## Error Handling
+
+### Common Issues
+- **Rate limiting**: Script includes automatic retry with backoff
+- **Authentication**: Verify GitHub token has correct permissions
+- **Duplicate issues**: Validation script identifies and reports duplicates
+
+### Troubleshooting
+```bash
+# Debug mode
+DEBUG=true node scripts/update-user-stories.js
+
+# Check API rate limits
+node scripts/check-rate-limits.js
+
+# Validate GitHub token
+gh auth token
+```
+
+## Best Practices
+
+### CSV Management
+- Keep CSV files focused by domain
+- Use consistent naming conventions
+- Include clear descriptions and acceptance criteria
+- Regularly validate against GitHub issues
+
+### Issue Management
+- Use descriptive titles that match CSV entries
+- Apply consistent labeling
+- Link related issues and documentation
+- Keep issue descriptions up to date
+
+### Synchronization
+- Run sync after CSV changes
+- Validate after sync operations
+- Commit changes together (CSV + generated files)
+- Monitor for sync failures in automation
+
+## Related
+- `/scripts/user-stories/` - CSV files
+- `/scripts/update-user-stories.js` - Main sync script
+- `.github/ISSUE_TEMPLATE/` - Issue templates
+- GitHub Project Boards
