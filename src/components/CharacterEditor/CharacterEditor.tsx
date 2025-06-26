@@ -7,6 +7,7 @@ import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PageError } from '@/components/ui/ErrorDisplay';
+import { Button } from '@/components/ui/button';
 import { PortraitSection } from './components/PortraitSection';
 import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
@@ -258,28 +259,27 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Action Buttons */}
       <div className="flex justify-between pt-4 border-t">
-        <button 
+        <Button 
+          variant="destructive"
           onClick={() => setShowDeleteDialog(true)}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
           disabled={saving}
         >
           Delete Character
-        </button>
+        </Button>
         <div className="flex space-x-4">
-          <button 
+          <Button 
+            variant="outline"
             onClick={handleCancel}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer"
             disabled={saving}
           >
             Cancel
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 cursor-pointer"
             disabled={saving}
           >
             {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          </Button>
         </div>
       </div>
       

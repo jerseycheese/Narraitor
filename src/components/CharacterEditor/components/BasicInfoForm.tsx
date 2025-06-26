@@ -1,6 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 
 interface BasicInfoFormProps {
   name: string;
@@ -39,31 +40,29 @@ export const BasicInfoForm: React.FC<BasicInfoFormProps> = ({
           <Label htmlFor="character-level">
             Level
           </Label>
-          <select
+          <Select
             id="character-level"
             value={level}
             onChange={(e) => onLevelChange(parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(level => (
               <option key={level} value={level}>Level {level}</option>
             ))}
-          </select>
+          </Select>
         </div>
         
         <div className="space-y-2">
           <Label htmlFor="character-type">
             Character Type
           </Label>
-          <select
+          <Select
             id="character-type"
             value={isPlayer ? 'player' : 'npc'}
             onChange={(e) => onPlayerTypeChange(e.target.value === 'player')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="player">Player Character</option>
             <option value="npc">Non-Player Character (NPC)</option>
-          </select>
+          </Select>
         </div>
       </div>
     </div>
