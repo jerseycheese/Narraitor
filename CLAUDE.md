@@ -176,6 +176,27 @@ test('displays all required world information', () => {
 - Performance considerations must be documented
 - Accessibility must be built-in, not added later
 
+## Documentation Standards
+New documentation should follow these guidelines for consistency and AI-readability:
+
+### Content Structure
+- **Lead with essentials**: Start with what/how, skip lengthy introductions
+- **Target length**: 150 lines max per doc, 300 absolute maximum
+- **Focus on implementation**: Practical guidance over theoretical explanations
+- **Use clear headings**: Make content scannable for both humans and AI
+
+### Tone Guidelines
+- **Direct and practical**: Write for personal reference and AI consumption
+- **Avoid corporate language**: Skip "This document outlines comprehensive..." style openings
+- **Use active voice**: "Configure the API" not "The API should be configured"
+- **Be concise**: One concept per paragraph, eliminate filler words
+
+### File Organization
+- **Consolidate related topics**: Don't create separate docs for closely related concepts
+- **Archive completed implementation plans**: Move to `/archive/` after feature completion
+- **Use consistent naming**: `[feature]-[type].md` (e.g., `character-creation-guide.md`)
+- **Update frontmatter**: Keep `updated` dates current, remove unused metadata
+
 ## GitHub Workflow
 - Always link commits to issues
 - Use semantic commit messages
