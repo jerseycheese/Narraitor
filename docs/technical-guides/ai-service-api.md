@@ -378,6 +378,11 @@ This implementation uses the new `@google/genai` SDK (currently in preview) whic
 - Client initialization: `new GoogleGenAI({ apiKey })`
 - Content generation: `genAI.models.generateContent()`
 
+## Related Documentation
+
+- [AI Response Parser Improvements](../fixes/ai-response-parser-improvements.md) - Detailed JSON parsing enhancements and error recovery
+- [Error Handling Guide](./error-handling.md) - General error handling patterns
+
 ## Future Enhancements
 
 - Token usage tracking and cost monitoring

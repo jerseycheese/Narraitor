@@ -152,7 +152,15 @@ src/
 - **Parent Epic**: #499 (Modern UI Component System)
 - **Next Steps**: #501 (Command Palette), #502 (Dialogs), #503 (Form Migration)
 
+## Accessibility
+For comprehensive accessibility implementation guidance, especially for dialog components, see:
+- [Dialog Accessibility Improvements](../fixes/dialog-accessibility-improvements.md) - WCAG-compliant dialog implementation
+- [WCAG Compliance Guidelines](../fixes/dialog-accessibility-improvements.md#wcag-compliance) - Detailed accessibility standards
+
 ## Resources
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [Tailwind CSS v4 Documentation](https://tailwindcss.com/docs)
 - [Radix UI Documentation](https://www.radix-ui.com/)
+
+## Related Documentation
+- [Dialog Accessibility Improvements](../fixes/dialog-accessibility-improvements.md) - Accessibility implementation for dialog components

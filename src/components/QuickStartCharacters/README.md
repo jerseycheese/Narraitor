@@ -201,3 +201,8 @@ const customWorld = {
 - **Badge**: UI component for displaying character attributes and skills
 - **Button**: UI component for actions and selection
 - **Card**: UI components for character archetype layout
+
+## Related Documentation
+
+- [QuickStart Character Integration Fix](../../../docs/fixes/quickstart-character-integration-fix.md) - Comprehensive implementation details and troubleshooting
+- [AI Response Parser Improvements](../../../docs/fixes/ai-response-parser-improvements.md) - Error handling for character generation
