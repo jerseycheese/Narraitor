@@ -1,220 +1,206 @@
 ---
-title: State Management Usage Guide
-aliases: [State Management, Zustand Usage]
-tags: [narraitor, documentation, technical-guide, state-management]
+title: State Management Usage
+tags: [state-management, zustand]
 created: 2025-05-13
-updated: 2025-05-13
+updated: 2025-06-26
 ---
 
-# State Management Usage Guide
+# State Management Usage
 
-This guide provides practical examples for using the Narraitor state management system, which is built with Zustand.
+Practical guide for using Zustand stores in Narraitor.
 
 ## Overview
 
-The Narraitor application uses Zustand for state management, organized into domain-specific stores. Each domain (World, Character, Inventory, etc.) has its own store that manages related state.
-
-## MVP Implementation Status
-
-The current implementation includes:
-- Basic store initialization with default values
-- TypeScript type definitions for all stores
-- IndexedDB persistence configuration (not yet integrated)
-- Unit tests for store initialization
-
-What's NOT included (out of MVP scope):
-- Complex state actions and mutations
-- Cross-domain state interactions
-- Actual persistence implementation
-- Advanced features like time-travel debugging
+Narraitor uses Zustand for state management with domain-specific stores. Each domain (World, Character, Narrative, etc.) has its own store managing related state and operations.
 
 ## Available Stores
 
-| Store | Purpose | Type |
-|-------|---------|------|
-| `worldStore` | Manages world configurations | `World` |
-| `characterStore` | Manages character data | `Character` |
-| `inventoryStore` | Manages inventory state | `Inventory` |
-| `narrativeStore` | Manages narrative segments | `{ segments: NarrativeSegment[] }` |
-| `journalStore` | Manages journal entries | `{ entries: JournalEntry[] }` |
-| `sessionStore` | Manages game sessions | `GameSession` |
-| `aiContextStore` | Manages AI context data | `AIContext` |
+| Store | Purpose | Features |
+|-------|---------|----------|
+| `useWorldStore` | World configurations | CRUD operations, IndexedDB persistence |
+| `useCharacterStore` | Character data | Multi-character support, attribute/skill management |
+| `useNarrativeStore` | Story segments | Context management, decision tracking |
+| `useJournalStore` | Journal entries | Session grouping, entry categorization |
+| `useSessionStore` | Game sessions | Session state, navigation tracking |
+| `useInventoryStore` | Item management | Equipment tracking, item effects |
+| `useAiContextStore` | AI prompt context | Context building, token management |
 
 ## Basic Usage
 
-### Importing Stores
+### Importing and Using Stores
 
 ```typescript
-import { 
-  worldStore, 
-  characterStore, 
-  inventoryStore,
-  narrativeStore,
-  journalStore,
-  sessionStore,
-  aiContextStore
-} from '@/state';
-```
+import { useWorldStore } from '@/state/worldStore';
 
-### Accessing State
-
-```typescript
-// Get current state
-const worldState = worldStore.getState();
-const characterState = characterStore.getState();
-
-// Use in React components
+// In a React component
 function MyComponent() {
-  const world = worldStore();
-  const character = characterStore();
+  const { worlds, createWorld, currentWorldId } = useWorldStore();
+  const { characters, createCharacter } = useCharacterStore();
   
   return (
     <div>
-      <h1>{world.name}</h1>
-      <p>{character.name}</p>
+      <h1>Current World: {worlds[currentWorldId]?.name}</h1>
+      <p>Characters: {Object.keys(characters).length}</p>
     </div>
   );
 }
 ```
 
-### Subscribing to Changes
+### Store Actions
 
 ```typescript
-// Subscribe to state changes
-const unsubscribe = worldStore.subscribe(
-  (state) => {
-    console.log('World state changed:', state);
-  }
-);
+// World operations
+const { createWorld, updateWorld, deleteWorld, setCurrentWorld } = useWorldStore();
 
-// Clean up subscription
-unsubscribe();
+// Create new world
+const worldId = createWorld({
+  name: 'Fantasy Realm',
+  genre: 'fantasy',
+  description: 'A magical world of wizards and dragons'
+});
+
+// Update existing world
+updateWorld(worldId, { description: 'Updated description' });
+
+// Set as current world
+setCurrentWorld(worldId);
 ```
 
-## Testing Pattern
+### Persistence
 
-The current test pattern verifies store initialization:
+All stores automatically persist to IndexedDB:
 
 ```typescript
-import { characterStore } from '../index';
+// State is automatically saved to IndexedDB
+const { createCharacter } = useCharacterStore();
 
-describe('characterStore', () => {
-  it('initializes with default state', () => {
-    const state = characterStore.getState();
-    expect(state).toBeDefined();
-    expect(state.id).toBe('');
-    expect(state.name).toBe('');
-    // ... other assertions
+// This will be persisted automatically
+createCharacter({
+  name: 'Gandalf',
+  worldId: 'world-123',
+  attributes: [{ id: 'strength', value: 8 }]
+});
+```
+
+## Store Patterns
+
+### Error Handling
+
+```typescript
+const { error, clearError, setError } = useWorldStore();
+
+// Check for errors
+if (error) {
+  return <div>Error: {error}</div>;
+}
+
+// Clear errors
+const handleRetry = () => {
+  clearError();
+  // Retry operation
+};
+```
+
+### Loading States
+
+```typescript
+const { loading, setLoading } = useNarrativeStore();
+
+const generateNarrative = async () => {
+  setLoading(true);
+  try {
+    // AI generation logic
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+### Selectors
+
+```typescript
+// Select specific data from store
+const currentWorld = useWorldStore((state) => 
+  state.worlds[state.currentWorldId]
+);
+
+const characterCount = useCharacterStore((state) => 
+  Object.keys(state.characters).length
+);
+```
+
+## Testing Stores
+
+```typescript
+import { useCharacterStore } from '@/state/characterStore';
+
+describe('CharacterStore', () => {
+  beforeEach(() => {
+    useCharacterStore.getState().reset();
+  });
+
+  it('creates character successfully', () => {
+    const { createCharacter, characters } = useCharacterStore.getState();
+    
+    const characterId = createCharacter({
+      name: 'Test Character',
+      worldId: 'world-1'
+    });
+    
+    expect(characters[characterId]).toMatchObject({
+      name: 'Test Character',
+      worldId: 'world-1'
+    });
   });
 });
 ```
 
-## Persistence Configuration
+## Common Patterns
 
-The persistence configuration is defined in `persistence.ts`:
-
-```typescript
-export const persistConfig = { name: 'narraitor-state' };
-```
-
-This configuration is intended for future integration with IndexedDB middleware.
-
-## TypeScript Support
-
-All stores are fully typed using the domain types from `@/types`:
+### Cross-Store Dependencies
 
 ```typescript
-// Example: Using typed state
-const character: Character = characterStore.getState();
-
-// Type-safe access to properties
-const characterName: string = character.name;
-const attributes: CharacterAttribute[] = character.attributes;
+// Get data from multiple stores
+function GameSession() {
+  const { worlds, currentWorldId } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { segments } = useNarrativeStore();
+  
+  const currentWorld = worlds[currentWorldId];
+  const worldCharacters = Object.values(characters)
+    .filter(char => char.worldId === currentWorldId);
+  
+  return (
+    <div>
+      <h1>{currentWorld?.name}</h1>
+      <p>Characters: {worldCharacters.length}</p>
+      <p>Story segments: {segments.length}</p>
+    </div>
+  );
+}
 ```
 
-## Future Enhancements
+### Computed Values
 
-The following features are planned for post-MVP implementation:
-- State actions (create, update, delete operations)
-- Persistence middleware integration
-- Cross-store selectors
-- Computed state values
-- State validation
+```typescript
+// Create computed selectors
+const useWorldStats = (worldId: string) => {
+  return useCharacterStore((state) => {
+    const worldCharacters = Object.values(state.characters)
+      .filter(char => char.worldId === worldId);
+    
+    return {
+      characterCount: worldCharacters.length,
+      totalLevels: worldCharacters.reduce((sum, char) => sum + char.level, 0)
+    };
+  });
+};
+```
 
 ## Best Practices
 
-1. **Access state directly**: For MVP, access state properties directly from stores
-2. **Use TypeScript**: Leverage type definitions for type safety
-3. **Keep it simple**: MVP implementation focuses on basic state management
-4. **Test initialization**: Ensure stores initialize with correct default values
-
-## Examples
-
-### Accessing World Data
-
-```typescript
-import { worldStore } from '@/state';
-
-function WorldInfo() {
-  const world = worldStore();
-  
-  return (
-    <div>
-      <h2>{world.name || 'No World Selected'}</h2>
-      <p>Theme: {world.theme || 'None'}</p>
-      <p>Created: {world.createdAt}</p>
-    </div>
-  );
-}
-```
-
-### Accessing Character Inventory
-
-```typescript
-import { characterStore, inventoryStore } from '@/state';
-
-function CharacterInventory() {
-  const character = characterStore();
-  const inventory = inventoryStore();
-  
-  return (
-    <div>
-      <h3>{character.name}'s Inventory</h3>
-      <p>Items: {inventory.items.length}</p>
-      <p>Capacity: {inventory.capacity}</p>
-    </div>
-  );
-}
-```
-
-### Working with Journal Entries
-
-```typescript
-import { journalStore } from '@/state';
-
-function JournalViewer() {
-  const { entries } = journalStore();
-  
-  return (
-    <div>
-      <h3>Journal Entries</h3>
-      <p>Total Entries: {entries.length}</p>
-      {entries.map((entry, index) => (
-        <div key={index}>
-          {/* Render entry content */}
-        </div>
-      ))}
-    </div>
-  );
-}
-```
-
-## Limitations (MVP Scope)
-
-- Stores only contain initial state without modification capabilities
-- No persistence implementation (configuration only)
-- No complex state derivation or computed values
-- No middleware integration
-- No state action creators
-
-For more advanced state management features, these will be implemented in future development phases as outlined in the project roadmap.
+1. **Use selectors** for performance optimization
+2. **Reset state** in tests to avoid test pollution
+3. **Handle errors** gracefully with error states
+4. **Batch updates** when making multiple changes
+5. **Use TypeScript** for type safety throughout
