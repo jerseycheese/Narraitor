@@ -2,7 +2,6 @@
  * Tests for SaveIndicator component - TDD Implementation
  */
 
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SaveIndicator } from '../SaveIndicator';
 

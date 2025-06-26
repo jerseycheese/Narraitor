@@ -10,6 +10,41 @@ export interface AIResponse {
 }
 
 /**
+ * Attempt to repair truncated or malformed JSON
+ */
+function attemptJsonRepair(jsonStr: string): string {
+  let repaired = jsonStr.trim();
+  
+  // Count braces and brackets to detect truncation
+  const openBraces = (repaired.match(/\{/g) || []).length;
+  const closeBraces = (repaired.match(/\}/g) || []).length;
+  const openBrackets = (repaired.match(/\[/g) || []).length;
+  const closeBrackets = (repaired.match(/\]/g) || []).length;
+  
+  // If we have unmatched opening braces/brackets, try to close them
+  if (openBraces > closeBraces || openBrackets > closeBrackets) {
+    // Remove trailing incomplete elements (like unclosed strings or arrays)
+    // Look for patterns that suggest truncation
+    repaired = repaired.replace(/,\s*$/, ''); // Remove trailing comma
+    repaired = repaired.replace(/,\s*[^,}]+$/, ''); // Remove incomplete last element
+    repaired = repaired.replace(/:\s*[^,}]*$/, ': ""'); // Complete incomplete value with empty string
+    
+    // Close unmatched brackets
+    const missingCloseBrackets = openBrackets - closeBrackets;
+    const missingCloseBraces = openBraces - closeBraces;
+    
+    for (let i = 0; i < missingCloseBrackets; i++) {
+      repaired += ']';
+    }
+    for (let i = 0; i < missingCloseBraces; i++) {
+      repaired += '}';
+    }
+  }
+  
+  return repaired;
+}
+
+/**
  * Parse JSON from AI response with proper error handling and markdown code block support
  */
 export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: string = 'Failed to parse AI response'): T {
@@ -32,7 +67,15 @@ export function parseAIJsonResponse<T>(response: AIResponse, errorMessage: strin
         // Use a more flexible regex that allows nested objects
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-          return JSON.parse(jsonMatch[0]);
+          // Try to parse the JSON, but if it fails due to truncation, attempt to fix it
+          let jsonStr = jsonMatch[0];
+          try {
+            return JSON.parse(jsonStr);
+          } catch {
+            // If JSON appears to be truncated, try to complete it
+            jsonStr = attemptJsonRepair(jsonStr);
+            return JSON.parse(jsonStr);
+          }
         } else {
           throw new Error('No valid JSON found in response');
         }

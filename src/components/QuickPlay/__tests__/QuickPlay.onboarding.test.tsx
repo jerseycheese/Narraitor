@@ -41,11 +41,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('First-time user experience', () => {
     beforeEach(() => {
       // Mock first-time user state
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: false,
-        isFirstTimeUser: () => true,
-        shouldShowOnboarding: () => true,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: false,
+          isFirstTimeUser: () => true,
+          shouldShowOnboarding: () => true,
+        };
+        return selector ? selector(mockState) : mockState;
       });
     });
 
@@ -69,11 +72,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('Returning user experience', () => {
     beforeEach(() => {
       // Mock returning user state (onboarding completed, no saved sessions yet)
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: true,
-        isFirstTimeUser: () => false,
-        shouldShowOnboarding: () => false,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: true,
+          isFirstTimeUser: () => false,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
     });
 
@@ -130,14 +136,17 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     beforeEach(() => {
       // Mock returning user with saved sessions
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {
-          'session-1': mockSavedSession,
-        },
-        onboardingCompleted: true,
-        isFirstTimeUser: () => false,
-        shouldShowOnboarding: () => false,
-        resumeSavedSession: jest.fn().mockReturnValue(true),
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {
+            'session-1': mockSavedSession,
+          },
+          onboardingCompleted: true,
+          isFirstTimeUser: () => false,
+          shouldShowOnboarding: () => false,
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+        };
+        return selector ? selector(mockState) : mockState;
       });
       
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
@@ -175,11 +184,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('User who skipped onboarding', () => {
     beforeEach(() => {
       // Mock user who completed onboarding (via skip) but has no saved sessions
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: true,
-        isFirstTimeUser: () => false,
-        shouldShowOnboarding: () => false,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: true,
+          isFirstTimeUser: () => false,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
     });
 
@@ -202,11 +214,14 @@ describe('QuickPlay - Onboarding Integration', () => {
   describe('Edge cases', () => {
     it('handles corrupted onboarding state gracefully', () => {
       // Mock corrupted state
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: undefined, // Corrupted
-        isFirstTimeUser: () => true, // Fallback to true
-        shouldShowOnboarding: () => true,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: undefined, // Corrupted
+          isFirstTimeUser: () => true, // Fallback to true
+          shouldShowOnboarding: () => true,
+        };
+        return selector ? selector(mockState) : mockState;
       });
 
       render(<QuickPlay />);
@@ -217,10 +232,13 @@ describe('QuickPlay - Onboarding Integration', () => {
 
     it('handles missing helper methods gracefully', () => {
       // Mock state without helper methods
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: false,
-        // Missing isFirstTimeUser and shouldShowOnboarding methods
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: false,
+          // Missing isFirstTimeUser and shouldShowOnboarding methods
+        };
+        return selector ? selector(mockState) : mockState;
       });
 
       render(<QuickPlay />);

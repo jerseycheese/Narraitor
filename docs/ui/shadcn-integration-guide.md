@@ -152,6 +152,13 @@ src/
 - **Parent Epic**: #499 (Modern UI Component System)
 - **Next Steps**: #501 (Command Palette), #502 (Dialogs), #503 (Form Migration)
 
+## Accessibility
+Dialog components built with shadcn/ui must follow WCAG accessibility standards:
+- DialogTitle must be a direct child of DialogContent (not nested in DialogHeader)
+- Proper ARIA labeling with aria-labelledby and aria-describedby
+- Keyboard navigation support and focus management
+- Screen reader compatibility with proper announcements
+
 ## Resources
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [Tailwind CSS v4 Documentation](https://tailwindcss.com/docs)

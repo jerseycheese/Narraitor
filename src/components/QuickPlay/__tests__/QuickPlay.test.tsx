@@ -27,10 +27,14 @@ describe('QuickPlay', () => {
 
   describe('when no saved sessions exist', () => {
     beforeEach(() => {
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {},
-        onboardingCompleted: true, // Assume onboarding completed for regular tests
-        shouldShowOnboarding: () => false, // Don't show onboarding for these tests
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {},
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+        };
+        return selector ? selector(mockState) : mockState;
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},
@@ -89,13 +93,16 @@ describe('QuickPlay', () => {
     };
 
     beforeEach(() => {
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {
@@ -126,13 +133,16 @@ describe('QuickPlay', () => {
 
     it('should resume session and navigate when "Continue Last Game" is clicked', async () => {
       const mockResume = jest.fn().mockReturnValue(true);
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: mockResume,
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: mockResume,
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
 
       render(<QuickPlay />);
@@ -152,14 +162,17 @@ describe('QuickPlay', () => {
         lastPlayed: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
       };
 
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {
-          'session-old': olderSession,
-          'session-1': mockSavedSession,
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {
+            'session-old': olderSession,
+            'session-1': mockSavedSession,
+          },
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
 
       render(<QuickPlay />);
@@ -171,19 +184,22 @@ describe('QuickPlay', () => {
 
   describe('when saved session references deleted world/character', () => {
     beforeEach(() => {
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        savedSessions: {
-          'session-1': {
-            id: 'session-1',
-            worldId: 'deleted-world',
-            characterId: 'deleted-char',
-            lastPlayed: new Date().toISOString(),
-            narrativeCount: 3,
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          savedSessions: {
+            'session-1': {
+              id: 'session-1',
+              worldId: 'deleted-world',
+              characterId: 'deleted-char',
+              lastPlayed: new Date().toISOString(),
+              narrativeCount: 3,
+            },
           },
-        },
-        resumeSavedSession: jest.fn().mockReturnValue(true),
-        onboardingCompleted: true,
-        shouldShowOnboarding: () => false,
+          resumeSavedSession: jest.fn().mockReturnValue(true),
+          onboardingCompleted: true,
+          shouldShowOnboarding: () => false,
+        };
+        return selector ? selector(mockState) : mockState;
       });
       (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: {},

@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { World } from '@/types/world.types';
 import { 
   CharacterArchetype, 
@@ -38,7 +38,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
 
-  const generateArchetypes = useCallback(async () => {
+  const generateArchetypes = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -47,22 +47,15 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(`Unable to generate character options: ${errorMessage}`);
-      console.error('Failed to generate archetypes:', err);
-      console.error('Error details:', {
-        error: err,
-        message: errorMessage,
-        stack: err instanceof Error ? err.stack : undefined
-      });
-      console.error('World data:', world);
-      console.error('Existing names:', existingCharacterNames);
     } finally {
       setLoading(false);
     }
-  }, [world, existingCharacterNames]);
+  };
 
   useEffect(() => {
     generateArchetypes();
-  }, [generateArchetypes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
 
   const handleArchetypeSelect = (archetype: CharacterArchetype) => {
     setSelectedArchetype(archetype.id);
@@ -72,14 +65,14 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }, SELECTION_DELAY_MS);
   };
 
+
   const handleRandomSelect = async () => {
     try {
       setLoading(true);
       const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
       handleArchetypeSelect(randomArchetype);
-    } catch (err) {
+    } catch {
       setError('Failed to generate random character. Please try again.');
-      console.error('Failed to generate random archetype:', err);
     } finally {
       setLoading(false);
     }

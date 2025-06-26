@@ -86,25 +86,23 @@ export function AchievementDialog({
         >
           {title || "Achievement Unlocked"}
         </DialogTitle>
+        
+        {icon && (
+          <div className="flex justify-center text-4xl mb-2">
+            {icon}
+          </div>
+        )}
+        
         <DialogHeader className="space-y-4">
-          {icon && (
-            <div className="flex justify-center text-4xl mb-2">
-              {icon}
-            </div>
-          )}
-          
           <DialogDescription
             id="achievement-description"
             className="text-base text-gray-700"
-            asChild
           >
-            <div>
-              {typeof description === 'string' ? (
-                <p>{description}</p>
-              ) : (
-                description
-              )}
-            </div>
+            {typeof description === 'string' ? (
+              description
+            ) : (
+              description
+            )}
           </DialogDescription>
         </DialogHeader>
 

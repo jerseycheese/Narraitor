@@ -84,7 +84,7 @@ describe('MVP IndexedDB Persistence', () => {
       // Create new instance with failing create - need to reset modules
       jest.resetModules();
       // Use CommonJS require syntax to avoid import error in tests
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+       
       const { createIndexedDBStorage: errorStorage } = require('../../persistence');
       const errorAdapter = errorStorage();
       

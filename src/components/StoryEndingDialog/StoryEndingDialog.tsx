@@ -74,25 +74,22 @@ export function StoryEndingDialog({
         aria-labelledby="story-ending-title"
         aria-describedby="story-ending-content"
       >
+        <DialogTitle
+          id="story-ending-title"
+          className="text-xl font-bold text-center mb-4"
+        >
+          {(title && title.trim()) || "Story Ending"}
+        </DialogTitle>
         <DialogHeader>
-          <DialogTitle
-            id="story-ending-title"
-            className="text-xl font-bold text-center mb-4"
-          >
-            {title || "Story Ending"}
-          </DialogTitle>
           <DialogDescription
             id="story-ending-content"
             className="text-base leading-relaxed text-gray-700"
-            asChild
           >
-            <div>
-              {typeof content === 'string' ? (
-                <p>{content}</p>
-              ) : (
-                content
-              )}
-            </div>
+            {typeof content === 'string' ? (
+              content
+            ) : (
+              content
+            )}
           </DialogDescription>
         </DialogHeader>
         

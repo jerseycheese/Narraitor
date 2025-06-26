@@ -98,9 +98,12 @@ describe('GuidedFirstTimeExperience', () => {
     (validateField as jest.Mock).mockReturnValue(null);
     
     // Mock useSessionStore
-    (useSessionStore as unknown as jest.Mock).mockReturnValue({
-      setOnboardingCompleted: mockSetOnboardingCompleted,
-      shouldShowOnboarding: jest.fn().mockReturnValue(true),
+    (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const mockState = {
+        setOnboardingCompleted: mockSetOnboardingCompleted,
+        shouldShowOnboarding: jest.fn().mockReturnValue(true),
+      };
+      return selector ? selector(mockState) : mockState;
     });
 
     // Mock useWorldStore 
@@ -123,9 +126,12 @@ describe('GuidedFirstTimeExperience', () => {
     });
 
     it('does not render when onboarding should not be shown', () => {
-      (useSessionStore as unknown as jest.Mock).mockReturnValue({
-        setOnboardingCompleted: mockSetOnboardingCompleted,
-        shouldShowOnboarding: jest.fn().mockReturnValue(false),
+      (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+        const mockState = {
+          setOnboardingCompleted: mockSetOnboardingCompleted,
+          shouldShowOnboarding: jest.fn().mockReturnValue(false),
+        };
+        return selector ? selector(mockState) : mockState;
       });
 
       const { container } = render(<GuidedFirstTimeExperience />);

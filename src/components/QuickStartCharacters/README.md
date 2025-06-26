@@ -201,3 +201,18 @@ const customWorld = {
 - **Badge**: UI component for displaying character attributes and skills
 - **Button**: UI component for actions and selection
 - **Card**: UI components for character archetype layout
+
+## Implementation Notes
+
+### Error Handling
+The component includes robust error handling for AI generation failures:
+- Automatic retry with exponential backoff for transient errors
+- JSON parsing repair for malformed AI responses
+- Fallback to genre-appropriate default archetypes when generation fails
+- User-friendly error messages with retry functionality
+
+### URL Parameter Integration
+When used in character creation flow:
+- Automatically extracts worldId from URL parameters
+- Synchronizes with world store state
+- Handles navigation between QuickStart and custom character creation
