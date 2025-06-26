@@ -1,214 +1,156 @@
 ---
-title: Domain Integration Protocols
-aliases: [Cross-Domain Communication, Domain Boundaries]
-tags: [narraitor, architecture, integration]
+title: Domain Integration
+tags: [architecture, domains, integration]
 created: 2025-04-29
-updated: 2025-04-29
+updated: 2025-06-26
 ---
 
-# Domain Integration Protocols
+# Domain Integration
 
-## Overview
-This document defines how the different domains within Narraitor communicate and interact with each other, establishing clear interfaces, data flow patterns, and error handling protocols at domain boundaries.
+How different domains communicate and integrate using Zustand stores.
 
-## Domain Communication Principles
-1. **Loose Coupling**: Domains should interact through well-defined interfaces only
-2. **Unidirectional Data Flow**: Domain data changes follow a unidirectional flow pattern
-3. **Explicit State Management**: Domain state is managed through dedicated reducers
-4. **Error Isolation**: Errors in one domain should not cascade to others
-5. **Minimal Shared State**: Domains should only share what is absolutely necessary
+## Domain Boundaries
 
-## Core Domain Interfaces
+**Core Domains:**
+- **World**: World configuration, attributes, skills
+- **Character**: Character data, progression, attributes
+- **Narrative**: Story generation, choices, progression
+- **Journal**: Entry tracking, session history
+- **Session**: Game state, navigation
+- **Inventory**: Items, equipment, effects
+- **AI Context**: Prompt management, context building
 
-### World Domain Interfaces
+## Integration Principles
+
+1. **Store Independence**: Each domain has its own Zustand store
+2. **Cross-Store Communication**: Components access multiple stores as needed
+3. **Consistent Patterns**: All stores follow the same CRUD structure
+4. **Error Isolation**: Domain errors don't cascade to other domains
+5. **Type Safety**: TypeScript interfaces ensure contract compliance
+
+## Integration Patterns
+
+### Cross-Domain Data Access
 
 ```typescript
-// Public interface for World domain
-interface WorldDomainInterface {
-  // State access
-  getCurrentWorld(): World | null;
-  getAllWorlds(): World[];
-  getWorldById(id: string): World | null;
+// Component accessing multiple domains
+function GameSession() {
+  const { worlds, currentWorldId } = useWorldStore();
+  const { characters } = useCharacterStore();
+  const { segments } = useNarrativeStore();
+  const { entries } = useJournalStore();
   
-  // Operations
-  createWorld(world: WorldCreationParams): Promise<World>;
-  updateWorld(id: string, updates: Partial<World>): Promise<World>;
-  deleteWorld(id: string): Promise<boolean>;
+  const currentWorld = worlds[currentWorldId];
+  const worldCharacters = Object.values(characters)
+    .filter(char => char.worldId === currentWorldId);
   
-  // Error handling
-  getWorldErrors(): WorldErrorState;
-  clearWorldErrors(): void;
+  return (
+    <div>
+      <h1>{currentWorld?.name}</h1>
+      <p>Characters: {worldCharacters.length}</p>
+      <p>Story segments: {segments.length}</p>
+      <p>Journal entries: {entries.length}</p>
+    </div>
+  );
 }
 ```
 
-### Character Domain Interfaces
+### Store-to-Store Communication
 
 ```typescript
-// Public interface for Character domain
-interface CharacterDomainInterface {
-  // State access
-  getCurrentCharacter(): Character | null;
-  getCharactersByWorldId(worldId: string): Character[];
-  getCharacterById(id: string): Character | null;
+// Character creation references world data
+function createCharacterForWorld(worldId: string, characterData: any) {
+  const { worlds } = useWorldStore.getState();
+  const { createCharacter } = useCharacterStore.getState();
   
-  // Operations
-  createCharacter(character: CharacterCreationParams): Promise<Character>;
-  updateCharacter(id: string, updates: Partial<Character>): Promise<Character>;
-  deleteCharacter(id: string): Promise<boolean>;
+  const world = worlds[worldId];
+  if (!world) throw new Error('World not found');
   
-  // Error handling
-  getCharacterErrors(): CharacterErrorState;
-  clearCharacterErrors(): void;
+  // Use world attributes/skills for validation
+  const character = createCharacter({
+    ...characterData,
+    worldId,
+    attributes: validateAttributes(characterData.attributes, world.attributes)
+  });
+  
+  return character;
 }
 ```
 
-### Narrative Domain Interfaces
+### Event-Driven Updates
 
 ```typescript
-// Public interface for Narrative domain
-interface NarrativeDomainInterface {
-  // State access
-  getCurrentNarrativeSession(): NarrativeSession | null;
-  getNarrativeHistory(): NarrativeEntry[];
-  getCurrentChoices(): PlayerChoice[];
+// Narrative generation triggers journal entries
+function generateNarrativeWithJournal(sessionId: string, choice: string) {
+  const { addSegment } = useNarrativeStore.getState();
+  const { createEntry } = useJournalStore.getState();
   
-  // Operations
-  startNarrativeSession(params: SessionStartParams): Promise<NarrativeSession>;
-  selectChoice(choiceId: string): Promise<NarrativeEntry>;
-  generateNarrative(prompt: string): Promise<NarrativeEntry>;
+  // Generate narrative
+  const segment = addSegment({
+    sessionId,
+    content: `Player chose: ${choice}`,
+    type: 'player-action'
+  });
   
-  // Error handling
-  getNarrativeErrors(): NarrativeErrorState;
-  clearNarrativeErrors(): void;
+  // Auto-create journal entry
+  createEntry({
+    sessionId,
+    type: 'decision',
+    content: choice,
+    narrativeSegmentId: segment.id
+  });
+  
+  return segment;
 }
 ```
 
-### Journal Domain Interfaces
+## Error Handling
+
+Each store manages its own error state:
 
 ```typescript
-// Public interface for Journal domain
-interface JournalDomainInterface {
-  // State access
-  getAllEntries(): JournalEntry[];
-  getEntriesBySession(sessionId: string): JournalEntry[];
-  getFilteredEntries(filters: JournalFilters): JournalEntry[];
-  
-  // Operations
-  createEntry(entry: JournalEntryParams): Promise<JournalEntry>;
-  updateEntry(id: string, updates: Partial<JournalEntry>): Promise<JournalEntry>;
-  deleteEntry(id: string): Promise<boolean>;
-  
-  // Error handling
-  getJournalErrors(): JournalErrorState;
-  clearJournalErrors(): void;
-}
+// Store-level error handling
+const handleError = (error: Error, operation: string) => {
+  console.error(`${operation} failed:`, error);
+  setError(`Failed to ${operation}: ${error.message}`);
+  setLoading(false);
+};
+
+// Cross-store error isolation
+const createCharacterSafely = (worldId: string, data: any) => {
+  try {
+    const world = useWorldStore.getState().worlds[worldId];
+    if (!world) {
+      throw new Error('World not found');
+    }
+    return createCharacter({ ...data, worldId });
+  } catch (error) {
+    handleError(error, 'create character');
+    return null;
+  }
+};
 ```
 
-## Cross-Domain Data Flows
+## Integration Testing
 
-### World → Character Flow
-- **Data Direction**: World configuration affects character creation options
-- **Flow Trigger**: Loading a world for character creation
-- **Data Passed**: Attribute definitions, skill definitions, world theme
-- **Implementation**: Character creation wizard receives world configuration
-- **Error Handling**: Invalid world data triggers error in character domain
+Test cross-domain functionality with realistic scenarios:
 
-### Character → Narrative Flow
-- **Data Direction**: Character details inform narrative generation
-- **Flow Trigger**: Starting a narrative session with a character
-- **Data Passed**: Character attributes, skills, background
-- **Implementation**: Narrative generation includes character context
-- **Error Handling**: Invalid character data triggers error in narrative session start
-
-### Narrative → Journal Flow
-- **Data Direction**: Narrative events create journal entries
-- **Flow Trigger**: Significant narrative events, player decisions
-- **Data Passed**: Event details, timestamp, context
-- **Implementation**: Event listeners in narrative domain call journal entry creation
-- **Error Handling**: Journal entry creation failures don't block narrative progression
-
-### Journal → Character Flow
-- **Data Direction**: Journal entries may affect character development
-- **Flow Trigger**: Character reviewing journal entries
-- **Data Passed**: Relevant past decisions and events
-- **Implementation**: Character development references journal history
-- **Error Handling**: Missing journal entries don't prevent character operations
-
-## Error Handling Protocols
-
-### Domain-Level Error Handling
-1. **Error Containment**: Errors should be handled at the domain level first
-2. **Error Transformation**: Domain-specific errors into user-friendly messages
-3. **Error State**: Each domain maintains its own error state
-4. **Error Recovery**: Domains define recovery paths for different error types
-
-### Cross-Domain Error Protocols
-1. **Error Propagation**: When an error should be communicated across domains
-2. **Failure Isolation**: Preventing cascading failures across domains
-3. **Default Values**: Using sensible defaults when cross-domain data is missing
-4. **Degraded Operation**: Continuing with limited functionality when dependencies fail
-
-### Error Types and Responses
-
-| Error Type | Domain Response | Cross-Domain Impact | UI Indication |
-|------------|----------------|---------------------|--------------|
-| Network Error | Retry with backoff | None until retries exhausted | Loading indicator |
-| Validation Error | Return detailed field errors | Block dependent operations | Field error messages |
-| Data Consistency Error | Attempt auto-repair | Alert dependent domains | Warning message |
-| Fatal Error | Reset to known good state | Force reload of dependent domains | Error modal |
-
-## Domain State Dependencies
-
-### Primary Dependencies
-- **Character** depends on **World** for attribute definitions
-- **Narrative** depends on **Character** for player context
-- **Journal** depends on **Narrative** for entry creation
-- **UI State** depends on all domains for display
-
-### Secondary Dependencies
-- **World** may reference **Character** count
-- **Character** may reference **Journal** for history
-- **Narrative** may reference **Journal** for continuity
-
-## Implementation Guidelines
-
-### Data Access Patterns
-- Use domain hooks to access data from other domains
-- Use selectors to derive data from domain state
-- Use domain context providers to make state available
-
-### Event Communication
-- Use event dispatchers for cross-domain communication
-- Use middleware for side effects that affect multiple domains
-- Use observer pattern for loosely coupled updates
-
-### Testing Considerations
-- Mock dependencies when testing cross-domain functionality
-- Use test boundaries that align with domain boundaries
-- Create integration tests specifically for domain interfaces
-
-## Example Cross-Domain Scenario
-
-### Creating a Character in a World
-
-```mermaid
-sequenceDiagram
-    participant UI as User Interface
-    participant WD as World Domain
-    participant CD as Character Domain
-    participant ST as State Management
-    
-    UI->>WD: getCurrentWorld()
-    WD-->>UI: worldConfiguration
-    UI->>CD: initializeCharacterCreation(worldId)
-    CD->>WD: getWorldById(worldId)
-    WD-->>CD: worldConfiguration
-    CD-->>UI: characterCreationContext
-    UI->>CD: createCharacter(characterData)
-    CD->>CD: validateAgainstWorld(characterData, worldConfig)
-    CD->>ST: saveCharacter(validatedData)
-    ST-->>CD: savedCharacter
-    CD-->>UI: creationSuccess
+```typescript
+test('character creation with world validation', () => {
+  const { result: worldStore } = renderHook(() => useWorldStore());
+  const { result: charStore } = renderHook(() => useCharacterStore());
+  
+  // Create test world
+  const worldId = worldStore.current.createWorld(testWorldData);
+  
+  // Create character with world reference
+  const charId = charStore.current.createCharacter({
+    ...testCharData,
+    worldId
+  });
+  
+  expect(charStore.current.characters[charId].worldId).toBe(worldId);
+});
 ```
 
 ## Related Documents
