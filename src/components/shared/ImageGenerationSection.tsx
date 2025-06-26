@@ -18,6 +18,7 @@ interface ImageGenerationSectionProps {
   removeButtonText?: string;
   imageComponent: React.ReactNode;
   className?: string;
+  defaultCustomPromptChecked?: boolean; // Whether the custom prompt checkbox should be checked by default
 }
 
 export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
@@ -37,10 +38,11 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
   regenerateButtonText = "Regenerate Image",
   removeButtonText = "Remove Image",
   imageComponent,
-  className = ""
+  className = "",
+  defaultCustomPromptChecked = !!currentPrompt
 }) => {
-  // Initialize state based on whether there's an existing prompt
-  const [showCustomPrompt, setShowCustomPrompt] = useState(!!currentPrompt);
+  // Initialize state based on the default prop or existing prompt
+  const [showCustomPrompt, setShowCustomPrompt] = useState(defaultCustomPromptChecked);
   const [customPrompt, setCustomPrompt] = useState(currentPrompt || '');
 
   const handleGenerate = () => {
