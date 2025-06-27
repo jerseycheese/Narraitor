@@ -1,6 +1,23 @@
 /**
- * PlayerDecisionTracker - Minimal implementation to pass MVP tests
- * Tracks and analyzes player choice patterns
+ * PlayerDecisionTracker - Advanced Decision Pattern Analysis System
+ * 
+ * This system tracks and analyzes player decision patterns for narrative personalization.
+ * It provides secure storage, pattern analysis, and behavioral insights that drive
+ * the AI's understanding of player preferences and storytelling style.
+ * 
+ * Key Features:
+ * - Secure input validation and sanitization (XSS protection)
+ * - Persistent storage with configurable limits
+ * - Statistical pattern analysis and trend detection
+ * - Session and world-based decision filtering
+ * - Real-time behavioral insights
+ * 
+ * Security: All inputs are validated and sanitized to prevent security vulnerabilities
+ * Storage: Uses IndexedDB for client-side persistence with fallback handling
+ * Performance: Optimized for large decision datasets with efficient filtering
+ * 
+ * @author Narraitor AI System
+ * @since 1.0.0
  */
 
 import { 
@@ -29,7 +46,19 @@ const DEFAULT_CONFIG: DecisionTrackerConfig = {
 };
 
 /**
- * Tracks player decisions for personalization analysis
+ * Tracks player decisions for personalization analysis and behavioral pattern detection
+ * 
+ * The PlayerDecisionTracker maintains a persistent record of player choices and provides
+ * analytical capabilities to understand decision patterns, preferences, and behavioral trends.
+ * All data is securely stored with input validation and sanitization.
+ * 
+ * @example
+ * ```typescript
+ * const tracker = new PlayerDecisionTracker();
+ * const decision = tracker.recordDecision('What do you do?', 'Help the stranger', 'helpful', 'session-1', 'world-1');
+ * const patterns = tracker.analyzeChoicePatterns();
+ * console.log(patterns.dominantChoiceTypes); // ['helpful', 'diplomatic']
+ * ```
  */
 export class PlayerDecisionTracker {
   private config: DecisionTrackerConfig;
