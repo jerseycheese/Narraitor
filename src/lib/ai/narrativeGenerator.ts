@@ -61,7 +61,7 @@ export class NarrativeGenerator {
       }
 
       return prompt;
-    } catch (error) {
+    } catch {
       return prompt;
     }
   }
@@ -241,7 +241,7 @@ export class NarrativeGenerator {
       }
 
       return prompt;
-    } catch (error) {
+    } catch {
       return prompt;
     }
   }
@@ -293,7 +293,7 @@ export class NarrativeGenerator {
           const { useLoreStore } = await import('@/state/loreStore');
           const { addStructuredLore } = useLoreStore.getState();
           addStructuredLore(structuredLore, request.worldId, request.sessionId);
-        } catch (error) {
+        } catch {
           // Failed to extract lore - continue without it
         }
       }
@@ -545,7 +545,7 @@ ${playerCharacter.skills
             };
           }
         }
-      } catch (parseError) {
+      } catch {
         // Try regex extraction as fallback for malformed JSON
         try {
           // Look for content field - handle malformed JSON with unescaped quotes
@@ -591,7 +591,7 @@ ${playerCharacter.skills
           if (moodMatch && moodMatch[1]) {
             extractedMetadata.mood = this.validateMood(moodMatch[1]);
           }
-        } catch (regexError) {
+        } catch {
           // Fallback extraction failed - use default content
         }
       }
@@ -797,7 +797,7 @@ ${playerCharacter.skills
       });
 
       return result;
-    } catch (error) {
+    } catch {
       // Return fallback choices instead of throwing
       const fallbackId = `decision-fallback-${Date.now()}`;
       return {

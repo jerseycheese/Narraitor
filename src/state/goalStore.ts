@@ -387,7 +387,7 @@ export const useGoalStore = create<GoalStore>()(
               if (goalId) {
                 newGoalsCreated++;
               }
-            } catch (error) {
+            } catch {
               // Continue processing other goals
             }
           }
@@ -400,7 +400,7 @@ export const useGoalStore = create<GoalStore>()(
                 get().updateGoal(goalUpdate.goalId, goalUpdate.updates);
                 goalsUpdated++;
               }
-            } catch (error) {
+            } catch {
               // Continue processing other goals
             }
           }
@@ -413,13 +413,12 @@ export const useGoalStore = create<GoalStore>()(
             goalsUpdated,
             goalsCompleted,
           };
-        } catch (error) {
+        } catch {
           return {
             newGoalsCreated: 0,
             goalsUpdated: 0,
             goalsCompleted: 0,
-            error:
-              error instanceof Error ? error.message : 'Unknown error occurred',
+            error: 'Failed to process segment for goals',
           };
         }
       },

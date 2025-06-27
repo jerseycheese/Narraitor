@@ -53,7 +53,7 @@ export class GoalExtractor {
 
       // Parse AI response
       return this.parseGoalExtractionResponse(response.content, request);
-    } catch (error) {
+    } catch {
       return {
         newGoals: [],
         updatedGoals: [],
@@ -88,7 +88,7 @@ export class GoalExtractor {
 
       // Parse completion response
       return this.parseCompletionResponse(response.content);
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -295,7 +295,7 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       }
 
       return result;
-    } catch (error) {
+    } catch {
       return this.createFallbackExtractionResult(request);
     }
   }
