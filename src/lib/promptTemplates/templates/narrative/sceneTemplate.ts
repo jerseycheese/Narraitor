@@ -9,7 +9,8 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
     narrativeContext,
     generationParameters,
     playerCharacterName,
-    characterSkillContext
+    characterSkillContext,
+    enhancedCharacterContext
   } = context;
 
   const segmentType = generationParameters?.segmentType || 'scene';
@@ -21,7 +22,7 @@ export const sceneTemplate = (context: any) => { // eslint-disable-line @typescr
   return `Continue the ${genre} narrative for "${worldName}" with a new ${segmentType} segment.
 
 World: ${worldName}
-Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}
+Tone: ${tone}${characterSkillContext ? characterSkillContext : ''}${enhancedCharacterContext ? enhancedCharacterContext : ''}
 
 STORY SO FAR:
 ${recentContent}
