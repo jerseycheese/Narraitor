@@ -1,13 +1,17 @@
 /**
  * Goal Store
- * 
+ *
  * Manages narrative goals with session tracking, status transitions, and mention counting.
  * Provides functionality for creating, updating, deleting, and querying goals with persistence.
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NarrativeGoal, GoalPriority, GoalExtractionRequest } from '../types/goal.types';
+import {
+  NarrativeGoal,
+  GoalPriority,
+  GoalExtractionRequest,
+} from '../types/goal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -35,7 +39,9 @@ interface GoalStore {
   loading: boolean;
 
   // Core CRUD Actions
-  createGoal: (goalData: Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  createGoal: (
+    goalData: Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'>
+  ) => EntityID;
   updateGoal: (goalId: EntityID, updates: Partial<NarrativeGoal>) => void;
   deleteGoal: (goalId: EntityID) => void;
 
@@ -50,7 +56,10 @@ interface GoalStore {
   clearSessionGoals: (sessionId: EntityID) => void;
 
   // Integration Actions
-  processSegmentForGoals: (segmentId: EntityID, characterId?: EntityID) => Promise<ProcessSegmentResult>;
+  processSegmentForGoals: (
+    segmentId: EntityID,
+    characterId?: EntityID
+  ) => Promise<ProcessSegmentResult>;
 
   // State Management
   reset: () => void;
@@ -82,10 +91,12 @@ const validateGoalData = (data: Partial<NarrativeGoal>): void => {
 };
 
 // Helper function to update active goal IDs
-const updateActiveGoalIds = (goals: Record<EntityID, NarrativeGoal>): EntityID[] => {
+const updateActiveGoalIds = (
+  goals: Record<EntityID, NarrativeGoal>
+): EntityID[] => {
   return Object.values(goals)
-    .filter(goal => goal.status === 'active')
-    .map(goal => goal.id);
+    .filter((goal) => goal.status === 'active')
+    .map((goal) => goal.id);
 };
 
 // Goal Store implementation with persistence
@@ -100,7 +111,7 @@ export const useGoalStore = create<GoalStore>()(
 
         const goalId = generateUniqueId('goal');
         const now = new Date().toISOString();
-        
+
         const newGoal: NarrativeGoal = {
           ...goalData,
           id: goalId,
@@ -112,7 +123,7 @@ export const useGoalStore = create<GoalStore>()(
         set((state) => {
           // Initialize session goals if not exists
           const sessionGoals = state.sessionGoals[goalData.sessionId] || [];
-          
+
           const updatedGoals = {
             ...state.goals,
             [goalId]: newGoal,
@@ -136,7 +147,7 @@ export const useGoalStore = create<GoalStore>()(
       updateGoal: (goalId, updates) => {
         const state = get();
         const existingGoal = state.goals[goalId];
-        
+
         if (!existingGoal) {
           throw new Error('Goal not found');
         }
@@ -150,7 +161,10 @@ export const useGoalStore = create<GoalStore>()(
 
         // Handle status transitions
         if (updates.status && updates.status !== existingGoal.status) {
-          if (updates.status === 'completed' || updates.status === 'abandoned') {
+          if (
+            updates.status === 'completed' ||
+            updates.status === 'abandoned'
+          ) {
             updatedGoal.completedAt = new Date();
           }
         }
@@ -173,7 +187,7 @@ export const useGoalStore = create<GoalStore>()(
       deleteGoal: (goalId) => {
         const state = get();
         const goal = state.goals[goalId];
-        
+
         if (!goal) {
           return; // Silent fail for delete
         }
@@ -182,11 +196,12 @@ export const useGoalStore = create<GoalStore>()(
           // Remove from goals
           const remainingGoals = { ...state.goals };
           delete remainingGoals[goalId];
-          
+
           // Remove from session goals
           const sessionId = goal.sessionId;
-          const updatedSessionGoals = state.sessionGoals[sessionId]?.filter(id => id !== goalId) || [];
-          
+          const updatedSessionGoals =
+            state.sessionGoals[sessionId]?.filter((id) => id !== goalId) || [];
+
           return {
             goals: remainingGoals,
             sessionGoals: {
@@ -204,26 +219,29 @@ export const useGoalStore = create<GoalStore>()(
         const state = get();
         const goalIds = state.sessionGoals[sessionId] || [];
         return goalIds
-          .map(id => state.goals[id])
-          .filter(goal => goal && goal.status === 'active');
+          .map((id) => state.goals[id])
+          .filter((goal) => goal && goal.status === 'active');
       },
 
       // Get goals by priority
       getGoalsByPriority: (priority) => {
         const state = get();
-        return Object.values(state.goals).filter(goal => goal.priority === priority);
+        return Object.values(state.goals).filter(
+          (goal) => goal.priority === priority
+        );
       },
 
       // Get recently mentioned goals
       getRecentlyMentionedGoals: (withinMs) => {
         const state = get();
         const cutoffTime = new Date(Date.now() - withinMs);
-        
-        return Object.values(state.goals).filter(goal => {
+
+        return Object.values(state.goals).filter((goal) => {
           if (!goal.lastMentionedAt) return false;
-          const mentionTime = goal.lastMentionedAt instanceof Date 
-            ? goal.lastMentionedAt 
-            : new Date(goal.lastMentionedAt);
+          const mentionTime =
+            goal.lastMentionedAt instanceof Date
+              ? goal.lastMentionedAt
+              : new Date(goal.lastMentionedAt);
           return mentionTime >= cutoffTime;
         });
       },
@@ -232,7 +250,7 @@ export const useGoalStore = create<GoalStore>()(
       incrementMentionCount: (goalId) => {
         const state = get();
         const goal = state.goals[goalId];
-        
+
         if (!goal) {
           throw new Error('Goal not found');
         }
@@ -258,7 +276,7 @@ export const useGoalStore = create<GoalStore>()(
       addProgressNote: (goalId, note) => {
         const state = get();
         const goal = state.goals[goalId];
-        
+
         if (!goal) {
           throw new Error('Goal not found');
         }
@@ -282,13 +300,13 @@ export const useGoalStore = create<GoalStore>()(
       clearSessionGoals: (sessionId) => {
         const state = get();
         const goalIdsToRemove = state.sessionGoals[sessionId] || [];
-        
+
         if (goalIdsToRemove.length === 0) return;
 
         set((state) => {
           // Remove goals from the goals record
           const updatedGoals = { ...state.goals };
-          goalIdsToRemove.forEach(id => {
+          goalIdsToRemove.forEach((id) => {
             delete updatedGoals[id];
           });
 
@@ -312,7 +330,7 @@ export const useGoalStore = create<GoalStore>()(
           const { useNarrativeStore } = await import('./narrativeStore');
           const narrativeState = useNarrativeStore.getState();
           const segment = narrativeState.segments[segmentId];
-          
+
           if (!segment) {
             return {
               newGoalsCreated: 0,
@@ -323,8 +341,9 @@ export const useGoalStore = create<GoalStore>()(
           }
 
           const goalState = get();
-          const sessionId = Object.keys(narrativeState.sessionSegments).find(sessionId =>
-            narrativeState.sessionSegments[sessionId]?.includes(segmentId)
+          const sessionId = Object.keys(narrativeState.sessionSegments).find(
+            (sessionId) =>
+              narrativeState.sessionSegments[sessionId]?.includes(segmentId)
           );
 
           if (!sessionId) {
@@ -337,7 +356,10 @@ export const useGoalStore = create<GoalStore>()(
           }
 
           // Get existing goals for context
-          const existingGoals = goalState.sessionGoals[sessionId]?.map(id => goalState.goals[id]).filter(Boolean) || [];
+          const existingGoals =
+            goalState.sessionGoals[sessionId]
+              ?.map((id) => goalState.goals[id])
+              .filter(Boolean) || [];
 
           // Prepare extraction request
           const extractionRequest: GoalExtractionRequest = {
@@ -350,7 +372,8 @@ export const useGoalStore = create<GoalStore>()(
           };
 
           // Extract goals using AI
-          const extractionResult = await goalExtractor.extractGoalsFromNarrative(extractionRequest);
+          const extractionResult =
+            await goalExtractor.extractGoalsFromNarrative(extractionRequest);
 
           let newGoalsCreated = 0;
           let goalsUpdated = 0;
@@ -365,7 +388,6 @@ export const useGoalStore = create<GoalStore>()(
                 newGoalsCreated++;
               }
             } catch (error) {
-              console.warn('Failed to create goal from extraction:', error);
               // Continue processing other goals
             }
           }
@@ -379,7 +401,6 @@ export const useGoalStore = create<GoalStore>()(
                 goalsUpdated++;
               }
             } catch (error) {
-              console.warn('Failed to update goal from extraction:', error);
               // Continue processing other goals
             }
           }
@@ -392,14 +413,13 @@ export const useGoalStore = create<GoalStore>()(
             goalsUpdated,
             goalsCompleted,
           };
-
         } catch (error) {
-          console.error('Goal processing error:', error);
           return {
             newGoalsCreated: 0,
             goalsUpdated: 0,
             goalsCompleted: 0,
-            error: error instanceof Error ? error.message : 'Unknown error occurred',
+            error:
+              error instanceof Error ? error.message : 'Unknown error occurred',
           };
         }
       },

@@ -9,7 +9,7 @@ import {
   GoalContext,
   GoalType,
   GoalPriority,
-  GoalStatus
+  GoalStatus,
 } from '../../types/goal.types';
 
 export class GoalExtractor {
@@ -22,7 +22,9 @@ export class GoalExtractor {
   /**
    * Extract goals from narrative content using AI
    */
-  async extractGoalsFromNarrative(request: GoalExtractionRequest): Promise<GoalExtractionResult> {
+  async extractGoalsFromNarrative(
+    request: GoalExtractionRequest
+  ): Promise<GoalExtractionResult> {
     try {
       // Handle empty content
       if (!request.content?.trim()) {
@@ -30,7 +32,7 @@ export class GoalExtractor {
           newGoals: [],
           updatedGoals: [],
           completedGoals: [],
-          confidence: 0
+          confidence: 0,
         };
       }
 
@@ -45,20 +47,18 @@ export class GoalExtractor {
           newGoals: [],
           updatedGoals: [],
           completedGoals: [],
-          confidence: 0
+          confidence: 0,
         };
       }
 
       // Parse AI response
       return this.parseGoalExtractionResponse(response.content, request);
-
     } catch (error) {
-      console.error('Goal extraction error:', error);
       return {
         newGoals: [],
         updatedGoals: [],
         completedGoals: [],
-        confidence: 0
+        confidence: 0,
       };
     }
   }
@@ -66,14 +66,20 @@ export class GoalExtractor {
   /**
    * Detect if a goal has been completed based on narrative content
    */
-  async detectGoalCompletion(goal: NarrativeGoal, narrativeContent: string): Promise<boolean> {
+  async detectGoalCompletion(
+    goal: NarrativeGoal,
+    narrativeContent: string
+  ): Promise<boolean> {
     try {
       // Validate inputs
       if (!goal?.title || !narrativeContent?.trim()) {
         return false;
       }
 
-      const prompt = this.buildCompletionDetectionPrompt(goal, narrativeContent);
+      const prompt = this.buildCompletionDetectionPrompt(
+        goal,
+        narrativeContent
+      );
       const response = await this.geminiClient.generateContent(prompt);
 
       if (!response.content) {
@@ -82,9 +88,7 @@ export class GoalExtractor {
 
       // Parse completion response
       return this.parseCompletionResponse(response.content);
-
     } catch (error) {
-      console.error('Goal completion detection error:', error);
       return false;
     }
   }
@@ -99,15 +103,15 @@ export class GoalExtractor {
         recentGoals: [],
         criticalGoals: [],
         contextText: '',
-        tokenCount: 0
+        tokenCount: 0,
       };
     }
 
     // Filter and sort goals by priority and recency
-    const activeGoals = goals.filter(g => g.status === 'active');
-    const criticalGoals = activeGoals.filter(g => g.priority === 'critical');
+    const activeGoals = goals.filter((g) => g.status === 'active');
+    const criticalGoals = activeGoals.filter((g) => g.priority === 'critical');
     const recentGoals = activeGoals
-      .filter(g => g.lastMentionedAt)
+      .filter((g) => g.lastMentionedAt)
       .sort((a, b) => {
         const aTime = new Date(a.lastMentionedAt!).getTime();
         const bTime = new Date(b.lastMentionedAt!).getTime();
@@ -119,16 +123,19 @@ export class GoalExtractor {
     let contextText = '';
     let tokenCount = 0;
     const prioritizedGoals = [...criticalGoals];
-    
+
     // Add high priority goals not already included
-    const highPriorityGoals = activeGoals.filter(g => 
-      g.priority === 'high' && !criticalGoals.some(cg => cg.id === g.id)
+    const highPriorityGoals = activeGoals.filter(
+      (g) =>
+        g.priority === 'high' && !criticalGoals.some((cg) => cg.id === g.id)
     );
     prioritizedGoals.push(...highPriorityGoals);
 
     // Add medium priority goals if we have token budget
-    const mediumPriorityGoals = activeGoals.filter(g => 
-      g.priority === 'medium' && !prioritizedGoals.some(pg => pg.id === g.id)
+    const mediumPriorityGoals = activeGoals.filter(
+      (g) =>
+        g.priority === 'medium' &&
+        !prioritizedGoals.some((pg) => pg.id === g.id)
     );
     prioritizedGoals.push(...mediumPriorityGoals);
 
@@ -136,7 +143,7 @@ export class GoalExtractor {
     for (const goal of prioritizedGoals) {
       const goalText = this.formatGoalForContext(goal);
       const goalTokens = this.estimateTokens(goalText);
-      
+
       if (tokenCount + goalTokens <= maxTokens) {
         contextText += goalText;
         tokenCount += goalTokens;
@@ -150,7 +157,7 @@ export class GoalExtractor {
       recentGoals,
       criticalGoals,
       contextText,
-      tokenCount
+      tokenCount,
     };
   }
 
@@ -158,9 +165,10 @@ export class GoalExtractor {
    * Build prompt for goal extraction
    */
   private buildGoalExtractionPrompt(request: GoalExtractionRequest): string {
-    const existingGoalsText = request.existingGoals && request.existingGoals.length > 0
-      ? `\n\nEXISTING GOALS:\n${request.existingGoals.map(g => `- ${g.title}: ${g.description}`).join('\n')}`
-      : '';
+    const existingGoalsText =
+      request.existingGoals && request.existingGoals.length > 0
+        ? `\n\nEXISTING GOALS:\n${request.existingGoals.map((g) => `- ${g.title}: ${g.description}`).join('\n')}`
+        : '';
 
     return `You are a goal extraction system. Analyze the following narrative content and extract goals, update existing goals, or mark goals as completed.
 
@@ -214,7 +222,10 @@ Respond with JSON in this exact format:
   /**
    * Build prompt for completion detection
    */
-  private buildCompletionDetectionPrompt(goal: NarrativeGoal, narrativeContent: string): string {
+  private buildCompletionDetectionPrompt(
+    goal: NarrativeGoal,
+    narrativeContent: string
+  ): string {
     return `Analyze if this goal has been completed based on the narrative content.
 
 GOAL: ${goal.title}
@@ -236,7 +247,10 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
   /**
    * Parse goal extraction response from AI
    */
-  private parseGoalExtractionResponse(content: string, request: GoalExtractionRequest): GoalExtractionResult {
+  private parseGoalExtractionResponse(
+    content: string,
+    request: GoalExtractionRequest
+  ): GoalExtractionResult {
     try {
       // Extract JSON from response
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/);
@@ -245,13 +259,13 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       }
 
       const parsed = JSON.parse(jsonMatch[1]);
-      
+
       // Validate and clean the response
       const result: GoalExtractionResult = {
         newGoals: [],
         updatedGoals: [],
         completedGoals: [],
-        confidence: Math.max(0, Math.min(1, parsed.confidence || 0))
+        confidence: Math.max(0, Math.min(1, parsed.confidence || 0)),
       };
 
       // Process new goals
@@ -267,19 +281,21 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
           .filter((u: Record<string, unknown>) => u.goalId && u.updates)
           .map((u: Record<string, unknown>) => ({
             goalId: u.goalId,
-            updates: this.validateGoalUpdates(u.updates as Record<string, unknown>)
+            updates: this.validateGoalUpdates(
+              u.updates as Record<string, unknown>
+            ),
           }));
       }
 
       // Process completed goals
       if (Array.isArray(parsed.completedGoals)) {
-        result.completedGoals = parsed.completedGoals.filter((id: unknown) => typeof id === 'string');
+        result.completedGoals = parsed.completedGoals.filter(
+          (id: unknown) => typeof id === 'string'
+        );
       }
 
       return result;
-
     } catch (error) {
-      console.error('Failed to parse goal extraction response:', error);
       return this.createFallbackExtractionResult(request);
     }
   }
@@ -289,35 +305,56 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
    */
   private parseCompletionResponse(content: string): boolean {
     const cleanContent = content.trim().toLowerCase();
-    return cleanContent.includes('completed') && !cleanContent.includes('not_completed');
+    return (
+      cleanContent.includes('completed') &&
+      !cleanContent.includes('not_completed')
+    );
   }
 
   /**
    * Create fallback extraction result using pattern matching
    */
-  private createFallbackExtractionResult(request: GoalExtractionRequest): GoalExtractionResult {
+  private createFallbackExtractionResult(
+    request: GoalExtractionRequest
+  ): GoalExtractionResult {
     const result: GoalExtractionResult = {
       newGoals: [],
       updatedGoals: [],
       completedGoals: [],
-      confidence: 0.5
+      confidence: 0.5,
     };
 
     const content = request.content.toLowerCase();
 
     // Simple pattern matching for common goal patterns
-    if (content.includes('need to') || content.includes('must') || content.includes('should')) {
-      const goalTitle = this.extractGoalFromPattern(request.content, /(?:need to|must|should)\s+([^.!?]+)/i);
+    if (
+      content.includes('need to') ||
+      content.includes('must') ||
+      content.includes('should')
+    ) {
+      const goalTitle = this.extractGoalFromPattern(
+        request.content,
+        /(?:need to|must|should)\s+([^.!?]+)/i
+      );
       if (goalTitle) {
         result.newGoals.push(this.createBasicGoal(goalTitle, request));
         result.confidence = 0.7;
       }
     }
 
-    if (content.includes('investigate') || content.includes('find') || content.includes('search')) {
-      const goalTitle = this.extractGoalFromPattern(request.content, /(investigate|find|search)\s+([^.!?]+)/i);
+    if (
+      content.includes('investigate') ||
+      content.includes('find') ||
+      content.includes('search')
+    ) {
+      const goalTitle = this.extractGoalFromPattern(
+        request.content,
+        /(investigate|find|search)\s+([^.!?]+)/i
+      );
       if (goalTitle) {
-        result.newGoals.push(this.createBasicGoal(`${goalTitle}`, request, 'exploration'));
+        result.newGoals.push(
+          this.createBasicGoal(`${goalTitle}`, request, 'exploration')
+        );
         result.confidence = 0.7;
       }
     }
@@ -328,7 +365,10 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
   /**
    * Extract goal from pattern match
    */
-  private extractGoalFromPattern(content: string, pattern: RegExp): string | null {
+  private extractGoalFromPattern(
+    content: string,
+    pattern: RegExp
+  ): string | null {
     const match = content.match(pattern);
     return match ? match[1]?.trim() || match[2]?.trim() : null;
   }
@@ -337,8 +377,8 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
    * Create basic goal from extracted text
    */
   private createBasicGoal(
-    title: string, 
-    request: GoalExtractionRequest, 
+    title: string,
+    request: GoalExtractionRequest,
     type: GoalType = 'quest'
   ): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
     return {
@@ -351,19 +391,38 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       priority: 'medium' as GoalPriority,
       status: 'active' as GoalStatus,
       mentionCount: 1,
-      keywords: title.split(' ').filter(word => word.length > 2),
+      keywords: title.split(' ').filter((word) => word.length > 2),
       contextSummary: `Player needs to ${title}`,
-      originSegmentId: request.segmentId
+      originSegmentId: request.segmentId,
     };
   }
 
   /**
    * Validate and clean goal data
    */
-  private validateAndCleanGoal(goal: Record<string, unknown>): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
-    const validTypes: GoalType[] = ['immediate', 'quest', 'exploration', 'social', 'mystery', 'survival'];
-    const validPriorities: GoalPriority[] = ['low', 'medium', 'high', 'critical'];
-    const validStatuses: GoalStatus[] = ['active', 'completed', 'abandoned', 'blocked'];
+  private validateAndCleanGoal(
+    goal: Record<string, unknown>
+  ): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
+    const validTypes: GoalType[] = [
+      'immediate',
+      'quest',
+      'exploration',
+      'social',
+      'mystery',
+      'survival',
+    ];
+    const validPriorities: GoalPriority[] = [
+      'low',
+      'medium',
+      'high',
+      'critical',
+    ];
+    const validStatuses: GoalStatus[] = [
+      'active',
+      'completed',
+      'abandoned',
+      'blocked',
+    ];
 
     return {
       sessionId: String(goal.sessionId || ''),
@@ -371,21 +430,35 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       worldId: goal.worldId as string | undefined,
       title: (goal.title as string)?.trim() || 'Untitled Goal',
       description: (goal.description as string)?.trim() || 'No description',
-      type: validTypes.includes(goal.type as GoalType) ? (goal.type as GoalType) : 'quest',
-      priority: validPriorities.includes(goal.priority as GoalPriority) ? (goal.priority as GoalPriority) : 'medium',
-      status: validStatuses.includes(goal.status as GoalStatus) ? (goal.status as GoalStatus) : 'active',
+      type: validTypes.includes(goal.type as GoalType)
+        ? (goal.type as GoalType)
+        : 'quest',
+      priority: validPriorities.includes(goal.priority as GoalPriority)
+        ? (goal.priority as GoalPriority)
+        : 'medium',
+      status: validStatuses.includes(goal.status as GoalStatus)
+        ? (goal.status as GoalStatus)
+        : 'active',
       mentionCount: Math.max(1, Number(goal.mentionCount) || 1),
-      keywords: Array.isArray(goal.keywords) ? (goal.keywords as unknown[]).filter((k: unknown) => typeof k === 'string') as string[] : [],
+      keywords: Array.isArray(goal.keywords)
+        ? ((goal.keywords as unknown[]).filter(
+            (k: unknown) => typeof k === 'string'
+          ) as string[])
+        : [],
       contextSummary: (goal.contextSummary as string)?.trim(),
-      involvedCharacters: Array.isArray(goal.involvedCharacters) ? goal.involvedCharacters as string[] : [],
-      originSegmentId: goal.originSegmentId as string | undefined
+      involvedCharacters: Array.isArray(goal.involvedCharacters)
+        ? (goal.involvedCharacters as string[])
+        : [],
+      originSegmentId: goal.originSegmentId as string | undefined,
     };
   }
 
   /**
    * Validate goal updates
    */
-  private validateGoalUpdates(updates: Record<string, unknown>): Partial<NarrativeGoal> {
+  private validateGoalUpdates(
+    updates: Record<string, unknown>
+  ): Partial<NarrativeGoal> {
     const validUpdates: Partial<NarrativeGoal> = {};
 
     if (typeof updates.mentionCount === 'number') {
@@ -393,15 +466,26 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
     }
 
     if (Array.isArray(updates.progressNotes)) {
-      validUpdates.progressNotes = (updates.progressNotes as unknown[]).filter((note: unknown) => typeof note === 'string') as string[];
+      validUpdates.progressNotes = (updates.progressNotes as unknown[]).filter(
+        (note: unknown) => typeof note === 'string'
+      ) as string[];
     }
 
     if (updates.lastMentionedAt) {
-      validUpdates.lastMentionedAt = new Date(updates.lastMentionedAt as string | number | Date);
+      validUpdates.lastMentionedAt = new Date(
+        updates.lastMentionedAt as string | number | Date
+      );
     }
 
-    if (['achieved', 'abandoned', 'superseded'].includes(updates.completionMethod as string)) {
-      validUpdates.completionMethod = updates.completionMethod as 'achieved' | 'abandoned' | 'superseded';
+    if (
+      ['achieved', 'abandoned', 'superseded'].includes(
+        updates.completionMethod as string
+      )
+    ) {
+      validUpdates.completionMethod = updates.completionMethod as
+        | 'achieved'
+        | 'abandoned'
+        | 'superseded';
     }
 
     return validUpdates;
@@ -411,8 +495,12 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
    * Format goal for context string
    */
   private formatGoalForContext(goal: NarrativeGoal): string {
-    const priority = goal.priority === 'critical' ? '[CRITICAL] ' : 
-                    goal.priority === 'high' ? '[HIGH] ' : '';
+    const priority =
+      goal.priority === 'critical'
+        ? '[CRITICAL] '
+        : goal.priority === 'high'
+          ? '[HIGH] '
+          : '';
     return `${priority}${goal.title}: ${goal.contextSummary || goal.description}\n`;
   }
 

@@ -61,14 +61,23 @@ interface AIContextStore {
   // Original Actions
   createContext: (sessionId: EntityID) => EntityID;
   updateContext: (contextId: EntityID, updates: Partial<AIContext>) => void;
-  addPromptContext: (contextId: EntityID, promptContext: AIPromptContext) => void;
+  addPromptContext: (
+    contextId: EntityID,
+    promptContext: AIPromptContext
+  ) => void;
   clearContext: (contextId: EntityID) => void;
-  
+
   // Goal Integration Actions
-  buildContextForSession: (sessionId: EntityID, options?: ContextBuildOptions) => AISessionContext;
-  saveContextToHistory: (sessionId: EntityID, context: AISessionContext) => void;
+  buildContextForSession: (
+    sessionId: EntityID,
+    options?: ContextBuildOptions
+  ) => AISessionContext;
+  saveContextToHistory: (
+    sessionId: EntityID,
+    context: AISessionContext
+  ) => void;
   getContextHistory: (sessionId: EntityID) => AISessionContext[];
-  
+
   // State management
   reset: () => void;
   setError: (error: string | null) => void;
@@ -80,12 +89,12 @@ interface AIContextStore {
 const estimateTokenCount = (text: string, budget?: number): number => {
   // Dynamic token estimation based on budget constraints
   const words = text.trim().split(/\s+/).length;
-  
+
   // For very low budgets (<=100), be extremely conservative
   if (budget && budget <= 100) {
     return words * 8;
   }
-  // For medium budgets (<=200), be moderately conservative  
+  // For medium budgets (<=200), be moderately conservative
   else if (budget && budget <= 200) {
     return Math.ceil(words * 2);
   }
@@ -98,38 +107,43 @@ const estimateTokenCount = (text: string, budget?: number): number => {
 const formatGoalForContext = (goal: NarrativeGoal): string => {
   // Use contextSummary if available, but include title if contextSummary doesn't contain key terms
   let mainText = goal.contextSummary || goal.title;
-  
+
   // If we have contextSummary, check if it contains key terms from the title
   if (goal.contextSummary && goal.title) {
     const titleWords = goal.title.toLowerCase().split(/\s+/);
     const contextWords = goal.contextSummary.toLowerCase();
-    const missingKeywords = titleWords.filter(word => 
-      word.length > 3 && !contextWords.includes(word)
+    const missingKeywords = titleWords.filter(
+      (word) => word.length > 3 && !contextWords.includes(word)
     );
-    
+
     // If important keywords are missing, append them
     if (missingKeywords.length > 0) {
       mainText = `${goal.contextSummary} (${goal.title})`;
     }
   }
-  
+
   // Only add URGENT prefix if the contextSummary doesn't already indicate urgency
-  const hasUrgencyIndicator = mainText.toLowerCase().includes('urgent') || 
-                              mainText.toLowerCase().includes('critical') ||
-                              mainText.toUpperCase().includes('CRITICAL:') ||
-                              mainText.toUpperCase().includes('URGENT:');
-  
-  const priorityPrefix = (goal.priority === 'critical' && !hasUrgencyIndicator) ? 'URGENT: ' : '';
+  const hasUrgencyIndicator =
+    mainText.toLowerCase().includes('urgent') ||
+    mainText.toLowerCase().includes('critical') ||
+    mainText.toUpperCase().includes('CRITICAL:') ||
+    mainText.toUpperCase().includes('URGENT:');
+
+  const priorityPrefix =
+    goal.priority === 'critical' && !hasUrgencyIndicator ? 'URGENT: ' : '';
   let context = `${priorityPrefix}${mainText}`;
-  
+
   if (goal.progressNotes && goal.progressNotes.length > 0) {
     context += ` Progress: ${goal.progressNotes.join(', ')}`;
   }
-  
+
   return context;
 };
 
-const prioritizeGoals = (goals: NarrativeGoal[], options: ContextBuildOptions): NarrativeGoal[] => {
+const prioritizeGoals = (
+  goals: NarrativeGoal[],
+  options: ContextBuildOptions
+): NarrativeGoal[] => {
   const priorityWeights: Record<GoalPriority, number> = {
     critical: 100,
     high: 75,
@@ -139,16 +153,23 @@ const prioritizeGoals = (goals: NarrativeGoal[], options: ContextBuildOptions): 
 
   return goals.sort((a, b) => {
     // Primary sort: priority
-    const priorityDiff = priorityWeights[b.priority] - priorityWeights[a.priority];
+    const priorityDiff =
+      priorityWeights[b.priority] - priorityWeights[a.priority];
     if (priorityDiff !== 0) return priorityDiff;
-    
+
     // Secondary sort: recency if prioritizeRecent is enabled
     if (options.prioritizeRecent && a.lastMentionedAt && b.lastMentionedAt) {
-      const aTime = a.lastMentionedAt instanceof Date ? a.lastMentionedAt : new Date(a.lastMentionedAt);
-      const bTime = b.lastMentionedAt instanceof Date ? b.lastMentionedAt : new Date(b.lastMentionedAt);
+      const aTime =
+        a.lastMentionedAt instanceof Date
+          ? a.lastMentionedAt
+          : new Date(a.lastMentionedAt);
+      const bTime =
+        b.lastMentionedAt instanceof Date
+          ? b.lastMentionedAt
+          : new Date(b.lastMentionedAt);
       return bTime.getTime() - aTime.getTime();
     }
-    
+
     // Tertiary sort: mention count
     return b.mentionCount - a.mentionCount;
   });
@@ -181,7 +202,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
   // Create context
   createContext: (sessionId) => {
     const contextId = generateUniqueId('context');
-    
+
     const newContext: AIContext = {
       id: contextId,
       sessionId,
@@ -205,93 +226,97 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
   },
 
   // Update context
-  updateContext: (contextId, updates) => set((state) => {
-    if (!state.contexts[contextId]) {
-      return { error: 'Context not found' };
-    }
+  updateContext: (contextId, updates) =>
+    set((state) => {
+      if (!state.contexts[contextId]) {
+        return { error: 'Context not found' };
+      }
 
-    const updatedContext: AIContext = {
-      ...state.contexts[contextId],
-      ...updates,
-      metadata: {
-        ...state.contexts[contextId].metadata,
-        lastUpdated: new Date().toISOString(),
-      },
-    };
+      const updatedContext: AIContext = {
+        ...state.contexts[contextId],
+        ...updates,
+        metadata: {
+          ...state.contexts[contextId].metadata,
+          lastUpdated: new Date().toISOString(),
+        },
+      };
 
-    return {
-      contexts: {
-        ...state.contexts,
-        [contextId]: updatedContext,
-      },
-      error: null,
-    };
-  }),
+      return {
+        contexts: {
+          ...state.contexts,
+          [contextId]: updatedContext,
+        },
+        error: null,
+      };
+    }),
 
   // Add prompt context
-  addPromptContext: (contextId, promptContext) => set((state) => {
-    if (!state.contexts[contextId]) {
-      return { error: 'Context not found' };
-    }
+  addPromptContext: (contextId, promptContext) =>
+    set((state) => {
+      if (!state.contexts[contextId]) {
+        return { error: 'Context not found' };
+      }
 
-    const context = state.contexts[contextId];
-    const updatedContext: AIContext = {
-      ...context,
-      recentContext: [...context.recentContext, promptContext],
-      metadata: {
-        ...context.metadata,
-        tokenCount: context.metadata.tokenCount + (promptContext.tokenCount || 0),
-        lastUpdated: new Date().toISOString(),
-      },
-    };
+      const context = state.contexts[contextId];
+      const updatedContext: AIContext = {
+        ...context,
+        recentContext: [...context.recentContext, promptContext],
+        metadata: {
+          ...context.metadata,
+          tokenCount:
+            context.metadata.tokenCount + (promptContext.tokenCount || 0),
+          lastUpdated: new Date().toISOString(),
+        },
+      };
 
-    return {
-      contexts: {
-        ...state.contexts,
-        [contextId]: updatedContext,
-      },
-      error: null,
-    };
-  }),
+      return {
+        contexts: {
+          ...state.contexts,
+          [contextId]: updatedContext,
+        },
+        error: null,
+      };
+    }),
 
   // Clear context
-  clearContext: (contextId) => set((state) => {
-    if (!state.contexts[contextId]) {
-      return { error: 'Context not found' };
-    }
+  clearContext: (contextId) =>
+    set((state) => {
+      if (!state.contexts[contextId]) {
+        return { error: 'Context not found' };
+      }
 
-    const clearedContext: AIContext = {
-      ...state.contexts[contextId],
-      recentContext: [],
-      metadata: {
-        tokenCount: 0,
-        lastUpdated: new Date().toISOString(),
-      },
-    };
+      const clearedContext: AIContext = {
+        ...state.contexts[contextId],
+        recentContext: [],
+        metadata: {
+          tokenCount: 0,
+          lastUpdated: new Date().toISOString(),
+        },
+      };
 
-    return {
-      contexts: {
-        ...state.contexts,
-        [contextId]: clearedContext,
-      },
-      error: null,
-    };
-  }),
+      return {
+        contexts: {
+          ...state.contexts,
+          [contextId]: clearedContext,
+        },
+        error: null,
+      };
+    }),
 
   // Goal Integration Actions
   buildContextForSession: (sessionId, options = {}) => {
     try {
       const goalStore = useGoalStore.getState();
-      
+
       // Get active goals for the session
       let activeGoals = goalStore.getActiveGoalsBySession(sessionId);
-      
+
       // Validate and filter corrupted goals
       activeGoals = activeGoals.filter(validateGoal);
-      
+
       // Include goals by default unless explicitly disabled
       const shouldIncludeGoals = options.includeGoals !== false;
-      
+
       if (!shouldIncludeGoals || activeGoals.length === 0) {
         return {
           sessionId,
@@ -308,12 +333,17 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
 
       // Prioritize goals
       const prioritizedGoals = prioritizeGoals(activeGoals, options);
-      
+
       // Separate goals by type
-      const criticalGoals = prioritizedGoals.filter(goal => goal.priority === 'critical');
-      const recentGoals = options.prioritizeRecent 
-        ? goalStore.getRecentlyMentionedGoals(30 * 60 * 1000) // 30 minutes
-            .filter(goal => goal.sessionId === sessionId && validateGoal(goal))
+      const criticalGoals = prioritizedGoals.filter(
+        (goal) => goal.priority === 'critical'
+      );
+      const recentGoals = options.prioritizeRecent
+        ? goalStore
+            .getRecentlyMentionedGoals(30 * 60 * 1000) // 30 minutes
+            .filter(
+              (goal) => goal.sessionId === sessionId && validateGoal(goal)
+            )
         : [];
 
       // Build context text with token limiting
@@ -325,7 +355,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
       if (prioritizedGoals.length > 0) {
         const headerText = 'ACTIVE GOALS:\n';
         const headerTokens = estimateTokenCount(headerText, maxTokens);
-        
+
         // Reserve space for header
         if (headerTokens >= maxTokens) {
           // If we can't even fit the header, return empty context
@@ -341,7 +371,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
             timestamp: new Date().toISOString(),
           };
         }
-        
+
         goalContext += headerText;
         tokenCount += headerTokens;
 
@@ -349,7 +379,7 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
           const goalText = formatGoalForContext(goal);
           const goalLineWithNewline = goalText + '\n';
           const goalTokens = estimateTokenCount(goalLineWithNewline, maxTokens);
-          
+
           // Check if adding this goal would exceed the limit
           if (tokenCount + goalTokens <= maxTokens) {
             goalContext += goalLineWithNewline;
@@ -383,7 +413,10 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
         criticalGoals: [],
         recentGoals: [],
         tokenCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error building context',
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Unknown error building context',
         timestamp: new Date().toISOString(),
       };
     }
@@ -393,9 +426,9 @@ export const aiContextStore = create<AIContextStore>()((set, get) => ({
     set((state) => {
       const sessionHistory = state.contextHistory[sessionId] || [];
       const maxHistorySize = 10; // Keep last 10 context snapshots
-      
+
       const updatedHistory = [...sessionHistory, context];
-      
+
       // Trim history if it gets too long
       if (updatedHistory.length > maxHistorySize) {
         updatedHistory.splice(0, updatedHistory.length - maxHistorySize);
