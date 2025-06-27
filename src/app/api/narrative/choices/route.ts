@@ -10,6 +10,7 @@ import {
   makeGeminiRequest,
   getSafetySettingsFromPrompt
 } from '../../../../utils/apiHelpers';
+import { getUserFriendlyError } from '../../../../lib/utils/errorUtils';
 
 interface ChoiceGenerateResponse {
   content: string;
@@ -68,15 +69,22 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      const apiError = new Error(`Gemini API failed: ${response.status} ${response.statusText}`);
+      
       console.error('Gemini API Error:', {
         status: response.status,
         statusText: response.statusText,
         errorText: errorText
       });
       
+      const userFriendlyError = getUserFriendlyError(apiError);
+      
       return NextResponse.json(
         { 
-          error: `Gemini API failed: ${response.status} ${response.statusText}`,
+          error: userFriendlyError.message,
+          title: userFriendlyError.title,
+          retryable: userFriendlyError.retryable,
+          actionLabel: userFriendlyError.actionLabel,
           details: errorText
         },
         { status: response.status }
@@ -126,10 +134,16 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Choice generation error:', error);
     
+    const errorObj = error instanceof Error ? error : new Error('Unknown error occurred');
+    const userFriendlyError = getUserFriendlyError(errorObj);
+    
     return NextResponse.json(
       { 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: userFriendlyError.message,
+        title: userFriendlyError.title,
+        retryable: userFriendlyError.retryable,
+        actionLabel: userFriendlyError.actionLabel,
+        details: errorObj.message
       },
       { status: 500 }
     );

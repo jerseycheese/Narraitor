@@ -52,8 +52,29 @@ const facts = await extractStructuredLore(narrative);
 ## Integration
 
 **Narrative Generation**: Lore context automatically enhances AI prompts for consistency
+**Goal System**: Works alongside goal tracking for comprehensive narrative consistency
 **Session Scoping**: Facts can be filtered by session or world-wide
 **Error Handling**: Graceful degradation when AI services unavailable
+
+### Relationship with Goal Tracking
+The lore tracking system complements the goal tracking system:
+- **Lore Facts**: Track world state, characters, locations, and events
+- **Goals**: Track player objectives and story progression
+- **Combined Context**: Both systems contribute to AI prompt context for maximum consistency
+
+```typescript
+// Combined context includes both lore facts and active goals
+const loreContext = getLoreContext(worldId, sessionId);
+const goalContext = aiContextStore.buildContextForSession(sessionId);
+
+const fullContext = `
+${loreContext}
+
+${goalContext.goalContext}
+
+Continue the story...
+`;
+```
 
 ## Testing
 
