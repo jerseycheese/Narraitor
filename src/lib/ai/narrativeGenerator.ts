@@ -18,14 +18,18 @@ import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
+import { PersonalizationEngine } from './personalizationEngine';
+import { playerDecisionTracker } from './playerDecisionTracker';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
   private templateGenerator: TemplateGenerator;
+  private personalizationEngine: PersonalizationEngine;
   
   constructor(private geminiClient: AIClient) {
     this.choiceGenerator = new ChoiceGenerator(geminiClient);
     this.templateGenerator = new TemplateGenerator(geminiClient);
+    this.personalizationEngine = new PersonalizationEngine();
   }
 
   /**
@@ -52,6 +56,51 @@ export class NarrativeGenerator {
     return prompt + detailedInstructions;
   }
 
+  /**
+   * Enhances a prompt with personalized character context
+   */
+  private enhancePromptWithPersonalization(
+    prompt: string,
+    worldId: EntityID,
+    characterIds: string[]
+  ): string {
+    try {
+      const world = this.getWorld(worldId);
+      const { characters } = useCharacterStore.getState();
+      const playerCharacterId = characterIds[0];
+      const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+
+      if (!playerCharacter) {
+        return prompt;
+      }
+
+      // Get player decisions for this world
+      const decisions = playerDecisionTracker.getWorldDecisions(worldId);
+      
+      // Create personalized context
+      const personalizedContext = this.personalizationEngine.createPersonalizedContext(
+        playerCharacter,
+        world,
+        decisions,
+        [], // relationships - future enhancement
+        [], // goals - future enhancement
+        []  // narrative history - future enhancement
+      );
+
+      // Generate enhancement text
+      const enhancementText = this.personalizationEngine.generateNarrativeEnhancement(personalizedContext);
+      
+      if (enhancementText.trim()) {
+        return `${prompt}\n\n${enhancementText}`;
+      }
+
+      return prompt;
+    } catch (error) {
+      console.warn('Failed to add personalization:', error);
+      return prompt;
+    }
+  }
+
   async generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult> {
     try {
       const world = this.getWorld(request.worldId);
@@ -60,9 +109,14 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
       
-      // Add tone settings and lore context to prompt
+      // Add tone settings, lore context, and personalization to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
-      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, request.worldId);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, request.worldId);
+      const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
+        loreEnhancedPrompt,
+        request.worldId,
+        request.characterIds || []
+      );
 
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       
@@ -114,9 +168,14 @@ export class NarrativeGenerator {
 
       const prompt = template(context);
       
-      // Add tone settings and lore context to initial scene
+      // Add tone settings, lore context, and personalization to initial scene
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
-      const fullyEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, worldId);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, worldId);
+      const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
+        loreEnhancedPrompt,
+        worldId,
+        characterIds
+      );
       
       const response = await this.geminiClient.generateContent(fullyEnhancedPrompt);
       

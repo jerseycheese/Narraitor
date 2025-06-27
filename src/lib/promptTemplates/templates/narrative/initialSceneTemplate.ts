@@ -9,7 +9,8 @@ export const initialSceneTemplate = (context: any) => { // eslint-disable-line @
     attributes,
     characterIds,
     playerCharacterName,
-    playerCharacterBackground
+    playerCharacterBackground,
+    enhancedCharacterContext
   } = context;
 
   return `You are creating the opening scene for a ${genre} story world called "${worldName}".
@@ -19,6 +20,7 @@ Tone: ${tone}
 World Attributes: ${JSON.stringify(attributes)}
 ${playerCharacterName ? `Player Character: ${playerCharacterName} (THE PLAYER - write from their perspective using "you")` : ''}
 ${playerCharacterBackground ? `Player Background: ${JSON.stringify(playerCharacterBackground)}` : ''}
+${enhancedCharacterContext ? enhancedCharacterContext : ''}
 ${characterIds?.length > 1 ? `Other Characters: ${characterIds.slice(1).join(', ')}` : ''}
 
 Create an engaging opening scene that:
