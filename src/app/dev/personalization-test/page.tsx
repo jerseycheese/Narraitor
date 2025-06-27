@@ -216,7 +216,9 @@ export default function PersonalizationTestPage() {
 PERSONALIZATION CONTEXT:
 ${enhancement}
 
-Generate a narrative response (2-3 paragraphs) that adapts to the player's established personality and preferences. The narrative should reflect their decision-making style and preferred approaches to problem-solving.`;
+Generate a narrative response (2-3 paragraphs) that adapts to the player's established personality and preferences. The narrative should reflect their decision-making style and preferred approaches to problem-solving.
+
+IMPORTANT: If the player shows aggressive/direct tendencies, the character should be bold, decisive, and willing to take risks. If they show careful/stealthy tendencies, emphasize caution and observation. Match the narrative voice and decision-making to the detected personality traits.`;
 
       const response = await fetch('/api/narrative/generate', {
         method: 'POST',

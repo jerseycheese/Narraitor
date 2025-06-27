@@ -212,7 +212,14 @@ export class PersonalizationEngine {
     // Add narrative style preference
     const style = context.playerPreferences.narrativeStyle || 'exploration';
     const detail = context.playerPreferences.detailLevel || 'moderate';
+    const contentFocus = context.playerPreferences.contentFocus || 'balanced';
+    
     enhancements.push(`NARRATIVE STYLE: Focus on ${style} elements. Player prefers ${detail} detail level.`);
+    
+    // Add specific guidance for action-focused players
+    if (style === 'action-focused' || contentFocus === 'action') {
+      enhancements.push(`ACTION EMPHASIS: Player favors direct action and immediate decisions. Show character acting boldly rather than hesitating. Emphasize movement, physical challenges, and decisive moments.`);
+    }
 
     return enhancements.join('\n\n');
   }
@@ -388,7 +395,7 @@ export class PersonalizationEngine {
   private getPatternInsight(preferredTypes: string[]): string {
     const insights: Record<string, string> = {
       'diplomatic': 'negotiation and peaceful resolution',
-      'aggressive': 'direct confrontation and decisive action',
+      'aggressive': 'bold, direct confrontation and immediate decisive action',
       'stealthy': 'careful planning and subtle maneuvering',
       'helpful': 'cooperation and supportive behavior',
       'selfish': 'self-interested and independent decision-making',
