@@ -123,6 +123,10 @@ export default function PersonalizationTestPage() {
   const [analysis, setAnalysis] = useState<ReturnType<PersonalizationEngine['analyzePlayerBehavior']> | null>(null);
   const [patterns, setPatterns] = useState<ReturnType<PlayerDecisionTracker['analyzeChoicePatterns']> | null>(null);
   const [enhancement, setEnhancement] = useState('');
+  const [sampleNarrative, setSampleNarrative] = useState('');
+  const [baselineNarrative, setBaselineNarrative] = useState('');
+  const [isGeneratingNarrative, setIsGeneratingNarrative] = useState(false);
+  const [isGeneratingBaseline, setIsGeneratingBaseline] = useState(false);
 
   const updateAnalysis = React.useCallback(() => {
     const currentDecisions = tracker.getAllDecisions();
@@ -194,6 +198,82 @@ export default function PersonalizationTestPage() {
   const clearDecisions = () => {
     tracker.clearDecisions();
     updateAnalysis();
+    setSampleNarrative('');
+    setBaselineNarrative('');
+  };
+
+  const generateSampleNarrative = async () => {
+    if (!enhancement) return;
+    
+    setIsGeneratingNarrative(true);
+    
+    try {
+      // Create a sample scenario prompt that would be enhanced with personalization
+      const basePrompt = `You are exploring an ancient temple. The air is thick with dust and mystery. Ahead, you see two paths: one leads deeper into darkness, while the other shows faint light filtering through cracks in the stone walls. What do you do?`;
+      
+      const personalizedPrompt = `${basePrompt}
+
+PERSONALIZATION CONTEXT:
+${enhancement}
+
+Generate a narrative response (2-3 paragraphs) that adapts to the player's established personality and preferences. The narrative should reflect their decision-making style and preferred approaches to problem-solving.`;
+
+      const response = await fetch('/api/narrative/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: personalizedPrompt,
+          maxTokens: 300
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSampleNarrative(data.content || 'No narrative generated');
+    } catch (error) {
+      console.error('Error generating narrative:', error);
+      setSampleNarrative('Error generating narrative. This demonstrates how the personalization would work with a live AI connection.');
+    } finally {
+      setIsGeneratingNarrative(false);
+    }
+  };
+
+  const generateBaselineNarrative = async () => {
+    setIsGeneratingBaseline(true);
+    
+    try {
+      const basePrompt = `You are exploring an ancient temple. The air is thick with dust and mystery. Ahead, you see two paths: one leads deeper into darkness, while the other shows faint light filtering through cracks in the stone walls. What do you do?
+
+Generate a narrative response (2-3 paragraphs) describing the scene and potential choices.`;
+
+      const response = await fetch('/api/narrative/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: basePrompt,
+          maxTokens: 300
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setBaselineNarrative(data.content || 'No narrative generated');
+    } catch (error) {
+      console.error('Error generating baseline narrative:', error);
+      setBaselineNarrative('Error generating narrative. This demonstrates the comparison between personalized and standard narrative generation.');
+    } finally {
+      setIsGeneratingBaseline(false);
+    }
   };
 
   const getStyleBadgeColor = (style: string) => {
@@ -460,6 +540,82 @@ export default function PersonalizationTestPage() {
                   Record some decisions to see narrative enhancement.
                 </p>
               )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Personalized Narrative Demo</CardTitle>
+              <CardDescription>
+                Compare how personalization affects actual AI narrative generation
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900 mb-2">Sample Scenario</h4>
+                <p className="text-blue-800 text-sm">
+                  &ldquo;You are exploring an ancient temple. The air is thick with dust and mystery. 
+                  Ahead, you see two paths: one leads deeper into darkness, while the other shows 
+                  faint light filtering through cracks in the stone walls. What do you do?&rdquo;
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <Button 
+                    onClick={generateBaselineNarrative}
+                    disabled={isGeneratingBaseline}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    {isGeneratingBaseline ? 'Generating...' : 'Generate Standard Narrative'}
+                  </Button>
+                  
+                  {baselineNarrative && (
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h4 className="font-medium text-gray-900 mb-2">🤖 Standard AI Narrative</h4>
+                      <div className="text-gray-800 text-sm whitespace-pre-wrap">
+                        {baselineNarrative}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={generateSampleNarrative}
+                    disabled={isGeneratingNarrative || !enhancement}
+                    className="w-full"
+                  >
+                    {isGeneratingNarrative ? 'Generating...' : 'Generate Personalized Narrative'}
+                  </Button>
+                  
+                  {sampleNarrative && (
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <h4 className="font-medium text-green-900 mb-2">✨ Personalized AI Narrative</h4>
+                      <div className="text-green-800 text-sm whitespace-pre-wrap">
+                        {sampleNarrative}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {!enhancement && (
+                <div className="p-3 bg-orange-50 rounded border border-orange-200">
+                  <p className="text-orange-800 text-sm">
+                    📝 <strong>Record some decisions first</strong> to enable personalized narrative generation.
+                  </p>
+                </div>
+              )}
+              
+              <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
+                <p className="text-yellow-800 text-xs">
+                  💡 <strong>How it works:</strong> Compare the two narratives to see how personalization context 
+                  affects AI storytelling. The personalized version uses your detected personality traits, 
+                  decision patterns, and preferences to craft a narrative that matches your play style.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
