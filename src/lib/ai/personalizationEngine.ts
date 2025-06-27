@@ -194,13 +194,18 @@ export class PersonalizationEngine {
       }
     }
 
-    // Add decision patterns
+    // Add decision patterns analysis
     if (context.character.recentDecisions.length > 0) {
-      const choiceTypes = context.character.recentDecisions
-        .map(d => d.choiceType)
-        .filter(type => type && typeof type === 'string');
-      if (choiceTypes.length > 0) {
-        enhancements.push(`DECISION PATTERNS: Player tends to make ${choiceTypes.join(', ')} choices.`);
+      const preferredTypes = context.playerPreferences.preferredChoiceTypes
+        .filter(type => type && typeof type === 'string')
+        .slice(0, 3); // Top 3 preferred types
+      
+      if (preferredTypes.length > 0) {
+        const patternDescription = preferredTypes.length === 1 
+          ? `primarily ${preferredTypes[0]}` 
+          : `${preferredTypes.slice(0, -1).join(', ')} and ${preferredTypes[preferredTypes.length - 1]}`;
+        
+        enhancements.push(`DECISION PATTERNS: Player tends to make ${patternDescription} choices. This suggests a preference for ${this.getPatternInsight(preferredTypes)} approaches to problem-solving.`);
       }
     }
 
@@ -375,6 +380,31 @@ export class PersonalizationEngine {
     if (detailRatio > 0.6) return 'detailed';
     if (detailRatio > 0.3) return 'moderate';
     return 'minimal';
+  }
+
+  /**
+   * Provides insight into what choice patterns suggest about player approach
+   */
+  private getPatternInsight(preferredTypes: string[]): string {
+    const insights: Record<string, string> = {
+      'diplomatic': 'negotiation and peaceful resolution',
+      'aggressive': 'direct confrontation and decisive action',
+      'stealthy': 'careful planning and subtle maneuvering',
+      'helpful': 'cooperation and supportive behavior',
+      'selfish': 'self-interested and independent decision-making',
+      'lawful': 'rule-following and structured problem-solving',
+      'chaotic': 'spontaneous and unconventional thinking',
+      'neutral': 'balanced and measured responses'
+    };
+    
+    const primaryInsights = preferredTypes
+      .map(type => insights[type])
+      .filter(insight => insight);
+    
+    if (primaryInsights.length === 0) return 'varied';
+    if (primaryInsights.length === 1) return primaryInsights[0];
+    
+    return `${primaryInsights.slice(0, -1).join(', ')} with elements of ${primaryInsights[primaryInsights.length - 1]}`;
   }
 
   /**
