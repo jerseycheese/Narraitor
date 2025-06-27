@@ -14,6 +14,7 @@ Comprehensive guide to AI-powered features in Narraitor using Google Gemini.
 Narraitor uses Google Gemini AI for multiple systems:
 - **Narrative Generation**: Dynamic story creation and progression
 - **Choice Generation**: Context-aware player options
+- **Goal Tracking**: Automatic extraction and tracking of player objectives
 - **World Suggestions**: AI-assisted world attribute and skill recommendations
 - **Smart Templates**: Automated world template generation
 - **Ending Detection**: Intelligent story conclusion point detection
@@ -160,6 +161,54 @@ Generated templates include:
 - Suggested attributes and skills
 - Theme and genre information
 - Template preview modal before selection
+
+## Goal Tracking System
+
+AI-powered extraction and tracking of player objectives for narrative consistency.
+
+### Key Features
+- **Automatic Extraction**: AI identifies explicit and implicit goals from narrative content
+- **Progress Tracking**: Monitors goal mentions, status, and completion
+- **Context Integration**: Goals automatically included in AI prompts for consistency
+- **Priority Management**: Critical, high, medium, and low priority classification
+- **Session Isolation**: Goals organized by game session
+
+### Goal Types
+- **Immediate**: Right-now actions requiring immediate attention
+- **Quest**: Specific objectives with clear completion criteria
+- **Exploration**: Discovery-based goals for world exploration
+- **Social**: Relationship and interaction objectives
+- **Mystery**: Investigation and puzzle-solving goals
+- **Survival**: Life-threatening situations requiring urgent action
+
+### Integration Example
+```typescript
+// Goals are automatically extracted from narrative
+const narrative = "The wizard warned me that the dragon will attack at dawn. I must find the Sword of Light before then.";
+
+// System extracts: "Find the Sword of Light" (critical priority, quest type)
+// Goals automatically included in subsequent AI prompts:
+// "ACTIVE GOALS: URGENT: Find the Sword of Light before dawn"
+```
+
+### Context Building
+```typescript
+import { aiContextStore } from '@/state/aiContextStore';
+
+const context = aiContextStore.buildContextForSession(sessionId, {
+  includeGoals: true,
+  maxTokens: 500,
+  prioritizeRecent: true
+});
+
+// Returns formatted goal context for AI consumption
+```
+
+### Detailed Documentation
+- **API Reference**: [Goal System API](../api/goal-system-api.md)
+- **Usage Guide**: [Goal Tracking Usage](../technical-guides/goal-tracking-usage.md)
+- **Integration Guide**: [Goal System Integration](../technical-guides/goal-system-integration.md)
+- **Feature Overview**: [Narrative Consistency Tracking](./narrative-consistency-tracking.md)
 
 ## Ending Detection
 

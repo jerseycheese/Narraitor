@@ -34,6 +34,23 @@ Welcome to the documentation for Narraitor, a world-agnostic narrative-driven RP
 - [[core-systems/character-system|Character System]]
 - [[core-systems/narrative-engine|Narrative Engine]]
 - [[core-systems/journal-system|Journal System]]
+- [[features/narrative-consistency-tracking|Goal Tracking System]]
+
+### Features
+- [[features/ai-systems|AI Systems Overview]]
+- [[features/narrative-consistency-tracking|Narrative Consistency Tracking]]
+- [[features/personalized-narrative-system|Personalized Narrative System]]
+- [[features/world-management|World Management]]
+
+### API Documentation
+- [[api/goal-system-api|Goal System API Reference]]
+- [[api/types-reference|Types Reference]]
+
+### Technical Guides
+- [[technical-guides/goal-tracking-usage|Goal Tracking Usage Guide]]
+- [[technical-guides/goal-system-integration|Goal System Integration]]
+- [[technical-guides/lore-tracking-system|Lore Tracking System]]
+- [[technical-guides/state-management-usage|State Management Usage]]
 
 ### Development
 - [[development/tdd-with-kiss|Test-Driven Development with KISS]]
