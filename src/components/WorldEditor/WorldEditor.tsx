@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
+import { Button } from '@/components/ui/button';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
@@ -82,12 +83,12 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
     return (
       <div className="p-4">
         <div className="text-red-600">{error || 'World not found'}</div>
-        <button 
+        <Button 
           onClick={() => router.push('/worlds')}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="mt-4"
         >
           Return to Worlds
-        </button>
+        </Button>
       </div>
     );
   }
@@ -127,20 +128,19 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
       />
       
       <div className="flex justify-end space-x-4 pt-4 border-t">
-        <button 
+        <Button 
+          variant="outline"
           onClick={handleCancel}
-          className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
           disabled={saving}
         >
           Cancel
-        </button>
-        <button 
+        </Button>
+        <Button 
           onClick={handleSave}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           disabled={saving}
         >
           {saving ? 'Saving...' : 'Save Changes'}
-        </button>
+        </Button>
       </div>
     </div>
   );

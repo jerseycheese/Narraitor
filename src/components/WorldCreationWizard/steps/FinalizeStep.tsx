@@ -8,6 +8,7 @@ import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
+import { Button } from '@/components/ui/button';
 
 interface FinalizeStepProps {
   worldData: Partial<World>;
@@ -239,36 +240,35 @@ export default function FinalizeStep({
 
       <div className="mt-6 flex justify-between">
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}
-            className={wizardStyles.navigation.cancelButton}
+            variant="outline"
           >
             Cancel
-          </button>
+          </Button>
           
           {onBack && (
-            <button
+            <Button
               type="button"
               onClick={onBack}
-              className={wizardStyles.navigation.secondaryButton}
+              variant="outline"
             >
               Back
-            </button>
+            </Button>
           )}
         </div>
         
-        <button
+        <Button
           type="button"
           data-testid="step-complete-button"
           onClick={() => {
             log('[FinalizeStep.tsx - inline onClick] Button raw click detected.');
             handleComplete();
           }}
-          className={wizardStyles.navigation.primaryButton}
         >
           Create World
-        </button>
+        </Button>
       </div>
     </div>
   );

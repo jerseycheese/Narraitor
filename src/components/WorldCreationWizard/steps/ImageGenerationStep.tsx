@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { World, WorldImage } from '@/types/world.types';
-import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
+import { WizardFormSection } from '@/components/shared/wizard';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
+import { Button } from '@/components/ui/button';
 
 interface ImageGenerationStepProps {
   worldData: Partial<World>;
@@ -146,56 +147,55 @@ export default function ImageGenerationStep({
       {/* Navigation */}
       <div className="mt-6 flex justify-between">
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
             onClick={onCancel || (() => window.history.back())}
-            className={wizardStyles.navigation.cancelButton}
+            variant="outline"
             disabled={isGenerating}
           >
             Cancel
-          </button>
+          </Button>
           
           {onBack && (
-            <button
+            <Button
               type="button"
               onClick={onBack}
-              className={wizardStyles.navigation.secondaryButton}
+              variant="outline"
               disabled={isGenerating}
             >
               Back
-            </button>
+            </Button>
           )}
         </div>
         
         <div className="flex gap-2">
           {!generatedImage && !isGenerating && (
-            <button
+            <Button
               type="button"
               onClick={handleSkip}
-              className={wizardStyles.navigation.secondaryButton}
+              variant="outline"
             >
               Skip Image
-            </button>
+            </Button>
           )}
           
           {generatedImage && !isGenerating && (
-            <button
+            <Button
               type="button"
               onClick={generateImage}
-              className={wizardStyles.navigation.secondaryButton}
+              variant="outline"
             >
               Regenerate
-            </button>
+            </Button>
           )}
           
-          <button
+          <Button
             type="button"
             onClick={handleContinue}
-            className={wizardStyles.navigation.primaryButton}
             disabled={isGenerating || (!generatedImage && !skipGeneration)}
           >
             {generatedImage ? 'Continue' : 'Skip & Continue'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

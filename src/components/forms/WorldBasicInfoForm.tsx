@@ -3,6 +3,7 @@ import { World } from '@/types/world.types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import { GENRES } from '@/lib/constants/genres';
 
 interface WorldBasicInfoFormProps {
@@ -44,18 +45,17 @@ const WorldBasicInfoForm: React.FC<WorldBasicInfoFormProps> = ({ world, onChange
           <Label htmlFor="worldGenre">
             Genre
           </Label>
-          <select
+          <Select
             id="worldGenre"
             value={world.genre}
             onChange={(e) => onChange({ genre: e.target.value })}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {GENRES.map((genre) => (
               <option key={genre.value} value={genre.value}>
                 {genre.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
     </section>

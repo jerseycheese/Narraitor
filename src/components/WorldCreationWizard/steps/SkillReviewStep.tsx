@@ -23,6 +23,7 @@ import {
   WizardTextArea,
   WizardSelect
 } from '@/components/shared/wizard';
+import { Button } from '@/components/ui/button';
 
 interface ExtendedSkillSuggestion extends SkillSuggestion {
   showDetails?: boolean;
@@ -355,9 +356,10 @@ export default function SkillReviewStep({
               </div>
               
               <div className="flex items-center gap-2">
-                <button 
+                <Button 
                   type="button" 
-                  className="text-sm text-blue-600 hover:underline focus:outline-none"
+                  variant="link"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     const newSuggestions = [...localSuggestions];
@@ -369,19 +371,16 @@ export default function SkillReviewStep({
                   }}
                 >
                   {suggestion.showDetails ? 'Hide details' : 'Customize'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   data-testid={`skill-toggle-${index}`}
                   onClick={() => handleToggleSkill(index)}
-                  className={`${wizardStyles.toggle.button} ${
-                    suggestion.accepted 
-                      ? wizardStyles.toggle.active 
-                      : wizardStyles.toggle.inactive
-                  }`}
+                  variant={suggestion.accepted ? "default" : "outline"}
+                  size="sm"
                 >
                   {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
-                </button>
+                </Button>
               </div>
             </div>
             
@@ -509,15 +508,15 @@ export default function SkillReviewStep({
                 Create your own unique skills for this world ({acceptedCount}/12 slots used)
               </p>
             </div>
-            <button
+            <Button
               type="button"
               onClick={handleAddCustomSkill}
-              className={`${wizardStyles.navigation.primaryButton} text-sm`}
+              size="sm"
               data-testid="add-custom-skill-button"
               disabled={acceptedCount >= 12}
             >
               + Add Custom Skill
-            </button>
+            </Button>
           </div>
           
           {customSkills.length === 0 && !isCreatingCustomSkill ? (
@@ -560,22 +559,24 @@ export default function SkillReviewStep({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleEditCustomSkill(skill.id)}
-                        className="text-sm text-blue-600 hover:underline"
+                        variant="link"
+                        size="sm"
                         data-testid={`edit-custom-skill-${skill.id}`}
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => handleDeleteCustomSkill(skill.id)}
-                        className="text-sm text-red-600 hover:underline"
+                        variant="destructive"
+                        size="sm"
                         data-testid={`delete-custom-skill-${skill.id}`}
                       >
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </div>
                   <div className="mt-2 text-sm text-gray-600">

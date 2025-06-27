@@ -9,6 +9,7 @@ import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { AttributeSuggestion, SkillSuggestion } from '../WizardState';
 import { World } from '@/types/world.types';
+import { Button } from '@/components/ui/button';
 
 interface TemplateStepProps {
   selectedTemplateId: string | null | undefined;
@@ -194,36 +195,33 @@ const TemplateStep: React.FC<TemplateStepProps> = ({
       )}
       
       <div className="mt-6 flex justify-between">
-        <button
+        <Button
           type="button"
           onClick={onCancel || (() => window.history.back())}
-          className={wizardStyles.navigation.cancelButton}
+          variant="outline"
         >
           Cancel
-        </button>
+        </Button>
         
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
             onClick={handleCreateOwnWorld}
-            className={wizardStyles.navigation.secondaryButton}
+            variant="outline"
             data-testid="create-own-button"
           >
             Create My Own World
-          </button>
+          </Button>
           
           {currentMode === 'traditional' && (
-            <button
+            <Button
               type="button"
               onClick={handleApplyTemplate}
               disabled={!selectedTemplateId || isApplying}
-              className={`${wizardStyles.navigation.primaryButton} ${
-                (!selectedTemplateId || isApplying) ? 'disabled:bg-gray-300 disabled:cursor-not-allowed' : ''
-              }`}
               data-testid="next-button"
             >
               {isApplying ? 'Applying Template...' : 'Use Selected Template'}
-            </button>
+            </Button>
           )}
         </div>
       </div>

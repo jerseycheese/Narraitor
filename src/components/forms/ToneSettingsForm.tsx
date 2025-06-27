@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import { ErrorBlock } from '@/components/shared';
 import {
   ToneSettings,
@@ -63,52 +64,49 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
         {/* Content Rating */}
         <div className="space-y-2">
           <Label htmlFor="content-rating">Content Rating</Label>
-          <select
+          <Select
             id="content-rating"
             value={toneSettings.contentRating}
             onChange={(e) => formUpdater.updateField('contentRating', e.target.value as ContentRating)}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {contentRatingOptions.map((option) => (
               <option key={option.value} value={option.value} title={option.description}>
                 {option.label} - {option.description}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Narrative Style */}
         <div className="space-y-2">
           <Label htmlFor="narrative-style">Narrative Style</Label>
-          <select
+          <Select
             id="narrative-style"
             value={toneSettings.narrativeStyle}
             onChange={(e) => formUpdater.updateField('narrativeStyle', e.target.value as NarrativeStyle)}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {narrativeStyleOptions.map((option) => (
               <option key={option.value} value={option.value} title={option.description}>
                 {option.label} - {option.description}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Language Complexity */}
         <div className="space-y-2">
           <Label htmlFor="language-complexity">Language Complexity</Label>
-          <select
+          <Select
             id="language-complexity"
             value={toneSettings.languageComplexity}
             onChange={(e) => formUpdater.updateField('languageComplexity', e.target.value as LanguageComplexity)}
-            className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {languageComplexityOptions.map((option) => (
               <option key={option.value} value={option.value} title={option.description}>
                 {option.label} - {option.description}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {/* Custom Instructions */}

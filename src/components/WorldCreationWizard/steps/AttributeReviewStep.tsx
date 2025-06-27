@@ -13,6 +13,7 @@ import {
   WizardTextField,
   WizardTextArea
 } from '@/components/shared/wizard';
+import { Button } from '@/components/ui/button';
 
 interface AttributeReviewStepProps {
   worldData: Partial<World>;
@@ -252,9 +253,10 @@ export default function AttributeReviewStep({
               </div>
               
               <div className="flex items-center gap-2">
-                <button 
+                <Button 
                   type="button" 
-                  className="text-sm text-blue-600 hover:underline focus:outline-none"
+                  variant="link"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     const newSuggestions = [...localSuggestions];
@@ -266,19 +268,16 @@ export default function AttributeReviewStep({
                   }}
                 >
                   {suggestion.showDetails ? 'Hide details' : 'Customize'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   data-testid={`attribute-toggle-${index}`}
                   onClick={() => handleToggleAttribute(index)}
-                  className={`${wizardStyles.toggle.button} ${
-                    suggestion.accepted 
-                      ? wizardStyles.toggle.active 
-                      : wizardStyles.toggle.inactive
-                  }`}
+                  variant={suggestion.accepted ? "default" : "outline"}
+                  size="sm"
                 >
                   {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
-                </button>
+                </Button>
               </div>
             </div>
             
@@ -340,15 +339,15 @@ export default function AttributeReviewStep({
                 Create your own unique attributes for this world ({acceptedCount}/6 slots used)
               </p>
             </div>
-            <button
+            <Button
               type="button"
               onClick={handleAddCustomAttribute}
-              className={`${wizardStyles.navigation.primaryButton} text-sm`}
+              size="sm"
               data-testid="add-custom-attribute-button"
               disabled={acceptedCount >= 6}
             >
               + Add Custom Attribute
-            </button>
+            </Button>
           </div>
           
           {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
@@ -382,22 +381,24 @@ export default function AttributeReviewStep({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleEditCustomAttribute(attribute.id)}
-                        className="text-sm text-blue-600 hover:underline"
+                        variant="link"
+                        size="sm"
                         data-testid={`edit-custom-attribute-${attribute.id}`}
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
                         onClick={() => handleDeleteCustomAttribute(attribute.id)}
-                        className="text-sm text-red-600 hover:underline"
+                        variant="destructive"
+                        size="sm"
                         data-testid={`delete-custom-attribute-${attribute.id}`}
                       >
                         Delete
-                      </button>
+                      </Button>
                     </div>
                   </div>
                   <div className="mt-2 text-sm text-gray-600">
