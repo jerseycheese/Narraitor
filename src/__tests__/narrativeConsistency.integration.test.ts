@@ -92,8 +92,8 @@ describe('Narrative Consistency Integration Tests', () => {
         timestamp: new Date(),
       });
 
-      // Process goals from discovery
-      await useGoalStore.getState().processSegmentForGoals(discoverySegmentId, characterId);
+      // Wait for automatic goal processing to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Verify goal was extracted and stored
       const activeGoals = useGoalStore.getState().getActiveGoalsBySession(sessionId);
@@ -133,7 +133,8 @@ describe('Narrative Consistency Integration Tests', () => {
         timestamp: new Date(),
       });
 
-      await useGoalStore.getState().processSegmentForGoals(travelSegmentId, characterId);
+      // Wait for automatic goal processing to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       // ===== STEP 3: Generate next narrative with goal context =====
 
