@@ -248,7 +248,7 @@ describe('Narrative Consistency Integration Tests', () => {
       expect(finalGoal.title).toBe('Investigate the mysterious hole');
       expect(finalGoal.status).toBe('active');
       expect(finalGoal.mentionCount).toBe(3);
-      expect(finalGoal.progressNotes).toContain('Brought Sarah back to investigate');
+      expect(finalGoal.progressNotes).toContain('Brought Sarah back to investigate the hole');
 
       // Goal should be consistently included in AI context
       const finalContext = useAiContextStore.getState().buildContextForSession(sessionId, {
