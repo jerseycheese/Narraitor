@@ -2,6 +2,7 @@ import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { useAiContextStore } from '@/state/aiContextStore';
 import {
   Decision,
   NarrativeContext,
@@ -41,6 +42,26 @@ export class NarrativeGenerator {
   }
 
   /**
+   * Enhances a prompt with goal context from the AI context store
+   */
+  private enhancePromptWithGoalContext(prompt: string, sessionId?: string): string {
+    if (!sessionId) return prompt;
+
+    try {
+      const aiContext = useAiContextStore.getState().buildContextForSession(sessionId);
+      
+      if (aiContext.goalContext && aiContext.goalContext.trim()) {
+        return `${prompt}\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
+      }
+      
+      return prompt;
+    } catch (error) {
+      console.warn('Failed to add goal context to prompt:', error);
+      return prompt;
+    }
+  }
+
+  /**
    * Enhances a prompt with detailed tone settings for consistent narrative style
    */
   private enhancePromptWithToneSettings(prompt: string, world: World): string {
@@ -54,6 +75,65 @@ export class NarrativeGenerator {
     );
 
     return prompt + detailedInstructions;
+  }
+
+  /**
+   * Extract session ID from decisions for goal context
+   */
+  private extractSessionId(decisions: Array<{ sessionId?: string }>): string | null {
+    // Try to find a session ID from the decision history
+    for (const decision of decisions) {
+      if (decision.sessionId) {
+        return decision.sessionId;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Convert NarrativeGoal to CharacterGoal for personalization engine
+   */
+  private convertToCharacterGoals(narrativeGoals: Array<any>): Array<any> {
+    return narrativeGoals.map(goal => ({
+      id: goal.id,
+      description: goal.description || goal.title,
+      priority: this.mapGoalPriority(goal.priority),
+      progress: this.calculateGoalProgress(goal),
+      establishedAt: goal.createdAt,
+      isActive: goal.status === 'active'
+    }));
+  }
+
+  /**
+   * Map goal priority from NarrativeGoal to CharacterGoal format
+   */
+  private mapGoalPriority(priority: string): 'primary' | 'secondary' | 'minor' {
+    switch (priority) {
+      case 'critical':
+      case 'high':
+        return 'primary';
+      case 'medium':
+        return 'secondary';
+      case 'low':
+      default:
+        return 'minor';
+    }
+  }
+
+  /**
+   * Calculate goal progress based on completion status and mention count
+   */
+  private calculateGoalProgress(goal: any): number {
+    if (goal.status === 'completed') return 100;
+    if (goal.status === 'abandoned') return 0;
+    
+    // Estimate progress based on mention count (more mentions = more progress)
+    const mentionCount = goal.mentionCount || 0;
+    if (mentionCount === 0) return 0;
+    if (mentionCount >= 10) return 80; // High activity suggests near completion
+    if (mentionCount >= 5) return 60;
+    if (mentionCount >= 3) return 40;
+    return 20; // Some progress made
   }
 
   /**
@@ -107,12 +187,18 @@ export class NarrativeGenerator {
       const decisions = playerDecisionTracker.getWorldDecisions(worldId);
       
       // Create personalized context
+      // Get goals from AI context store
+      const sessionId = this.extractSessionId(decisions);
+      const aiContext = sessionId ? useAiContextStore.getState().buildContextForSession(sessionId) : null;
+      const narrativeGoals = aiContext?.activeGoals || [];
+      const characterGoals = this.convertToCharacterGoals(narrativeGoals);
+
       const personalizedContext = this.personalizationEngine.createPersonalizedContext(
         playerCharacter,
         world,
         decisions,
         [], // relationships - future enhancement
-        [], // goals - future enhancement
+        characterGoals, // converted goals for personalization engine
         []  // narrative history - future enhancement
       );
 
@@ -138,11 +224,12 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       const prompt = template(context);
       
-      // Add tone settings, lore context, and personalization to prompt
+      // Add tone settings, lore context, goal context, and personalization to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(prompt, world);
       const loreEnhancedPrompt = this.enhancePromptWithLore(toneEnhancedPrompt, request.worldId);
+      const goalEnhancedPrompt = this.enhancePromptWithGoalContext(loreEnhancedPrompt, request.sessionId);
       const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
-        loreEnhancedPrompt,
+        goalEnhancedPrompt,
         request.worldId,
         request.characterIds || []
       );

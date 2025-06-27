@@ -336,16 +336,13 @@ describe('goalStore', () => {
     });
 
     test('should handle persistence errors gracefully', () => {
-      const store = useGoalStore.getState();
-      
       // Simulate error by setting error state
-      store.setError('Persistence failed');
-      
-      expect(store.error).toBe('Persistence failed');
+      useGoalStore.getState().setError('Persistence failed');
+      expect(useGoalStore.getState().error).toBe('Persistence failed');
       
       // Clear error
-      store.clearError();
-      expect(store.error).toBeNull();
+      useGoalStore.getState().clearError();
+      expect(useGoalStore.getState().error).toBeNull();
     });
   });
 });

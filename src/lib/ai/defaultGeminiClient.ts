@@ -24,8 +24,28 @@ class MockGeminiClient implements AIClient {
     const isChoiceGeneration = prompt.includes('create 4 distinct action choices') || 
                               prompt.includes('ALIGNMENT DEFINITIONS') ||
                               prompt.includes('alignedPlayerChoice');
+    const isGoalExtraction = prompt.includes('goal extraction system') || prompt.includes('Extract goals following these rules');
+    const isGoalCompletion = prompt.includes('Has this goal been completed') || prompt.includes('COMPLETED" or "NOT_COMPLETED');
     
-    if (isInitialScene) {
+    if (isGoalExtraction) {
+      // Handle goal extraction
+      const content = this.generateGoalExtractionResponse(prompt);
+      return {
+        content,
+        finishReason: 'STOP',
+        promptTokens: 150,
+        completionTokens: 250
+      };
+    } else if (isGoalCompletion) {
+      // Handle goal completion detection
+      const content = this.generateGoalCompletionResponse(prompt);
+      return {
+        content,
+        finishReason: 'STOP',
+        promptTokens: 80,
+        completionTokens: 20
+      };
+    } else if (isInitialScene) {
       // Generate a scene based on the genre/world name
       const content = this.generateInitialSceneByGenre(genre?.trim(), worldName?.trim());
       return {
@@ -231,6 +251,249 @@ Options:
       case 'steampunk': return 'Victorian Metropolis';
       default: return 'Starting Location';
     }
+  }
+
+  // Generate goal extraction response based on narrative content
+  private generateGoalExtractionResponse(prompt: string): string {
+    const narrativeContent = prompt.toLowerCase();
+    
+    // Extract session and character IDs from the prompt
+    const sessionIdMatch = prompt.match(/"sessionId":\s*"([^"]+)"/);
+    const characterIdMatch = prompt.match(/"characterId":\s*"([^"]+)"/);
+    const segmentIdMatch = prompt.match(/"originSegmentId":\s*"([^"]+)"/);
+    const worldIdMatch = prompt.match(/"worldId":\s*"([^"]+)"/);
+    
+    const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'session-123';
+    const characterId = characterIdMatch ? characterIdMatch[1] : 'char-789';
+    const segmentId = segmentIdMatch ? segmentIdMatch[1] : 'segment-456';
+    const worldId = worldIdMatch ? worldIdMatch[1] : 'world-101';
+
+    // Check for specific test scenarios - put most specific conditions first
+    if (narrativeContent.includes('peer into the hole') && narrativeContent.includes('light flickering')) {
+      // Handle goal update scenario - must come before generic hole condition
+      return `\`\`\`json
+{
+  "newGoals": [],
+  "updatedGoals": [
+    {
+      "goalId": "goal-456",
+      "updates": {
+        "mentionCount": 2,
+        "progressNotes": ["light flickering"],
+        "lastMentionedAt": "${new Date().toISOString()}"
+      }
+    }
+  ],
+  "completedGoals": [],
+  "confidence": 0.85
+}
+\`\`\``;
+    }
+
+    if (narrativeContent.includes('insert the key') && narrativeContent.includes('door creaks open')) {
+      // Handle completion scenario
+      return `\`\`\`json
+{
+  "newGoals": [],
+  "updatedGoals": [
+    {
+      "goalId": "goal-123",
+      "updates": {
+        "completionMethod": "achieved"
+      }
+    }
+  ],
+  "completedGoals": ["goal-123"],
+  "confidence": 0.9
+}
+\`\`\``;
+    }
+
+    if (narrativeContent.includes('hole in the wall') && narrativeContent.includes('investigate')) {
+      return `\`\`\`json
+{
+  "newGoals": [
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "investigate the mysterious hole",
+      "description": "Found a hole in the wall that needs investigation",
+      "type": "exploration",
+      "priority": "medium",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["hole", "wall", "investigate"],
+      "contextSummary": "Player needs to investigate mysterious hole in wall",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    }
+  ],
+  "updatedGoals": [],
+  "completedGoals": [],
+  "confidence": 0.8
+}
+\`\`\``;
+    }
+
+    if (narrativeContent.includes('rusty key') && narrativeContent.includes('examine')) {
+      return `\`\`\`json
+{
+  "newGoals": [
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Find what the key unlocks",
+      "description": "Discovered a rusty key with strange markings",
+      "type": "quest",
+      "priority": "medium",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["key", "unlock", "door"],
+      "contextSummary": "Player found mysterious key and needs to find what it unlocks",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    }
+  ],
+  "updatedGoals": [],
+  "completedGoals": [],
+  "confidence": 0.75
+}
+\`\`\``;
+    }
+
+    if (narrativeContent.includes('three tasks') && narrativeContent.includes('artifact') && narrativeContent.includes('daughter')) {
+      // Handle multiple goals scenario
+      return `\`\`\`json
+{
+  "newGoals": [
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Find the stolen artifact",
+      "description": "Merchant asked to recover stolen artifact",
+      "type": "quest",
+      "priority": "medium",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["artifact", "stolen", "find"],
+      "contextSummary": "Merchant wants player to find stolen artifact",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    },
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Rescue the merchant's daughter",
+      "description": "Save daughter from bandits",
+      "type": "quest",
+      "priority": "medium",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["daughter", "rescue", "bandits"],
+      "contextSummary": "Merchant wants player to rescue his daughter from bandits",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    },
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Deliver message to neighboring village",
+      "description": "Carry message to nearby village",
+      "type": "quest",
+      "priority": "medium",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["message", "deliver", "village"],
+      "contextSummary": "Merchant wants player to deliver message to neighboring village",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    }
+  ],
+  "updatedGoals": [],
+  "completedGoals": [],
+  "confidence": 0.9
+}
+\`\`\``;
+    }
+
+    if (narrativeContent.includes('building is on fire') && narrativeContent.includes('find sarah')) {
+      // Handle urgency scenario
+      return `\`\`\`json
+{
+  "newGoals": [
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Find Sarah before smoke gets too thick",
+      "description": "Building is on fire, must find Sarah immediately",
+      "type": "survival",
+      "priority": "critical",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["sarah", "fire", "find", "smoke"],
+      "contextSummary": "URGENT: Building on fire, must find Sarah immediately",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    },
+    {
+      "sessionId": "${sessionId}",
+      "characterId": "${characterId}",
+      "worldId": "${worldId}",
+      "title": "Return book to library",
+      "description": "Need to return book to library today",
+      "type": "quest",
+      "priority": "low",
+      "status": "active",
+      "mentionCount": 1,
+      "keywords": ["book", "library", "return"],
+      "contextSummary": "Player needs to return book to library",
+      "involvedCharacters": ["${characterId}"],
+      "originSegmentId": "${segmentId}"
+    }
+  ],
+  "updatedGoals": [],
+  "completedGoals": [],
+  "confidence": 0.85
+}
+\`\`\``;
+    }
+
+    // Default empty response for unrecognized content
+    return `\`\`\`json
+{
+  "newGoals": [],
+  "updatedGoals": [],
+  "completedGoals": [],
+  "confidence": 0
+}
+\`\`\``;
+  }
+
+  // Generate goal completion detection response
+  private generateGoalCompletionResponse(prompt: string): string {
+    const content = prompt.toLowerCase();
+    
+    // Check for completion indicators
+    if (content.includes('chest opens') || content.includes('satisfying click')) {
+      return 'COMPLETED';
+    }
+    
+    if (content.includes('tavern burns down') || content.includes('electrical fault')) {
+      return 'COMPLETED';
+    }
+    
+    if (content.includes('practice') && content.includes('fire spell') && content.includes('flame')) {
+      return 'NOT_COMPLETED';
+    }
+    
+    // Default to not completed
+    return 'NOT_COMPLETED';
   }
 }
 

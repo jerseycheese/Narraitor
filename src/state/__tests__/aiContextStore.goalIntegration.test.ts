@@ -139,7 +139,7 @@ describe('aiContextStore - Goal Integration', () => {
     test('should include recently mentioned goals', () => {
       const sessionId = 'session-123';
       const now = new Date();
-      const recentTime = new Date(now.getTime() - 30 * 60 * 1000); // 30 minutes ago
+      const recentTime = new Date(now.getTime() - 10 * 60 * 1000); // 10 minutes ago (well within 30 minute window)
       const oldTime = new Date(now.getTime() - 5 * 60 * 60 * 1000); // 5 hours ago
 
       // Create goals with different mention times
