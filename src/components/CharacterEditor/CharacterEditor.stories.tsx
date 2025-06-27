@@ -15,6 +15,35 @@ const meta = {
         push: () => {},
       },
     },
+    docs: {
+      description: {
+        component: `
+CharacterEditor provides a comprehensive interface for editing existing characters.
+
+## Key Features
+- **Pre-populated forms** with current character data
+- **Custom prompt functionality** for portrait generation with undo capability
+- **Consistent UI components** using shadcn/ui throughout
+- **Save/Cancel functionality** with proper state management
+- **Validation reuse** from character creation system
+
+## Recent Improvements
+- ✅ Custom prompt field no longer gets polluted by API responses
+- ✅ "Customize physical description" is unchecked by default
+- ✅ Added "Undo customizations" button for easy reset
+- ✅ Replaced all raw HTML elements with proper shadcn/ui components
+- ✅ Consistent button variants (default, outline, destructive, link)
+- ✅ Proper checkbox, select, textarea, and input components
+- ✅ **NEW**: Comprehensive UI standardization across entire codebase
+- ✅ **NEW**: All world editing forms now use shadcn/ui components
+- ✅ **NEW**: World creation wizard steps updated with consistent UI
+- ✅ **NEW**: Improved accessibility and keyboard navigation
+
+## Usage
+The editor automatically loads character data and provides forms for all editable fields including basic info, background, attributes, skills, and portrait generation.
+        `
+      }
+    }
   },
   decorators: [
     (Story) => {
@@ -261,5 +290,153 @@ export const ErrorWithRetry: Story = {
         </div>
       </div>
     )
+  ]
+};
+
+export const CustomPromptTesting: Story = {
+  args: {
+    characterId: 'custom-prompt-test-character'
+  },
+  decorators: [
+    (Story) => {
+      // Create a test character specifically for testing custom prompt functionality
+      const { worlds } = useWorldStore.getState();
+      const worldId = Object.keys(worlds)[0];
+      const world = worlds[worldId];
+      
+      const characterId = useCharacterStore.getState().createCharacter({
+        name: 'Custom Prompt Test Character',
+        description: 'A character for testing the custom prompt functionality',
+        worldId: worldId,
+        level: 1,
+        attributes: world.attributes.map((attr, index) => ({
+          id: `char-attr-${index}`,
+          characterId: 'custom-prompt-test-character',
+          name: attr.name,
+          baseValue: attr.baseValue,
+          modifiedValue: attr.baseValue
+        })),
+        skills: world.skills.map((skill, index) => ({
+          id: `char-skill-${index}`,
+          characterId: 'custom-prompt-test-character',
+          name: skill.name,
+          level: 3
+        })),
+        background: {
+          history: 'A test character created to demonstrate custom prompt functionality',
+          personality: 'Designed for testing UI interactions',
+          goals: ['Test custom prompts', 'Demonstrate undo functionality'],
+          fears: ['Broken UI components'],
+          physicalDescription: 'A basic character appearance for testing portrait generation',
+          relationships: []
+        },
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
+      });
+      
+      return (
+        <div className="min-h-screen bg-gray-100 p-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h2 className="font-semibold text-blue-800 mb-2">Custom Prompt Testing Instructions</h2>
+              <ul className="text-blue-700 space-y-1 text-sm">
+                <li>1. Check that &quot;Customize physical description&quot; is <strong>unchecked by default</strong></li>
+                <li>2. Check the checkbox and enter custom text in the textarea</li>
+                <li>3. Verify the &quot;Undo customizations&quot; button appears</li>
+                <li>4. Click &quot;Undo customizations&quot; to test the reset functionality</li>
+                <li>5. Note that all form elements use proper shadcn/ui components</li>
+              </ul>
+            </div>
+            <Story args={{ characterId }} />
+          </div>
+        </div>
+      );
+    }
+  ]
+};
+
+export const UIComponentShowcase: Story = {
+  args: {
+    characterId: 'ui-showcase-character'
+  },
+  decorators: [
+    (Story) => {
+      // Create a character to showcase all the UI components
+      const { worlds } = useWorldStore.getState();
+      const worldId = Object.keys(worlds)[0];
+      const world = worlds[worldId];
+      
+      const characterId = useCharacterStore.getState().createCharacter({
+        name: 'UI Components Showcase',
+        description: 'Demonstrating shadcn/ui component integration',
+        worldId: worldId,
+        level: 5,
+        attributes: world.attributes.map((attr, index) => ({
+          id: `char-attr-${index}`,
+          characterId: 'ui-showcase-character',
+          name: attr.name,
+          baseValue: attr.baseValue + 2,
+          modifiedValue: attr.baseValue + 2
+        })),
+        skills: world.skills.map((skill, index) => ({
+          id: `char-skill-${index}`,
+          characterId: 'ui-showcase-character',
+          name: skill.name,
+          level: 6
+        })),
+        background: {
+          history: 'This character showcases all the UI component improvements made to the character editor',
+          personality: 'Well-designed and consistent with the design system',
+          goals: ['Demonstrate proper UI patterns', 'Show component consistency'],
+          fears: ['Inconsistent styling', 'Raw HTML elements'],
+          physicalDescription: 'Clean, modern appearance that follows design standards',
+          relationships: []
+        },
+        isPlayer: true,
+        status: {
+          health: 150,
+          maxHealth: 150,
+          conditions: ['Enhanced UI']
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 25,
+          categories: []
+        }
+      });
+      
+      return (
+        <div className="min-h-screen bg-gray-100 p-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
+              <h2 className="font-semibold text-green-800 mb-2">shadcn/ui Component Integration</h2>
+              <ul className="text-green-700 space-y-1 text-sm">
+                <li>✅ <strong>Input</strong> components with proper styling and focus states</li>
+                <li>✅ <strong>Select</strong> components replacing raw select elements</li>
+                <li>✅ <strong>Textarea</strong> components with consistent styling</li>
+                <li>✅ <strong>Button</strong> components with variants (default, outline, destructive, link)</li>
+                <li>✅ <strong>Checkbox</strong> components with integrated labels</li>
+                <li>✅ <strong>Label</strong> components with proper accessibility</li>
+                <li>✅ <strong>NEW:</strong> RadioGroup components for better form controls</li>
+                <li>✅ <strong>NEW:</strong> Consistent styling across world editor and creation wizard</li>
+                <li>✅ <strong>NEW:</strong> Improved component reusability and maintainability</li>
+              </ul>
+            </div>
+            <Story args={{ characterId }} />
+          </div>
+        </div>
+      );
+    }
   ]
 };

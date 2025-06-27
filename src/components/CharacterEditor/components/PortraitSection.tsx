@@ -41,6 +41,7 @@ export const PortraitSection: React.FC<PortraitSectionProps> = ({
       generateButtonText="Generate Portrait"
       regenerateButtonText="Regenerate Portrait"
       removeButtonText="Remove Portrait"
+      defaultCustomPromptChecked={false}
       imageComponent={
         <CharacterPortrait
           portrait={portrait || { type: 'placeholder', url: null }}

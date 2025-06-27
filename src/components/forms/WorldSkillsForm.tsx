@@ -15,6 +15,9 @@ import SkillRangeEditor from './SkillRangeEditor';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface WorldSkillsFormProps {
   skills: WorldSkill[];
@@ -63,12 +66,12 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
     <section className="p-4 bg-white rounded shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Skills</h2>
-        <button
+        <Button
           onClick={handleAddSkill}
-          className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+          size="sm"
         >
           Add Skill
-        </button>
+        </Button>
       </div>
       
       {skills.length === 0 ? (
@@ -79,12 +82,13 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
             <div key={skill.id} className="p-3 border border-gray-200 rounded">
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">{skill.name}</h3>
-                <button
+                <Button
                   onClick={() => handleRemoveSkill(index)}
-                  className="text-red-600 hover:text-red-800"
+                  variant="destructive"
+                  size="sm"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
               
               <div className="space-y-4">
@@ -131,20 +135,19 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     <Label htmlFor={`skill-difficulty-${index}`}>
                       Difficulty
                     </Label>
-                    <select
+                    <Select
                       id={`skill-difficulty-${index}`}
                       value={skill.difficulty}
                       onChange={(e) => handleUpdateSkill(index, { 
                         difficulty: e.target.value as SkillDifficulty
                       })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded"
                     >
                       {SKILL_DIFFICULTIES.map(difficulty => (
                         <option key={difficulty.value} value={difficulty.value}>
                           {difficulty.label}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                   
                   <div className="space-y-2">
@@ -156,9 +159,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                     ) : (
                       <div className="space-y-2">
                         {attributes.map(attr => (
-                          <label key={attr.id} className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
+                          <div key={attr.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`skill-${index}-attr-${attr.id}`}
                               checked={skill.attributeIds?.includes(attr.id) || false}
                               onChange={(e) => {
                                 const isChecked = e.target.checked;
@@ -168,10 +171,9 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                                   : currentAttributeIds.filter(id => id !== attr.id);
                                 handleUpdateSkill(index, { attributeIds: newAttributeIds });
                               }}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              label={attr.name}
                             />
-                            <span className="text-sm text-gray-700">{attr.name}</span>
-                          </label>
+                          </div>
                         ))}
                       </div>
                     )}

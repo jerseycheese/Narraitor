@@ -12,6 +12,8 @@ import {
   WizardFormSection,
   wizardStyles
 } from '@/components/shared/wizard';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { GENRES } from '@/lib/constants/genres';
 
 interface BasicInfoStepProps {
@@ -75,19 +77,19 @@ export default function BasicInfoStep({
         <WizardFormGroup label="World Type" error={combinedErrors.relationship}>
           <div className="space-y-4 my-4">
             <div className="flex items-start space-x-3">
-              <input
+              <Input
                 type="radio"
                 id="relationship-none"
                 name="relationship"
                 value=""
                 checked={!worldData.relationship}
                 onChange={() => onUpdate({ ...worldData, relationship: undefined, reference: '' })}
-                className="mt-1 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4"
               />
               <div>
-                <label htmlFor="relationship-none" className="text-sm font-medium text-gray-900">
+                <Label htmlFor="relationship-none" className="text-sm font-medium text-gray-900">
                   Original World
-                </label>
+                </Label>
                 <p className="text-sm text-gray-600">
                   Create a completely original world from your imagination
                 </p>
@@ -95,20 +97,20 @@ export default function BasicInfoStep({
             </div>
             
             <div className="flex items-start space-x-3">
-              <input
+              <Input
                 type="radio"
                 id="relationship-based-on"
                 name="relationship"
                 value="based_on"
                 checked={worldData.relationship === 'inspired_by'}
                 onChange={() => onUpdate({ ...worldData, relationship: 'inspired_by' })}
-                className="mt-1 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4"
                 data-testid="relationship-based-on-radio"
               />
               <div>
-                <label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-900">
+                <Label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-900">
                   Inspired By
-                </label>
+                </Label>
                 <p className="text-sm text-gray-600">
                   Create an original world inspired by an existing fictional universe or real setting
                 </p>
@@ -116,20 +118,20 @@ export default function BasicInfoStep({
             </div>
             
             <div className="flex items-start space-x-3">
-              <input
+              <Input
                 type="radio"
                 id="relationship-set-in"
                 name="relationship"
                 value="set_in"
                 checked={worldData.relationship === 'set_within'}
                 onChange={() => onUpdate({ ...worldData, relationship: 'set_within' })}
-                className="mt-1 text-blue-600 focus:ring-blue-500"
+                className="mt-1 h-4 w-4"
                 data-testid="relationship-set-in-radio"
               />
               <div>
-                <label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-900">
+                <Label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-900">
                   Set Within
-                </label>
+                </Label>
                 <p className="text-sm text-gray-600">
                   Place your world directly within an existing fictional universe or real setting
                 </p>

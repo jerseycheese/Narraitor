@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { AttributeSuggestion, SkillSuggestion } from './WizardState';
+import { Button } from '@/components/ui/button';
 
 interface AISuggestionsProps {
   loading: boolean;
@@ -74,20 +75,22 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                     )}
                   </div>
                   <div className="flex gap-2 ml-4">
-                    <button
+                    <Button
                       onClick={() => onAcceptAttribute(attribute)}
-                      className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                      size="sm"
+                      className="bg-green-500 hover:bg-green-600"
                       aria-label={`Accept ${attribute.name}`}
                     >
                       Accept
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onRejectAttribute(attribute)}
-                      className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                      variant="destructive"
+                      size="sm"
                       aria-label={`Reject ${attribute.name}`}
                     >
                       Reject
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -122,20 +125,22 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                     </div>
                   </div>
                   <div className="flex gap-2 ml-4">
-                    <button
+                    <Button
                       onClick={() => onAcceptSkill(skill)}
-                      className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
+                      size="sm"
+                      className="bg-green-500 hover:bg-green-600"
                       aria-label={`Accept ${skill.name}`}
                     >
                       Accept
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onRejectSkill(skill)}
-                      className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                      variant="destructive"
+                      size="sm"
                       aria-label={`Reject ${skill.name}`}
                     >
                       Reject
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
