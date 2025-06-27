@@ -56,7 +56,7 @@ const sampleScenarios = [
     choices: [
       { text: "Pick the lock quietly", type: 'stealthy' as ChoiceTypePreference },
       { text: "Break down the door", type: 'aggressive' as ChoiceTypePreference },
-      { text: "Look for another way around", type: 'cautious' as ChoiceTypePreference },
+      { text: "Look for another way around", type: 'neutral' as ChoiceTypePreference },
       { text: "Ask the guard for permission", type: 'lawful' as ChoiceTypePreference }
     ]
   },
@@ -65,7 +65,7 @@ const sampleScenarios = [
     choices: [
       { text: "Immediately offer to help search", type: 'helpful' as ChoiceTypePreference },
       { text: "Politely decline and continue on", type: 'selfish' as ChoiceTypePreference },
-      { text: "Ask questions to verify their story first", type: 'cautious' as ChoiceTypePreference },
+      { text: "Ask questions to verify their story first", type: 'neutral' as ChoiceTypePreference },
       { text: "Suggest they contact local authorities", type: 'lawful' as ChoiceTypePreference }
     ]
   },
@@ -85,6 +85,24 @@ const sampleScenarios = [
       { text: "Threaten to report them", type: 'aggressive' as ChoiceTypePreference },
       { text: "Quietly warn the tourists", type: 'helpful' as ChoiceTypePreference },
       { text: "Mind your own business", type: 'selfish' as ChoiceTypePreference }
+    ]
+  },
+  {
+    prompt: "You discover someone has been going through your belongings. What do you do?",
+    choices: [
+      { text: "Confront them immediately", type: 'aggressive' as ChoiceTypePreference },
+      { text: "Set a trap to catch them", type: 'stealthy' as ChoiceTypePreference },
+      { text: "Talk to them calmly about it", type: 'diplomatic' as ChoiceTypePreference },
+      { text: "Ignore it and secure your things better", type: 'neutral' as ChoiceTypePreference }
+    ]
+  },
+  {
+    prompt: "A group is planning something that seems chaotic but fun. What do you do?",
+    choices: [
+      { text: "Join in enthusiastically", type: 'chaotic' as ChoiceTypePreference },
+      { text: "Suggest they follow proper procedures", type: 'lawful' as ChoiceTypePreference },
+      { text: "Offer to help them organize it better", type: 'helpful' as ChoiceTypePreference },
+      { text: "Watch from a distance", type: 'neutral' as ChoiceTypePreference }
     ]
   }
 ];
