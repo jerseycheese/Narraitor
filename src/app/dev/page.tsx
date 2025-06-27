@@ -8,7 +8,7 @@ export default function DevPage() {
       { href: '/dev/game-session', label: 'Game Session', color: 'blue' },
       { href: '/dev/ending-screen', label: 'Ending Screen', color: 'blue' },
       { href: '/dev/narrative-system', label: 'Narrative System', color: 'blue' },
-      { href: '/dev/personalization-test', label: 'Personalization System (Issue #303)', color: 'pink' },
+      { href: '/dev/personalization-test', label: 'Personalization System', color: 'pink' },
       { href: '/dev/choice-generator', label: 'Player Choice Generator', color: 'blue' },
       { href: '/dev/choice-alignment', label: 'Choice Alignment Test', color: 'blue' },
       { href: '/dev/decision-points', label: 'Decision Points Test', color: 'blue' },
@@ -28,8 +28,8 @@ export default function DevPage() {
       { href: '/dev/portrait-prompt-test', label: 'Portrait Testing', color: 'purple' },
     ],
     'Journal System': [
-      { href: '/dev/enhanced-journal', label: 'Enhanced Journal UI (Issue #562)', color: 'amber' },
-      { href: '/dev/journal-access', label: 'Basic Journal Access (Issue #278)', color: 'orange' },
+      { href: '/dev/enhanced-journal', label: 'Enhanced Journal UI', color: 'amber' },
+      { href: '/dev/journal-access', label: 'Basic Journal Access', color: 'orange' },
     ],
     'Navigation & UI': [
       { href: '/dev/navigation-flow', label: 'Navigation Flow', color: 'teal' },
