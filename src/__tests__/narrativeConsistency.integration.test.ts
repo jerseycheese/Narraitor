@@ -5,6 +5,7 @@ import { useNarrativeStore } from '../state/narrativeStore';
 import { useAiContextStore } from '../state/aiContextStore';
 import { goalExtractor } from '../lib/ai/goalExtractor';
 import { NarrativeGenerator } from '../lib/ai/narrativeGenerator';
+import { AIClient } from '../lib/ai/types';
 import { GoalType, GoalPriority, GoalStatus } from '../types/goal.types';
 
 // Mock AI services
@@ -37,8 +38,9 @@ describe('Narrative Consistency Integration Tests', () => {
     });
 
     useAiContextStore.setState({
-      context: {},
-      contextHistory: [],
+      contexts: {},
+      contextHistory: {},
+      activeContextId: null,
       loading: false,
       error: null,
     });
@@ -86,6 +88,8 @@ describe('Narrative Consistency Integration Tests', () => {
           tags: ['discovery', 'mystery', 'hole'],
           mood: 'mysterious',
         },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date(),
       });
 
       // Process goals from discovery
@@ -125,6 +129,8 @@ describe('Narrative Consistency Integration Tests', () => {
           tags: ['travel', 'companion', 'hole'],
           mood: 'neutral',
         },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date(),
       });
 
       await useGoalStore.getState().processSegmentForGoals(travelSegmentId, characterId);
@@ -159,7 +165,7 @@ describe('Narrative Consistency Integration Tests', () => {
       const mockGenerateSegment = jest.fn().mockResolvedValue(mockNarrativeGeneration);
       (NarrativeGenerator as jest.MockedClass<typeof NarrativeGenerator>).mockImplementation(() => ({
         generateSegment: mockGenerateSegment,
-      } as any));
+      } as unknown as NarrativeGenerator));
 
       // Build AI context including goal information
       const aiContext = useAiContextStore.getState().buildContextForSession(sessionId, {
@@ -174,7 +180,7 @@ describe('Narrative Consistency Integration Tests', () => {
       expect(aiContext.activeGoals[0].title).toBe('Investigate the mysterious hole');
 
       // Create mock instance for this specific test
-      const narrativeGeneratorInstance = new NarrativeGenerator({} as any);
+      const narrativeGeneratorInstance = new NarrativeGenerator({} as AIClient);
       
       // Generate narrative with goal context
       const generationResult = await narrativeGeneratorInstance.generateSegment({
@@ -191,7 +197,6 @@ describe('Narrative Consistency Integration Tests', () => {
           recentSegments: [useNarrativeStore.getState().segments[travelSegmentId]],
         },
         // Goal context would be included here by the narrative generator
-        goalContext: aiContext.goalContext,
       });
 
       // Verify the generated narrative maintains goal awareness
@@ -226,6 +231,8 @@ describe('Narrative Consistency Integration Tests', () => {
         content: generationResult.content,
         type: 'dialogue',
         metadata: generationResult.metadata,
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date(),
       });
 
       await useGoalStore.getState().processSegmentForGoals(returnSegmentId, characterId);
@@ -302,7 +309,7 @@ describe('Narrative Consistency Integration Tests', () => {
         type: 'action',
         metadata: {
           tags: ['success', 'key', 'discovery'],
-          mood: 'triumphant',
+          mood: 'emotional',
         },
       });
 
@@ -367,8 +374,10 @@ describe('Narrative Consistency Integration Tests', () => {
         type: 'scene',
         metadata: {
           tags: ['destruction', 'fire', 'market', 'loss'],
-          mood: 'tragic',
+          mood: 'emotional',
         },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date(),
       });
 
       await useGoalStore.getState().processSegmentForGoals(destructionSegmentId, characterId);
@@ -403,7 +412,7 @@ describe('Narrative Consistency Integration Tests', () => {
         contextSummary: 'CRITICAL: Player desperately needs water',
       });
 
-      const questGoalId = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         characterId,
         title: 'Deliver message to the council',
@@ -415,7 +424,7 @@ describe('Narrative Consistency Integration Tests', () => {
         contextSummary: 'Player has important message for council',
       });
 
-      const socialGoalId = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         characterId,
         title: 'Check on friend\'s shop',
@@ -514,6 +523,8 @@ describe('Narrative Consistency Integration Tests', () => {
           tags: ['orders', 'conflict', 'military'],
           mood: 'tense',
         },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date(),
       });
 
       await useGoalStore.getState().processSegmentForGoals(conflictSegmentId, characterId);

@@ -4,7 +4,7 @@ import { useGoalStore } from '../../goalStore';
 import { useNarrativeStore } from '../../narrativeStore';
 import { useAiContextStore } from '../../aiContextStore';
 import { goalExtractor } from '../../../lib/ai/goalExtractor';
-import { NarrativeGoal, GoalType, GoalPriority, GoalStatus } from '../../../types/goal.types';
+import { GoalType, GoalPriority, GoalStatus } from '../../../types/goal.types';
 
 // Mock the goal extractor
 jest.mock('../../../lib/ai/goalExtractor');

@@ -58,7 +58,7 @@ describe('aiContextStore - Goal Integration', () => {
         keywords: ['fire', 'escape', 'building', 'urgent'],
       });
 
-      const questGoalId = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         characterId,
         worldId,
@@ -155,7 +155,7 @@ describe('aiContextStore - Goal Integration', () => {
         contextSummary: 'Player recently discussed this exploration goal',
       });
 
-      const oldGoalId = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         title: 'Old goal',
         description: 'This goal was mentioned long ago',
@@ -211,7 +211,7 @@ describe('aiContextStore - Goal Integration', () => {
       const sessionId = 'session-123';
 
       // Initial context with one goal
-      const goalId1 = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         title: 'Initial goal',
         description: 'Starting objective',
@@ -229,7 +229,7 @@ describe('aiContextStore - Goal Integration', () => {
       useAiContextStore.getState().saveContextToHistory(sessionId, context1);
 
       // Add another goal
-      const goalId2 = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId,
         title: 'New urgent goal',
         description: 'Urgent new objective',
@@ -399,8 +399,8 @@ describe('aiContextStore - Goal Integration', () => {
           ...state.goals,
           [goalId]: {
             ...state.goals[goalId],
-            title: null as any, // Corrupt data
-            priority: 'invalid' as any,
+            title: null as unknown, // Corrupt data
+            priority: 'invalid' as unknown,
           }
         }
       }));

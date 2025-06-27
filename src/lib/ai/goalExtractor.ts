@@ -10,8 +10,7 @@ import {
   GoalType,
   GoalPriority,
   GoalStatus
-} from '../types/goal.types';
-import { EntityID } from '../types/common.types';
+} from '../../types/goal.types';
 
 export class GoalExtractor {
   private geminiClient: AIClient;
@@ -258,23 +257,23 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       // Process new goals
       if (Array.isArray(parsed.newGoals)) {
         result.newGoals = parsed.newGoals
-          .filter(g => g.title && g.description)
-          .map(g => this.validateAndCleanGoal(g));
+          .filter((g: Record<string, unknown>) => g.title && g.description)
+          .map((g: Record<string, unknown>) => this.validateAndCleanGoal(g));
       }
 
       // Process updated goals
       if (Array.isArray(parsed.updatedGoals)) {
         result.updatedGoals = parsed.updatedGoals
-          .filter(u => u.goalId && u.updates)
-          .map(u => ({
+          .filter((u: Record<string, unknown>) => u.goalId && u.updates)
+          .map((u: Record<string, unknown>) => ({
             goalId: u.goalId,
-            updates: this.validateGoalUpdates(u.updates)
+            updates: this.validateGoalUpdates(u.updates as Record<string, unknown>)
           }));
       }
 
       // Process completed goals
       if (Array.isArray(parsed.completedGoals)) {
-        result.completedGoals = parsed.completedGoals.filter(id => typeof id === 'string');
+        result.completedGoals = parsed.completedGoals.filter((id: unknown) => typeof id === 'string');
       }
 
       return result;
@@ -361,32 +360,32 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
   /**
    * Validate and clean goal data
    */
-  private validateAndCleanGoal(goal: any): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
+  private validateAndCleanGoal(goal: Record<string, unknown>): Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'> {
     const validTypes: GoalType[] = ['immediate', 'quest', 'exploration', 'social', 'mystery', 'survival'];
     const validPriorities: GoalPriority[] = ['low', 'medium', 'high', 'critical'];
     const validStatuses: GoalStatus[] = ['active', 'completed', 'abandoned', 'blocked'];
 
     return {
-      sessionId: goal.sessionId || '',
-      characterId: goal.characterId,
-      worldId: goal.worldId,
-      title: goal.title?.trim() || 'Untitled Goal',
-      description: goal.description?.trim() || 'No description',
-      type: validTypes.includes(goal.type) ? goal.type : 'quest',
-      priority: validPriorities.includes(goal.priority) ? goal.priority : 'medium',
-      status: validStatuses.includes(goal.status) ? goal.status : 'active',
-      mentionCount: Math.max(1, goal.mentionCount || 1),
-      keywords: Array.isArray(goal.keywords) ? goal.keywords.filter(k => typeof k === 'string') : [],
-      contextSummary: goal.contextSummary?.trim(),
-      involvedCharacters: Array.isArray(goal.involvedCharacters) ? goal.involvedCharacters : [],
-      originSegmentId: goal.originSegmentId
+      sessionId: String(goal.sessionId || ''),
+      characterId: goal.characterId as string | undefined,
+      worldId: goal.worldId as string | undefined,
+      title: (goal.title as string)?.trim() || 'Untitled Goal',
+      description: (goal.description as string)?.trim() || 'No description',
+      type: validTypes.includes(goal.type as GoalType) ? (goal.type as GoalType) : 'quest',
+      priority: validPriorities.includes(goal.priority as GoalPriority) ? (goal.priority as GoalPriority) : 'medium',
+      status: validStatuses.includes(goal.status as GoalStatus) ? (goal.status as GoalStatus) : 'active',
+      mentionCount: Math.max(1, Number(goal.mentionCount) || 1),
+      keywords: Array.isArray(goal.keywords) ? (goal.keywords as unknown[]).filter((k: unknown) => typeof k === 'string') as string[] : [],
+      contextSummary: (goal.contextSummary as string)?.trim(),
+      involvedCharacters: Array.isArray(goal.involvedCharacters) ? goal.involvedCharacters as string[] : [],
+      originSegmentId: goal.originSegmentId as string | undefined
     };
   }
 
   /**
    * Validate goal updates
    */
-  private validateGoalUpdates(updates: any): Partial<NarrativeGoal> {
+  private validateGoalUpdates(updates: Record<string, unknown>): Partial<NarrativeGoal> {
     const validUpdates: Partial<NarrativeGoal> = {};
 
     if (typeof updates.mentionCount === 'number') {
@@ -394,15 +393,15 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
     }
 
     if (Array.isArray(updates.progressNotes)) {
-      validUpdates.progressNotes = updates.progressNotes.filter(note => typeof note === 'string');
+      validUpdates.progressNotes = (updates.progressNotes as unknown[]).filter((note: unknown) => typeof note === 'string') as string[];
     }
 
     if (updates.lastMentionedAt) {
-      validUpdates.lastMentionedAt = new Date(updates.lastMentionedAt);
+      validUpdates.lastMentionedAt = new Date(updates.lastMentionedAt as string | number | Date);
     }
 
-    if (['achieved', 'abandoned', 'superseded'].includes(updates.completionMethod)) {
-      validUpdates.completionMethod = updates.completionMethod;
+    if (['achieved', 'abandoned', 'superseded'].includes(updates.completionMethod as string)) {
+      validUpdates.completionMethod = updates.completionMethod as 'achieved' | 'abandoned' | 'superseded';
     }
 
     return validUpdates;

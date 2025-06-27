@@ -21,6 +21,7 @@ import { TemplateGenerator, WorldTemplate } from './templateGenerator';
 import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
+import { CharacterGoal } from '@/types/personalization.types';
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -93,13 +94,13 @@ export class NarrativeGenerator {
   /**
    * Convert NarrativeGoal to CharacterGoal for personalization engine
    */
-  private convertToCharacterGoals(narrativeGoals: Array<any>): Array<any> {
+  private convertToCharacterGoals(narrativeGoals: Array<Record<string, unknown>>): CharacterGoal[] {
     return narrativeGoals.map(goal => ({
-      id: goal.id,
-      description: goal.description || goal.title,
-      priority: this.mapGoalPriority(goal.priority),
+      id: goal.id as string,
+      description: (goal.description || goal.title) as string,
+      priority: this.mapGoalPriority(goal.priority as string),
       progress: this.calculateGoalProgress(goal),
-      establishedAt: goal.createdAt,
+      establishedAt: goal.createdAt as string,
       isActive: goal.status === 'active'
     }));
   }
@@ -123,12 +124,12 @@ export class NarrativeGenerator {
   /**
    * Calculate goal progress based on completion status and mention count
    */
-  private calculateGoalProgress(goal: any): number {
+  private calculateGoalProgress(goal: Record<string, unknown>): number {
     if (goal.status === 'completed') return 100;
     if (goal.status === 'abandoned') return 0;
     
     // Estimate progress based on mention count (more mentions = more progress)
-    const mentionCount = goal.mentionCount || 0;
+    const mentionCount = Number(goal.mentionCount) || 0;
     if (mentionCount === 0) return 0;
     if (mentionCount >= 10) return 80; // High activity suggests near completion
     if (mentionCount >= 5) return 60;
@@ -191,7 +192,7 @@ export class NarrativeGenerator {
       const sessionId = this.extractSessionId(decisions);
       const aiContext = sessionId ? useAiContextStore.getState().buildContextForSession(sessionId) : null;
       const narrativeGoals = aiContext?.activeGoals || [];
-      const characterGoals = this.convertToCharacterGoals(narrativeGoals);
+      const characterGoals = this.convertToCharacterGoals(narrativeGoals as unknown as Array<Record<string, unknown>>);
 
       const personalizedContext = this.personalizationEngine.createPersonalizedContext(
         playerCharacter,

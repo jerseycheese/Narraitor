@@ -175,7 +175,7 @@ const initialState = {
 };
 
 // AI Context Store implementation
-export const aiContextStore = create<AIContextStore>()((set) => ({
+export const aiContextStore = create<AIContextStore>()((set, get) => ({
   ...initialState,
 
   // Create context
@@ -411,7 +411,7 @@ export const aiContextStore = create<AIContextStore>()((set) => ({
   },
 
   getContextHistory: (sessionId) => {
-    const state = aiContextStore.getState();
+    const state = get();
     return state.contextHistory[sessionId] || [];
   },
 

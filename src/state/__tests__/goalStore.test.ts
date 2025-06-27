@@ -1,7 +1,7 @@
 // src/state/__tests__/goalStore.test.ts
 
 import { useGoalStore } from '../goalStore';
-import { NarrativeGoal, GoalStatus, GoalPriority, GoalType } from '../../types/goal.types';
+import { GoalStatus, GoalPriority, GoalType } from '../../types/goal.types';
 
 describe('goalStore', () => {
   beforeEach(() => {
@@ -109,7 +109,7 @@ describe('goalStore', () => {
         mentionCount: 1,
       });
 
-      const goal2Id = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId: session1,
         title: 'Goal 2',
         description: 'Completed goal',
@@ -119,7 +119,7 @@ describe('goalStore', () => {
         mentionCount: 2,
       });
 
-      const goal3Id = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId: session2,
         title: 'Goal 3',
         description: 'Different session goal',
@@ -184,7 +184,7 @@ describe('goalStore', () => {
         lastMentionedAt: oneHourAgo,
       });
 
-      const oldGoalId = useGoalStore.getState().createGoal({
+      useGoalStore.getState().createGoal({
         sessionId: 'session-123',
         title: 'Old Goal',
         description: 'Long time since mention',

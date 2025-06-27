@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NarrativeGoal, GoalStatus, GoalPriority, GoalType, GoalExtractionRequest } from '../types/goal.types';
+import { NarrativeGoal, GoalPriority, GoalExtractionRequest } from '../types/goal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -142,7 +142,7 @@ export const useGoalStore = create<GoalStore>()(
         }
 
         const now = new Date().toISOString();
-        let updatedGoal = {
+        const updatedGoal = {
           ...existingGoal,
           ...updates,
           updatedAt: now,
@@ -180,7 +180,8 @@ export const useGoalStore = create<GoalStore>()(
 
         set((state) => {
           // Remove from goals
-          const { [goalId]: deletedGoal, ...remainingGoals } = state.goals;
+          const remainingGoals = { ...state.goals };
+          delete remainingGoals[goalId];
           
           // Remove from session goals
           const sessionId = goal.sessionId;
@@ -292,7 +293,8 @@ export const useGoalStore = create<GoalStore>()(
           });
 
           // Remove session from sessionGoals
-          const { [sessionId]: removedSession, ...remainingSessionGoals } = state.sessionGoals;
+          const remainingSessionGoals = { ...state.sessionGoals };
+          delete remainingSessionGoals[sessionId];
 
           return {
             goals: updatedGoals,
