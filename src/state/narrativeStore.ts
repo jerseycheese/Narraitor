@@ -120,6 +120,21 @@ export const useNarrativeStore = create<NarrativeStore>()(
       };
     });
 
+    // Process the segment for goal extraction asynchronously
+    // Import goalStore dynamically to avoid circular dependencies
+    import('../state/goalStore').then(({ useGoalStore }) => {
+      const goalStore = useGoalStore.getState();
+      goalStore.processSegmentForGoals(segmentId, segmentData.metadata?.characterIds?.[0])
+        .then((result) => {
+          logger.debug('[NarrativeStore]', 'Goal processing result:', result);
+        })
+        .catch((error) => {
+          logger.error('[NarrativeStore]', 'Goal processing failed:', error);
+        });
+    }).catch((error) => {
+      logger.error('[NarrativeStore]', 'Failed to import goalStore:', error);
+    });
+
     return segmentId;
   },
 
