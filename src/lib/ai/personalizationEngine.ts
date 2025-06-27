@@ -31,6 +31,13 @@ import {
   ChoiceTypePreference,
   NarrativeStylePreference
 } from '@/types/personalization.types';
+import { 
+  isPersonalityTrait, 
+  isPlayerDecisionArray, 
+  isSafeString,
+  sanitizeString
+} from '@/types/type-guards';
+import { memoize, memoizeWithTTL } from '../utils/memoization';
 // Simple character interface for personalization - avoids complex type dependencies
 interface PersonalizationCharacter {
   id: string;
@@ -82,6 +89,15 @@ const CHOICE_TO_TRAIT_MAP: Record<ChoiceTypePreference, PersonalityTrait[]> = {
  * ```
  */
 export class PersonalizationEngine {
+  // Memoized expensive operations - initialized in constructor
+  private memoizedTokenEstimation: (text: string) => number;
+  private memoizedGoalPrioritization: (goals: CharacterGoal[], context: PersonalizedNarrativeContext) => CharacterGoal[];
+
+  constructor() {
+    // Initialize memoized methods
+    this.memoizedTokenEstimation = memoize(this.estimateTokenCountCore.bind(this), 500);
+    this.memoizedGoalPrioritization = memoizeWithTTL(this.prioritizeGoalsCore.bind(this), 2 * 60 * 1000, 50);
+  }
   /**
    * Analyzes player behavior patterns to create personalized narrative context
    * 
@@ -109,6 +125,12 @@ export class PersonalizationEngine {
     relationships: CharacterRelationship[] = [],
     goals: CharacterGoal[] = []
   ): PersonalizationAnalysis {
+    // Validate input data
+    if (!isPlayerDecisionArray(decisions)) {
+      console.warn('Invalid decisions array provided to analyzePlayerBehavior');
+      return this.getDefaultAnalysis();
+    }
+    
     const detectedTraits = this.detectPersonalityTraits(decisions);
     const preferences = this.analyzePreferences(decisions);
     
@@ -139,10 +161,8 @@ export class PersonalizationEngine {
   ): PersonalizedNarrativeContext {
     const analysis = this.analyzePlayerBehavior(character, world, decisions, relationships, goals);
     
-    // Include skill names in established elements - handle both skill formats
-    const skillNames = character.skills?.map(skill => 
-      'name' in skill ? skill.name : skill.skillId
-    ) || [];
+    // Include skill names in established elements - handle both skill formats safely
+    const skillNames = this.extractSkillNamesSafely(character.skills);
     
     return {
       character: {
@@ -184,13 +204,12 @@ export class PersonalizationEngine {
       enhancements.push(`CHARACTER SKILLS: The character has expertise in ${sanitizedElements.skills.join(', ')}.`);
     }
 
-    // Add character personality
+    // Add character personality with type safety
     if (context.character.personality.length > 0) {
-      const sanitizedTraits = context.character.personality
-        .filter(trait => trait && typeof trait === 'string')
-        .map(trait => trait.replace(/[<>]/g, ''));
-      if (sanitizedTraits.length > 0) {
-        enhancements.push(`CHARACTER PERSONALITY: The character tends to be ${sanitizedTraits.join(', ')}.`);
+      const validTraits = context.character.personality
+        .filter(trait => isPersonalityTrait(trait));
+      if (validTraits.length > 0) {
+        enhancements.push(`CHARACTER PERSONALITY: The character tends to be ${validTraits.join(', ')}.`);
       }
     }
 
@@ -257,23 +276,15 @@ export class PersonalizationEngine {
    * Sanitizes narrative elements to prevent injection attacks
    */
   private sanitizeNarrativeElements(elements: EstablishedElements): EstablishedElements {
-    const sanitizeString = (str?: string): string | undefined => {
-      if (!str) return undefined;
-      // Remove potentially dangerous characters and limit length
-      return str
-        .replace(/[<>'"&]/g, '')
-        .substring(0, 200)
-        .trim() || undefined;
-    };
-
     return {
       characterName: sanitizeString(elements.characterName),
       worldName: sanitizeString(elements.worldName),
       characterBackground: sanitizeString(elements.characterBackground),
-      skills: elements.skills
-        .map(skill => sanitizeString(skill))
-        .filter((skill): skill is string => Boolean(skill))
-        .slice(0, 10) // Limit number of skills
+      skills: Array.isArray(elements.skills) ? 
+        elements.skills
+          .map(skill => sanitizeString(skill, 100))
+          .filter((skill): skill is string => skill !== undefined)
+          .slice(0, 10) : []
     };
   }
 
@@ -436,5 +447,161 @@ export class PersonalizationEngine {
     if (actionRatio - dialogueRatio > 0.2) return 'action';
     if (dialogueRatio - actionRatio > 0.2) return 'dialogue';
     return 'balanced';
+  }
+
+  /**
+   * Safely extracts skill names from character skills array
+   */
+  private extractSkillNamesSafely(skills?: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>): string[] {
+    if (!Array.isArray(skills)) return [];
+    
+    return skills
+      .map(skill => {
+        if (typeof skill !== 'object' || skill === null) return null;
+        
+        // Handle both skill formats safely
+        const name = 'name' in skill ? skill.name : ('skillId' in skill ? skill.skillId : null);
+        return isSafeString(name, 50) ? name : null;
+      })
+      .filter((name): name is string => name !== null)
+      .slice(0, 10); // Limit to 10 skills
+  }
+
+  /**
+   * Returns default analysis when input validation fails
+   */
+  private getDefaultAnalysis(): PersonalizationAnalysis {
+    return {
+      detectedTraits: [],
+      preferences: {
+        narrativeStyle: 'exploration',
+        preferredChoiceTypes: [],
+        detailLevel: 'moderate',
+        contentFocus: 'balanced',
+        confidenceLevel: 0,
+        lastUpdated: new Date().toISOString()
+      },
+      narrativeEmphasis: {
+        characterFocus: [],
+        relationshipFocus: [],
+        goalFocus: []
+      },
+      confidence: 0
+    };
+  }
+
+  /**
+   * Estimates token count for narrative context (memoized)
+   * Used to optimize prompt size for AI requests
+   */
+  estimateTokenCount(text: string): number {
+    // Use memoized version for performance
+    return this.memoizedTokenEstimation(text);
+  }
+
+  /**
+   * Core token estimation logic
+   * Rough approximation: 1 token ≈ 4 characters for English text
+   */
+  private estimateTokenCountCore(text: string): number {
+    if (!text || typeof text !== 'string') return 0;
+    
+    // Basic tokenization approximation
+    const words = text.split(/\s+/).length;
+    const chars = text.length;
+    
+    // GPT-style estimation: average 1.3 tokens per word, ~4 chars per token
+    const wordTokens = words * 1.3;
+    const charTokens = chars / 4;
+    
+    // Use the higher estimate for safety
+    return Math.ceil(Math.max(wordTokens, charTokens));
+  }
+
+  /**
+   * Prioritizes goals based on context and player behavior (memoized)
+   */
+  prioritizeGoals(goals: CharacterGoal[], context: PersonalizedNarrativeContext): CharacterGoal[] {
+    // Use memoized version for performance
+    return this.memoizedGoalPrioritization(goals, context);
+  }
+
+  /**
+   * Core goal prioritization logic
+   */
+  private prioritizeGoalsCore(goals: CharacterGoal[], context: PersonalizedNarrativeContext): CharacterGoal[] {
+    if (!Array.isArray(goals) || goals.length === 0) return [];
+    
+    // Score goals based on various factors
+    const scoredGoals = goals.map(goal => {
+      let score = 0;
+      
+      // Base priority score
+      if (goal.priority === 'primary') score += 100;
+      else if (goal.priority === 'secondary') score += 50;
+      else score += 25; // minor
+      
+      // Active goals get boost
+      if (goal.isActive) score += 30;
+      
+      // Progress-based scoring (higher progress = higher relevance)
+      if (goal.progress > 0) {
+        score += Math.min(goal.progress / 10, 25); // Max 25 points for 100% progress
+      }
+      
+      // Player preference alignment (basic scoring since goal.type doesn't exist)
+      const playerChoiceTypes = context.playerPreferences.preferredChoiceTypes;
+      if (playerChoiceTypes.includes('diplomatic')) score += 5;
+      if (playerChoiceTypes.includes('aggressive')) score += 5;
+      if (playerChoiceTypes.includes('stealthy')) score += 5;
+      
+      return { goal, score };
+    });
+    
+    // Sort by score and return goals
+    return scoredGoals
+      .sort((a, b) => b.score - a.score)
+      .map(({ goal }) => goal);
+  }
+
+  /**
+   * Optimized context generation with token budget management
+   */
+  generateOptimizedContext(
+    character: PersonalizationCharacter,
+    world: World,
+    decisions: PlayerDecision[],
+    goals: CharacterGoal[] = [],
+    maxTokens: number = 1000
+  ): PersonalizedNarrativeContext {
+    // Create base context
+    const baseContext = this.createPersonalizedContext(character, world, decisions, [], goals);
+    
+    // Prioritize goals if we have them
+    if (goals.length > 0) {
+      const prioritizedGoals = this.prioritizeGoals(goals, baseContext);
+      baseContext.character.goals = prioritizedGoals;
+    }
+    
+    // Optimize narrative history to fit token budget
+    const enhancement = this.generateNarrativeEnhancement(baseContext);
+    const estimatedTokens = this.estimateTokenCount(enhancement);
+    
+    // If we're over budget, trim the context
+    if (estimatedTokens > maxTokens) {
+      // Reduce goals to most critical
+      baseContext.character.goals = baseContext.character.goals.slice(0, 3);
+      
+      // Reduce recent decisions
+      baseContext.character.recentDecisions = baseContext.character.recentDecisions.slice(0, 3);
+      
+      // Reduce established elements
+      if (baseContext.narrativeHistory.establishedElements.length > 5) {
+        baseContext.narrativeHistory.establishedElements = 
+          baseContext.narrativeHistory.establishedElements.slice(0, 5);
+      }
+    }
+    
+    return baseContext;
   }
 }

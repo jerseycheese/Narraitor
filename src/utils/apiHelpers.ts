@@ -204,6 +204,17 @@ export async function makeGeminiRequest(
     return response;
   } catch (err) {
     clearTimeout(timeoutId);
+    
+    // Enhanced error handling for common scenarios
+    if (err instanceof Error) {
+      if (err.name === 'AbortError') {
+        throw new Error('Request timeout - please try again');
+      }
+      if (err.message.includes('network') || err.message.includes('fetch')) {
+        throw new Error('Network error - please check your connection');
+      }
+    }
+    
     throw err;
   }
 }
