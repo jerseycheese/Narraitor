@@ -11,10 +11,30 @@ import {
   CharacterRelationship,
   PlayerPreferences,
   PersonalityTrait,
-  ChoiceTypePreference
+  ChoiceTypePreference,
+  NarrativeStylePreference
 } from '@/types/personalization.types';
-import { Character } from '@/types/character.types';
+// Simple character interface for personalization - avoids complex type dependencies
+interface PersonalizationCharacter {
+  id: string;
+  name: string;
+  background: string;
+  attributes: Record<string, number> | Array<{ attributeId: string; value: number }>;
+  skills: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+  createdAt: string;
+  updatedAt: string;
+}
 import { World } from '@/types/world.types';
+
+/**
+ * Structured representation of established narrative elements
+ */
+interface EstablishedElements {
+  characterName?: string;
+  worldName?: string;
+  characterBackground?: string;
+  skills: string[];
+}
 
 /**
  * Maps choice types to personality traits
@@ -38,7 +58,7 @@ export class PersonalizationEngine {
    * Analyzes player behavior to create personalized narrative context
    */
   analyzePlayerBehavior(
-    character: Character,
+    character: PersonalizationCharacter,
     world: World,
     decisions: PlayerDecision[],
     relationships: CharacterRelationship[] = [],
@@ -65,7 +85,7 @@ export class PersonalizationEngine {
    * Creates comprehensive personalized context for narrative generation
    */
   createPersonalizedContext(
-    character: Character,
+    character: PersonalizationCharacter,
     world: World,
     decisions: PlayerDecision[],
     relationships: CharacterRelationship[] = [],
@@ -74,8 +94,10 @@ export class PersonalizationEngine {
   ): PersonalizedNarrativeContext {
     const analysis = this.analyzePlayerBehavior(character, world, decisions, relationships, goals);
     
-    // Include skill names in established elements
-    const skillNames = character.skills?.map(skill => skill.name) || [];
+    // Include skill names in established elements - handle both skill formats
+    const skillNames = character.skills?.map(skill => 
+      'name' in skill ? skill.name : skill.skillId
+    ) || [];
     
     return {
       character: {
@@ -87,7 +109,7 @@ export class PersonalizationEngine {
       playerPreferences: analysis.preferences,
       narrativeHistory: {
         keyEvents: narrativeHistory,
-        establishedElements: [character.name, world.name, character.background, ...skillNames],
+        establishedElements: this.buildEstablishedElementsArray(character, world, skillNames),
         characterMilestones: []
       }
     };
@@ -97,38 +119,105 @@ export class PersonalizationEngine {
    * Generates narrative enhancement text based on personalized context
    */
   generateNarrativeEnhancement(context: PersonalizedNarrativeContext): string {
+    // Parse established elements safely
+    const elements = this.parseEstablishedElements(context.narrativeHistory.establishedElements);
+    
+    // Validate and sanitize input
+    const sanitizedElements = this.sanitizeNarrativeElements(elements);
+    
     const enhancements: string[] = [];
 
     // Add character background details
-    const characterName = context.narrativeHistory.establishedElements[0];
-    const characterBackground = context.narrativeHistory.establishedElements[2];
-    if (characterName && characterName !== 'undefined') {
-      enhancements.push(`CHARACTER FOCUS: Reference ${characterName}${characterBackground ? ` as ${characterBackground}` : ''} and their background details.`);
+    if (sanitizedElements.characterName) {
+      const backgroundText = sanitizedElements.characterBackground ? 
+        ` as ${sanitizedElements.characterBackground}` : '';
+      enhancements.push(`CHARACTER FOCUS: Reference ${sanitizedElements.characterName}${backgroundText} and their background details.`);
     }
 
     // Add character skills
-    const skills = context.narrativeHistory.establishedElements.slice(3); // Skills start at index 3
-    if (skills.length > 0) {
-      enhancements.push(`CHARACTER SKILLS: The character has expertise in ${skills.join(', ')}.`);
+    if (sanitizedElements.skills.length > 0) {
+      enhancements.push(`CHARACTER SKILLS: The character has expertise in ${sanitizedElements.skills.join(', ')}.`);
     }
 
     // Add character personality
     if (context.character.personality.length > 0) {
-      enhancements.push(`CHARACTER PERSONALITY: The character tends to be ${context.character.personality.join(', ')}.`);
+      const sanitizedTraits = context.character.personality
+        .filter(trait => trait && typeof trait === 'string')
+        .map(trait => trait.replace(/[<>]/g, ''));
+      if (sanitizedTraits.length > 0) {
+        enhancements.push(`CHARACTER PERSONALITY: The character tends to be ${sanitizedTraits.join(', ')}.`);
+      }
     }
 
-    // Add skill references
+    // Add decision patterns
     if (context.character.recentDecisions.length > 0) {
-      const choiceTypes = context.character.recentDecisions.map(d => d.choiceType);
+      const choiceTypes = context.character.recentDecisions
+        .map(d => d.choiceType)
+        .filter(type => type && typeof type === 'string');
       if (choiceTypes.length > 0) {
         enhancements.push(`DECISION PATTERNS: Player tends to make ${choiceTypes.join(', ')} choices.`);
       }
     }
 
     // Add narrative style preference
-    enhancements.push(`NARRATIVE STYLE: Focus on ${context.playerPreferences.narrativeStyle} elements. Player prefers ${context.playerPreferences.detailLevel} detail level.`);
+    const style = context.playerPreferences.narrativeStyle || 'exploration';
+    const detail = context.playerPreferences.detailLevel || 'moderate';
+    enhancements.push(`NARRATIVE STYLE: Focus on ${style} elements. Player prefers ${detail} detail level.`);
 
     return enhancements.join('\n\n');
+  }
+
+  /**
+   * Builds established elements array in a structured way
+   */
+  private buildEstablishedElementsArray(
+    character: PersonalizationCharacter, 
+    world: World, 
+    skillNames: string[]
+  ): string[] {
+    // Use structured format: [characterName, worldName, characterBackground, ...skills]
+    return [
+      character.name || '',
+      world.name || '',
+      character.background || '',
+      ...skillNames
+    ].filter(element => element.trim().length > 0);
+  }
+
+  /**
+   * Safely parses established elements array into structured format
+   */
+  private parseEstablishedElements(elements: string[]): EstablishedElements {
+    return {
+      characterName: elements[0] || undefined,
+      worldName: elements[1] || undefined,
+      characterBackground: elements[2] || undefined,
+      skills: elements.slice(3).filter(skill => skill && skill.trim().length > 0)
+    };
+  }
+
+  /**
+   * Sanitizes narrative elements to prevent injection attacks
+   */
+  private sanitizeNarrativeElements(elements: EstablishedElements): EstablishedElements {
+    const sanitizeString = (str?: string): string | undefined => {
+      if (!str) return undefined;
+      // Remove potentially dangerous characters and limit length
+      return str
+        .replace(/[<>'"&]/g, '')
+        .substring(0, 200)
+        .trim() || undefined;
+    };
+
+    return {
+      characterName: sanitizeString(elements.characterName),
+      worldName: sanitizeString(elements.worldName),
+      characterBackground: sanitizeString(elements.characterBackground),
+      skills: elements.skills
+        .map(skill => sanitizeString(skill))
+        .filter((skill): skill is string => Boolean(skill))
+        .slice(0, 10) // Limit number of skills
+    };
   }
 
   /**
@@ -168,12 +257,102 @@ export class PersonalizationEngine {
       .map(([type]) => type);
 
     return {
-      narrativeStyle: 'exploration',
+      narrativeStyle: this.inferNarrativeStyle(decisions),
       preferredChoiceTypes: sortedChoiceTypes.slice(0, 3),
-      detailLevel: 'moderate',
-      contentFocus: 'balanced',
+      detailLevel: this.inferDetailLevel(decisions),
+      contentFocus: this.inferContentFocus(decisions),
       confidenceLevel: Math.min(85, decisions.length * 15),
       lastUpdated: new Date().toISOString()
     };
+  }
+
+  /**
+   * Infers narrative style from player decision patterns
+   */
+  private inferNarrativeStyle(decisions: PlayerDecision[]): NarrativeStylePreference {
+    if (decisions.length === 0) return 'exploration';
+
+    const actionChoices = decisions.filter(d => 
+      ['aggressive', 'chaotic', 'direct'].includes(d.choiceType)
+    ).length;
+    
+    const socialChoices = decisions.filter(d => 
+      ['diplomatic', 'helpful', 'empathetic'].includes(d.choiceType)
+    ).length;
+    
+    const stealthyChoices = decisions.filter(d => 
+      ['stealthy', 'cautious'].includes(d.choiceType)
+    ).length;
+
+    const total = decisions.length;
+    
+    // Calculate percentages
+    const actionRatio = actionChoices / total;
+    const socialRatio = socialChoices / total;
+    const stealthyRatio = stealthyChoices / total;
+
+    // Determine dominant style (need >40% for clear preference)
+    if (actionRatio > 0.4) return 'action-focused';
+    if (socialRatio > 0.4) return 'character-driven';
+    if (stealthyRatio > 0.3) return 'strategic';
+    
+    // Check for dialogue-heavy pattern (context-based)
+    const dialogueContexts = decisions.filter(d => 
+      d.context.situation?.toLowerCase().includes('conversation') ||
+      d.context.situation?.toLowerCase().includes('talk') ||
+      d.context.charactersPresent && d.context.charactersPresent.length > 0
+    ).length;
+    
+    if (dialogueContexts / total > 0.3) return 'dialogue-heavy';
+
+    // Default to exploration if no clear pattern
+    return 'exploration';
+  }
+
+  /**
+   * Infers detail level preference from decision context complexity
+   */
+  private inferDetailLevel(decisions: PlayerDecision[]): 'minimal' | 'moderate' | 'detailed' {
+    if (decisions.length === 0) return 'moderate';
+
+    // Analyze context richness as proxy for detail preference
+    const richContexts = decisions.filter(d => {
+      const context = d.context;
+      const hasLocation = Boolean(context.location);
+      const hasSituation = Boolean(context.situation);
+      const hasCharacters = Boolean(context.charactersPresent?.length);
+      
+      return (hasLocation ? 1 : 0) + (hasSituation ? 1 : 0) + (hasCharacters ? 1 : 0) >= 2;
+    }).length;
+
+    const detailRatio = richContexts / decisions.length;
+    
+    if (detailRatio > 0.6) return 'detailed';
+    if (detailRatio > 0.3) return 'moderate';
+    return 'minimal';
+  }
+
+  /**
+   * Infers content focus from choice types
+   */
+  private inferContentFocus(decisions: PlayerDecision[]): 'action' | 'dialogue' | 'balanced' {
+    if (decisions.length === 0) return 'balanced';
+
+    const actionChoices = decisions.filter(d => 
+      ['aggressive', 'chaotic', 'stealthy'].includes(d.choiceType)
+    ).length;
+    
+    const dialogueChoices = decisions.filter(d => 
+      ['diplomatic', 'helpful', 'empathetic'].includes(d.choiceType)
+    ).length;
+
+    const total = decisions.length;
+    const actionRatio = actionChoices / total;
+    const dialogueRatio = dialogueChoices / total;
+
+    // Need significant difference (>20%) for focused preference
+    if (actionRatio - dialogueRatio > 0.2) return 'action';
+    if (dialogueRatio - actionRatio > 0.2) return 'dialogue';
+    return 'balanced';
   }
 }

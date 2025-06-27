@@ -41,7 +41,7 @@ export class PlayerDecisionTracker {
   }
 
   /**
-   * Records a player decision
+   * Records a player decision with input validation
    */
   recordDecision(
     prompt: string,
@@ -55,15 +55,25 @@ export class PlayerDecisionTracker {
       charactersPresent?: string[];
     }
   ): PlayerDecision {
-    const decision: PlayerDecision = {
-      id: generateUniqueId(),
+    // Validate and sanitize inputs
+    const validatedData = this.validateDecisionInput({
       prompt,
       choiceText,
       choiceType,
-      timestamp: new Date().toISOString(),
       sessionId,
       worldId,
-      context: context || {}
+      context
+    });
+
+    const decision: PlayerDecision = {
+      id: generateUniqueId(),
+      prompt: validatedData.prompt,
+      choiceText: validatedData.choiceText,
+      choiceType: validatedData.choiceType,
+      timestamp: new Date().toISOString(),
+      sessionId: validatedData.sessionId,
+      worldId: validatedData.worldId,
+      context: validatedData.context
     };
 
     this.decisions.unshift(decision);
@@ -71,6 +81,104 @@ export class PlayerDecisionTracker {
     this.saveDecisions();
 
     return decision;
+  }
+
+  /**
+   * Validates and sanitizes decision input data
+   */
+  private validateDecisionInput(input: {
+    prompt: string;
+    choiceText: string;
+    choiceType: ChoiceTypePreference;
+    sessionId: EntityID;
+    worldId: EntityID;
+    context?: {
+      location?: string;
+      situation?: string;
+      charactersPresent?: string[];
+    };
+  }): {
+    prompt: string;
+    choiceText: string;
+    choiceType: ChoiceTypePreference;
+    sessionId: EntityID;
+    worldId: EntityID;
+    context: {
+      location?: string;
+      situation?: string;
+      charactersPresent?: string[];
+    };
+  } {
+    // Validate required string inputs
+    if (!input.prompt || typeof input.prompt !== 'string') {
+      throw new Error('Decision prompt is required and must be a string');
+    }
+    if (!input.choiceText || typeof input.choiceText !== 'string') {
+      throw new Error('Choice text is required and must be a string');
+    }
+    if (!input.sessionId || typeof input.sessionId !== 'string') {
+      throw new Error('Session ID is required and must be a string');
+    }
+    if (!input.worldId || typeof input.worldId !== 'string') {
+      throw new Error('World ID is required and must be a string');
+    }
+
+    // Validate choice type
+    const validChoiceTypes: ChoiceTypePreference[] = [
+      'diplomatic', 'aggressive', 'stealthy', 'helpful',
+      'selfish', 'lawful', 'chaotic', 'neutral'
+    ];
+    if (!validChoiceTypes.includes(input.choiceType)) {
+      throw new Error(`Invalid choice type: ${input.choiceType}`);
+    }
+
+    // Sanitize string inputs
+    const sanitizeString = (str: string, maxLength: number = 500): string => {
+      return str
+        .replace(/[<>'"&]/g, '') // Remove potentially dangerous characters
+        .substring(0, maxLength)
+        .trim();
+    };
+
+    // Validate and sanitize context
+    const sanitizedContext: {
+      location?: string;
+      situation?: string;
+      charactersPresent?: string[];
+    } = {};
+
+    if (input.context) {
+      if (input.context.location && typeof input.context.location === 'string') {
+        const sanitized = sanitizeString(input.context.location, 100);
+        if (sanitized) sanitizedContext.location = sanitized;
+      }
+
+      if (input.context.situation && typeof input.context.situation === 'string') {
+        const sanitized = sanitizeString(input.context.situation, 200);
+        if (sanitized) sanitizedContext.situation = sanitized;
+      }
+
+      if (Array.isArray(input.context.charactersPresent)) {
+        const sanitizedCharacters = input.context.charactersPresent
+          .filter(char => typeof char === 'string')
+          .map(char => sanitizeString(char, 50))
+          .filter(char => char.length > 0)
+          .slice(0, 10); // Limit to 10 characters
+        
+        if (sanitizedCharacters.length > 0) {
+          sanitizedContext.charactersPresent = sanitizedCharacters;
+        }
+      }
+    }
+
+    return {
+      prompt: sanitizeString(input.prompt, 500),
+      choiceText: sanitizeString(input.choiceText, 300),
+      choiceType: input.choiceType,
+      sessionId: sanitizeString(input.sessionId, 50),
+      worldId: sanitizeString(input.worldId, 50),
+      context: sanitizedContext
+    };
   }
 
   /**

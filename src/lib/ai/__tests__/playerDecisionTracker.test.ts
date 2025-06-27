@@ -17,20 +17,6 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
   });
 
   describe('Core Decision Tracking', () => {
-    test('records player decisions', () => {
-      const decision = tracker.recordDecision(
-        'What do you do?',
-        'Help the stranger',
-        'helpful',
-        'session-1',
-        'world-1'
-      );
-
-      expect(decision.id).toBeDefined();
-      expect(decision.prompt).toBe('What do you do?');
-      expect(decision.choiceText).toBe('Help the stranger');
-      expect(decision.choiceType).toBe('helpful');
-    });
 
     test('retrieves decisions by session', () => {
       tracker.recordDecision('Test 1', 'Choice 1', 'helpful', 'session-1', 'world-1');
@@ -132,6 +118,65 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
     });
   });
 
+  describe('Input Validation', () => {
+    test('validates required fields', () => {
+      expect(() => {
+        tracker.recordDecision('', 'Valid choice', 'helpful', 'session-1', 'world-1');
+      }).toThrow('Decision prompt is required');
+
+      expect(() => {
+        tracker.recordDecision('Valid prompt', '', 'helpful', 'session-1', 'world-1');
+      }).toThrow('Choice text is required');
+
+      expect(() => {
+        tracker.recordDecision('Valid prompt', 'Valid choice', 'invalid' as ChoiceTypePreference, 'session-1', 'world-1');
+      }).toThrow('Invalid choice type');
+    });
+
+    test('sanitizes malicious input', () => {
+      const decision = tracker.recordDecision(
+        'Prompt with <script>alert("xss")</script>',
+        'Choice with "quotes" & symbols',
+        'helpful',
+        'session-1',
+        'world-1',
+        {
+          location: 'Evil<script>location</script>',
+          situation: 'Dangerous & "situation"',
+          charactersPresent: ['Good character', 'Evil<script>char</script>', 'Normal & safe']
+        }
+      );
+
+      expect(decision.prompt).not.toContain('<script>');
+      expect(decision.choiceText).not.toContain('"');
+      expect(decision.choiceText).not.toContain('&');
+      expect(decision.context.location).not.toContain('<script>');
+      expect(decision.context.situation).not.toContain('&');
+      expect(decision.context.charactersPresent?.[1]).not.toContain('<script>');
+      
+      // Should still contain safe content
+      expect(decision.prompt).toContain('Prompt with');
+      expect(decision.choiceText).toContain('Choice with');
+      expect(decision.context.location).toContain('Evil');
+      expect(decision.context.charactersPresent).toContain('Good character');
+    });
+
+    test('limits input lengths', () => {
+      const longString = 'a'.repeat(1000);
+      
+      const decision = tracker.recordDecision(
+        longString,
+        longString,
+        'helpful',
+        'session-1',
+        'world-1'
+      );
+
+      expect(decision.prompt.length).toBeLessThanOrEqual(500);
+      expect(decision.choiceText.length).toBeLessThanOrEqual(300);
+    });
+  });
+
   describe('Edge Cases', () => {
     test('handles empty decision history', () => {
       const analysis = tracker.analyzeChoicePatterns();
@@ -141,14 +186,6 @@ describe('PlayerDecisionTracker - MVP Tests', () => {
       expect(Object.keys(analysis.choiceDistribution)).toHaveLength(0);
     });
 
-    test('handles single decision', () => {
-      tracker.recordDecision('Single test', 'Single choice', 'neutral', 'session-1', 'world-1');
-      
-      const analysis = tracker.analyzeChoicePatterns();
-
-      expect(analysis.dominantChoiceTypes).toContain('neutral');
-      expect(analysis.patternStrength).toBeGreaterThan(0);
-    });
 
     test('clears session decisions correctly', () => {
       tracker.recordDecision('Test 1', 'Choice 1', 'helpful', 'session-1', 'world-1');

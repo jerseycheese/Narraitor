@@ -57,6 +57,32 @@ export class NarrativeGenerator {
   }
 
   /**
+   * Converts store character to personalization-compatible character
+   */
+  private convertToPersonalizationCharacter(storeCharacter: unknown): {
+    id: string;
+    name: string;
+    background: string;
+    attributes: Record<string, number> | Array<{ attributeId: string; value: number }>;
+    skills: Array<{ name: string; level: number; worldSkillId?: string }> | Array<{ skillId: string; level: number }>;
+    createdAt: string;
+    updatedAt: string;
+  } {
+    // Create a character object compatible with PersonalizationEngine
+    // This handles the type mismatch between store Character and PersonalizationEngine Character
+    const char = storeCharacter as Record<string, unknown>;
+    return {
+      id: String(char.id || ''),
+      name: String(char.name || ''),
+      background: (char.background as { summary?: string })?.summary || String(char.background || ''),
+      attributes: (char.attributes as Record<string, number>) || {},
+      skills: (char.skills as Array<{ name: string; level: number; worldSkillId?: string }>) || [],
+      createdAt: String(char.createdAt || ''),
+      updatedAt: String(char.updatedAt || '')
+    };
+  }
+
+  /**
    * Enhances a prompt with personalized character context
    */
   private enhancePromptWithPersonalization(
@@ -68,11 +94,14 @@ export class NarrativeGenerator {
       const world = this.getWorld(worldId);
       const { characters } = useCharacterStore.getState();
       const playerCharacterId = characterIds[0];
-      const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+      const storeCharacter = playerCharacterId ? characters[playerCharacterId] : null;
 
-      if (!playerCharacter) {
+      if (!storeCharacter) {
         return prompt;
       }
+
+      // Convert store character to personalization-compatible format
+      const playerCharacter = this.convertToPersonalizationCharacter(storeCharacter);
 
       // Get player decisions for this world
       const decisions = playerDecisionTracker.getWorldDecisions(worldId);
@@ -150,7 +179,8 @@ export class NarrativeGenerator {
       // Get character details
       const { characters } = useCharacterStore.getState();
       const playerCharacterId = characterIds[0]; // First character is the player
-      const playerCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+      const storeCharacter = playerCharacterId ? characters[playerCharacterId] : null;
+      const playerCharacter = storeCharacter ? this.convertToPersonalizationCharacter(storeCharacter) : null;
       
       const toneSettings = world.toneSettings || DEFAULT_TONE_SETTINGS;
       

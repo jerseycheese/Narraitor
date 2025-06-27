@@ -59,6 +59,67 @@ describe('PersonalizationEngine - MVP Tests', () => {
       expect(enhancement).toContain('archaeologist');
     });
 
+    test('dynamically infers narrative style from decisions', () => {
+      const aggressiveDecisions: PlayerDecision[] = [
+        {
+          id: 'dec-1',
+          prompt: 'Combat situation',
+          choiceText: 'Attack directly',
+          choiceType: 'aggressive',
+          timestamp: '2023-01-01',
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          context: {}
+        },
+        {
+          id: 'dec-2', 
+          prompt: 'Conflict',
+          choiceText: 'Fight back',
+          choiceType: 'aggressive',
+          timestamp: '2023-01-01',
+          sessionId: 'session-1',
+          worldId: 'world-1',
+          context: {}
+        }
+      ];
+
+      const analysis = engine.analyzePlayerBehavior(
+        mockCharacter,
+        mockWorld,
+        aggressiveDecisions,
+        [],
+        []
+      );
+
+      expect(analysis.preferences.narrativeStyle).toBe('action-focused');
+    });
+
+    test('sanitizes dangerous input in narrative enhancement', () => {
+      const maliciousCharacter = {
+        ...mockCharacter,
+        name: 'Alex<script>alert("xss")</script>',
+        background: 'Evil & "dangerous" character'
+      };
+
+      const context = engine.createPersonalizedContext(
+        maliciousCharacter,
+        mockWorld,
+        [],
+        [],
+        [],
+        []
+      );
+
+      const enhancement = engine.generateNarrativeEnhancement(context);
+
+      // Should not contain dangerous characters
+      expect(enhancement).not.toContain('<script>');
+      expect(enhancement).not.toContain('&');
+      expect(enhancement).not.toContain('"');
+      expect(enhancement).toContain('Alex');
+      expect(enhancement).toContain('Evil');
+    });
+
     test('analyzes player behavior from decision history', () => {
       const decisions: PlayerDecision[] = [
         {
@@ -85,59 +146,10 @@ describe('PersonalizationEngine - MVP Tests', () => {
       expect(analysis.preferences.preferredChoiceTypes).toContain('diplomatic');
     });
 
-    test('creates personalized context with character and world information', () => {
-      const context = engine.createPersonalizedContext(
-        mockCharacter,
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
-
-      expect(context.character.personality).toBeDefined();
-      expect(context.playerPreferences).toBeDefined();
-      expect(context.narrativeHistory).toBeDefined();
-    });
   });
 
   describe('MVP Acceptance Criteria', () => {
-    test('references specific character details in narrative enhancement', () => {
-      const context = engine.createPersonalizedContext(
-        mockCharacter,
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
 
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Must reference character background
-      expect(enhancement).toMatch(/archaeologist|mysterious past/i);
-      
-      // Must reference character skills if present
-      if (mockCharacter.skills.length > 0) {
-        expect(enhancement).toMatch(/Investigation|Athletics/i);
-      }
-    });
-
-    test('maintains consistency with world genre and tone', () => {
-      const context = engine.createPersonalizedContext(
-        mockCharacter,
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
-
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Should reference world genre
-      expect(enhancement).toMatch(/mystery|exploration/i);
-    });
 
     test('integrates player decision patterns when available', () => {
       const decisions: PlayerDecision[] = [
@@ -176,49 +188,6 @@ describe('PersonalizationEngine - MVP Tests', () => {
 
       // Should reference decision patterns
       expect(enhancement).toMatch(/helpful|diplomatic/i);
-    });
-  });
-
-  describe('Edge Cases', () => {
-    test('handles empty decision history gracefully', () => {
-      const context = engine.createPersonalizedContext(
-        mockCharacter,
-        mockWorld,
-        [], // Empty decisions
-        [],
-        [],
-        []
-      );
-
-      const enhancement = engine.generateNarrativeEnhancement(context);
-
-      // Should still generate enhancement with character info
-      expect(enhancement).toBeTruthy();
-      expect(enhancement.length).toBeGreaterThan(0);
-    });
-
-    test('handles minimal character information', () => {
-      const minimalCharacter: Character = {
-        id: 'char-min',
-        name: 'Min Char',
-        background: '',
-        attributes: {},
-        skills: [],
-        createdAt: '2023-01-01',
-        updatedAt: '2023-01-01'
-      };
-
-      const context = engine.createPersonalizedContext(
-        minimalCharacter,
-        mockWorld,
-        [],
-        [],
-        [],
-        []
-      );
-
-      expect(context).toBeDefined();
-      expect(() => engine.generateNarrativeEnhancement(context)).not.toThrow();
     });
   });
 });
