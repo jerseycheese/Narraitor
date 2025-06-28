@@ -5,6 +5,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '../ui/Button';
+import { ErrorDisplay } from '../ui/ErrorDisplay/ErrorDisplay';
 import { ExportService } from '../../lib/storage/exportService';
 
 interface ExportImportControlsProps {
@@ -109,16 +110,13 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
       </div>
 
       {message && (
-        <div
-          className={`rounded-md p-3 text-sm ${
-            messageType === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-          role="alert"
-        >
-          {message}
-        </div>
+        <ErrorDisplay
+          variant="section"
+          severity={messageType === 'success' ? 'info' : 'error'}
+          message={message}
+          showDismiss={true}
+          onDismiss={() => setMessage(null)}
+        />
       )}
 
       <div className="text-xs text-gray-500 space-y-1">

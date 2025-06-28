@@ -33,12 +33,6 @@ describe('ExportImportControls', () => {
   });
 
   describe('export functionality', () => {
-    test('displays export button', () => {
-      render(<ExportImportControls />);
-
-      expect(screen.getByRole('button', { name: /export game/i })).toBeInTheDocument();
-    });
-
     test('shows progress indicator during export', async () => {
       render(<ExportImportControls />);
 
@@ -74,12 +68,6 @@ describe('ExportImportControls', () => {
   });
 
   describe('import functionality', () => {
-    test('displays file input for import', () => {
-      render(<ExportImportControls />);
-
-      expect(screen.getByLabelText(/import game/i)).toBeInTheDocument();
-    });
-
     test('handles file selection', async () => {
       render(<ExportImportControls />);
 

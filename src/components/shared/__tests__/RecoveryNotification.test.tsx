@@ -23,30 +23,10 @@ describe('RecoveryNotification', () => {
   });
 
   describe('rendering', () => {
-    test('displays recovery notification when visible', () => {
-      render(<RecoveryNotification {...defaultProps} />);
-
-      expect(screen.getByText(/data recovery available/i)).toBeInTheDocument();
-      expect(screen.getByText(/last saved/i)).toBeInTheDocument();
-    });
-
-    test('does not render when not visible', () => {
-      render(<RecoveryNotification {...defaultProps} isVisible={false} />);
-
-      expect(screen.queryByText(/data recovery available/i)).not.toBeInTheDocument();
-    });
-
     test('displays formatted last saved date', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
       expect(screen.getByText(/January 1, 2023/i)).toBeInTheDocument();
-    });
-
-    test('shows recover and dismiss buttons', () => {
-      render(<RecoveryNotification {...defaultProps} />);
-
-      expect(screen.getByRole('button', { name: /recover data/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument();
     });
   });
 

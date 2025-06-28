@@ -12,6 +12,11 @@ import { sessionStore } from '../../state/sessionStore';
 import { journalStore } from '../../state/journalStore';
 import { narrativeStore } from '../../state/narrativeStore';
 
+// Type for Zustand stores with setState capability
+type ZustandStoreWithSetState = {
+  setState: (partial: unknown) => void;
+};
+
 export interface GameStateExport {
   version: string;
   exportedAt: string;
@@ -112,23 +117,23 @@ export class ExportService {
       
       // Use the underlying Zustand setState method if available
       if (validatedGameState.worldState && 'setState' in worldStore) {
-        (worldStore as any).setState(validatedGameState.worldState);
+        (worldStore as ZustandStoreWithSetState).setState(validatedGameState.worldState);
       }
       
       if (validatedGameState.characterState && 'setState' in characterStore) {
-        (characterStore as any).setState(validatedGameState.characterState);
+        (characterStore as ZustandStoreWithSetState).setState(validatedGameState.characterState);
       }
       
       if (validatedGameState.sessionState && 'setState' in sessionStore) {
-        (sessionStore as any).setState(validatedGameState.sessionState);
+        (sessionStore as ZustandStoreWithSetState).setState(validatedGameState.sessionState);
       }
       
       if (validatedGameState.journalState && 'setState' in journalStore) {
-        (journalStore as any).setState(validatedGameState.journalState);
+        (journalStore as ZustandStoreWithSetState).setState(validatedGameState.journalState);
       }
       
       if (validatedGameState.narrativeState && 'setState' in narrativeStore) {
-        (narrativeStore as any).setState(validatedGameState.narrativeState);
+        (narrativeStore as ZustandStoreWithSetState).setState(validatedGameState.narrativeState);
       }
 
       return {
