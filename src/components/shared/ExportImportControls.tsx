@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '../ui/button';
 import { ErrorDisplay } from '../ui/ErrorDisplay/ErrorDisplay';
 import { ExportService } from '../../lib/storage/exportService';
 
