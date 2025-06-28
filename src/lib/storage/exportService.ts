@@ -110,24 +110,25 @@ export class ExportService {
       // Import data into stores - cast to GameStateExport after validation
       const validatedGameState = gameState as GameStateExport;
       
-      if (validatedGameState.worldState) {
-        worldStore.setState(validatedGameState.worldState);
+      // Use the underlying Zustand setState method if available
+      if (validatedGameState.worldState && 'setState' in worldStore) {
+        (worldStore as any).setState(validatedGameState.worldState);
       }
       
-      if (validatedGameState.characterState) {
-        characterStore.setState(validatedGameState.characterState);
+      if (validatedGameState.characterState && 'setState' in characterStore) {
+        (characterStore as any).setState(validatedGameState.characterState);
       }
       
-      if (validatedGameState.sessionState) {
-        sessionStore.setState(validatedGameState.sessionState);
+      if (validatedGameState.sessionState && 'setState' in sessionStore) {
+        (sessionStore as any).setState(validatedGameState.sessionState);
       }
       
-      if (validatedGameState.journalState) {
-        journalStore.setState(validatedGameState.journalState);
+      if (validatedGameState.journalState && 'setState' in journalStore) {
+        (journalStore as any).setState(validatedGameState.journalState);
       }
       
-      if (validatedGameState.narrativeState) {
-        narrativeStore.setState(validatedGameState.narrativeState);
+      if (validatedGameState.narrativeState && 'setState' in narrativeStore) {
+        (narrativeStore as any).setState(validatedGameState.narrativeState);
       }
 
       return {

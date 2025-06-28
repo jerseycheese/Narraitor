@@ -5,20 +5,42 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useDataRecovery } from '../useDataRecovery';
+import { RecoveryService } from '../../lib/storage/recoveryService';
 
 // Mock the recovery service
 jest.mock('../../lib/storage/recoveryService');
+jest.mock('../../lib/storage/localStorageAdapter');
+jest.mock('../../lib/storage/indexedDBAdapter');
+
+const MockedRecoveryService = RecoveryService as jest.MockedClass<typeof RecoveryService>;
 
 describe('useDataRecovery', () => {
+  let mockCheckRecoveryNeeded: jest.Mock;
+  let mockPerformRecovery: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    mockCheckRecoveryNeeded = jest.fn().mockResolvedValue(false);
+    mockPerformRecovery = jest.fn().mockResolvedValue({ success: true, message: 'Recovery successful' });
+    
+    MockedRecoveryService.mockImplementation(() => ({
+      checkRecoveryNeeded: mockCheckRecoveryNeeded,
+      performRecovery: mockPerformRecovery,
+      getRecoveryPreview: jest.fn(),
+      clearRecoveryData: jest.fn(),
+    }) as RecoveryService);
   });
 
   describe('initial state', () => {
-    test('returns initial state correctly', () => {
+    test('returns initial state correctly', async () => {
       const { result } = renderHook(() => useDataRecovery());
 
-      expect(result.current.isCheckingRecovery).toBe(false);
+      // Wait for initial async effect to complete
+      await act(async () => {
+        // Allow effects to run
+      });
+
       expect(result.current.needsRecovery).toBe(false);
       expect(result.current.isRecovering).toBe(false);
       expect(result.current.recoveryComplete).toBe(false);
@@ -28,10 +50,7 @@ describe('useDataRecovery', () => {
 
   describe('recovery check', () => {
     test('checks for recovery needs on mount', async () => {
-      const mockRecoveryService = require('../../lib/storage/recoveryService');
-      mockRecoveryService.RecoveryService.mockImplementation(() => ({
-        checkRecoveryNeeded: jest.fn().mockResolvedValue(true),
-      }));
+      mockCheckRecoveryNeeded.mockResolvedValue(true);
 
       const { result } = renderHook(() => useDataRecovery());
 
@@ -43,10 +62,7 @@ describe('useDataRecovery', () => {
     });
 
     test('handles recovery check errors', async () => {
-      const mockRecoveryService = require('../../lib/storage/recoveryService');
-      mockRecoveryService.RecoveryService.mockImplementation(() => ({
-        checkRecoveryNeeded: jest.fn().mockRejectedValue(new Error('Check failed')),
-      }));
+      mockCheckRecoveryNeeded.mockRejectedValue(new Error('Check failed'));
 
       const { result } = renderHook(() => useDataRecovery());
 
@@ -61,14 +77,6 @@ describe('useDataRecovery', () => {
 
   describe('recovery process', () => {
     test('performs recovery successfully', async () => {
-      const mockRecoveryService = require('../../lib/storage/recoveryService');
-      mockRecoveryService.RecoveryService.mockImplementation(() => ({
-        performRecovery: jest.fn().mockResolvedValue({ 
-          success: true, 
-          message: 'Recovery successful' 
-        }),
-      }));
-
       const { result } = renderHook(() => useDataRecovery());
 
       await act(async () => {
@@ -80,13 +88,10 @@ describe('useDataRecovery', () => {
     });
 
     test('handles recovery errors', async () => {
-      const mockRecoveryService = require('../../lib/storage/recoveryService');
-      mockRecoveryService.RecoveryService.mockImplementation(() => ({
-        performRecovery: jest.fn().mockResolvedValue({ 
-          success: false, 
-          error: 'Recovery failed' 
-        }),
-      }));
+      mockPerformRecovery.mockResolvedValue({ 
+        success: false, 
+        error: 'Recovery failed' 
+      });
 
       const { result } = renderHook(() => useDataRecovery());
 
@@ -113,7 +118,6 @@ describe('useDataRecovery', () => {
     test('clears errors', () => {
       const { result } = renderHook(() => useDataRecovery());
 
-      // Set error state
       act(() => {
         result.current.clearError();
       });

@@ -6,13 +6,30 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ExportImportControls } from '../ExportImportControls';
+import { ExportService } from '../../../lib/storage/exportService';
 
 // Mock the export service
 jest.mock('../../../lib/storage/exportService');
 
+const MockedExportService = ExportService as jest.MockedClass<typeof ExportService>;
+
 describe('ExportImportControls', () => {
+  let mockDownloadGameState: jest.Mock;
+  let mockImportFromFile: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    mockDownloadGameState = jest.fn().mockResolvedValue(undefined);
+    mockImportFromFile = jest.fn().mockResolvedValue({ success: true, message: 'Import successful' });
+    
+    MockedExportService.mockImplementation(() => ({
+      downloadGameState: mockDownloadGameState,
+      importFromFile: mockImportFromFile,
+      exportGameState: jest.fn(),
+      importGameState: jest.fn(),
+      getExportSize: jest.fn(),
+    }) as ExportService);
   });
 
   describe('export functionality', () => {
@@ -43,11 +60,7 @@ describe('ExportImportControls', () => {
     });
 
     test('shows error message on export failure', async () => {
-      // Mock export failure
-      const mockExportService = require('../../../lib/storage/exportService');
-      mockExportService.ExportService.mockImplementation(() => ({
-        downloadGameState: jest.fn().mockRejectedValue(new Error('Export failed')),
-      }));
+      mockDownloadGameState.mockRejectedValue(new Error('Export failed'));
 
       render(<ExportImportControls />);
 
@@ -81,11 +94,6 @@ describe('ExportImportControls', () => {
     });
 
     test('shows import success message', async () => {
-      const mockExportService = require('../../../lib/storage/exportService');
-      mockExportService.ExportService.mockImplementation(() => ({
-        importFromFile: jest.fn().mockResolvedValue({ success: true, message: 'Import successful' }),
-      }));
-
       render(<ExportImportControls />);
 
       const fileInput = screen.getByLabelText(/import game/i);
@@ -99,10 +107,7 @@ describe('ExportImportControls', () => {
     });
 
     test('shows import error message', async () => {
-      const mockExportService = require('../../../lib/storage/exportService');
-      mockExportService.ExportService.mockImplementation(() => ({
-        importFromFile: jest.fn().mockResolvedValue({ success: false, error: 'Invalid file' }),
-      }));
+      mockImportFromFile.mockResolvedValue({ success: false, error: 'Invalid file' });
 
       render(<ExportImportControls />);
 

@@ -36,6 +36,10 @@ export function RecoveryNotification({
     
     try {
       const date = new Date(dateString);
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return null;
+      }
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',

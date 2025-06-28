@@ -17,6 +17,9 @@ jest.mock('../../../state/sessionStore');
 global.URL.createObjectURL = jest.fn(() => 'mock-blob-url');
 global.URL.revokeObjectURL = jest.fn();
 
+// Mock File.prototype.text method
+global.File.prototype.text = jest.fn();
+
 // Mock download functionality
 const mockClick = jest.fn();
 const mockElement = {
@@ -24,9 +27,13 @@ const mockElement = {
   setAttribute: jest.fn(),
   style: { display: '' },
 };
-jest.spyOn(document, 'createElement').mockReturnValue(mockElement as any);
-jest.spyOn(document.body, 'appendChild').mockImplementation(() => mockElement as any);
+jest.spyOn(document, 'createElement').mockReturnValue(mockElement as HTMLElement);
+jest.spyOn(document.body, 'appendChild').mockImplementation(() => mockElement as HTMLElement);
 jest.spyOn(document.body, 'removeChild').mockImplementation();
+
+const MockedWorldStore = worldStore as jest.Mocked<typeof worldStore>;
+const MockedCharacterStore = characterStore as jest.Mocked<typeof characterStore>;
+const MockedSessionStore = sessionStore as jest.Mocked<typeof sessionStore>;
 
 describe('ExportService', () => {
   let exportService: ExportService;
@@ -38,13 +45,13 @@ describe('ExportService', () => {
 
   describe('export functionality', () => {
     test('exports complete game state', async () => {
-      const mockWorldState = { worlds: { 'world-1': { id: 'world-1', name: 'Test World' } } };
-      const mockCharacterState = { characters: { 'char-1': { id: 'char-1', name: 'Test Character' } } };
+      const mockWorldState: Record<string, unknown> = { worlds: { 'world-1': { id: 'world-1', name: 'Test World' } } };
+      const mockCharacterState: Record<string, unknown> = { characters: { 'char-1': { id: 'char-1', name: 'Test Character' } } };
       const mockSessionState = { activeSession: 'session-1' };
 
-      (worldStore.getState as jest.Mock).mockReturnValue(mockWorldState);
-      (characterStore.getState as jest.Mock).mockReturnValue(mockCharacterState);
-      (sessionStore.getState as jest.Mock).mockReturnValue(mockSessionState);
+      MockedWorldStore.getState.mockReturnValue(mockWorldState);
+      MockedCharacterStore.getState.mockReturnValue(mockCharacterState);
+      MockedSessionStore.getState.mockReturnValue(mockSessionState);
 
       const result = await exportService.exportGameState();
 
@@ -55,11 +62,13 @@ describe('ExportService', () => {
         worldState: mockWorldState,
         characterState: mockCharacterState,
         sessionState: mockSessionState,
+        journalState: expect.any(Object),
+        narrativeState: expect.any(Object),
       });
     });
 
     test('handles export errors gracefully', async () => {
-      (worldStore.getState as jest.Mock).mockImplementation(() => {
+      MockedWorldStore.getState.mockImplementation(() => {
         throw new Error('Store error');
       });
 
@@ -71,9 +80,9 @@ describe('ExportService', () => {
 
     test('creates downloadable file', async () => {
       const mockState = { worlds: {}, characters: {}, sessions: {} };
-      (worldStore.getState as jest.Mock).mockReturnValue(mockState);
-      (characterStore.getState as jest.Mock).mockReturnValue(mockState);
-      (sessionStore.getState as jest.Mock).mockReturnValue(mockState);
+      MockedWorldStore.getState.mockReturnValue(mockState);
+      MockedCharacterStore.getState.mockReturnValue(mockState);
+      MockedSessionStore.getState.mockReturnValue(mockState);
 
       await exportService.downloadGameState();
 
@@ -95,6 +104,10 @@ describe('ExportService', () => {
       };
 
       const result = await exportService.importGameState(validGameState);
+
+      if (!result.success) {
+        console.error('Import failed:', result.error);
+      }
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('Game state imported successfully');
@@ -146,7 +159,14 @@ describe('ExportService', () => {
 
       const mockFile = new File([validJSON], 'save.json', { type: 'application/json' });
       
+      // Mock the text() method to return our JSON
+      (mockFile.text as jest.Mock).mockResolvedValue(validJSON);
+      
       const result = await exportService.importFromFile(mockFile);
+
+      if (!result.success) {
+        console.error('File import failed:', result.error);
+      }
 
       expect(result.success).toBe(true);
     });
@@ -154,6 +174,9 @@ describe('ExportService', () => {
     test('handles invalid JSON files', async () => {
       const invalidJSON = 'invalid json content';
       const mockFile = new File([invalidJSON], 'save.json', { type: 'application/json' });
+      
+      // Mock the text() method to return invalid JSON
+      (mockFile.text as jest.Mock).mockResolvedValue(invalidJSON);
       
       const result = await exportService.importFromFile(mockFile);
 
