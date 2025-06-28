@@ -11,8 +11,7 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Jest and React Testing Library for testing
 - Google Gemini for AI integration (secure server-side implementation)
 - IndexedDB for client-side persistence
-- Tailwind CSS v4 for styling
-- shadcn/ui for accessible component library
+- **Tailwind CSS v3**: Required for Storybook compatibility
 
 ## Security Architecture
 - **API Key Protection**: All API keys stored server-side only (`GEMINI_API_KEY`)
@@ -32,6 +31,7 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Document architectural decisions
 - Write comprehensive tests for critical paths
 - Review and refactor code regularly
+- **NEVER change package versions** unless explicitly requested - maintain existing dependency versions to avoid breaking compatibility
 
 ## Automation Workflow System
 Advanced automation capabilities for accelerated development:
