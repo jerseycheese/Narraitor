@@ -80,7 +80,7 @@ describe('Narrative Consistency Integration Tests', () => {
       (goalExtractor.extractGoalsFromNarrative as jest.Mock).mockResolvedValue(mockDiscoveryExtraction);
 
       // Add discovery segment
-      const discoverySegmentId = useNarrativeStore.getState().addSegment(sessionId, {
+      useNarrativeStore.getState().addSegment(sessionId, {
         worldId,
         content: 'You notice a strange hole in the stone wall. It\'s about the size of your fist and seems to lead into darkness. Something about it feels important.',
         type: 'scene',
