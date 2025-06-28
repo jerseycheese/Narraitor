@@ -6,16 +6,12 @@
  * of imported game state to ensure data integrity.
  */
 
-import { worldStore } from '../../state/worldStore';
-import { characterStore } from '../../state/characterStore';
-import { sessionStore } from '../../state/sessionStore';
-import { journalStore } from '../../state/journalStore';
-import { narrativeStore } from '../../state/narrativeStore';
+import { useWorldStore } from '../../state/worldStore';
+import { useCharacterStore } from '../../state/characterStore';
+import { useSessionStore } from '../../state/sessionStore';
+import { useJournalStore } from '../../state/journalStore';
+import { useNarrativeStore } from '../../state/narrativeStore';
 
-// Type for Zustand stores with setState capability
-type ZustandStoreWithSetState = {
-  setState: (partial: unknown) => void;
-};
 
 export interface GameStateExport {
   version: string;
@@ -51,11 +47,11 @@ export class ExportService {
       const gameState: GameStateExport = {
         version: this.CURRENT_VERSION,
         exportedAt: new Date().toISOString(),
-        worldState: worldStore.getState(),
-        characterState: characterStore.getState(),
-        sessionState: sessionStore.getState(),
-        journalState: journalStore.getState(),
-        narrativeState: narrativeStore.getState(),
+        worldState: useWorldStore.getState(),
+        characterState: useCharacterStore.getState(),
+        sessionState: useSessionStore.getState(),
+        journalState: useJournalStore.getState(),
+        narrativeState: useNarrativeStore.getState(),
       };
 
       return {
@@ -116,24 +112,24 @@ export class ExportService {
       const validatedGameState = gameState as GameStateExport;
       
       // Use the underlying Zustand setState method if available
-      if (validatedGameState.worldState && 'setState' in worldStore) {
-        (worldStore as ZustandStoreWithSetState).setState(validatedGameState.worldState);
+      if (validatedGameState.worldState) {
+        useWorldStore.setState(validatedGameState.worldState);
       }
       
-      if (validatedGameState.characterState && 'setState' in characterStore) {
-        (characterStore as ZustandStoreWithSetState).setState(validatedGameState.characterState);
+      if (validatedGameState.characterState) {
+        useCharacterStore.setState(validatedGameState.characterState);
       }
       
-      if (validatedGameState.sessionState && 'setState' in sessionStore) {
-        (sessionStore as ZustandStoreWithSetState).setState(validatedGameState.sessionState);
+      if (validatedGameState.sessionState) {
+        useSessionStore.setState(validatedGameState.sessionState);
       }
       
-      if (validatedGameState.journalState && 'setState' in journalStore) {
-        (journalStore as ZustandStoreWithSetState).setState(validatedGameState.journalState);
+      if (validatedGameState.journalState) {
+        useJournalStore.setState(validatedGameState.journalState);
       }
       
-      if (validatedGameState.narrativeState && 'setState' in narrativeStore) {
-        (narrativeStore as ZustandStoreWithSetState).setState(validatedGameState.narrativeState);
+      if (validatedGameState.narrativeState) {
+        useNarrativeStore.setState(validatedGameState.narrativeState);
       }
 
       return {
