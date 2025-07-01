@@ -387,15 +387,15 @@ import { Button } from '@/components/ui/button'
 ```
 
 ## Claude Code Commands
-All Claude Code commands are now provided by the Development Framework with Narraitor-specific configuration:
+All Claude Code commands are now provided by the Development Framework with project-specific configuration:
 
 ### Command Usage
 ```bash
 # Set Narraitor configuration
 export PROJECT_CONFIG="./narraitor-config.json"
 
-# Use any Development Framework command
-claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/[command].template.md [arguments]
+# Use configurable framework commands
+claude [framework-command-template] [arguments]
 ```
 
 ### Available Commands
@@ -412,15 +412,17 @@ claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/[com
 
 ### Quick Examples
 ```bash
-# Implement an issue with guided workflow
+# Set configuration for all commands
 export PROJECT_CONFIG="./narraitor-config.json"
-claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue.template.md 123
+
+# Implement an issue with guided workflow
+claude do-issue.template.md 123
 
 # Batch process multiple issues automatically  
-claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-continuous-issues.template.md 101,102,103
+claude do-continuous-issues.template.md 101,102,103
 
 # Generate documentation following Narraitor patterns
-claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/create-docs.template.md "WorldCard"
+claude create-docs.template.md "WorldCard"
 ```
 
 ## Working with Claude App and Claude Code
@@ -440,7 +442,7 @@ For smoothly transitioning between planning in Claude App and implementation in 
 3. **Simple Workflow**:
    - Pick an issue from GitHub
    - Plan in Claude App to create technical spec
-   - Implement using: `claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue.template.md [issue-number]`
+   - Implement using Development Framework commands with project configuration
    - Verify and complete following the guided process
 
 ### Benefits of Framework Integration
@@ -458,18 +460,18 @@ Available at `/dev/*` routes:
 - `/dev/game-session` - Game session testing
 
 ## Development Framework Integration
-The project now integrates with a broader development framework located at `/Users/jackhaas/Projects/Development`:
+The project now integrates with a broader development framework for configurable development tools:
 
 ### Generic Development Tools
-- **Issue Analysis Framework**: `/Users/jackhaas/Projects/Development/frameworks/issue-analysis/issue-analyzer.sh` - Project-agnostic issue dependency analysis
-- **Claude Code Commands**: `/Users/jackhaas/Projects/Development/frameworks/claude-code/commands/` - Configurable command templates
-- **GitHub Tools**: `/Users/jackhaas/Projects/Development/tools/github/` - Reusable GitHub API wrappers
-- **Automation Tools**: `/Users/jackhaas/Projects/Development/tools/automation/` - Cross-project automation utilities
+- **Issue Analysis Framework**: Project-agnostic issue dependency analysis with domain configuration
+- **Claude Code Commands**: Configurable command templates that work with any project structure
+- **GitHub Tools**: Reusable GitHub API wrappers for consistent automation
+- **Automation Tools**: Cross-project automation utilities for development workflows
 
 ### Configuration-Driven Development
 The development workflow now uses project-specific configuration files:
 - **Narraitor Config**: `./narraitor-config.json` - Defines Narraitor's domain structure, GitHub settings, and conflict rules
-- **Template Config**: `/Users/jackhaas/Projects/Development/frameworks/issue-analysis/project-config.template.json` - Generic template for other projects
+- **Template Config**: Generic project configuration template for other projects
 
 This architecture allows:
 - **Reusable Tools**: Same automation scripts work across different projects
