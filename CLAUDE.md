@@ -387,14 +387,41 @@ import { Button } from '@/components/ui/button'
 ```
 
 ## Claude Code Commands
-We've created several custom Claude Code slash commands:
-- `/project:do-issue [issue-number]`: Complete workflow for implementing an issue
-- `/project:do-issue-auto [issue-number]`: Complete workflow automatically without review stops
-- `/project:analyze-issue [issue-number]`: Analyze GitHub issue and create technical spec
-- `/project:tdd-implement [feature-name]`: Implement a feature using TDD
-- `/project:create-docs [component/feature]`: Create comprehensive documentation
-- `/project:create-pr [feature-description]`: Create a pull request
-- `/project:transition [context]`: Transition between Claude App and Claude Code
+All Claude Code commands are now provided by the Development Framework with Narraitor-specific configuration:
+
+### Command Usage
+```bash
+# Set Narraitor configuration
+export PROJECT_CONFIG="./narraitor-config.json"
+
+# Use any Development Framework command
+claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/[command].template.md [arguments]
+```
+
+### Available Commands
+- **`do-issue.template.md [issue-number]`**: Complete guided workflow for implementing an issue
+- **`do-issue-auto.template.md [issue-number]`**: Fully automated workflow without review stops
+- **`analyze-issue.template.md [issue-number]`**: Analyze GitHub issue and create technical spec
+- **`tdd-implement.template.md [feature-name]`**: Implement a feature using TDD
+- **`create-docs.template.md [component/feature]`**: Create comprehensive documentation
+- **`create-pr.template.md [feature-description]`**: Create a pull request
+- **`transition.template.md [context]`**: Transition between Claude App and Claude Code
+- **`do-continuous-issues.template.md [issue-list]`**: Batch process multiple issues
+- **`complete-workflow.template.md [target]`**: End-to-end development workflow
+- **`test.template.md [target]`**: Comprehensive testing using Narraitor patterns
+
+### Quick Examples
+```bash
+# Implement an issue with guided workflow
+export PROJECT_CONFIG="./narraitor-config.json"
+claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue.template.md 123
+
+# Batch process multiple issues automatically  
+claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-continuous-issues.template.md 101,102,103
+
+# Generate documentation following Narraitor patterns
+claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/create-docs.template.md "WorldCard"
+```
 
 ## Working with Claude App and Claude Code
 For smoothly transitioning between planning in Claude App and implementation in Claude Code:
@@ -405,17 +432,22 @@ For smoothly transitioning between planning in Claude App and implementation in 
    - Plan architecture and component structure
 
 2. **Implementation in Claude Code**:
-   - Use `/project:do-issue [issue-number]` for guided implementation
+   - Set up configuration: `export PROJECT_CONFIG="./narraitor-config.json"`
+   - Use Development Framework commands for guided implementation
    - Follow the Three-Stage Verification framework
-   - Use helper scripts to avoid permission prompts
+   - All commands automatically use Narraitor's domain structure and patterns
 
 3. **Simple Workflow**:
    - Pick an issue from GitHub
    - Plan in Claude App to create technical spec
-   - Implement in Claude Code using `/project:do-issue [issue-number]`
+   - Implement using: `claude /Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue.template.md [issue-number]`
    - Verify and complete following the guided process
 
-Use the custom Claude Code commands for guided development workflows.
+### Benefits of Framework Integration
+- **Consistent Commands**: Same commands work across all your projects
+- **Narraitor Patterns**: Automatically uses Narraitor's domain structure, testing patterns, and conventions
+- **Zero Maintenance**: No need to maintain project-specific commands
+- **Cross-Project Learning**: Improvements to the framework benefit all projects
 
 ## Development Test Harnesses
 Available at `/dev/*` routes:
