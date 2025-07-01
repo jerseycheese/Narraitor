@@ -297,6 +297,38 @@ See the MCP GitHub tool documentation for complete usage details.
 - `npm run build-storybook`: Build Storybook for deployment
 - `npm run lint`: Run ESLint
 
+## Parallel Work Analysis Commands
+
+### Unified Tool (Recommended)
+- `./scripts/parallel-work-planner.sh analyze [issues]`: Comprehensive issue analysis for parallel work safety
+- `./scripts/parallel-work-planner.sh recommend [count]`: Get recommended safe issue combinations
+- `./scripts/parallel-work-planner.sh setup [issues]`: Set up complete parallel work environment
+- `./scripts/parallel-work-planner.sh monitor`: Monitor active parallel work across all tools
+- `./scripts/parallel-work-planner.sh guide`: Access comprehensive planning documentation
+
+### Individual Tools
+- `./scripts/analyze-issue-dependencies.sh [issue-number]`: Analyze single issue dependencies
+- `./scripts/analyze-issue-dependencies.sh --compare [issue1] [issue2]`: Compare two issues for conflicts
+- `./scripts/analyze-issue-dependencies.sh --batch [issue1,issue2,issue3]`: Batch analyze multiple issues
+- `./scripts/check-related-issues.sh [issue-number]`: Find cross-referenced issues
+- `./scripts/parallel-claude-setup.sh setup`: Set up multiple worktrees for parallel development
+- `./scripts/worktree-helper.sh status`: Monitor all active worktrees
+
+### Quick Start
+```bash
+# Analyze issues for parallel work safety
+./scripts/parallel-work-planner.sh analyze 504,220
+
+# Get recommended safe combinations
+./scripts/parallel-work-planner.sh recommend
+
+# Set up parallel work environment
+./scripts/parallel-work-planner.sh setup 504,220
+```
+
+### Project-Specific Implementation
+The tools above are specifically designed for Narraitor's domain structure (World, Character, Narrative, Journal, Inventory) and integrate with Narraitor's development workflow.
+
 ## Security Testing Commands
 - `./demo-secure-api.sh`: Quick verification of secure API implementation
 - `./test-secure-api.sh`: Comprehensive security testing (requires dev server)
@@ -355,14 +387,43 @@ import { Button } from '@/components/ui/button'
 ```
 
 ## Claude Code Commands
-We've created several custom Claude Code slash commands:
-- `/project:do-issue [issue-number]`: Complete workflow for implementing an issue
-- `/project:do-issue-auto [issue-number]`: Complete workflow automatically without review stops
-- `/project:analyze-issue [issue-number]`: Analyze GitHub issue and create technical spec
-- `/project:tdd-implement [feature-name]`: Implement a feature using TDD
-- `/project:create-docs [component/feature]`: Create comprehensive documentation
-- `/project:create-pr [feature-description]`: Create a pull request
-- `/project:transition [context]`: Transition between Claude App and Claude Code
+All Claude Code commands are now provided by the Development Framework with project-specific configuration:
+
+### Command Usage
+```bash
+# Set Narraitor configuration
+export PROJECT_CONFIG="./narraitor-config.json"
+
+# Use configurable framework commands
+claude [framework-command-template] [arguments]
+```
+
+### Available Commands
+- **`do-issue.template.md [issue-number]`**: Complete guided workflow for implementing an issue
+- **`do-issue-auto.template.md [issue-number]`**: Fully automated workflow without review stops
+- **`analyze-issue.template.md [issue-number]`**: Analyze GitHub issue and create technical spec
+- **`tdd-implement.template.md [feature-name]`**: Implement a feature using TDD
+- **`create-docs.template.md [component/feature]`**: Create comprehensive documentation
+- **`create-pr.template.md [feature-description]`**: Create a pull request
+- **`transition.template.md [context]`**: Transition between Claude App and Claude Code
+- **`do-continuous-issues.template.md [issue-list]`**: Batch process multiple issues
+- **`complete-workflow.template.md [target]`**: End-to-end development workflow
+- **`test.template.md [target]`**: Comprehensive testing using Narraitor patterns
+
+### Quick Examples
+```bash
+# Set configuration for all commands
+export PROJECT_CONFIG="./narraitor-config.json"
+
+# Implement an issue with guided workflow
+claude do-issue.template.md 123
+
+# Batch process multiple issues automatically  
+claude do-continuous-issues.template.md 101,102,103
+
+# Generate documentation following Narraitor patterns
+claude create-docs.template.md "WorldCard"
+```
 
 ## Working with Claude App and Claude Code
 For smoothly transitioning between planning in Claude App and implementation in Claude Code:
@@ -373,17 +434,22 @@ For smoothly transitioning between planning in Claude App and implementation in 
    - Plan architecture and component structure
 
 2. **Implementation in Claude Code**:
-   - Use `/project:do-issue [issue-number]` for guided implementation
+   - Set up configuration: `export PROJECT_CONFIG="./narraitor-config.json"`
+   - Use Development Framework commands for guided implementation
    - Follow the Three-Stage Verification framework
-   - Use helper scripts to avoid permission prompts
+   - All commands automatically use Narraitor's domain structure and patterns
 
 3. **Simple Workflow**:
    - Pick an issue from GitHub
    - Plan in Claude App to create technical spec
-   - Implement in Claude Code using `/project:do-issue [issue-number]`
+   - Implement using Development Framework commands with project configuration
    - Verify and complete following the guided process
 
-Use the custom Claude Code commands for guided development workflows.
+### Benefits of Framework Integration
+- **Consistent Commands**: Same commands work across all your projects
+- **Narraitor Patterns**: Automatically uses Narraitor's domain structure, testing patterns, and conventions
+- **Zero Maintenance**: No need to maintain project-specific commands
+- **Cross-Project Learning**: Improvements to the framework benefit all projects
 
 ## Development Test Harnesses
 Available at `/dev/*` routes:
@@ -392,3 +458,22 @@ Available at `/dev/*` routes:
 - `/dev/devtools-test` - DevTools panel testing
 - `/dev/template-selector` - Template selector testing
 - `/dev/game-session` - Game session testing
+
+## Development Framework Integration
+The project now integrates with a broader development framework for configurable development tools:
+
+### Generic Development Tools
+- **Issue Analysis Framework**: Project-agnostic issue dependency analysis with domain configuration
+- **Claude Code Commands**: Configurable command templates that work with any project structure
+- **GitHub Tools**: Reusable GitHub API wrappers for consistent automation
+- **Automation Tools**: Cross-project automation utilities for development workflows
+
+### Configuration-Driven Development
+The development workflow now uses project-specific configuration files:
+- **Narraitor Config**: `./narraitor-config.json` - Defines Narraitor's domain structure, GitHub settings, and conflict rules
+- **Template Config**: Generic project configuration template for other projects
+
+This architecture allows:
+- **Reusable Tools**: Same automation scripts work across different projects
+- **Domain Configuration**: Each project defines its own domain structure and patterns
+- **Consistent Workflows**: Standardized development processes while maintaining project-specific customization
