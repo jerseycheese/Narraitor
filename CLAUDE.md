@@ -297,6 +297,37 @@ See the MCP GitHub tool documentation for complete usage details.
 - `npm run build-storybook`: Build Storybook for deployment
 - `npm run lint`: Run ESLint
 
+## Parallel Work Analysis Commands
+
+### Unified Tool (Recommended)
+- `./scripts/parallel-work-planner.sh analyze [issues]`: Comprehensive issue analysis for parallel work safety
+- `./scripts/parallel-work-planner.sh recommend [count]`: Get recommended safe issue combinations
+- `./scripts/parallel-work-planner.sh setup [issues]`: Set up complete parallel work environment
+- `./scripts/parallel-work-planner.sh monitor`: Monitor active parallel work across all tools
+- `./scripts/parallel-work-planner.sh guide`: Access comprehensive planning documentation
+
+### Individual Tools
+- `./scripts/analyze-issue-dependencies.sh [issue-number]`: Analyze single issue dependencies
+- `./scripts/analyze-issue-dependencies.sh --compare [issue1] [issue2]`: Compare two issues for conflicts
+- `./scripts/analyze-issue-dependencies.sh --batch [issue1,issue2,issue3]`: Batch analyze multiple issues
+- `./scripts/check-related-issues.sh [issue-number]`: Find cross-referenced issues
+- `./scripts/parallel-claude-setup.sh setup`: Set up multiple worktrees for parallel development
+- `./scripts/worktree-helper.sh status`: Monitor all active worktrees
+
+### Quick Start
+```bash
+# Analyze issues for parallel work safety
+./scripts/parallel-work-planner.sh analyze 504,220
+
+# Get recommended safe combinations
+./scripts/parallel-work-planner.sh recommend
+
+# Set up parallel work environment
+./scripts/parallel-work-planner.sh setup 504,220
+```
+
+See `/docs/development/workflows/parallel-work-planning-guide.md` for comprehensive planning process
+
 ## Security Testing Commands
 - `./demo-secure-api.sh`: Quick verification of secure API implementation
 - `./test-secure-api.sh`: Comprehensive security testing (requires dev server)

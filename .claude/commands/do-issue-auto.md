@@ -5,32 +5,39 @@
 # "Yes, and don't ask again this session" on the first prompt you see.
 # This will enable session-level auto-accept for all subsequent operations.
 
-I'll implement issue #$ARGUMENTS entirely automatically, proceeding through all steps without manual stops.
+I'll implement issue #$ARGUMENTS entirely automatically, proceeding through all steps without manual stops using enhanced subagent delegation.
 
 ## SUBAGENT DELEGATION STRATEGY
 
-Throughout this workflow, I'll leverage subagents/tasks for specialized work:
-- **Analysis Tasks**: Delegate research and specification creation
-- **Test Writing**: Delegate test creation to specialized testing agents
-- **Implementation**: Use component-specific agents for UI/logic implementation
-- **Code Review**: Delegate pattern analysis and optimization identification
-- **Documentation**: Use documentation specialists for API/usage docs
+Throughout this workflow, I'll leverage specialized subagents via the Task tool for expert-level work:
+- **Analysis Tasks**: Issue Analysis Specialist for GitHub issue research and specification creation
+- **Test Writing**: Test Writing Specialist for TDD-focused test creation
+- **Implementation**: UI Component, Business Logic, and Integration Specialists (parallel execution)
+- **Verification**: Verification Coordinator for BrowserMCP testing orchestration
+- **Code Review**: Code Review Specialist for pattern analysis and optimization identification
+- **Documentation**: Documentation Specialist for API/usage docs creation
 
-Let's start by creating a feature branch and defining clear scope boundaries to prevent scope creep.
+Let's start by creating the comprehensive todo structure and beginning with specialized subagent delegation.
 
-```
-Update Todos
-  ☐ Branch Creation & Issue Analysis
-  ☐ Define Tests Phase
-  ☐ Implementation Phase
-  ☐ Build Phase
-  ☐ Test Fixes Phase
-  ☐ Code Review & Reusability Analysis
-  ☐ Cleanup & Documentation Phase
-  ☐ GitHub Issue Management
-```
+Please use the TodoWrite tool to create these workflow todos:
+
+[
+  {"id": "branch-creation-analysis-$ARGUMENTS", "content": "Branch Creation & Issue Analysis", "status": "pending", "priority": "high"},
+  {"id": "define-tests-$ARGUMENTS", "content": "Define Tests Phase", "status": "pending", "priority": "high"},
+  {"id": "implementation-$ARGUMENTS", "content": "Implementation Phase", "status": "pending", "priority": "high"},
+  {"id": "build-$ARGUMENTS", "content": "Build Phase", "status": "pending", "priority": "high"},
+  {"id": "test-fixes-$ARGUMENTS", "content": "Test Fixes Phase", "status": "pending", "priority": "high"},
+  {"id": "automated-verification-$ARGUMENTS", "content": "Automated Verification Phase", "status": "pending", "priority": "high"},
+  {"id": "code-review-reusability-$ARGUMENTS", "content": "Code Review & Reusability Analysis", "status": "pending", "priority": "medium"},
+  {"id": "cleanup-documentation-$ARGUMENTS", "content": "Cleanup & Documentation Phase", "status": "pending", "priority": "medium"},
+  {"id": "github-issue-management-$ARGUMENTS", "content": "GitHub Issue Management", "status": "pending", "priority": "medium"}
+]
 
 ## STEP 1: BRANCH CREATION & ISSUE ANALYSIS
+
+Now I'll mark the first phase as in_progress and begin the Issue Analysis.
+
+Please update the "Branch Creation & Issue Analysis" todo to in_progress status.
 
 First, I'll generate a descriptive branch name based on the issue title and create the feature branch:
 
@@ -55,20 +62,27 @@ All changes will be made on this feature branch, allowing easy rollback if neede
 
 ### SUBAGENT: Issue Analysis Specialist
 
-I'll now delegate the issue analysis to a specialized subagent:
+I'll now delegate the issue analysis to a specialized subagent using the Task tool:
 
-```
-TASK FOR ISSUE ANALYSIS SUBAGENT:
-1. Fetch GitHub issue #$ARGUMENTS from jerseycheese/narraitor repository
-2. Analyze the issue description, comments, and linked issues
+Please use the Task tool to delegate this work to a specialized subagent:
+
+Description: Analyze GitHub issue and create technical specification
+Prompt: You are an Issue Analysis Specialist subagent. Your task is to:
+
+1. Fetch GitHub issue #$ARGUMENTS from jerseycheese/narraitor repository using available GitHub tools
+2. Analyze the issue description, comments, and acceptance criteria 
 3. Create a comprehensive technical specification with:
    - Clear scope boundaries (what's included/excluded)
    - Technical approach and implementation plan
    - Identification of existing utilities to leverage
    - Test strategy focused on acceptance criteria
    - Success criteria checklist
-4. Return the analysis in structured format
-```
+4. Identify which domain this issue belongs to (World, Character, Inventory, Narrative, Journal)
+5. Return the analysis in structured markdown format
+
+IMPORTANT: Focus only on what's explicitly requested in the issue. Do not suggest additional features or enhancements outside the defined scope. Follow KISS principles and maintain existing patterns.
+
+Please analyze issue #$ARGUMENTS and return a complete technical specification.
 
 First, let me fetch the issue details using the MCP GitHub tool:
 ```javascript
@@ -162,24 +176,30 @@ Update Todos
 
 ## STEP 2: DEFINE TESTS PHASE
 
+Please mark "Branch Creation & Issue Analysis" as completed and "Define Tests Phase" as in_progress.
+
 ### SUBAGENT: Test Writing Specialist
 
-I'll delegate test creation to a specialized testing subagent:
+I'll delegate test creation to a specialized testing subagent using the Task tool:
 
-```
-TASK FOR TEST WRITING SUBAGENT:
-1. Based on the technical specification and acceptance criteria
-2. Write focused tests that verify core functionality
-3. Follow these guidelines:
+Please use the Task tool to delegate this work to a specialized subagent:
+
+Description: Create focused TDD tests for implementation
+Prompt: You are a Test Writing Specialist subagent following strict TDD principles. Your task is to:
+
+1. Based on the technical specification above, write focused tests that verify core functionality
+2. Follow these guidelines:
    - Test WHAT not HOW (behavior over implementation)
-   - Focus on acceptance criteria
+   - Focus on acceptance criteria from the spec
    - Avoid testing style classes or implementation details
    - Create minimal test files targeting key functionality
-   - **Ensure tests are MVP-level and align with issue acceptance criteria**
-   - **Skip trivial tests that don't add value to the core functionality**
-4. Ensure tests will fail initially (red phase of TDD)
-5. Return test files ready for implementation
-```
+   - Ensure tests are MVP-level and align with issue acceptance criteria
+   - Skip trivial tests that don't add value to core functionality
+3. Create test files that will fail initially (red phase of TDD)
+4. Include Storybook story specifications following 'Narraitor/[Category]/[Component]' naming
+5. Plan test harness scenarios for /dev/[component-name] testing
+
+Please create focused test files and specifications that directly verify the acceptance criteria without testing implementation details.
 
 I'll now write focused tests that directly verify the acceptance criteria:
 
@@ -246,29 +266,51 @@ git commit -m "test(issue-$ARGUMENTS): Add tests for [feature description]"
 
 ## STEP 3: IMPLEMENTATION PHASE
 
-### SUBAGENT: Implementation Specialist
+Please mark "Define Tests Phase" as completed and "Implementation Phase" as in_progress.
 
-I'll delegate the implementation to specialized subagents based on the type of work:
+### SUBAGENT: Implementation Specialists
 
-```
-TASK FOR IMPLEMENTATION SUBAGENT(S):
-1. UI COMPONENT SUBAGENT (if applicable):
-   - Create React components following project patterns
-   - Use existing shadcn/ui components where possible
-   - Maintain <300 lines per component
-   - Follow single responsibility principle
+I'll delegate the implementation to specialized subagents using the Task tool for parallel execution:
 
-2. BUSINESS LOGIC SUBAGENT (if applicable):
-   - Implement core functionality to pass tests
-   - Use existing utilities from the codebase
-   - Follow established patterns for state management
-   - Ensure proper error handling
+Please use the Task tool to delegate to three parallel implementation specialists:
 
-3. INTEGRATION SUBAGENT:
-   - Connect components with stores/services
-   - Ensure proper data flow
-   - Handle edge cases within scope
-```
+**UI Component Specialist:**
+Description: Implement React components following project patterns
+Prompt: You are a UI Component Implementation Specialist subagent. Your task is to:
+
+1. Create React components following project patterns from the specification
+2. Use existing shadcn/ui components where possible  
+3. Maintain <300 lines per component following single responsibility principle
+4. Follow established TypeScript patterns and domain boundaries
+5. Create Storybook stories for all component variants and states
+6. Ensure accessibility is built-in, not added later
+
+Focus only on UI component implementation to pass the defined tests. Do not add features outside the specification scope.
+
+**Business Logic Specialist:**
+Description: Implement core functionality and state management
+Prompt: You are a Business Logic Implementation Specialist subagent. Your task is to:
+
+1. Implement core functionality to pass tests using existing patterns
+2. Use existing utilities from the codebase where possible
+3. Follow established Zustand store patterns for state management
+4. Ensure proper error handling with recovery mechanisms
+5. Maintain atomic and predictable state updates
+6. Integrate with existing domain stores appropriately
+
+Implement the minimum business logic needed to satisfy the test requirements and acceptance criteria.
+
+**Integration Specialist:**
+Description: Connect components with stores and services
+Prompt: You are an Integration Specialist subagent. Your task is to:
+
+1. Connect components with stores/services following project patterns
+2. Ensure proper data flow between components and state management
+3. Handle edge cases within the defined scope
+4. Create test harness pages at /dev/[component-name] for interactive testing
+5. Ensure integration with existing systems follows domain boundaries
+
+Focus on integration points and ensure all components work together seamlessly within the existing architecture.
 
 I'll implement the feature using Test-Driven Development, strictly adhering to the defined scope boundaries:
 
@@ -414,19 +456,22 @@ If critical issues are found, I'll implement fixes and re-run verification befor
 
 ### SUBAGENT: Code Review Specialist
 
-I'll delegate code analysis to a specialized review subagent:
+I'll delegate code analysis to a specialized review subagent using the Task tool:
 
-```
-TASK FOR CODE REVIEW SUBAGENT:
-1. Analyze implemented code for:
-   - Opportunities to use existing components
-   - Type safety and interface reuse
-   - Performance optimization opportunities
-   - Code patterns that could be extracted
-2. Identify specific refactoring opportunities
-3. Check adherence to project patterns
-4. Return prioritized list of improvements
-```
+Please use the Task tool to delegate this work to a specialized subagent:
+
+Description: Analyze code for pattern compliance and optimization
+Prompt: You are a Code Review Specialist subagent focused on pattern analysis and optimization. Your task is to:
+
+1. Analyze implemented code for opportunities to use existing components/utilities
+2. Check for type safety improvements and interface reuse opportunities
+3. Identify performance optimization opportunities without over-engineering
+4. Look for code patterns that could be extracted for reusability
+5. Ensure adherence to project patterns and domain boundaries
+6. Check file size compliance (<300 lines per component)
+7. Verify error handling follows project standards
+
+Return a prioritized list of improvements that enhance code quality while maintaining the existing scope.
 
 I'll analyze the implemented code for potential improvements and reuse opportunities:
 
@@ -473,19 +518,21 @@ git commit -m "refactor(issue-$ARGUMENTS): Integrate existing components and ext
 
 ### SUBAGENT: Documentation Specialist
 
-I'll delegate documentation creation to a specialized subagent:
+I'll delegate documentation creation to a specialized subagent using the Task tool:
 
-```
-TASK FOR DOCUMENTATION SUBAGENT:
-1. Create comprehensive documentation for:
-   - API/Props/Parameters of new components
-   - Usage examples demonstrating key functionality
-   - Integration guide with existing systems
-   - Error handling scenarios
-2. Ensure documentation follows project standards
-3. Include code examples where appropriate
-4. Return documentation files ready for commit
-```
+Please use the Task tool to delegate this work to a specialized subagent:
+
+Description: Create comprehensive technical documentation
+Prompt: You are a Documentation Specialist subagent focused on comprehensive technical documentation. Your task is to:
+
+1. Create API/Props/Parameters documentation for all new components
+2. Write usage examples demonstrating key functionality from the implementation
+3. Document integration points with existing systems
+4. Cover error handling scenarios and edge cases
+5. Follow project documentation standards from CLAUDE.md
+6. Ensure documentation is concise and AI-readable (150 lines max per doc)
+
+Return documentation files ready for commit that provide comprehensive guidance for using the implemented features.
 
 I'll create documentation and clean up the implementation:
 

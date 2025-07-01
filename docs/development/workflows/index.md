@@ -76,7 +76,24 @@ Development processes and workflow guidelines for Narraitor.
 - Test in Storybook for component isolation
 - Verify responsive design and accessibility
 
+## Parallel Development
+
+### Planning Parallel Work
+1. **Analyze dependencies** - Use issue analysis tools to detect conflicts
+2. **Assess safety** - Apply YOLO safety criteria for parallel work
+3. **Setup worktrees** - Create isolated development environments
+4. **Monitor progress** - Track work across multiple issues
+5. **Coordinate integration** - Plan merge order and testing
+
+### Parallel Work Tools
+- `./scripts/analyze-issue-dependencies.sh` - Analyze issue dependencies and conflicts
+- `./scripts/parallel-claude-setup.sh` - Set up multiple worktrees for parallel development
+- `./scripts/worktree-helper.sh` - Manage individual worktrees and monitor progress
+
 ## Related Workflows
 - [Core Development Workflow](./core-development-workflow.md)
 - [PR and Testing Workflow](./pr-and-testing-workflow.md)
 - [Storybook Workflow](./storybook-workflow-streamlined.md)
+- [Parallel Work Planning Guide](./parallel-work-planning-guide.md)
+- [YOLO Safe Issues Classification](./yolo-safe-issues.md)
+- [Parallel Work Analysis Audit](./parallel-work-analysis-audit.md)
