@@ -1,0 +1,90 @@
+{
+  "github": {
+    "repository": "jerseycheese/Narraitor",
+    "token": "$GITHUB_TOKEN"
+  },
+  "domain": {
+    "labelPrefix": "domain:",
+    "default": "utilities-and-helpers"
+  },
+  "labels": {
+    "complexityPrefix": "complexity:",
+    "priorityPrefix": "priority:"
+  },
+  "domains": {
+    "world": {
+      "keywords": ["world", "template", "genre", "creation", "configuration"],
+      "paths": [
+        "src/app/world/",
+        "src/components/World/",
+        "src/state/worldStore.ts"
+      ]
+    },
+    "character": {
+      "keywords": ["character", "sheet", "progression", "creation"],
+      "paths": [
+        "src/app/characters/",
+        "src/components/Character/",
+        "src/state/characterStore.ts"
+      ]
+    },
+    "narrative": {
+      "keywords": ["narrative", "story", "prompt", "ai", "generation"],
+      "paths": [
+        "src/lib/narrative/",
+        "src/components/Narrative/",
+        "src/state/narrativeStore.ts"
+      ]
+    },
+    "journal": {
+      "keywords": ["journal", "entry", "history", "tracking"],
+      "paths": [
+        "src/app/journal/",
+        "src/components/Journal/",
+        "src/state/journalStore.ts"
+      ]
+    },
+    "inventory": {
+      "keywords": ["inventory", "item", "equipment", "effects"],
+      "paths": [
+        "src/components/Inventory/",
+        "src/state/inventoryStore.ts"
+      ]
+    },
+    "ui": {
+      "keywords": ["ui", "component", "toast", "navigation", "setting"],
+      "paths": [
+        "src/components/ui/",
+        "src/components/shared/",
+        "src/app/settings/"
+      ]
+    },
+    "state-management": {
+      "keywords": ["state", "store", "persistence", "storage", "backup"],
+      "paths": [
+        "src/state/",
+        "src/lib/storage/",
+        "src/lib/persistence/"
+      ]
+    },
+    "utilities-and-helpers": {
+      "keywords": ["util", "helper", "library", "shared", "common"],
+      "paths": [
+        "src/lib/",
+        "src/utils/"
+      ]
+    }
+  },
+  "testing": {
+    "patterns": [
+      "__tests__/",
+      "*.test.js",
+      "*.test.tsx"
+    ]
+  },
+  "conflicts": {
+    "sameDomainRisk": "MEDIUM",
+    "differentDomainRisk": "LOW", 
+    "sharedPathRisk": "HIGH"
+  }
+}

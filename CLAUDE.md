@@ -424,3 +424,22 @@ Available at `/dev/*` routes:
 - `/dev/devtools-test` - DevTools panel testing
 - `/dev/template-selector` - Template selector testing
 - `/dev/game-session` - Game session testing
+
+## Development Framework Integration
+The project now integrates with a broader development framework located at `/Users/jackhaas/Projects/Development`:
+
+### Generic Development Tools
+- **Issue Analysis Framework**: `/Users/jackhaas/Projects/Development/frameworks/issue-analysis/issue-analyzer.sh` - Project-agnostic issue dependency analysis
+- **Claude Code Commands**: `/Users/jackhaas/Projects/Development/frameworks/claude-code/commands/` - Configurable command templates
+- **GitHub Tools**: `/Users/jackhaas/Projects/Development/tools/github/` - Reusable GitHub API wrappers
+- **Automation Tools**: `/Users/jackhaas/Projects/Development/tools/automation/` - Cross-project automation utilities
+
+### Configuration-Driven Development
+The development workflow now uses project-specific configuration files:
+- **Narraitor Config**: `./narraitor-config.json` - Defines Narraitor's domain structure, GitHub settings, and conflict rules
+- **Template Config**: `/Users/jackhaas/Projects/Development/frameworks/issue-analysis/project-config.template.json` - Generic template for other projects
+
+This architecture allows:
+- **Reusable Tools**: Same automation scripts work across different projects
+- **Domain Configuration**: Each project defines its own domain structure and patterns
+- **Consistent Workflows**: Standardized development processes while maintaining project-specific customization
