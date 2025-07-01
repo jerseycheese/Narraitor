@@ -13,7 +13,15 @@ jest.mock('@/components/shared/ExportImportControls', () => {
 // Mock the PageLayout component
 jest.mock('@/components/shared/PageLayout', () => {
   return {
-    PageLayout: function MockPageLayout({ title, description, children }: any) {
+    PageLayout: function MockPageLayout({ 
+      title, 
+      description, 
+      children 
+    }: { 
+      title: string; 
+      description?: string; 
+      children: React.ReactNode;
+    }) {
       return (
         <main>
           <h1>{title}</h1>
@@ -21,6 +29,27 @@ jest.mock('@/components/shared/PageLayout', () => {
           {children}
         </main>
       );
+    }
+  };
+});
+
+// Mock the Card components
+jest.mock('@/components/ui/card', () => {
+  return {
+    Card: function MockCard({ children }: { children: React.ReactNode }) {
+      return <div data-testid="card">{children}</div>;
+    },
+    CardHeader: function MockCardHeader({ children }: { children: React.ReactNode }) {
+      return <div data-testid="card-header">{children}</div>;
+    },
+    CardTitle: function MockCardTitle({ children }: { children: React.ReactNode }) {
+      return <h3>{children}</h3>;
+    },
+    CardDescription: function MockCardDescription({ children }: { children: React.ReactNode }) {
+      return <p>{children}</p>;
+    },
+    CardContent: function MockCardContent({ children }: { children: React.ReactNode }) {
+      return <div data-testid="card-content">{children}</div>;
     }
   };
 });

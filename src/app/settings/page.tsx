@@ -2,6 +2,7 @@
 
 import { PageLayout } from '@/components/shared/PageLayout';
 import { ExportImportControls } from '@/components/shared/ExportImportControls';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 /**
  * SettingsPage - Application settings and configuration
@@ -26,18 +27,19 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <section>
           <h2 className="text-2xl font-semibold mb-4">Data Management</h2>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="mb-4">
-              <h3 className="text-lg font-medium mb-2">Backup & Restore</h3>
-              <p className="text-gray-600 text-sm mb-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Backup & Restore</CardTitle>
+              <CardDescription>
                 Create backups of your worlds, characters, and game progress. 
                 Export generates a downloadable JSON file containing all your data, 
                 and import restores from a previously exported backup file.
-              </p>
-            </div>
-            
-            <ExportImportControls className="max-w-none" />
-          </div>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ExportImportControls className="max-w-none" />
+            </CardContent>
+          </Card>
         </section>
       </div>
     </PageLayout>
