@@ -132,6 +132,14 @@ export function Navigation() {
                 >
                   Characters
                 </Link>
+                <Link 
+                  href="/settings" 
+                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                    pathname === '/settings' ? 'text-white' : ''
+                  }`}
+                >
+                  Settings
+                </Link>
               </div>
             </div>
             
