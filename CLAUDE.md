@@ -326,7 +326,8 @@ See the MCP GitHub tool documentation for complete usage details.
 ./scripts/parallel-work-planner.sh setup 504,220
 ```
 
-See `/docs/development/workflows/parallel-work-planning-guide.md` for comprehensive planning process
+### Project-Specific Implementation
+The tools above are specifically designed for Narraitor's domain structure (World, Character, Narrative, Journal, Inventory) and integrate with Narraitor's development workflow.
 
 ## Security Testing Commands
 - `./demo-secure-api.sh`: Quick verification of secure API implementation
