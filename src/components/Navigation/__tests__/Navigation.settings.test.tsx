@@ -25,6 +25,21 @@ const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldSt
 const mockUseCharacterStore = useCharacterStore as jest.MockedFunction<typeof useCharacterStore>;
 const mockUseNavigationLoadingContext = useNavigationLoadingContext as jest.MockedFunction<typeof useNavigationLoadingContext>;
 
+// Mock window.matchMedia for mobile detection
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false, // Simulate desktop
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 describe('Navigation - Settings Integration', () => {
   beforeEach(() => {
     mockUseWorldStore.mockReturnValue({

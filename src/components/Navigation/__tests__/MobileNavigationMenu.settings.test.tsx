@@ -14,6 +14,21 @@ jest.mock('next/navigation', () => ({
 const mockUseWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
 const mockUseCharacterStore = useCharacterStore as jest.MockedFunction<typeof useCharacterStore>;
 
+// Mock window.matchMedia for mobile detection
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
 describe('MobileNavigationMenu - Settings Integration', () => {
   const mockOnClose = jest.fn();
   const mockOnNavigate = jest.fn();

@@ -3,8 +3,25 @@ import SettingsPage from '../page';
 
 // Mock the ExportImportControls component
 jest.mock('@/components/shared/ExportImportControls', () => {
-  return function MockExportImportControls() {
-    return <div data-testid="export-import-controls">Export/Import Controls</div>;
+  return {
+    ExportImportControls: function MockExportImportControls() {
+      return <div data-testid="export-import-controls">Export/Import Controls</div>;
+    }
+  };
+});
+
+// Mock the PageLayout component
+jest.mock('@/components/shared/PageLayout', () => {
+  return {
+    PageLayout: function MockPageLayout({ title, description, children }: any) {
+      return (
+        <main>
+          <h1>{title}</h1>
+          {description && <p>{description}</p>}
+          {children}
+        </main>
+      );
+    }
   };
 });
 
@@ -16,7 +33,7 @@ describe('SettingsPage', () => {
     expect(screen.getByRole('heading', { name: 'Settings' })).toBeInTheDocument();
     
     // Test that the description mentions backup and restore functionality
-    expect(screen.getByText(/backup.*restore/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/backup.*restore/i).length).toBeGreaterThan(0);
   });
 
   test('includes ExportImportControls component', () => {
