@@ -1,6 +1,6 @@
 # Narraitor
 
-A world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any fictional world.
+A world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any world.
 
 ## Project Overview
 
