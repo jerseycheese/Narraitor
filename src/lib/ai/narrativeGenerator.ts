@@ -16,6 +16,7 @@ import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
 import { validateNarrativeConsistency } from './narrativeConsistencyValidator';
+import type { LoreFact } from '@/types/lore.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
@@ -38,7 +39,7 @@ export class NarrativeGenerator {
   /**
    * Enhances a prompt with lore context for the given world
    */
-  private enhancePromptWithLore(prompt: string, worldId: EntityID, generationParams?: any): string {
+  private enhancePromptWithLore(prompt: string, worldId: EntityID, generationParams?: { maxTokens?: number }): string {
     const loreContext = getLoreContextForPrompt(worldId, { maxTokens: generationParams?.maxTokens });
     return prompt + loreContext;
   }
@@ -46,10 +47,10 @@ export class NarrativeGenerator {
   /**
    * Build consistency instructions for template context
    */
-  private buildConsistencyInstructions(worldId: EntityID): string {
+  private async buildConsistencyInstructions(worldId: EntityID): Promise<string> {
     try {
-      // Import lore store dynamically to avoid circular dependency
-      const { useLoreStore } = require('@/state/loreStore');
+      // Import lore store
+      const { useLoreStore } = await import('@/state/loreStore');
       const { getFacts } = useLoreStore.getState();
       const facts = getFacts({ worldId });
       
@@ -57,7 +58,7 @@ export class NarrativeGenerator {
         return '';
       }
       
-      const categories = new Set(facts.map((f: any) => f.category));
+      const categories = new Set(facts.map((f: LoreFact) => f.category));
       const instructions: string[] = ['\nCONSISTENCY REQUIREMENTS:'];
       
       if (categories.has('characters')) {
@@ -308,7 +309,7 @@ export class NarrativeGenerator {
       
       try {
         loreContext = getLoreContextForPrompt(request.worldId, { maxTokens: request.generationParameters?.maxTokens });
-        consistencyInstructions = this.buildConsistencyInstructions(request.worldId);
+        consistencyInstructions = await this.buildConsistencyInstructions(request.worldId);
       } catch (error) {
         console.warn('Failed to enhance context with lore/consistency data:', error);
       }

@@ -186,7 +186,7 @@ function detectCharacterContradictions(
   const contradictions: NarrativeContradiction[] = [];
   const foundContradictions = new Set<string>(); // Track to avoid duplicates
 
-  for (const [keyword, loreEntries] of loreMap.entries()) {
+  for (const [, loreEntries] of loreMap.entries()) {
     // Look for character-related lore
     const characterLore = loreEntries.filter(entry => 
       entry.toLowerCase().includes('hero') || 
@@ -244,7 +244,7 @@ function detectLocationContradictions(
 ): NarrativeContradiction[] {
   const contradictions: NarrativeContradiction[] = [];
 
-  for (const [keyword, loreEntries] of loreMap.entries()) {
+  for (const [, loreEntries] of loreMap.entries()) {
     const locationLore = loreEntries.filter(entry =>
       entry.toLowerCase().includes('forest') ||
       entry.toLowerCase().includes('location') ||
@@ -285,7 +285,7 @@ function detectRuleContradictions(
   const contradictions: NarrativeContradiction[] = [];
   const foundRuleContradictions = new Set<string>(); // Track rule types to avoid duplicates
 
-  for (const [keyword, loreEntries] of loreMap.entries()) {
+  for (const [, loreEntries] of loreMap.entries()) {
     const ruleLore = loreEntries.filter(entry =>
       entry.toLowerCase().includes('requires') ||
       entry.toLowerCase().includes('magic') ||

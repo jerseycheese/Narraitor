@@ -18,7 +18,7 @@ export function getLoreContextForPrompt(worldId: EntityID, options?: { maxTokens
   }
   
   // Use enhanced formatting for consistency
-  const formatOptions: any = {};
+  const formatOptions: { maxFacts?: number } = {};
   
   // If max tokens is limited, reduce the number of facts
   if (options?.maxTokens && options.maxTokens < 1000) {

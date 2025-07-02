@@ -10,7 +10,7 @@
 
 import { validateNarrativeConsistency, formatLoreForConsistency, detectPotentialContradictions } from '../narrativeConsistencyValidator';
 import { useLoreStore } from '@/state/loreStore';
-import type { LoreFact, StructuredLoreExtraction } from '@/types/lore.types';
+import type { LoreFact } from '@/types/lore.types';
 
 // Mock the lore store
 jest.mock('@/state/loreStore', () => ({
@@ -21,7 +21,6 @@ jest.mock('@/state/loreStore', () => ({
 
 describe('Narrative Consistency Validator', () => {
   const mockWorldId = 'world-123';
-  const mockSessionId = 'session-456';
 
   beforeEach(() => {
     jest.clearAllMocks();

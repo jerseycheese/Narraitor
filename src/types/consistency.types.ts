@@ -3,7 +3,6 @@
  * Issue #184: AI consistency for enhanced player experience
  */
 
-import type { EntityID } from './common.types';
 import type { LoreFact, LoreCategory } from './lore.types';
 
 /**
