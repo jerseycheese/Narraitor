@@ -100,18 +100,17 @@ function formatParagraphs(text: string, preserveLineBreaks?: boolean): string {
  * @returns Text with properly quoted dialogue
  */
 function formatDialogue(text: string): string {
-  // Pattern to match dialogue - handles quoted and unquoted text
-  const dialoguePattern = /(\w+\s+(?:said|replied|exclaimed|asked|whispered|shouted|muttered|declared),)\s+("?)([^".!?\n]+)([.!?]?)("?)/gi;
+  // Simple pattern to match dialogue at end of lines
+  // Matches: "Name said, content" where content doesn't start with quotes
+  let result = text;
   
-  return text.replace(dialoguePattern, (match, speaker, openQuote, dialogue, punctuation, closeQuote) => {
-    // If dialogue already has quotes (both open and close), preserve as is
-    if (openQuote && closeQuote) {
-      return match;
-    }
-    
-    // Otherwise, add quotes around the dialogue with punctuation inside
-    return `${speaker} "${dialogue.trim()}${punctuation}"`;
-  });
+  // Handle "Name said, content" pattern
+  result = result.replace(/(\b\w+\s+said,\s+)([^"\n].+?)([.!?]?)\s*$/gmi, '$1"$2$3"');
+  
+  // Handle other speech verbs
+  result = result.replace(/(\b\w+\s+(?:replied|exclaimed|asked|whispered|shouted|muttered|declared),\s+)([^"\n].+?)([.!?]?)\s*$/gmi, '$1"$2$3"');
+  
+  return result;
 }
 
 /**
