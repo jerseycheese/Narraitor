@@ -20,6 +20,7 @@ const mockStorageContext = {
   error: null,
   lastSuccessfulSync: new Date().toISOString(),
   checkHealth: jest.fn(),
+  isLoading: false,
 };
 
 jest.mock('../../../hooks/useStorageStatus', () => ({
@@ -32,26 +33,22 @@ describe('StorageStatus Component', () => {
   });
 
   describe('Healthy Storage State', () => {
-    it('should show minimal indicator when storage is healthy', () => {
+    it('should not render when storage is healthy (floating mode)', () => {
       mockStorageContext.status = StorageStatusEnum.HEALTHY;
       mockStorageContext.error = null;
 
-      render(<StorageStatus />);
+      const { container } = render(<StorageStatus />);
 
-      // Should show green indicator
-      const indicator = screen.getByRole('status');
-      expect(indicator).toHaveClass('storage-status--healthy');
-      
-      // Should not show error message
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      // Component should not render in healthy state (floating mode)
+      expect(container.firstChild).toBeNull();
     });
 
-    it('should show last sync time when available', () => {
+    it('should show last sync time when using inline variant', () => {
       const syncTime = new Date('2023-01-01T12:00:00Z').toISOString();
       mockStorageContext.status = StorageStatusEnum.HEALTHY;
       mockStorageContext.lastSuccessfulSync = syncTime;
 
-      render(<StorageStatus />);
+      render(<StorageStatus variant="inline" />);
 
       // Should display sync time (exact format depends on implementation)
       expect(screen.getByText(/last saved/i)).toBeInTheDocument();

@@ -9,9 +9,6 @@ import { useCharacterStore } from '../characterStore';
 import { StorageStatus } from '../../lib/storage/resilientStorage';
 
 // Mock the resilient storage
-jest.mock('../../lib/storage/resilientStorage');
-jest.mock('../../lib/storage/indexedDBAdapter');
-
 const mockResilientStorage = {
   setItem: jest.fn(),
   getItem: jest.fn(),
@@ -23,6 +20,9 @@ const mockResilientStorage = {
   stopHealthMonitoring: jest.fn(),
   onStatusChange: jest.fn(),
 };
+
+jest.mock('../../lib/storage/resilientStorage');
+jest.mock('../../lib/storage/indexedDBAdapter');
 
 // Mock the persistence storage to use our mocked resilient storage
 jest.mock('../persistence', () => ({

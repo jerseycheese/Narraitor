@@ -204,6 +204,38 @@
     box-shadow: var(--shadow-md);
   }
   
+  /* Formatted narrative content styling */
+  .formatted-narrative-content {
+    line-height: 1.7;
+  }
+  
+  .formatted-narrative-content p {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .formatted-narrative-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .formatted-narrative-content em {
+    font-style: italic;
+    font-weight: 500;
+    color: inherit;
+  }
+  
+  /* Enhanced dialogue styling for better visual distinction */
+  .narrative-segment.dialogue-enhanced .formatted-narrative-content {
+    margin-left: 0.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid #3b82f6; /* blue-500 */
+  }
+  
+  /* Ensure proper spacing for different paragraph modes */
+  .formatted-narrative-content.double-spacing p {
+    margin-bottom: 1.5rem;
+  }
+  
   .btn {
     display: inline-block;
     padding: var(--spacing-2) var(--spacing-4);

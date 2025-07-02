@@ -81,8 +81,8 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
     setIsExpanded(!isExpanded);
   };
 
-  // Don't render if healthy and not expanded, or if dismissed
-  if ((storageState.status === StorageStatusEnum.HEALTHY && !isExpanded) || isDismissed) {
+  // Don't render if healthy and not expanded (floating mode only), or if dismissed
+  if ((storageState.status === StorageStatusEnum.HEALTHY && !isExpanded && variant === 'floating') || isDismissed) {
     return null;
   }
 

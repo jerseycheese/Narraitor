@@ -2,6 +2,7 @@ import React from 'react';
 import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
+import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -199,15 +200,66 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
   };
 
   const styles = getSegmentStyles(segment.type);
-  const displayContent = parseContent(segment.content);
+  const parsedContent = parseContent(segment.content);
+  
+  // Get formatting options based on segment type
+  const getFormattingOptions = (segmentType: string): FormattingOptions => {
+    switch (segmentType) {
+      case 'dialogue':
+        return { 
+          formatDialogue: true, 
+          enableItalics: true, 
+          preserveLineBreaks: false,
+          paragraphSpacing: 'single'
+        };
+      case 'scene':
+      case 'action':
+      case 'exploration':
+      case 'character_interaction':
+        return { 
+          enableItalics: true, 
+          preserveLineBreaks: false,
+          paragraphSpacing: 'single'
+        };
+      case 'revelation':
+      case 'resolution':
+        return { 
+          enableItalics: true, 
+          preserveLineBreaks: false,
+          paragraphSpacing: 'double'
+        };
+      default:
+        return { 
+          preserveLineBreaks: false,
+          paragraphSpacing: 'single'
+        };
+    }
+  };
+  
+  const formattingOptions = getFormattingOptions(segment.type);
+  const displayContent = formatAIResponse(parsedContent, formattingOptions);
+  
+  // Determine additional CSS classes based on formatting options
+  const formatClasses = [
+    'formatted-narrative-content',
+    formattingOptions.paragraphSpacing === 'double' ? 'double-spacing' : '',
+  ].filter(Boolean).join(' ');
+  
+  // Determine if dialogue should get enhanced styling
+  const containerClasses = [
+    'narrative-segment p-6 rounded-lg',
+    styles.container,
+    segment.type === 'dialogue' && formattingOptions.formatDialogue ? 'dialogue-enhanced' : ''
+  ].filter(Boolean).join(' ');
 
   return (
     <div className="space-y-3 snap-center">
-      <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
+      <div className={containerClasses}>
         <p className={styles.label}>{segment.type}</p>
-        <p className={`text-l leading-relaxed whitespace-pre-wrap ${styles.text}`}>
-          {displayContent}
-        </p>
+        <div 
+          className={`text-l leading-relaxed whitespace-pre-wrap ${styles.text} ${formatClasses}`}
+          dangerouslySetInnerHTML={{ __html: displayContent.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>') }}
+        />
         {segment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">

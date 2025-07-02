@@ -100,17 +100,21 @@ function formatParagraphs(text: string, preserveLineBreaks?: boolean): string {
  * @returns Text with properly quoted dialogue
  */
 function formatDialogue(text: string): string {
-  // Pattern to match dialogue - handles quoted and unquoted text
-  const dialoguePattern = /(\w+\s+(?:said|replied|exclaimed|asked|whispered|shouted|muttered|declared),)\s+("?)([^".!?\n]+)([.!?]?)("?)/gi;
+  // Pattern to match dialogue: Speaker verb, content OR Speaker verb content
+  // This pattern is more careful about what it captures as dialogue content
+  const dialoguePattern = /(\b\w+\s+(?:said|replied|exclaimed|asked|whispered|shouted|muttered|declared))(?:,\s+|\s+)(?!")([^".!?\n]*[^.!?\s])?([.!?]*)/gi;
   
-  return text.replace(dialoguePattern, (match, speaker, openQuote, dialogue, punctuation, closeQuote) => {
-    // If dialogue already has quotes (both open and close), preserve as is
-    if (openQuote && closeQuote) {
+  return text.replace(dialoguePattern, (match, speaker, dialogue, punctuation) => {
+    // Skip if this doesn't look like actual dialogue content
+    if (!dialogue || dialogue.trim().length === 0) {
       return match;
     }
     
-    // Otherwise, add quotes around the dialogue with punctuation inside
-    return `${speaker} "${dialogue.trim()}${punctuation}"`;
+    const trimmedDialogue = dialogue.trim();
+    const cleanPunctuation = punctuation || '';
+    
+    // Format with proper quotation marks and punctuation placement
+    return `${speaker}, "${trimmedDialogue}${cleanPunctuation}"`;
   });
 }
 

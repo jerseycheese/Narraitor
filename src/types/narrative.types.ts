@@ -1,6 +1,7 @@
 // src/types/narrative.types.ts
 
 import { EntityID, TimestampedEntity } from './common.types';
+import type { ConsistencyValidationResult } from './consistency.types';
 
 /**
  * Represents a segment of narrative in the game
@@ -134,6 +135,8 @@ export interface GenerationParameters {
   segmentType?: 'scene' | 'dialogue' | 'action' | 'transition';
   includedTopics?: string[];
   excludedTopics?: string[];
+  validateConsistency?: boolean;
+  maxTokens?: number;
 }
 
 /**
@@ -160,6 +163,8 @@ export interface NarrativeGenerationResult {
       action: string;
       implicitSkills?: string[];
     };
+    // Consistency validation results
+    consistencyValidation?: ConsistencyValidationResult;
   };
   choices?: Array<{
     text: string;

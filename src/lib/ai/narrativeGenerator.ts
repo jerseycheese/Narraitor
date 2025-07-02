@@ -15,6 +15,7 @@ import { EntityID } from '@/types/common.types';
 import { ChoiceGenerator } from './choiceGenerator';
 import { getLoreContextForPrompt } from './loreContextHelper';
 import { extractStructuredLore } from './structuredLoreExtractor';
+import { validateNarrativeConsistency } from './narrativeConsistencyValidator';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { TemplateGenerator, WorldTemplate } from './templateGenerator';
@@ -40,6 +41,47 @@ export class NarrativeGenerator {
   private enhancePromptWithLore(prompt: string, worldId: EntityID): string {
     const loreContext = getLoreContextForPrompt(worldId);
     return prompt + loreContext;
+  }
+
+  /**
+   * Build consistency instructions for template context
+   */
+  private buildConsistencyInstructions(worldId: EntityID): string {
+    try {
+      const { useLoreStore } = require('@/state/loreStore');
+      const { getFacts } = useLoreStore.getState();
+      const facts = getFacts({ worldId });
+      
+      if (facts.length === 0) {
+        return '';
+      }
+      
+      const categories = new Set(facts.map((f: any) => f.category));
+      const instructions: string[] = ['\nCONSISTENCY REQUIREMENTS:'];
+      
+      if (categories.has('characters')) {
+        instructions.push('- Always refer to established characters by their correct names');
+      }
+      
+      if (categories.has('locations')) {
+        instructions.push('- Maintain consistent descriptions of locations');
+      }
+      
+      if (categories.has('rules')) {
+        instructions.push('- Respect established world rules and magical systems');
+      }
+      
+      if (categories.has('events')) {
+        instructions.push('- Build upon previously established events');
+      }
+      
+      instructions.push('- Maintain consistency with previously established facts');
+      instructions.push('- Do not contradict the established lore');
+      
+      return instructions.join('\n') + '\n';
+    } catch {
+      return '';
+    }
   }
 
   /**
@@ -256,7 +298,18 @@ export class NarrativeGenerator {
       );
 
       const context = this.buildContext(world, request);
-      const prompt = template(context);
+      
+      // Add lore context and consistency instructions for template
+      const loreContext = getLoreContextForPrompt(request.worldId);
+      const consistencyInstructions = this.buildConsistencyInstructions(request.worldId);
+      
+      const enhancedContext = {
+        ...context,
+        loreContext,
+        consistencyInstructions
+      };
+      
+      const prompt = template(enhancedContext);
 
       // Add tone settings, lore context, goal context, and personalization to prompt
       const toneEnhancedPrompt = this.enhancePromptWithToneSettings(
@@ -298,10 +351,27 @@ export class NarrativeGenerator {
         }
       }
 
-      return this.formatResponse(
+      const result = this.formatResponse(
         response,
         request.generationParameters?.segmentType || 'scene'
       );
+      
+      // Add consistency validation if requested
+      if (request.generationParameters?.validateConsistency && response.content) {
+        try {
+          const validationResult = validateNarrativeConsistency(
+            response.content,
+            request.worldId,
+            { includeWarnings: true }
+          );
+          
+          result.metadata.consistencyValidation = validationResult;
+        } catch {
+          // Validation failed - continue without it
+        }
+      }
+
+      return result;
     } catch {
       throw new Error('Failed to generate narrative segment');
     }
