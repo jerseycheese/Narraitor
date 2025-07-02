@@ -115,7 +115,7 @@ describe('SkillReviewStep', () => {
     expect(screen.getByTestId('skill-attributes-0')).toBeInTheDocument();
   });
 
-  test('displays Learning Curve instead of Difficulty', () => {
+  test('displays Difficulty label (not Learning Curve)', () => {
     const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
       ...s,
       accepted: i === 0,
@@ -143,7 +143,10 @@ describe('SkillReviewStep', () => {
       />
     );
 
-    expect(screen.getByText('Learning Curve')).toBeInTheDocument();
+    // Should display "Difficulty" label for consistency
+    expect(screen.getByText('Difficulty')).toBeInTheDocument();
+    // Should NOT display "Learning Curve" 
+    expect(screen.queryByText('Learning Curve')).not.toBeInTheDocument();
   });
 
   test('allows editing skill properties', () => {
