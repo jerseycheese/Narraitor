@@ -70,7 +70,7 @@ export const InContext: Story = {
         <h3 className="text-lg font-semibold">Skill: Arcane Mastery</h3>
         <p className="text-sm text-gray-600 mb-2">The ability to manipulate magical energies</p>
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Learning Curve:</span>
+          <span className="text-sm text-gray-600">Difficulty:</span>
           <SkillDifficulty
             difficulty="hard"
             showDescription={false}
@@ -81,7 +81,7 @@ export const InContext: Story = {
         <h3 className="text-lg font-semibold">Skill: Animal Handling</h3>
         <p className="text-sm text-gray-600 mb-2">Calming and controlling animals</p>
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Learning Curve:</span>
+          <span className="text-sm text-gray-600">Difficulty:</span>
           <SkillDifficulty
             difficulty="medium"
             showDescription={false}
@@ -92,7 +92,7 @@ export const InContext: Story = {
         <h3 className="text-lg font-semibold">Skill: Observation</h3>
         <p className="text-sm text-gray-600 mb-2">Noticing details in your surroundings</p>
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Learning Curve:</span>
+          <span className="text-sm text-gray-600">Difficulty:</span>
           <SkillDifficulty
             difficulty="easy"
             showDescription={false}

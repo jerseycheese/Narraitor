@@ -407,7 +407,7 @@ export default function SkillReviewStep({
                 
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <WizardFormGroup label="Learning Curve">
+                    <WizardFormGroup label="Difficulty">
                       <WizardSelect
                         value={suggestion.difficulty}
                         onChange={(value) => handleModifySkill(index, 'difficulty', value)}

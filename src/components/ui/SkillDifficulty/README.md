@@ -26,7 +26,7 @@ import SkillDifficulty from '@/components/ui/SkillDifficulty';
 
 // In a form or list context
 <div className="flex justify-between items-center">
-  <span>Learning Curve:</span>
+  <span>Difficulty:</span>
   <SkillDifficulty difficulty="easy" />
 </div>
 ```
