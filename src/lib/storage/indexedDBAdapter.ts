@@ -15,6 +15,8 @@ export class IndexedDBAdapter {
 
   /**
    * Static factory method for creating adapter instances
+   * Uses async initialization to prevent race conditions
+   * @returns Promise resolving to an initialized IndexedDBAdapter
    */
   static async create(): Promise<IndexedDBAdapter> {
     const adapter = new IndexedDBAdapter();
@@ -24,6 +26,8 @@ export class IndexedDBAdapter {
 
   /**
    * Initialize the IndexedDB database
+   * Creates the database and object store if they don't exist
+   * Handles environments without IndexedDB gracefully
    */
   async initialize(): Promise<void> {
     if (typeof indexedDB === 'undefined') {
@@ -57,6 +61,8 @@ export class IndexedDBAdapter {
 
   /**
    * Get an item from storage
+   * @param key - The key to retrieve
+   * @returns Promise resolving to the stored value or null if not found
    */
   async getItem(key: string): Promise<string | null> {
     if (!this.db) {
@@ -96,6 +102,9 @@ export class IndexedDBAdapter {
 
   /**
    * Set an item in storage
+   * @param key - The key to store the value under
+   * @param value - The value to store (as JSON string)
+   * @throws DOMException for quota exceeded or other storage errors
    */
   async setItem(key: string, value: string): Promise<void> {
     if (!this.db) {
@@ -150,6 +159,8 @@ export class IndexedDBAdapter {
 
   /**
    * Remove an item from storage
+   * @param key - The key to remove
+   * @returns Promise that resolves when the item is removed (or if removal fails gracefully)
    */
   async removeItem(key: string): Promise<void> {
     if (!this.db) {

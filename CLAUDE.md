@@ -10,7 +10,7 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - Storybook for component development
 - Jest and React Testing Library for testing
 - Google Gemini for AI integration (secure server-side implementation)
-- IndexedDB for client-side persistence
+- IndexedDB for client-side persistence with resilient storage middleware
 - **Tailwind CSS v3**: Required for Storybook compatibility
 
 ## Security Architecture
@@ -367,6 +367,14 @@ interface StoreInterface {
 ```
 
 Stores include: `worldStore`, `characterStore`, `narrativeStore`, `journalStore`, `inventoryStore`, `sessionStore`, `aiContextStore`
+
+### Storage Resilience
+All stores use resilient IndexedDB persistence with:
+- **Automatic Retry**: Exponential backoff for transient failures
+- **Memory Fallback**: Seamless operation when storage fails
+- **Recovery Detection**: Automatic sync when storage becomes available
+- **Health Monitoring**: Periodic checks with user notifications
+- **Error Handling**: Graceful degradation for all error types
 
 ## UI Component System (shadcn/ui)
 The project uses shadcn/ui for accessible, themeable components:
