@@ -26,7 +26,7 @@ describe('ResilientStorageMiddleware', () => {
       getItem: jest.fn(),
       setItem: jest.fn(),
       removeItem: jest.fn(),
-    } as any;
+    } as jest.Mocked<IndexedDBAdapter>;
     
     mockIndexedDBAdapter.create.mockResolvedValue(mockAdapter);
     mockNotificationCallback = jest.fn();
