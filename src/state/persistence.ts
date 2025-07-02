@@ -4,7 +4,7 @@
  */
 
 import { PersistStorage } from 'zustand/middleware';
-import { ResilientStorageMiddleware, StorageStatus } from '../lib/storage/resilientStorage';
+import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
 import { isStorageAvailable } from '../utils/storageHelpers';
 import { showStorageNotification } from '../lib/notifications/storageNotifications';
 

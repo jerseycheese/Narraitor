@@ -6,7 +6,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { useWorldStore } from '../worldStore';
 import { useCharacterStore } from '../characterStore';
-import { ResilientStorageMiddleware, StorageStatus } from '../../lib/storage/resilientStorage';
+import { StorageStatus } from '../../lib/storage/resilientStorage';
 
 // Mock the resilient storage
 jest.mock('../../lib/storage/resilientStorage');
@@ -168,7 +168,7 @@ describe('Storage Resilience Integration', () => {
       mockResilientStorage.getLastError.mockReturnValue(mockError);
       mockResilientStorage.getStorageStatus.mockReturnValue(StorageStatus.UNAVAILABLE);
 
-      const { result } = renderHook(() => useWorldStore());
+      renderHook(() => useWorldStore());
 
       // Stores should be able to access storage error information
       // This would be implemented as part of the enhanced store interface
@@ -186,7 +186,7 @@ describe('Storage Resilience Integration', () => {
         shouldNotify: true,
       });
 
-      const { result } = renderHook(() => useWorldStore());
+      renderHook(() => useWorldStore());
 
       // Simulate recovery
       mockResilientStorage.getStorageStatus.mockReturnValue(StorageStatus.HEALTHY);
@@ -219,7 +219,7 @@ describe('Storage Resilience Integration', () => {
 
       // Should handle intermittent failures
       act(() => {
-        result.current.createWorld({
+        const worldId = result.current.createWorld({
           name: 'Intermittent Test',
           description: 'Testing intermittent failures',
           genre: 'Mystery',
@@ -232,6 +232,8 @@ describe('Storage Resilience Integration', () => {
             allowCustomSkills: true,
           },
         });
+
+        expect(worldId).toBeDefined();
       });
 
       // Should have attempted storage operations
@@ -262,6 +264,7 @@ describe('Storage Resilience Integration', () => {
         });
 
         expect(result.current.worlds[worldId]).toBeDefined();
+        expect(worldId).toBeDefined();
       });
 
       // Should have attempted storage and handled quota error
