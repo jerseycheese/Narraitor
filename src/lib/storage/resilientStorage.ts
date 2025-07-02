@@ -59,7 +59,8 @@ export class ResilientStorageMiddleware {
   }
 
   /**
-   * Initialize the IndexedDB adapter
+   * Initialize the IndexedDB adapter with error handling
+   * Attempts to create an IndexedDB adapter and falls back to memory-only mode on failure
    */
   private async initializeAdapter(): Promise<void> {
     try {
@@ -152,6 +153,9 @@ export class ResilientStorageMiddleware {
 
   /**
    * Execute an operation with exponential backoff retry logic
+   * @param operation - The async operation to execute with retries
+   * @returns Promise resolving to the operation result
+   * @throws The last error if all retry attempts fail
    */
   private async executeWithRetry<T>(
     operation: () => Promise<T>
@@ -193,6 +197,8 @@ export class ResilientStorageMiddleware {
 
   /**
    * Handle storage failure and update status
+   * Categorizes errors and updates storage status based on recoverability
+   * @param error - The error that occurred during storage operation
    */
   private handleStorageFailure(error: Error): void {
     const storageError = handleStorageError(error);
@@ -261,7 +267,7 @@ export class ResilientStorageMiddleware {
     
     try {
       // Sync all memory data back to storage
-      for (const [key, value] of this.memoryStorage.entries()) {
+      for (const [key, value] of Array.from(this.memoryStorage.entries())) {
         await this.adapter?.setItem(key, value);
       }
       
@@ -275,6 +281,8 @@ export class ResilientStorageMiddleware {
 
   /**
    * Start periodic health monitoring
+   * Periodically checks storage health and attempts recovery when possible
+   * @param intervalMs - Interval between health checks in milliseconds (default: 30000)
    */
   startHealthMonitoring(intervalMs: number = 30000): void {
     this.stopHealthMonitoring(); // Clear any existing interval

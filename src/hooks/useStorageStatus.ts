@@ -1,5 +1,7 @@
 /**
  * Hook for accessing storage status and health information
+ * Provides real-time monitoring of storage health with polling
+ * @returns StorageStatusHook interface with status, error, and health check capabilities
  */
 
 import { useState, useEffect } from 'react';
@@ -16,6 +18,8 @@ export interface StorageStatusHook {
 
 /**
  * Hook to monitor storage status and provide health check capabilities
+ * Automatically polls storage status every 5 seconds and provides manual health check
+ * @returns StorageStatusHook interface with current status and health management
  */
 export function useStorageStatus(): StorageStatusHook {
   const [status, setStatus] = useState<StorageStatus>(StorageStatus.HEALTHY);
