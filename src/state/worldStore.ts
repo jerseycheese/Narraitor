@@ -3,8 +3,9 @@ import { persist } from 'zustand/middleware';
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '../types/world.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
-import { createIndexedDBStorage } from './persistence';
+import { createIndexedDBStorage, getResilientStorageInstance } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
+import { StorageStatus, StorageError } from '../lib/storage/resilientStorage';
 
 /**
  * World store interface with state and actions
@@ -15,6 +16,11 @@ export interface WorldStore {
   currentWorldId: EntityID | null;
   error: string | null;
   loading: boolean;
+  
+  // Storage status
+  storageStatus: StorageStatus;
+  storageError: StorageError | null;
+  lastSuccessfulSync: string | null;
 
   // Actions
   createWorld: (world: Omit<World, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
@@ -44,6 +50,10 @@ export interface WorldStore {
   setError: (error: string | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  
+  // Storage management
+  updateStorageStatus: () => Promise<void>;
+  checkStorageHealth: () => Promise<void>;
 }
 
 // Initial state
@@ -52,6 +62,9 @@ const initialState = {
   currentWorldId: null,
   error: null,
   loading: false,
+  storageStatus: StorageStatus.HEALTHY,
+  storageError: null,
+  lastSuccessfulSync: null,
 };
 
 // World Store implementation with persistence
@@ -373,6 +386,37 @@ export const useWorldStore = create<WorldStore>()(
             loading: false, 
             error: error instanceof Error ? error.message : 'Failed to fetch worlds'
           });
+        }
+      },
+
+      // Update storage status from resilient storage middleware
+      updateStorageStatus: async () => {
+        try {
+          const storage = await getResilientStorageInstance();
+          set({
+            storageStatus: storage.getStorageStatus(),
+            storageError: storage.getLastError(),
+            lastSuccessfulSync: storage.getLastSuccessfulSync(),
+          });
+        } catch (error) {
+          console.warn('Failed to update storage status:', error);
+        }
+      },
+
+      // Check storage health and update status
+      checkStorageHealth: async () => {
+        try {
+          const storage = await getResilientStorageInstance();
+          await storage.checkStorageHealth();
+          
+          // Update status after health check
+          set({
+            storageStatus: storage.getStorageStatus(),
+            storageError: storage.getLastError(),
+            lastSuccessfulSync: storage.getLastSuccessfulSync(),
+          });
+        } catch (error) {
+          console.warn('Storage health check failed:', error);
         }
       },
     }),
