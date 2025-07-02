@@ -9,7 +9,7 @@ import type { EntityID } from '@/types';
 /**
  * Get lore context string for AI prompt inclusion
  */
-export function getLoreContextForPrompt(worldId: EntityID): string {
+export function getLoreContextForPrompt(worldId: EntityID, options?: { maxTokens?: number }): string {
   const { getLoreContext, getFacts } = useLoreStore.getState();
   const facts = getFacts({ worldId });
   
@@ -18,7 +18,14 @@ export function getLoreContextForPrompt(worldId: EntityID): string {
   }
   
   // Use enhanced formatting for consistency
-  const loreContext = formatLoreForConsistency(worldId);
+  const formatOptions: any = {};
+  
+  // If max tokens is limited, reduce the number of facts
+  if (options?.maxTokens && options.maxTokens < 1000) {
+    formatOptions.maxFacts = 5; // Limit facts when tokens are constrained
+  }
+  
+  const loreContext = formatLoreForConsistency(worldId, formatOptions);
   
   if (loreContext.formattedContext) {
     // Add consistency instructions

@@ -38,8 +38,8 @@ export class NarrativeGenerator {
   /**
    * Enhances a prompt with lore context for the given world
    */
-  private enhancePromptWithLore(prompt: string, worldId: EntityID): string {
-    const loreContext = getLoreContextForPrompt(worldId);
+  private enhancePromptWithLore(prompt: string, worldId: EntityID, generationParams?: any): string {
+    const loreContext = getLoreContextForPrompt(worldId, { maxTokens: generationParams?.maxTokens });
     return prompt + loreContext;
   }
 
@@ -48,6 +48,7 @@ export class NarrativeGenerator {
    */
   private buildConsistencyInstructions(worldId: EntityID): string {
     try {
+      // Import lore store dynamically to avoid circular dependency
       const { useLoreStore } = require('@/state/loreStore');
       const { getFacts } = useLoreStore.getState();
       const facts = getFacts({ worldId });
@@ -79,7 +80,9 @@ export class NarrativeGenerator {
       instructions.push('- Do not contradict the established lore');
       
       return instructions.join('\n') + '\n';
-    } catch {
+    } catch (error) {
+      // Log the error for debugging but don't fail the entire generation
+      console.warn('Failed to build consistency instructions:', error);
       return '';
     }
   }
@@ -300,8 +303,15 @@ export class NarrativeGenerator {
       const context = this.buildContext(world, request);
       
       // Add lore context and consistency instructions for template
-      const loreContext = getLoreContextForPrompt(request.worldId);
-      const consistencyInstructions = this.buildConsistencyInstructions(request.worldId);
+      let loreContext = '';
+      let consistencyInstructions = '';
+      
+      try {
+        loreContext = getLoreContextForPrompt(request.worldId, { maxTokens: request.generationParameters?.maxTokens });
+        consistencyInstructions = this.buildConsistencyInstructions(request.worldId);
+      } catch (error) {
+        console.warn('Failed to enhance context with lore/consistency data:', error);
+      }
       
       const enhancedContext = {
         ...context,
@@ -318,7 +328,8 @@ export class NarrativeGenerator {
       );
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        request.worldId
+        request.worldId,
+        request.generationParameters
       );
       const goalEnhancedPrompt = this.enhancePromptWithGoalContext(
         loreEnhancedPrompt,
@@ -336,7 +347,7 @@ export class NarrativeGenerator {
       // Extract structured lore from generated narrative
       if (response.content) {
         try {
-          const existingLoreContext = getLoreContextForPrompt(request.worldId);
+          const existingLoreContext = getLoreContextForPrompt(request.worldId, { maxTokens: request.generationParameters?.maxTokens });
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -366,13 +377,15 @@ export class NarrativeGenerator {
           );
           
           result.metadata.consistencyValidation = validationResult;
-        } catch {
+        } catch (error) {
           // Validation failed - continue without it
+          console.warn('Failed to validate narrative consistency:', error);
         }
       }
 
       return result;
-    } catch {
+    } catch (error) {
+      console.error('Error in generateSegment:', error);
       throw new Error('Failed to generate narrative segment');
     }
   }
@@ -418,7 +431,8 @@ export class NarrativeGenerator {
       );
       const loreEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        worldId
+        worldId,
+        undefined
       );
       const fullyEnhancedPrompt = this.enhancePromptWithPersonalization(
         loreEnhancedPrompt,
@@ -432,7 +446,7 @@ export class NarrativeGenerator {
       // Extract structured lore from initial scene
       if (response.content) {
         try {
-          const existingLoreContext = getLoreContextForPrompt(worldId);
+          const existingLoreContext = getLoreContextForPrompt(worldId, { maxTokens: undefined });
           const structuredLore = await extractStructuredLore(
             response.content,
             existingLoreContext
@@ -493,7 +507,8 @@ export class NarrativeGenerator {
 
   private buildContext(world: World, request: NarrativeGenerationRequest) {
     // Get character details
-    const { characters } = useCharacterStore.getState();
+    const characterState = useCharacterStore.getState();
+    const characters = characterState?.characters || {};
     const playerCharacterId = request.characterIds?.[0]; // First character is the player
     const playerCharacter = playerCharacterId
       ? characters[playerCharacterId]
@@ -836,7 +851,8 @@ ${playerCharacter.skills
       );
       const fullyEnhancedPrompt = this.enhancePromptWithLore(
         toneEnhancedPrompt,
-        worldId
+        worldId,
+        undefined
       );
 
       const response =
