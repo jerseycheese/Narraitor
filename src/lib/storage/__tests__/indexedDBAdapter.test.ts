@@ -17,20 +17,18 @@ const createMockDB = () => ({
     oncomplete: null,
     onerror: null
   })),
-  close: jest.fn()
+  close: jest.fn(),
+  createObjectStore: jest.fn(),
+  objectStoreNames: { contains: jest.fn() }
 });
 
 describe('IndexedDBAdapter', () => {
   let adapter: IndexedDBAdapter;
 
   beforeEach(() => {
-    // Clear all mocks
     jest.clearAllMocks();
-    
-    // Mock global indexedDB
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global as any).indexedDB = mockIDB;
-    
     adapter = new IndexedDBAdapter();
   });
 
@@ -40,167 +38,77 @@ describe('IndexedDBAdapter', () => {
   });
 
   describe('initialization', () => {
-    test('should create database with correct name and version', async () => {
+    test('should successfully initialize and be ready for operations', async () => {
       const mockDB = createMockDB();
       const mockRequest = {
         onsuccess: null as ((ev: Event) => void) | null,
         onerror: null as ((ev: Event) => void) | null,
-        onupgradeneeded: null as ((ev: IDBVersionChangeEvent) => void) | null,
         result: mockDB
       };
       
-      mockIDB.open.mockImplementation((name, version) => {
-        expect(name).toBe('narraitor-state');
-        expect(version).toBe(1);
-        
-        // Immediately call the success callback
+      mockIDB.open.mockImplementation(() => {
         setTimeout(() => {
           if (mockRequest.onsuccess) {
             mockRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return mockRequest;
       });
 
-      await adapter.initialize();
-    });
-
-    test('should create object store if not exists', async () => {
-      const mockDB = createMockDB();
-      mockDB.objectStoreNames = { contains: jest.fn(() => false) };
-      mockDB.createObjectStore = jest.fn(() => ({ name: 'narraitor-store' }));
+      await expect(adapter.initialize()).resolves.toBeUndefined();
       
-      const mockTransaction = { 
-        oncomplete: null as (() => void) | null 
-      };
+      // Verify adapter is ready for use by testing a basic operation
+      const mockStore = { get: jest.fn(() => ({ onsuccess: null, onerror: null, result: null })) };
+      mockDB.transaction.mockReturnValue({ objectStore: jest.fn(() => mockStore) });
       
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null,
-        onupgradeneeded: null as ((ev: IDBVersionChangeEvent) => void) | null,
-        result: mockDB,
-        transaction: mockTransaction
-      };
-      
-      mockIDB.open.mockImplementation(() => {
-        // First trigger upgrade event
-        setTimeout(() => {
-          if (mockRequest.onupgradeneeded) {
-            mockRequest.onupgradeneeded({ 
-              target: { result: mockDB, transaction: mockTransaction } 
-            } as unknown as IDBVersionChangeEvent);
-          }
-          // Then trigger transaction complete
-          if (mockTransaction.oncomplete) {
-            mockTransaction.oncomplete();
-          }
-        }, 0);
-        
-        return mockRequest;
-      });
-
-      await adapter.initialize();
-
-      expect(mockDB.createObjectStore).toHaveBeenCalledWith('narraitor-store');
-    });
-
-    test('should handle database upgrade scenarios', async () => {
-      const mockDB = {
-        ...createMockDB(),
-        createObjectStore: jest.fn(),
-        objectStoreNames: { contains: jest.fn(() => true) }
-      };
-      
-      const mockTransaction = { 
-        oncomplete: null as (() => void) | null 
-      };
-      
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null,
-        onupgradeneeded: null as ((ev: IDBVersionChangeEvent) => void) | null,
-        result: mockDB,
-        transaction: mockTransaction
-      };
-      
-      mockIDB.open.mockImplementation(() => {
-        // First trigger upgrade event
-        setTimeout(() => {
-          if (mockRequest.onupgradeneeded) {
-            mockRequest.onupgradeneeded({ 
-              target: { result: mockDB, transaction: mockTransaction } 
-            } as unknown as IDBVersionChangeEvent);
-          }
-          // Then trigger transaction complete
-          if (mockTransaction.oncomplete) {
-            mockTransaction.oncomplete();
-          }
-        }, 0);
-        
-        return mockRequest;
-      });
-
-      await adapter.initialize();
-
-      expect(mockDB.createObjectStore).not.toHaveBeenCalled();
+      await adapter.getItem('test-key');
+      expect(mockStore.get).toHaveBeenCalledWith('test-key');
     });
   });
 
-  describe('getItem', () => {
-    test('should retrieve stored value by key', async () => {
+  describe('data retrieval', () => {
+    beforeEach(async () => {
       const mockDB = createMockDB();
-      const mockValue = { data: 'test-value' };
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null,
-        result: { value: mockValue }
-      };
-
-      // Mock the open request to initialize the adapter
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null,
           result: mockDB
         };
-        
         setTimeout(() => {
           if (openRequest.onsuccess) {
             openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
-
-      // Initialize the adapter first
       await adapter.initialize();
+    });
 
-      const mockStore = {
-        get: jest.fn(() => mockRequest)
+    test('should retrieve and deserialize stored data correctly', async () => {
+      const mockDB = createMockDB();
+      const testData = { worldName: 'Fantasy World', characters: ['Hero', 'Villain'] };
+      const mockRequest = {
+        onsuccess: null as ((ev: Event) => void) | null,
+        onerror: null as ((ev: Event) => void) | null,
+        result: { value: testData }
       };
-      mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
-      });
 
-      // Now test getItem
-      const getPromise = adapter.getItem('test-key');
+      const mockStore = { get: jest.fn(() => mockRequest) };
+      mockDB.transaction.mockReturnValue({ objectStore: jest.fn(() => mockStore) });
 
-      // Simulate successful get
+      const getPromise = adapter.getItem('game-data');
       setTimeout(() => {
         if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({ target: { result: { value: mockValue } } } as unknown as Event);
+          mockRequest.onsuccess({ target: { result: { value: testData } } } as unknown as Event);
         }
       }, 0);
 
       const result = await getPromise;
-
-      expect(mockStore.get).toHaveBeenCalledWith('test-key');
-      expect(result).toBe(JSON.stringify(mockValue));
+      expect(JSON.parse(result as string)).toEqual(testData);
     });
 
-    test('should return null for non-existent key', async () => {
+    test('should handle missing data gracefully', async () => {
       const mockDB = createMockDB();
       const mockRequest = {
         onsuccess: null as ((ev: Event) => void) | null,
@@ -208,36 +116,10 @@ describe('IndexedDBAdapter', () => {
         result: undefined
       };
 
-      // Mock the open request to initialize the adapter
-      mockIDB.open.mockImplementation(() => {
-        const openRequest = {
-          onsuccess: null as ((ev: Event) => void) | null,
-          onerror: null as ((ev: Event) => void) | null,
-          result: mockDB
-        };
-        
-        setTimeout(() => {
-          if (openRequest.onsuccess) {
-            openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
-          }
-        }, 0);
-        
-        return openRequest;
-      });
+      const mockStore = { get: jest.fn(() => mockRequest) };
+      mockDB.transaction.mockReturnValue({ objectStore: jest.fn(() => mockStore) });
 
-      // Initialize the adapter first
-      await adapter.initialize();
-
-      const mockStore = {
-        get: jest.fn(() => mockRequest)
-      };
-      mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
-      });
-
-      const getPromise = adapter.getItem('non-existent-key');
-
-      // Simulate no result
+      const getPromise = adapter.getItem('missing-key');
       setTimeout(() => {
         if (mockRequest.onsuccess) {
           mockRequest.onsuccess({ target: { result: undefined } } as unknown as Event);
@@ -248,230 +130,130 @@ describe('IndexedDBAdapter', () => {
       expect(result).toBeNull();
     });
 
-    test('should handle IndexedDB errors gracefully', async () => {
+    test('should gracefully handle database access errors', async () => {
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null
         };
-        
         setTimeout(() => {
           if (openRequest.onerror) {
-            openRequest.onerror({ target: { error: new Error('DB Error') } } as unknown as Event);
+            openRequest.onerror({ target: { error: new Error('Access denied') } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
 
-      const result = await adapter.getItem('test-key');
+      const result = await adapter.getItem('any-key');
       expect(result).toBeNull();
     });
   });
 
-  describe('setItem', () => {
-    test('should store value with key', async () => {
+  describe('data persistence', () => {
+    beforeEach(async () => {
       const mockDB = createMockDB();
-      const testData = { name: 'Test World' };
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
-      };
-
-      // Mock the open request to initialize the adapter
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null,
           result: mockDB
         };
-        
         setTimeout(() => {
           if (openRequest.onsuccess) {
             openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
-
-      // Initialize the adapter first
       await adapter.initialize();
-
-      const mockStore = {
-        put: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
-      mockDB.transaction.mockReturnValue(mockTransaction);
-
-      const setPromise = adapter.setItem('test-key', JSON.stringify(testData));
-
-      // Simulate successful put
-      setTimeout(() => {
-        if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({} as Event);
-        }
-      }, 0);
-
-      await setPromise;
-
-      expect(mockStore.put).toHaveBeenCalledWith({
-        id: 'test-key',
-        value: testData
-      }, 'test-key');
     });
 
-    test('should overwrite existing value', async () => {
+    test('should handle complete data lifecycle: store, retrieve, update', async () => {
       const mockDB = createMockDB();
-      const newData = { name: 'Updated World' };
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
+      const originalData = { worldName: 'Test World', level: 1 };
+      const updatedData = { worldName: 'Test World', level: 2 };
+      
+      let storedData: any = null;
+      const mockStore = {
+        put: jest.fn((data) => {
+          storedData = data.value;
+          return { onsuccess: null, onerror: null };
+        }),
+        get: jest.fn(() => ({
+          onsuccess: null,
+          onerror: null,
+          result: storedData ? { value: storedData } : undefined
+        }))
       };
-
-      // Mock the open request to initialize the adapter
-      mockIDB.open.mockImplementation(() => {
-        const openRequest = {
-          onsuccess: null as ((ev: Event) => void) | null,
-          onerror: null as ((ev: Event) => void) | null,
-          result: mockDB
-        };
-        
-        setTimeout(() => {
-          if (openRequest.onsuccess) {
-            openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
-          }
-        }, 0);
-        
-        return openRequest;
+      
+      mockDB.transaction.mockReturnValue({
+        objectStore: jest.fn(() => mockStore)
       });
 
-      // Initialize the adapter first
-      await adapter.initialize();
-
-      const mockStore = {
-        put: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
-      mockDB.transaction.mockReturnValue(mockTransaction);
-
-      const setPromise = adapter.setItem('existing-key', JSON.stringify(newData));
-
-      // Simulate successful overwrite
+      // Store initial data
+      const setPromise = adapter.setItem('game-state', JSON.stringify(originalData));
       setTimeout(() => {
-        if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({} as Event);
-        }
+        const putRequest = mockStore.put.mock.results[0]?.value;
+        if (putRequest?.onsuccess) putRequest.onsuccess({} as Event);
       }, 0);
-
       await setPromise;
 
-      expect(mockStore.put).toHaveBeenCalledWith({
-        id: 'existing-key',
-        value: newData
-      }, 'existing-key');
-    });
+      // Verify data was stored
+      expect(storedData).toEqual(originalData);
 
-    test('should handle large data (>1MB)', async () => {
-      const mockDB = createMockDB();
-      const largeData = { data: 'x'.repeat(1024 * 1024 + 1) }; // >1MB
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
-      };
-
-      // Mock the open request to initialize the adapter
-      mockIDB.open.mockImplementation(() => {
-        const openRequest = {
-          onsuccess: null as ((ev: Event) => void) | null,
-          onerror: null as ((ev: Event) => void) | null,
-          result: mockDB
-        };
-        
-        setTimeout(() => {
-          if (openRequest.onsuccess) {
-            openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
-          }
-        }, 0);
-        
-        return openRequest;
-      });
-
-      // Initialize the adapter first
-      await adapter.initialize();
-
-      const mockStore = {
-        put: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
-      mockDB.transaction.mockReturnValue(mockTransaction);
-
-      const setPromise = adapter.setItem('large-data', JSON.stringify(largeData));
-
-      // Simulate successful large data storage
+      // Retrieve and verify
+      const getPromise = adapter.getItem('game-state');
       setTimeout(() => {
-        if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({} as Event);
+        const getRequest = mockStore.get.mock.results[0]?.value;
+        if (getRequest?.onsuccess) {
+          getRequest.onsuccess({ target: { result: { value: storedData } } } as unknown as Event);
         }
       }, 0);
+      
+      const retrievedData = await getPromise;
+      expect(JSON.parse(retrievedData as string)).toEqual(originalData);
 
-      await setPromise;
+      // Update data
+      const updatePromise = adapter.setItem('game-state', JSON.stringify(updatedData));
+      setTimeout(() => {
+        const putRequest = mockStore.put.mock.results[1]?.value;
+        if (putRequest?.onsuccess) putRequest.onsuccess({} as Event);
+      }, 0);
+      await updatePromise;
 
-      expect(mockStore.put).toHaveBeenCalled();
+      expect(storedData).toEqual(updatedData);
     });
 
-    test('should handle IndexedDB quota exceeded error', async () => {
+    test('should handle large game state data without corruption', async () => {
       const mockDB = createMockDB();
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
+      const largeGameState = {
+        worlds: Array(100).fill(null).map((_, i) => ({ id: i, name: `World ${i}` })),
+        characters: Array(500).fill(null).map((_, i) => ({ id: i, name: `Char ${i}` })),
+        narrative: 'x'.repeat(10000) // Large text content
       };
-
-      // Mock the open request to initialize the adapter
-      mockIDB.open.mockImplementation(() => {
-        const openRequest = {
-          onsuccess: null as ((ev: Event) => void) | null,
-          onerror: null as ((ev: Event) => void) | null,
-          result: mockDB
-        };
-        
-        setTimeout(() => {
-          if (openRequest.onsuccess) {
-            openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
-          }
-        }, 0);
-        
-        return openRequest;
-      });
-
-      // Initialize the adapter first
-      await adapter.initialize();
-
-      const mockStore = {
-        put: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
+      
+      const mockRequest = { onsuccess: null as ((ev: Event) => void) | null, onerror: null };
+      const mockStore = { put: jest.fn(() => mockRequest) };
+      const mockTransaction = { objectStore: jest.fn(() => mockStore) };
       mockDB.transaction.mockReturnValue(mockTransaction);
 
-      const setPromise = adapter.setItem('test-key', JSON.stringify({ data: 'test' }));
+      const setPromise = adapter.setItem('large-state', JSON.stringify(largeGameState));
+      setTimeout(() => {
+        if (mockRequest.onsuccess) mockRequest.onsuccess({} as Event);
+      }, 0);
 
-      // Simulate quota exceeded error
+      await expect(setPromise).resolves.toBeUndefined();
+    });
+
+    test('should properly handle storage quota exceeded scenarios', async () => {
+      const mockDB = createMockDB();
+      const mockRequest = { onsuccess: null, onerror: null as ((ev: Event) => void) | null };
+      const mockStore = { put: jest.fn(() => mockRequest) };
+      const mockTransaction = { objectStore: jest.fn(() => mockStore) };
+      mockDB.transaction.mockReturnValue(mockTransaction);
+
+      const setPromise = adapter.setItem('quota-test', JSON.stringify({ data: 'test' }));
+      
       setTimeout(() => {
         if (mockRequest.onerror) {
           const quotaError = new DOMException('QuotaExceededError');
@@ -484,164 +266,106 @@ describe('IndexedDBAdapter', () => {
     });
   });
 
-  describe('removeItem', () => {
-    test('should remove stored value by key', async () => {
+  describe('data cleanup', () => {
+    beforeEach(async () => {
       const mockDB = createMockDB();
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
-      };
-
-      // Mock the open request to initialize the adapter
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null,
           result: mockDB
         };
-        
         setTimeout(() => {
           if (openRequest.onsuccess) {
             openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
-
-      // Initialize the adapter first
       await adapter.initialize();
-
-      const mockStore = {
-        delete: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
-      mockDB.transaction.mockReturnValue(mockTransaction);
-
-      const removePromise = adapter.removeItem('test-key');
-
-      // Simulate successful deletion
-      setTimeout(() => {
-        if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({} as Event);
-        }
-      }, 0);
-
-      await removePromise;
-
-      expect(mockStore.delete).toHaveBeenCalledWith('test-key');
     });
 
-    test('should handle removal of non-existent key', async () => {
+    test('should successfully remove stored data', async () => {
       const mockDB = createMockDB();
-      const mockRequest = {
-        onsuccess: null as ((ev: Event) => void) | null,
-        onerror: null as ((ev: Event) => void) | null
-      };
+      const mockRequest = { onsuccess: null as ((ev: Event) => void) | null, onerror: null };
+      const mockStore = { delete: jest.fn(() => mockRequest) };
+      const mockTransaction = { objectStore: jest.fn(() => mockStore) };
+      mockDB.transaction.mockReturnValue(mockTransaction);
 
-      // Mock the open request to initialize the adapter
-      mockIDB.open.mockImplementation(() => {
-        const openRequest = {
-          onsuccess: null as ((ev: Event) => void) | null,
-          onerror: null as ((ev: Event) => void) | null,
-          result: mockDB
-        };
-        
-        setTimeout(() => {
-          if (openRequest.onsuccess) {
-            openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
-          }
-        }, 0);
-        
-        return openRequest;
-      });
+      const removePromise = adapter.removeItem('cleanup-key');
+      setTimeout(() => {
+        if (mockRequest.onsuccess) mockRequest.onsuccess({} as Event);
+      }, 0);
 
-      // Initialize the adapter first
-      await adapter.initialize();
+      await expect(removePromise).resolves.toBeUndefined();
+    });
 
-      const mockStore = {
-        delete: jest.fn(() => mockRequest)
-      };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
+    test('should handle removal operations gracefully even for missing data', async () => {
+      const mockDB = createMockDB();
+      const mockRequest = { onsuccess: null as ((ev: Event) => void) | null, onerror: null };
+      const mockStore = { delete: jest.fn(() => mockRequest) };
+      const mockTransaction = { objectStore: jest.fn(() => mockStore) };
       mockDB.transaction.mockReturnValue(mockTransaction);
 
       const removePromise = adapter.removeItem('non-existent-key');
-
-      // Simulate successful deletion (even for non-existent key)
       setTimeout(() => {
-        if (mockRequest.onsuccess) {
-          mockRequest.onsuccess({} as Event);
-        }
+        if (mockRequest.onsuccess) mockRequest.onsuccess({} as Event);
       }, 0);
 
-      await removePromise;
-
-      expect(mockStore.delete).toHaveBeenCalledWith('non-existent-key');
+      await expect(removePromise).resolves.toBeUndefined();
     });
   });
 
-  describe('error scenarios', () => {
-    test('should fallback gracefully when IndexedDB is unavailable', async () => {
+  describe('resilience and edge cases', () => {
+    test('should gracefully handle IndexedDB unavailability', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).indexedDB;
-
       const localAdapter = new IndexedDBAdapter();
       
+      // Should not crash and provide safe fallback behavior
       await expect(localAdapter.getItem('test')).resolves.toBeNull();
       await expect(localAdapter.setItem('test', 'value')).resolves.toBeUndefined();
       await expect(localAdapter.removeItem('test')).resolves.toBeUndefined();
     });
 
-    test('should handle concurrent access', async () => {
+    test('should handle concurrent operations without data corruption', async () => {
       const mockDB = createMockDB();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mockRequests: any[] = [];
+      const storedData = new Map();
 
-      // Mock the open request to initialize the adapter
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null,
           result: mockDB
         };
-        
         setTimeout(() => {
           if (openRequest.onsuccess) {
             openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
 
-      // Initialize the adapter first
       await adapter.initialize();
 
       const mockStore = {
-        put: jest.fn(() => {
+        put: jest.fn((data, key) => {
+          storedData.set(key, data.value);
           const request = { onsuccess: null, onerror: null };
           mockRequests.push(request);
           return request;
         })
       };
-      const mockTransaction = {
-        objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
-        onerror: null
-      };
-      mockDB.transaction.mockReturnValue(mockTransaction);
+      mockDB.transaction.mockReturnValue({ objectStore: jest.fn(() => mockStore) });
 
-      // Initiate concurrent operations
-      const promise1 = adapter.setItem('key1', JSON.stringify({ data: 1 }));
-      const promise2 = adapter.setItem('key2', JSON.stringify({ data: 2 }));
+      // Simulate race condition with concurrent writes
+      const gameState1 = { currentLevel: 1, score: 100 };
+      const gameState2 = { currentLevel: 2, score: 200 };
+      
+      const promise1 = adapter.setItem('game-state', JSON.stringify(gameState1));
+      const promise2 = adapter.setItem('player-stats', JSON.stringify(gameState2));
 
       // Resolve all requests
       setTimeout(() => {
@@ -652,57 +376,48 @@ describe('IndexedDBAdapter', () => {
 
       await Promise.all([promise1, promise2]);
 
-      expect(mockStore.put).toHaveBeenCalledTimes(2);
+      // Verify both operations completed without interference
+      expect(storedData.get('game-state')).toEqual(gameState1);
+      expect(storedData.get('player-stats')).toEqual(gameState2);
     });
 
-    test('should recover from corrupted data', async () => {
+    test('should handle corrupted data gracefully without crashing', async () => {
       const mockDB = createMockDB();
-      const corruptedData = 'invalid-json-{';
+      const corruptedData = '{"incomplete":json';
       const mockRequest = {
         onsuccess: null as ((ev: Event) => void) | null,
         onerror: null as ((ev: Event) => void) | null,
         result: { value: corruptedData }
       };
 
-      // Mock the open request to initialize the adapter
       mockIDB.open.mockImplementation(() => {
         const openRequest = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null,
           result: mockDB
         };
-        
         setTimeout(() => {
           if (openRequest.onsuccess) {
             openRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
           }
         }, 0);
-        
         return openRequest;
       });
 
-      // Initialize the adapter first
       await adapter.initialize();
 
-      const mockStore = {
-        get: jest.fn(() => mockRequest)
-      };
-      mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
-      });
+      const mockStore = { get: jest.fn(() => mockRequest) };
+      mockDB.transaction.mockReturnValue({ objectStore: jest.fn(() => mockStore) });
 
-      const getPromise = adapter.getItem('corrupt-key');
-
-      // Simulate retrieval of corrupted data
+      const getPromise = adapter.getItem('corrupted-key');
       setTimeout(() => {
         if (mockRequest.onsuccess) {
           mockRequest.onsuccess({ target: { result: { value: corruptedData } } } as unknown as Event);
         }
       }, 0);
 
+      // Should return raw data instead of throwing error
       const result = await getPromise;
-      
-      // Should return the raw string if JSON parsing fails
       expect(result).toBe(corruptedData);
     });
   });

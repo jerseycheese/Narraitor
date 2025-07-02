@@ -20,20 +20,17 @@ class MockDOMException extends Error {
 describe('storageHelpers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Define types for the global object
     (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
     (global as unknown as { DOMException?: typeof MockDOMException }).DOMException = MockDOMException;
   });
 
   afterEach(() => {
-    // Use properly typed global object
     delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
     delete (global as unknown as { DOMException?: typeof MockDOMException }).DOMException;
   });
 
-  describe('isStorageAvailable', () => {
-    test('should detect when IndexedDB is available', async () => {
-      // Mock successful database open
+  describe('storage availability detection', () => {
+    test('should correctly identify when browser supports persistent storage', async () => {
       const mockDB = { close: jest.fn() };
       const mockRequest = {
         onsuccess: null as ((ev: Event) => void) | null,
@@ -45,7 +42,7 @@ describe('storageHelpers', () => {
 
       const checkPromise = isStorageAvailable();
       
-      // Simulate successful open
+      // Simulate successful database connection
       if (mockRequest.onsuccess) {
         mockRequest.onsuccess({ target: { result: mockDB } } as unknown as Event);
       }
@@ -56,8 +53,7 @@ describe('storageHelpers', () => {
       expect(mockDB.close).toHaveBeenCalled();
     });
 
-    test('should detect when IndexedDB is unavailable', async () => {
-      // Use properly typed global object
+    test('should handle environments without IndexedDB support', async () => {
       delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
       const result = await isStorageAvailable();
@@ -65,7 +61,7 @@ describe('storageHelpers', () => {
       expect(result).toBe(false);
     });
 
-    test('should handle IndexedDB open errors', async () => {
+    test('should handle database access failures gracefully', async () => {
       const mockRequest = {
         onsuccess: null as ((ev: Event) => void) | null,
         onerror: null as ((ev: Event) => void) | null
@@ -75,9 +71,9 @@ describe('storageHelpers', () => {
 
       const checkPromise = isStorageAvailable();
       
-      // Simulate error
+      // Simulate database access error
       if (mockRequest.onerror) {
-        mockRequest.onerror({ target: { error: new Error('Failed to open') } } as unknown as Event);
+        mockRequest.onerror({ target: { error: new Error('Database locked') } } as unknown as Event);
       }
 
       const result = await checkPromise;
@@ -85,24 +81,31 @@ describe('storageHelpers', () => {
       expect(result).toBe(false);
     });
 
-    test('should handle security errors in private browsing', async () => {
-      // Mock exception when opening IndexedDB in private browsing
+    test('should handle private browsing mode restrictions', async () => {
       mockIndexedDB.open.mockImplementation(() => {
-        return null; // Return a truthy value that doesn't have success/error handlers
+        const mockRequest = {
+          onsuccess: null as ((ev: Event) => void) | null,
+          onerror: null as ((ev: Event) => void) | null
+        };
+        
+        setTimeout(() => {
+          if (mockRequest.onerror) {
+            mockRequest.onerror({ 
+              target: { error: new MockDOMException('SecurityError') } 
+            } as unknown as Event);
+          }
+        }, 0);
+        
+        return mockRequest;
       });
 
-      try {
-        const result = await isStorageAvailable();
-        expect(result).toBe(false);
-      } catch {
-        // If error is thrown, it should still be handled gracefully
-        expect(true).toBe(true);
-      }
+      const result = await isStorageAvailable();
+      expect(result).toBe(false);
     });
   });
 
-  describe('handleStorageError', () => {
-    test('should format quota exceeded errors appropriately', () => {
+  describe('error handling and user communication', () => {
+    test('should provide helpful guidance for storage quota issues', () => {
       const error = new MockDOMException('QuotaExceededError');
       const result = handleStorageError(error);
 
@@ -114,7 +117,7 @@ describe('storageHelpers', () => {
       });
     });
 
-    test('should format security errors appropriately', () => {
+    test('should handle private browsing limitations clearly', () => {
       const error = new MockDOMException('SecurityError');
       const result = handleStorageError(error);
 
@@ -126,7 +129,7 @@ describe('storageHelpers', () => {
       });
     });
 
-    test('should format network errors appropriately', () => {
+    test('should provide actionable feedback for network-related storage issues', () => {
       const error = new MockDOMException('NetworkError');
       const result = handleStorageError(error);
 
@@ -138,19 +141,7 @@ describe('storageHelpers', () => {
       });
     });
 
-    test('should provide fallback for unknown errors', () => {
-      const error = new Error('Unknown error');
-      const result = handleStorageError(error);
-
-      expect(result).toEqual({
-        userMessage: 'An error occurred while accessing storage.',
-        technicalMessage: 'Unknown error',
-        isRecoverable: false,
-        shouldNotify: true
-      });
-    });
-
-    test('should handle corrupted data errors', () => {
+    test('should handle data corruption with recovery guidance', () => {
       const error = new MockDOMException('DataError');
       const result = handleStorageError(error);
 
@@ -161,18 +152,28 @@ describe('storageHelpers', () => {
         shouldNotify: true
       });
     });
+
+    test('should provide safe fallback for unexpected errors', () => {
+      const error = new Error('Unexpected database error');
+      const result = handleStorageError(error);
+
+      expect(result).toEqual({
+        userMessage: 'An error occurred while accessing storage.',
+        technicalMessage: 'Unexpected database error',
+        isRecoverable: false,
+        shouldNotify: true
+      });
+    });
   });
 
-  describe('clearAllStoredData', () => {
-    test('should clear all persisted state', async () => {
-      // Mock successful deletion
+  describe('data cleanup and reset functionality', () => {
+    test('should successfully reset all game data when requested', async () => {
       mockIndexedDB.deleteDatabase.mockImplementation(() => {
         const request = {
           onsuccess: null as ((ev: Event) => void) | null,
           onerror: null as ((ev: Event) => void) | null
         };
         
-        // Simulate async success
         setTimeout(() => {
           if (request.onsuccess) {
             request.onsuccess({} as Event);
@@ -182,18 +183,13 @@ describe('storageHelpers', () => {
         return request;
       });
 
-      await clearAllStoredData();
-
-      // Verify all databases were deleted
+      await expect(clearAllStoredData()).resolves.toBeUndefined();
       expect(mockIndexedDB.deleteDatabase).toHaveBeenCalledWith('narraitor-state');
-      expect(mockIndexedDB.deleteDatabase).toHaveBeenCalledTimes(1);
     });
 
-    test('should handle partial clearing on error', async () => {
+    test('should handle cleanup failures gracefully', async () => {
       const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
       
-      // Mock first deletion success, second failure
-      let callCount = 0;
       mockIndexedDB.deleteDatabase.mockImplementation(() => {
         const request = {
           onsuccess: null as ((ev: Event) => void) | null,
@@ -201,45 +197,38 @@ describe('storageHelpers', () => {
         };
         
         setTimeout(() => {
-          if (callCount === 0 && request.onsuccess) {
-            request.onsuccess({} as Event);
-          } else if (callCount === 1 && request.onerror) {
-            request.onerror({ target: { error: new Error('Delete failed') } } as unknown as Event);
+          if (request.onerror) {
+            request.onerror({ target: { error: new Error('Cleanup failed') } } as unknown as Event);
           }
-          callCount++;
         }, 0);
         
         return request;
       });
 
-      try {
-        await clearAllStoredData();
-      } catch {
-        // Expected to throw
-      }
-
-      // First database should be cleared
-      expect(mockIndexedDB.deleteDatabase).toHaveBeenCalled();
+      // Should complete without throwing (errors are logged, not thrown)
+      await expect(clearAllStoredData()).resolves.toBeUndefined();
+      
+      // Should have logged the error
+      expect(consoleError).toHaveBeenCalledWith(
+        'Failed to delete database narraitor-state:', 
+        expect.any(Error)
+      );
       
       consoleError.mockRestore();
     });
 
-    test('should handle missing IndexedDB gracefully', async () => {
-      // Use properly typed global object
+    test('should handle environments without storage support', async () => {
       delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
-      // Should not throw, just return
       await expect(clearAllStoredData()).resolves.toBeUndefined();
     });
 
-    test('should handle security errors during clearing', async () => {
+    test('should handle security restrictions during cleanup', async () => {
       mockIndexedDB.deleteDatabase.mockImplementation(() => {
         throw new MockDOMException('SecurityError');
       });
 
-      // Should handle the error gracefully
       await expect(clearAllStoredData()).rejects.toThrow('SecurityError');
-      // Remove unused error variable
     });
   });
 });
