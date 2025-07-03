@@ -9,24 +9,47 @@
 import { IndexedDBAdapter } from './indexedDBAdapter';
 import { handleStorageError } from '../../utils/storageHelpers';
 
+/**
+ * Storage health status enumeration
+ * Tracks the current state of browser storage functionality
+ */
 export enum StorageStatus {
+  /** Storage is working normally */
   HEALTHY = 'healthy',
+  /** Storage has intermittent issues but is partially functional */
   DEGRADED = 'degraded', 
+  /** Storage is completely unavailable, using memory-only fallback */
   UNAVAILABLE = 'unavailable',
+  /** Currently syncing memory data back to recovered storage */
   RECOVERING = 'recovering',
 }
 
+/**
+ * Storage error information with user-friendly messaging
+ * Provides structured error data for UI display and logging
+ */
 export interface StorageError {
+  /** User-friendly error message suitable for display */
   userMessage: string;
+  /** Technical error details for debugging */
   technicalMessage: string;
+  /** Whether retrying the operation might succeed */
   isRecoverable: boolean;
+  /** Whether the user should be notified of this error */
   shouldNotify: boolean;
 }
 
+/**
+ * Configuration options for resilient storage middleware
+ */
 export interface ResilientStorageConfig {
+  /** Number of retry attempts for failed operations (default: 3) */
   retryAttempts?: number;
+  /** Base delay in ms for exponential backoff (default: 100) */
   baseDelay?: number;
+  /** Maximum delay in ms for exponential backoff (default: 1000) */
   maxDelay?: number;
+  /** Callback invoked when storage status changes */
   onStatusChange?: (status: StorageStatus, error?: StorageError | null) => void;
 }
 
