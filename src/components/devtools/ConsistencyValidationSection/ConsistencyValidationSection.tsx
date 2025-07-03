@@ -10,11 +10,39 @@ import { DevToolsSection } from '../shared/DevToolsSection';
 /**
  * Consistency Validation Debug Section
  * 
- * Provides debugging tools for AI consistency validation:
- * - Live preview of lore context building
- * - Generated consistency instructions preview
- * - Lore fact categorization viewer
- * - Importance ranking validation
+ * A comprehensive debugging interface for the AI consistency validation system.
+ * This DevTools-only component provides real-time analysis of how lore facts
+ * are processed and converted into consistency instructions for narrative generation.
+ * 
+ * ## Features
+ * - **World Selection**: Choose from available worlds with lore data
+ * - **Live Lore Analysis**: Real-time preview of lore context building from facts
+ * - **Instruction Generation**: Generated consistency instructions preview
+ * - **Categorization Viewer**: Visual breakdown of lore into categories (characters, locations, etc.)
+ * - **Importance Ranking**: Validation of lore fact importance rankings
+ * - **Statistics Dashboard**: Overview metrics for lore fact analysis
+ * 
+ * ## Usage
+ * 1. Select a world from the dropdown (only worlds with lore facts are shown)
+ * 2. Review the lore statistics for overview metrics
+ * 3. Examine the generated consistency instructions
+ * 4. Inspect the structured lore context and categorization details
+ * 
+ * ## Integration
+ * - Uses `useLoreStore` to access stored lore facts
+ * - Integrates with `buildLoreContext` for lore processing
+ * - Calls `generateConsistencyInstructions` for live instruction preview
+ * - Utilizes `JsonViewer` for structured data display
+ * 
+ * @example
+ * ```tsx
+ * // Used within DevToolsPanel
+ * <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
+ *   <ConsistencyValidationSection />
+ * </CollapsibleSection>
+ * ```
+ * 
+ * @since 1.0.0 - Issue #184: AI Consistency Validation System
  */
 export const ConsistencyValidationSection = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<string>('');
