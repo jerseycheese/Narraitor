@@ -1,0 +1,250 @@
+/**
+ * StorageStatus component for displaying storage health and status
+ * Provides user-friendly interface for storage error states and recovery
+ */
+
+import React, { useState, useEffect } from 'react';
+import { StorageStatus as StorageStatusEnum, StorageError } from '../../lib/storage/resilientStorage';
+import { getResilientStorageInstance } from '../../state/persistence';
+
+interface StorageStatusProps {
+  /**
+   * Whether to show the component inline or as a floating indicator
+   */
+  variant?: 'inline' | 'floating';
+  /**
+   * Custom className for styling
+   */
+  className?: string;
+}
+
+interface StorageState {
+  status: StorageStatusEnum;
+  error: StorageError | null;
+  lastSuccessfulSync: string | null;
+}
+
+export function StorageStatus({ variant = 'floating', className = '' }: StorageStatusProps) {
+  const [storageState, setStorageState] = useState<StorageState>({
+    status: StorageStatusEnum.HEALTHY,
+    error: null,
+    lastSuccessfulSync: null,
+  });
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const updateStorageState = async () => {
+      try {
+        const storage = await getResilientStorageInstance();
+        if (!mounted) return;
+
+        setStorageState({
+          status: storage.getStorageStatus(),
+          error: storage.getLastError(),
+          lastSuccessfulSync: storage.getLastSuccessfulSync(),
+        });
+      } catch (error) {
+        console.warn('Failed to get storage status:', error);
+      }
+    };
+
+    // Initial state
+    updateStorageState();
+
+    // Poll for status updates
+    const interval = setInterval(updateStorageState, 5000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleRetry = async () => {
+    try {
+      const storage = await getResilientStorageInstance();
+      await storage.checkStorageHealth();
+    } catch (error) {
+      console.warn('Storage health check failed:', error);
+    }
+  };
+
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    setIsExpanded(false);
+  };
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // Don't render if healthy and not expanded (floating mode only), or if dismissed
+  if ((storageState.status === StorageStatusEnum.HEALTHY && !isExpanded && variant === 'floating') || isDismissed) {
+    return null;
+  }
+
+  const getStatusIcon = () => {
+    switch (storageState.status) {
+      case StorageStatusEnum.HEALTHY:
+        return '✅';
+      case StorageStatusEnum.DEGRADED:
+        return '⚠️';
+      case StorageStatusEnum.UNAVAILABLE:
+        return '❌';
+      case StorageStatusEnum.RECOVERING:
+        return '🔄';
+      default:
+        return '❓';
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (storageState.status) {
+      case StorageStatusEnum.HEALTHY:
+        return 'text-green-600 bg-green-50 border-green-200';
+      case StorageStatusEnum.DEGRADED:
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case StorageStatusEnum.UNAVAILABLE:
+        return 'text-red-600 bg-red-50 border-red-200';
+      case StorageStatusEnum.RECOVERING:
+        return 'text-blue-600 bg-blue-50 border-blue-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  const formatLastSync = (timestamp: string | null) => {
+    if (!timestamp) return 'Never';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    return date.toLocaleDateString();
+  };
+
+  const baseClassName = `storage-status storage-status--${storageState.status} ${getStatusColor()} ${className}`;
+  
+  if (variant === 'floating') {
+    return (
+      <div
+        className={`${baseClassName} fixed bottom-4 right-4 p-3 rounded-lg border shadow-lg max-w-sm z-50`}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="text-lg" role="img" aria-label={`Storage status: ${storageState.status}`}>
+              {getStatusIcon()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-medium text-sm">
+                {storageState.status === StorageStatusEnum.HEALTHY && 'Storage Active'}
+                {storageState.status === StorageStatusEnum.DEGRADED && 'Storage Issues'}
+                {storageState.status === StorageStatusEnum.UNAVAILABLE && 'Memory-Only Mode'}
+                {storageState.status === StorageStatusEnum.RECOVERING && 'Restoring Storage'}
+              </h4>
+              {storageState.error && (
+                <p className="text-xs mt-1" role="alert">
+                  {storageState.error.userMessage}
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="ml-2 text-gray-400 hover:text-gray-600"
+            aria-label="Dismiss notification"
+          >
+            ×
+          </button>
+        </div>
+
+        {storageState.status !== StorageStatusEnum.HEALTHY && (
+          <div className="mt-3 flex space-x-2">
+            {storageState.error?.isRecoverable && (
+              <button
+                onClick={handleRetry}
+                className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+              >
+                Retry
+              </button>
+            )}
+            <button
+              onClick={toggleExpanded}
+              className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+            >
+              {isExpanded ? 'Less' : 'Details'}
+            </button>
+          </div>
+        )}
+
+        {isExpanded && (
+          <div className="mt-3 pt-3 border-t border-current border-opacity-20">
+            <div className="text-xs space-y-1">
+              <div>
+                <span className="font-medium">Last saved:</span> {formatLastSync(storageState.lastSuccessfulSync)}
+              </div>
+              {storageState.error && (
+                <div>
+                  <span className="font-medium">Technical details:</span> {storageState.error.technicalMessage}
+                </div>
+              )}
+              {storageState.status === StorageStatusEnum.UNAVAILABLE && (
+                <div className="text-xs text-gray-600 mt-2">
+                  <p>Your progress is preserved in memory but will be lost if you refresh or close the browser.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {storageState.status === StorageStatusEnum.RECOVERING && (
+          <div className="mt-3">
+            <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar">
+              <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Inline variant
+  return (
+    <div className={`${baseClassName} p-2 rounded border`} role="status" aria-live="polite">
+      <div className="flex items-center space-x-2">
+        <span role="img" aria-label={`Storage status: ${storageState.status}`}>
+          {getStatusIcon()}
+        </span>
+        <span className="text-sm">
+          {storageState.status === StorageStatusEnum.HEALTHY && `Last saved: ${formatLastSync(storageState.lastSuccessfulSync)}`}
+          {storageState.status === StorageStatusEnum.DEGRADED && 'Storage issues detected'}
+          {storageState.status === StorageStatusEnum.UNAVAILABLE && 'Memory-only mode'}
+          {storageState.status === StorageStatusEnum.RECOVERING && 'Restoring storage...'}
+        </span>
+        {storageState.error?.isRecoverable && storageState.status !== StorageStatusEnum.HEALTHY && (
+          <button
+            onClick={handleRetry}
+            className="ml-auto px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+          >
+            Retry
+          </button>
+        )}
+      </div>
+      
+      {storageState.error && storageState.status !== StorageStatusEnum.HEALTHY && (
+        <p className="text-xs mt-1 text-gray-600" role="alert">
+          {storageState.error.userMessage}
+        </p>
+      )}
+    </div>
+  );
+}
