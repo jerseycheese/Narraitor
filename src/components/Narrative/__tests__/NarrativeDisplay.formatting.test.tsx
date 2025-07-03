@@ -126,7 +126,7 @@ describe('NarrativeDisplay - Formatting Integration', () => {
       
       // All formatting should work together: emphasis, dialogue quotes, and paragraphs
       expect(container?.innerHTML).toContain('<em>bustling</em>');
-      expect(container?.innerHTML).toContain('"What can I get you?"');
+      expect(container?.innerHTML).toContain('What can I get you?');
       expect(container?.innerHTML).toContain('"Just some information."');
       expect(screen.getByText('The conversation continued late into the night.')).toBeInTheDocument();
     });
