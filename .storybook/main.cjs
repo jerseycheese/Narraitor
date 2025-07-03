@@ -17,10 +17,12 @@ const config = {
   framework: {
     name: '@storybook/nextjs',
     options: {
-      nextConfigPath: path.resolve(__dirname, '../next.config.ts'),
+      nextConfigPath: path.resolve(__dirname, '../next.config.js'),
     }
   },
-  staticDirs: ['../public'],
+  staticDirs: [
+    { from: '../public', to: '/' }
+  ],
   
   // Configure webpack for proper path resolution
   webpackFinal: async (config) => {
@@ -29,6 +31,16 @@ const config = {
       '@': path.resolve(__dirname, '../src')
     };
     return config;
+  },
+
+  // Configure for proper Vercel deployment
+  managerHead: (head) => `
+    ${head}
+    <base href="/">
+  `,
+
+  core: {
+    disableTelemetry: true
   }
 };
 

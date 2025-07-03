@@ -39,7 +39,6 @@ next-env.d.ts
 
 # storybook
 storybook-static
-public/storybook
 *storybook.log
 
 # IDE
