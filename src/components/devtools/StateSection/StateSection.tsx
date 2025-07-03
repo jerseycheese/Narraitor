@@ -44,8 +44,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
   }, []);
 
   return (
-    <div data-testid="devtools-state-section" className="space-y-2">
-      <h2 className="text-sm font-bold mb-2">Application State</h2>
+    <div data-testid="devtools-state-section" className="space-y-3">
       
       {Object.entries(storeStates).map(([storeName, storeState]) => (
         <CollapsibleSection 
