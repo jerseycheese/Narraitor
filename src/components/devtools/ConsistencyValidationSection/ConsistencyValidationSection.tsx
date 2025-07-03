@@ -5,6 +5,7 @@ import { useLoreStore } from '../../../state/loreStore';
 import { generateConsistencyInstructions } from '../../../lib/ai/consistencyInstructions';
 import { buildLoreContext } from '../../../lib/lore/loreContext';
 import { JsonViewer } from '../JsonViewer';
+import { DevToolsSection } from '../shared/DevToolsSection';
 
 /**
  * Consistency Validation Debug Section
@@ -65,14 +66,14 @@ export const ConsistencyValidationSection = () => {
   return (
     <div className="flex flex-col space-y-3">
       {/* World Selection */}
-      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-        <label className="devtools-panel block !text-xs text-slate-300 !my-0 mb-1">
+      <DevToolsSection>
+        <label className="block text-xs text-slate-300 mb-1">
           Select World for Consistency Analysis:
         </label>
         <select
           value={selectedWorldId}
           onChange={(e) => setSelectedWorldId(e.target.value)}
-          className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500"
+          className="w-full bg-slate-600 text-slate-200 border border-slate-500 rounded px-2 py-1 text-xs"
         >
           <option value="">-- Select a World --</option>
           {availableWorldIds.map(worldId => (
@@ -81,13 +82,12 @@ export const ConsistencyValidationSection = () => {
             </option>
           ))}
         </select>
-      </div>
+      </DevToolsSection>
 
       {selectedWorldId && (
         <>
           {/* Lore Statistics */}
-          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Lore Statistics</h4>
+          <DevToolsSection title="Lore Statistics">
             <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
               <div>Total Facts: {loreStats.totalFacts}</div>
               <div>High Importance: {loreStats.highImportance}</div>
@@ -96,41 +96,37 @@ export const ConsistencyValidationSection = () => {
               <div>World Rules: {loreStats.worldRules}</div>
               <div>Historical Events: {loreStats.historicalEvents}</div>
             </div>
-          </div>
+          </DevToolsSection>
 
           {/* Generated Consistency Instructions */}
-          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Generated Consistency Instructions</h4>
+          <DevToolsSection title="Generated Consistency Instructions">
             <div className="bg-slate-800 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-slate-300">
               {consistencyInstructions || 'No instructions generated'}
             </div>
-          </div>
+          </DevToolsSection>
 
           {/* Structured Lore Context */}
-          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Structured Lore Context</h4>
+          <DevToolsSection title="Structured Lore Context">
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={loreContext} 
                 className="bg-slate-800"
               />
             </div>
-          </div>
+          </DevToolsSection>
 
           {/* Raw Lore Facts */}
-          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Raw Lore Facts ({worldLoreFacts.length})</h4>
+          <DevToolsSection title={`Raw Lore Facts (${worldLoreFacts.length})`}>
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={worldLoreFacts} 
                 className="bg-slate-800"
               />
             </div>
-          </div>
+          </DevToolsSection>
 
           {/* Categorization Breakdown */}
-          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Categorization Details</h4>
+          <DevToolsSection title="Categorization Details">
             <div className="space-y-2 text-xs">
               {loreContext.characters.length > 0 && (
                 <div>
@@ -176,12 +172,12 @@ export const ConsistencyValidationSection = () => {
                 </div>
               )}
             </div>
-          </div>
+          </DevToolsSection>
         </>
       )}
 
       {!selectedWorldId && availableWorldIds.length === 0 && (
-        <div className="devtools-panel !text-xs text-slate-400">
+        <div className="text-xs text-slate-400">
           No lore facts found. Create some lore in a game session to test consistency validation.
         </div>
       )}

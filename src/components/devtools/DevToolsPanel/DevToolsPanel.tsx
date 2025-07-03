@@ -9,6 +9,7 @@ import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
+import { DevToolsSection } from '../shared/DevToolsSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -29,13 +30,12 @@ const EnvironmentInfo = () => {
   const isDev = process.env.NODE_ENV === 'development';
   
   return (
-    <div className="mb-4 text-xs bg-slate-700 p-2 rounded border border-slate-600">
-      <h3 className="font-bold mb-1 text-slate-200">Environment Info:</h3>
+    <DevToolsSection title="Environment Info:" className="mb-4 text-xs">
       <div className="text-slate-300">NODE_ENV: {nodeEnv}</div>
       <div className="text-slate-300">Is Client: {String(mounted)}</div>
       <div className="text-slate-300">Is Development: {String(isDev)}</div>
       <div className="text-slate-300">Window Location: {location}</div>
-    </div>
+    </DevToolsSection>
   );
 };
 
