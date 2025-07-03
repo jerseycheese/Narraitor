@@ -1,43 +1,37 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build-storybook",
-  "devCommand": "npm run storybook", 
-  "installCommand": "npm ci",
+  "devCommand": "npm run storybook",
+  "installCommand": "npm install",
   "framework": null,
   "outputDirectory": "./storybook-static",
   "headers": [
     {
-      "source": "/(.*).js",
+      "source": "/sb-addons/**/*.js",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     },
     {
-      "source": "/(.*).mjs",
+      "source": "/sb-manager/**/*.js",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     },
     {
-      "source": "/(.*).css",
+      "source": "**/*.js",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/css"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
