@@ -90,3 +90,31 @@ export interface StructuredLoreExtraction {
     description?: string;
   }>;
 }
+
+/**
+ * Enhanced lore context for AI consistency instructions (Issue #184)
+ */
+export interface ConsistencyLoreContext {
+  characters: Array<{
+    name: string;
+    traits: string[];
+    background: string;
+    importance?: 'high' | 'medium' | 'low';
+  }>;
+  locations: Array<{
+    name: string;
+    type: string;
+    description: string;
+    importance?: 'high' | 'medium' | 'low';
+  }>;
+  worldRules: Array<{
+    rule: string;
+    description: string;
+    importance?: 'high' | 'medium' | 'low';
+  }>;
+  historicalEvents: Array<{
+    event: string;
+    description: string;
+    importance?: 'high' | 'medium' | 'low';
+  }>;
+}

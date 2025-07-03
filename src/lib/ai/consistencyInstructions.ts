@@ -5,7 +5,7 @@
  * to ensure adherence to established lore and world rules.
  */
 
-import { ConsistencyLoreContext } from '../types/lore.types';
+import { ConsistencyLoreContext } from '../../types/lore.types';
 
 /**
  * Generates enhanced consistency instructions for AI narrative generation

@@ -5,7 +5,7 @@
  * for better AI consistency instruction generation.
  */
 
-import { LoreFact, ConsistencyLoreContext } from '../types/lore.types';
+import { LoreFact, ConsistencyLoreContext } from '../../types/lore.types';
 
 /**
  * Builds enhanced lore context from raw lore facts
@@ -24,9 +24,9 @@ export function buildEnhancedLoreContext(loreFacts: LoreFact[]): ConsistencyLore
     historicalEvents: []
   };
 
-  loreFacts.forEach(fact => {
+  for (const fact of loreFacts) {
     if (!fact || !fact.value || typeof fact.value !== 'string') {
-      return; // Skip invalid facts
+      continue; // Skip invalid facts
     }
 
     try {
@@ -55,11 +55,11 @@ export function buildEnhancedLoreContext(loreFacts: LoreFact[]): ConsistencyLore
           // Ignore unknown categories
           break;
       }
-    } catch (error) {
+    } catch {
       // Skip malformed facts
       continue;
     }
-  });
+  }
 
   return context;
 }
