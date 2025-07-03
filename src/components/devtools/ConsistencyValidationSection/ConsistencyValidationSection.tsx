@@ -63,16 +63,16 @@ export const ConsistencyValidationSection = () => {
   }, [loreContext, worldLoreFacts]);
 
   return (
-    <div className="devtools-panel space-y-4 text-slate-200">
+    <div className="flex flex-col space-y-3">
       {/* World Selection */}
-      <div>
-        <label className="block text-sm font-medium mb-2">
+      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+        <label className="devtools-panel block !text-xs text-slate-300 !my-0 mb-1">
           Select World for Consistency Analysis:
         </label>
         <select
           value={selectedWorldId}
           onChange={(e) => setSelectedWorldId(e.target.value)}
-          className="w-full px-3 py-1 bg-slate-700 border border-slate-600 rounded text-slate-200 text-sm"
+          className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500"
         >
           <option value="">-- Select a World --</option>
           {availableWorldIds.map(worldId => (
@@ -86,9 +86,9 @@ export const ConsistencyValidationSection = () => {
       {selectedWorldId && (
         <>
           {/* Lore Statistics */}
-          <div className="bg-slate-700 p-3 rounded border border-slate-600">
-            <h4 className="font-medium mb-2">Lore Statistics</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Lore Statistics</h4>
+            <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
               <div>Total Facts: {loreStats.totalFacts}</div>
               <div>High Importance: {loreStats.highImportance}</div>
               <div>Characters: {loreStats.characters}</div>
@@ -99,16 +99,16 @@ export const ConsistencyValidationSection = () => {
           </div>
 
           {/* Generated Consistency Instructions */}
-          <div className="bg-slate-700 p-3 rounded border border-slate-600">
-            <h4 className="font-medium mb-2">Generated Consistency Instructions</h4>
-            <div className="bg-slate-800 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
+          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Generated Consistency Instructions</h4>
+            <div className="bg-slate-800 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-slate-300">
               {consistencyInstructions || 'No instructions generated'}
             </div>
           </div>
 
           {/* Structured Lore Context */}
-          <div className="bg-slate-700 p-3 rounded border border-slate-600">
-            <h4 className="font-medium mb-2">Structured Lore Context</h4>
+          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Structured Lore Context</h4>
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={loreContext} 
@@ -118,8 +118,8 @@ export const ConsistencyValidationSection = () => {
           </div>
 
           {/* Raw Lore Facts */}
-          <div className="bg-slate-700 p-3 rounded border border-slate-600">
-            <h4 className="font-medium mb-2">Raw Lore Facts ({worldLoreFacts.length})</h4>
+          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Raw Lore Facts ({worldLoreFacts.length})</h4>
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={worldLoreFacts} 
@@ -129,12 +129,12 @@ export const ConsistencyValidationSection = () => {
           </div>
 
           {/* Categorization Breakdown */}
-          <div className="bg-slate-700 p-3 rounded border border-slate-600">
-            <h4 className="font-medium mb-2">Categorization Details</h4>
+          <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
+            <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Categorization Details</h4>
             <div className="space-y-2 text-xs">
               {loreContext.characters.length > 0 && (
                 <div>
-                  <div className="font-medium">Characters:</div>
+                  <div className="font-medium text-slate-200">Characters:</div>
                   {loreContext.characters.map((char, idx) => (
                     <div key={idx} className="ml-2 text-slate-300">
                       {char.name} - {char.importance} importance - Traits: {char.traits.join(', ')}
@@ -145,7 +145,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.locations.length > 0 && (
                 <div>
-                  <div className="font-medium">Locations:</div>
+                  <div className="font-medium text-slate-200">Locations:</div>
                   {loreContext.locations.map((loc, idx) => (
                     <div key={idx} className="ml-2 text-slate-300">
                       {loc.name} ({loc.type}) - {loc.importance} importance
@@ -156,7 +156,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.worldRules.length > 0 && (
                 <div>
-                  <div className="font-medium">World Rules:</div>
+                  <div className="font-medium text-slate-200">World Rules:</div>
                   {loreContext.worldRules.map((rule, idx) => (
                     <div key={idx} className="ml-2 text-slate-300">
                       {rule.rule} - {rule.importance} importance
@@ -167,7 +167,7 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.historicalEvents.length > 0 && (
                 <div>
-                  <div className="font-medium">Historical Events:</div>
+                  <div className="font-medium text-slate-200">Historical Events:</div>
                   {loreContext.historicalEvents.map((event, idx) => (
                     <div key={idx} className="ml-2 text-slate-300">
                       {event.event} - {event.importance} importance
@@ -181,7 +181,7 @@ export const ConsistencyValidationSection = () => {
       )}
 
       {!selectedWorldId && availableWorldIds.length === 0 && (
-        <div className="text-slate-400 text-sm">
+        <div className="devtools-panel !text-xs text-slate-400">
           No lore facts found. Create some lore in a game session to test consistency validation.
         </div>
       )}
