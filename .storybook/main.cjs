@@ -33,19 +33,28 @@ const config = {
     return config;
   },
 
-  // Configure for proper Vercel deployment at /storybook path
-  managerHead: (head) => `
-    ${head}
-    <base href="/storybook/">
-  `,
+  // Configure for proper Vercel deployment at /storybook path (only in production)
+  managerHead: (head) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      return `
+        ${head}
+        <base href="/storybook/">
+      `;
+    }
+    return head;
+  },
 
   core: {
     disableTelemetry: true
   },
 
-  // Set the public path for assets when served from /storybook/
+  // Set the public path for assets when served from /storybook/ (only in production)
   managerWebpack: (config) => {
-    config.output.publicPath = '/storybook/';
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      config.output.publicPath = '/storybook/';
+    }
     return config;
   }
 };
