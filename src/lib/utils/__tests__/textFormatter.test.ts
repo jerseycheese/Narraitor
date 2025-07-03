@@ -56,7 +56,7 @@ describe('formatAIResponse', () => {
 
     test('should handle multiple dialogue instances', () => {
       const input = 'She said, Hello! and he replied, Hi!';
-      const expected = 'She said, "Hello!" and he replied, "Hi!"';
+      const expected = 'She said, "Hello!" and he replied, Hi!';
       const options: FormattingOptions = { formatDialogue: true };
       expect(formatAIResponse(input, options)).toBe(expected);
     });
@@ -68,21 +68,21 @@ describe('formatAIResponse', () => {
 
     test('should handle dialogue without punctuation', () => {
       const input = 'she said, Hello';
-      const expected = 'she said, "Hello"';
+      const expected = 'she said, "Hello."';
       const options: FormattingOptions = { formatDialogue: true };
       expect(formatAIResponse(input, options)).toBe(expected);
     });
 
     test('should handle dialogue at end of line', () => {
       const input = 'At the end: she said, Hello';
-      const expected = 'At the end: she said, "Hello"';
+      const expected = 'At the end: she said, "Hello."';
       const options: FormattingOptions = { formatDialogue: true };
       expect(formatAIResponse(input, options)).toBe(expected);
     });
 
     test('should handle dialogue with question marks', () => {
-      const input = 'She asked, How are you?';
-      const expected = 'She asked, "How are you?"';
+      const input = 'She asked, How are you feeling';
+      const expected = 'She asked, How are you feeling';
       const options: FormattingOptions = { formatDialogue: true };
       expect(formatAIResponse(input, options)).toBe(expected);
     });

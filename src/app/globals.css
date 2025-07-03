@@ -3,6 +3,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Narrative Content Styling for Readable Storytelling */
+.narrative-content {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.narrative-content p {
+  margin-bottom: 1rem;
+}
+
+.narrative-content p:last-child {
+  margin-bottom: 0;
+}
+
+.narrative-content em {
+  font-style: italic;
+  color: inherit;
+}
+
+/* Scene segments with extra paragraph spacing */
+.narrative-content.scene-spacing p {
+  margin-bottom: 1.5rem;
+}
+
+/* Dialogue segments with specific styling */
+.narrative-content.dialogue-segment {
+  font-style: italic;
+}
+
+/* Transition segments preserve line breaks */
+.narrative-content.preserve-breaks {
+  white-space: pre-line;
+}
+
 /* shadcn/ui CSS Variables */
 @layer base {
   :root {

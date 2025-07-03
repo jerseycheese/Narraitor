@@ -17,10 +17,12 @@ const config = {
   framework: {
     name: '@storybook/nextjs',
     options: {
-      nextConfigPath: path.resolve(__dirname, '../next.config.ts'),
+      nextConfigPath: path.resolve(__dirname, '../next.config.js'),
     }
   },
-  staticDirs: ['../public'],
+  staticDirs: [
+    { from: '../public', to: '/' }
+  ],
   
   // Configure webpack for proper path resolution
   webpackFinal: async (config) => {
@@ -28,6 +30,31 @@ const config = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, '../src')
     };
+    return config;
+  },
+
+  // Configure for proper Vercel deployment at /storybook path (only in production)
+  managerHead: (head) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      return `
+        ${head}
+        <base href="/storybook/">
+      `;
+    }
+    return head;
+  },
+
+  core: {
+    disableTelemetry: true
+  },
+
+  // Set the public path for assets when served from /storybook/ (only in production)
+  managerWebpack: (config) => {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      config.output.publicPath = '/storybook/';
+    }
     return config;
   }
 };
