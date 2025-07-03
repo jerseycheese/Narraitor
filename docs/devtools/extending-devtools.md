@@ -15,20 +15,32 @@ Guide for adding new debugging sections to the DevTools panel.
 - `DevToolsContext`: Manages panel visibility state
 - `DevToolsPanel`: Main panel UI with toggle functionality
 - `CollapsibleSection`: Reusable collapsible sections
+- `DevToolsSection`: Reusable container with consistent styling
 - `JsonViewer`: JSON display with syntax highlighting
 - `StateSection`: Shows Zustand store states
+- `ConsistencyValidationSection`: AI consistency validation debugging
 
 ## Adding a New Section
 
 ### Step 1: Create Component
-Create component in `src/components/devtools/` using `CollapsibleSection`:
+Create component in `src/components/devtools/` using consistent patterns:
 
 ```typescript
+import { DevToolsSection } from '../shared/DevToolsSection';
+
+// For simple sections with consistent styling
+<DevToolsSection title="My Section Title">
+  <div>Content for the section</div>
+</DevToolsSection>
+
+// For collapsible sections in the DevToolsPanel
 <CollapsibleSection 
   title="My Section Title" 
   initialCollapsed={true}
 >
-  <div>Content for the section</div>
+  <DevToolsSection title="Subsection">
+    <div>Subsection content</div>
+  </DevToolsSection>
 </CollapsibleSection>
 ```
 
@@ -150,6 +162,58 @@ function replacer(key, value) {
 }
 ```
 
+## Available DevTools Sections
+
+### AI Consistency Validation (Issue #184)
+Real-time debugging for the AI consistency validation system:
+
+```typescript
+import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
+
+<CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
+  <ConsistencyValidationSection />
+</CollapsibleSection>
+```
+
+**Features:**
+- World selection with lore fact filtering
+- Live lore context building analysis
+- Generated consistency instructions preview
+- Categorization breakdown (characters, locations, world rules, historical events)
+- Importance ranking validation
+- Statistics dashboard for lore metrics
+
+**Use Cases:**
+- Debug why consistency instructions aren't generating
+- Verify lore fact categorization is working correctly
+- Analyze importance ranking algorithm performance
+- Inspect structured lore context output
+
+## DevToolsSection Component
+
+Use `DevToolsSection` for consistent styling across all DevTools components:
+
+```typescript
+import { DevToolsSection } from '../shared/DevToolsSection';
+
+// Replaces this pattern:
+<div className="bg-slate-700 p-2 rounded border border-slate-600">
+  <h4 className="text-xs font-medium mb-2 text-slate-200">Title</h4>
+  {content}
+</div>
+
+// With this:
+<DevToolsSection title="Title">
+  {content}
+</DevToolsSection>
+```
+
+**Benefits:**
+- Eliminates code duplication
+- Ensures consistent dark theme styling
+- Provides standardized spacing and typography
+- Supports additional className for customization
+
 ## Common Extension Ideas
 
 1. **Performance Monitoring** - Render times, re-renders
@@ -158,3 +222,5 @@ function replacer(key, value) {
 4. **Error Tracking** - Show recent errors and warnings
 5. **Component Tree** - Visualize component hierarchy
 6. **Event Logging** - Log user interactions
+7. **AI Prompt Analysis** - Debug AI prompt generation and responses
+8. **Lore Management** - CRUD operations for lore facts during development

@@ -34,82 +34,26 @@ type Story = StoryObj<typeof meta>;
 export const Triumphant: Story = {
   args: {
     isOpen: true,
-    title: 'Victory at Last!',
-    content: 'After a long and treacherous journey through the mystical lands of Aetheria, you have finally defeated the ancient dragon and saved the kingdom. The people cheer your name as you return home as a true hero.',
+    title: 'Story Complete!',
+    content: 'Your choices led to a positive outcome. The characters you helped are now thriving, and the world is a better place because of your decisions.',
     endingType: 'triumphant',
-    onContinue: undefined,
   },
 };
 
 export const Bittersweet: Story = {
   args: {
     isOpen: true,
-    title: 'A Difficult Choice',
-    content: 'You have saved the kingdom, but at great personal cost. Your closest companion has fallen in the final battle, and though the realm is safe, your heart carries the weight of loss. Peace has been won, but the price was higher than you ever imagined.',
+    title: 'A Complex Ending',
+    content: 'Your journey has come to an end. While you achieved your main goal, some sacrifices were necessary along the way. The choices you made will have lasting consequences.',
     endingType: 'bittersweet',
-    onContinue: undefined,
   },
 };
 
 export const Tragic: Story = {
   args: {
     isOpen: true,
-    title: 'The End of Hope',
-    content: 'Despite your best efforts, the darkness has consumed everything you fought to protect. The kingdom has fallen, and the ancient evil spreads across the land. Your journey ends in failure, but perhaps your sacrifice will inspire others to continue the fight.',
+    title: 'A Difficult Conclusion',
+    content: 'Despite your best efforts, things did not turn out as hoped. Your decisions led to unforeseen consequences, but even in failure, there are lessons to be learned.',
     endingType: 'tragic',
-    onContinue: undefined,
-  },
-};
-
-export const WithContinueButton: Story = {
-  args: {
-    isOpen: true,
-    title: 'Chapter Complete',
-    content: 'You have successfully completed this chapter of your adventure. The road ahead promises new challenges and discoveries.',
-    endingType: 'default',
-    onContinue: () => console.log('Continue clicked'),
-    continueText: 'Next Chapter',
-  },
-};
-
-export const CustomButtonText: Story = {
-  args: {
-    isOpen: true,
-    title: 'Adventure Awaits',
-    content: 'Your first quest is complete, but this is only the beginning of your legend.',
-    endingType: 'triumphant',
-    continueText: 'Begin New Quest',
-    closeText: 'Return to Town',
-    onContinue: () => console.log('New quest started'),
-  },
-};
-
-export const JSXContent: Story = {
-  args: {
-    isOpen: true,
-    title: 'The Final Revelation',
-    content: (
-      <div className="space-y-4">
-        <p>
-          As you stand before the ancient altar, the truth becomes clear. You are not just a wanderer—you are the prophesied one.
-        </p>
-        <p className="font-semibold italic">
-          &ldquo;The blood of kings flows through your veins, and with it, the power to reshape this world.&rdquo;
-        </p>
-        <p>
-          The choice is yours: embrace your destiny or forge a new path entirely.
-        </p>
-      </div>
-    ),
-    endingType: 'bittersweet',
-  },
-};
-
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    title: 'This dialog is closed',
-    content: 'You should not see this content when the dialog is closed.',
-    endingType: 'default',
   },
 };

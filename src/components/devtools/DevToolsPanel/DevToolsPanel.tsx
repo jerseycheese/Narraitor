@@ -8,6 +8,8 @@ import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
+import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
+import { DevToolsSection } from '../shared/DevToolsSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -28,13 +30,12 @@ const EnvironmentInfo = () => {
   const isDev = process.env.NODE_ENV === 'development';
   
   return (
-    <div className="devtools-panel mb-4 text-xs bg-slate-700 p-2 rounded border border-slate-600">
-      <h3 className="devtools-panel font-bold mb-1 text-slate-200">Environment Info:</h3>
-      <div className="devtools-panel text-slate-300">NODE_ENV: {nodeEnv}</div>
-      <div className="devtools-panel text-slate-300">Is Client: {String(mounted)}</div>
-      <div className="devtools-panel text-slate-300">Is Development: {String(isDev)}</div>
-      <div className="devtools-panel text-slate-300">Window Location: {location}</div>
-    </div>
+    <DevToolsSection title="Environment Info:" className="mb-4 text-xs">
+      <div className="text-slate-300">NODE_ENV: {nodeEnv}</div>
+      <div className="text-slate-300">Is Client: {String(mounted)}</div>
+      <div className="text-slate-300">Is Development: {String(isDev)}</div>
+      <div className="text-slate-300">Window Location: {location}</div>
+    </DevToolsSection>
   );
 };
 
@@ -113,26 +114,64 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="devtools-panel p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-slate-800 text-slate-200"
+          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-slate-800 text-slate-200"
         >
           <EnvironmentInfo />
-          <StateSection defaultCollapsed={true} />
           
-          {/* AI Testing Section */}
-          <CollapsibleSection title="AI Testing" initialCollapsed={true}>
-            <AITestingPanel />
-          </CollapsibleSection>
-          
-          {/* Test Data Generators Section */}
-          <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
-            <TestDataGeneratorSection />
-          </CollapsibleSection>
-          
-          {/* Portrait Generation Debug Section */}
-          <PortraitDebugSection />
-          
-          {/* Ending Image Generation Debug Section */}
-          <EndingImageDebugSection />
+          {/* Two-column grid layout organized by function */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column: State Management */}
+            <div className="space-y-4">
+              {/* State Management Group */}
+              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                  State Management
+                </h3>
+                <StateSection defaultCollapsed={true} />
+              </div>
+            </div>
+            
+            {/* Right Column: AI Tools, Test Data & Content Generation */}
+            <div className="space-y-4">
+              {/* AI Tools Group */}
+              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                  AI Tools & Validation
+                </h3>
+                <div className="space-y-3">
+                  <CollapsibleSection title="AI Testing" initialCollapsed={true}>
+                    <AITestingPanel />
+                  </CollapsibleSection>
+                  
+                  <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
+                    <ConsistencyValidationSection />
+                  </CollapsibleSection>
+                </div>
+              </div>
+              
+              {/* Test Data Group */}
+              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                  Test Data & Generators
+                </h3>
+                <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
+                  <TestDataGeneratorSection />
+                </CollapsibleSection>
+              </div>
+              
+              {/* Content Generation Group */}
+              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                  Content Generation
+                </h3>
+                <div className="space-y-3">
+                  <PortraitDebugSection />
+                  
+                  <EndingImageDebugSection />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

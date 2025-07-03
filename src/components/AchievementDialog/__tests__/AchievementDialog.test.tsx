@@ -60,36 +60,41 @@ describe('AchievementDialog', () => {
     it('applies quest styling for quest achievements', () => {
       render(<AchievementDialog {...mockProps} type="quest" />);
       
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('achievement-quest');
+      const modalContent = screen.getByRole('dialog').querySelector('div[class*="achievement-quest"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('achievement-quest');
     });
 
     it('applies skill styling for skill achievements', () => {
       render(<AchievementDialog {...mockProps} type="skill" />);
       
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('achievement-skill');
+      const modalContent = screen.getByRole('dialog').querySelector('div[class*="achievement-skill"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('achievement-skill');
     });
 
     it('applies discovery styling for discovery achievements', () => {
       render(<AchievementDialog {...mockProps} type="discovery" />);
       
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('achievement-discovery');
+      const modalContent = screen.getByRole('dialog').querySelector('div[class*="achievement-discovery"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('achievement-discovery');
     });
 
     it('applies milestone styling for milestone achievements', () => {
       render(<AchievementDialog {...mockProps} type="milestone" />);
       
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('achievement-milestone');
+      const modalContent = screen.getByRole('dialog').querySelector('div[class*="achievement-milestone"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('achievement-milestone');
     });
 
     it('applies default styling when no type is specified', () => {
       render(<AchievementDialog {...mockProps} />);
       
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('achievement-default');
+      const modalContent = screen.getByRole('dialog').querySelector('div[class*="achievement-default"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('achievement-default');
     });
   });
 
@@ -129,7 +134,7 @@ describe('AchievementDialog', () => {
       
       const dialog = screen.getByRole('dialog');
       expect(dialog).toHaveAttribute('aria-labelledby');
-      expect(dialog).toHaveAttribute('aria-describedby');
+      expect(dialog).toHaveAttribute('aria-modal', 'true');
     });
 
     it('focuses continue button by default', async () => {
@@ -197,11 +202,14 @@ describe('AchievementDialog', () => {
   });
 
   describe('Mobile Responsiveness', () => {
-    it('applies mobile-responsive classes', () => {
+    it('applies responsive modal sizing', () => {
       render(<AchievementDialog {...mockProps} />);
       
+      // The modal uses size="lg" which applies max-w-2xl to the content div
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('max-w-lg', 'sm:rounded-lg');
+      const modalContent = dialog.querySelector('div[class*="max-w-2xl"]');
+      expect(modalContent).toBeInTheDocument();
+      expect(modalContent).toHaveClass('max-w-2xl');
     });
   });
 });

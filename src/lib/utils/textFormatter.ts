@@ -119,44 +119,49 @@ function formatParagraphs(
   return formatted;
 }
 
+// Pre-compiled dialogue patterns for performance optimization
+// List of common dialogue verbs
+const dialogueVerbs = [
+  'said', 'says', 'replied', 'replies', 'asked', 'asks', 'whispered', 'whispers',
+  'shouted', 'shouts', 'yelled', 'yells', 'exclaimed', 'exclaims', 'muttered', 'mutters',
+  'declared', 'declares', 'announced', 'announces', 'stated', 'states', 'told', 'tells',
+  'answered', 'answers', 'responded', 'responds', 'cried', 'cries', 'called', 'calls',
+  'spoke', 'speaks', 'remarked', 'remarks', 'added', 'adds', 'continued', 'continues',
+  'began', 'begins', 'finished', 'finishes', 'interrupted', 'interrupts', 'agreed', 'agrees',
+  'argued', 'argues', 'insisted', 'insists', 'suggested', 'suggests', 'explained', 'explains',
+  'admitted', 'admits', 'confessed', 'confesses', 'complained', 'complains', 'promised', 'promises',
+  'warned', 'warns', 'laughed', 'laughs', 'sighed', 'sighs', 'growled', 'growls',
+  'hissed', 'hisses', 'roared', 'roars', 'breathed', 'breathes', 'gasped', 'gasps',
+  'commanded', 'commands', 'demanded', 'demands', 'inquired', 'inquires', 'wondered', 'wonders',
+  'observed', 'observes', 'noted', 'notes', 'mentioned', 'mentions', 'commented', 'comments'
+].join('|');
+
+// Pattern 1: Character name/pronoun + verb + comma/colon + unquoted text
+const dialoguePattern1 = new RegExp(
+  `\\b([A-Z][\\w\\s]+|[Hh]e|[Ss]he|[Tt]hey|[Ii]t|[Tt]he [\\w\\s]+)\\s+(${dialogueVerbs})([,:]\\s+)(?![""])([^.!?\\n"]{3,})([.!?]?)`,
+  'g'
+);
+
+// Pattern 2: Verb at start of sentence after period
+const dialoguePattern2 = new RegExp(
+  `\\.\\s+([Hh]e|[Ss]he|[Tt]hey)\\s+(${dialogueVerbs})([,:]?\\s+)(?![""])([^.!?\\n"]{3,})([.!?]?)`,
+  'g'
+);
+
 /**
  * Formats dialogue with quotation marks
  * @param text - Text containing dialogue to format
  * @returns Text with properly quoted dialogue
  */
 function formatDialogue(text: string): string {
-  // List of common dialogue verbs
-  const dialogueVerbs = [
-    'said', 'says', 'replied', 'replies', 'asked', 'asks', 'whispered', 'whispers',
-    'shouted', 'shouts', 'yelled', 'yells', 'exclaimed', 'exclaims', 'muttered', 'mutters',
-    'declared', 'declares', 'announced', 'announces', 'stated', 'states', 'told', 'tells',
-    'answered', 'answers', 'responded', 'responds', 'cried', 'cries', 'called', 'calls',
-    'spoke', 'speaks', 'remarked', 'remarks', 'added', 'adds', 'continued', 'continues',
-    'began', 'begins', 'finished', 'finishes', 'interrupted', 'interrupts', 'agreed', 'agrees',
-    'argued', 'argues', 'insisted', 'insists', 'suggested', 'suggests', 'explained', 'explains',
-    'admitted', 'admits', 'confessed', 'confesses', 'complained', 'complains', 'promised', 'promises',
-    'warned', 'warns', 'laughed', 'laughs', 'sighed', 'sighs', 'growled', 'growls',
-    'hissed', 'hisses', 'roared', 'roars', 'breathed', 'breathes', 'gasped', 'gasps',
-    'commanded', 'commands', 'demanded', 'demands', 'inquired', 'inquires', 'wondered', 'wonders',
-    'observed', 'observes', 'noted', 'notes', 'mentioned', 'mentions', 'commented', 'comments'
-  ].join('|');
-  
-  // Pattern 1: Character name/pronoun + verb + comma/colon + unquoted text
-  const pattern1 = new RegExp(
-    `\\b([A-Z][\\w\\s]+|[Hh]e|[Ss]he|[Tt]hey|[Ii]t|[Tt]he [\\w\\s]+)\\s+(${dialogueVerbs})([,:]\\s+)(?![""])([^.!?\\n"]{3,})([.!?]?)`,
-    'g'
-  );
-  
-  // Pattern 2: Verb at start of sentence after period
-  const pattern2 = new RegExp(
-    `\\.\\s+([Hh]e|[Ss]he|[Tt]hey)\\s+(${dialogueVerbs})([,:]?\\s+)(?![""])([^.!?\\n"]{3,})([.!?]?)`,
-    'g'
-  );
-  
   let formatted = text;
   
+  // Reset regex state to avoid issues with global flag
+  dialoguePattern1.lastIndex = 0;
+  dialoguePattern2.lastIndex = 0;
+  
   // Apply both patterns
-  formatted = formatted.replace(pattern1, (match, speaker, verb, separator, dialogue, punct) => {
+  formatted = formatted.replace(dialoguePattern1, (match, speaker, verb, separator, dialogue, punct) => {
     // Skip if it looks like indirect speech
     if (dialogue.match(/^(that|if|whether|to|about|how|why|when|where|what|who)/i)) {
       return match;
@@ -165,7 +170,7 @@ function formatDialogue(text: string): string {
     return `${speaker} ${verb}${separator}"${dialogue.trim()}${finalPunct}"`;
   });
   
-  formatted = formatted.replace(pattern2, (match, pronoun, verb, separator, dialogue, punct) => {
+  formatted = formatted.replace(dialoguePattern2, (match, pronoun, verb, separator, dialogue, punct) => {
     // Skip if it looks like indirect speech
     if (dialogue.match(/^(that|if|whether|to|about|how|why|when|where|what|who)/i)) {
       return match;
