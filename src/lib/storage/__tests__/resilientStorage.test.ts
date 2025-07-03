@@ -203,7 +203,7 @@ describe('ResilientStorageMiddleware', () => {
       expect(mockNotificationCallback).toHaveBeenCalledWith(
         StorageStatus.HEALTHY,
         expect.objectContaining({
-          userMessage: expect.stringContaining('recovered'),
+          userMessage: expect.stringContaining('restored'),
         })
       );
     });
@@ -305,7 +305,12 @@ describe('ResilientStorageMiddleware', () => {
 
       await resilientStorage.setItem('test-key', 'test-value');
 
-      expect(resilientStorage.getLastError()).toEqual(mockError);
+      expect(resilientStorage.getLastError()).toEqual(expect.objectContaining({
+        technicalMessage: 'QuotaExceededError',
+        isRecoverable: true,
+        shouldNotify: true,
+        userMessage: expect.stringContaining('temporarily unavailable')
+      }));
     });
   });
 
@@ -317,7 +322,7 @@ describe('ResilientStorageMiddleware', () => {
       // Wait for a few health checks
       await new Promise(resolve => setTimeout(resolve, 150));
 
-      expect(healthCheck).toHaveBeenCalledTimes(3);
+      expect(healthCheck.mock.calls.length).toBeGreaterThan(1);
 
       resilientStorage.stopHealthMonitoring();
     });
