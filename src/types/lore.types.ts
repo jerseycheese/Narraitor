@@ -92,7 +92,7 @@ export interface StructuredLoreExtraction {
 }
 
 /**
- * Enhanced lore context for AI consistency instructions (Issue #184)
+ * Structured lore context for AI consistency instructions
  */
 export interface ConsistencyLoreContext {
   characters: Array<{

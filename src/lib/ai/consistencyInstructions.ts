@@ -1,18 +1,18 @@
 /**
- * Enhanced AI Consistency Instructions Generator (Issue #184)
+ * AI Consistency Instructions Generator
  * 
- * Generates enhanced consistency instructions for AI narrative generation
+ * Generates consistency instructions for AI narrative generation
  * to ensure adherence to established lore and world rules.
  */
 
 import { ConsistencyLoreContext } from '../../types/lore.types';
 
 /**
- * Generates enhanced consistency instructions for AI narrative generation
- * @param loreContext Enhanced lore context with structured and prioritized information
+ * Generates consistency instructions for AI narrative generation
+ * @param loreContext Structured lore context with prioritized information
  * @returns Formatted consistency instructions for AI consumption
  */
-export function enhanceConsistencyInstructions(loreContext: ConsistencyLoreContext): string {
+export function generateConsistencyInstructions(loreContext: ConsistencyLoreContext): string {
   if (!loreContext || typeof loreContext !== 'object') {
     return 'Maintain consistency with any established narrative elements and avoid contradictions.';
   }

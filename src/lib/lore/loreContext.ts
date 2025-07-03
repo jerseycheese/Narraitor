@@ -1,18 +1,18 @@
 /**
- * Enhanced Lore Context Builder (Issue #184)
+ * Lore Context Builder
  * 
- * Builds enhanced lore context with improved formatting and importance ranking
- * for better AI consistency instruction generation.
+ * Builds structured lore context with formatting and importance ranking
+ * for AI consistency instruction generation.
  */
 
 import { LoreFact, ConsistencyLoreContext } from '../../types/lore.types';
 
 /**
- * Builds enhanced lore context from raw lore facts
+ * Builds structured lore context from raw lore facts
  * @param loreFacts Array of raw lore facts from the lore store
  * @returns Structured and prioritized lore context for consistency instructions
  */
-export function buildEnhancedLoreContext(loreFacts: LoreFact[]): ConsistencyLoreContext {
+export function buildLoreContext(loreFacts: LoreFact[]): ConsistencyLoreContext {
   if (!Array.isArray(loreFacts)) {
     return createEmptyContext();
   }
