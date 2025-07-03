@@ -254,7 +254,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
       <div className={`narrative-segment p-6 rounded-lg ${styles.container}`}>
         <p className={styles.label}>{segment.type}</p>
         <div 
-          className={`text-l narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
+          className={`text-lg narrative-content readable ${segment.type === 'scene' ? 'scene-spacing' : ''} ${segment.type === 'dialogue' ? 'dialogue-segment' : ''} ${segment.type === 'transition' ? 'preserve-breaks' : ''} ${styles.text}`}
           dangerouslySetInnerHTML={{ __html: formattedContent }}
         />
         {segment.metadata?.location && (

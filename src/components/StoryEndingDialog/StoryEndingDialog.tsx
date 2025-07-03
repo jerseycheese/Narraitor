@@ -87,6 +87,7 @@ export function StoryEndingDialog({
           <div
             id="story-ending-content"
             className="text-base leading-relaxed text-gray-700"
+            aria-describedby="story-ending-content"
           >
             {typeof content === 'string' ? (
               <p>{content}</p>
