@@ -7,7 +7,7 @@
   "outputDirectory": "./storybook-static",
   "headers": [
     {
-      "source": "/sb-addons/**/*.js",
+      "source": "/sb-addons/(.*).js",
       "headers": [
         {
           "key": "Content-Type",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "source": "/sb-manager/**/*.js",
+      "source": "/sb-manager/(.*).js",
       "headers": [
         {
           "key": "Content-Type",
@@ -25,7 +25,7 @@
       ]
     },
     {
-      "source": "**/*.js",
+      "source": "/(.*).js",
       "headers": [
         {
           "key": "Content-Type",
