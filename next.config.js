@@ -16,6 +16,15 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Serve Storybook from /storybook path (files are copied to public/storybook during build)
+      {
+        source: '/storybook',
+        destination: '/storybook/index.html',
+      },
+    ];
+  },
   // Configure external image domains
   images: {
     remotePatterns: [
@@ -31,6 +40,20 @@ const nextConfig = {
     // Add path resolver
     config.resolve.fallback = { fs: false, path: false };
     return config;
+  },
+  // Include storybook-static directory in the build output
+  async headers() {
+    return [
+      {
+        source: '/storybook/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
   }
 };
 
