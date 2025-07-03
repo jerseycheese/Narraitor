@@ -33,14 +33,20 @@ const config = {
     return config;
   },
 
-  // Configure for proper Vercel deployment
+  // Configure for proper Vercel deployment at /storybook path
   managerHead: (head) => `
     ${head}
-    <base href="/">
+    <base href="/storybook/">
   `,
 
   core: {
     disableTelemetry: true
+  },
+
+  // Set the public path for assets when served from /storybook/
+  managerWebpack: (config) => {
+    config.output.publicPath = '/storybook/';
+    return config;
   }
 };
 
