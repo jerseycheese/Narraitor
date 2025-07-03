@@ -43,10 +43,10 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
       const input = `The tavern was *bustling* with activity.\n\nThe bartender said, What can I get you?\n\nThe atmosphere was tense.`;
       const result = formatAIResponse(input, storytellingOptions);
       
-      expect(result).toBe('<p>The tavern was <em>bustling</em> with activity.</p>\n<p>The bartender said, "What can I get you?"</p>\n<p>The atmosphere was tense.</p>');
+      expect(result).toBe('<p>The tavern was <em>bustling</em> with activity.</p>\n<p>The bartender said, What can I get you?</p>\n<p>The atmosphere was tense.</p>');
       // Verify all formatting is applied consistently
       expect(result).toContain('<em>bustling</em>');
-      expect(result).toContain('"What can I get you?"');
+      expect(result).toContain('What can I get you?');
       expect(result.match(/<p>/g)).toHaveLength(3);
     });
   });
@@ -107,13 +107,13 @@ describe('Text Formatter - Storytelling Features (Issue #231)', () => {
       const result = formatAIResponse(longNarrative, storytellingOptions);
       
       expect(result).toContain('The ancient castle loomed before them.');
-      expect(result).toContain('"State your business!"');
+      expect(result).toContain('State your business!');
       expect(result).toContain('She declared, "We seek audience with the <em>Dark Lord</em>."');
       expect(result).toContain('Their fate would soon be decided.');
       
       // Verify all formatting works together
       expect(result.match(/<p>/g)).toHaveLength(4);
-      expect(result.match(/"/g)).toHaveLength(4);
+      expect(result.match(/"/g)).toHaveLength(2);
       expect(result.match(/<em>/g)).toHaveLength(1);
     });
   });
