@@ -8,6 +8,7 @@ import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
+import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 
 /**
  * Environment info component for the DevTools panel
@@ -121,6 +122,11 @@ export const DevToolsPanel = () => {
           {/* AI Testing Section */}
           <CollapsibleSection title="AI Testing" initialCollapsed={true}>
             <AITestingPanel />
+          </CollapsibleSection>
+          
+          {/* Consistency Validation Section */}
+          <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
+            <ConsistencyValidationSection />
           </CollapsibleSection>
           
           {/* Test Data Generators Section */}
