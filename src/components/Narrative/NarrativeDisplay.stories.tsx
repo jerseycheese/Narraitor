@@ -63,11 +63,11 @@ export const Scene: Story = {
   },
 };
 
-// Dialogue type
+// Dialogue type - showcases automatic quotation mark formatting
 export const Dialogue: Story = {
   args: {
     segment: createMockSegment(
-      '"Welcome to the Mystical Forest," said the ethereal voice. "Few mortals find their way here without purpose. What brings you to these ancient woods?"',
+      'The guardian said, Welcome to the Mystical Forest. The traveler replied, Thank you for your guidance.',
       'dialogue',
       {
         characterIds: ['char-1'],
@@ -78,11 +78,26 @@ export const Dialogue: Story = {
   },
 };
 
-// Action type
+// Dialogue with existing quotes - shows preservation of existing formatting
+export const DialogueWithQuotes: Story = {
+  args: {
+    segment: createMockSegment(
+      'She whispered, "The secret lies beneath the ancient oak." He asked, "How do you know this?"',
+      'dialogue',
+      {
+        characterIds: ['char-1', 'char-2'],
+        mood: 'mysterious',
+        tags: ['conversation', 'secrets'],
+      }
+    ),
+  },
+};
+
+// Action type - shows action segment formatting (no dialogue formatting)
 export const Action: Story = {
   args: {
     segment: createMockSegment(
-      'The hero leapt across the chasm with a mighty roar, the wind whipping through their hair as they soared through the air.',
+      'The hero leapt across the chasm with a *mighty* roar. The warrior said, For honor! But the words were lost in the wind.',
       'action',
       {
         mood: 'action',
@@ -93,15 +108,19 @@ export const Action: Story = {
 };
 
 
-// Transition type
+// Transition type - shows preserved line breaks formatting
 export const Transition: Story = {
   args: {
     segment: createMockSegment(
-      'Hours passed as they ventured deeper into the forest...',
+      `Hours passed as they ventured deeper into the forest...
+
+The *ancient* path wound through towering trees.
+
+Time seemed to slow in this *mystical* place.`,
       'transition',
       {
         mood: 'neutral',
-        tags: ['time-skip', 'travel'],
+        tags: ['time-skip', 'travel', 'atmosphere'],
       }
     ),
   },
@@ -128,20 +147,126 @@ export const Error: Story = {
   },
 };
 
-// Long content
-export const LongContent: Story = {
+// Paragraph formatting - shows multi-paragraph organization
+export const ParagraphFormatting: Story = {
   args: {
     segment: createMockSegment(
-      `The sprawling city of Aetheria stretched before them, a breathtaking vista of soaring spires and gleaming crystal domes. Bridges of light connected the floating districts, each one pulsing with the energy of thousands of lives.
+      `The ancient library stretched endlessly before them. Towering shelves disappeared into shadow above.
 
-In the market district, merchants hawked their wares with enthusiastic cries, their stalls overflowing with exotic goods from across the realm. The air was thick with the scent of spices and the sound of countless conversations in a dozen different tongues.
+Books of every size and color filled the shelves. Some glowed with inner light, others seemed to absorb the surrounding darkness.
 
-Above it all, the great Citadel of Stars rose into the clouds, its ancient walls bearing witness to centuries of history. The setting sun painted its white marble in shades of gold and rose, creating a spectacle that drew gasps from even the most jaded travelers.`,
+The *mystical* atmosphere was overwhelming. This was truly a place of *ancient wisdom*.`,
+      'scene',
+      {
+        location: 'Ancient Library',
+        mood: 'mysterious',
+        tags: ['library', 'knowledge', 'atmosphere'],
+      }
+    ),
+  },
+};
+
+// Text emphasis - showcases italic formatting
+export const TextEmphasis: Story = {
+  args: {
+    segment: createMockSegment(
+      'The *ancient* artifact glowed with *mysterious* power. Its surface was covered in *intricate* runes that seemed to pulse with life.',
+      'scene',
+      {
+        mood: 'mysterious',
+        tags: ['artifact', 'magic', 'discovery'],
+      }
+    ),
+  },
+};
+
+// Mixed content formatting - combines dialogue, paragraphs, and emphasis
+export const MixedContentFormatting: Story = {
+  args: {
+    segment: createMockSegment(
+      `The tavern was *bustling* with activity. Smoke from countless pipes created a hazy atmosphere.
+
+The bartender said, What can I get you? The traveler replied, Just some information about the *ancient ruins*.
+
+The conversation continued late into the night. Many *secrets* were shared over ale and bread.`,
+      'scene',
+      {
+        location: 'The Crossroads Tavern',
+        mood: 'neutral',
+        tags: ['tavern', 'conversation', 'information'],
+      }
+    ),
+  },
+};
+
+// Segment comparison - shows how same content formats differently by type
+export const SceneFormatting: Story = {
+  args: {
+    segment: createMockSegment(
+      `The wizard said, Beware the *ancient* curse!
+
+The hero replied, I am not afraid.
+
+They ventured forth into the *dark* cavern.`,
+      'scene', // Formats dialogue with quotes and double paragraph spacing
+      {
+        location: 'Mysterious Cavern',
+        mood: 'mysterious',
+        tags: ['dialogue', 'adventure'],
+      }
+    ),
+  },
+};
+
+export const ActionFormatting: Story = {
+  args: {
+    segment: createMockSegment(
+      `The wizard said, Beware the *ancient* curse!
+
+The hero replied, I am not afraid.
+
+They ventured forth into the *dark* cavern.`,
+      'action', // Does NOT format dialogue, only emphasis
+      {
+        mood: 'action',
+        tags: ['dialogue', 'adventure'],
+      }
+    ),
+  },
+};
+
+export const DialogueFormatting: Story = {
+  args: {
+    segment: createMockSegment(
+      `The wizard said, Beware the *ancient* curse!
+
+The hero replied, I am not afraid.
+
+They ventured forth into the *dark* cavern.`,
+      'dialogue', // Formats dialogue with quotes and adds italic styling
+      {
+        characterIds: ['wizard', 'hero'],
+        mood: 'mysterious',
+        tags: ['conversation', 'warning'],
+      }
+    ),
+  },
+};
+
+// Long content with comprehensive formatting
+export const LongContentFormatted: Story = {
+  args: {
+    segment: createMockSegment(
+      `The sprawling city of Aetheria stretched before them, a breathtaking vista of soaring spires and gleaming crystal domes. Bridges of *light* connected the floating districts, each one pulsing with the energy of thousands of lives.
+
+In the market district, merchants hawked their wares with enthusiastic cries. The merchant called out, Fresh fruits from the *celestial* gardens! A customer replied, How much for a dozen starfruit?
+
+Above it all, the great Citadel of Stars rose into the clouds. Its *ancient* walls bore witness to centuries of history. The setting sun painted its white marble in shades of gold and rose, creating a spectacle that drew gasps from even the most jaded travelers.`,
       'scene',
       {
         location: 'City of Aetheria',
-        mood: 'emotional', // Changed from 'awe' to use a valid mood
-        tags: ['city', 'description', 'worldbuilding', 'awe'],
+        mood: 'emotional',
+        tags: ['city', 'description', 'worldbuilding', 'dialogue'],
       }
     ),
   },
