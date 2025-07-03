@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm run build-storybook && node scripts/copy-storybook.js && next build",
     "start": "next start",
     "lint": "next lint",
     "tailwind:build-for-storybook": "npx @tailwindcss/cli -i src/app/globals.css -o .storybook/tailwind-compiled.css",
