@@ -1,103 +1,33 @@
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useStorageStatus } from '../useStorageStatus';
-// Removed unused imports
 
-// Mock storage service
-const mockStorageService = {
-  checkAvailability: jest.fn(),
-  getStatus: jest.fn(),
-  attemptRecovery: jest.fn(),
-  clearError: jest.fn(),
-  onStatusChange: jest.fn(),
-  removeStatusListener: jest.fn()
+// Mock the resilient storage implementation
+const mockResilientStorage = {
+  getStorageStatus: jest.fn(() => 'HEALTHY'),
+  getLastError: jest.fn(() => null),
+  getLastSuccessfulSync: jest.fn(() => new Date().toISOString()),
+  checkStorageHealth: jest.fn().mockResolvedValue(undefined),
+  startHealthMonitoring: jest.fn(),
+  stopHealthMonitoring: jest.fn(),
 };
 
-// Mock the useStorageStatus module to use our mock service
-jest.mock('../useStorageStatus', () => {
-  const { useState, useEffect, useCallback, useRef } = jest.requireActual('react');
-  
-  return {
-    useStorageStatus: () => {
-      const [status, setStatus] = useState(() => mockStorageService.getStatus());
-      const [isLoading, setIsLoading] = useState(false);
-      const statusCallbackRef = useRef();
+// Mock the persistence module
+jest.mock('../../state/persistence', () => ({
+  getResilientStorageInstance: jest.fn(() => Promise.resolve(mockResilientStorage)),
+}));
 
-      useEffect(() => {
-        const updateStatus = (newStatus: string) => {
-          setStatus(newStatus);
-        };
-
-        statusCallbackRef.current = updateStatus;
-        mockStorageService.onStatusChange(updateStatus);
-
-        // Initial status check
-        mockStorageService.checkAvailability().catch(() => {});
-
-        return () => {
-          if (statusCallbackRef.current) {
-            mockStorageService.removeStatusListener(statusCallbackRef.current);
-          }
-        };
-      }, []);
-
-      const retryConnection = useCallback(async () => {
-        setIsLoading(true);
-        try {
-          const isAvailable = await mockStorageService.checkAvailability();
-          return isAvailable;
-        } catch (error: unknown) {
-          setStatus((prev: Record<string, unknown>) => ({
-            ...prev,
-            lastError: error instanceof Error ? error.message : 'Unknown error'
-          }));
-          return false;
-        } finally {
-          setIsLoading(false);
-        }
-      }, []);
-
-      const clearError = useCallback(() => {
-        mockStorageService.clearError();
-      }, []);
-
-      const attemptRecovery = useCallback(async () => {
-        try {
-          await mockStorageService.attemptRecovery();
-        } catch (error: unknown) {
-          setStatus((prev: Record<string, unknown>) => ({
-            ...prev,
-            lastError: error instanceof Error ? error.message : 'Recovery failed'
-          }));
-        }
-      }, []);
-
-      return {
-        status,
-        retryConnection,
-        clearError,
-        attemptRecovery,
-        isLoading
-      };
-    }
-  };
-});
+// Import the actual hook after mocking dependencies
+import { useStorageStatus } from '../useStorageStatus';
 
 describe('useStorageStatus Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Default mock implementations
-    mockStorageService.checkAvailability.mockResolvedValue(true);
-    mockStorageService.getStatus.mockReturnValue({
-      isAvailable: true,
-      fallbackActive: false,
-      pendingRecovery: 0,
-      lastError: null,
-      recoveryInProgress: false
-    });
-    mockStorageService.attemptRecovery.mockResolvedValue({ success: true });
-    mockStorageService.clearError.mockImplementation(() => {});
+    // Reset mocks to healthy state
+    mockResilientStorage.getStorageStatus.mockReturnValue('HEALTHY');
+    mockResilientStorage.getLastError.mockReturnValue(null);
+    mockResilientStorage.getLastSuccessfulSync.mockReturnValue(new Date().toISOString());
+    mockResilientStorage.checkStorageHealth.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -105,185 +35,82 @@ describe('useStorageStatus Hook', () => {
   });
 
   describe('Initial State', () => {
-    test('should return initial storage status', () => {
+    test('should return healthy storage status initially', async () => {
       const { result } = renderHook(() => useStorageStatus());
       
-      expect(result.current.status).toEqual({
-        isAvailable: true,
-        fallbackActive: false,
-        pendingRecovery: 0,
-        lastError: null,
-        recoveryInProgress: false
+      await waitFor(() => {
+        expect(result.current.status).toBe('HEALTHY');
+        expect(result.current.error).toBeNull();
+        expect(result.current.lastSuccessfulSync).toBeDefined();
       });
-      expect(result.current.isLoading).toBe(false);
     });
 
-    test('should detect storage unavailability on mount', async () => {
-      mockStorageService.getStatus.mockReturnValue({
-        isAvailable: false,
-        fallbackActive: true,
-        pendingRecovery: 5,
-        lastError: 'Storage quota exceeded',
-        recoveryInProgress: false
-      });
+    test('should detect storage issues on mount', async () => {
+      const mockError = {
+        userMessage: 'Storage quota exceeded',
+        technicalMessage: 'QuotaExceededError',
+        isRecoverable: true,
+        shouldNotify: true,
+      };
+
+      mockResilientStorage.getStorageStatus.mockReturnValue('UNAVAILABLE');
+      mockResilientStorage.getLastError.mockReturnValue(mockError);
 
       const { result } = renderHook(() => useStorageStatus());
       
       await waitFor(() => {
-        expect(result.current.status.isAvailable).toBe(false);
-        expect(result.current.status.fallbackActive).toBe(true);
-        expect(result.current.status.pendingRecovery).toBe(5);
-        expect(result.current.status.lastError).toBe('Storage quota exceeded');
+        expect(result.current.status).toBe('UNAVAILABLE');
+        expect(result.current.error).toEqual(mockError);
       });
     });
   });
 
-  describe('Status Updates', () => {
-    test('should update status when storage becomes unavailable', async () => {
+  describe('Health Check Function', () => {
+    test('should perform health check when requested', async () => {
       const { result } = renderHook(() => useStorageStatus());
       
-      // Initially available
-      expect(result.current.status.isAvailable).toBe(true);
-      
-      // Simulate storage failure by triggering callback
-      let statusCallback: ((status: string) => void) | undefined;
-      act(() => {
-        // Get the callback that was registered
-        statusCallback = mockStorageService.onStatusChange.mock.calls[0][0];
-        
-        // Trigger status change
-        statusCallback({
-          isAvailable: false,
-          fallbackActive: true,
-          pendingRecovery: 2,
-          lastError: 'QuotaExceededError',
-          recoveryInProgress: false
-        });
-      });
-      
-      expect(result.current.status.isAvailable).toBe(false);
-      expect(result.current.status.fallbackActive).toBe(true);
-      expect(result.current.status.lastError).toBe('QuotaExceededError');
-    });
-
-    test('should update status when storage recovers', async () => {
-      mockStorageService.getStatus.mockReturnValue({
-        isAvailable: false,
-        fallbackActive: true,
-        pendingRecovery: 3,
-        lastError: 'NetworkError',
-        recoveryInProgress: false
-      });
-
-      const { result } = renderHook(() => useStorageStatus());
-      
-      // Initially unavailable
-      expect(result.current.status.isAvailable).toBe(false);
-      
-      // Simulate storage recovery
-      act(() => {
-        mockStorageService.getStatus.mockReturnValue({
-          isAvailable: true,
-          fallbackActive: false,
-          pendingRecovery: 0,
-          lastError: null,
-          recoveryInProgress: false
-        });
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.isAvailable).toBe(true);
-        expect(result.current.status.fallbackActive).toBe(false);
-        expect(result.current.status.pendingRecovery).toBe(0);
-      });
-    });
-
-    test('should track recovery progress', async () => {
-      const { result } = renderHook(() => useStorageStatus());
-      
-      // Start recovery
-      act(() => {
-        mockStorageService.getStatus.mockReturnValue({
-          isAvailable: false,
-          fallbackActive: true,
-          pendingRecovery: 5,
-          lastError: null,
-          recoveryInProgress: true
-        });
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.recoveryInProgress).toBe(true);
-        expect(result.current.status.pendingRecovery).toBe(5);
-      });
-      
-      // Recovery completes
-      act(() => {
-        mockStorageService.getStatus.mockReturnValue({
-          isAvailable: true,
-          fallbackActive: false,
-          pendingRecovery: 0,
-          lastError: null,
-          recoveryInProgress: false
-        });
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.recoveryInProgress).toBe(false);
-        expect(result.current.status.isAvailable).toBe(true);
-      });
-    });
-  });
-
-  describe('Retry Connection', () => {
-    test('should retry storage connection when requested', async () => {
-      mockStorageService.checkAvailability.mockResolvedValue(true);
-      
-      const { result } = renderHook(() => useStorageStatus());
-      
-      let retryResult: boolean;
       await act(async () => {
-        retryResult = await result.current.retryConnection();
+        await result.current.checkHealth();
       });
       
-      expect(retryResult).toBe(true);
-      expect(mockStorageService.checkAvailability).toHaveBeenCalled();
+      expect(mockResilientStorage.checkStorageHealth).toHaveBeenCalled();
     });
 
-    test('should handle retry failures gracefully', async () => {
-      mockStorageService.checkAvailability.mockRejectedValue(new Error('Still unavailable'));
+    test('should handle health check failures gracefully', async () => {
+      mockResilientStorage.checkStorageHealth.mockRejectedValue(new Error('Health check failed'));
       
       const { result } = renderHook(() => useStorageStatus());
       
-      let retryResult: boolean;
       await act(async () => {
-        retryResult = await result.current.retryConnection();
+        await result.current.checkHealth();
       });
       
-      expect(retryResult).toBe(false);
-      expect(result.current.status.lastError).toContain('Still unavailable');
+      expect(mockResilientStorage.checkStorageHealth).toHaveBeenCalled();
+      // Hook should not crash on health check failure
+      expect(result.current.status).toBeDefined();
     });
 
-    test('should set loading state during retry', async () => {
-      let resolveRetry: (value: boolean) => void;
-      const retryPromise = new Promise<boolean>((resolve) => {
-        resolveRetry = resolve;
+    test('should set loading state during health check', async () => {
+      let resolveHealthCheck: (value?: unknown) => void;
+      const healthCheckPromise = new Promise((resolve) => {
+        resolveHealthCheck = resolve;
       });
       
-      mockStorageService.checkAvailability.mockReturnValue(retryPromise);
+      mockResilientStorage.checkStorageHealth.mockReturnValue(healthCheckPromise);
       
       const { result } = renderHook(() => useStorageStatus());
       
       act(() => {
-        result.current.retryConnection();
+        result.current.checkHealth();
       });
       
-      // Should be loading during retry
+      // Should be loading during health check
       expect(result.current.isLoading).toBe(true);
       
-      // Complete retry
-      act(() => {
-        resolveRetry!(true);
+      // Complete health check
+      await act(async () => {
+        resolveHealthCheck();
+        await healthCheckPromise;
       });
       
       await waitFor(() => {
@@ -292,187 +119,65 @@ describe('useStorageStatus Hook', () => {
     });
   });
 
-  describe('Recovery Operations', () => {
-    test('should trigger recovery when requested', async () => {
-      mockStorageService.attemptRecovery.mockResolvedValue({
-        success: true,
-        recovered: ['key1', 'key2'],
-        failed: []
-      });
-
-      const { result } = renderHook(() => useStorageStatus());
+  describe('Storage Status Monitoring', () => {
+    test('should monitor different storage states', async () => {
+      const states = ['HEALTHY', 'DEGRADED', 'UNAVAILABLE', 'RECOVERING'];
       
-      await act(async () => {
-        await result.current.attemptRecovery();
-      });
-      
-      expect(mockStorageService.attemptRecovery).toHaveBeenCalled();
-    });
-
-    test('should handle recovery failures', async () => {
-      mockStorageService.attemptRecovery.mockRejectedValue(new Error('Recovery failed'));
-
-      const { result } = renderHook(() => useStorageStatus());
-      
-      await act(async () => {
-        await result.current.attemptRecovery();
-      });
-      
-      expect(result.current.status.lastError).toContain('Recovery failed');
-    });
-
-    test('should update recovery progress during operation', async () => {
-      let resolveRecovery: (value: boolean) => void;
-      const recoveryPromise = new Promise((resolve) => {
-        resolveRecovery = resolve;
-      });
-      
-      mockStorageService.attemptRecovery.mockReturnValue(recoveryPromise);
-      
-      const { result } = renderHook(() => useStorageStatus());
-      
-      act(() => {
-        result.current.attemptRecovery();
-      });
-      
-      // Should show recovery in progress
-      await waitFor(() => {
-        expect(result.current.status.recoveryInProgress).toBe(true);
-      });
-      
-      // Complete recovery
-      act(() => {
-        resolveRecovery!({ success: true, recovered: ['key1'], failed: [] });
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.recoveryInProgress).toBe(false);
-      });
-    });
-  });
-
-  describe('Error Management', () => {
-    test('should clear errors when requested', () => {
-      mockStorageService.getStatus.mockReturnValue({
-        isAvailable: false,
-        fallbackActive: true,
-        pendingRecovery: 0,
-        lastError: 'Previous error',
-        recoveryInProgress: false
-      });
-
-      const { result } = renderHook(() => useStorageStatus());
-      
-      expect(result.current.status.lastError).toBe('Previous error');
-      
-      act(() => {
-        result.current.clearError();
-      });
-      
-      expect(mockStorageService.clearError).toHaveBeenCalled();
-    });
-
-    test('should categorize different error types', async () => {
-      const errorTypes = [
-        { error: 'QuotaExceededError', category: 'quota' },
-        { error: 'SecurityError', category: 'security' },
-        { error: 'NetworkError', category: 'network' }
-      ];
-
-      const { result } = renderHook(() => useStorageStatus());
-      
-      for (const { error } of errorTypes) {
-        act(() => {
-          mockStorageService.getStatus.mockReturnValue({
-            isAvailable: false,
-            fallbackActive: true,
-            pendingRecovery: 0,
-            lastError: error,
-            recoveryInProgress: false
-          });
-        });
+      for (const state of states) {
+        mockResilientStorage.getStorageStatus.mockReturnValue(state);
+        
+        const { result } = renderHook(() => useStorageStatus());
         
         await waitFor(() => {
-          expect(result.current.status.lastError).toBe(error);
-          // Should categorize error type for appropriate user messaging
+          expect(result.current.status).toBe(state);
         });
       }
     });
+
+    test('should handle error states properly', async () => {
+      const mockError = {
+        userMessage: 'Storage quota exceeded',
+        technicalMessage: 'QuotaExceededError',
+        isRecoverable: true,
+        shouldNotify: true,
+      };
+
+      mockResilientStorage.getStorageStatus.mockReturnValue('UNAVAILABLE');
+      mockResilientStorage.getLastError.mockReturnValue(mockError);
+
+      const { result } = renderHook(() => useStorageStatus());
+      
+      await waitFor(() => {
+        expect(result.current.status).toBe('UNAVAILABLE');
+        expect(result.current.error).toEqual(mockError);
+      });
+    });
+
+    test('should track last successful sync time', async () => {
+      const syncTime = '2023-12-01T10:00:00.000Z';
+      mockResilientStorage.getLastSuccessfulSync.mockReturnValue(syncTime);
+
+      const { result } = renderHook(() => useStorageStatus());
+      
+      await waitFor(() => {
+        expect(result.current.lastSuccessfulSync).toBe(syncTime);
+      });
+    });
   });
 
-  describe('Cleanup and Memory Management', () => {
-    test('should cleanup listeners on unmount', () => {
-      const { unmount } = renderHook(() => useStorageStatus());
+  describe('Hook Lifecycle', () => {
+    test('should initialize and cleanup properly', async () => {
+      const { result, unmount } = renderHook(() => useStorageStatus());
       
-      // Should have registered listener
-      expect(mockStorageService.onStatusChange).toHaveBeenCalled();
+      // Should initialize successfully
+      await waitFor(() => {
+        expect(result.current.status).toBeDefined();
+        expect(result.current.lastSuccessfulSync).toBeDefined();
+      });
       
+      // Should cleanup without errors
       unmount();
-      
-      // Should cleanup listener
-      expect(mockStorageService.removeStatusListener).toHaveBeenCalled();
-    });
-
-    test('should not cause memory leaks with frequent status changes', async () => {
-      const { result } = renderHook(() => useStorageStatus());
-      
-      // Simulate rapid status changes
-      for (let i = 0; i < 100; i++) {
-        act(() => {
-          mockStorageService.getStatus.mockReturnValue({
-            isAvailable: i % 2 === 0,
-            fallbackActive: i % 2 !== 0,
-            pendingRecovery: i % 5,
-            lastError: i % 10 === 0 ? `Error ${i}` : null,
-            recoveryInProgress: false
-          });
-        });
-      }
-      
-      // Should handle rapid updates without issues
-      expect(result.current.status).toBeDefined();
-    });
-  });
-
-  describe('Integration with Storage Events', () => {
-    test('should respond to storage quota events', async () => {
-      const { result } = renderHook(() => useStorageStatus());
-      
-      // Simulate quota exceeded event
-      act(() => {
-        const quotaEvent = new Event('error');
-        Object.defineProperty(quotaEvent, 'name', { value: 'QuotaExceededError' });
-        window.dispatchEvent(quotaEvent);
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.fallbackActive).toBe(true);
-        expect(result.current.status.lastError).toContain('quota');
-      });
-    });
-
-    test('should respond to storage recovery events', async () => {
-      // Start in fallback mode
-      mockStorageService.getStatus.mockReturnValue({
-        isAvailable: false,
-        fallbackActive: true,
-        pendingRecovery: 3,
-        lastError: 'Storage unavailable',
-        recoveryInProgress: false
-      });
-
-      const { result } = renderHook(() => useStorageStatus());
-      
-      // Simulate recovery event
-      act(() => {
-        const recoveryEvent = new CustomEvent('storageRecovered');
-        window.dispatchEvent(recoveryEvent);
-      });
-      
-      await waitFor(() => {
-        expect(result.current.status.isAvailable).toBe(true);
-        expect(result.current.status.fallbackActive).toBe(false);
-      });
+      expect(true).toBe(true); // Test passed if no errors during unmount
     });
   });
 });

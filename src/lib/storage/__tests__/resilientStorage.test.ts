@@ -19,7 +19,7 @@ describe('ResilientStorageMiddleware', () => {
   let mockAdapter: jest.Mocked<IndexedDBAdapter>;
   let mockNotificationCallback: jest.Mock;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     mockAdapter = {
       initialize: jest.fn(),
@@ -28,7 +28,9 @@ describe('ResilientStorageMiddleware', () => {
       removeItem: jest.fn(),
     } as jest.Mocked<IndexedDBAdapter>;
     
-    mockIndexedDBAdapter.create.mockResolvedValue(mockAdapter);
+    // Ensure the static create method returns our mock adapter
+    mockIndexedDBAdapter.create = jest.fn().mockResolvedValue(mockAdapter);
+    
     mockNotificationCallback = jest.fn();
     
     resilientStorage = new ResilientStorageMiddleware({
@@ -36,6 +38,9 @@ describe('ResilientStorageMiddleware', () => {
       retryAttempts: 3,
       baseDelay: 100, // Shorter delays for testing
     });
+    
+    // Wait for initialization to complete
+    await new Promise(resolve => setTimeout(resolve, 10));
   });
 
   describe('Retry Logic', () => {
@@ -175,8 +180,20 @@ describe('ResilientStorageMiddleware', () => {
       expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
 
       // Now make storage work again
-      mockAdapter.setItem.mockResolvedValue(undefined);
-      mockAdapter.getItem.mockResolvedValue('test-value');
+      let lastSetValue: string | undefined;
+      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
+        if (key === '__narraitor_health_check__') {
+          lastSetValue = value;
+        }
+        return Promise.resolve();
+      });
+      mockAdapter.getItem.mockImplementation((key: string) => {
+        if (key === '__narraitor_health_check__') {
+          return Promise.resolve(lastSetValue || null);
+        }
+        return Promise.resolve('test-value');
+      });
+      mockAdapter.removeItem.mockResolvedValue(undefined);
 
       // Trigger recovery check
       await resilientStorage.checkStorageHealth();
@@ -208,8 +225,20 @@ describe('ResilientStorageMiddleware', () => {
       await resilientStorage.setItem('key2', 'value2');
 
       // Enable storage recovery
-      mockAdapter.setItem.mockResolvedValue(undefined);
-      mockAdapter.getItem.mockResolvedValue(null);
+      let lastSetValue: string | undefined;
+      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
+        if (key === '__narraitor_health_check__') {
+          lastSetValue = value;
+        }
+        return Promise.resolve();
+      });
+      mockAdapter.getItem.mockImplementation((key: string) => {
+        if (key === '__narraitor_health_check__') {
+          return Promise.resolve(lastSetValue || null);
+        }
+        return Promise.resolve(null);
+      });
+      mockAdapter.removeItem.mockResolvedValue(undefined);
 
       // Trigger recovery
       await resilientStorage.checkStorageHealth();
@@ -242,7 +271,20 @@ describe('ResilientStorageMiddleware', () => {
       expect(resilientStorage.getStorageStatus()).toBe(StorageStatus.UNAVAILABLE);
 
       // Restore storage
-      mockAdapter.setItem.mockResolvedValue(undefined);
+      let lastSetValue: string | undefined;
+      mockAdapter.setItem.mockImplementation((key: string, value: string) => {
+        if (key === '__narraitor_health_check__') {
+          lastSetValue = value;
+        }
+        return Promise.resolve();
+      });
+      mockAdapter.getItem.mockImplementation((key: string) => {
+        if (key === '__narraitor_health_check__') {
+          return Promise.resolve(lastSetValue || null);
+        }
+        return Promise.resolve('test-value');
+      });
+      mockAdapter.removeItem.mockResolvedValue(undefined);
       await resilientStorage.checkStorageHealth();
 
       // Should transition back to healthy
