@@ -5,6 +5,7 @@ import { ClientOnlyDevTools } from "@/components/ClientOnlyDevTools";
 import { Navigation } from "@/components/Navigation";
 import { NavigationLoadingProvider } from "@/components/shared/NavigationLoadingProvider";
 import { NavigationPersistenceProvider } from "@/components/shared/NavigationPersistenceProvider";
+import { SkipLinks } from "@/components/shared/SkipLinks";
 
 export const metadata: Metadata = {
   title: "Narraitor",
@@ -25,13 +26,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className="antialiased">
       <body className="font-sans m-0 p-0">
+        <SkipLinks />
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
             <DevToolsProvider>
               <Navigation />
-              <div className="min-h-screen pb-12 md:pb-14">
+              <main id="main-content" tabIndex={-1} className="min-h-screen pb-12 md:pb-14">
                 {children}
-              </div>
+              </main>
               {/* Only render dev tools in development */}
               {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
             </DevToolsProvider>

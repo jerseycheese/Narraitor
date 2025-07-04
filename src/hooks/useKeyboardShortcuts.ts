@@ -1,4 +1,5 @@
 import { useEffect, useCallback } from 'react';
+import { isInputElement } from '@/lib/utils/keyboardConstants';
 
 export interface KeyboardShortcut {
   key: string;
@@ -8,14 +9,27 @@ export interface KeyboardShortcut {
   metaKey?: boolean;
   action: () => void;
   description: string;
+  ignoreInputs?: boolean;
 }
 
 /**
  * Custom hook for managing keyboard shortcuts
+ * 
+ * Features:
+ * - Support for modifier keys (Ctrl, Alt, Shift, Meta)
+ * - Automatic input element detection to avoid conflicts
+ * - Enable/disable functionality
+ * - Proper event cleanup
+ * - preventDefault and stopPropagation for matched shortcuts
  */
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled: boolean = true) {
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (!enabled) return;
+
+    // Skip if typing in input elements (unless explicitly allowed)
+    if (isInputElement(event.target)) {
+      return;
+    }
 
     // Find matching shortcut
     const matchingShortcut = shortcuts.find(shortcut => {
