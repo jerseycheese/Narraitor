@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/ui/dialog';
 import { useFocusTrap, useEscapeKey } from '@/hooks/useKeyboardShortcuts';
 import { globalShortcutManager } from '@/lib/accessibility/keyboardNavigation';
 
@@ -75,15 +74,6 @@ export function KeyboardShortcutsHelp({ isOpen, onClose, className = '' }: Keybo
     return matchesSearch && matchesCategory && matchesSkillLevel;
   });
 
-  // Group shortcuts by category
-  const groupedShortcuts = filteredShortcuts.reduce((groups, shortcut) => {
-    const category = shortcut.category;
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(shortcut);
-    return groups;
-  }, {} as Record<string, typeof filteredShortcuts>);
 
   // Format shortcut key for display
   const formatShortcutKey = (shortcutKey: string): string => {
@@ -334,7 +324,7 @@ export function KeyboardShortcutsHelp({ isOpen, onClose, className = '' }: Keybo
                   <div className="ml-3">
                     <h4 className="text-sm font-medium text-blue-800">Platform Information</h4>
                     <p className="text-sm text-blue-700 mt-1">
-                      You're using {isMac ? 'macOS' : 'Windows/Linux'}. 
+                      You&apos;re using {isMac ? 'macOS' : 'Windows/Linux'}. 
                       Shortcuts are displayed with platform-specific modifier keys.
                       {!isMac && ' Use Ctrl instead of ⌘, and Alt instead of ⌥.'}
                     </p>

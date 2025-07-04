@@ -78,7 +78,7 @@ export function useEnhancedKeyboardShortcuts(
     handler: (event: KeyboardEvent) => void;
     enabled?: boolean;
   }>,
-  dependencies: any[] = []
+  dependencies: unknown[] = []
 ) {
   useEffect(() => {
     const unregisterFunctions: Array<() => void> = [];
@@ -93,7 +93,7 @@ export function useEnhancedKeyboardShortcuts(
     return () => {
       unregisterFunctions.forEach(unregister => unregister());
     };
-  }, dependencies);
+  }, [shortcuts, ...dependencies]);
 }
 
 /**
@@ -146,7 +146,7 @@ export function useKeyboardNavigation(
       handleArrowNavigation(event, container, { orientation: 'vertical', wrap: true });
       return;
     }
-  }, [enabled, enableEscapeClose, enableArrowKeys, enableTabLoop, skipHidden, restoreFocus]);
+  }, [enabled, enableEscapeClose, enableArrowKeys, enableTabLoop, skipHidden, restoreFocus, activeContainerRef]);
 
   useEffect(() => {
     const container = activeContainerRef.current;
@@ -162,7 +162,7 @@ export function useKeyboardNavigation(
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown, enabled]);
+  }, [handleKeyDown, enabled, activeContainerRef, restoreFocus]);
 
   return {
     containerRef: activeContainerRef,
@@ -185,7 +185,7 @@ export function useFocusTrap(
     initialFocus?: React.RefObject<HTMLElement>;
   } = {}
 ) {
-  const { restoreFocus = true, initialFocus } = options;
+  const { initialFocus } = options;
   const cleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export function useFocusTrap(
         cleanupRef.current();
       }
     };
-  }, []);
+  }, [containerRef]);
 }
 
 /**
@@ -292,7 +292,7 @@ export function useListNavigation(
         wrap
       });
     }
-  }, [enabled, orientation, columns, wrap]);
+  }, [enabled, orientation, columns, wrap, activeContainerRef]);
 
   useEffect(() => {
     const container = activeContainerRef.current;
@@ -303,7 +303,7 @@ export function useListNavigation(
     return () => {
       container.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown, enabled]);
+  }, [handleKeyDown, enabled, activeContainerRef]);
 
   return {
     containerRef: activeContainerRef
@@ -319,7 +319,7 @@ export function useNumberKeyShortcuts(
     handler: () => void;
     enabled?: boolean;
   }>,
-  dependencies: any[] = []
+  dependencies: unknown[] = []
 ) {
   useEnhancedKeyboardShortcuts(
     handlers.map(({ number, handler, enabled = true }) => ({

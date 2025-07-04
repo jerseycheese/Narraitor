@@ -62,7 +62,7 @@ export function Navigation() {
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
   
   // Keyboard navigation setup
-  const { containerRef } = useKeyboardNavigation({
+  useKeyboardNavigation({
     containerRef: navRef,
     enableArrowKeys: true,
     enableTabLoop: true,
@@ -279,7 +279,7 @@ export function Navigation() {
                       role="menu"
                       aria-label="World switcher menu"
                     >
-                      {Object.values(worlds).map((world, index) => {
+                      {Object.values(worlds).map((world) => {
                         const worldCharacters = Object.values(characters).filter(
                           char => char.worldId === world.id
                         ).length;

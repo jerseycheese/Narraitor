@@ -86,7 +86,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   const { announce } = useScreenReader();
 
   // Keyboard navigation for the card
-  const { containerRef } = useKeyboardNavigation({
+  useKeyboardNavigation({
     containerRef: cardRef,
     enableArrowKeys: true,
     enableTabLoop: true
@@ -128,7 +128,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       },
       handler: () => {
         if (cardRef.current?.contains(document.activeElement)) {
-          handleCreateCharacter(new MouseEvent('click') as any);
+          handleCreateCharacter({} as React.MouseEvent);
           announce(`Creating character in ${world.name}`);
         }
       }

@@ -65,7 +65,7 @@ export function handleTabNavigation(
   container: HTMLElement,
   options: KeyboardNavigationOptions = {}
 ): boolean {
-  const { enableTabLoop = true, skipHidden = true } = options;
+  const { enableTabLoop = true } = options;
   
   if (event.key !== 'Tab') return false;
 
