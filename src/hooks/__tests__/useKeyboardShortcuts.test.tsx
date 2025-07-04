@@ -8,10 +8,6 @@ describe('useKeyboardShortcuts', () => {
   beforeEach(() => {
     mockAction = jest.fn();
     mockEscapeAction = jest.fn();
-    
-    // Clear all event listeners
-    document.removeEventListener = jest.fn();
-    document.addEventListener = jest.fn();
   });
 
   afterEach(() => {
@@ -19,6 +15,8 @@ describe('useKeyboardShortcuts', () => {
   });
 
   test('registers keyboard shortcuts including Escape', () => {
+    const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+    
     const shortcuts = [
       {
         key: 'Escape',
@@ -34,10 +32,12 @@ describe('useKeyboardShortcuts', () => {
 
     renderHook(() => useKeyboardShortcuts(shortcuts));
 
-    expect(document.addEventListener).toHaveBeenCalledWith(
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
       'keydown',
       expect.any(Function)
     );
+    
+    addEventListenerSpy.mockRestore();
   });
 
   test('handles Escape key to close dialogs and modals', () => {
@@ -51,29 +51,17 @@ describe('useKeyboardShortcuts', () => {
 
     renderHook(() => useKeyboardShortcuts(shortcuts));
 
-    // Get the actual event listener that was added
-    const addEventListenerCalls = (document.addEventListener as jest.Mock).mock.calls;
-    const keydownHandler = addEventListenerCalls.find(call => call[0] === 'keydown')?.[1];
+    // Create and dispatch a real keyboard event
+    const keydownEvent = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+    });
 
-    if (keydownHandler) {
-      // Create a keyboard event and call the handler directly
-      const keydownEvent = {
-        key: 'Escape',
-        ctrlKey: false,
-        altKey: false,
-        shiftKey: false,
-        metaKey: false,
-        target: document.body,
-        preventDefault: jest.fn(),
-        stopPropagation: jest.fn(),
-      };
+    act(() => {
+      document.dispatchEvent(keydownEvent);
+    });
 
-      act(() => {
-        keydownHandler(keydownEvent);
-      });
-
-      expect(mockEscapeAction).toHaveBeenCalled();
-    }
+    expect(mockEscapeAction).toHaveBeenCalled();
   });
 
   test('supports modifier keys for shortcuts', () => {
@@ -143,6 +131,8 @@ describe('useKeyboardShortcuts', () => {
   });
 
   test('cleans up event listeners on unmount', () => {
+    const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+    
     const shortcuts = [
       {
         key: 'Escape',
@@ -155,10 +145,12 @@ describe('useKeyboardShortcuts', () => {
 
     unmount();
 
-    expect(document.removeEventListener).toHaveBeenCalledWith(
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
       'keydown',
       expect.any(Function)
     );
+    
+    removeEventListenerSpy.mockRestore();
   });
 
   test('ignores shortcuts when input elements are focused', () => {
@@ -177,14 +169,25 @@ describe('useKeyboardShortcuts', () => {
     document.body.appendChild(input);
     input.focus();
 
-    const keydownEvent = new KeyboardEvent('keydown', {
-      key: 'j',
-      bubbles: true,
-      target: input,
-    } as EventInit);
+    // Create a custom event with the input as target
+    const keydownEvent = Object.create(KeyboardEvent.prototype, {
+      key: { value: 'j' },
+      bubbles: { value: true },
+      target: { value: input },
+      ctrlKey: { value: false },
+      altKey: { value: false },
+      shiftKey: { value: false },
+      metaKey: { value: false },
+      preventDefault: { value: jest.fn() },
+      stopPropagation: { value: jest.fn() },
+    });
 
     act(() => {
-      document.dispatchEvent(keydownEvent);
+      // Dispatch the event from the input element directly
+      input.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'j',
+        bubbles: true,
+      }));
     });
 
     // Should not trigger when input is focused and should be ignored
@@ -226,23 +229,39 @@ describe('useKeyboardShortcuts', () => {
     const preventDefaultSpy = jest.fn();
     const stopPropagationSpy = jest.fn();
     
-    const keydownEvent = new KeyboardEvent('keydown', {
+    // Create a custom event that we can spy on
+    const keydownEvent = {
       key: 'Escape',
-      bubbles: true,
-    });
-    
-    // Mock preventDefault and stopPropagation
-    Object.defineProperty(keydownEvent, 'preventDefault', {
-      value: preventDefaultSpy,
-    });
-    Object.defineProperty(keydownEvent, 'stopPropagation', {
-      value: stopPropagationSpy,
-    });
+      ctrlKey: false,
+      altKey: false,
+      shiftKey: false,
+      metaKey: false,
+      target: document.body,
+      preventDefault: preventDefaultSpy,
+      stopPropagation: stopPropagationSpy,
+    };
 
+    // Manually trigger the event handler
     act(() => {
-      document.dispatchEvent(keydownEvent);
+      const event = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+      });
+      
+      // Override the methods
+      Object.defineProperty(event, 'preventDefault', {
+        value: preventDefaultSpy,
+        writable: true,
+      });
+      Object.defineProperty(event, 'stopPropagation', {
+        value: stopPropagationSpy,
+        writable: true,
+      });
+      
+      document.dispatchEvent(event);
     });
 
+    expect(mockEscapeAction).toHaveBeenCalled();
     expect(preventDefaultSpy).toHaveBeenCalled();
     expect(stopPropagationSpy).toHaveBeenCalled();
   });
