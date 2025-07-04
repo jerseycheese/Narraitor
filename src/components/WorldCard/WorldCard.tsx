@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,6 +13,11 @@ import {
   CardActionGroup
 } from '../shared/cards';
 import { Badge } from '@/components/ui/badge';
+import { 
+  useKeyboardNavigation, 
+  useEnhancedKeyboardShortcuts, 
+  useScreenReader 
+} from '@/hooks/useKeyboardShortcuts';
 
 interface WorldCardProps {
   /** The world data to display */
@@ -76,6 +81,85 @@ const WorldCard: React.FC<WorldCardProps> = ({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const router = _router ? null : useRouter();
   const actualRouter = _router || router;
+  
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { announce } = useScreenReader();
+
+  // Keyboard navigation for the card
+  const { containerRef } = useKeyboardNavigation({
+    containerRef: cardRef,
+    enableArrowKeys: true,
+    enableTabLoop: true
+  });
+
+  // Single-key shortcuts for quick actions
+  useEnhancedKeyboardShortcuts([
+    {
+      shortcut: {
+        key: 'p',
+        description: 'Play world',
+        category: 'action'
+      },
+      handler: () => {
+        if (cardRef.current?.contains(document.activeElement)) {
+          handlePlayClick();
+          announce(`Playing ${world.name}`);
+        }
+      }
+    },
+    {
+      shortcut: {
+        key: 'e',
+        description: 'Edit world',
+        category: 'action'
+      },
+      handler: () => {
+        if (cardRef.current?.contains(document.activeElement)) {
+          handleEditClick();
+          announce(`Editing ${world.name}`);
+        }
+      }
+    },
+    {
+      shortcut: {
+        key: 'c',
+        description: 'Create character',
+        category: 'action'
+      },
+      handler: () => {
+        if (cardRef.current?.contains(document.activeElement)) {
+          handleCreateCharacter(new MouseEvent('click') as any);
+          announce(`Creating character in ${world.name}`);
+        }
+      }
+    },
+    {
+      shortcut: {
+        key: 'v',
+        description: 'View world',
+        category: 'action'
+      },
+      handler: () => {
+        if (cardRef.current?.contains(document.activeElement) && actualRouter) {
+          actualRouter.push(`/world/${world.id}`);
+          announce(`Viewing ${world.name}`);
+        }
+      }
+    },
+    {
+      shortcut: {
+        key: 'd',
+        description: 'Delete world',
+        category: 'action'
+      },
+      handler: () => {
+        if (cardRef.current?.contains(document.activeElement)) {
+          handleDeleteClick();
+          announce(`Deleting ${world.name}`);
+        }
+      }
+    }
+  ], [world.id, world.name, actualRouter]);
 
   const handleMakeActive = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -7,11 +7,18 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
+import { 
+  useKeyboardNavigation, 
+  useEnhancedKeyboardShortcuts, 
+  useEscapeKey,
+  useScreenReader 
+} from '@/hooks/useKeyboardShortcuts';
 import { Breadcrumbs } from './Breadcrumbs';
 import { RecentPagesDropdown } from './RecentPagesDropdown';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { KeyboardShortcutsHelp } from '@/components/KeyboardShortcutsHelp';
 
 /**
  * Navigation - Main application navigation component
@@ -40,7 +47,11 @@ export function Navigation() {
   const { navigateWithLoading } = useNavigationLoadingContext();
   const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  
+  const { announce } = useScreenReader();
   
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
   const worldCharacterCount = Object.values(characters).filter(
@@ -50,6 +61,77 @@ export function Navigation() {
   // Check if we should show breadcrumbs
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
   
+  // Keyboard navigation setup
+  const { containerRef } = useKeyboardNavigation({
+    containerRef: navRef,
+    enableArrowKeys: true,
+    enableTabLoop: true,
+    enableEscapeClose: true
+  });
+
+  // Global navigation shortcuts
+  useEnhancedKeyboardShortcuts([
+    {
+      shortcut: {
+        key: 'w',
+        altKey: true,
+        description: 'Navigate to Worlds page',
+        category: 'navigation'
+      },
+      handler: () => {
+        navigateWithLoading('/worlds', 'Loading Worlds...');
+        announce('Navigating to Worlds page');
+      }
+    },
+    {
+      shortcut: {
+        key: 'c',
+        altKey: true,
+        description: 'Navigate to Characters page',
+        category: 'navigation'
+      },
+      handler: () => {
+        navigateWithLoading('/characters', 'Loading Characters...');
+        announce('Navigating to Characters page');
+      }
+    },
+    {
+      shortcut: {
+        key: 's',
+        altKey: true,
+        description: 'Navigate to Settings page',
+        category: 'navigation'
+      },
+      handler: () => {
+        navigateWithLoading('/settings', 'Loading Settings...');
+        announce('Navigating to Settings page');
+      }
+    },
+    {
+      shortcut: {
+        key: 'h',
+        altKey: true,
+        description: 'Open keyboard shortcuts help',
+        category: 'navigation'
+      },
+      handler: () => {
+        setShowKeyboardHelp(true);
+        announce('Opening keyboard shortcuts help');
+      }
+    }
+  ], [navigateWithLoading, announce]);
+
+  // Close dropdowns with Escape
+  useEscapeKey(() => {
+    if (showWorldSwitcher) {
+      setShowWorldSwitcher(false);
+      announce('World switcher closed');
+    } else if (isMenuOpen) {
+      closeMenu();
+      announce('Mobile menu closed');
+    }
+  }, showWorldSwitcher || isMenuOpen);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,6 +152,7 @@ export function Navigation() {
     // Navigate to the selected world's view page with loading state
     const worldName = worlds[worldId]?.name || 'world';
     navigateWithLoading(`/world/${worldId}`, `Loading ${worldName}...`);
+    announce(`Switched to ${worldName} world`);
   };
   
   // Don't show navigation on dev pages
@@ -79,7 +162,12 @@ export function Navigation() {
   
   return (
     <>
-      <nav className="bg-gray-900 text-white shadow-lg" role="banner">
+      <nav 
+        ref={navRef}
+        className="bg-gray-900 text-white shadow-lg" 
+        role="banner"
+        aria-label="Main navigation"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left side - Logo and mobile menu button */}
@@ -153,7 +241,21 @@ export function Navigation() {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
-                    className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+                        e.preventDefault();
+                        setShowWorldSwitcher(true);
+                        // Focus first world option when opened
+                        setTimeout(() => {
+                          const firstOption = dropdownRef.current?.querySelector('button[data-world-option]') as HTMLButtonElement;
+                          firstOption?.focus();
+                        }, 50);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    aria-expanded={showWorldSwitcher}
+                    aria-haspopup="true"
+                    aria-label={`Current world: ${currentWorld ? currentWorld.name : 'Select World'}. Click to open world switcher`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -172,8 +274,12 @@ export function Navigation() {
                   </button>
                   
                   {showWorldSwitcher && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto">
-                      {Object.values(worlds).map(world => {
+                    <div 
+                      className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto"
+                      role="menu"
+                      aria-label="World switcher menu"
+                    >
+                      {Object.values(worlds).map((world, index) => {
                         const worldCharacters = Object.values(characters).filter(
                           char => char.worldId === world.id
                         ).length;
@@ -181,10 +287,36 @@ export function Navigation() {
                         return (
                           <button
                             key={world.id}
+                            data-world-option
                             onClick={() => handleWorldSwitch(world.id)}
-                            className={`w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center justify-between ${
+                            onKeyDown={(e) => {
+                              const worldButtons = Array.from(dropdownRef.current?.querySelectorAll('button[data-world-option]') || []);
+                              const currentIndex = worldButtons.indexOf(e.currentTarget);
+                              
+                              if (e.key === 'ArrowDown') {
+                                e.preventDefault();
+                                const nextIndex = currentIndex < worldButtons.length - 1 ? currentIndex + 1 : 0;
+                                (worldButtons[nextIndex] as HTMLButtonElement)?.focus();
+                              } else if (e.key === 'ArrowUp') {
+                                e.preventDefault();
+                                const prevIndex = currentIndex > 0 ? currentIndex - 1 : worldButtons.length - 1;
+                                (worldButtons[prevIndex] as HTMLButtonElement)?.focus();
+                              } else if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleWorldSwitch(world.id);
+                              } else if (e.key === 'Escape') {
+                                e.preventDefault();
+                                setShowWorldSwitcher(false);
+                                // Return focus to the trigger button
+                                const trigger = dropdownRef.current?.querySelector('button[aria-haspopup]') as HTMLButtonElement;
+                                trigger?.focus();
+                              }
+                            }}
+                            className={`w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none transition-colors flex items-center justify-between ${
                               world.id === currentWorldId ? 'bg-green-50 border-l-4 border-green-500' : ''
                             }`}
+                            role="menuitem"
+                            aria-label={`Switch to ${world.name} world. ${world.genre} genre, ${worldCharacters} characters${world.id === currentWorldId ? '. Currently selected' : ''}`}
                           >
                             <div>
                               <div className="font-medium text-gray-900">{world.name}</div>
@@ -259,6 +391,12 @@ export function Navigation() {
           </div>
         </div>
       )}
+
+      {/* Keyboard Shortcuts Help Dialog */}
+      <KeyboardShortcutsHelp 
+        isOpen={showKeyboardHelp}
+        onClose={() => setShowKeyboardHelp(false)}
+      />
     </>
   );
 }
