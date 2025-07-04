@@ -21,7 +21,10 @@ export function SkipLinks() {
     const mainContent = document.getElementById('main-content');
     if (mainContent) {
       mainContent.focus();
-      mainContent.scrollIntoView();
+      // Check if scrollIntoView exists (not available in test environment)
+      if (typeof mainContent.scrollIntoView === 'function') {
+        mainContent.scrollIntoView();
+      }
     }
   };
 

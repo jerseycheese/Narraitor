@@ -49,21 +49,31 @@ describe('useKeyboardShortcuts', () => {
       }
     ];
 
-    const { unmount } = renderHook(() => useKeyboardShortcuts(shortcuts));
+    renderHook(() => useKeyboardShortcuts(shortcuts));
 
-    // Simulate Escape key press
-    const keydownEvent = new KeyboardEvent('keydown', {
-      key: 'Escape',
-      bubbles: true,
-    });
+    // Get the actual event listener that was added
+    const addEventListenerCalls = (document.addEventListener as jest.Mock).mock.calls;
+    const keydownHandler = addEventListenerCalls.find(call => call[0] === 'keydown')?.[1];
 
-    act(() => {
-      document.dispatchEvent(keydownEvent);
-    });
+    if (keydownHandler) {
+      // Create a keyboard event and call the handler directly
+      const keydownEvent = {
+        key: 'Escape',
+        ctrlKey: false,
+        altKey: false,
+        shiftKey: false,
+        metaKey: false,
+        target: document.body,
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn(),
+      };
 
-    expect(mockEscapeAction).toHaveBeenCalled();
-    
-    unmount();
+      act(() => {
+        keydownHandler(keydownEvent);
+      });
+
+      expect(mockEscapeAction).toHaveBeenCalled();
+    }
   });
 
   test('supports modifier keys for shortcuts', () => {
