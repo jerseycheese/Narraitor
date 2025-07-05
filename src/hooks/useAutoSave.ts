@@ -9,6 +9,7 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { AutoSaveService, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
+import { useToast } from '@/components/ui/toast';
 
 /**
  * Hook for managing auto-save functionality
@@ -19,6 +20,7 @@ export const useAutoSave = () => {
   const characterStore = useCharacterStore();
   const narrativeStore = useNarrativeStore();
   const journalStore = useJournalStore();
+  const toast = useToast();
   
   const autoSaveServiceRef = useRef<AutoSaveService | null>(null);
 
@@ -47,6 +49,12 @@ export const useAutoSave = () => {
       autoSaveServiceRef.current = new AutoSaveService(stateProvider, {
         onSave: (result) => {
           sessionStore.recordAutoSave(result.timestamp.toISOString());
+          
+          // Show success toast for manual saves
+          if (result.reason === 'manual') {
+            toast.success('Game saved successfully', 
+              `Your progress has been saved (${result.size ? Math.round(result.size / 1024) : 0}KB)`);
+          }
         },
         onError: (error) => {
           // Use enhanced error information if available
@@ -55,6 +63,9 @@ export const useAutoSave = () => {
           };
           const errorMessage = enhancedError.userFriendlyError?.message || error.message;
           sessionStore.updateAutoSaveStatus('error', errorMessage);
+          
+          // Show error toast
+          toast.error('Save failed', errorMessage);
         },
       });
     }

@@ -5,6 +5,7 @@ import { ClientOnlyDevTools } from "@/components/ClientOnlyDevTools";
 import { Navigation } from "@/components/Navigation";
 import { NavigationLoadingProvider } from "@/components/shared/NavigationLoadingProvider";
 import { NavigationPersistenceProvider } from "@/components/shared/NavigationPersistenceProvider";
+import { ToastProvider, Toaster } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Narraitor",
@@ -28,12 +29,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
             <DevToolsProvider>
-              <Navigation />
-              <div className="min-h-screen pb-12 md:pb-14">
-                {children}
-              </div>
-              {/* Only render dev tools in development */}
-              {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
+              <ToastProvider>
+                <Navigation />
+                <div className="min-h-screen pb-12 md:pb-14">
+                  {children}
+                </div>
+                {/* Only render dev tools in development */}
+                {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
+                <Toaster />
+              </ToastProvider>
             </DevToolsProvider>
           </NavigationPersistenceProvider>
         </NavigationLoadingProvider>
