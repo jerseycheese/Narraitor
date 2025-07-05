@@ -10,6 +10,7 @@ import {
   CardActionGroup
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
+import { Plus, Star } from 'lucide-react';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -93,7 +94,10 @@ export function CharacterCard({
             <span className="text-sm text-gray-500">Level {character.level || 1}</span>
             {character.background?.isKnownFigure !== undefined && (
               <Badge
-                icon={character.background.isKnownFigure ? '⭐' : '➕'}
+                icon={character.background.isKnownFigure ? 
+                  <Star className="w-3 h-3 text-white" /> : 
+                  <Plus className="w-3 h-3 text-white" />
+                }
                 variant={character.background.isKnownFigure ? 'warning' : 'default'}
               >
                 {character.background.isKnownFigure ? 'Known Figure' : 'Original'}
