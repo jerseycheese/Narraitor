@@ -247,4 +247,220 @@ describe('Breadcrumbs', () => {
       expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
   });
+
+  describe('Icon functionality', () => {
+    describe('Icon mapping', () => {
+      it('should display Home icon for Worlds breadcrumb', () => {
+        (usePathname as jest.Mock).mockReturnValue('/world/123');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        // Home icon should be present in Worlds breadcrumb
+        const worldsBreadcrumb = screen.getByTestId('breadcrumb-home');
+        expect(worldsBreadcrumb.querySelector('[data-testid="icon-home"]')).toBeInTheDocument();
+      });
+
+      it('should display Globe icon for World breadcrumb', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        // Globe icon should be present in World breadcrumb
+        const worldBreadcrumb = screen.getByTestId('breadcrumb-world');
+        expect(worldBreadcrumb.querySelector('[data-testid="icon-globe"]')).toBeInTheDocument();
+      });
+
+      it('should display User icon for Character breadcrumb', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters/char-456');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        (characterStore as jest.Mock).mockReturnValue({
+          characters: {
+            'char-456': { id: 'char-456', name: 'Aragorn', worldId: '123' }
+          },
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: false },
+          { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        // User icon should be present in Character breadcrumb
+        const characterBreadcrumb = screen.getByTestId('breadcrumb-character');
+        expect(characterBreadcrumb.querySelector('[data-testid="icon-user"]')).toBeInTheDocument();
+      });
+
+      it('should display correct icons for full breadcrumb hierarchy', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters/char-456');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        (characterStore as jest.Mock).mockReturnValue({
+          characters: {
+            'char-456': { id: 'char-456', name: 'Aragorn', worldId: '123' }
+          },
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: false },
+          { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        // Verify all icons are present in the correct breadcrumbs
+        const worldsBreadcrumb = screen.getByTestId('breadcrumb-home');
+        const worldBreadcrumb = screen.getByTestId('breadcrumb-world');
+        const charactersBreadcrumb = screen.getByTestId('breadcrumb-characters');
+        const characterBreadcrumb = screen.getByTestId('breadcrumb-character');
+        
+        expect(worldsBreadcrumb.querySelector('[data-testid="icon-home"]')).toBeInTheDocument();
+        expect(worldBreadcrumb.querySelector('[data-testid="icon-globe"]')).toBeInTheDocument();
+        expect(charactersBreadcrumb.querySelector('[data-testid="icon-user"]')).toBeInTheDocument();
+        expect(characterBreadcrumb.querySelector('[data-testid="icon-user"]')).toBeInTheDocument();
+      });
+    });
+
+    describe('Icon accessibility', () => {
+      it('should mark all icons as decorative with aria-hidden="true"', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters/char-456');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        (characterStore as jest.Mock).mockReturnValue({
+          characters: {
+            'char-456': { id: 'char-456', name: 'Aragorn', worldId: '123' }
+          },
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: false },
+          { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        // All icons should be marked as decorative
+        const allIcons = screen.getAllByTestId(/^icon-/);
+        expect(allIcons.length).toBeGreaterThan(0);
+        
+        allIcons.forEach(icon => {
+          expect(icon).toHaveAttribute('aria-hidden', 'true');
+        });
+      });
+
+      it('should mark Home icon as decorative', () => {
+        (usePathname as jest.Mock).mockReturnValue('/world/123');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        const homeIcon = screen.getByTestId('icon-home');
+        expect(homeIcon).toHaveAttribute('aria-hidden', 'true');
+      });
+
+      it('should mark Globe icon as decorative', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        const globeIcon = screen.getByTestId('icon-globe');
+        expect(globeIcon).toHaveAttribute('aria-hidden', 'true');
+      });
+
+      it('should mark User icon as decorative', () => {
+        (usePathname as jest.Mock).mockReturnValue('/characters/char-456');
+        (worldStore as jest.Mock).mockReturnValue({
+          worlds: {
+            '123': { id: '123', name: 'Fantasy Realm' }
+          },
+          currentWorldId: '123',
+        });
+        (characterStore as jest.Mock).mockReturnValue({
+          characters: {
+            'char-456': { id: 'char-456', name: 'Aragorn', worldId: '123' }
+          },
+        });
+        
+        mockedBuildBreadcrumbSegments.mockReturnValue([
+          { label: 'Worlds', href: '/worlds', isCurrentPage: false },
+          { label: 'Fantasy Realm', href: '/world/123', isCurrentPage: false },
+          { label: 'Characters', href: '/characters', isCurrentPage: false },
+          { label: 'Aragorn', href: '/characters/char-456', isCurrentPage: true },
+        ]);
+        
+        render(<Breadcrumbs />);
+        
+        const userIcons = screen.getAllByTestId('icon-user');
+        expect(userIcons.length).toBe(2); // Characters list and individual character
+        
+        userIcons.forEach(icon => {
+          expect(icon).toHaveAttribute('aria-hidden', 'true');
+        });
+      });
+    });
+  });
 });
