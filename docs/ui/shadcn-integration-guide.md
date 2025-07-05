@@ -54,6 +54,63 @@ function MyComponent() {
 - `lg` - Large size
 - `icon` - Icon-only button
 
+### Icon Integration with Components
+
+shadcn/ui components work seamlessly with lucide-react icons following Narraitor's icon usage standards:
+
+#### Button with Icons
+```tsx
+import { Settings, Plus, Trash } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+// Icon-only buttons
+<Button size="icon">
+  <Settings className="w-4 h-4" />
+</Button>
+
+// Buttons with text and icons
+<Button className="flex items-center gap-2">
+  <Plus className="w-4 h-4" />
+  Create New
+</Button>
+
+// Destructive actions
+<Button variant="destructive" className="flex items-center gap-2">
+  <Trash className="w-4 h-4" />
+  Delete
+</Button>
+```
+
+#### Badge with Icons
+The Badge component includes built-in icon support:
+
+```tsx
+import { Star, Globe, Plus } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+
+<Badge 
+  icon={<Star className="w-3 h-3 text-white" />}
+  variant="warning"
+>
+  Known Figure
+</Badge>
+
+<Badge 
+  icon={<Globe className="w-3 h-3 text-white" />}
+  variant="info"
+>
+  Set in Middle Earth
+</Badge>
+```
+
+#### Icon Sizing Standards
+Follow Narraitor's established icon sizing patterns:
+- **Badge icons**: `w-3 h-3` for compact spaces
+- **Button icons**: `w-4 h-4` for general UI elements
+- **Dialog icons**: `w-8 h-8` for prominent displays
+
+See the [Icon Usage Guide](../design-system/icon-usage-guide.md) for complete standards.
+
 ## CSS Variables System
 
 ### Default Theme Variables

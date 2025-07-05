@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { Settings } from 'lucide-react'
 import { Button } from './button'
 
 const meta: Meta<typeof Button> = {
@@ -51,7 +52,7 @@ export const Sizes: Story = {
       <Button size="sm">Small</Button>
       <Button>Default</Button>
       <Button size="lg">Large</Button>
-      <Button size="icon">⚙️</Button>
+      <Button size="icon"><Settings className="w-4 h-4" /></Button>
     </div>
   ),
 }

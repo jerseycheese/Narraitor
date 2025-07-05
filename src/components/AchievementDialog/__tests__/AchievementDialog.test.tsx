@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { Trophy } from 'lucide-react';
 import { AchievementDialog } from '../AchievementDialog';
 
 describe('AchievementDialog', () => {
@@ -178,7 +179,7 @@ describe('AchievementDialog', () => {
 
   describe('Visual Feedback', () => {
     it('displays achievement icon when provided', () => {
-      const Icon = () => <div data-testid="achievement-icon">🏆</div>;
+      const Icon = () => <div data-testid="achievement-icon"><Trophy className="w-8 h-8" /></div>;
       render(<AchievementDialog {...mockProps} icon={<Icon />} />);
       
       expect(screen.getByTestId('achievement-icon')).toBeInTheDocument();
