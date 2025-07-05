@@ -1,5 +1,43 @@
 /**
  * useAutoSave hook - Provides auto-save functionality for game components
+ * 
+ * Manages automatic saving of game state with toast notifications for user feedback.
+ * Integrates with the toast system to provide visual confirmation of save operations
+ * and error notifications when saves fail.
+ * 
+ * @example
+ * ```tsx
+ * function GameComponent() {
+ *   const autoSave = useAutoSave()
+ * 
+ *   const handleManualSave = () => {
+ *     // Triggers save with success toast
+ *     autoSave.triggerSave('manual')
+ *   }
+ * 
+ *   const handleToggleAutoSave = () => {
+ *     autoSave.setEnabled(!autoSave.isEnabled)
+ *   }
+ * 
+ *   return (
+ *     <div>
+ *       <button onClick={handleManualSave}>Save Now</button>
+ *       <button onClick={handleToggleAutoSave}>
+ *         {autoSave.isEnabled ? 'Disable' : 'Enable'} Auto-Save
+ *       </button>
+ *       <p>Status: {autoSave.status}</p>
+ *     </div>
+ *   )
+ * }
+ * ```
+ * 
+ * @integration
+ * Toast Integration:
+ * - Success toasts for manual saves showing save size
+ * - Error toasts for failed saves with user-friendly messages
+ * - No toasts for automatic saves (non-intrusive)
+ * 
+ * @hook
  */
 
 import { useEffect, useRef, useCallback } from 'react';
@@ -9,9 +47,28 @@ import { useCharacterStore } from '@/state/characterStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useJournalStore } from '@/state/journalStore';
 import { AutoSaveService, SaveTriggerReason, GameState } from '@/lib/services/autoSaveService';
+import { useToast } from '@/components/ui/toast';
 
 /**
- * Hook for managing auto-save functionality
+ * Hook for managing auto-save functionality with toast notifications
+ * 
+ * Provides comprehensive auto-save capabilities with user feedback through toast notifications.
+ * Handles both automatic and manual saves, with different notification strategies for each.
+ * 
+ * @returns Object containing auto-save state and control methods
+ * @returns {boolean} returns.isEnabled - Whether auto-save is currently enabled
+ * @returns {string} returns.status - Current save status ('idle', 'saving', 'error')
+ * @returns {string|null} returns.lastSaveTime - ISO string of last successful save
+ * @returns {string|null} returns.errorMessage - Error message if save failed
+ * @returns {number} returns.totalSaves - Total number of successful saves
+ * @returns {boolean} returns.isRunning - Whether auto-save service is actively running
+ * @returns {Function} returns.start - Start the auto-save service
+ * @returns {Function} returns.stop - Stop the auto-save service
+ * @returns {Function} returns.triggerSave - Manually trigger a save
+ * @returns {Function} returns.setEnabled - Enable/disable auto-save
+ * @returns {Function} returns.retry - Retry failed save operation
+ * 
+ * @hook
  */
 export const useAutoSave = () => {
   const sessionStore = useSessionStore();
@@ -19,6 +76,7 @@ export const useAutoSave = () => {
   const characterStore = useCharacterStore();
   const narrativeStore = useNarrativeStore();
   const journalStore = useJournalStore();
+  const toast = useToast();
   
   const autoSaveServiceRef = useRef<AutoSaveService | null>(null);
 
@@ -47,6 +105,12 @@ export const useAutoSave = () => {
       autoSaveServiceRef.current = new AutoSaveService(stateProvider, {
         onSave: (result) => {
           sessionStore.recordAutoSave(result.timestamp.toISOString());
+          
+          // Show success toast for manual saves only (non-intrusive for auto-saves)
+          if (result.reason === 'manual') {
+            toast.success('Game saved successfully', 
+              `Your progress has been saved (${result.size ? Math.round(result.size / 1024) : 0}KB)`);
+          }
         },
         onError: (error) => {
           // Use enhanced error information if available
@@ -55,6 +119,9 @@ export const useAutoSave = () => {
           };
           const errorMessage = enhancedError.userFriendlyError?.message || error.message;
           sessionStore.updateAutoSaveStatus('error', errorMessage);
+          
+          // Show error toast for all save failures (both manual and automatic)
+          toast.error('Save failed', errorMessage);
         },
       });
     }
@@ -64,7 +131,7 @@ export const useAutoSave = () => {
         autoSaveServiceRef.current.stop();
       }
     };
-  }, [stateProvider, sessionStore]);
+  }, [stateProvider, sessionStore, toast]);
 
   // Auto-start when session becomes active
   useEffect(() => {
