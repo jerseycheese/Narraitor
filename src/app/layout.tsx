@@ -29,9 +29,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <NavigationPersistenceProvider>
             <DevToolsProvider>
               <Navigation />
-              <main className="min-h-screen pb-12 md:pb-14">
+              <div className="min-h-screen pb-12 md:pb-14">
                 {children}
-              </main>
+              </div>
               {/* Only render dev tools in development */}
               {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
             </DevToolsProvider>
