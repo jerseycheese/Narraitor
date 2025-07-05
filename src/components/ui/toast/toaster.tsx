@@ -1,3 +1,5 @@
+"use client"
+
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { Toast } from "./toast"
