@@ -39,20 +39,6 @@ Closes #
 ## Screenshots
 <!-- For UI changes, include before/after screenshots if applicable -->
 
-## Code Review Summary (if applicable)
-<!-- For automated implementations, include code review analysis -->
-
-## Playwright MCP Verification Summary (if applicable)
-<!-- For browser automation testing, include verification results -->
-
-## Quality Checks (if applicable)
-<!-- For automated workflows, check relevant items -->
-- [ ] Linting passed
-- [ ] Type checking passed
-- [ ] Security audit passed
-- [ ] No console.log statements in production code
-- [ ] No unhandled promises
-
 ## Testing Instructions
 <!-- Instructions for testing changes locally, with three stage verification -->
 
