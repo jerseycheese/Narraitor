@@ -7,7 +7,6 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Breadcrumbs } from './Breadcrumbs';
 import { RecentPagesDropdown } from './RecentPagesDropdown';
 import { MobileNavigationMenu } from './MobileNavigationMenu';
@@ -51,21 +50,6 @@ export function Navigation() {
   // Check if we should show breadcrumbs
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
   
-  // Keyboard shortcuts for navigation
-  useKeyboardShortcuts([
-    {
-      key: 'Escape',
-      action: () => {
-        if (showWorldSwitcher) {
-          setShowWorldSwitcher(false);
-        }
-        if (isMenuOpen) {
-          closeMenu();
-        }
-      },
-      description: 'Close open menus and dropdowns'
-    }
-  ], true);
 
   // Close dropdown when clicking outside
   useEffect(() => {
