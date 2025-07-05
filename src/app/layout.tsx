@@ -6,6 +6,7 @@ import { Navigation } from "@/components/Navigation";
 import { NavigationLoadingProvider } from "@/components/shared/NavigationLoadingProvider";
 import { NavigationPersistenceProvider } from "@/components/shared/NavigationPersistenceProvider";
 import { SkipLinks } from "@/components/shared/SkipLinks";
+import { ToastProvider, Toaster } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Narraitor",
@@ -30,12 +31,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <NavigationLoadingProvider>
           <NavigationPersistenceProvider>
             <DevToolsProvider>
-              <Navigation />
-              <main id="main-content" tabIndex={-1} className="min-h-screen pb-12 md:pb-14">
-                {children}
-              </main>
-              {/* Only render dev tools in development */}
-              {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
+              {/* Toast notification system - provides context for all toast notifications */}
+              <ToastProvider>
+                <Navigation />
+                <main id="main-content" tabIndex={-1} className="min-h-screen pb-12 md:pb-14">
+                  {children}
+                </main>
+                {/* Only render dev tools in development */}
+                {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
+                {/* Toast container - renders all active toasts */}
+                <Toaster />
+              </ToastProvider>
             </DevToolsProvider>
           </NavigationPersistenceProvider>
         </NavigationLoadingProvider>
