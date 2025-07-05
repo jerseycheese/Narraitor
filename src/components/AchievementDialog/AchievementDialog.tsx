@@ -1,14 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Modal } from '@/components/ui/Modal/Modal';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/classNames';
 
@@ -70,42 +63,32 @@ export function AchievementDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent
-        showCloseButton={false}
-        className={cn(
-          'max-w-lg sm:rounded-lg text-center',
-          achievementTypeClasses[type]
-        )}
-        aria-labelledby="achievement-title"
-        aria-describedby="achievement-description"
-      >
-        <DialogTitle
-          id="achievement-title"
-          className="text-2xl font-bold text-center"
-        >
-          {title || "Achievement Unlocked"}
-        </DialogTitle>
-        
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title || "Achievement Unlocked"}
+      showCloseButton={false}
+      closeOnBackdropClick={false}
+      size="lg"
+      className={cn(
+        'text-center',
+        achievementTypeClasses[type]
+      )}
+    >
+      <div className="space-y-4">
         {icon && (
           <div className="flex justify-center text-4xl mb-2">
             {icon}
           </div>
         )}
         
-        <DialogHeader className="space-y-4">
-          <DialogDescription
-            id="achievement-description"
-            className="text-base text-gray-700"
-          >
-            {typeof description === 'string' ? (
-              description
-            ) : (
-              description
-            )}
-          </DialogDescription>
-        </DialogHeader>
+        {description && (
+          <div className="text-base text-gray-700">
+            {description}
+          </div>
+        )}
 
+        
         <div className="py-6" role="status" aria-live="polite">
           <div className="bg-white/50 rounded-lg p-4 border border-white/20 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
@@ -128,7 +111,7 @@ export function AchievementDialog({
           </div>
         </div>
         
-        <DialogFooter>
+        <div className="flex justify-center pt-4">
           <Button
             ref={continueButtonRef}
             onClick={handleContinue}
@@ -137,8 +120,8 @@ export function AchievementDialog({
           >
             {buttonText}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </Modal>
   );
 }

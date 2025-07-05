@@ -85,6 +85,29 @@ Comprehensive automation guides available in personal docs:
 - Individual permissions are also configured in `.claude/settings.local.json`
 - Helper scripts are pre-approved in the settings for additional security
 
+## AI Consistency Validation System (Issue #184)
+Comprehensive debugging tools for AI consistency validation integrated into DevTools:
+
+### Components
+- **ConsistencyValidationSection**: Main debugging interface for lore analysis
+- **DevToolsSection**: Reusable UI component eliminating code duplication across DevTools
+- **Enhanced DevToolsPanel**: Updated with consistent styling patterns
+
+### Features
+- **Live Lore Analysis**: Real-time preview of lore context building from facts
+- **Instruction Generation**: Generated consistency instructions preview
+- **Categorization Viewer**: Visual breakdown of lore into categories (characters, locations, world rules, historical events)
+- **Importance Ranking**: Validation of lore fact importance rankings
+- **Statistics Dashboard**: Overview metrics for lore fact analysis
+
+### Usage
+Access via DevTools → AI Tools & Validation → Consistency Validation section. Select a world with lore facts to begin analysis.
+
+### Documentation
+- `docs/features/ai-consistency-validation.md`: Complete feature documentation
+- `docs/devtools/extending-devtools.md`: Updated with new components and patterns
+- Storybook stories: `DevToolsSection.stories.tsx` for component documentation
+
 ## Helper Scripts for Claude Code
 We've created several helper scripts to streamline Claude Code workflow:
 - `./scripts/claude-branch.sh`: Manages git branches without permission prompts

@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeDisplay } from './NarrativeDisplay';
 import { NarrativeSegment } from '@/types/narrative.types';
 
+// Updated stories aligned with actual app usage patterns
+
 const meta = {
   title: 'Narraitor/Narrative/Display/NarrativeDisplay',
   component: NarrativeDisplay,
@@ -63,45 +65,38 @@ export const Scene: Story = {
   },
 };
 
-// Dialogue type
-export const Dialogue: Story = {
+// Scene with dialogue - shows automatic quotation mark formatting in real scene segments
+export const SceneWithDialogue: Story = {
   args: {
     segment: createMockSegment(
-      '"Welcome to the Mystical Forest," said the ethereal voice. "Few mortals find their way here without purpose. What brings you to these ancient woods?"',
-      'dialogue',
+      'The guardian stepped forward from the shadows. The guardian said, Welcome to the Mystical Forest. The traveler replied, Thank you for your guidance.',
+      'scene',
       {
         characterIds: ['char-1'],
         mood: 'mysterious',
         tags: ['conversation', 'introduction'],
-      }
-    ),
-  },
-};
-
-// Action type
-export const Action: Story = {
-  args: {
-    segment: createMockSegment(
-      'The hero leapt across the chasm with a mighty roar, the wind whipping through their hair as they soared through the air.',
-      'action',
-      {
-        mood: 'action',
-        tags: ['action', 'movement', 'dramatic'],
+        location: 'Forest Entrance'
       }
     ),
   },
 };
 
 
-// Transition type
+
+
+// Transition type - shows preserved line breaks formatting
 export const Transition: Story = {
   args: {
     segment: createMockSegment(
-      'Hours passed as they ventured deeper into the forest...',
+      `Hours passed as they ventured deeper into the forest...
+
+The *ancient* path wound through towering trees.
+
+Time seemed to slow in this *mystical* place.`,
       'transition',
       {
         mood: 'neutral',
-        tags: ['time-skip', 'travel'],
+        tags: ['time-skip', 'travel', 'atmosphere'],
       }
     ),
   },
@@ -128,21 +123,27 @@ export const Error: Story = {
   },
 };
 
-// Long content
-export const LongContent: Story = {
+
+
+// Realistic comprehensive example - shows mixed content with all formatting features
+export const RealisticMixedContent: Story = {
   args: {
     segment: createMockSegment(
-      `The sprawling city of Aetheria stretched before them, a breathtaking vista of soaring spires and gleaming crystal domes. Bridges of light connected the floating districts, each one pulsing with the energy of thousands of lives.
+      `The ancient chamber fell silent as they entered. Dust motes danced in the *ethereal* light filtering through crystal windows.
 
-In the market district, merchants hawked their wares with enthusiastic cries, their stalls overflowing with exotic goods from across the realm. The air was thick with the scent of spices and the sound of countless conversations in a dozen different tongues.
+The guardian stepped forward from the shadows. The guardian said, Welcome, travelers. You have come seeking the *ancient* knowledge.
 
-Above it all, the great Citadel of Stars rose into the clouds, its ancient walls bearing witness to centuries of history. The setting sun painted its white marble in shades of gold and rose, creating a spectacle that drew gasps from even the most jaded travelers.`,
+The hero replied, We need to understand the curse that plagues our land. She whispered, "The secret lies in the old texts." But he asked, "How do we know which ones to trust?"
+
+Their quest would require both courage and wisdom to succeed.`,
       'scene',
       {
-        location: 'City of Aetheria',
-        mood: 'emotional', // Changed from 'awe' to use a valid mood
-        tags: ['city', 'description', 'worldbuilding', 'awe'],
+        location: 'Ancient Chamber',
+        characterIds: ['guardian', 'hero'],
+        mood: 'mysterious',
+        tags: ['dialogue', 'exploration', 'mystery'],
       }
     ),
   },
 };
+

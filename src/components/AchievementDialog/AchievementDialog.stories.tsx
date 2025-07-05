@@ -35,137 +35,59 @@ const meta: Meta<typeof AchievementDialog> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Quest: Story = {
-  args: {
-    isOpen: true,
-    title: 'Quest Completed!',
-    description: 'You have successfully completed the "Dragon\'s Hoard" quest and saved the village from the ancient dragon\'s terror.',
-    achievement: 'Dragon Slayer',
-    reward: '500 Gold Coins + Legendary Sword',
-    type: 'quest',
-    icon: '🐉',
-  },
-};
-
-export const Skill: Story = {
-  args: {
-    isOpen: true,
-    title: 'Skill Mastered!',
-    description: 'Through dedication and practice, you have achieved mastery in the ancient art of swordsmanship.',
-    achievement: 'Master Swordsman',
-    reward: '+10 Attack Power',
-    type: 'skill',
-    icon: '⚔️',
-  },
-};
-
-export const Discovery: Story = {
-  args: {
-    isOpen: true,
-    title: 'Discovery Made!',
-    description: 'You have uncovered the lost ruins of the ancient civilization, revealing secrets that have been hidden for centuries.',
-    achievement: 'Explorer of the Lost',
-    reward: 'Ancient Map Fragment',
-    type: 'discovery',
-    icon: '🗺️',
-  },
-};
-
-export const Milestone: Story = {
-  args: {
-    isOpen: true,
-    title: 'Milestone Reached!',
-    description: 'You have reached level 50, marking a significant milestone in your adventuring career.',
-    achievement: 'Veteran Adventurer',
-    reward: 'Skill Point + Special Ability',
-    type: 'milestone',
-    icon: '⭐',
-  },
-};
-
-export const WithoutReward: Story = {
+export const AchievementFromEnding: Story = {
   args: {
     isOpen: true,
     title: 'Achievement Unlocked!',
-    description: 'You have successfully completed your first story chapter. The foundation of your legend has been laid.',
-    achievement: 'First Steps',
+    description: 'You overcame the trials in the Mystic Forest and helped restore balance to the realm.',
+    achievement: 'Forest Guardian',
     type: 'milestone',
-    icon: '🎯',
+    icon: '🏆',
+    buttonText: 'Continue',
   },
 };
 
-export const WithContinueCallback: Story = {
+export const SimpleAchievement: Story = {
   args: {
     isOpen: true,
-    title: 'Rare Discovery!',
-    description: 'You have found a mystical portal that leads to an undiscovered realm filled with ancient magic and forgotten treasures.',
-    achievement: 'Portal Walker',
-    reward: 'Portal Key + Magic Essence',
-    type: 'discovery',
-    icon: '🌀',
-    buttonText: 'Enter Portal',
-    onContinue: () => console.log('Entering portal...'),
+    title: 'Achievement Unlocked!',
+    description: 'You made a difficult choice that showed true courage in the face of adversity.',
+    achievement: 'Brave Heart',
+    type: 'milestone',
+    icon: '🏆',
+    buttonText: 'Continue',
   },
 };
 
-export const CustomButtonText: Story = {
+export const LongDescriptionAchievement: Story = {
   args: {
     isOpen: true,
-    title: 'Boss Defeated!',
-    description: 'You have defeated the Shadow Lord and brought peace to the Darkwood Forest.',
-    achievement: 'Shadow Bane',
-    reward: '1000 Experience Points',
-    type: 'quest',
-    icon: '👑',
-    buttonText: 'Claim Victory',
+    title: 'Achievement Unlocked!',
+    description: 'Through wisdom and patience, you managed to unite the warring factions and bring peace to the troubled lands. Your diplomatic skills proved invaluable in resolving the ancient conflict.',
+    achievement: 'Peacemaker',
+    type: 'milestone',
+    icon: '🏆',
+    buttonText: 'Continue',
   },
 };
 
-export const JSXDescription: Story = {
+export const WithJSXDescription: Story = {
   args: {
     isOpen: true,
-    title: 'Epic Achievement!',
+    title: 'Achievement Unlocked!',
     description: (
-      <div className="space-y-3">
-        <p>
-          You have accomplished something truly extraordinary! Your journey has led to:
-        </p>
+      <div className="space-y-2">
+        <p>You demonstrated exceptional leadership by:</p>
         <ul className="list-disc list-inside space-y-1 text-sm">
-          <li>Mastery of all four elemental schools of magic</li>
-          <li>Alliance with the Dragon Council</li>
-          <li>Restoration of the World Tree</li>
+          <li>Uniting the divided council</li>
+          <li>Negotiating a peaceful resolution</li>
+          <li>Protecting the innocent</li>
         </ul>
-        <p className="font-semibold text-purple-700">
-          You are now recognized as an Archmage of the realm!
-        </p>
       </div>
     ),
-    achievement: 'Archmage Supreme',
-    reward: 'Staff of Infinite Power + Archmage Robes',
+    achievement: 'Natural Leader',
     type: 'milestone',
-    icon: '🔮',
-  },
-};
-
-export const LongContent: Story = {
-  args: {
-    isOpen: true,
-    title: 'Epic Saga Completed!',
-    description: 'After months of adventure, countless battles, and difficult choices, you have completed the Epic Saga of the Eternal Flame. Your decisions have shaped the fate of three kingdoms, and your name will be remembered in the annals of history. The bonds you forged, the enemies you defeated, and the sacrifices you made have all led to this moment of triumph.',
-    achievement: 'Legend of the Eternal Flame',
-    reward: 'Legendary Title + 10,000 Gold + Eternal Flame Artifact',
-    type: 'milestone',
-    icon: '🔥',
-    buttonText: 'Enter the Hall of Legends',
-  },
-};
-
-export const Closed: Story = {
-  args: {
-    isOpen: false,
-    title: 'This dialog is closed',
-    description: 'You should not see this content when the dialog is closed.',
-    achievement: 'Hidden Achievement',
-    type: 'default',
+    icon: '🏆',
+    buttonText: 'Continue',
   },
 };

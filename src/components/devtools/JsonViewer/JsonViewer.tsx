@@ -75,8 +75,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   return (
     <pre
       data-testid="json-viewer"
-      className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 ${className}`}
-      style={{ backgroundColor: 'var(--color-background)', borderColor: 'var(--color-border)', boxShadow: 'var(--shadow-sm)' }}
+      className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 bg-slate-900 border border-slate-600 text-slate-100 ${className}`}
     >
       {!isMounted ? (
         // Simple content for server-side rendering
@@ -107,17 +106,17 @@ function syntaxHighlight(json: string): string {
     return sanitized.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null|undefined|\[Circular Reference\])\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, 
       (match) => {
-        let cls = 'color: var(--color-primary);'; // number
+        let cls = 'color: #60a5fa;'; // number - blue-400
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'color: var(--color-foreground); font-weight: bold;'; // key
+            cls = 'color: #f1f5f9; font-weight: bold;'; // key - slate-100
           } else {
-            cls = 'color: var(--color-secondary);'; // string
+            cls = 'color: #34d399;'; // string - emerald-400
           }
         } else if (/true|false/.test(match)) {
-          cls = 'color: var(--color-accent);'; // boolean
+          cls = 'color: #fbbf24;'; // boolean - amber-400
         } else if (/null|undefined|\[Circular Reference\]|\[Function\]/.test(match)) {
-          cls = 'color: var(--color-muted);'; // null, undefined, circular ref
+          cls = 'color: #94a3b8;'; // null, undefined, circular ref - slate-400
         }
         return `<span style="${cls}">${match}</span>`;
       }

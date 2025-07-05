@@ -81,16 +81,20 @@ export function StoryEndingDialog({
           {(title && title.trim()) || "Story Ending"}
         </DialogTitle>
         <DialogHeader>
-          <DialogDescription
+          <DialogDescription className="sr-only">
+            Story ending dialog content
+          </DialogDescription>
+          <div
             id="story-ending-content"
             className="text-base leading-relaxed text-gray-700"
+            aria-describedby="story-ending-content"
           >
             {typeof content === 'string' ? (
-              content
+              <p>{content}</p>
             ) : (
               content
             )}
-          </DialogDescription>
+          </div>
         </DialogHeader>
         
         <DialogFooter className="mt-6">
