@@ -8,6 +8,22 @@ beforeAll(() => {
   Element.prototype.scrollTo = jest.fn();
 });
 
+// Mock useToast hook
+const mockToast = {
+  success: jest.fn(),
+  error: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  addToast: jest.fn(),
+  removeToast: jest.fn(),
+  removeAllToasts: jest.fn(),
+  toasts: [],
+};
+
+jest.mock('@/components/ui/toast', () => ({
+  useToast: () => mockToast,
+}));
+
 // Compose the stories for testing
 const composedStories = composeStories(stories);
 

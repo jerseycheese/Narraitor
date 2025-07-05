@@ -67,6 +67,22 @@ jest.mock('../../state/journalStore', () => ({
   }),
 }));
 
+// Mock useToast hook
+const mockToast = {
+  success: jest.fn(),
+  error: jest.fn(),
+  warning: jest.fn(),
+  info: jest.fn(),
+  addToast: jest.fn(),
+  removeToast: jest.fn(),
+  removeAllToasts: jest.fn(),
+  toasts: [],
+};
+
+jest.mock('../../components/ui/toast', () => ({
+  useToast: () => mockToast,
+}));
+
 describe('useAutoSave', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -139,5 +155,14 @@ describe('useAutoSave', () => {
     });
     
     expect(mockSessionStore.setAutoSaveEnabled).toHaveBeenCalledWith(false);
+  });
+
+  it('should clear toast mocks before each test', () => {
+    // This test ensures our toast mocking is working
+    const { result } = renderHook(() => useAutoSave());
+    
+    expect(result.current).toBeDefined();
+    expect(mockToast.success).toHaveBeenCalledTimes(0);
+    expect(mockToast.error).toHaveBeenCalledTimes(0);
   });
 });
