@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Home, Globe, User } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -84,8 +85,9 @@ export function Breadcrumbs({
             <React.Fragment key={segment.href}>
               <span
                 data-testid={testId}
-                className="text-gray-400"
+                className="text-gray-400 flex items-center gap-2"
               >
+                {getSegmentIcon(segment)}
                 {segment.label}
               </span>
               {!isLast && (
@@ -103,12 +105,13 @@ export function Breadcrumbs({
               data-testid={testId}
               aria-current={segment.isCurrentPage ? 'page' : undefined}
               className={cn(
-                'hover:text-gray-700 transition-colors',
+                'hover:text-gray-700 transition-colors flex items-center gap-2',
                 segment.isCurrentPage 
                   ? 'text-gray-900 font-medium cursor-default' 
                   : 'text-gray-600'
               )}
             >
+              {getSegmentIcon(segment)}
               {segment.label}
             </Link>
             {!isLast && (
@@ -218,4 +221,27 @@ function getTestId(segment: BreadcrumbSegment): string {
   }
   
   return 'breadcrumb-item';
+}
+
+/**
+ * Get appropriate icon component based on segment type
+ */
+function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
+  // Home/Root segments
+  if (segment.label === 'Worlds') {
+    return <Home className="w-4 h-4" data-testid="icon-home" aria-hidden="true" />;
+  }
+  
+  // World segments
+  if (segment.href.startsWith('/world/')) {
+    return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
+  }
+  
+  // Character segments
+  if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
+    return <User className="w-4 h-4" data-testid="icon-user" aria-hidden="true" />;
+  }
+  
+  // No icon for other segments
+  return null;
 }
