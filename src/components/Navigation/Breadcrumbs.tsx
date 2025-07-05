@@ -225,6 +225,8 @@ function getTestId(segment: BreadcrumbSegment): string {
 
 /**
  * Get appropriate icon component based on segment type
+ * @param segment - The breadcrumb segment to get an icon for
+ * @returns React node containing the appropriate icon or null if no icon should be shown
  */
 function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
   // Home/Root segments
