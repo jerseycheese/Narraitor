@@ -72,11 +72,19 @@ test.describe('Keyboard Navigation - Issue #510', () => {
     // Test that focus styles are applied correctly
     await page.keyboard.press('Tab');
     const skipLink = page.locator('a[href="#main-content"]');
+    await expect(skipLink).toBeFocused();
     
-    // Check that focus styles are present
-    const focusedElement = await page.locator(':focus').first();
-    const className = await focusedElement.getAttribute('class');
-    expect(className).toContain('focus:');
+    // Check that the skip link has focus styles
+    const skipLinkClassName = await skipLink.getAttribute('class');
+    expect(skipLinkClassName).toContain('focus:');
+    
+    // Test focus on other elements
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    
+    // Should have some element focused
+    const focusedElements = await page.locator(':focus').count();
+    expect(focusedElements).toBeGreaterThan(0);
   });
 
   test('No keyboard traps exist in the page', async ({ page }) => {

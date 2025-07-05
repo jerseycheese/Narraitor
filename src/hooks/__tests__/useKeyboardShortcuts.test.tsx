@@ -169,18 +169,7 @@ describe('useKeyboardShortcuts', () => {
     document.body.appendChild(input);
     input.focus();
 
-    // Create a custom event with the input as target
-    const keydownEvent = Object.create(KeyboardEvent.prototype, {
-      key: { value: 'j' },
-      bubbles: { value: true },
-      target: { value: input },
-      ctrlKey: { value: false },
-      altKey: { value: false },
-      shiftKey: { value: false },
-      metaKey: { value: false },
-      preventDefault: { value: jest.fn() },
-      stopPropagation: { value: jest.fn() },
-    });
+    // Dispatch event from input element directly
 
     act(() => {
       // Dispatch the event from the input element directly
@@ -228,18 +217,6 @@ describe('useKeyboardShortcuts', () => {
 
     const preventDefaultSpy = jest.fn();
     const stopPropagationSpy = jest.fn();
-    
-    // Create a custom event that we can spy on
-    const keydownEvent = {
-      key: 'Escape',
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false,
-      target: document.body,
-      preventDefault: preventDefaultSpy,
-      stopPropagation: stopPropagationSpy,
-    };
 
     // Manually trigger the event handler
     act(() => {
