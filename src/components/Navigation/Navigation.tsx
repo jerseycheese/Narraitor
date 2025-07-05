@@ -50,6 +50,7 @@ export function Navigation() {
   // Check if we should show breadcrumbs
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
   
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

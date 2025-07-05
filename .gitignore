@@ -74,3 +74,6 @@ docs/development/workflows
 
 # Personal paths (security)
 **/Users/*/
+
+# Worktrees
+narraitor-worktrees/
