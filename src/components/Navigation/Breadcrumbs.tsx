@@ -237,8 +237,8 @@ function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
     return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
   }
   
-  // Character segments
-  if (segment.href.startsWith('/characters/') && segment.href !== '/characters/create') {
+  // Character segments (both /characters list and individual characters)
+  if (segment.href === '/characters' || (segment.href.startsWith('/characters/') && segment.href !== '/characters/create')) {
     return <User className="w-4 h-4" data-testid="icon-user" aria-hidden="true" />;
   }
   
