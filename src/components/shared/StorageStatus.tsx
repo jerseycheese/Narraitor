@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { CheckCircle, AlertTriangle, XCircle, RotateCcw, HelpCircle } from 'lucide-react';
 import { StorageStatus as StorageStatusEnum, StorageError } from '../../lib/storage/resilientStorage';
 import { getResilientStorageInstance } from '../../state/persistence';
 
@@ -87,17 +88,18 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
   }
 
   const getStatusIcon = () => {
+    const iconClass = "w-4 h-4";
     switch (storageState.status) {
       case StorageStatusEnum.HEALTHY:
-        return '✅';
+        return <CheckCircle className={`${iconClass} text-green-600`} />;
       case StorageStatusEnum.DEGRADED:
-        return '⚠️';
+        return <AlertTriangle className={`${iconClass} text-yellow-600`} />;
       case StorageStatusEnum.UNAVAILABLE:
-        return '❌';
+        return <XCircle className={`${iconClass} text-red-600`} />;
       case StorageStatusEnum.RECOVERING:
-        return '🔄';
+        return <RotateCcw className={`${iconClass} text-blue-600 animate-spin`} />;
       default:
-        return '❓';
+        return <HelpCircle className={`${iconClass} text-gray-600`} />;
     }
   };
 
@@ -141,7 +143,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-lg" role="img" aria-label={`Storage status: ${storageState.status}`}>
+            <span aria-label={`Storage status: ${storageState.status}`}>
               {getStatusIcon()}
             </span>
             <div className="min-w-0 flex-1">
@@ -221,7 +223,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
   return (
     <div className={`${baseClassName} p-2 rounded border`} role="status" aria-live="polite">
       <div className="flex items-center space-x-2">
-        <span role="img" aria-label={`Storage status: ${storageState.status}`}>
+        <span aria-label={`Storage status: ${storageState.status}`}>
           {getStatusIcon()}
         </span>
         <span className="text-sm">

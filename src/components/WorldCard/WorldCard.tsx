@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Globe, Sparkles, Zap } from 'lucide-react';
 import { World } from '../../types/world.types';
 import { useWorldStore } from '../../state/worldStore';
 import { useSessionStore } from '../../state/sessionStore';
@@ -197,7 +198,10 @@ const WorldCard: React.FC<WorldCardProps> = ({
               {/* World type badge */}
               {world.relationship && world.reference ? (
                 <Badge
-                  icon={world.relationship === 'set_within' ? '🌍' : '✨'}
+                  icon={world.relationship === 'set_within' ? 
+                    <Globe className="w-3 h-3 text-white" /> : 
+                    <Sparkles className="w-3 h-3 text-white" />
+                  }
                   variant={world.relationship === 'set_within' ? 'info' : 'success'}
                   data-testid="world-card-type"
                 >
@@ -205,7 +209,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 </Badge>
               ) : (
                 <Badge
-                  icon="⚡"
+                  icon={<Zap className="w-3 h-3 text-white" />}
                   variant="default"
                   data-testid="world-card-type"
                 >
