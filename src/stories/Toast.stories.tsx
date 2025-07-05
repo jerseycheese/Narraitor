@@ -145,12 +145,19 @@ function InteractiveDemo() {
   );
 }
 
-export const InteractiveToasts: Story = {
+export const InteractiveToasts = {
   render: () => (
     <ToastProvider>
       <InteractiveDemo />
     </ToastProvider>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Interactive demo showing all toast variants and the useToast hook in action',
+      },
+    },
+  },
 };
 
 // Mobile responsive demo

@@ -75,7 +75,7 @@ export const useAutoSave = () => {
         autoSaveServiceRef.current.stop();
       }
     };
-  }, [stateProvider, sessionStore]);
+  }, [stateProvider, sessionStore, toast]);
 
   // Auto-start when session becomes active
   useEffect(() => {

@@ -96,4 +96,81 @@ describe('AutoSaveService', () => {
       expect(() => service.triggerSave('periodic')).not.toThrow();
     });
   });
+
+  describe('Toast Integration', () => {
+    it('should trigger success toast on successful save', async () => {
+      const mockOnSave = jest.fn();
+      const mockToast = jest.fn();
+      service = new AutoSaveService(mockStateProvider, { 
+        onSave: mockOnSave,
+        onToast: mockToast 
+      });
+      
+      service.start();
+      await service.triggerSave('manual');
+      
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Save Successful',
+        description: 'Your progress has been saved automatically.',
+        variant: 'success'
+      });
+    });
+
+    it('should trigger error toast on save failure', async () => {
+      const mockOnSave = jest.fn();
+      const mockToast = jest.fn();
+      mockStateProvider.mockRejectedValue(new Error('Network error'));
+      
+      service = new AutoSaveService(mockStateProvider, { 
+        onSave: mockOnSave,
+        onToast: mockToast 
+      });
+      
+      service.start();
+      await service.triggerSave('manual');
+      
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Save Failed',
+        description: 'Unable to save your progress. Please try again.',
+        variant: 'error'
+      });
+    });
+
+    it('should trigger warning toast when save is delayed due to debouncing', async () => {
+      const mockOnSave = jest.fn();
+      const mockToast = jest.fn();
+      service = new AutoSaveService(mockStateProvider, { 
+        onSave: mockOnSave,
+        onToast: mockToast,
+        debounceMs: 2000 
+      });
+      
+      service.start();
+      
+      // Trigger multiple saves quickly
+      service.triggerSave('player-choice');
+      service.triggerSave('player-choice');
+      service.triggerSave('player-choice');
+      
+      expect(mockToast).toHaveBeenCalledWith({
+        title: 'Saving...',
+        description: 'Your changes are being saved.',
+        variant: 'info'
+      });
+    });
+
+    it('should not trigger toast when toast handler is not provided', async () => {
+      const mockOnSave = jest.fn();
+      service = new AutoSaveService(mockStateProvider, { onSave: mockOnSave });
+      
+      service.start();
+      
+      // Should not throw error when no toast handler is provided
+      expect(async () => {
+        await service.triggerSave('manual');
+      }).not.toThrow();
+      
+      expect(mockOnSave).toHaveBeenCalled();
+    });
+  });
 });

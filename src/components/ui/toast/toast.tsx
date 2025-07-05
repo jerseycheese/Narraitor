@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { useState, useEffect } from "react"
 import { cn } from "@/lib/utils/classNames"
 
 export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,9 +18,9 @@ const toastVariants = {
 
 const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
   ({ className, title, description, variant = "info", duration = 5000, onDismiss, ...props }, ref) => {
-    const [isVisible, setIsVisible] = React.useState(true)
+    const [isVisible, setIsVisible] = useState(true)
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (duration === Infinity) return
 
       const timer = setTimeout(() => {

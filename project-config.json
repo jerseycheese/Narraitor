@@ -1,0 +1,110 @@
+{
+  "github": {
+    "repository": "jackhaas/narraitor",
+    "defaultBranch": "main",
+    "token": "$GITHUB_TOKEN"
+  },
+  "domain": {
+    "labelPrefix": "domain:",
+    "default": "frontend"
+  },
+  "labels": {
+    "complexityPrefix": "complexity:",
+    "priorityPrefix": "priority:"
+  },
+  "domains": {
+    "frontend": {
+      "keywords": [
+        "component", "ui", "interface", "view", "page", "layout", 
+        "styling", "css", "responsive", "animation", "react", "nextjs",
+        "narrative", "character", "world", "story", "game"
+      ],
+      "paths": [
+        "src/components/",
+        "src/pages/",
+        "src/app/",
+        "src/hooks/",
+        "src/styles/"
+      ]
+    },
+    "backend": {
+      "keywords": [
+        "api", "route", "handler", "middleware", "server", 
+        "database", "auth", "validation", "service", "storage"
+      ],
+      "paths": [
+        "src/api/",
+        "src/lib/",
+        "src/utils/",
+        "src/server/",
+        "src/services/"
+      ]
+    },
+    "testing": {
+      "keywords": [
+        "test", "spec", "jest", "testing-library", 
+        "e2e", "unit", "integration", "mock", "playwright"
+      ],
+      "paths": [
+        "src/__tests__/",
+        "__tests__/",
+        "tests/",
+        "src/**/*.test.{js,jsx,ts,tsx}",
+        "src/**/*.spec.{js,jsx,ts,tsx}"
+      ]
+    },
+    "documentation": {
+      "keywords": [
+        "docs", "readme", "documentation", "guide", "storybook", 
+        "comments", "jsdoc", "changelog"
+      ],
+      "paths": [
+        "docs/",
+        "README.md",
+        "CHANGELOG.md",
+        "stories/",
+        ".storybook/"
+      ]
+    },
+    "infrastructure": {
+      "keywords": [
+        "build", "deploy", "ci", "cd", "docker", "config", 
+        "webpack", "vite", "eslint", "prettier", "github-actions"
+      ],
+      "paths": [
+        ".github/",
+        "scripts/",
+        "config/",
+        "Dockerfile",
+        ".eslintrc.js",
+        "prettier.config.js",
+        "next.config.js",
+        "vite.config.js"
+      ]
+    }
+  },
+  "commands": {
+    "build": "npm run build",
+    "test": "npm test",
+    "lint": "npm run lint",
+    "typecheck": "npm run type-check",
+    "dev": "npm run dev",
+    "storybook": "npm run storybook"
+  },
+  "testing": {
+    "framework": "jest",
+    "coverage": 80,
+    "patterns": [
+      "__tests__/",
+      "*.test.{js,jsx,ts,tsx}",
+      "*.spec.{js,jsx,ts,tsx}"
+    ],
+    "testDir": "__tests__",
+    "e2eFramework": "playwright"
+  },
+  "conflicts": {
+    "sameDomainRisk": "MEDIUM",
+    "differentDomainRisk": "LOW",
+    "sharedPathRisk": "HIGH"
+  }
+}

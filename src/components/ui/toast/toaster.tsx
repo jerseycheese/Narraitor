@@ -1,4 +1,4 @@
-import * as React from "react"
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { Toast } from "./toast"
 
@@ -15,7 +15,7 @@ export interface ToasterProps {
   maxToasts?: number
 }
 
-const ToastContext = React.createContext<{
+const ToastContext = createContext<{
   toasts: ToastData[]
   addToast: (toast: Omit<ToastData, 'id'>) => string
   removeToast: (id: string) => void
@@ -23,9 +23,9 @@ const ToastContext = React.createContext<{
 } | null>(null)
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = React.useState<ToastData[]>([])
+  const [toasts, setToasts] = useState<ToastData[]>([])
 
-  const addToast = React.useCallback((toast: Omit<ToastData, 'id'>) => {
+  const addToast = useCallback((toast: Omit<ToastData, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9)
     const newToast: ToastData = { ...toast, id }
     
@@ -33,15 +33,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     return id
   }, [])
 
-  const removeToast = React.useCallback((id: string) => {
+  const removeToast = useCallback((id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }, [])
 
-  const removeAllToasts = React.useCallback(() => {
+  const removeAllToasts = useCallback(() => {
     setToasts([])
   }, [])
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     () => ({ toasts, addToast, removeToast, removeAllToasts }),
     [toasts, addToast, removeToast, removeAllToasts]
   )
@@ -54,7 +54,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useToast() {
-  const context = React.useContext(ToastContext)
+  const context = useContext(ToastContext)
   if (!context) {
     throw new Error('useToast must be used within a ToastProvider')
   }
@@ -74,9 +74,9 @@ export function useToast() {
 
 export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterProps) {
   const { toasts, removeToast } = useToast()
-  const [container, setContainer] = React.useState<HTMLElement | null>(null)
+  const [container, setContainer] = useState<HTMLElement | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const div = document.createElement('div')
     div.id = 'toast-container'
     document.body.appendChild(div)
