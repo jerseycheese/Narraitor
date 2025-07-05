@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Scale, Flame, ChevronRight } from 'lucide-react';
 import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '@/types/narrative.types';
 // Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
@@ -88,15 +89,15 @@ interface ChoiceSelectorProps {
 /**
  * Get icon for choice alignment
  */
-const getAlignmentIcon = (alignment?: ChoiceAlignment): string => {
+const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
   switch (alignment) {
     case 'lawful':
-      return '⚖️'; // Scales of justice for lawful
+      return <Scale className="w-4 h-4" />; // Scales of justice for lawful
     case 'chaotic':
-      return '🔥'; // Fire for chaotic/unpredictable
+      return <Flame className="w-4 h-4" />; // Fire for chaotic/unpredictable
     case 'neutral':
     default:
-      return ''; // No icon for neutral
+      return null; // No icon for neutral
   }
 };
 
@@ -369,9 +370,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             role="radio"
           >
             <div className="flex items-start gap-2">
-              {option.isSelected && <span>➤</span>}
+              {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" />}
               {!option.isSelected && getAlignmentIcon(option.alignment) && (
-                <span className="text-lg leading-none relative top-[3px]">{getAlignmentIcon(option.alignment)}</span>
+                <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
               )}
               <span className="flex-1">{option.text}</span>
             </div>

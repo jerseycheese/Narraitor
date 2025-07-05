@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { Star, Trophy } from 'lucide-react';
 import { useNarrativeStore } from '../../state/narrativeStore';
 import { useCharacterStore } from '../../state/characterStore';
 import { useWorldStore } from '../../state/worldStore';
@@ -332,7 +333,7 @@ export function EndingScreen() {
                           className="flex items-start space-x-2 text-gray-800 w-full text-left p-2 rounded-lg hover:bg-yellow-50 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300"
                           aria-label={`View details for achievement: ${title}`}
                         >
-                          <span className="text-yellow-500 mt-0.5">★</span>
+                          <Star className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                           <div>
                             <span className="font-bold">{title}</span>
                             {description && <span>: {description}</span>}
@@ -373,7 +374,7 @@ export function EndingScreen() {
           description={selectedAchievement.description}
           achievement={selectedAchievement.title}
           type="milestone"
-          icon="🏆"
+          icon={<Trophy className="w-8 h-8" />}
           buttonText="Continue"
         />
       )}

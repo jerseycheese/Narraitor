@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { Star, Plus } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 
 interface Character {
@@ -63,9 +64,9 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                       }`}
                     >
                       {character.background.isKnownFigure ? (
-                        <>⭐ Known Figure</>
+                        <><Star className="w-3 h-3 inline mr-1" />Known Figure</>
                       ) : (
-                        <>➕ Original</>
+                        <><Plus className="w-3 h-3 inline mr-1" />Original</>
                       )}
                     </span>
                   )}
