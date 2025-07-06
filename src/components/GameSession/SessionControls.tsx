@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 interface SessionControlsProps {
   onEnd: () => void;
@@ -17,31 +18,32 @@ const SessionControls: React.FC<SessionControlsProps> = ({
     <div className="mt-6 flex gap-2 justify-end">
       <div className="flex gap-2">
         {onRestart && (
-          <button
+          <Button
             data-testid="game-session-controls-restart"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            variant="default"
             onClick={onRestart}
           >
             New Session
-          </button>
+          </Button>
         )}
         {onEndStory && (
-          <button
+          <Button
             data-testid="game-session-controls-end-story"
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+            variant="secondary"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
             onClick={onEndStory}
             title="End your story with an AI-generated epilogue"
           >
             End Story
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           data-testid="game-session-controls-end"
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          variant="destructive"
           onClick={onEnd}
         >
           End Session
-        </button>
+        </Button>
       </div>
     </div>
   );

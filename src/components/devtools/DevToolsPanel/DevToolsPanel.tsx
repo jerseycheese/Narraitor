@@ -10,6 +10,7 @@ import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
+import { Button } from '@/components/ui/button';
 
 /**
  * Environment info component for the DevTools panel
@@ -101,13 +102,15 @@ export const DevToolsPanel = () => {
           Narraitor DevTools
           {isTestPage && ' (Test Page Mode)'}
         </div>
-        <button
+        <Button
           data-testid="devtools-panel-toggle"
           onClick={toggleDevTools}
-          className="px-2 py-1 text-xs rounded focus:outline-none focus:ring-2 bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
+          variant="ghost"
+          size="sm"
+          className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
         >
           {isOpen ? 'Hide DevTools' : 'Show DevTools'}
-        </button>
+        </Button>
       </div>
 
       {/* Content area - only rendered when open */}

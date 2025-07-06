@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
         </div>
 
         <div className="mt-6 flex justify-end space-x-3">
-          <button
+          <Button
             type="button"
             onClick={onClose}
             disabled={isDeleting}
@@ -87,11 +88,12 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
+            variant="secondary"
           >
             {cancelButtonText}
-          </button>
+          </Button>
           
-          <button
+          <Button
             type="button"
             onClick={handleConfirm}
             disabled={isDeleting}
@@ -100,9 +102,10 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
                 ? 'bg-red-300 text-red-100 cursor-not-allowed'
                 : 'bg-red-600 text-white hover:bg-red-700'
             }`}
+            variant="destructive"
           >
             {isDeleting ? 'Deleting...' : confirmButtonText}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { useJournalStore } from '@/state/journalStore';
 import { EntityID } from '@/types/common.types';
+import { Button } from '@/components/ui/button';
 
 interface JournalModalProps {
   isOpen: boolean;
@@ -45,13 +46,15 @@ export const JournalModal: React.FC<JournalModalProps> = ({
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 id="journal-title" className="text-xl font-bold">Game Journal</h2>
-          <button
+          <Button
             onClick={onClose}
             aria-label="Close journal modal"
+            variant="ghost"
+            size="icon"
             className="text-gray-500 hover:text-gray-700 text-xl"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Content */}

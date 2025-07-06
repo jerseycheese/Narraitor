@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface SkillEditorProps {
   worldId: EntityID;
@@ -255,8 +256,7 @@ export function SkillEditor({
             <div className="space-y-2">
               {existingAttributes.map((attribute) => (
                 <div key={attribute.id} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id={`attribute-${attribute.id}`}
                     checked={formData.attributeIds?.includes(attribute.id) || false}
                     onChange={() => handleAttributeToggle(attribute.id)}

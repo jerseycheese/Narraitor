@@ -1,6 +1,8 @@
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface GenerateCharacterDialogProps {
   isOpen: boolean;
@@ -38,53 +40,37 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
         <div className="space-y-4">
           {/* Generation Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Label className="block text-sm font-medium text-gray-700 mb-2">
               What type of character would you like to create?
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  value="known"
-                  checked={generationType === 'known'}
-                  onChange={(e) => onGenerationTypeChange(e.target.value as 'known' | 'original' | 'specific')}
-                  className="mr-3"
-                  disabled={isGenerating}
-                />
+            </Label>
+            <RadioGroup
+              value={generationType}
+              onValueChange={(value) => onGenerationTypeChange(value as 'known' | 'original' | 'specific')}
+              disabled={isGenerating}
+              className="space-y-2"
+            >
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <RadioGroupItem value="known" id="known" className="mr-3" />
                 <div>
                   <div className="font-medium">Known Figure</div>
                   <div className="text-sm text-gray-600">Generate a major character from {worldName}</div>
                 </div>
-              </label>
-              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  value="original"
-                  checked={generationType === 'original'}
-                  onChange={(e) => onGenerationTypeChange(e.target.value as 'known' | 'original' | 'specific')}
-                  className="mr-3"
-                  disabled={isGenerating}
-                />
+              </div>
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <RadioGroupItem value="original" id="original" className="mr-3" />
                 <div>
                   <div className="font-medium">Original Character</div>
                   <div className="text-sm text-gray-600">Create a unique character that fits the world</div>
                 </div>
-              </label>
-              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  value="specific"
-                  checked={generationType === 'specific'}
-                  onChange={(e) => onGenerationTypeChange(e.target.value as 'known' | 'original' | 'specific')}
-                  className="mr-3"
-                  disabled={isGenerating}
-                />
+              </div>
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <RadioGroupItem value="specific" id="specific" className="mr-3" />
                 <div>
                   <div className="font-medium">Specific Known Figure</div>
                   <div className="text-sm text-gray-600">Generate a specific character from {worldName} lore</div>
                 </div>
-              </label>
-            </div>
+              </div>
+            </RadioGroup>
           </div>
           
           {/* Name Input (only shown for specific type) */}
@@ -116,20 +102,20 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           </p>
         )}
         <div className="flex justify-end gap-2 mt-6">
-          <button
+          <Button
             onClick={onClose}
             disabled={isGenerating}
-            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer disabled:opacity-50"
+            variant="outline"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onGenerate}
             disabled={isGenerating || (generationType === 'specific' && !characterName.trim())}
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-purple-600 text-white hover:bg-purple-700"
           >
             {isGenerating ? 'Generating...' : 'Generate'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

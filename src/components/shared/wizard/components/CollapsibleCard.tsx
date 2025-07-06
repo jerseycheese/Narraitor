@@ -1,5 +1,6 @@
 import React from 'react';
 import { wizardStyles } from '../styles/wizardStyles';
+import { Button } from '@/components/ui/button';
 
 export interface CollapsibleCardProps {
   isExpanded: boolean;
@@ -29,16 +30,18 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
       >
         {header}
         
-        <button 
+        <Button 
           type="button" 
-          className="text-sm text-blue-600 hover:underline focus:outline-none ml-2"
+          variant="link"
+          size="sm"
+          className="text-blue-600 hover:underline p-0 h-auto ml-2"
           onClick={(e) => {
             e.stopPropagation();
             onToggleExpand();
           }}
         >
           {isExpanded ? 'Hide details' : 'Show details'}
-        </button>
+        </Button>
       </div>
       
       {isExpanded && (

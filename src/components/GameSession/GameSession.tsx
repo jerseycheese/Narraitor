@@ -13,6 +13,7 @@ import GameSessionError from './GameSessionError';
 import ActiveGameSession from './ActiveGameSession';
 import GameSessionResume from './GameSessionResume';
 import { SectionError } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { Button } from '@/components/ui/button';
 
 interface GameSessionProps {
   worldId: string;
@@ -302,12 +303,13 @@ const GameSession: React.FC<GameSessionProps> = ({
             <p className="text-gray-600 mb-4">
               You need to create a character before you can start playing in this world.
             </p>
-            <button 
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            <Button 
+              variant="default"
+              className="bg-blue-600 hover:bg-blue-700"
               onClick={() => actualRouter?.push(`/characters/create?worldId=${worldId}`)}
             >
               Create Character
-            </button>
+            </Button>
           </div>
         </div>
       );
@@ -321,12 +323,13 @@ const GameSession: React.FC<GameSessionProps> = ({
           <div className="text-xs text-gray-500 mb-4">
             Debug: Session ID: {sessionState.id || 'none'}, Status: {sessionState.status}
           </div>
-          <button 
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          <Button 
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700"
             onClick={startSession}
           >
             Start Session
-          </button>
+          </Button>
         </div>
       </div>
     );

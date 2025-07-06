@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 interface WorldCardActionsProps {
   worldId?: string;
@@ -33,19 +34,21 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
       <div className="flex gap-2">
         {isActive ? (
           <>
-            <button 
+            <Button 
               onClick={handleCreateCharacter}
-              className="flex-1 px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
               data-testid="world-card-actions-create-character-button"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Create Character
-            </button>
-            <button 
+            </Button>
+            <Button 
               onClick={onPlay} 
-              className="flex-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              variant="default"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium"
               data-testid="world-card-actions-play-button"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,38 +56,43 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Play
-            </button>
+            </Button>
           </>
         ) : (
-          <button 
+          <Button 
             onClick={onMakeActive}
-            className="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+            variant="default"
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium"
             data-testid="world-card-actions-make-active-button"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Make Active World
-          </button>
+          </Button>
         )}
       </div>
       
       {/* Secondary Actions */}
       <div className="flex gap-2 text-sm">
-        <button 
+        <Button 
           onClick={onEdit} 
-          className="flex-1 px-3 py-1.5 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          variant="outline"
+          size="sm"
+          className="flex-1 text-gray-600 border-gray-300 hover:bg-gray-50"
           data-testid="world-card-actions-edit-button"
         >
           Edit
-        </button>
-        <button 
+        </Button>
+        <Button 
           onClick={onDelete} 
-          className="flex-1 px-3 py-1.5 text-red-600 border border-red-300 rounded hover:bg-red-50 transition-colors"
+          variant="outline"
+          size="sm"
+          className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
           data-testid="world-card-actions-delete-button"
         >
           Delete
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -2,6 +2,10 @@
 
 import React from 'react';
 import { WorldTypeOption, WorldTypeData } from './types';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export interface WorldTypeSelectorProps {
   value: WorldTypeData;
@@ -67,6 +71,10 @@ export function WorldTypeSelector({
     });
   };
 
+  const handleRadioChange = (value: string) => {
+    handleTypeChange(value as WorldTypeData['worldType']);
+  };
+
   const handleReferenceChange = (worldReference: string) => {
     onChange({ ...value, worldReference });
   };
@@ -109,12 +117,17 @@ export function WorldTypeSelector({
     <div className={`${className}`}>
       {/* World Type Selection */}
       {showLabels && (
-        <label className={`block ${styles.label} text-gray-700 mb-3`}>
+        <Label className={`block ${styles.label} text-gray-700 mb-3`}>
           World Type <span className="text-red-500">*</span>
-        </label>
+        </Label>
       )}
       
-      <div className={layoutClasses}>
+      <RadioGroup
+        value={value.worldType}
+        onValueChange={handleRadioChange}
+        disabled={disabled}
+        className={layoutClasses}
+      >
         {WORLD_TYPE_OPTIONS.map((option) => (
           <label
             key={option.id}
@@ -122,13 +135,8 @@ export function WorldTypeSelector({
               value.worldType === option.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <input
-              type="radio"
-              name="worldType"
+            <RadioGroupItem
               value={option.id}
-              checked={value.worldType === option.id}
-              onChange={() => handleTypeChange(option.id)}
-              disabled={disabled}
               className="mt-1 mr-3"
             />
             <div className="flex-1">
@@ -137,17 +145,17 @@ export function WorldTypeSelector({
             </div>
           </label>
         ))}
-      </div>
+      </RadioGroup>
 
       {/* Conditional Fields */}
       {selectedOption?.requiresReference && (
         <div className={styles.container}>
           {/* Existing Setting Field */}
           <div>
-            <label htmlFor="world-reference" className={`block ${styles.label} text-gray-700 mb-2`}>
+            <Label htmlFor="world-reference" className={`block ${styles.label} text-gray-700 mb-2`}>
               {selectedOption.referenceLabel} <span className="text-red-500">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
               id="world-reference"
               type="text"
               className={`w-full px-3 ${styles.input} border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -160,14 +168,14 @@ export function WorldTypeSelector({
 
           {/* Additional Details Field */}
           <div>
-            <label htmlFor="additional-details" className={`block ${styles.label} text-gray-700 mb-2`}>
+            <Label htmlFor="additional-details" className={`block ${styles.label} text-gray-700 mb-2`}>
               {selectedOption.additionalDetailsLabel} {value.worldType === 'set_within' ? (
                 <span className="text-gray-500 text-xs">(optional - will be inferred from your reference)</span>
               ) : (
                 <span className="text-red-500">*</span>
               )}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               id="additional-details"
               rows={3}
               className={`w-full px-3 ${styles.input} border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}

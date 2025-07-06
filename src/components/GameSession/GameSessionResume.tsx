@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { SavedSessionInfo } from '@/types/game.types';
+import { Button } from '@/components/ui/button';
 
 interface GameSessionResumeProps {
   savedSession: SavedSessionInfo;
@@ -33,21 +34,23 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
         </div>
         
         <div className="space-y-3">
-          <button
+          <Button
             onClick={onResume}
             className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
             data-testid="resume-session-button"
+            variant="default"
           >
             Continue Adventure
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={onNewGame}
             className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
             data-testid="new-session-button"
+            variant="default"
           >
             Start New Adventure
-          </button>
+          </Button>
         </div>
         
         <p className="text-xs text-gray-500 mt-4 text-center">

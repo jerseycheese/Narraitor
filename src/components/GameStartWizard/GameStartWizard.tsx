@@ -8,6 +8,7 @@ import { createWizardValidator, WizardStepValidator } from '@/lib/utils/wizardVa
 import { WorldSelectionStep } from './steps/WorldSelectionStep';
 import { CharacterSelectionStep } from './steps/CharacterSelectionStep';
 import { GameReadyStep } from './steps/GameReadyStep';
+import { Button } from '@/components/ui/button';
 
 export interface GameStartWizardProps {
   initialWorldId?: string;
@@ -122,13 +123,15 @@ export function GameStartWizard({
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-900">Start Your Adventure</h2>
           {onCancel && (
-            <button
+            <Button
               onClick={onCancel}
-              className="text-gray-500 hover:text-gray-700"
+              variant="ghost"
+              size="icon"
+              className="text-gray-500 hover:text-gray-700 h-8 w-8"
               aria-label="Cancel"
             >
               ✕
-            </button>
+            </Button>
           )}
         </div>
         <div className="flex items-center space-x-2">

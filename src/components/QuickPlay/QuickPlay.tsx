@@ -9,6 +9,7 @@ import { formatDistanceToNow } from '@/lib/utils/textFormatter';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
+import { Button } from '@/components/ui/button';
 
 export function QuickPlay() {
   const router = useRouter();
@@ -64,12 +65,13 @@ export function QuickPlay() {
   if (!hasValidSession) {
     return (
       <div className="text-center">
-        <button
+        <Button
           onClick={handleNewGame}
           className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-colors"
+          variant="default"
         >
           Start New Game
-        </button>
+        </Button>
       </div>
     );
   }
@@ -112,23 +114,25 @@ export function QuickPlay() {
           </div>
         </div>
         
-        <button
+        <Button
           onClick={handleContinue}
           className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
+          variant="default"
         >
           Continue Last Game
-        </button>
+        </Button>
       </div>
 
       {/* Start New Game - Secondary Option */}
       <div className="text-center">
         <p className="text-sm text-gray-600 mb-2">Or</p>
-        <button
+        <Button
           onClick={handleNewGame}
           className="px-6 py-2 border border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-md transition-colors"
+          variant="outline"
         >
           Start New Game
-        </button>
+        </Button>
       </div>
     </div>
   );
