@@ -6,6 +6,8 @@ import { Decision, ChoiceAlignment, DecisionWeight, DecisionRequirement } from '
 // Import removed - using local character type definition to match store structure
 import { WorldSkill } from '@/types/world.types';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
 
@@ -315,7 +317,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       {/* Custom input field - shown first when enabled */}
       {enableCustomInput && (
         <div className="mb-4 bg-gray-50 p-4 rounded border">
-          <textarea
+          <Textarea
             id="custom-input"
             ref={inputRef}
             value={customInputText}
@@ -324,20 +326,20 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             placeholder={customInputPlaceholder}
             disabled={isDisabled}
             aria-label="Custom response input"
-            className="w-full p-2 border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full resize-none"
             rows={3}
           />
           <div className="flex justify-between items-center mt-2">
             <span className={`text-sm ${characterCountClass}`}>
               {characterCount}/{maxCustomLength}
             </span>
-            <button
+            <Button
               onClick={handleCustomSubmit}
               disabled={isDisabled || !customInputText.trim()}
-              className="px-4 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              size="sm"
             >
               Submit
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -356,10 +358,11 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
         aria-labelledby="choices-heading"
       >
         {allOptions.map((option) => (
-          <button
+          <Button
             key={option.id}
             data-testid={`choice-option-${option.id}`}
-            className={`block w-full text-left p-3 border rounded transition-colors ${
+            variant="ghost"
+            className={`block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal ${
               option.isSelected
                 ? 'bg-blue-100 border-blue-500 font-bold'
                 : getAlignmentClasses(option.alignment, isDisabled)
@@ -397,7 +400,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
                 })}
               </div>
             )}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

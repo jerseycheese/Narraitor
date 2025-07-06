@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
+import { Button } from '@/components/ui/button';
 
 interface RecentPagesDropdownProps {
   className?: string;
@@ -123,10 +124,11 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      <button
+      <Button
         onClick={() => setShowRecentPages(!showRecentPages)}
         className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors text-gray-300 hover:text-white"
         aria-label="Recent pages"
+        variant="ghost"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -135,7 +137,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
         <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">
           {recentPages.length}
         </span>
-      </button>
+      </Button>
       
       {showRecentPages && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto border">
@@ -152,10 +154,11 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
               className="group relative"
             >
               <div className="flex items-center">
-                <button
+                <Button
                   onClick={() => handleNavigateToPage(entry.path, entry.title)}
                   className="flex-1 text-left px-4 py-3 hover:bg-gray-100 transition-colors"
                   aria-label={`Navigate to ${formatPageTitle(entry)}`}
+                  variant="ghost"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900 truncate">
@@ -168,18 +171,20 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                       {formatTimestamp(entry.timestamp)}
                     </div>
                   </div>
-                </button>
+                </Button>
                 
                 {/* Remove button - now a sibling, not nested */}
-                <button
+                <Button
                   onClick={(e) => handleRemoveFromHistory(entry.path, e)}
                   className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-200 rounded transition-all mr-4"
                   aria-label={`Remove ${formatPageTitle(entry)} from history`}
+                  variant="ghost"
+                  size="icon"
                 >
                   <svg className="w-4 h-4 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </button>
+                </Button>
               </div>
               
               {index < recentPages.length - 1 && (

@@ -2,6 +2,7 @@
 
 import React, { memo } from 'react';
 import { GENRES, MIXABLE_GENRES } from '@/lib/constants/genres';
+import { Button } from '@/components/ui/button';
 
 interface GenreSelectorProps {
   selectedGenres: string[];
@@ -37,11 +38,12 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
         const isDisabled = isGenreDisabled(genre.label);
         
         return (
-          <button
+          <Button
             key={genre.value}
             type="button"
             onClick={() => !isDisabled && onToggleGenre(genre.label)}
             disabled={isDisabled}
+            variant={isSelected ? 'default' : 'outline'}
             className={`
               p-3 rounded-lg text-sm font-medium transition-all duration-200
               border-2 text-center
@@ -57,7 +59,7 @@ const GenreSelector: React.FC<GenreSelectorProps> = memo(({
             title={genre.description}
           >
             {genre.label}
-          </button>
+          </Button>
         );
       })}
     </div>

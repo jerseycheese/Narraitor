@@ -3,6 +3,7 @@
 import React from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
+import { Button } from '@/components/ui/button';
 
 export interface GameReadyStepProps {
   worldId: string;
@@ -49,10 +50,11 @@ export function GameReadyStep({
       </div>
 
       <div className="space-y-4">
-        <button
+        <Button
           onClick={onStart}
           disabled={isStarting}
           className="inline-flex items-center px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium rounded-md transition-colors"
+          variant="default"
         >
           {isStarting ? (
             <>
@@ -62,16 +64,17 @@ export function GameReadyStep({
           ) : (
             'Start Playing'
           )}
-        </button>
+        </Button>
         
         <div>
-          <button
+          <Button
             onClick={onBack}
             disabled={isStarting}
             className="text-gray-600 hover:text-gray-800 disabled:text-gray-400"
+            variant="ghost"
           >
             ← Change Character
-          </button>
+          </Button>
         </div>
       </div>
     </div>

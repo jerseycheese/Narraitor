@@ -10,6 +10,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
 import { cn } from '@/lib/utils/classNames';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
+import { Button } from '@/components/ui/button';
 
 export interface BreadcrumbsProps {
   className?: string;
@@ -136,7 +137,7 @@ export function Breadcrumbs({
         <div className="ml-4 flex items-center">
           <span className="text-gray-400 mr-2">{separator}</span>
           <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
-          <button
+          <Button
             onClick={() => {
               if (currentWorldId && nextStep.characterId) {
                 initializeSession(currentWorldId, nextStep.characterId, () => {
@@ -145,9 +146,11 @@ export function Breadcrumbs({
               }
             }}
             className="text-sm px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+            variant="default"
+            size="sm"
           >
             Play as {character?.name}
-          </button>
+          </Button>
         </div>
       );
     }
@@ -157,7 +160,7 @@ export function Breadcrumbs({
         <div className="ml-4 flex items-center">
           <span className="text-gray-400 mr-2">{separator}</span>
           <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
-          <button
+          <Button
             onClick={() => {
               const firstCharacter = Object.values(characters).find(c => c.worldId === currentWorldId);
               if (currentWorldId && firstCharacter) {
@@ -167,9 +170,11 @@ export function Breadcrumbs({
               }
             }}
             className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            variant="default"
+            size="sm"
           >
             Quick Start
-          </button>
+          </Button>
         </div>
       );
     }

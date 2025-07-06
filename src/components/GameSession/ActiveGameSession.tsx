@@ -21,6 +21,7 @@ import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { SaveIndicator } from '@/components/ui/SaveIndicator';
+import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -615,9 +616,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         {/* Session Control Buttons */}
         {onEnd && (
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <button
+            <Button
               data-testid="game-session-new"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer w-full sm:w-auto"
+              variant="default"
+              className="w-full sm:w-auto"
               onClick={() => {
                 // Save current session and clear narrative
                 useSessionStore.getState().endSession();
@@ -628,23 +630,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               }}
             >
               Start New Session
-            </button>
-            <button
+            </Button>
+            <Button
               data-testid="game-session-end-story"
-              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer w-full sm:w-auto"
+              variant="secondary"
+              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white"
               onClick={handleEndStoryClick}
               disabled={isGeneratingEnding || isSessionEnded(sessionId)}
               title="End your story with an AI-generated epilogue"
             >
               {isGeneratingEnding ? 'Generating...' : 'End Story'}
-            </button>
-            <button
+            </Button>
+            <Button
               data-testid="game-session-end"
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer w-full sm:w-auto"
+              variant="destructive"
+              className="w-full sm:w-auto"
               onClick={onEnd}
             >
               End Session
-            </button>
+            </Button>
           </div>
         )}
       </div>

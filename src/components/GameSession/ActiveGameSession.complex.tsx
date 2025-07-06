@@ -16,6 +16,7 @@ import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirma
 import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
+import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -364,10 +365,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               <CharacterSummary character={character} />
             </div>
             {/* Journal Access Button - Issue #278: AC1 */}
-            <button
+            <Button
               data-testid="journal-access-button"
               onClick={() => setShowJournalModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              variant="default"
+              className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-label="Open journal to view your adventure entries"
               title="View your journal entries"
             >
@@ -375,7 +377,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
               <span className="hidden sm:inline">Journal</span>
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -440,8 +442,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             <div className="player-choices-container">
               <div className="p-4 border rounded bg-gray-50">
                 <p className="text-sm text-gray-600 mb-2">No choices available.</p>
-                <button 
-                  className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                <Button 
+                  variant="default"
+                  size="sm"
+                  className="bg-blue-500 hover:bg-blue-600"
                   onClick={() => {
                     // Try to get latest decision from narrative store
                     const latestDecision = useNarrativeStore.getState().getLatestDecision(sessionId);
@@ -483,7 +487,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
                   }}
                 >
                   Generate Fallback Choices
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -492,9 +496,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
 
       {onEnd && (
         <div className="mt-6 flex justify-end gap-2">
-          <button
+          <Button
             data-testid="game-session-new"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700"
             onClick={() => {
               // Save current session and clear narrative
               useSessionStore.getState().endSession();
@@ -505,23 +510,25 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             }}
           >
             Start New Session
-          </button>
-          <button
+          </Button>
+          <Button
             data-testid="game-session-end-story"
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors cursor-pointer"
+            variant="default"
+            className="bg-purple-600 hover:bg-purple-700"
             onClick={handleEndStoryClick}
             disabled={isGeneratingEnding || isSessionEnded(sessionId)}
             title="End your story with an AI-generated epilogue"
           >
             {isGeneratingEnding ? 'Generating...' : 'End Story'}
-          </button>
-          <button
+          </Button>
+          <Button
             data-testid="game-session-end"
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors cursor-pointer"
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700"
             onClick={onEnd}
           >
             End Session
-          </button>
+          </Button>
         </div>
       )}
 

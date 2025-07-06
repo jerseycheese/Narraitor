@@ -117,6 +117,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
  * 
  * @example
  * ```tsx
+ * import { Button } from '@/components/ui/button'
+ * 
  * function MyComponent() {
  *   const toast = useToast()
  * 
@@ -141,9 +143,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
  * 
  *   return (
  *     <div>
- *       <button onClick={handleSuccess}>Show Success</button>
- *       <button onClick={handleError}>Show Error</button>
- *       <button onClick={handleCustomToast}>Show Custom</button>
+ *       <Button onClick={handleSuccess}>Show Success</Button>
+ *       <Button onClick={handleError}>Show Error</Button>
+ *       <Button onClick={handleCustomToast}>Show Custom</Button>
  *     </div>
  *   )
  * }

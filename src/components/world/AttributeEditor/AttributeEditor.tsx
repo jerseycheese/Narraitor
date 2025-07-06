@@ -6,6 +6,7 @@ import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 export interface AttributeEditorProps {
   worldId: EntityID;
@@ -217,29 +218,32 @@ export function AttributeEditor({
       <div className="flex justify-between items-center pt-4 border-t">
         <div className="flex gap-2">
           {mode === 'edit' && onDelete && (
-            <button
+            <Button
               onClick={handleDeleteClick}
-              className="px-4 py-3 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 font-medium transition-colors"
+              variant="destructive"
+              className="font-medium"
               aria-label="Delete attribute"
             >
               Delete Attribute
-            </button>
+            </Button>
           )}
         </div>
 
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={onCancel}
-            className="px-4 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+            variant="outline"
+            className="font-medium"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
-            className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+            variant="default"
+            className="font-medium"
           >
             {mode === 'create' ? 'Create Attribute' : 'Save Changes'}
-          </button>
+          </Button>
         </div>
       </div>
 

@@ -3,6 +3,11 @@
 import React from 'react';
 import { GENRES } from '@/lib/constants/genres';
 import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 export interface WorldNameInputProps {
   value: string;
@@ -25,10 +30,10 @@ export function WorldNameInput({
 }: WorldNameInputProps) {
   return (
     <div className={className}>
-      <label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
+      <Label htmlFor="world-name" className="block text-sm font-medium text-gray-700 mb-2">
         World Name {required && <span className="text-red-500">*</span>}
-      </label>
-      <input
+      </Label>
+      <Input
         id="world-name"
         type="text"
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -65,10 +70,10 @@ export function GenreSelect({
 }: GenreSelectProps) {
   return (
     <div className={className}>
-      <label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
+      <Label htmlFor="world-genre" className="block text-sm font-medium text-gray-700 mb-2">
         Genre {required && <span className="text-red-500">*</span>}
-      </label>
-      <select
+      </Label>
+      <Select
         id="world-genre"
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={value}
@@ -81,7 +86,7 @@ export function GenreSelect({
             {genre.label}
           </option>
         ))}
-      </select>
+      </Select>
       {error && (
         <p className="text-sm text-red-600 mt-1">{error}</p>
       )}
@@ -119,10 +124,10 @@ export function DescriptionTextArea({
 
   return (
     <div className={className}>
-      <label htmlFor="world-description" className="block text-sm font-medium text-gray-700 mb-2">
+      <Label htmlFor="world-description" className="block text-sm font-medium text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <textarea
+      </Label>
+      <Textarea
         id="world-description"
         rows={rows}
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -213,20 +218,22 @@ export function ErrorDisplay({
         {(onRetry || onDismiss) && (
           <div className="flex space-x-2 ml-4">
             {onRetry && (
-              <button
+              <Button
                 onClick={onRetry}
+                variant="ghost"
                 className="text-sm font-medium text-red-800 hover:text-red-900 underline"
               >
                 Retry
-              </button>
+              </Button>
             )}
             {onDismiss && (
-              <button
+              <Button
                 onClick={onDismiss}
+                variant="ghost"
                 className="text-sm font-medium text-red-800 hover:text-red-900"
               >
                 ×
-              </button>
+              </Button>
             )}
           </div>
         )}

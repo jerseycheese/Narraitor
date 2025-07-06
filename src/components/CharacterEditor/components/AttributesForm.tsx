@@ -1,5 +1,7 @@
 import React from 'react';
 import { World } from '@/types/world.types';
+import RangeSlider from '@/components/ui/RangeSlider';
+import { Label } from '@/components/ui/label';
 
 interface CharacterAttribute {
   attributeId: string;  // ← Actual structure from store
@@ -39,23 +41,20 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
           
           return (
             <div key={uniqueKey}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
                 {worldAttr?.name || `Attribute ${index + 1}`}
-              </label>
+              </Label>
               {worldAttr?.description && (
                 <p className="text-xs text-gray-500 mb-2">{worldAttr.description}</p>
               )}
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={minValue}
-                  max={maxValue}
-                  value={attr.value}
-                  onChange={(e) => handleAttributeChange(attr.attributeId, parseInt(e.target.value))}
-                  className="flex-1"
-                />
-                <span className="w-12 text-center font-medium">{attr.value}</span>
-              </div>
+              <RangeSlider
+                value={attr.value}
+                min={minValue}
+                max={maxValue}
+                onChange={(value) => handleAttributeChange(attr.attributeId, value)}
+                showLabel={false}
+                testId={`attribute-${attr.attributeId}`}
+              />
               <div className="text-xs text-gray-400 mt-1">
                 Range: {minValue} - {maxValue}
               </div>

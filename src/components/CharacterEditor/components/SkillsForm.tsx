@@ -1,5 +1,7 @@
 import React from 'react';
 import { World } from '@/types/world.types';
+import RangeSlider from '@/components/ui/RangeSlider';
+import { Label } from '@/components/ui/label';
 
 interface CharacterSkill {
   skillId: string;      // ← Actual structure from store
@@ -40,9 +42,9 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
           return (
             <div key={uniqueKey}>
               <div className="flex items-center gap-2 mb-1">
-                <label className="block text-sm font-medium text-gray-700">
+                <Label className="block text-sm font-medium text-gray-700">
                   {worldSkill?.name || `Skill ${index + 1}`}
-                </label>
+                </Label>
                 {worldSkill?.difficulty && (
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     worldSkill.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
@@ -56,17 +58,14 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
               {worldSkill?.description && (
                 <p className="text-xs text-gray-500 mb-2">{worldSkill.description}</p>
               )}
-              <div className="flex items-center gap-2">
-                <input
-                  type="range"
-                  min={minValue}
-                  max={maxValue}
-                  value={skill.level}
-                  onChange={(e) => handleSkillChange(skill.skillId, parseInt(e.target.value))}
-                  className="flex-1"
-                />
-                <span className="w-12 text-center font-medium">{skill.level}</span>
-              </div>
+              <RangeSlider
+                value={skill.level}
+                min={minValue}
+                max={maxValue}
+                onChange={(value) => handleSkillChange(skill.skillId, value)}
+                showLabel={false}
+                testId={`skill-${skill.skillId}`}
+              />
               <div className="text-xs text-gray-400 mt-1">
                 Range: {minValue} - {maxValue}
                 {worldSkill?.attributeIds && worldSkill.attributeIds.length > 0 && (

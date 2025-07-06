@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { Button } from '@/components/ui/button';
 
 export interface CharacterSelectionStepProps {
   worldId: string;
@@ -37,12 +38,13 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
             Create Your Character
           </Link>
           <div>
-            <button
+            <Button
               onClick={onBack}
               className="text-gray-600 hover:text-gray-800"
+              variant="ghost"
             >
               ← Back to World Selection
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -60,10 +62,11 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
       
       <div className="space-y-4 mb-6">
         {worldCharacters.map(character => (
-          <button
+          <Button
             key={character.id}
             onClick={() => onNext(character.id)}
             className="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+            variant="ghost"
           >
             <div className="flex items-start justify-between">
               <div>
@@ -76,17 +79,18 @@ export function CharacterSelectionStep({ worldId, onNext, onBack }: CharacterSel
                 Select →
               </span>
             </div>
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="flex justify-between items-center pt-4 border-t">
-        <button
+        <Button
           onClick={onBack}
           className="text-gray-600 hover:text-gray-800"
+          variant="ghost"
         >
           ← Back
-        </button>
+        </Button>
         <Link
           href="/characters/create"
           className="text-blue-600 hover:text-blue-700 font-medium"

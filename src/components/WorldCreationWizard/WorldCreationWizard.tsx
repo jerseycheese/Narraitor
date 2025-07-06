@@ -24,6 +24,7 @@ import { AttributeSuggestion, SkillSuggestion, WIZARD_STEPS } from './WizardStat
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
+import { Button } from '@/components/ui/button';
 
 export type { AttributeSuggestion, SkillSuggestion };
 
@@ -406,9 +407,9 @@ export default function WorldCreationWizard({
           return (
             <div className="text-center py-12">
               <p className="text-red-600">Error: World not found. Please try creating the world again.</p>
-              <button onClick={handleBack} className="mt-4 text-blue-600 hover:underline">
+              <Button onClick={handleBack} variant="link" className="mt-4 text-blue-600 hover:underline p-0 h-auto">
                 Go Back
-              </button>
+              </Button>
             </div>
           );
         }

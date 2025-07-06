@@ -198,6 +198,14 @@ test('displays all required world information', () => {
 - State updates must be atomic and predictable
 - Performance considerations must be documented
 - Accessibility must be built-in, not added later
+- **UI Components**: Always use shadcn/ui components instead of raw HTML elements:
+  - Use `Button` instead of `<button>`
+  - Use `Input` instead of `<input>`
+  - Use `Textarea` instead of `<textarea>`
+  - Use `Select` instead of `<select>`
+  - Use `RadioGroup`/`RadioGroupItem` instead of radio inputs
+  - Use `Checkbox` instead of checkbox inputs
+  - Import from `@/components/ui/[component]`
 
 ## Documentation Standards
 New documentation should follow these guidelines for consistency and AI-readability:
