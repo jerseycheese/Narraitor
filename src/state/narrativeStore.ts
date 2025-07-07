@@ -31,7 +31,7 @@ interface NarrativeStore {
   // Decision actions
   addDecision: (sessionId: EntityID, decision: Omit<Decision, 'id'>) => EntityID;
   updateDecision: (decisionId: EntityID, updates: Partial<Decision>) => void;
-  selectDecisionOption: (decisionId: EntityID, optionId: EntityID) => void;
+  selectDecisionOption: (decisionId: EntityID, optionId: EntityID, characterId?: EntityID) => void;
   getSessionDecisions: (sessionId: EntityID) => Decision[];
   getLatestDecision: (sessionId: EntityID) => Decision | null;
   
@@ -263,7 +263,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
     };
   }),
   
-  selectDecisionOption: (decisionId, optionId) => set((state) => {
+  selectDecisionOption: (decisionId, optionId, characterId) => set((state) => {
     if (!state.decisions[decisionId]) {
       return { error: 'Decision not found' };
     }
@@ -271,6 +271,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
     const updatedDecision: Decision = {
       ...state.decisions[decisionId],
       selectedOptionId: optionId,
+      selectedAt: new Date(),
+      characterId,
     };
 
     return {
