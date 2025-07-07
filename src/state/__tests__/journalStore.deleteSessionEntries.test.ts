@@ -26,7 +26,7 @@ describe('journalStore - deleteSessionEntries', () => {
     const entryId2 = addEntry('session-1', mockEntry2);
     
     // Add entry for session-2 (should not be deleted)
-    const entryId3 = addEntry('session-2', { ...mockEntry1, content: 'Different session entry' });
+    addEntry('session-2', { ...mockEntry1, content: 'Different session entry' });
     
     // Verify entries exist
     expect(getSessionEntries('session-1')).toHaveLength(2);
