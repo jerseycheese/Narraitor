@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { World, WorldSkill } from '@/types/world.types';
-import { SkillSuggestion } from '../WorldCreationWizard';
+import { SkillSuggestion } from '@/types/ai-suggestions.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 import { SkillEditor } from '@/components/world/SkillEditor';
@@ -130,6 +130,29 @@ export default function SkillReviewStep({
   const [editingCustomSkillId, setEditingCustomSkillId] = useState<string | null>(null);
 
   /**
+   * Helper function to initialize a suggestion with original values for modification tracking
+   */
+  const initializeSuggestionWithTracking = (
+    suggestion: SkillSuggestion, 
+    accepted: boolean,
+    showDetails: boolean
+  ): ExtendedSkillSuggestion => {
+    const initialAttributeNames = suggestion.linkedAttributeNames || [];
+    
+    return {
+      ...suggestion,
+      accepted,
+      showDetails,
+      selectedAttributeNames: initialAttributeNames,
+      // Store original values for modification tracking
+      originalName: suggestion.originalName || suggestion.name,
+      originalDescription: suggestion.originalDescription || suggestion.description,
+      originalDifficulty: suggestion.originalDifficulty || suggestion.difficulty,
+      isModified: false
+    };
+  };
+
+  /**
    * Initialize local suggestions state with all skills accepted by default
    * 
    * This provides a better UX by starting with all AI suggestions selected,
@@ -144,16 +167,11 @@ export default function SkillReviewStep({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
       
-      // Initialize with multi-attribute support
-      const initialAttributeNames = suggestion.linkedAttributeNames || [];
+      // Use the suggestion's accepted value, defaulting to true if not specified
+      const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
+      const showDetails = index === 0; // Show details only for the first one
       
-      return {
-        ...suggestion,
-        // Use the suggestion's accepted value, defaulting to true if not specified
-        accepted: suggestion.accepted !== undefined ? suggestion.accepted : true,
-        showDetails: index === 0, // Show details only for the first one
-        selectedAttributeNames: initialAttributeNames
-      };
+      return initializeSuggestionWithTracking(suggestion, accepted, showDetails);
     });
   });
 
@@ -169,16 +187,9 @@ export default function SkillReviewStep({
         const existingSkill = worldData.skills?.find(skill => skill.name === suggestion.name);
         // Use the suggestion's accepted value, defaulting to true if not specified
         const accepted = suggestion.accepted !== undefined ? suggestion.accepted : true;
+        const showDetails = index === 0; // Show details for the first one
         
-        // Initialize with multi-attribute support
-        const initialAttributeNames = suggestion.linkedAttributeNames || [];
-        
-        return {
-          ...suggestion,
-          accepted,
-          showDetails: index === 0, // Show details for the first one
-          selectedAttributeNames: initialAttributeNames
-        };
+        return initializeSuggestionWithTracking(suggestion, accepted, showDetails);
       });
       
       setLocalSuggestions(newSuggestions);
@@ -220,9 +231,12 @@ export default function SkillReviewStep({
   const handleToggleSkill = (index: number) => {
     // Toggle the state in a new array
     const updatedSuggestions = [...localSuggestions];
+    const currentSuggestion = updatedSuggestions[index];
+    
     updatedSuggestions[index] = {
-      ...updatedSuggestions[index],
-      accepted: !updatedSuggestions[index].accepted
+      ...currentSuggestion,
+      accepted: !currentSuggestion.accepted
+      // Keep existing isModified state - modification status persists
     };
     
     // Update local state
@@ -233,9 +247,25 @@ export default function SkillReviewStep({
     onUpdate({ ...worldData, skills: allSkills });
   };
 
+  /**
+   * Helper function to check if a skill has been modified from its original values
+   */
+  const isSkillModified = (suggestion: ExtendedSkillSuggestion): boolean => {
+    return (
+      suggestion.name !== suggestion.originalName ||
+      suggestion.description !== suggestion.originalDescription ||
+      suggestion.difficulty !== suggestion.originalDifficulty
+    );
+  };
+
   const handleModifySkill = (index: number, field: keyof SkillSuggestion, value: string) => {
     const updatedSuggestions = [...localSuggestions];
-    updatedSuggestions[index] = { ...updatedSuggestions[index], [field]: value };
+    const updatedSuggestion = { ...updatedSuggestions[index], [field]: value };
+    
+    // Check if the skill is now modified
+    updatedSuggestion.isModified = isSkillModified(updatedSuggestion);
+    
+    updatedSuggestions[index] = updatedSuggestion;
     setLocalSuggestions(updatedSuggestions);
     
     // Calculate and update world skills immediately
@@ -348,6 +378,11 @@ export default function SkillReviewStep({
                 }`}>
                   {suggestion.difficulty}
                 </span>
+                {suggestion.isModified && (
+                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                    Modified
+                  </span>
+                )}
                 {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     Linked: {suggestion.selectedAttributeNames.join(', ')}

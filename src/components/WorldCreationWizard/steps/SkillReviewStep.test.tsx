@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SkillReviewStep from './SkillReviewStep';
-import { SkillSuggestion } from '../WorldCreationWizard';
+import { SkillSuggestion } from '@/types/ai-suggestions.types';
 import { World } from '@/types/world.types';
 
 const mockOnUpdate = jest.fn();
@@ -602,6 +602,128 @@ describe('SkillReviewStep', () => {
 
       expect(screen.getByText('Skills Selected: 12 / 12')).toBeInTheDocument();
       expect(screen.getByText('(Maximum reached)')).toBeInTheDocument();
+    });
+  });
+
+  // Skill Modification Tracking Tests
+  describe('Skill Modification Tracking', () => {
+    test('shows modified badge when skill name is changed', () => {
+      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+        ...s,
+        accepted: i === 0,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={suggestionsWithSelection}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Modify the skill name
+      const nameInput = screen.getByTestId('skill-name-input-0');
+      fireEvent.change(nameInput, { target: { value: 'Melee Combat' } });
+
+      // Should show modified badge
+      expect(screen.getByText('Modified')).toBeInTheDocument();
+    });
+
+    test('shows modified badge when skill description is changed', () => {
+      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+        ...s,
+        accepted: i === 0,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={suggestionsWithSelection}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Modify the skill description
+      const descriptionInput = screen.getByTestId('skill-description-textarea-0');
+      fireEvent.change(descriptionInput, { target: { value: 'Enhanced combat abilities' } });
+
+      // Should show modified badge
+      expect(screen.getByText('Modified')).toBeInTheDocument();
+    });
+
+    test('shows modified badge when skill difficulty is changed', () => {
+      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+        ...s,
+        accepted: i === 0,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={suggestionsWithSelection}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Modify the skill difficulty
+      const difficultySelect = screen.getByTestId('skill-difficulty-select-0');
+      fireEvent.change(difficultySelect, { target: { value: 'hard' } });
+
+      // Should show modified badge
+      expect(screen.getByText('Modified')).toBeInTheDocument();
+    });
+
+    test('does not show modified badge for unmodified skills', () => {
+      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+        ...s,
+        accepted: i === 0,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={suggestionsWithSelection}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Should not show modified badge initially
+      expect(screen.queryByText('Modified')).not.toBeInTheDocument();
+    });
+
+    test('preserves modification state when toggling skill selection', () => {
+      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
+        ...s,
+        accepted: i === 0,
+      }));
+
+      render(
+        <SkillReviewStep
+          worldData={defaultWorldData}
+          suggestions={suggestionsWithSelection}
+          errors={{}}
+          onUpdate={mockOnUpdate}
+        />
+      );
+
+      // Modify the skill name
+      const nameInput = screen.getByTestId('skill-name-input-0');
+      fireEvent.change(nameInput, { target: { value: 'Melee Combat' } });
+
+      // Should show modified badge
+      expect(screen.getByText('Modified')).toBeInTheDocument();
+
+      // Toggle skill off and back on
+      const toggleButton = screen.getByTestId('skill-toggle-0');
+      fireEvent.click(toggleButton); // Exclude
+      fireEvent.click(toggleButton); // Include again
+
+      // Should still show modified badge
+      expect(screen.getByText('Modified')).toBeInTheDocument();
     });
   });
 

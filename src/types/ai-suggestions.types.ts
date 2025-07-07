@@ -22,6 +22,10 @@ export interface SkillSuggestion extends AISuggestionBase {
   baseValue: number;
   minValue: number;
   maxValue: number;
+  isModified?: boolean;
+  originalName?: string;
+  originalDescription?: string;
+  originalDifficulty?: SkillDifficulty;
 }
 
 export interface WorldAnalysisResult {
