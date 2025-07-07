@@ -1,9 +1,21 @@
+// === CORE UTILITIES ===
+
+/** UUID generation utilities */
 export { generateUniqueId } from './generateId';
+
+/** AI text formatting utilities */
 export { formatAIResponse } from './textFormatter';
 export type { FormattingOptions } from './textFormatter';
+
+/** CSS class name utilities */
 export { cn } from './classNames';
 
-// Formatting utilities
+// === FORMATTING UTILITIES ===
+
+/** 
+ * Comprehensive formatting utilities for dates, strings, and numbers
+ * @see README.md for detailed usage examples
+ */
 export {
   formatRelativeTime,
   formatDate,
@@ -18,6 +30,8 @@ export {
   formatPercentage,
   formatCompactNumber
 } from './formatters';
+
+/** Type definitions for formatting options */
 export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } from './formatters';
 
 // Error handling utilities
