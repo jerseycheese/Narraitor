@@ -33,6 +33,9 @@ interface JournalStore {
   getSessionEntries: (sessionId: EntityID) => JournalEntry[];
   getEntriesByType: (type: JournalEntryType) => JournalEntry[];
   
+  // Cleanup actions
+  deleteSessionEntries: (sessionId: EntityID) => void;
+  
   // State management
   reset: () => void;
   setError: (error: string | null) => void;
@@ -177,6 +180,28 @@ export const useJournalStore = create<JournalStore>()(
     const state = get();
     return Object.values(state.entries).filter((entry) => entry.type === type);
   },
+
+  // Delete all entries for a session
+  deleteSessionEntries: (sessionId) => set((state) => {
+    const entryIds = state.sessionEntries[sessionId] || [];
+    
+    // Remove all entries for this session
+    const remainingEntries = { ...state.entries };
+    entryIds.forEach(entryId => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [entryId]: _, ...rest } = remainingEntries;
+      Object.assign(remainingEntries, rest);
+    });
+    
+    // Remove session entries mapping
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [sessionId]: _sessionEntries, ...remainingSessionEntries } = state.sessionEntries;
+    
+    return {
+      entries: remainingEntries,
+      sessionEntries: remainingSessionEntries,
+    };
+  }),
 
   // State management actions
   reset: () => set(() => initialState),

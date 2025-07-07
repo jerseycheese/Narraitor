@@ -180,6 +180,82 @@ describe('QuickPlay', () => {
       // Should show the more recent session
       expect(screen.getByText(/test hero/i)).toBeInTheDocument();
     });
+
+    describe('campaign deletion', () => {
+      let mockDeleteSavedSession: jest.Mock;
+
+      beforeEach(() => {
+        mockDeleteSavedSession = jest.fn();
+        (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+          const mockState = {
+            savedSessions: {
+              'session-1': mockSavedSession,
+            },
+            resumeSavedSession: jest.fn().mockReturnValue(true),
+            deleteSavedSession: mockDeleteSavedSession,
+            onboardingCompleted: true,
+            shouldShowOnboarding: () => false,
+          };
+          return selector ? selector(mockState) : mockState;
+        });
+      });
+
+      it('should show delete button on campaign card', () => {
+        render(<QuickPlay />);
+        
+        expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
+      });
+
+      it('should open confirmation dialog when delete button is clicked', () => {
+        render(<QuickPlay />);
+        
+        fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+        
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByText(/delete campaign/i)).toBeInTheDocument();
+        expect(screen.getByText(/test world.*test hero/i)).toBeInTheDocument();
+      });
+
+      it('should not delete campaign when dialog is canceled', () => {
+        render(<QuickPlay />);
+        
+        fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+        fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+        
+        expect(mockDeleteSavedSession).not.toHaveBeenCalled();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      it('should delete campaign when confirmed', async () => {
+        render(<QuickPlay />);
+        
+        fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+        fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+        
+        await waitFor(() => {
+          expect(mockDeleteSavedSession).toHaveBeenCalledWith('session-1');
+        });
+      });
+
+      it('should show "Start New Game" after campaign is deleted', () => {
+        // Mock empty sessions after deletion
+        (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
+          const mockState = {
+            savedSessions: {},
+            resumeSavedSession: jest.fn().mockReturnValue(true),
+            deleteSavedSession: mockDeleteSavedSession,
+            onboardingCompleted: true,
+            shouldShowOnboarding: () => false,
+          };
+          return selector ? selector(mockState) : mockState;
+        });
+
+        render(<QuickPlay />);
+        
+        expect(screen.getByRole('button', { name: /start new game/i })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /continue last game/i })).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe('when saved session references deleted world/character', () => {
