@@ -209,9 +209,7 @@ export const useJournalStore = create<JournalStore>()(
     // Remove all entries for this session
     const remainingEntries = { ...state.entries };
     entryIds.forEach(entryId => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [entryId]: _, ...rest } = remainingEntries;
-      Object.assign(remainingEntries, rest);
+      delete remainingEntries[entryId];
     });
     
     // Remove session entries mapping

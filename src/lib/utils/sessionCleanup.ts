@@ -19,9 +19,9 @@ import { useSessionStore } from '@/state/sessionStore';
  * @param sessionId - The ID of the session to clean up
  * @returns Promise that resolves when cleanup is complete
  * 
- * @throws {Error} Individual cleanup operations may fail, but the function continues
- * to attempt all cleanup operations. Errors are logged but not thrown to prevent
- * partial cleanup states.
+ * @note Individual cleanup operations may fail, but the function continues to 
+ * attempt all cleanup operations. Errors are collected and logged but not thrown 
+ * to ensure all cleanup operations are attempted and prevent partial cleanup states.
  * 
  * @example
  * ```typescript
