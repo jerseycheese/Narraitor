@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -10,6 +10,8 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 import { Button } from '@/components/ui/button';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 
 export function QuickPlay() {
   const router = useRouter();
@@ -19,6 +21,10 @@ export function QuickPlay() {
   const resumeSavedSession = useSessionStore(state => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const onboardingCompleted = useSessionStore(state => state.onboardingCompleted);
+  
+  // State for delete confirmation dialog
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
@@ -50,6 +56,20 @@ export function QuickPlay() {
 
   const handleNewGame = () => {
     router.push('/worlds');
+  };
+
+  const handleDeleteSession = async () => {
+    if (!mostRecentSession) return;
+    
+    setIsDeleting(true);
+    try {
+      await cleanupSessionData(mostRecentSession.id);
+    } catch (error) {
+      console.error('Failed to delete session:', error);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
   };
 
   // Show guided experience for first-time users
@@ -114,13 +134,22 @@ export function QuickPlay() {
           </div>
         </div>
         
-        <Button
-          onClick={handleContinue}
-          className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
-          variant="default"
-        >
-          Continue Last Game
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleContinue}
+            className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
+            variant="default"
+          >
+            Continue Last Game
+          </Button>
+          <Button
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors"
+            variant="destructive"
+          >
+            Delete
+          </Button>
+        </div>
       </div>
 
       {/* Start New Game - Secondary Option */}
@@ -134,6 +163,17 @@ export function QuickPlay() {
           Start New Game
         </Button>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteSession}
+        title="Delete Campaign"
+        description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
+        itemName={mostRecentSession ? `${world.name} - ${character.name}` : ''}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
