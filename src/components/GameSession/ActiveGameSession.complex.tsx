@@ -201,7 +201,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // If we have a current decision, update its selected option
     if (currentDecision) {
-      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId);
+      useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined);
     }
     
     // Clear current decision to prevent showing stale choices during generation

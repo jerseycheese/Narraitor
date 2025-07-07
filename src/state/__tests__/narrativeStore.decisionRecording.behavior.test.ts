@@ -44,7 +44,8 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       const afterSelection = Date.now();
       
       // Verify complete record was created
-      const decision = store.decisions[decisionId];
+      const updatedState = useNarrativeStore.getState();
+      const decision = updatedState.decisions[decisionId];
       
       // Core requirements verification
       expect(decision.id).toBe(decisionId); // Decision ID
@@ -139,8 +140,9 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       store.selectDecisionOption(bobDecisionId, 'bob-option-2', bobCharacterId);
       
       // Verify correct character associations
-      const aliceDecision = store.decisions[aliceDecisionId];
-      const bobDecision = store.decisions[bobDecisionId];
+      const updatedState = useNarrativeStore.getState();
+      const aliceDecision = updatedState.decisions[aliceDecisionId];
+      const bobDecision = updatedState.decisions[bobDecisionId];
       
       expect(aliceDecision.characterId).toBe(aliceCharacterId);
       expect(aliceDecision.selectedOptionId).toBe('alice-option-1');
@@ -173,7 +175,8 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       store.selectDecisionOption(decisionId, 'option-right', characterId);
       
       // Verify record contains required IDs
-      const decision = store.decisions[decisionId];
+      const updatedState = useNarrativeStore.getState();
+      const decision = updatedState.decisions[decisionId];
       
       expect(decision.id).toBe(decisionId); // Decision ID
       expect(decision.selectedOptionId).toBe('option-right'); // Option ID
@@ -211,9 +214,10 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       store.selectDecisionOption(decision3Id, 'opt-3', characterId);
       
       // Verify all choices were recorded correctly
-      const decision1 = store.decisions[decision1Id];
-      const decision2 = store.decisions[decision2Id];
-      const decision3 = store.decisions[decision3Id];
+      const updatedState = useNarrativeStore.getState();
+      const decision1 = updatedState.decisions[decision1Id];
+      const decision2 = updatedState.decisions[decision2Id];
+      const decision3 = updatedState.decisions[decision3Id];
       
       expect(decision1.selectedOptionId).toBe('opt-1');
       expect(decision1.characterId).toBe(characterId);

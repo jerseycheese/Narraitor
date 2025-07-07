@@ -30,6 +30,8 @@ export interface Decision {
   prompt: string;
   options: DecisionOption[];
   selectedOptionId?: EntityID;
+  selectedAt?: Date;
+  characterId?: EntityID;
   consequences?: Consequence[];
   // Enhanced fields for better decision presentation
   contextSummary?: string;
