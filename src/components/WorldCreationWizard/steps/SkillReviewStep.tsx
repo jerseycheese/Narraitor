@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { World, WorldSkill } from '@/types/world.types';
-import { SkillSuggestion } from '../WorldCreationWizard';
+import { SkillSuggestion } from '@/types/ai-suggestions.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
 import { SkillEditor } from '@/components/world/SkillEditor';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SkillReviewStep from './SkillReviewStep';
-import { SkillSuggestion } from '../WorldCreationWizard';
+import { SkillSuggestion } from '@/types/ai-suggestions.types';
 import { World } from '@/types/world.types';
 
 const mockOnUpdate = jest.fn();
