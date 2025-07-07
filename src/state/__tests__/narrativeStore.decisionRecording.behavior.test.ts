@@ -1,7 +1,7 @@
 // src/state/__tests__/narrativeStore.decisionRecording.behavior.test.ts
 
 import { useNarrativeStore } from '../narrativeStore';
-import { Decision, DecisionOption } from '../../types/narrative.types';
+import { DecisionOption } from '../../types/narrative.types';
 
 describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () => {
   beforeEach(() => {
