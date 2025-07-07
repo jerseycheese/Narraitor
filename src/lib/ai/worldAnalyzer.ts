@@ -2,6 +2,7 @@ import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
 import { truncate } from '../utils';
+import { logger } from '../utils/logger';
 
 export interface WorldAnalysisResult {
   attributes: AttributeSuggestion[];
@@ -30,18 +31,18 @@ interface AIAnalysisResponse {
 }
 
 export async function analyzeWorldDescription(description: string): Promise<WorldAnalysisResult> {
-  console.log('analyzeWorldDescription called with:', truncate(description, 100));
+  logger.debug('analyzeWorldDescription called with:', truncate(description, 100));
   
   try {
     const config = getAIConfig();
-    console.log('Using AI config:', { 
+    logger.debug('Using AI config:', { 
       modelName: config.modelName, 
       timeout: config.timeout,
       hasApiKey: !!config.geminiApiKey 
     });
     
     if (!config.geminiApiKey) {
-      console.error('API key is not configured - check GEMINI_API_KEY environment variable');
+      logger.error('API key is not configured - check GEMINI_API_KEY environment variable');
       throw new Error('API key is not configured');
     }
     
@@ -92,7 +93,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
       }
     `;
     
-    console.log('Calling AI service directly...');
+    logger.debug('Calling AI service directly...');
     // Call the AI service directly with proper configuration
     const client = new GeminiClient({
       apiKey: config.geminiApiKey,
@@ -106,33 +107,33 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     // Add a small delay to ensure loading overlay appears
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    console.log('Making AI request...');
+    logger.debug('Making AI request...');
     const response = await client.generateContent(prompt);
-    console.log('Response received, length:', response.content.length);
-    console.log('Response content preview:', truncate(response.content, 200));
+    logger.debug('Response received, length:', response.content.length);
+    logger.debug('Response content preview:', truncate(response.content, 200));
     
     // Parse the JSON response
     let analysis: AIAnalysisResponse;
     try {
       // First try to parse directly
       analysis = JSON.parse(response.content);
-      console.log('Parsed analysis:', analysis);
+      logger.debug('Parsed analysis:', analysis);
     } catch {
-      console.log('Initial parse failed, attempting to extract JSON from markdown...');
+      logger.debug('Initial parse failed, attempting to extract JSON from markdown...');
       
       // Fallback to extract JSON from response if not pure JSON
       // Look for JSON wrapped in markdown code blocks
       const codeBlockMatch = response.content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (codeBlockMatch) {
         analysis = JSON.parse(codeBlockMatch[1]);
-        console.log('Successfully parsed from code block');
+        logger.debug('Successfully parsed from code block');
       } else {
         // Look for JSON object anywhere in the content
         // Use a more flexible regex that allows nested objects
         const jsonMatch = response.content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           analysis = JSON.parse(jsonMatch[0]);
-          console.log('Successfully extracted JSON using regex');
+          logger.debug('Successfully extracted JSON using regex');
         } else {
           throw new Error('Failed to parse AI response as JSON');
         }
@@ -164,7 +165,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     
     return { attributes, skills };
   } catch (error) {
-    console.error('Error in analyzeWorldDescription:', error);
+    logger.error('Error in analyzeWorldDescription:', error);
     // Return default suggestions as fallback
     return {
       attributes: [
