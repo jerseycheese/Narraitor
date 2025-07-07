@@ -3,6 +3,23 @@ export { formatAIResponse } from './textFormatter';
 export type { FormattingOptions } from './textFormatter';
 export { cn } from './classNames';
 
+// Formatting utilities
+export {
+  formatRelativeTime,
+  formatDate,
+  formatTime,
+  formatDateTime,
+  truncate,
+  capitalize,
+  titleCase,
+  sentenceCase,
+  safeTrim,
+  formatNumber,
+  formatPercentage,
+  formatCompactNumber
+} from './formatters';
+export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } from './formatters';
+
 // Error handling utilities
 export { 
   isRetryableError, 
