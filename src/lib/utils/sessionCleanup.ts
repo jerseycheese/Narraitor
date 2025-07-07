@@ -14,22 +14,42 @@ import { useSessionStore } from '@/state/sessionStore';
  * @param sessionId - The ID of the session to clean up
  */
 export async function cleanupSessionData(sessionId: string): Promise<void> {
+  const errors: Error[] = [];
+
+  // Clean up narrative segments
   try {
-    // Clean up narrative data
     const narrativeStore = useNarrativeStore.getState();
     narrativeStore.clearSessionSegments(sessionId);
-    narrativeStore.clearSessionDecisions(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
 
-    // Clean up journal entries
+  // Clean up narrative decisions
+  try {
+    const narrativeStore = useNarrativeStore.getState();
+    narrativeStore.clearSessionDecisions(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
+  // Clean up journal entries
+  try {
     const journalStore = useJournalStore.getState();
     journalStore.deleteSessionEntries(sessionId);
+  } catch (error) {
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
 
-    // Remove session record last to maintain referential integrity
+  // Remove session record last to maintain referential integrity
+  try {
     const sessionStore = useSessionStore.getState();
     sessionStore.deleteSavedSession(sessionId);
-
   } catch (error) {
-    // Log error but don't throw - we want to attempt all cleanup operations
-    console.error('Error during session cleanup:', error);
+    errors.push(error instanceof Error ? error : new Error(String(error)));
+  }
+
+  // Log any errors that occurred
+  if (errors.length > 0) {
+    console.error('Error during session cleanup:', errors);
   }
 }

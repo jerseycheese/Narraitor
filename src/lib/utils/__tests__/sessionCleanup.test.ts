@@ -49,7 +49,13 @@ describe('sessionCleanup', () => {
 
   it('should handle errors during cleanup gracefully', async () => {
     const sessionId = 'test-session-1';
-    mockClearSessionSegments.mockRejectedValue(new Error('Cleanup failed'));
+    
+    // Mock console.error to prevent error logging during test
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    
+    mockClearSessionSegments.mockImplementation(() => {
+      throw new Error('Cleanup failed');
+    });
 
     // Should not throw, but should still attempt other cleanup operations
     await expect(cleanupSessionData(sessionId)).resolves.toBeUndefined();
@@ -58,6 +64,9 @@ describe('sessionCleanup', () => {
     expect(mockClearSessionDecisions).toHaveBeenCalledWith(sessionId);
     expect(mockDeleteSessionEntries).toHaveBeenCalledWith(sessionId);
     expect(mockDeleteSavedSession).toHaveBeenCalledWith(sessionId);
+    expect(consoleSpy).toHaveBeenCalledWith('Error during session cleanup:', expect.any(Array));
+    
+    consoleSpy.mockRestore();
   });
 
   it('should clean up in the correct order to maintain data integrity', async () => {

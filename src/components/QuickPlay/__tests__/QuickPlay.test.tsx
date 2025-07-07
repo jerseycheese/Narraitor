@@ -5,6 +5,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
+import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -15,6 +16,11 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/state/sessionStore');
 jest.mock('@/state/worldStore');
 jest.mock('@/state/characterStore');
+
+// Mock session cleanup utility
+jest.mock('@/lib/utils/sessionCleanup', () => ({
+  cleanupSessionData: jest.fn(),
+}));
 
 describe('QuickPlay', () => {
   const mockPush = jest.fn();
@@ -183,9 +189,13 @@ describe('QuickPlay', () => {
 
     describe('campaign deletion', () => {
       let mockDeleteSavedSession: jest.Mock;
+      let mockCleanupSessionData: jest.Mock;
 
       beforeEach(() => {
         mockDeleteSavedSession = jest.fn();
+        mockCleanupSessionData = cleanupSessionData as jest.Mock;
+        mockCleanupSessionData.mockClear();
+
         (useSessionStore as unknown as jest.Mock).mockImplementation((selector) => {
           const mockState = {
             savedSessions: {
@@ -222,18 +232,27 @@ describe('QuickPlay', () => {
         fireEvent.click(screen.getByRole('button', { name: /delete/i }));
         fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
         
-        expect(mockDeleteSavedSession).not.toHaveBeenCalled();
+        expect(mockCleanupSessionData).not.toHaveBeenCalled();
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       });
 
       it('should delete campaign when confirmed', async () => {
         render(<QuickPlay />);
         
-        fireEvent.click(screen.getByRole('button', { name: /delete/i }));
+        // Click the delete button on the card
         fireEvent.click(screen.getByRole('button', { name: /delete/i }));
         
+        // Wait for dialog to open and click the confirm button
         await waitFor(() => {
-          expect(mockDeleteSavedSession).toHaveBeenCalledWith('session-1');
+          expect(screen.getByRole('dialog')).toBeInTheDocument();
+        });
+        
+        // Click the confirm delete button in the dialog (there will be 2 delete buttons now)
+        const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+        fireEvent.click(deleteButtons[1]); // Second one is in the dialog
+        
+        await waitFor(() => {
+          expect(mockCleanupSessionData).toHaveBeenCalledWith('session-1');
         });
       });
 
