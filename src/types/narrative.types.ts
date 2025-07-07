@@ -30,7 +30,9 @@ export interface Decision {
   prompt: string;
   options: DecisionOption[];
   selectedOptionId?: EntityID;
+  /** Timestamp when the decision option was selected by the player */
   selectedAt?: Date;
+  /** ID of the character who made this decision */
   characterId?: EntityID;
   consequences?: Consequence[];
   // Enhanced fields for better decision presentation
