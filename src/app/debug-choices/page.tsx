@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ChoiceGenerator } from '@/lib/ai/choiceGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { Decision, NarrativeContext } from '@/types/narrative.types';
+import { capitalize } from '@/lib/utils';
 
 export default function DebugChoicesPage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -108,7 +109,7 @@ export default function DebugChoicesPage() {
               <ul className="list-disc list-inside ml-4">
                 {result.options.map((option) => (
                   <li key={option.id}>
-                    <strong>[{option.alignment?.toUpperCase()}]</strong> {option.text}
+                    <strong>[{option.alignment ? capitalize(option.alignment) : ''}]</strong> {option.text}
                   </li>
                 ))}
               </ul>

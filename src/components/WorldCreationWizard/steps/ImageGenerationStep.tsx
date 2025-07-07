@@ -9,6 +9,7 @@ import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { Button } from '@/components/ui/button';
+import { formatDateTime } from '@/lib/utils';
 
 interface ImageGenerationStepProps {
   worldData: Partial<World>;
@@ -135,7 +136,7 @@ export default function ImageGenerationStep({
                 {generatedImage.generatedAt && (
                   <div>
                     <dt className="inline font-medium">Generated:</dt>
-                    <dd className="inline ml-2">{new Date(generatedImage.generatedAt).toLocaleString()}</dd>
+                    <dd className="inline ml-2">{formatDateTime(generatedImage.generatedAt)}</dd>
                   </div>
                 )}
               </dl>

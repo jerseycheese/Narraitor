@@ -6,6 +6,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import type { EndingType } from '@/types/narrative.types';
+import { formatTime, truncate } from '@/lib/utils';
 
 // Test scenarios for AI ending detection
 const TEST_SCENARIOS = {
@@ -111,7 +112,7 @@ export default function AIEndingDetectionTestPage() {
   }, [createWorld, createCharacter]);
 
   const addLog = (message: string) => {
-    setLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+    setLogs(prev => [...prev, `${formatTime(new Date())}: ${message}`]);
   };
 
   const handleEndingSuggestion = (reason: string, endingType: EndingType) => {
@@ -151,7 +152,7 @@ export default function AIEndingDetectionTestPage() {
     };
 
     const segmentId = addSegment(sessionId, segmentData);
-    addLog(`📝 Added segment ${segmentIndex + 1}: "${content.substring(0, 50)}..."`);
+    addLog(`📝 Added segment ${segmentIndex + 1}: "${truncate(content, 50)}"`);
     
     // Manually trigger AI ending detection after adding segment
     // Get all current segments and check the new one
@@ -191,7 +192,7 @@ export default function AIEndingDetectionTestPage() {
       
       // Get broader story context (all segments but condensed)
       const fullStoryContext = allSegments.length > 10 
-        ? `Earlier story: ${allSegments.slice(0, -5).map(s => s.content).join(' ').substring(0, 500)}...\n\n`
+        ? `Earlier story: ${truncate(allSegments.slice(0, -5).map(s => s.content).join(' '), 500)}\n\n`
         : '';
       
       const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
@@ -259,7 +260,7 @@ Respond with JSON format:
         }
       } catch (parseError) {
         addLog(`❌ Failed to parse AI response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
-        addLog(`📄 Raw response: ${response.content.substring(0, 200)}...`);
+        addLog(`📄 Raw response: ${truncate(response.content, 200)}`);
       }
     } catch (error) {
       addLog(`❌ AI ending detection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);

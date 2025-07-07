@@ -6,6 +6,7 @@ import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
+import { truncate } from '@/lib/utils';
 
 /**
  * Parameters for choice generation
@@ -461,7 +462,7 @@ CHOICE GENERATION FOCUS:
         // Extract the first sentence or up to 100 characters for context
         const firstSentence = latestSegment.content.split('.')[0];
         const contextText = firstSentence.length > 100 
-          ? firstSentence.substring(0, 100) + '...' 
+          ? truncate(firstSentence, 100)
           : firstSentence + '.';
         
         return contextText;

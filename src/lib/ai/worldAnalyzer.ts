@@ -1,6 +1,7 @@
 import { GeminiClient } from '@/lib/ai/geminiClient';
 import { getAIConfig, getGenerationConfig, getSafetySettings } from '@/lib/ai/config';
 import { AttributeSuggestion, SkillSuggestion } from '@/components/WorldCreationWizard/WorldCreationWizard';
+import { truncate } from '../utils';
 
 export interface WorldAnalysisResult {
   attributes: AttributeSuggestion[];
@@ -29,7 +30,7 @@ interface AIAnalysisResponse {
 }
 
 export async function analyzeWorldDescription(description: string): Promise<WorldAnalysisResult> {
-  console.log('analyzeWorldDescription called with:', description.substring(0, 100) + '...');
+  console.log('analyzeWorldDescription called with:', truncate(description, 100));
   
   try {
     const config = getAIConfig();
@@ -108,7 +109,7 @@ export async function analyzeWorldDescription(description: string): Promise<Worl
     console.log('Making AI request...');
     const response = await client.generateContent(prompt);
     console.log('Response received, length:', response.content.length);
-    console.log('Response content preview:', response.content.substring(0, 200) + '...');
+    console.log('Response content preview:', truncate(response.content, 200));
     
     // Parse the JSON response
     let analysis: AIAnalysisResponse;

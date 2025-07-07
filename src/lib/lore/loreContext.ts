@@ -6,6 +6,7 @@
  */
 
 import { LoreFact, ConsistencyLoreContext } from '../../types/lore.types';
+import { safeTrim } from '../utils';
 
 /**
  * Builds structured lore context from raw lore facts
@@ -80,15 +81,15 @@ function createEmptyContext(): ConsistencyLoreContext {
  * Parses character fact into enhanced character format
  */
 function parseCharacterFact(fact: LoreFact): ConsistencyLoreContext['characters'][0] | null {
-  const value = fact.value.trim();
+  const value = safeTrim(fact.value);
   if (!value) return null;
 
   // Extract name (usually before first dash or colon)
   const nameMatch = value.match(/^([^-:]+?)(?:\s*[-:]\s*(.+))?$/);
   if (!nameMatch) return null;
 
-  const name = nameMatch[1].trim();
-  const description = nameMatch[2]?.trim() || value;
+  const name = safeTrim(nameMatch[1]);
+  const description = safeTrim(nameMatch[2] || '') || value;
 
   // Extract traits from description
   const traits = extractTraitsFromDescription(description);
@@ -111,15 +112,15 @@ function parseCharacterFact(fact: LoreFact): ConsistencyLoreContext['characters'
  * Parses location fact into enhanced location format
  */
 function parseLocationFact(fact: LoreFact): ConsistencyLoreContext['locations'][0] | null {
-  const value = fact.value.trim();
+  const value = safeTrim(fact.value);
   if (!value) return null;
 
   // Extract name and description
   const nameMatch = value.match(/^([^-:]+?)(?:\s*[-:]\s*(.+))?$/);
   if (!nameMatch) return null;
 
-  const name = nameMatch[1].trim();
-  const description = nameMatch[2]?.trim() || value;
+  const name = safeTrim(nameMatch[1]);
+  const description = safeTrim(nameMatch[2] || '') || value;
 
   // Extract location type from description
   const type = extractLocationTypeFromDescription(description);
@@ -139,13 +140,13 @@ function parseLocationFact(fact: LoreFact): ConsistencyLoreContext['locations'][
  * Parses world rule fact into enhanced world rule format
  */
 function parseWorldRuleFact(fact: LoreFact): ConsistencyLoreContext['worldRules'][0] | null {
-  const value = fact.value.trim();
+  const value = safeTrim(fact.value);
   if (!value) return null;
 
   // Extract rule and description
   const ruleMatch = value.match(/^([^-:]+?)(?:\s*[-:]\s*(.+))?$/);
-  const rule = ruleMatch ? ruleMatch[1].trim() : value;
-  const description = ruleMatch?.[2]?.trim() || rule;
+  const rule = ruleMatch ? safeTrim(ruleMatch[1]) : value;
+  const description = safeTrim(ruleMatch?.[2] || '') || rule;
 
   // Determine importance (rules from manual source are typically high importance)
   const importance = determineImportance(fact, value);
@@ -161,15 +162,15 @@ function parseWorldRuleFact(fact: LoreFact): ConsistencyLoreContext['worldRules'
  * Parses historical event fact into enhanced historical event format
  */
 function parseHistoricalEventFact(fact: LoreFact): ConsistencyLoreContext['historicalEvents'][0] | null {
-  const value = fact.value.trim();
+  const value = safeTrim(fact.value);
   if (!value) return null;
 
   // Extract event name and description
   const eventMatch = value.match(/^([^-:]+?)(?:\s*[-:]\s*(.+))?$/);
   if (!eventMatch) return null;
 
-  const event = eventMatch[1].trim();
-  const description = eventMatch[2]?.trim() || value;
+  const event = safeTrim(eventMatch[1]);
+  const description = safeTrim(eventMatch[2] || '') || value;
 
   // Determine importance
   const importance = determineImportance(fact, description);
@@ -215,10 +216,11 @@ function extractTraitsFromDescription(description: string): string[] {
  */
 function extractBackgroundFromDescription(description: string): string {
   // Remove common prefixes and return cleaned description
-  return description
+  const result = description
     .replace(/^[^-:]*[-:]\s*/, '') // Remove name prefix
-    .replace(/^(a|an|the)\s+/i, '') // Remove articles
-    .trim();
+    .replace(/^(a|an|the)\s+/i, ''); // Remove articles
+  
+  return safeTrim(result);
 }
 
 /**

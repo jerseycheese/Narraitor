@@ -7,6 +7,7 @@ import { useNarrativeStore } from '../../../state/narrativeStore';
 import { useCharacterStore } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '../../../types/narrative.types';
+import { capitalize } from '@/lib/utils';
 
 export function EndingImageDebugSection() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -300,7 +301,7 @@ export function EndingImageDebugSection() {
                 >
                   {toneOptions.map((tone) => (
                     <option key={tone} value={tone}>
-                      {tone.charAt(0).toUpperCase() + tone.slice(1)}
+                      {capitalize(tone)}
                     </option>
                   ))}
                 </select>

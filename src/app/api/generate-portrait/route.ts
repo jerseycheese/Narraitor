@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Logger from '@/lib/utils/logger';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
+import { truncate } from '@/lib/utils';
 
 const logger = new Logger('API');
 
@@ -65,7 +66,7 @@ async function buildPortraitPrompt(
       worldGenre: worldGenre
     });
     
-    logger.debug('generate-portrait API', 'AI detection successful, prompt:', prompt.substring(0, 100) + '...');
+    logger.debug('generate-portrait API', 'AI detection successful, prompt:', truncate(prompt, 100));
     return prompt;
     
   } catch (error) {
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    logger.debug('generate-portrait API', 'Generating portrait with prompt:', prompt.substring(0, 100) + '...');
+    logger.debug('generate-portrait API', 'Generating portrait with prompt:', truncate(prompt, 100));
 
     const apiKey = process.env.GEMINI_API_KEY;
     

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/EmptyState/EmptyState';
 import StatusBadge from '@/components/ui/StatusBadge/StatusBadge';
+import { capitalize } from '@/lib/utils';
 
 interface JournalModalProps {
   isOpen: boolean;
@@ -82,7 +83,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                     <StatusBadge
                       variant="significance"
                       state={entry.significance as 'critical' | 'major' | 'minor'}
-                      label={entry.significance.charAt(0).toUpperCase() + entry.significance.slice(1)}
+                      label={capitalize(entry.significance)}
                     />
                     <Badge 
                       variant="info"

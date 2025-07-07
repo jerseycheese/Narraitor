@@ -8,6 +8,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
+import { formatDateTime } from '@/lib/utils';
 
 export default function NavigationFlowTestPage() {
   const [activeTest, setActiveTest] = useState<'quickplay' | 'wizard' | 'breadcrumbs' | 'flow'>('quickplay');
@@ -263,7 +264,7 @@ export default function NavigationFlowTestPage() {
                           <div><span className="font-medium">World:</span> {quickStartInfo.worldName}</div>
                           <div><span className="font-medium">Character:</span> {quickStartInfo.characterName}</div>
                           <div><span className="font-medium">Progress:</span> {quickStartInfo.narrativeCount} entries</div>
-                          <div><span className="font-medium">Last Played:</span> {new Date(quickStartInfo.lastPlayed).toLocaleString()}</div>
+                          <div><span className="font-medium">Last Played:</span> {formatDateTime(quickStartInfo.lastPlayed)}</div>
                         </div>
                       );
                     })()}

@@ -5,6 +5,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '../ui/button';
+import { formatDateTime } from '@/lib/utils';
 
 interface RecoveryNotificationProps {
   isVisible: boolean;
@@ -31,28 +32,8 @@ export function RecoveryNotification({
     return null;
   }
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return null;
-    
-    try {
-      const date = new Date(dateString);
-      // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        return null;
-      }
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch {
-      return null;
-    }
-  };
-
-  const formattedDate = formatDate(lastSaved);
+  const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;
+  const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
 
   return (
     <div
@@ -103,9 +84,9 @@ export function RecoveryNotification({
           <p className="text-sm text-gray-600 mb-3">
             We detected that your game data may have been cleared, but we found a backup of your progress.
           </p>
-          {formattedDate && (
+          {validDate && (
             <p className="text-sm text-gray-500">
-              <strong>Last saved:</strong> {formattedDate}
+              <strong>Last saved:</strong> {validDate}
             </p>
           )}
           <p className="text-sm text-gray-600 mt-3">

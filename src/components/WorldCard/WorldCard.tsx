@@ -14,6 +14,7 @@ import {
   CardActionGroup
 } from '../shared/cards';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils';
 
 interface WorldCardProps {
   /** The world data to display */
@@ -251,10 +252,10 @@ const WorldCard: React.FC<WorldCardProps> = ({
         <footer className="mt-auto pt-3 border-t border-gray-200">
         <div className="flex justify-between text-sm text-gray-600 mb-3">
           <time data-testid="world-card-createdAt">
-            Created: {new Date(world.createdAt).toLocaleDateString()}
+            Created: {formatDate(world.createdAt)}
           </time>
           <time data-testid="world-card-updatedAt">
-            Updated: {new Date(world.updatedAt).toLocaleDateString()}
+            Updated: {formatDate(world.updatedAt)}
           </time>
         </div>
         <div className="space-y-2">

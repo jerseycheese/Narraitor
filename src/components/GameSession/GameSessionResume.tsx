@@ -3,6 +3,7 @@
 import React from 'react';
 import { SavedSessionInfo } from '@/types/game.types';
 import { Button } from '@/components/ui/button';
+import { formatDateTime } from '@/lib/utils';
 
 interface GameSessionResumeProps {
   savedSession: SavedSessionInfo;
@@ -15,13 +16,7 @@ const GameSessionResume: React.FC<GameSessionResumeProps> = ({
   onResume,
   onNewGame,
 }) => {
-  const lastPlayedDate = new Date(savedSession.lastPlayed);
-  const formattedDate = lastPlayedDate.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const formattedDate = formatDateTime(savedSession.lastPlayed);
 
   return (
     <div data-testid="game-session-resume" className="p-4">

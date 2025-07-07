@@ -4,6 +4,7 @@ import React from 'react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 // Use the store's Character type since it's more complete
 import { useCharacterStore } from '@/state/characterStore';
+import { formatDate } from '@/lib/utils';
 
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 import { World } from '@/types/world.types';
@@ -31,7 +32,7 @@ export function CharacterHeader({ character, world }: CharacterHeaderProps) {
         )}
         <div className="space-y-2">
           <p className="text-sm text-gray-500">
-            <strong>Created:</strong> {new Date(character.createdAt).toLocaleDateString()}
+            <strong>Created:</strong> {formatDate(character.createdAt)}
           </p>
           <p className="text-sm text-gray-500">
             <strong>World:</strong> {world.name}

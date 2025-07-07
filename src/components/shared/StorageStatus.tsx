@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, AlertTriangle, XCircle, RotateCcw, HelpCircle } from 'lucide-react';
 import { StorageStatus as StorageStatusEnum, StorageError } from '../../lib/storage/resilientStorage';
 import { getResilientStorageInstance } from '../../state/persistence';
+import { formatRelativeTime } from '@/lib/utils';
 
 interface StorageStatusProps {
   /**
@@ -120,16 +121,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
 
   const formatLastSync = (timestamp: string | null) => {
     if (!timestamp) return 'Never';
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return date.toLocaleDateString();
+    return formatRelativeTime(timestamp);
   };
 
   const baseClassName = `storage-status storage-status--${storageState.status} ${getStatusColor()} ${className}`;

@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToneSettingsForm } from '../ToneSettingsForm';
 import { DEFAULT_TONE_SETTINGS, ToneSettings } from '@/types/tone-settings.types';
+import { titleCase } from '@/lib/utils';
 
 // Mock the validation utility
 jest.mock('@/lib/utils', () => ({
@@ -11,7 +12,7 @@ jest.mock('@/lib/utils', () => ({
   descriptionsToSelectOptions: jest.fn((descriptions) => 
     Object.entries(descriptions).map(([value, description]) => ({
       value,
-      label: value.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      label: titleCase(value.replace(/-/g, ' ')),
       description
     }))
   ),

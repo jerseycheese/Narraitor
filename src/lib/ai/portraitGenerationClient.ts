@@ -2,6 +2,7 @@
 
 import { AIClient, AIImageResponse } from './types';
 import { GeminiClient } from './geminiClient';
+import { truncate } from '../utils';
 
 /**
  * Portrait generation client using Gemini's imagen API
@@ -33,7 +34,7 @@ export class PortraitGenerationClient extends GeminiClient implements AIClient {
             status: response.status,
             statusText: response.statusText,
             contentType,
-            text: errorText.substring(0, 500) + '...'
+            text: truncate(errorText, 500)
           });
           throw new Error(`Image generation failed: ${response.status} ${response.statusText} - Server returned HTML instead of JSON`);
         }

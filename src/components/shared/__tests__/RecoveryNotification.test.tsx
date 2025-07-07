@@ -26,7 +26,7 @@ describe('RecoveryNotification', () => {
     test('displays formatted last saved date', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      expect(screen.getByText(/January 1, 2023/i)).toBeInTheDocument();
+      expect(screen.getByText(/Jan 1, 2023, 7:00 AM/i)).toBeInTheDocument();
     });
   });
 
