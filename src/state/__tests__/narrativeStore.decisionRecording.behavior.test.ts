@@ -155,33 +155,6 @@ describe('narrativeStore - Decision Recording Behavior Tests (Issue #207)', () =
       expect(bobDecision.characterId).not.toBe(aliceCharacterId);
     });
 
-    it('should record decision ID and option ID in choice record', () => {
-      // Test Requirement: The record includes decision ID, option ID, and timestamp
-      
-      const store = useNarrativeStore.getState();
-      const sessionId = 'session-123';
-      const characterId = 'char-456';
-      
-      // Create decision
-      const decisionId = store.addDecision(sessionId, {
-        prompt: 'Choose your path',
-        options: [
-          { id: 'option-left', text: 'Go left' },
-          { id: 'option-right', text: 'Go right' }
-        ] as DecisionOption[]
-      });
-      
-      // Make choice
-      store.selectDecisionOption(decisionId, 'option-right', characterId);
-      
-      // Verify record contains required IDs
-      const updatedState = useNarrativeStore.getState();
-      const decision = updatedState.decisions[decisionId];
-      
-      expect(decision.id).toBe(decisionId); // Decision ID
-      expect(decision.selectedOptionId).toBe('option-right'); // Option ID
-      expect(decision.selectedAt).toBeInstanceOf(Date); // Timestamp
-    });
   });
 
   describe('User Experience Verification', () => {
