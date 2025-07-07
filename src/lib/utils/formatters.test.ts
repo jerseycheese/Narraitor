@@ -39,7 +39,7 @@ describe('Date Formatting', () => {
 
     it('handles invalid dates gracefully', () => {
       expect(formatRelativeTime(new Date('invalid'))).toBe('Invalid date');
-      expect(formatRelativeTime(null as any)).toBe('Invalid date');
+      expect(formatRelativeTime(null as unknown as Date)).toBe('Invalid date');
     });
   });
 
@@ -142,8 +142,8 @@ describe('String Formatting', () => {
     });
 
     it('handles null and undefined', () => {
-      expect(safeTrim(null as any)).toBe('');
-      expect(safeTrim(undefined as any)).toBe('');
+      expect(safeTrim(null as unknown as string)).toBe('');
+      expect(safeTrim(undefined as unknown as string)).toBe('');
     });
 
     it('preserves empty strings', () => {

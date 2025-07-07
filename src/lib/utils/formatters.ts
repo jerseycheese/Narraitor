@@ -75,7 +75,7 @@ export function formatRelativeTime(date: Date | string): string {
       // For dates more than a week away, show the actual date
       return targetDate.toLocaleDateString();
     }
-  } catch (error) {
+  } catch {
     return 'Invalid date';
   }
 }
@@ -102,7 +102,7 @@ export function formatDate(date: Date | string, options: DateFormatOptions = {})
     };
 
     return targetDate.toLocaleDateString(undefined, defaultOptions);
-  } catch (error) {
+  } catch {
     return 'Invalid date';
   }
 }
@@ -128,7 +128,7 @@ export function formatTime(date: Date | string, includeSeconds: boolean = false)
     };
 
     return targetDate.toLocaleTimeString(undefined, options);
-  } catch (error) {
+  } catch {
     return 'Invalid time';
   }
 }
@@ -157,7 +157,7 @@ export function formatDateTime(date: Date | string, options: DateTimeFormatOptio
     };
 
     return targetDate.toLocaleString(undefined, defaultOptions);
-  } catch (error) {
+  } catch {
     return 'Invalid date';
   }
 }
@@ -268,7 +268,7 @@ export function formatNumber(value: number, decimals?: number): string {
     };
 
     return value.toLocaleString(undefined, options);
-  } catch (error) {
+  } catch {
     return value.toString();
   }
 }
@@ -291,7 +291,7 @@ export function formatPercentage(value: number, decimals?: number): string {
     }
     
     return `${percentage.toFixed(decimals)}%`;
-  } catch (error) {
+  } catch {
     return `${value}%`;
   }
 }
@@ -318,7 +318,7 @@ export function formatCompactNumber(value: number): string {
       const billions = absValue / 1000000000;
       return `${sign}${billions.toFixed(1)}B`.replace('.0B', 'B');
     }
-  } catch (error) {
+  } catch {
     return value.toString();
   }
 }
