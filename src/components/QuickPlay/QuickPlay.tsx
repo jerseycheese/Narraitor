@@ -24,7 +24,7 @@ export function QuickPlay() {
   
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); // Prevents multiple delete operations
 
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
@@ -58,6 +58,18 @@ export function QuickPlay() {
     router.push('/worlds');
   };
 
+  /**
+   * Handle campaign deletion with confirmation
+   * 
+   * Performs complete cleanup of all session-related data including:
+   * - Narrative segments and decisions
+   * - Journal entries
+   * - Session record
+   * 
+   * The UI is updated immediately after deletion to reflect the removed campaign.
+   * If deletion fails, the error is logged but the dialog is still closed to prevent
+   * the user from getting stuck in a failed state.
+   */
   const handleDeleteSession = async () => {
     if (!mostRecentSession) return;
     
@@ -142,6 +154,7 @@ export function QuickPlay() {
           >
             Continue Last Game
           </Button>
+          {/* Campaign deletion button - opens confirmation dialog */}
           <Button
             onClick={() => setIsDeleteDialogOpen(true)}
             className="px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors"
@@ -164,7 +177,7 @@ export function QuickPlay() {
         </Button>
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog - Prevents accidental campaign deletion */}
       <DeleteConfirmationDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}

@@ -11,10 +11,40 @@ import { useSessionStore } from '@/state/sessionStore';
 
 /**
  * Clean up all data associated with a session
+ * 
+ * Performs coordinated cleanup of all data related to a session to maintain
+ * referential integrity and prevent orphaned data. The cleanup follows a specific
+ * order: narrative data first, then journal entries, and finally the session record.
+ * 
  * @param sessionId - The ID of the session to clean up
+ * @returns Promise that resolves when cleanup is complete
+ * 
+ * @throws {Error} Individual cleanup operations may fail, but the function continues
+ * to attempt all cleanup operations. Errors are logged but not thrown to prevent
+ * partial cleanup states.
+ * 
+ * @example
+ * ```typescript
+ * // Clean up all data for a specific session
+ * await cleanupSessionData('session-123');
+ * 
+ * // Handle cleanup with error checking
+ * try {
+ *   await cleanupSessionData(sessionId);
+ *   console.log('Session cleaned up successfully');
+ * } catch (error) {
+ *   // Note: Function doesn't throw, but individual operations might fail
+ *   console.error('Some cleanup operations failed:', error);
+ * }
+ * ```
  */
 export async function cleanupSessionData(sessionId: string): Promise<void> {
   const errors: Error[] = [];
+
+  // Cleanup order is important for data integrity:
+  // 1. Narrative data (segments and decisions)
+  // 2. Journal entries
+  // 3. Session record (last to maintain referential integrity)
 
   // Clean up narrative segments
   try {

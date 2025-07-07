@@ -181,7 +181,28 @@ export const useJournalStore = create<JournalStore>()(
     return Object.values(state.entries).filter((entry) => entry.type === type);
   },
 
-  // Delete all entries for a session
+  /**
+   * Delete all journal entries for a specific session
+   * 
+   * Removes all journal entries associated with a session and cleans up the
+   * session entries mapping. This is typically used during campaign deletion
+   * to ensure complete data cleanup.
+   * 
+   * @param sessionId - The ID of the session whose entries should be deleted
+   * 
+   * @example
+   * ```typescript
+   * // Delete all journal entries for a session
+   * const { deleteSessionEntries } = useJournalStore.getState();
+   * deleteSessionEntries('session-123');
+   * 
+   * // Use in cleanup workflow
+   * const cleanupSession = async (sessionId: string) => {
+   *   const journalStore = useJournalStore.getState();
+   *   journalStore.deleteSessionEntries(sessionId);
+   * };
+   * ```
+   */
   deleteSessionEntries: (sessionId) => set((state) => {
     const entryIds = state.sessionEntries[sessionId] || [];
     
