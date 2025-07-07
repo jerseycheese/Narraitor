@@ -2,7 +2,6 @@
 
 import { useNarrativeStore } from '../narrativeStore';
 import { Decision, DecisionOption } from '../../types/narrative.types';
-import { EntityID } from '../../types/common.types';
 
 describe('narrativeStore - Decision Recording (Issue #207)', () => {
   beforeEach(() => {
