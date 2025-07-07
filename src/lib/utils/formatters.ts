@@ -37,6 +37,16 @@ export interface NumberFormatOptions {
 // === DATE FORMATTING ===
 
 /**
+ * Validates and parses a date input, handling both Date objects and strings
+ * @param date - Date object or ISO string to validate
+ * @returns Parsed Date object or null if invalid
+ */
+function validateAndParseDate(date: Date | string): Date | null {
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
+  return isNaN(targetDate.getTime()) ? null : targetDate;
+}
+
+/**
  * Formats a date to show relative time (e.g., "2 hours ago", "yesterday")
  * Extends the existing formatDistanceToNow function with better future handling
  * @param date - Date object or ISO string to format
@@ -44,12 +54,8 @@ export interface NumberFormatOptions {
  */
 export function formatRelativeTime(date: Date | string): string {
   try {
-    const targetDate = typeof date === 'string' ? new Date(date) : date;
-    
-    // Check for invalid date
-    if (isNaN(targetDate.getTime())) {
-      return 'Invalid date';
-    }
+    const targetDate = validateAndParseDate(date);
+    if (!targetDate) return 'Invalid date';
 
     const now = new Date();
     const diffInMilliseconds = targetDate.getTime() - now.getTime();
@@ -88,11 +94,8 @@ export function formatRelativeTime(date: Date | string): string {
  */
 export function formatDate(date: Date | string, options: DateFormatOptions = {}): string {
   try {
-    const targetDate = typeof date === 'string' ? new Date(date) : date;
-    
-    if (isNaN(targetDate.getTime())) {
-      return 'Invalid date';
-    }
+    const targetDate = validateAndParseDate(date);
+    if (!targetDate) return 'Invalid date';
 
     const defaultOptions: DateFormatOptions = {
       year: 'numeric',
@@ -115,11 +118,8 @@ export function formatDate(date: Date | string, options: DateFormatOptions = {})
  */
 export function formatTime(date: Date | string, includeSeconds: boolean = false): string {
   try {
-    const targetDate = typeof date === 'string' ? new Date(date) : date;
-    
-    if (isNaN(targetDate.getTime())) {
-      return 'Invalid time';
-    }
+    const targetDate = validateAndParseDate(date);
+    if (!targetDate) return 'Invalid time';
 
     const options: Intl.DateTimeFormatOptions = {
       hour: 'numeric',
@@ -141,11 +141,8 @@ export function formatTime(date: Date | string, includeSeconds: boolean = false)
  */
 export function formatDateTime(date: Date | string, options: DateTimeFormatOptions = {}): string {
   try {
-    const targetDate = typeof date === 'string' ? new Date(date) : date;
-    
-    if (isNaN(targetDate.getTime())) {
-      return 'Invalid date';
-    }
+    const targetDate = validateAndParseDate(date);
+    if (!targetDate) return 'Invalid date';
 
     const defaultOptions: DateTimeFormatOptions = {
       year: 'numeric',
@@ -259,6 +256,11 @@ export function safeTrim(text: string | null | undefined): string {
  */
 export function formatNumber(value: number, decimals?: number): string {
   try {
+    // Handle edge cases for invalid numbers
+    if (!Number.isFinite(value)) {
+      return 'Invalid number';
+    }
+    
     const options: Intl.NumberFormatOptions = {
       useGrouping: true,
       ...(decimals !== undefined && {
@@ -281,6 +283,11 @@ export function formatNumber(value: number, decimals?: number): string {
  */
 export function formatPercentage(value: number, decimals?: number): string {
   try {
+    // Handle edge cases for invalid numbers
+    if (!Number.isFinite(value)) {
+      return 'Invalid percentage';
+    }
+    
     const percentage = value * 100;
     
     // If decimals not specified, use intelligent formatting
@@ -303,6 +310,11 @@ export function formatPercentage(value: number, decimals?: number): string {
  */
 export function formatCompactNumber(value: number): string {
   try {
+    // Handle edge cases for invalid numbers
+    if (!Number.isFinite(value)) {
+      return 'Invalid number';
+    }
+    
     const absValue = Math.abs(value);
     const sign = value < 0 ? '-' : '';
     

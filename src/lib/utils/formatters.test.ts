@@ -165,6 +165,8 @@ describe('Number Formatting', () => {
     it('handles edge cases', () => {
       expect(formatNumber(0)).toBe('0');
       expect(formatNumber(-1234)).toMatch(/-1.234|-1,234/);
+      expect(formatNumber(Infinity)).toBe('Invalid number');
+      expect(formatNumber(NaN)).toBe('Invalid number');
     });
   });
 
@@ -183,6 +185,8 @@ describe('Number Formatting', () => {
       expect(formatPercentage(0)).toBe('0%');
       expect(formatPercentage(1)).toBe('100%');
       expect(formatPercentage(1.5)).toBe('150%');
+      expect(formatPercentage(Infinity)).toBe('Invalid percentage');
+      expect(formatPercentage(NaN)).toBe('Invalid percentage');
     });
   });
 
@@ -200,6 +204,11 @@ describe('Number Formatting', () => {
 
     it('handles negative numbers', () => {
       expect(formatCompactNumber(-1234)).toMatch(/-1\.2K|-1,2K/);
+    });
+
+    it('handles invalid numbers', () => {
+      expect(formatCompactNumber(Infinity)).toBe('Invalid number');
+      expect(formatCompactNumber(NaN)).toBe('Invalid number');
     });
   });
 });
