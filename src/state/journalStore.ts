@@ -33,6 +33,9 @@ interface JournalStore {
   getSessionEntries: (sessionId: EntityID) => JournalEntry[];
   getEntriesByType: (type: JournalEntryType) => JournalEntry[];
   
+  // Cleanup actions
+  deleteSessionEntries: (sessionId: EntityID) => void;
+  
   // State management
   reset: () => void;
   setError: (error: string | null) => void;
@@ -177,6 +180,47 @@ export const useJournalStore = create<JournalStore>()(
     const state = get();
     return Object.values(state.entries).filter((entry) => entry.type === type);
   },
+
+  /**
+   * Delete all journal entries for a specific session
+   * 
+   * Removes all journal entries associated with a session and cleans up the
+   * session entries mapping. This is typically used during campaign deletion
+   * to ensure complete data cleanup.
+   * 
+   * @param sessionId - The ID of the session whose entries should be deleted
+   * 
+   * @example
+   * ```typescript
+   * // Delete all journal entries for a session
+   * const { deleteSessionEntries } = useJournalStore.getState();
+   * deleteSessionEntries('session-123');
+   * 
+   * // Use in cleanup workflow
+   * const cleanupSession = async (sessionId: string) => {
+   *   const journalStore = useJournalStore.getState();
+   *   journalStore.deleteSessionEntries(sessionId);
+   * };
+   * ```
+   */
+  deleteSessionEntries: (sessionId) => set((state) => {
+    const entryIds = state.sessionEntries[sessionId] || [];
+    
+    // Remove all entries for this session
+    const remainingEntries = { ...state.entries };
+    entryIds.forEach(entryId => {
+      delete remainingEntries[entryId];
+    });
+    
+    // Remove session entries mapping
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [sessionId]: _sessionEntries, ...remainingSessionEntries } = state.sessionEntries;
+    
+    return {
+      entries: remainingEntries,
+      sessionEntries: remainingSessionEntries,
+    };
+  }),
 
   // State management actions
   reset: () => set(() => initialState),
