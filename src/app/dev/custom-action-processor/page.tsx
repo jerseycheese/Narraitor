@@ -20,6 +20,7 @@
 
 import React, { useState } from 'react';
 import CustomActionProcessor, { CustomActionResult } from '@/components/shared/CustomActionProcessor';
+import { formatPercentage } from '@/lib/utils';
 
 const mockCharacter = {
   skills: [
@@ -148,7 +149,7 @@ export default function CustomActionProcessorTestPage() {
                           {check.success ? 'SUCCESS' : 'FAILED'}
                         </span>
                         <span className="text-gray-500 text-xs">
-                          {check.current}/{check.required} (Confidence: {Math.round(check.confidence * 100)}%)
+                          {check.current}/{check.required} (Confidence: {formatPercentage(check.confidence)})
                         </span>
                       </div>
                       {check.reasoning && (

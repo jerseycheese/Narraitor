@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDate } from '@/lib/utils';
 
 interface ImageGenerationSectionProps {
   title: string;
@@ -158,7 +159,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           </div>
           {generatedAt && (
             <p className="text-sm text-gray-500 mt-2">
-              Generated: {new Date(generatedAt).toLocaleDateString()}
+              Generated: {formatDate(generatedAt)}
             </p>
           )}
         </div>

@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PromptContextManager } from '../promptContextManager';
 import { WorldContext, CharacterContext } from '../types';
+import { formatPercentage } from '@/lib/utils';
 
 interface ContextPreviewProps {
   world?: WorldContext | null;
@@ -118,7 +119,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
                 retentionStatus === 'medium' ? 'text-yellow-600' :
                 'text-red-600'
               }`}>
-                {contextRetentionPercentage.toFixed(1)}%
+                {formatPercentage(contextRetentionPercentage / 100, 1)}
               </span>
             </div>
             

@@ -10,6 +10,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { truncate } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { StoryEndingDialog } from '@/components/StoryEndingDialog';
@@ -207,7 +208,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       // Convert from second person to past tense if needed
       summary = summary.replace(/^You\s+/, '').replace(/\byou\b/g, 'the character');
       // Keep it concise - max 60 characters
-      return summary.length > 60 ? summary.substring(0, 57) + '...' : summary + '.';
+      return summary.length > 60 ? truncate(summary, 57) : summary + '.';
     }
     return 'Something happened in the adventure.';
   };

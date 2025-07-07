@@ -5,6 +5,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { useHistory } from '@/lib/hooks/useHistory';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { wizardStyles } from '@/components/shared/wizard/styles/wizardStyles';
+import { formatDate } from '@/lib/utils';
 
 interface RecentTemplatesProps {
   onTemplateSelect: (entry: TemplateHistoryEntry) => void;
@@ -82,7 +83,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Generated {new Date(entry.generatedAt).toLocaleDateString()}
+                  Generated {formatDate(entry.generatedAt)}
                 </p>
               </div>
               <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.secondary} ml-2 shrink-0`}>

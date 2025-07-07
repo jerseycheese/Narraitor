@@ -3,6 +3,7 @@
 import React from 'react';
 import { DataField } from '@/components/shared/DataField';
 import { World } from '@/types/world.types';
+import { formatDate, titleCase } from '@/lib/utils';
 
 interface WorldInfoSectionProps {
   world: World;
@@ -15,18 +16,18 @@ export function WorldInfoSection({ world }: WorldInfoSectionProps) {
       <div className="grid grid-cols-2 gap-4">
         <DataField 
           label="Created" 
-          value={new Date(world.createdAt).toLocaleDateString()} 
+          value={formatDate(world.createdAt)} 
           variant="inline"
         />
         <DataField 
           label="Updated" 
-          value={new Date(world.updatedAt).toLocaleDateString()} 
+          value={formatDate(world.updatedAt)} 
           variant="inline"
         />
         {world.relationship && (
           <DataField 
             label="Relationship" 
-            value={world.relationship.replace(/_/g, ' ').charAt(0).toUpperCase() + world.relationship.slice(1).replace(/_/g, ' ')} 
+            value={titleCase(world.relationship.replace(/_/g, ' '))} 
             variant="inline"
           />
         )}

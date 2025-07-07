@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { Button } from '@/components/ui/button';
+import { formatRelativeTime, capitalize } from '@/lib/utils';
 
 interface RecentPagesDropdownProps {
   className?: string;
@@ -88,7 +89,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     if (segments.length === 0) return 'Home';
     
     const lastSegment = segments[segments.length - 1];
-    return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).replace(/-/g, ' ');
+    return capitalize(lastSegment.replace(/-/g, ' '));
   };
 
   /**
@@ -99,27 +100,15 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     if (segments.length === 0) return '/';
     
     return segments
-      .map(segment => segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '))
+      .map(segment => capitalize(segment.replace(/-/g, ' ')))
       .join(' › ');
   };
 
   /**
-   * Format timestamp for display
+   * Format timestamp for display using our centralized formatter
    */
   const formatTimestamp = (timestamp: string): string => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffMinutes < 1) return 'Just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    
-    return date.toLocaleDateString();
+    return formatRelativeTime(timestamp);
   };
 
   return (

@@ -3,10 +3,11 @@
  * Provides user-friendly interface for storage error states and recovery
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CheckCircle, AlertTriangle, XCircle, RotateCcw, HelpCircle } from 'lucide-react';
 import { StorageStatus as StorageStatusEnum, StorageError } from '../../lib/storage/resilientStorage';
 import { getResilientStorageInstance } from '../../state/persistence';
+import { formatRelativeTime } from '@/lib/utils';
 
 interface StorageStatusProps {
   /**
@@ -82,6 +83,12 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
     setIsExpanded(!isExpanded);
   };
 
+  // Memoize the formatted last sync time
+  const formattedLastSync = useMemo(() => {
+    if (!storageState.lastSuccessfulSync) return 'Never';
+    return formatRelativeTime(storageState.lastSuccessfulSync);
+  }, [storageState.lastSuccessfulSync]);
+
   // Don't render if healthy and not expanded (floating mode only), or if dismissed
   if ((storageState.status === StorageStatusEnum.HEALTHY && !isExpanded && variant === 'floating') || isDismissed) {
     return null;
@@ -116,20 +123,6 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
     }
-  };
-
-  const formatLastSync = (timestamp: string | null) => {
-    if (!timestamp) return 'Never';
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minutes ago`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours} hours ago`;
-    return date.toLocaleDateString();
   };
 
   const baseClassName = `storage-status storage-status--${storageState.status} ${getStatusColor()} ${className}`;
@@ -192,7 +185,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
           <div className="mt-3 pt-3 border-t border-current border-opacity-20">
             <div className="text-xs space-y-1">
               <div>
-                <span className="font-medium">Last saved:</span> {formatLastSync(storageState.lastSuccessfulSync)}
+                <span className="font-medium">Last saved:</span> {formattedLastSync}
               </div>
               {storageState.error && (
                 <div>
@@ -227,7 +220,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
           {getStatusIcon()}
         </span>
         <span className="text-sm">
-          {storageState.status === StorageStatusEnum.HEALTHY && `Last saved: ${formatLastSync(storageState.lastSuccessfulSync)}`}
+          {storageState.status === StorageStatusEnum.HEALTHY && `Last saved: ${formattedLastSync}`}
           {storageState.status === StorageStatusEnum.DEGRADED && 'Storage issues detected'}
           {storageState.status === StorageStatusEnum.UNAVAILABLE && 'Memory-only mode'}
           {storageState.status === StorageStatusEnum.RECOVERING && 'Restoring storage...'}

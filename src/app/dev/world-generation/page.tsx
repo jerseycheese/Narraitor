@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { generateWorld, type GeneratedWorldData } from '@/lib/generators/worldGenerator';
+import { safeTrim, capitalize } from '@/lib/utils';
 
 export default function WorldGenerationTestPage() {
   const [worldReference, setWorldReference] = useState('');
@@ -14,7 +15,7 @@ export default function WorldGenerationTestPage() {
   const { worlds, createWorld } = useWorldStore();
   
   const handleGenerate = async () => {
-    if (!worldReference.trim()) {
+    if (!safeTrim(worldReference)) {
       setError('Please enter a world reference');
       return;
     }
@@ -27,10 +28,10 @@ export default function WorldGenerationTestPage() {
       const existingNames = Object.values(worlds).map(w => w.name);
       const result = await generateWorld({
         method: 'ai',
-        reference: worldReference.trim(),
+        reference: safeTrim(worldReference),
         relationship: 'inspired_by',
         existingNames,
-        suggestedName: suggestedName.trim() || undefined
+        suggestedName: safeTrim(suggestedName) || undefined
       });
       
       setGeneratedWorld(result);
@@ -143,7 +144,7 @@ export default function WorldGenerationTestPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <button
             onClick={handleGenerate}
-            disabled={isGenerating || !worldReference.trim()}
+            disabled={isGenerating || !safeTrim(worldReference)}
             className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? 'Generating World...' : 'Generate World'}
@@ -206,7 +207,7 @@ export default function WorldGenerationTestPage() {
                           skill.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-red-100 text-red-800'
                         }`}>
-                          {skill.difficulty}
+                          {capitalize(skill.difficulty)}
                         </span>
                       </div>
                     </div>

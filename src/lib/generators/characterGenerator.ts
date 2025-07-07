@@ -1,5 +1,6 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
+import { truncate } from '../utils';
 
 const logger = new Logger('CharacterGenerator');
 
@@ -249,7 +250,7 @@ CRITICAL INSTRUCTIONS:
     let jsonString = jsonMatch[0];
     
     // Log the raw JSON before cleaning for debugging
-    logger.debug('CharacterGenerator', 'Raw JSON before cleaning:', jsonString.substring(0, 200) + '...');
+    logger.debug('CharacterGenerator', 'Raw JSON before cleaning:', truncate(jsonString, 200));
     
     // Remove any comments that might have been included
     jsonString = jsonString.replace(/\/\/.*$/gm, ''); // Remove single-line comments
@@ -288,7 +289,7 @@ CRITICAL INSTRUCTIONS:
       return `"${escapedKey}":`;
     });
     
-    logger.debug('CharacterGenerator', 'Cleaned JSON string:', jsonString.substring(0, 500) + '...');
+    logger.debug('CharacterGenerator', 'Cleaned JSON string:', truncate(jsonString, 500));
     
     let characterData: GeneratedCharacterData;
     try {

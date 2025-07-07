@@ -1,3 +1,5 @@
+import { titleCase } from '@/lib/utils';
+
 /**
  * Interface for select option with description
  */
@@ -28,9 +30,7 @@ export function descriptionsToSelectOptions(
  * Default label formatter - capitalizes and replaces hyphens with spaces
  */
 function formatLabel(key: string): string {
-  return key
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
+  return titleCase(key.replace(/-/g, ' '));
 }
 
 /**

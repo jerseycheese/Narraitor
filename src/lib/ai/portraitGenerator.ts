@@ -2,6 +2,7 @@
 
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
+import { capitalize, truncate } from '@/lib/utils';
 
 interface PortraitGenerationOptions {
   worldGenre?: string;
@@ -576,7 +577,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         description = description.replace(namePattern, '');
         
         // Capitalize first letter
-        description = description.charAt(0).toUpperCase() + description.slice(1);
+        description = capitalize(description);
         
         // Fix multiple periods
         enhancements.physicalDescription = description.replace(/\.+$/, '.');
@@ -755,9 +756,6 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
    * Truncate text to specified length
    */
   private truncateText(text: string, maxLength: number): string {
-    if (text.length <= maxLength) {
-      return text;
-    }
-    return text.substring(0, maxLength - 3) + '...';
+    return truncate(text, maxLength);
   }
 }

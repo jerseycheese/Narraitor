@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import WorldCard from '../WorldCard';
 import { createMockWorld } from '@/lib/test-utils/testDataFactory';
+import { formatDate } from '@/lib/utils';
 
 describe('WorldCard', () => {
   const mockWorld = createMockWorld({
@@ -24,8 +25,8 @@ describe('WorldCard', () => {
     expect(screen.getByTestId('world-card-genre')).toHaveTextContent('Fantasy');
     
     // Verify timestamps are displayed
-    expect(screen.getByTestId('world-card-createdAt')).toHaveTextContent(`Created: ${new Date(mockWorld.createdAt).toLocaleDateString()}`);
-    expect(screen.getByTestId('world-card-updatedAt')).toHaveTextContent(`Updated: ${new Date(mockWorld.updatedAt).toLocaleDateString()}`);
+    expect(screen.getByTestId('world-card-createdAt')).toHaveTextContent(`Created: ${formatDate(mockWorld.createdAt)}`);
+    expect(screen.getByTestId('world-card-updatedAt')).toHaveTextContent(`Updated: ${formatDate(mockWorld.updatedAt)}`);
   });
 
   // Test case for visual presentation

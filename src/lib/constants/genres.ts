@@ -5,6 +5,8 @@
  * used throughout the application, including UI components, AI generators, and templates.
  */
 
+import { capitalize } from '@/lib/utils';
+
 export interface GenreOption {
   value: string;
   label: string;
@@ -43,7 +45,7 @@ export const GENRE_LABELS: Record<string, string> = GENRES.reduce(
  * Get genre label by value
  */
 export function getGenreLabel(value: string): string {
-  return GENRE_LABELS[value] || value.charAt(0).toUpperCase() + value.slice(1);
+  return GENRE_LABELS[value] || capitalize(value);
 }
 
 /**

@@ -4,6 +4,7 @@ import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
+import { truncate } from '@/lib/utils';
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -155,7 +156,7 @@ export const NarrativeController: React.FC<NarrativeControllerProps> = ({
       
       // Get broader story context (all segments but condensed)
       const fullStoryContext = allSegments.length > 10 
-        ? `Earlier story: ${allSegments.slice(0, -5).map(s => s.content).join(' ').substring(0, 500)}...\n\n`
+        ? `Earlier story: ${truncate(allSegments.slice(0, -5).map(s => s.content).join(' '), 500)}\n\n`
         : '';
       
       const analysisPrompt = `You are a narrative expert analyzing a story in progress. Determine if this story has reached a natural conclusion point where the player would feel satisfied ending.
@@ -333,7 +334,7 @@ Respond with JSON format:
       ],
       decisionWeight: 'minor',
       contextSummary: recentSegments.length > 0 ? 
-        `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${recentSegments[recentSegments.length - 1]?.content?.substring(0, 100) || 'Making a decision'}...` :
+        `${recentSegments[recentSegments.length - 1]?.metadata?.location || 'Unknown location'}: ${truncate(recentSegments[recentSegments.length - 1]?.content || 'Making a decision', 100)}` :
         'Making a decision in an unknown location.'
     };
     

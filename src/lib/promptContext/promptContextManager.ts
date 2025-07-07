@@ -2,6 +2,7 @@ import { ContextBuilder } from './contextBuilder';
 import { ContextPrioritizer } from './contextPrioritizer';
 import { ContextOptions, ContextElement } from './types';
 import { estimateTokenCount } from './tokenUtils';
+import { truncate } from '@/lib/utils';
 
 /**
  * Manages the generation of AI prompt context by coordinating between
@@ -385,6 +386,6 @@ export class PromptContextManager {
       // Fallback truncation if needed after initial truncation/prioritization
       const charsPerToken = content.length / currentTokens;
       const charsToKeep = Math.floor(tokenLimit * charsPerToken);
-      return content.substring(0, charsToKeep) + '...';
+      return truncate(content, charsToKeep);
   }
 }

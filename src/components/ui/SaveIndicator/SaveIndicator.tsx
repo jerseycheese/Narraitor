@@ -6,7 +6,7 @@ import React from 'react';
 import { SaveTriggerReason } from '@/lib/services/autoSaveService';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
-import { cn } from '@/lib/utils';
+import { cn, formatTime } from '@/lib/utils';
 
 export interface SaveIndicatorProps {
   status: 'idle' | 'saving' | 'saved' | 'error';
@@ -31,17 +31,6 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   className = '',
   compact = false,
 }) => {
-  const formatTime = (timestamp: string) => {
-    try {
-      return new Date(timestamp).toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    } catch {
-      return 'Invalid time';
-    }
-  };
-
   const getStatusText = () => {
     switch (status) {
       case 'saved':

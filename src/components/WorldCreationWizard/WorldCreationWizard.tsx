@@ -25,6 +25,7 @@ import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
+import { truncate } from '@/lib/utils';
 
 export type { AttributeSuggestion, SkillSuggestion };
 
@@ -150,7 +151,7 @@ export default function WorldCreationWizard({
       return;
     }
     
-    console.log('Starting AI suggestion generation for description:', wizard.state.data.description.substring(0, 100) + '...');
+    console.log('Starting AI suggestion generation for description:', truncate(wizard.state.data.description, 100));
     
     try {
       wizard.setProcessing(true);

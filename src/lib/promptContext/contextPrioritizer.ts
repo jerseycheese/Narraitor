@@ -1,5 +1,6 @@
 import { ContextElement, PriorityWeights } from './types';
 import { estimateTokenCount } from './tokenUtils';
+import { truncate } from '@/lib/utils';
 
 /**
  * Manages token limits and prioritizes context elements based on configurable weights.
@@ -139,7 +140,7 @@ export class ContextPrioritizer {
     const approximateCharLimit = Math.floor(tokenLimit * ratio);
     
     // Truncate and add ellipsis
-    return content.substring(0, approximateCharLimit) + '...';
+    return truncate(content, approximateCharLimit);
   }
 
   /**

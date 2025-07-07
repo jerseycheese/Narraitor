@@ -11,6 +11,7 @@ import {
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Star } from 'lucide-react';
+import { truncate } from '@/lib/utils';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -115,7 +116,7 @@ export function CharacterCard({
                 if ((result + trimmed + '.').length > 280) break;
                 result += (result ? ' ' : '') + trimmed + '.';
               }
-              return result || text.substring(0, 280) + (text.length > 280 ? '...' : '');
+              return result || truncate(text, 280);
             })()}
           </p>
           <div className="clear-both"></div>

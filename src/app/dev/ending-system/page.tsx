@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { EndingScreen } from '../../../components/GameSession/EndingScreen';
 import { useNarrativeStore } from '../../../state/narrativeStore';
 import type { EndingType, EndingTone, StoryEnding } from '../../../types/narrative.types';
+import { capitalize } from '@/lib/utils';
 
 export default function EndingSystemTestHarness() {
   const { generateEnding, currentEnding, isGeneratingEnding, endingError, clearEnding } = useNarrativeStore();
@@ -52,7 +53,7 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
       'Legendary Hero',
       'Realm Protector',
       `${endingType === 'character-retirement' ? 'Peaceful Retirement' : 'Quest Complete'}`,
-      `${desiredTone.charAt(0).toUpperCase() + desiredTone.slice(1)} Ending`,
+      `${capitalize(desiredTone)} Ending`,
       'Story Complete'
     ],
     playTime: 7200 // 2 hours

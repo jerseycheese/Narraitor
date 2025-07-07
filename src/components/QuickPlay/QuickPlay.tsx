@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { formatDistanceToNow } from '@/lib/utils/textFormatter';
+import { formatRelativeTime } from '@/lib/utils';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
@@ -110,7 +110,7 @@ export function QuickPlay() {
 
   const world = worlds[mostRecentSession.worldId];
   const character = characters[mostRecentSession.characterId];
-  const lastPlayedText = formatDistanceToNow(mostRecentSession.lastPlayed);
+  const lastPlayedText = formatRelativeTime(mostRecentSession.lastPlayed);
 
   return (
     <div className="space-y-6">

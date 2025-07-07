@@ -8,6 +8,7 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
 import { GENRES } from '@/lib/constants/genres';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import { formatDate } from '@/lib/utils';
 
 // Mock data for Storybook
 const mockTemplateHistory = [
@@ -218,7 +219,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                         <h4 className="font-medium">{entry.template.name}</h4>
                         <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
                         <p className="text-xs text-gray-500 mt-2">
-                          {new Date(entry.generatedAt).toLocaleDateString()}
+                          {formatDate(entry.generatedAt)}
                         </p>
                       </div>
                       <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">

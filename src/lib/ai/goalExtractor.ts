@@ -11,6 +11,7 @@ import {
   GoalPriority,
   GoalStatus,
 } from '../../types/goal.types';
+import { capitalize } from '@/lib/utils';
 
 export class GoalExtractor {
   private geminiClient: AIClient;
@@ -385,7 +386,7 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
       sessionId: request.sessionId,
       characterId: request.characterId,
       worldId: request.worldId,
-      title: title.charAt(0).toUpperCase() + title.slice(1),
+      title: capitalize(title),
       description: `${title} (extracted from narrative)`,
       type,
       priority: 'medium' as GoalPriority,

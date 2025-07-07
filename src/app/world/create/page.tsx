@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
+import { truncate } from '@/lib/utils';
 
 export default function CreateWorldPage() {
   const router = useRouter();
@@ -47,7 +48,7 @@ export default function CreateWorldPage() {
         const data = JSON.parse(templateData);
         console.log('Parsed smart template data:', {
           name: data.name,
-          description: data.description?.substring(0, 50) + '...',
+          description: data.description ? truncate(data.description, 50) : undefined,
           attributeCount: data.aiSuggestions?.attributes?.length,
           skillCount: data.aiSuggestions?.skills?.length,
           firstAttribute: data.aiSuggestions?.attributes?.[0]
@@ -74,7 +75,7 @@ export default function CreateWorldPage() {
         const data = JSON.parse(recentTemplateData);
         console.log('Parsed recent template data:', {
           name: data.name,
-          description: data.description?.substring(0, 50) + '...',
+          description: data.description ? truncate(data.description, 50) : undefined,
           attributeCount: data.aiSuggestions?.attributes?.length,
           skillCount: data.aiSuggestions?.skills?.length
         });

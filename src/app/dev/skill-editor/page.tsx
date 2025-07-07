@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { SkillEditor } from '@/components/world/SkillEditor';
 import { WorldSkill, WorldAttribute } from '@/types/world.types';
+import { formatTime } from '@/lib/utils';
 // TypeScript type for skill difficulty is implicitly used in WorldSkill interface
 
 // Mock data for testing
@@ -77,7 +78,7 @@ export default function SkillEditorTestPage() {
   const [activityLog, setActivityLog] = useState<string[]>([]);
 
   const logActivity = (message: string) => {
-    setActivityLog(prev => [`[${new Date().toLocaleTimeString()}] ${message}`, ...prev.slice(0, 9)]);
+    setActivityLog(prev => [`[${formatTime(new Date())}] ${message}`, ...prev.slice(0, 9)]);
   };
 
   const handleSaveSkill = (skill: WorldSkill) => {
