@@ -318,7 +318,7 @@ describe('objectAccess', () => {
       });
 
       it('should handle circular references gracefully', () => {
-        const circularObject: any = { a: 1 };
+        const circularObject: Record<string, unknown> = { a: 1 };
         circularObject.self = circularObject;
         
         const paths = getNestedPaths(circularObject);

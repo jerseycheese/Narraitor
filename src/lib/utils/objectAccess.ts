@@ -9,7 +9,7 @@
  * @param defaultValue - Default value to return if path doesn't exist
  * @returns The value at the path or defaultValue if not found
  */
-export function getNestedValue<T = any>(
+export function getNestedValue<T = unknown>(
   obj: unknown,
   path: string | (string | number)[],
   defaultValue?: T
@@ -36,7 +36,7 @@ export function getNestedValue<T = any>(
     return defaultValue;
   }
 
-  let current: any = obj;
+  let current: unknown = obj;
 
   for (const key of keys) {
     if (current === null || current === undefined) {
@@ -49,8 +49,8 @@ export function getNestedValue<T = any>(
         return defaultValue;
       }
       current = current[key];
-    } else if (typeof current === 'object' && key in current) {
-      current = current[key];
+    } else if (typeof current === 'object' && current !== null && key in current) {
+      current = (current as Record<string | number, unknown>)[key];
     } else {
       return defaultValue;
     }
@@ -90,7 +90,7 @@ export function hasNestedProperty(
     return false;
   }
 
-  let current: any = obj;
+  let current: unknown = obj;
 
   for (const key of keys) {
     if (current === null || current === undefined) {
@@ -103,8 +103,8 @@ export function hasNestedProperty(
         return false;
       }
       current = current[key];
-    } else if (typeof current === 'object' && key in current) {
-      current = current[key];
+    } else if (typeof current === 'object' && current !== null && key in current) {
+      current = (current as Record<string | number, unknown>)[key];
     } else {
       return false;
     }
@@ -134,7 +134,7 @@ export function getNestedPaths(
   const paths: string[] = [];
   const visited = new WeakSet();
 
-  function traverse(current: any, path: string, depth: number) {
+  function traverse(current: unknown, path: string, depth: number) {
     // Prevent infinite loops with circular references
     if (typeof current === 'object' && current !== null) {
       if (visited.has(current)) {
@@ -155,10 +155,11 @@ export function getNestedPaths(
         traverse(item, itemPath, depth + 1);
       });
     } else if (typeof current === 'object' && current !== null) {
-      Object.keys(current).forEach(key => {
+      const currentObj = current as Record<string, unknown>;
+      Object.keys(currentObj).forEach(key => {
         const keyPath = path ? `${path}.${key}` : key;
         paths.push(keyPath);
-        traverse(current[key], keyPath, depth + 1);
+        traverse(currentObj[key], keyPath, depth + 1);
       });
     }
   }
@@ -216,5 +217,13 @@ function parsePath(path: string): (string | number)[] {
   }
 
   // Filter out empty strings that might result from malformed paths like 'a..b' or '.a'
-  return keys.filter(key => key !== '');
+  const filteredKeys = keys.filter(key => key !== '');
+  
+  // If the original path had malformed syntax (consecutive dots, trailing dots, etc.)
+  // and we filtered out keys, treat this as an invalid path
+  if (path.includes('..') || path.startsWith('.') || path.endsWith('.')) {
+    return [];
+  }
+  
+  return filteredKeys;
 }
