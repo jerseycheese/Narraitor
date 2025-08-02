@@ -1,17 +1,17 @@
 # Narraitor MVP Roadmap
 
-## Project Overview
-Narraitor is an AI-driven narrative RPG that combines world creation, character development, and dynamic storytelling powered by Google Gemini AI. The project uses Next.js, TypeScript, and follows domain-driven design with strict TDD practices.
+## Where We Are
+The core functionality is working and stable. All the main systems (AI storytelling, world creation, character building, session persistence) are operational and tested. Currently in the polish phase - fixing UI edge cases, optimizing performance, and preparing for broader use.
 
-**Current Status**: Functional MVP Ready - Core systems implemented, in testing/polish phase for public launch
+**Status**: Functional MVP ready, focusing on user experience refinements.
 
-## MVP Definition
-The MVP delivers a complete single-player narrative experience with:
-- AI-powered world and character creation
-- Dynamic narrative generation with meaningful choices
-- Character progression and session persistence
-- Journal tracking and session persistence
-- Polished UI/UX for desktop and mobile
+## What the MVP Does
+A complete solo narrative RPG experience where you can:
+- Create any fictional world with AI assistance for attributes and skills
+- Build characters that fit your world's rules and theme
+- Play through AI-generated stories that adapt to your choices and setting
+- Track progress and decisions in a persistent journal
+- Pick up where you left off with automatic session saving
 
 ## Development Phases
 
@@ -25,29 +25,29 @@ The MVP delivers a complete single-player narrative experience with:
 - [x] State management and persistence
 
 ### Phase 2: UI/UX Polish 🎯 (Current Focus)
-**Navigation Improvements (#493)**
-- [x] Mobile navigation experience (#509)
-- [ ] Keyboard navigation support (#510)
-- [x] Navigation state persistence (#511)
-- [x] Loading states for transitions (#512)
+Making the user experience smooth and intuitive. Navigation improvements are mostly done - mobile works well, loading states are responsive, and state persists properly. 
 
-**Content Presentation**
-- [ ] Format dialogue and paragraphs (#231)
-- [ ] Review attribute suggestions UI (#229)
-- [ ] Review skill suggestions UI (#232)
+**Remaining work**:
+- Keyboard navigation support for accessibility
+- Better formatting for dialogue and narrative text 
+- UI review for attribute and skill suggestion workflows
 
 ### Phase 3: Testing & Quality 🔧
-- [ ] Visual regression testing setup (#384)
-- [ ] E2E test coverage for critical paths
-- [ ] Performance optimization
-- [ ] Accessibility audit and fixes
-- [ ] Cross-browser compatibility
+Foundation is solid, now ensuring everything works reliably across different environments and use cases.
+
+- Visual regression testing for UI consistency
+- E2E coverage for critical user flows
+- Performance optimization (especially AI response times)
+- Accessibility audit and compliance fixes
+- Cross-browser testing and compatibility
 
 ### Phase 4: Launch Preparation 📦
-- [ ] Production deployment configuration
-- [ ] Analytics and monitoring setup
-- [ ] User onboarding flow
-- [ ] Documentation and help system
+Getting ready for broader use beyond personal development.
+
+- Production deployment setup and monitoring
+- User onboarding flow for new users
+- Documentation and help system
+- Analytics to understand usage patterns
 - [ ] Marketing website/landing page
 
 ## High-Priority MVP Issues
