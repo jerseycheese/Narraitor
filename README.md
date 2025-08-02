@@ -1,146 +1,106 @@
 # Narraitor
 
-A world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any world.
+So I've been building this AI-powered storytelling app that basically lets you play through narrative RPG experiences in any fictional world you can imagine. Whether you want to explore Middle Earth, create adventures in the Star Wars universe, or design something completely original, Narraitor adapts the AI storytelling to match your world's themes and tone.
 
-## Project Overview
+## What This Actually Does
 
-Narraitor is a Next.js-based web application providing an AI-driven narrative experience for tabletop RPGs across any fictional world. The application uses modern AI models to deliver dynamic storytelling while adapting to the specific themes, tone, and mechanics of the selected world.
+The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part - it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
 
-## Features
+## Key Features
 
-- **World Configuration**: Flexible system for defining settings, rules, and parameters for any fictional universe
-- **AI-Assisted World Creation**: Wizard with intelligent attribute and skill suggestions based on genre and theme
-- **Character Management**: Comprehensive creation and management system with attributes, skills, and background
-- **Dynamic AI Narrative Engine**: Advanced storytelling with context-aware generation and decision weight analysis
-- **Decision Weight System**: Visual prominence indicators for important narrative choices (Minor/Major/Critical)
-- **Choice Alignment System**: Lawful/Neutral/Chaotic choice categorization with visual indicators
-- **Smart Context Summaries**: AI-generated decision context that explains stakes rather than retelling story
-- **Ending Generation**: AI-powered story conclusions with multiple ending types and visual feedback
-- **Journal System**: Comprehensive tracking of gameplay events, decisions, and narrative progression
-- **State Persistence**: Reliable session management using IndexedDB for seamless gameplay continuation
-- **Navigation Loading System**: Comprehensive loading states with debounced indicators, accessibility support, and graceful error handling
-- **Visual Theming**: Dynamic styling and presentation based on world settings and narrative context
-- **Template Worlds**: Pre-configured worlds (Western, Sitcom, Adventure) for quick start gameplay
-- **Accessibility**: Screen reader support, keyboard navigation, semantic HTML structure, and focus management
+**World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-## Getting Started
+**Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories - all tailored to fit your specific fictional universe.
 
-### Prerequisites
+**Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
-- Node.js (v18 or later)
-- npm
-- Google Gemini API key (for AI features)
+**Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
-### Installation
+**Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
+
+**Template Worlds**: Don't want to build from scratch? Start with pre-configured worlds like Western, Sitcom, or high Fantasy, then customize from there.
+
+## Getting It Running
+
+You'll need Node.js (v18+), npm, and a Google Gemini API key. The API key stays server-side for security - no client exposure.
 
 ```bash
-# Clone the repository
+# Clone and set up
 git clone https://github.com/jerseycheese/narraitor.git
 cd narraitor
-
-# Install dependencies
 npm install
 
-# Configure environment variables
+# Add your API key
 cp .env.example .env.local
-# Edit .env.local and add your GEMINI_API_KEY (server-side only for security)
+# Edit .env.local and add: GEMINI_API_KEY=your-key-here
 
-# Start the development server
+# Fire it up
 npm run dev
 ```
 
-## Development
+The app runs on `localhost:3000`. You'll see the world creation wizard first - either pick a template or build your own universe.
 
-This project follows a component-first development approach using Storybook and Test-Driven Development.
+## Development Setup
+
+I've been using a component-first approach with Storybook and TDD. Basically, build components in isolation first, then integrate them. It keeps things manageable.
 
 ```bash
-# Run Storybook
+# Component development
 npm run storybook
 
-# Run tests
+# Testing
 npm run test
+npm run test:prompt-templates  # AI prompt validation
 
-# Run specific test suites
-npm run test:prompt-templates
+# Interactive testing
+npm run dev
+# Then visit /dev routes for component testing
 ```
 
-### Development Test Harnesses
+There are several `/dev` routes for testing components interactively - `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
 
-The application includes test harnesses for interactive component testing:
+## How It's Organized
 
-- `/dev` - Development test harness index
-- `/dev/world-creation-wizard` - World Creation Wizard test harness
-- `/dev/test` - Basic test component
-- `/dev/controls` - Developer controls interface
-- `/dev/mocks` - Mock services testing
-
-## Project Structure
-
-The project uses Next.js App Router (Next.js 15+) with the following structure:
+Using Next.js 15 with App Router. The structure follows domain-driven design, so related functionality stays together:
 
 ```
 src/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Home page
-│   ├── error.tsx           # Error boundary
-│   ├── loading.tsx         # Loading state
-│   └── dev/                # Development test harnesses
-├── components/             # Shared UI components
-├── lib/                    # Utility functions and services
-├── state/                  # State management (Zustand stores)
-├── types/                  # TypeScript type definitions
+├── app/                    # Next.js pages and API routes
+├── components/             # UI components (organized by domain)
+├── state/                  # Zustand stores for each domain
+├── lib/                    # AI services and utilities  
+├── types/                  # TypeScript definitions
 └── utils/                  # Helper functions
 ```
 
-## Architecture
+The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/WorldEditor/` instead of `components/editors/WorldEditor/`. Makes it easier to find related functionality.
 
-Narraitor follows a domain-driven design approach with clear separation of concerns:
+## Technical Architecture
 
-- **World Configuration**: Define settings, rules, and parameters
-  - Multi-step wizard for creating worlds
-  - AI-assisted attribute and skill generation
-  - Default attributes and skills for quick setup
-- **Character System**: Create and manage characters
-- **Narrative Engine**: AI-driven storytelling with template system
-- **Journal System**: Track gameplay events
-- **State Management**: Persist game state between sessions using Zustand
-- **AI Service Integration**: Google Gemini integration for dynamic content generation
+The app separates concerns into clear domains:
 
-### App Router Migration
+**World Management**: Multi-step wizard for creating fictional universes. The AI suggests attributes and skills based on your world's theme, but you can customize everything. Template worlds give you starting points.
 
-The application has been migrated from Next.js Pages Router to App Router, leveraging:
-- React Server Components for improved performance
-- Nested layouts for better code organization
-- Built-in error boundaries and loading states
-- Metadata API for SEO optimization
+**Character Creation**: Point-allocation system that adapts to your world's attributes and skills. Background generation helps flesh out character stories.
 
-## AI Service Integration
+**AI Narrative Engine**: Google Gemini integration handles story generation. The key innovation here is context management - the AI maintains awareness of your world's rules, character details, and story history to generate consistent narratives.
 
-Narraitor uses Google Gemini AI for dynamic narrative generation through secure server-side API routes. Configure the service by setting environment variables:
+**State Persistence**: Zustand stores with IndexedDB backing. Game sessions persist across browser sessions, and there's graceful fallback to memory-only if IndexedDB fails.
+
+**Security**: API keys stay server-side. All AI requests go through Next.js API routes with rate limiting (50/hour per IP) to prevent abuse.
+
+## AI Integration Details
+
+The AI system routes everything through Next.js API endpoints (`/api/narrative/generate`, `/api/narrative/choices`) for security. Your API key never touches the browser.
 
 ```bash
 # .env.local
-GEMINI_API_KEY=your-api-key  # Server-side only for security
+GEMINI_API_KEY=your-api-key
 ```
 
-### Security Features
+**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
-- **Server-side API keys**: API keys are never exposed to the browser
-- **Rate limiting**: 50 requests per hour per IP to prevent abuse
-- **Secure proxy**: All AI requests route through Next.js API endpoints
-- **Request validation**: Input sanitization and error handling
-
-All AI requests are processed through secure API routes (`/api/narrative/generate`, `/api/narrative/choices`) instead of direct client-side calls. See the [AI Service API documentation](docs/technical-guides/ai-service-api.md) for implementation details.
-
-### Portrait Generation
-
-Narraitor includes an AI-powered portrait generation system for creating character images. For comprehensive documentation, see:
-
-- [Portrait Generation Documentation](docs/features/portrait-generation/) - Complete guide to the portrait system
-- [API Reference](docs/features/portrait-generation/api.md) - Endpoint documentation and OpenAPI spec
-- [Integration Guide](docs/features/portrait-generation/integration-guide.md) - How to use portraits in your components
-- [Troubleshooting](docs/features/portrait-generation/troubleshooting.md) - Common issues and solutions
+**Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation/` for details on how that works.
 
 ## License
 

@@ -8,7 +8,7 @@ updated: 2025-04-30
 
 # Narraitor Documentation
 
-Welcome to the documentation for Narraitor, a world-agnostic narrative-driven RPG framework using AI to deliver dynamic storytelling experiences adaptable to any fictional world.
+So this is the documentation hub for Narraitor - an AI-powered storytelling app that lets you play narrative RPGs in any fictional universe you can imagine. The docs are organized by topic, but honestly the project overview is probably the best starting point if you're new here.
 
 ## Documentation Sections
 
@@ -74,22 +74,19 @@ Welcome to the documentation for Narraitor, a world-agnostic narrative-driven RP
 - [[universes/sitcom|Sitcom World Template]]
 - [[universes/fantasy|Fantasy World Template]]
 
-## Key Project Goals
+## What I'm Building Toward
 
-1. Create a flexible narrative RPG framework adaptable to any fictional world
-2. Implement world-agnostic systems for characters and storytelling
-3. Develop a clean, modular codebase with strict quality standards
-4. Follow Test-Driven Development practices
-5. Create a responsive and accessible UI with world-appropriate styling
-6. Build robust error handling and recovery mechanisms
+The goal is a flexible storytelling framework that can adapt to any fictional universe - not just generic fantasy. Whether you want noir detective stories, space opera, or something set in your favorite fictional world, the AI should understand and match that setting's tone and rules.
 
-## Development Status
+**Technical priorities**: Clean, modular code with TDD practices. Responsive UI that adapts styling to match different world themes. Robust error handling because AI integrations can be unpredictable.
 
-The project is currently in the planning phase. Requirements have been refined and detailed, and the next steps include converting these requirements into GitHub issues and beginning the implementation of the core state management system and world configuration functionality.
+## Current Status
+
+The core functionality is working and stable. Currently in the polish phase - fixing UI edge cases, optimizing performance, and preparing for broader use. Check the project overview for more details.
 
 ## Contributing
 
-This is primarily a solo project, but suggestions and feedback are welcome through GitHub issues.
+Primarily a solo project, but suggestions and feedback through GitHub issues are always welcome.
 
 ## License
 
