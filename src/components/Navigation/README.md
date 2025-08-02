@@ -1,14 +1,14 @@
 # Navigation Component
 
-## Overview
-The Navigation component provides the main application navigation with integrated loading states, responsive design, and accessibility features.
+So this handles the main app navigation with loading states, responsive design, and accessibility features. The key insight was that navigation needs to be context-aware - the available options change based on whether you have a world selected, characters created, etc.
 
-## Features
-- **Integrated Loading States**: Automatic loading indicators for navigation actions
-- **Responsive Design**: Adaptive layout for desktop and mobile devices
-- **Current World Context**: Dynamic navigation based on active world
-- **Accessibility**: Keyboard navigation and screen reader support
-- **Loading Integration**: Pre-integrated with NavigationLoadingProvider
+## What It Provides
+
+**Smart context awareness** - Navigation options adapt based on current world and available characters. No dead links or confusing states.
+
+**Integrated loading states** - Automatic loading indicators when navigating between pages. Users always know when something is happening.
+
+**Mobile-friendly** - Responsive design that works well on both desktop and mobile devices with appropriate touch targets.
 
 ## Usage
 

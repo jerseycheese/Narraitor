@@ -1,10 +1,10 @@
 # GameSession Components
 
-This folder contains the refactored GameSession components, which were split according to issue #361 to meet the project's file size constraints (<300 lines per file).
+So this folder contains the game session components that were split up to keep files under 300 lines (issue #361). The main challenge was organizing complex state management and AI interactions into manageable pieces.
 
-## Component Architecture
+## How It's Organized
 
-The GameSession has been refactored using the Container/Presenter pattern:
+Using a Container/Presenter pattern where the main GameSession component orchestrates everything, and smaller components handle specific responsibilities:
 
 ### Main Components
 

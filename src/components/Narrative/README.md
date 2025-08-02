@@ -1,12 +1,12 @@
 # Narrative Component System
 
-The Narrative components are responsible for generating, displaying, and managing AI-powered narrative content within game sessions. This system dynamically generates world-specific narrative content that adapts to the game world's theme, attributes, and player choices.
+So these components handle the core AI storytelling functionality - generating, displaying, and managing narrative content that adapts to your specific world and player choices. This is where the magic happens in terms of creating stories that feel authentic to your setting.
 
 ## Components Overview
 
 ### NarrativeController
 
-The main controller component that handles the generation of narrative segments and stores them.
+The main orchestrator that handles AI narrative generation. It manages the flow from player choices to new story segments, keeps track of what's already been generated, and automatically generates contextual player choices after each story segment.
 
 **Props:**
 - `worldId` (string, required): The ID of the current world

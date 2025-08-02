@@ -1,26 +1,14 @@
 # Character Creation Wizard
 
-A multi-step wizard for creating player characters with attribute allocation, skill selection, and background creation.
+So this wizard handles character creation with point allocation, skill selection, and background building. The challenge was balancing flexibility with guidance - giving users enough options without overwhelming them.
 
-## Features
+## What It Does
 
-- **4-Step Process**:
-  1. Basic Information (name, description, portrait)
-  2. Attributes (point allocation with constraints)
-  3. Skills (selection based on world limits)
-  4. Background (history, personality, goals)
+**Guided 4-step process**: Basic info → Attribute allocation → Skill selection → Background creation. Each step builds on your world's specific rules and constraints.
 
-- **Smart Validation**:
-  - Name uniqueness checking
-  - Minimum character counts for descriptions
-  - Point pool constraints
-  - Real-time validation feedback
+**Smart validation**: Prevents duplicate names, enforces point pool limits, provides real-time feedback. You can't accidentally create invalid characters.
 
-- **Visual Features**:
-  - Dynamic portrait placeholder with initials
-  - Progress tracking
-  - Responsive design
-  - Consistent styling with WorldCreationWizard
+**Adaptive to world rules**: Uses your world's custom attributes and skills. Creating a character for a Star Wars world feels different from a Lovecraft horror setting.
 
 ## Usage
 
