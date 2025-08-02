@@ -3,7 +3,7 @@ title: Narraitor Documentation
 aliases: [Documentation Home, Docs Home]
 tags: [narraitor, documentation, index]
 created: 2025-04-28
-updated: 2025-04-30
+updated: 2025-08-02
 ---
 
 # Narraitor Documentation
@@ -82,7 +82,9 @@ The goal is a flexible storytelling framework that can adapt to any fictional un
 
 ## Current Status
 
-The core functionality is working and stable. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use. Check the project overview for more details.
+**Major milestone achieved**: Core MVP functionality is complete! All primary systems (world creation, character building, narrative engine, navigation, session persistence) are fully operational. Focus has shifted to user experience polish, developer infrastructure, and production readiness.
+
+**Current phase**: Advanced polish - 30 high-priority items remain, primarily journal system completeness, developer debugging tools, and feature depth. Check the [MVP roadmap](development/mvp-roadmap.md) and [remaining work breakdown](development/remaining-mvp-work.md) for detailed status.
 
 ## Contributing
 
