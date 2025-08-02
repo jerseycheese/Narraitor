@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useNavigationPersistence } from '@/hooks/useNavigationPersistence';
 import Logger from '@/lib/utils/logger';
 
 /**
