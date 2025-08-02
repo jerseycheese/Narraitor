@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Repository Structure
 
-Next.js App Router project structure with domain-driven organization.
+So the project structure follows domain-driven design principles with Next.js App Router. The idea is to group related functionality together rather than organizing by file type - which makes finding related code much easier.
 
 ## Structure
 
@@ -59,25 +59,23 @@ narraitor/
 └── package.json                 # Dependencies and scripts
 ```
 
-## Domain Organization
+## How Domain Organization Works
 
-**Zustand Stores**: Each domain has its own store (`worldStore`, `characterStore`, etc.)
-**Components**: Organized by domain with shared UI components
-**Types**: TypeScript definitions grouped by domain
-**Pages**: App Router structure with nested routes
+Instead of having all components in one giant folder, they're grouped by what part of the app they serve:
 
-## Key Features
+- **`components/world/`** - Everything related to world creation and management
+- **`components/character/`** - Character creation, editing, display components
+- **`components/narrative/`** - Story generation, choice presentation, narrative flow
+- **`components/ui/`** - Shared shadcn/ui components used everywhere
 
-**Development Harnesses**: `/dev/*` routes for testing components
-**API Security**: Server-side API routes with rate limiting
-**State Persistence**: IndexedDB integration with Zustand
-**Component Development**: Storybook for isolated component testing
-**Type Safety**: Comprehensive TypeScript coverage
+Same pattern for stores, types, and pages. When you're working on character creation, all the related files are in the same area.
 
-## Configuration Files
+## Notable Features
 
-- `next.config.ts` - Next.js configuration
-- `tailwind.config.ts` - Tailwind CSS v4 setup
-- `jest.config.cjs` - Testing configuration
-- `.storybook/` - Storybook configuration
-- `CLAUDE.md` - AI assistant instructions
+**Development routes** - The `/dev/*` pages let you test components in isolation with real data. Really helpful for debugging complex interactions.
+
+**API security** - All AI requests go through server-side routes with rate limiting. API keys never touch the browser.
+
+**State persistence** - Zustand stores automatically sync with IndexedDB, so game sessions persist across browser restarts.
+
+**Type safety** - TypeScript everywhere with domain-specific type definitions. Makes refactoring much safer.

@@ -7,9 +7,9 @@ updated: 2025-06-26
 
 # State Management Guide
 
-Domain-driven state management using Zustand with TypeScript.
+So the state management here uses Zustand with domain-driven stores. The key insight was that each major area of the app (World, Character, Narrative, etc.) needed its own state management, but they should follow consistent patterns.
 
-## Architecture Overview
+## How It's Organized
 
 ```mermaid
 graph TD
@@ -23,9 +23,11 @@ graph TD
     B --> I[Inventory Store]
 ```
 
+Each store handles its own domain, but they can interact when needed. For example, the Character Store needs to know about available worlds from the World Store.
+
 ## Store Pattern
 
-Each domain follows a consistent structure:
+Every store follows the same basic structure, which makes them predictable and easier to test:
 
 ```typescript
 interface DomainStore {

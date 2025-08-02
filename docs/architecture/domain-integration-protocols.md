@@ -7,26 +7,29 @@ updated: 2025-06-26
 
 # Domain Integration
 
-How different domains communicate and integrate using Zustand stores.
+So the different parts of the app need to work together, but without creating tight coupling. The approach here is independent stores that components can access as needed, with clear boundaries between domains.
 
-## Domain Boundaries
+## Domain Structure
 
-**Core Domains:**
-- **World**: World configuration, attributes, skills
-- **Character**: Character data, progression, attributes
-- **Narrative**: Story generation, choices, progression
-- **Journal**: Entry tracking, session history
-- **Session**: Game state, navigation
-- **Inventory**: Items, equipment, effects
-- **AI Context**: Prompt management, context building
+Each major area has its own responsibilities:
 
-## Integration Principles
+- **World**: World configuration, custom attributes, skills, and rules
+- **Character**: Character creation, progression, and attribute management
+- **Narrative**: AI story generation, choice presentation, and story flow
+- **Journal**: Session tracking, decision history, and progress logging
+- **Session**: Current game state, navigation, and user context
+- **Inventory**: Items, equipment, and character possessions (future)
+- **AI Context**: Prompt building, context management, and AI communication
 
-1. **Store Independence**: Each domain has its own Zustand store
-2. **Cross-Store Communication**: Components access multiple stores as needed
-3. **Consistent Patterns**: All stores follow the same CRUD structure
-4. **Error Isolation**: Domain errors don't cascade to other domains
-5. **Type Safety**: TypeScript interfaces ensure contract compliance
+## How They Work Together
+
+**Store independence** - Each domain manages its own state without directly depending on others. This makes testing easier and prevents cascading failures.
+
+**Cross-domain access** - Components can read from multiple stores when they need data from different domains. For example, a game session needs world rules, character data, and narrative state.
+
+**Consistent patterns** - All stores follow the same CRUD structure, so learning one store makes the others predictable.
+
+**Error containment** - If the AI service fails, it doesn't break world creation or character management.
 
 ## Integration Patterns
 
