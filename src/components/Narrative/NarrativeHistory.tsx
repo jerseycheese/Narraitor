@@ -45,21 +45,11 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
       // Only auto-scroll if user hasn't manually scrolled or is near bottom
       if (!userHasScrolledRef.current || isNearBottomRef.current) {
-        // For smooth snap-to-center scrolling, scroll to the last segment
-        const lastSegment = scrollViewportRef.current.querySelector('.narrative-segment:last-child');
-        if (lastSegment && typeof lastSegment.scrollIntoView === 'function') {
-          lastSegment.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
-          });
-        } else {
-          // Fallback to regular scroll
-          scrollViewportRef.current.scrollTo({
-            top: scrollViewportRef.current.scrollHeight,
-            behavior: 'smooth'
-          });
-        }
+        // Scroll to the bottom of the container to show the latest content
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
         userHasScrolledRef.current = false; // Reset manual scroll flag
       }
     }
@@ -158,10 +148,10 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         break;
       case 'End':
         event.preventDefault();
-        const lastSegment = segments[segments.length - 1] as HTMLElement;
-        lastSegment.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
+        // Scroll to the bottom to show the latest content
+        scrollViewportRef.current.scrollTo({
+          top: scrollViewportRef.current.scrollHeight,
+          behavior: 'smooth'
         });
         userHasScrolledRef.current = true;
         break;
