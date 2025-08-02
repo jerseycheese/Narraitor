@@ -7,21 +7,15 @@ updated: 2025-06-08
 
 # Custom Player Input
 
-Allows players to type custom actions instead of being limited to AI-generated choices. Enhances player agency while maintaining narrative coherence.
+So this feature addresses a key limitation of most AI narrative systems - being stuck with whatever choices the AI generates. Sometimes you want to try something completely different, and the AI should be able to respond to creative player input.
 
-## User Interface
+## How It Works
 
-### Input Design
-- **Prominent textarea**: Always visible at top of choice interface
-- **Character limit**: 250 characters (configurable)
-- **Live counter**: Shows "23/250" with color feedback (amber near limit, red at limit)
-- **Validation**: Prevents empty/whitespace-only submissions
-- **Submission**: Submit button or Enter key
-- **Auto-clear**: Input clears after successful submission
+**Always Available Input** - There's a prominent text area above the suggested actions where you can type anything you want to try. 250 character limit keeps responses focused while allowing creative freedom.
 
-### Visual Hierarchy
-- Custom input field is larger and more prominent than suggested actions
-- Suggested actions appear below with "Or choose a suggested action:" header
+**Smart Validation** - Prevents empty submissions and shows a live character counter with color feedback (amber when getting close to the limit, red when you hit it).
+
+**Prioritized Display** - The custom input field is more prominent than the suggested actions, with suggested choices appearing below under "Or choose a suggested action." This encourages creativity while still providing fallback options.
 
 ## Technical Implementation
 

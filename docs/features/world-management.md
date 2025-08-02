@@ -7,42 +7,22 @@ updated: 2025-06-26
 
 # World Management
 
-Complete world lifecycle management including creation, editing, deletion, and configuration systems.
+So world creation is where users define the rules and tone for their narrative experiences. The challenge was making this flexible enough for any fictional universe while keeping it approachable for users who just want to jump in and play.
 
-## World Configuration System
+## How World Configuration Works
 
-Foundation system for defining fictional world parameters, tone, and mechanics.
+**Basic Setup** - Name, description, genre, and visual theme. This gives the AI context about what kind of stories to generate.
 
-### Core Components
+**Custom Attributes** - These are the core characteristics that matter in your world. Want "Force Sensitivity" for Star Wars? "Sanity" for Lovecraft? You define what's important. Range is 1-10 for simplicity.
 
-**World Entity**
-- **Basic Information**: Name, description, genre, and visual theme
-- **Attributes**: Core characteristics that define entities (1-10 range)
-- **Skills**: Specific abilities entities can develop (1-5 range)
-- **Tone Settings**: Parameters controlling narrative style and content
-- **Limits**: Configurable constraints (max 6 attributes, 12 skills)
+**World-Specific Skills** - Abilities that make sense for your setting. "Lightsaber Combat" for Star Wars, "Occult Knowledge" for horror settings. Range is 1-5 to keep character creation manageable.
 
-**Attributes**
-- **Name**: Attribute identifier (e.g., "Strength", "Arcane Power")
-- **Description**: What the attribute represents in the world
-- **Range**: Fixed 1-10 for MVP
-- **Default Value**: Starting value for new characters (1-10)
+**Tone Settings** - This controls how the AI generates content:
+- **Content rating** from G to NC-17 with clear content guidelines
+- **Narrative style** - serious, humorous, dramatic, mysterious, action-packed
+- **Language complexity** and **pacing** to match your preferences
 
-**Skills**
-- **Name**: Skill identifier (e.g., "Marksmanship", "Spellcasting")
-- **Description**: What the skill represents in the world
-- **Related Attributes**: Attributes that influence this skill
-- **Range**: Fixed 1-5 for MVP
-- **Default Value**: Starting value for new characters (1-5)
-
-### Tone Settings
-
-Control narrative style and AI-generated content:
-
-**Content Rating**: G, PG, PG-13, R, NC-17 with specific content guidelines
-**Narrative Style**: Serious, humorous, dramatic, mysterious, action-packed, etc.
-**Language Complexity**: Simple, moderate, advanced vocabulary levels
-**Pacing**: Slow, moderate, fast narrative progression
+**Constraints** - Up to 6 attributes and 12 skills max. This keeps character creation from becoming overwhelming while allowing enough customization for most settings.
 
 ## World Creation
 

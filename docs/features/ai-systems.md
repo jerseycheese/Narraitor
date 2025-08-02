@@ -7,29 +7,27 @@ updated: 2025-06-26
 
 # AI Systems
 
-Comprehensive guide to AI-powered features in Narraitor using Google Gemini.
+So the AI integration here is pretty central to the whole experience. The key insight was that generic AI story generation produces bland results, but if you give the AI specific context about your world's rules and tone, it can generate content that feels authentic to that setting.
 
-## Overview
+## What the AI Does
 
-Narraitor uses Google Gemini AI for multiple systems:
-- **Narrative Generation**: Dynamic story creation and progression
-- **Choice Generation**: Context-aware player options
-- **Goal Tracking**: Automatic extraction and tracking of player objectives
-- **World Suggestions**: AI-assisted world attribute and skill recommendations
-- **Smart Templates**: Automated world template generation
-- **Ending Detection**: Intelligent story conclusion point detection
+**Narrative Generation** - Creates story segments that adapt to your world's theme and tone. A noir detective story feels completely different from a space opera adventure.
 
-## Security Architecture
+**Choice Generation** - Provides contextual player options that make sense for the current situation and character abilities.
 
-### Secure Proxy Pattern
-- **Client**: Uses `ClientGeminiClient` (proxies to API routes)
-- **Server**: Uses `GeminiClient` with secure API key
-- **API Routes**: `/api/narrative/generate`, `/api/narrative/choices`, `/api/generate-portrait`
+**World Building Assistance** - Suggests appropriate attributes and skills based on your world's genre and description.
 
-### Rate Limiting & Protection
-- **50 requests/hour per IP**
-- Server-side API key protection (`GEMINI_API_KEY`)
-- Headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+**Smart Goal Tracking** - Automatically extracts and tracks player objectives from the narrative flow.
+
+**Ending Detection** - Recognizes when a story arc has reached a natural conclusion point.
+
+## Security & Performance
+
+The AI requests all go through secure server-side routes to keep API keys protected:
+
+- **Rate limiting**: 50 requests/hour per IP to prevent abuse and control costs
+- **Server-side keys**: `GEMINI_API_KEY` never reaches the browser
+- **Proxy pattern**: Client-side code calls Next.js API routes, which handle the actual AI communication
 
 ## AI Service Integration
 
