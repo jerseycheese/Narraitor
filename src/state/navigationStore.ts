@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { isStorageAvailable } from '@/utils/storageHelpers';
 import Logger from '@/lib/utils/logger';
 
@@ -200,8 +201,7 @@ const defaultPreferences: NavigationPreferences = {
  * Navigation store for managing navigation state persistence
  */
 export const useNavigationStore = create<NavigationState>()(
-  // Temporarily remove persist middleware to fix initialization blocking
-  // persist(
+  persist(
     (set, get) => ({
       // Initial state
       currentPath: null,
@@ -446,16 +446,14 @@ export const useNavigationStore = create<NavigationState>()(
         const { history } = get();
         return history.some(entry => entry.path === path);
       },
-    })
-    // Remove persist configuration temporarily to fix initialization blocking
-    // {
-    //   name: 'narraitor-navigation-store',
-    //   storage: createIndexedDBStorage(),
-    //   version: 1,
-    //   partialize: (state) => ({
-    //     history: state.history,
-    //     preferences: state.preferences,
-    //   }),
-    // }
-  // )
+    }),
+    {
+      name: 'narraitor-navigation-store',
+      version: 1,
+      partialize: (state) => ({
+        history: state.history,
+        preferences: state.preferences,
+      }),
+    }
+  )
 );
