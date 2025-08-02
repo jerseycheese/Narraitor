@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # GitHub Integration Guide
 
-So I built some automation to keep GitHub issues and project documentation in sync. The goal was to reduce manual work for managing user stories and project tracking.
+This I built some automation to keep GitHub issues and project documentation in sync. The goal was to reduce manual work for managing user stories and project tracking.
 
 ## Getting Started
 

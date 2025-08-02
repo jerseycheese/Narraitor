@@ -8,12 +8,12 @@ updated: 2025-06-26
 # Narraitor Project Overview
 
 ## What This Project Does
-So I built this AI storytelling app that lets you play RPG narratives in any fictional universe you can imagine. The key insight was that most AI story generators produce generic fantasy, but what if the AI could actually understand and adapt to specific world rules and tones? 
+I built this AI storytelling app that lets you play RPG narratives in any fictional universe you can imagine. The key insight was that most AI story generators produce generic fantasy, but what if the AI could actually understand and adapt to specific world rules and tones? 
 
 Whether you want noir detective stories, space opera adventures, or something set in Middle Earth, Narraitor learns your world's mechanics and generates narratives that feel authentic to that setting. It's designed for solo play when you want a narrative RPG experience but don't have a group or game master available.
 
 ## Current Status
-The core functionality is working and stable. All the main systems (world creation, character building, AI narrative generation, session persistence) are operational. Currently in the polish phase - fixing UI edge cases, optimizing performance, and preparing for broader use.
+The core functionality is working and stable. All the main systems (world creation, character building, AI narrative generation, session persistence) are operational. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use.
 
 ## Technical Foundation
 - **Framework**: Next.js 15+ with App Router
@@ -41,13 +41,13 @@ The core functionality is working and stable. All the main systems (world creati
 API keys stay server-side with rate limiting (50 requests/hour per IP) to prevent abuse. All input gets sanitized and validated before hitting the AI service.
 
 ## Who This Is For
-Built primarily for personal use - solo narrative RPG experiences when you want to explore stories in specific fictional universes without needing a group or game master.
+Built primarily for personal use: solo narrative RPG experiences when you want to explore stories in specific fictional universes without needing a group or game master.
 
 ## Development Philosophy
 **KISS approach**: Simple, maintainable code over clever solutions. **TDD workflow**: Tests before implementation to catch issues early. **Component-first**: Build in Storybook isolation before integration. **Domain boundaries**: Keep related functionality together.
 
 ## Current Focus
-Polishing the user experience - responsive design, performance optimization, edge case handling. The core functionality works well, so now it's about making it smooth and reliable for broader use.
+Polishing the user experience: responsive design, performance optimization, edge case handling. The core functionality works well, so now it's about making it smooth and reliable for broader use.
 
 ## Technical Architecture
 Domain-driven structure with Zustand stores for each area (World, Character, Narrative, etc.). Shared component patterns for wizards and forms. AI service abstractions handle prompt management and context building. Everything's type-safe with comprehensive validation.

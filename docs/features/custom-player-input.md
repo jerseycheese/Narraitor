@@ -7,7 +7,7 @@ updated: 2025-06-08
 
 # Custom Player Input
 
-So this feature addresses a key limitation of most AI narrative systems - being stuck with whatever choices the AI generates. Sometimes you want to try something completely different, and the AI should be able to respond to creative player input.
+This this feature addresses a key limitation of most AI narrative systems: being stuck with whatever choices the AI generates. Sometimes you want to try something completely different, and the AI should be able to respond to creative player input.
 
 ## How It Works
 

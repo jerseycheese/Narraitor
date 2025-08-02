@@ -1,16 +1,16 @@
 # Narraitor
 
-So I've been building this AI-powered storytelling app that basically lets you play through narrative RPG experiences in any fictional world you can imagine. Whether you want to explore Middle Earth, create adventures in the Star Wars universe, or design something completely original, Narraitor adapts the AI storytelling to match your world's themes and tone.
+I've been building this AI-powered storytelling app that basically lets you play through narrative RPG experiences in any fictional world you can imagine. Whether you want to explore Middle Earth, create adventures in the Star Wars universe, or design something completely original, Narraitor adapts the AI storytelling to match your world's themes and tone.
 
 ## What This Actually Does
 
-The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part - it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
+The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part: it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
 
 ## Key Features
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-**Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories - all tailored to fit your specific fictional universe.
+**Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
@@ -22,7 +22,7 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 ## Getting It Running
 
-You'll need Node.js (v18+), npm, and a Google Gemini API key. The API key stays server-side for security - no client exposure.
+You'll need Node.js (v18+), npm, and a Google Gemini API key. The API key stays server-side for security; no client exposure.
 
 ```bash
 # Clone and set up
@@ -38,7 +38,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The app runs on `localhost:3000`. You'll see the world creation wizard first - either pick a template or build your own universe.
+The app runs on `localhost:3000`. You'll see the world creation wizard first: either pick a template or build your own universe.
 
 ## Development Setup
 
@@ -57,7 +57,7 @@ npm run dev
 # Then visit /dev routes for component testing
 ```
 
-There are several `/dev` routes for testing components interactively - `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
+There are several `/dev` routes for testing components interactively: `/dev/world-creation-wizard`, `/dev/devtools-test`, etc. These let you test components with real data without going through the full app flow.
 
 ## How It's Organized
 
@@ -83,7 +83,7 @@ The app separates concerns into clear domains:
 
 **Character Creation**: Point-allocation system that adapts to your world's attributes and skills. Background generation helps flesh out character stories.
 
-**AI Narrative Engine**: Google Gemini integration handles story generation. The key innovation here is context management - the AI maintains awareness of your world's rules, character details, and story history to generate consistent narratives.
+**AI Narrative Engine**: Google Gemini integration handles story generation. The key innovation here is context management: the AI maintains awareness of your world's rules, character details, and story history to generate consistent narratives.
 
 **State Persistence**: Zustand stores with IndexedDB backing. Game sessions persist across browser sessions, and there's graceful fallback to memory-only if IndexedDB fails.
 
@@ -98,10 +98,10 @@ The AI system routes everything through Next.js API endpoints (`/api/narrative/g
 GEMINI_API_KEY=your-api-key
 ```
 
-**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
+**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part: it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
 **Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation/` for details on how that works.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License; see the LICENSE file for details.

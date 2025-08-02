@@ -1,7 +1,7 @@
 # Narraitor MVP Roadmap
 
 ## Where We Are
-The core functionality is working and stable. All the main systems (AI storytelling, world creation, character building, session persistence) are operational and tested. Currently in the polish phase - fixing UI edge cases, optimizing performance, and preparing for broader use.
+The core functionality is working and stable. All the main systems (AI storytelling, world creation, character building, session persistence) are operational and tested. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use.
 
 **Status**: Functional MVP ready, focusing on user experience refinements.
 
@@ -25,7 +25,7 @@ A complete solo narrative RPG experience where you can:
 - [x] State management and persistence
 
 ### Phase 2: UI/UX Polish 🎯 (Current Focus)
-Making the user experience smooth and intuitive. Navigation improvements are mostly done - mobile works well, loading states are responsive, and state persists properly. 
+Making the user experience smooth and intuitive. Navigation improvements are mostly done: mobile works well, loading states are responsive, and state persists properly. 
 
 **Remaining work**:
 - Keyboard navigation support for accessibility

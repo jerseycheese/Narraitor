@@ -42,5 +42,5 @@ Added guidance under "Code Standards" section:
 - All button styling and functionality preserved
 - Maintained all existing className props for custom styling where needed
 - Kept all event handlers and state management intact
-- No behavioral changes - only UI component standardization
+- No behavioral changes: only UI component standardization
 - All data-testid attributes preserved for testing

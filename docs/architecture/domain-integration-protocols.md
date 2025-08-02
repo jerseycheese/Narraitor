@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Domain Integration
 
-So the different parts of the app need to work together, but without creating tight coupling. The approach here is independent stores that components can access as needed, with clear boundaries between domains.
+This the different parts of the app need to work together, but without creating tight coupling. The approach here is independent stores that components can access as needed, with clear boundaries between domains.
 
 ## Domain Structure
 

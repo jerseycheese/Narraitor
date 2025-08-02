@@ -1,6 +1,6 @@
 # Character Creation Wizard
 
-So this wizard handles character creation with point allocation, skill selection, and background building. The challenge was balancing flexibility with guidance - giving users enough options without overwhelming them.
+This wizard handles character creation with point allocation, skill selection, and background building. The challenge was balancing flexibility with guidance: giving users enough options without overwhelming them.
 
 ## What It Does
 

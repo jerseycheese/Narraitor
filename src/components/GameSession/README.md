@@ -1,6 +1,6 @@
 # GameSession Components
 
-So this folder contains the game session components that were split up to keep files under 300 lines (issue #361). The main challenge was organizing complex state management and AI interactions into manageable pieces.
+This folder contains the game session components that were split up to keep files under 300 lines (issue #361). The main challenge was organizing complex state management and AI interactions into manageable pieces.
 
 ## How It's Organized
 

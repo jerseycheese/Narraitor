@@ -50,7 +50,7 @@ const WIZARD_STEPS = [
     title: 'Quick Start Characters',
     description: 'Choose a character to begin your adventure',
     component: QuickStartStep,
-    validation: () => true // Always valid - selection is optional
+    validation: () => true // Always valid: selection is optional
   }
 ];
 ```
@@ -67,7 +67,7 @@ const showNavigation = currentStep > 0 && currentStep < WIZARD_STEPS.length - 1;
 
 return (
   <div className="max-w-7xl mx-auto p-6">
-    {/* Step indicator - exclude QuickStart from progress */}
+    {/* Step indicator: exclude QuickStart from progress */}
     <StepIndicator 
       steps={WIZARD_STEPS.slice(0, -1)} // Exclude QuickStart
       currentStep={Math.min(currentStep, WIZARD_STEPS.length - 2)}
@@ -80,7 +80,7 @@ return (
       onBack={handleBack}
     />
     
-    {/* Navigation - hidden on QuickStart step */}
+    {/* Navigation: hidden on QuickStart step */}
     {showNavigation && (
       <WizardNavigation 
         onNext={handleNext}

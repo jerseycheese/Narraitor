@@ -8,7 +8,7 @@ updated: 2025-04-30
 
 # Narraitor Documentation
 
-So this is the documentation hub for Narraitor - an AI-powered storytelling app that lets you play narrative RPGs in any fictional universe you can imagine. The docs are organized by topic, but honestly the project overview is probably the best starting point if you're new here.
+This is the documentation hub for Narraitor: an AI-powered storytelling app that lets you play narrative RPGs in any fictional universe you can imagine. The docs are organized by topic, but honestly the project overview is probably the best starting point if you're new here.
 
 ## Documentation Sections
 
@@ -76,13 +76,13 @@ So this is the documentation hub for Narraitor - an AI-powered storytelling app 
 
 ## What I'm Building Toward
 
-The goal is a flexible storytelling framework that can adapt to any fictional universe - not just generic fantasy. Whether you want noir detective stories, space opera, or something set in your favorite fictional world, the AI should understand and match that setting's tone and rules.
+The goal is a flexible storytelling framework that can adapt to any fictional universe: not just generic fantasy. Whether you want noir detective stories, space opera, or something set in your favorite fictional world, the AI should understand and match that setting's tone and rules.
 
 **Technical priorities**: Clean, modular code with TDD practices. Responsive UI that adapts styling to match different world themes. Robust error handling because AI integrations can be unpredictable.
 
 ## Current Status
 
-The core functionality is working and stable. Currently in the polish phase - fixing UI edge cases, optimizing performance, and preparing for broader use. Check the project overview for more details.
+The core functionality is working and stable. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use. Check the project overview for more details.
 
 ## Contributing
 
@@ -90,4 +90,4 @@ Primarily a solo project, but suggestions and feedback through GitHub issues are
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License: see the LICENSE file for details.

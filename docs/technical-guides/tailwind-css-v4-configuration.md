@@ -9,7 +9,7 @@ updated: 2025-06-08
 
 # Tailwind CSS v4 Configuration Guide
 
-So this documents the Tailwind CSS v4 setup, which required some specific configuration changes to work properly with Next.js 15 and the App Router. The main issue was PostCSS plugin compatibility.
+This this documents the Tailwind CSS v4 setup, which required some specific configuration changes to work properly with Next.js 15 and the App Router. The main issue was PostCSS plugin compatibility.
 
 ## Why v4 and Configuration Notes
 

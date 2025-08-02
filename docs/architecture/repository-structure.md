@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Repository Structure
 
-So the project structure follows domain-driven design principles with Next.js App Router. The idea is to group related functionality together rather than organizing by file type - which makes finding related code much easier.
+This the project structure follows domain-driven design principles with Next.js App Router. The idea is to group related functionality together rather than organizing by file type: which makes finding related code much easier.
 
 ## Structure
 

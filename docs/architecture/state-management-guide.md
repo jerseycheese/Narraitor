@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # State Management Guide
 
-So the state management here uses Zustand with domain-driven stores. The key insight was that each major area of the app (World, Character, Narrative, etc.) needed its own state management, but they should follow consistent patterns.
+This the state management here uses Zustand with domain-driven stores. The key insight was that each major area of the app (World, Character, Narrative, etc.) needed its own state management, but they should follow consistent patterns.
 
 ## How It's Organized
 

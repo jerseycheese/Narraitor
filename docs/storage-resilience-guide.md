@@ -118,7 +118,7 @@ function MyComponent() {
 
 | Status | Description | User Impact |
 |--------|-------------|-------------|
-| `HEALTHY` | Storage working normally | None - data saved automatically |
+| `HEALTHY` | Storage working normally | None: data saved automatically |
 | `DEGRADED` | Intermittent issues detected | Some operations may be slower |
 | `UNAVAILABLE` | Storage completely unavailable | Memory-only mode active |
 | `RECOVERING` | Syncing data back to storage | Brief delay during recovery |
@@ -212,7 +212,7 @@ A: User needs to clear browser data or the app needs storage optimization
 A: Try manual health check via UI or wait for next automatic check
 
 **Q: Memory-only mode performance issues**
-A: Large datasets in memory may impact performance - consider data pruning
+A: Large datasets in memory may impact performance: consider data pruning
 
 **Q: Status not updating in UI**
 A: Ensure useStorageStatus hook is used and component is properly mounted

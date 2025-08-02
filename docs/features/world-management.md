@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # World Management
 
-So world creation is where users define the rules and tone for their narrative experiences. The challenge was making this flexible enough for any fictional universe while keeping it approachable for users who just want to jump in and play.
+This world creation is where users define the rules and tone for their narrative experiences. The challenge was making this flexible enough for any fictional universe while keeping it approachable for users who just want to jump in and play.
 
 ## How World Configuration Works
 

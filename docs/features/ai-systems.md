@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # AI Systems
 
-So the AI integration here is pretty central to the whole experience. The key insight was that generic AI story generation produces bland results, but if you give the AI specific context about your world's rules and tone, it can generate content that feels authentic to that setting.
+This the AI integration here is pretty central to the whole experience. The key insight was that generic AI story generation produces bland results, but if you give the AI specific context about your world's rules and tone, it can generate content that feels authentic to that setting.
 
 ## What the AI Does
 
@@ -213,7 +213,7 @@ const context = aiContextStore.buildContextForSession(sessionId, {
 AI-powered detection of natural story conclusion points.
 
 ### Key Features
-- **Pure AI Analysis**: No keyword matching - understands narrative structure
+- **Pure AI Analysis**: No keyword matching: understands narrative structure
 - **Context-Aware**: Analyzes recent segments and broader story context
 - **Confidence-Based**: Only suggests endings with medium/high confidence
 - **Multiple Types**: story-complete, character-retirement, session-limit

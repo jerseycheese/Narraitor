@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Lore Tracking System
 
-So this system solves a major problem with AI storytelling - the AI forgetting important details from earlier in the story. It automatically tracks characters, locations, events, and world rules so the AI can maintain consistency.
+This this system solves a major problem with AI storytelling: the AI forgetting important details from earlier in the story. It automatically tracks characters, locations, events, and world rules so the AI can maintain consistency.
 
 ## What It Does
 

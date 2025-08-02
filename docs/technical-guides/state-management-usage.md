@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # State Management Usage
 
-So here's how to actually work with the Zustand stores in practice. Each major area of the app has its own store, which keeps things organized and makes it easier to reason about state changes.
+This here's how to actually work with the Zustand stores in practice. Each major area of the app has its own store, which keeps things organized and makes it easier to reason about state changes.
 
 ## How the Stores Work
 

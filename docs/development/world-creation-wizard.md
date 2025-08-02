@@ -14,7 +14,7 @@ The World Creation Wizard is a multi-step interface for creating new game worlds
 ## Implementation
 
 ### Components
-- `WorldCreationWizard.tsx` - Main wizard controller (400 lines - needs refactoring)
+- `WorldCreationWizard.tsx` - Main wizard controller (400 lines: needs refactoring)
 - `BasicInfoStep.tsx` - Collects world name and genre
 - `DescriptionStep.tsx` - Gathers world description and triggers AI analysis
 - `AttributeReviewStep.tsx` - Review and modify suggested attributes (max 6)

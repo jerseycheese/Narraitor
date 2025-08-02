@@ -8,7 +8,7 @@ updated: 2025-04-29
 
 # UI/UX Guidelines
 
-So the UI approach here is about creating immersive experiences that adapt to different fictional worlds while staying accessible and responsive. The challenge is balancing thematic consistency with usability.
+This the UI approach here is about creating immersive experiences that adapt to different fictional worlds while staying accessible and responsive. The challenge is balancing thematic consistency with usability.
 
 ## Design Philosophy
 

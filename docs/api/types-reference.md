@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # TypeScript Types Reference
 
-So here are the main TypeScript interfaces and types used throughout the app. These define the data structures for worlds, characters, narratives, and other core entities.
+This here are the main TypeScript interfaces and types used throughout the app. These define the data structures for worlds, characters, narratives, and other core entities.
 
 ## Base Types
 

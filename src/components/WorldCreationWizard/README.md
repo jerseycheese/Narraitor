@@ -1,6 +1,6 @@
 # World Creation Wizard
 
-So this is the multi-step wizard that guides users through creating custom worlds. The challenge was making world creation approachable for users who just want to start playing, while still allowing deep customization for those who want it.
+This is the multi-step wizard that guides users through creating custom worlds. The challenge was making world creation approachable for users who just want to start playing, while still allowing deep customization for those who want it.
 
 ## Key Features
 

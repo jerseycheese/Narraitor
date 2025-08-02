@@ -1,6 +1,6 @@
 # Narrative Component System
 
-So these components handle the core AI storytelling functionality - generating, displaying, and managing narrative content that adapts to your specific world and player choices. This is where the magic happens in terms of creating stories that feel authentic to your setting.
+These components handle the core AI storytelling functionality: generating, displaying, and managing narrative content that adapts to your specific world and player choices. This is where the magic happens in terms of creating stories that feel authentic to your setting.
 
 ## Components Overview
 

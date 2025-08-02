@@ -30,7 +30,7 @@ interface CharacterCardProps {
   onEdit: (id: string) => void;
 }
 
-// ❌ Swiss army knife component - break this down
+// ❌ Swiss army knife component: break this down
 interface CharacterCardProps {
   character: Character;
   onEdit?: (id: string) => void;
@@ -53,7 +53,7 @@ const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
   </div>
 );
 
-// ❌ Too many jobs - split this into smaller components
+// ❌ Too many jobs: split this into smaller components
 const CharacterManager = ({ characters, onEdit, onDelete, onAdd }) => {
   // Handles display, editing, deletion, creation, filtering, sorting...
   // This is asking for bugs
@@ -70,7 +70,7 @@ const [character, setCharacter] = useState<Character | null>(null);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 
-// ❌ Nested state - harder to update safely
+// ❌ Nested state: harder to update safely
 const [state, setState] = useState({
   character: { data: null, meta: { loading: false, error: null } }
 });
@@ -112,7 +112,7 @@ useEffect(() => {
   return () => cancelPendingRequests();
 }, []);
 
-// ❌ Kitchen sink effect - nightmare to debug
+// ❌ Kitchen sink effect: nightmare to debug
 useEffect(() => {
   if (characterId) loadCharacter(characterId);
   if (worldId && !world) loadWorld(worldId);

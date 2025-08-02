@@ -7,14 +7,14 @@ updated: 2025-06-26
 
 # Testing Guide
 
-So the testing approach here is pretty systematic - TDD with React Testing Library and component-driven development. The goal is to catch issues early and make refactoring safer.
+This the testing approach here is pretty systematic - TDD with React Testing Library and component-driven development. The goal is to catch issues early and make refactoring safer.
 
 ## Testing Philosophy
 
 I've found that focusing on user behavior over implementation details makes tests way more useful. Instead of testing internal state changes, test what users actually see and do. This makes tests resilient to refactoring and actually validates the user experience.
 
 **Key principles**:
-- **TDD**: Write tests before implementation - forces you to think about the API first
+- **TDD**: Write tests before implementation: forces you to think about the API first
 - **User-centric**: Test what users see, not how code works internally  
 - **Component isolation**: Test components independently before integration
 - **One thing per test**: Clear, focused assertions that are easy to debug
@@ -71,12 +71,12 @@ test('creates character and updates store', async () => {
 **Descriptive test names** save so much debugging time. When a test fails, you should immediately know what broke:
 
 ```typescript
-// ✅ Clear - tells you exactly what failed
+// ✅ Clear: tells you exactly what failed
 test('displays error message when character creation fails', () => {
   // Test implementation
 });
 
-// ❌ Vague - have to read the test to understand what it does
+// ❌ Vague: have to read the test to understand what it does
 test('handles error', () => {
   // Test implementation
 });
@@ -105,7 +105,7 @@ jest.mock('@/lib/api', () => ({
   createCharacter: mockApiCall
 }));
 
-// ❌ Don't mock your own functions - test them instead
+// ❌ Don't mock your own functions: test them instead
 const mockCalculateTotal = jest.fn();
 jest.mock('./utils', () => ({
   calculateTotal: mockCalculateTotal  // This defeats the purpose of testing

@@ -1,6 +1,6 @@
 # Narrative Consistency Tracking System
 
-So this system solves a key problem with AI storytelling - keeping track of what the player is supposed to be doing and ensuring the AI remembers important story elements. Without this, narratives tend to drift and lose coherence.
+This this system solves a key problem with AI storytelling: keeping track of what the player is supposed to be doing and ensuring the AI remembers important story elements. Without this, narratives tend to drift and lose coherence.
 
 ## What It Does
 

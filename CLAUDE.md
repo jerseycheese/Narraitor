@@ -1,7 +1,7 @@
 # Narraitor Project Memory
 
 ## Project Overview
-So this is an AI-powered storytelling app built with Next.js that lets you play RPG narratives in any fictional universe. The key differentiator is that it's not just generic fantasy - you define your world's rules and tone, and the AI adapts its storytelling to match. Uses domain-driven architecture with strict TDD because keeping things organized matters when you're dealing with complex state management and AI integration.
+This is an AI-powered storytelling app built with Next.js that lets you play RPG narratives in any fictional universe. The key differentiator is that it's not just generic fantasy: you define your world's rules and tone, and the AI adapts its storytelling to match. Uses domain-driven architecture with strict TDD because keeping things organized matters when you're dealing with complex state management and AI integration.
 
 ## Technical Foundation
 - Next.js 15+ with App Router
@@ -21,14 +21,14 @@ So this is an AI-powered storytelling app built with Next.js that lets you play 
 - **No Client Exposure**: Zero sensitive data in browser or JavaScript bundles
 
 ## Development Workflow
-The approach here is pretty systematic. Always write tests first (TDD) because it forces you to think about the API before implementation. Build components in Storybook isolation before integrating them - this catches UI issues early and makes debugging much easier.
+The approach here is pretty systematic. Always write tests first (TDD) because it forces you to think about the API before implementation. Build components in Storybook isolation before integrating them: this catches UI issues early and makes debugging much easier.
 
 Key practices:
 - **File size limits**: 300 lines max for components. If it's bigger, break it down.
 - **Domain boundaries**: Related functionality stays together. No mixing World logic with Character logic.
 - **PR-based workflow**: No direct commits to main branches. Every change gets reviewed.
 - **KISS principle**: Simple solutions over clever ones. The codebase should be readable six months later.
-- **Package stability**: Don't change versions unless explicitly needed - dependency changes break things in unexpected ways.
+- **Package stability**: Don't change versions unless explicitly needed: dependency changes break things in unexpected ways.
 
 ## Automation Workflow System
 Built some pretty sophisticated automation for handling repetitive development tasks. The goal was to reduce friction for common workflows while maintaining safety guardrails:
@@ -165,7 +165,7 @@ The testing approach focuses on behavior over implementation. Test what users ac
 
 Here's the pattern that works well:
 ```javascript
-// Good approach - tests user-visible behavior
+// Good approach: tests user-visible behavior
 test('displays all required world information', () => {
   const mockWorld = { name: 'Test World', description: 'Description', theme: 'Fantasy' };
   render(<WorldCard world={mockWorld} />);
@@ -192,7 +192,7 @@ This approach makes tests more resilient to refactoring and actually validates t
 - Max 300 lines per file
 - Single responsibility for components and functions
 - Domain boundaries must be respected
-- Type safety is mandatory - no any types
+- Type safety is mandatory: no any types
 - Error handling must include recovery mechanisms
 - State updates must be atomic and predictable
 - Performance considerations must be documented
@@ -218,7 +218,7 @@ Documentation should sound like explaining something to a colleague, not writing
 
 ### Content Organization
 - **Keep it practical**: Focus on implementation over theory
-- **Reasonable length**: 150 lines target, 300 max - if it's longer, split it up
+- **Reasonable length**: 150 lines target, 300 max: if it's longer, split it up
 - **Clear headings**: Make it scannable for both humans and AI
 - **Delete outdated stuff**: Remove completed implementation plans (git preserves them)
 - **Consistent naming**: `[feature]-[type].md` pattern
@@ -368,7 +368,7 @@ GEMINI_API_KEY=your-api-key  # Server-side only, never use NEXT_PUBLIC_*
 NEXT_PUBLIC_DEBUG_LOGGING=true
 GITHUB_TOKEN=your-github-token
 
-# .env.production (Production - set in deployment platform)
+# .env.production (Production: set in deployment platform)
 GEMINI_API_KEY=your-api-key  # Server-side only
 NEXT_PUBLIC_DEBUG_LOGGING=false
 ```

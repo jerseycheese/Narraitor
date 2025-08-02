@@ -92,7 +92,7 @@ GEMINI_API_KEY=your-api-key
 ## Best Practices
 
 1. **Performance**: AI analysis is triggered only when necessary
-2. **User Control**: All suggestions are optional - users maintain full control
+2. **User Control**: All suggestions are optional: users maintain full control
 3. **Rate Limiting**: Respects API limits to prevent abuse
 4. **Security**: No API keys exposed to client-side code
 5. **Feedback**: Clear loading states and error messages

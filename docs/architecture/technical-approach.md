@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Technical Approach
 
-So the tech stack here prioritizes maintainability and developer experience over being cutting-edge. The goal was to choose technologies that would still make sense in a year, with good TypeScript support and clear upgrade paths.
+This the tech stack here prioritizes maintainability and developer experience over being cutting-edge. The goal was to choose technologies that would still make sense in a year, with good TypeScript support and clear upgrade paths.
 
 ## Technology Choices
 

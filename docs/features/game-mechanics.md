@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Game Mechanics
 
-So the gameplay here focuses on meaningful choices rather than complex mechanics. The insight was that players needed to understand which decisions actually matter for the story versus routine choices that just move things along.
+This the gameplay here focuses on meaningful choices rather than complex mechanics. The insight was that players needed to understand which decisions actually matter for the story versus routine choices that just move things along.
 
 ## Decision Weight System
 

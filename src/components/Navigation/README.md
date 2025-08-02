@@ -1,6 +1,6 @@
 # Navigation Component
 
-So this handles the main app navigation with loading states, responsive design, and accessibility features. The key insight was that navigation needs to be context-aware - the available options change based on whether you have a world selected, characters created, etc.
+This handles the main app navigation with loading states, responsive design, and accessibility features. The key insight was that navigation needs to be context-aware: the available options change based on whether you have a world selected, characters created, etc.
 
 ## What It Provides
 
