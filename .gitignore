@@ -66,6 +66,7 @@ docs/.obsidian
 
 # Docs
 docs/development/workflows
+docs/voice-profile.md
 
 # Claude Code
 .claude/*
