@@ -45,19 +45,33 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     if (segments.length > prevSegmentCountRef.current && scrollViewportRef.current) {
       // Only auto-scroll if user hasn't manually scrolled or is near bottom
       if (!userHasScrolledRef.current || isNearBottomRef.current) {
-        scrollViewportRef.current.scrollTo({
-          top: scrollViewportRef.current.scrollHeight,
-          behavior: 'smooth'
-        });
+        // For smooth snap-to-center scrolling, scroll to the last segment
+        const lastSegment = scrollViewportRef.current.querySelector('.narrative-segment:last-child');
+        if (lastSegment) {
+          lastSegment.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+          });
+        } else {
+          // Fallback to regular scroll
+          scrollViewportRef.current.scrollTo({
+            top: scrollViewportRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
         userHasScrolledRef.current = false; // Reset manual scroll flag
       }
     }
     prevSegmentCountRef.current = segments.length;
   }, [segments.length]);
 
-  // Keyboard navigation handler
+  // Keyboard navigation handler with snap-to-center behavior
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (!scrollViewportRef.current) return;
+
+    const segments = scrollViewportRef.current.querySelectorAll('.narrative-segment');
+    if (segments.length === 0) return;
 
     const { scrollTop, scrollHeight, clientHeight } = scrollViewportRef.current;
     const scrollStep = clientHeight * 0.8; // Scroll 80% of viewport height
@@ -65,18 +79,56 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
-        scrollViewportRef.current.scrollTo({
-          top: Math.min(scrollTop + 40, scrollHeight - clientHeight),
-          behavior: 'smooth'
-        });
+        // Find the next segment to snap to
+        const currentCenter = scrollTop + clientHeight / 2;
+        let nextSegment = null;
+        for (let i = 0; i < segments.length; i++) {
+          const segment = segments[i] as HTMLElement;
+          const segmentCenter = segment.offsetTop + segment.offsetHeight / 2;
+          if (segmentCenter > currentCenter + 50) { // 50px threshold
+            nextSegment = segment;
+            break;
+          }
+        }
+        if (nextSegment) {
+          nextSegment.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        } else {
+          // If no next segment, scroll down normally
+          scrollViewportRef.current.scrollBy({
+            top: 40,
+            behavior: 'smooth'
+          });
+        }
         userHasScrolledRef.current = true;
         break;
       case 'ArrowUp':
         event.preventDefault();
-        scrollViewportRef.current.scrollTo({
-          top: Math.max(scrollTop - 40, 0),
-          behavior: 'smooth'
-        });
+        // Find the previous segment to snap to
+        const currentCenterUp = scrollTop + clientHeight / 2;
+        let prevSegment = null;
+        for (let i = segments.length - 1; i >= 0; i--) {
+          const segment = segments[i] as HTMLElement;
+          const segmentCenter = segment.offsetTop + segment.offsetHeight / 2;
+          if (segmentCenter < currentCenterUp - 50) { // 50px threshold
+            prevSegment = segment;
+            break;
+          }
+        }
+        if (prevSegment) {
+          prevSegment.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        } else {
+          // If no previous segment, scroll up normally
+          scrollViewportRef.current.scrollBy({
+            top: -40,
+            behavior: 'smooth'
+          });
+        }
         userHasScrolledRef.current = true;
         break;
       case 'PageDown':
@@ -97,17 +149,19 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
         break;
       case 'Home':
         event.preventDefault();
-        scrollViewportRef.current.scrollTo({
-          top: 0,
-          behavior: 'smooth'
+        const firstSegment = segments[0] as HTMLElement;
+        firstSegment.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         });
         userHasScrolledRef.current = true;
         break;
       case 'End':
         event.preventDefault();
-        scrollViewportRef.current.scrollTo({
-          top: scrollHeight - clientHeight,
-          behavior: 'smooth'
+        const lastSegment = segments[segments.length - 1] as HTMLElement;
+        lastSegment.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         });
         userHasScrolledRef.current = true;
         break;
@@ -209,7 +263,14 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
           WebkitOverflowScrolling: 'touch'
         }}
       >
-        <div className="space-y-4 px-4 py-4" style={{ scrollSnapType: 'y mandatory' }}>
+        <div 
+          className="space-y-4 px-4 py-4" 
+          style={{ 
+            scrollSnapType: 'y mandatory',
+            // Ensure scroll snap works properly
+            scrollBehavior: 'smooth'
+          }}
+        >
           {renderContent()}
         </div>
       </ScrollArea>
