@@ -47,7 +47,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
       if (!userHasScrolledRef.current || isNearBottomRef.current) {
         // For smooth snap-to-center scrolling, scroll to the last segment
         const lastSegment = scrollViewportRef.current.querySelector('.narrative-segment:last-child');
-        if (lastSegment) {
+        if (lastSegment && typeof lastSegment.scrollIntoView === 'function') {
           lastSegment.scrollIntoView({
             behavior: 'smooth',
             block: 'center',
