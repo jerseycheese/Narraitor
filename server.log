@@ -1,0 +1,857 @@
+
+> narraitor@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.158:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1039ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1833ms (1249 modules)
+(node:47365) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 2068ms
+ ✓ Compiled in 336ms (486 modules)
+ ✓ Compiled /dev in 199ms (1248 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev 200 in 289ms
+ ✓ Compiled in 171ms (490 modules)
+ ✓ Compiled in 128ms (490 modules)
+ ✓ Compiled / in 135ms (763 modules)
+ ⨯ [Error: Invariant: missing bootstrap script. This is a bug in Next.js] {
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 626ms (1572 modules)
+ GET / 500 in 1508ms
+ ✓ Compiled /favicon.ico in 252ms (866 modules)
+ GET /favicon.ico 200 in 321ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 159ms
+ ✓ Compiled /_not-found in 198ms (1592 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/layout.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/page.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/css/app/layout.css?v=1754116819371 404 in 320ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 317ms
+ GET /_next/static/chunks/app/error.js 404 in 317ms
+ GET /_next/static/chunks/app/page.js 404 in 314ms
+ GET /_next/static/chunks/main-app.js?v=1754116819371 404 in 319ms
+ GET /_next/static/chunks/app/layout.js 404 in 317ms
+ GET /favicon.ico 200 in 9ms
+ ✓ Compiled in 212ms (1606 modules)
+ ⨯ ./src/app/layout.tsx
+Error:   [31mx[0m Unexpected token `html`. Expected jsx identifier
+    ,-[[36;1;4m/Users/jackhaas/Projects/narraitor/src/app/layout.tsx[0m:28:1]
+ [2m25[0m | 
+ [2m26[0m | export default function RootLayout({ children }: RootLayoutProps) {
+ [2m27[0m |   return (
+ [2m28[0m |     <html lang="en" className="antialiased">
+    : [35;1m     ^^^^[0m
+ [2m29[0m |       <body className="font-sans m-0 p-0">
+ [2m30[0m |         <SkipLinks />
+ [2m31[0m |         <NavigationLoadingProvider>
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/layout.tsx
+ ✓ Compiled in 222ms (1601 modules)
+ ✓ Compiled in 111ms (737 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 274ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/page.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/main-app.js?v=1754116856081 404 in 100ms
+ GET /_next/static/chunks/app/error.js 404 in 99ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 99ms
+ GET /_next/static/chunks/app/page.js 404 in 99ms
+ GET /favicon.ico 200 in 13ms
+ ✓ Compiled /worlds in 470ms (1704 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /worlds. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /worlds 200 in 664ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/app/error.js 404 in 60ms
+ GET /_next/static/chunks/main-app.js?v=1754116859629 404 in 61ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 61ms
+ GET /favicon.ico 200 in 5ms
+ ⨯ ./src/app/layout.tsx
+Error:   [31mx[0m Unexpected token `html`. Expected jsx identifier
+    ,-[[36;1;4m/Users/jackhaas/Projects/narraitor/src/app/layout.tsx[0m:28:1]
+ [2m25[0m | 
+ [2m26[0m | export default function RootLayout({ children }: RootLayoutProps) {
+ [2m27[0m |   return (
+ [2m28[0m |     <html lang="en" className="antialiased">
+    : [35;1m     ^^^^[0m
+ [2m29[0m |       <body className="font-sans m-0 p-0">
+ [2m30[0m |         <SkipLinks />
+ [2m31[0m |         <NavigationLoadingProvider>
+    `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/layout.tsx
+ ✓ Compiled in 227ms (1723 modules)
+ ✓ Compiled in 109ms (796 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 151ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/app/error.js 404 in 44ms
+ GET /_next/static/chunks/main-app.js?v=1754116890640 404 in 46ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 45ms
+ GET /favicon.ico 200 in 7ms
+ ✓ Compiled in 182ms (1709 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 116ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/main-app.js?v=1754116912345 404 in 44ms
+ GET /_next/static/chunks/app/error.js 404 in 43ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 44ms
+ GET /favicon.ico 200 in 7ms
+ ⨯ ./src/state/navigationStore.ts
+Error:   [31mx[0m Expression expected
+     ,-[[36;1;4m/Users/jackhaas/Projects/narraitor/src/state/navigationStore.ts[0m:469:1]
+ [2m466[0m |       }),
+ [2m467[0m |     }
+ [2m468[0m |   )
+ [2m469[0m | );
+     : [35;1m^[0m
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/state/navigationStore.ts
+./src/components/shared/NavigationPersistenceProvider.tsx
+ ✓ Compiled in 116ms (1649 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 110ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/main-app.js?v=1754116935168 404 in 42ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 41ms
+ GET /_next/static/chunks/app/error.js 404 in 41ms
+ GET /favicon.ico 200 in 6ms
+ ✓ Compiled in 208ms (1661 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 108ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/app-pages-internals.js 404 in 43ms
+ GET /_next/static/chunks/app/error.js 404 in 43ms
+ GET /_next/static/chunks/main-app.js?v=1754116959573 404 in 44ms
+ GET /favicon.ico 200 in 6ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 43ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/chunks/app/error.js 404 in 30ms
+ GET /_next/static/chunks/main-app.js?v=1754117000802 404 in 30ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 31ms
+ GET /favicon.ico 200 in 5ms
+ ✓ Compiled in 313ms (888 modules)
+ ✓ Compiled in 54ms (778 modules)
+ ✓ Compiled in 300ms (792 modules)
+ ✓ Compiled in 129ms (792 modules)
+ ○ Compiling /dev/game-session ...
+ ✓ Compiled /dev/game-session in 1048ms (1861 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/game-session. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/game-session 200 in 1309ms
+ ✓ Compiled /_not-found in 93ms (1865 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/dev/layout.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/layout.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/css/app/layout.css?v=1754154921785 404 in 197ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 196ms
+ GET /_next/static/chunks/app/error.js 404 in 195ms
+ GET /_next/static/chunks/main-app.js?v=1754154921785 404 in 196ms
+ GET /_next/static/chunks/app/dev/layout.js 404 in 195ms
+ GET /_next/static/chunks/app/layout.js 404 in 196ms
+ ✓ Compiled /favicon.ico in 53ms (982 modules)
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/favicon.ico/route.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:208:28)
+    at <unknown> (.next/server/webpack-runtime.js:116:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:115:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:167:22)
+    at <unknown> (.next/server/app/favicon.ico/route.js:1:36116)
+    at Object.<anonymous> (.next/server/app/favicon.ico/route.js:1:36163) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/favicon.ico'
+}
+ GET /favicon.ico 500 in 81ms
+ ✓ Compiled in 324ms (992 modules)
+ ⨯ ./src/state/navigationStore.ts
+Error:   [31mx[0m Expected ',', got ';'
+     ,-[[36;1;4m/Users/jackhaas/Projects/narraitor/src/state/navigationStore.ts[0m:461:1]
+ [2m458[0m |     //   }),
+ [2m459[0m |     // }
+ [2m460[0m |   // )
+ [2m461[0m | );
+     : [35;1m ^[0m
+     `----
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/state/navigationStore.ts
+./src/state/index.ts
+./src/components/devtools/StateSection/StateSection.tsx
+ ✓ Compiled in 126ms (896 modules)
+ ✓ Compiled / in 250ms (849 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 460ms
+ ✓ Compiled /dev/game-session in 127ms (990 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/game-session. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/game-session 200 in 328ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/game-session. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/game-session 200 in 39ms
+ ✓ Compiled in 531ms (1006 modules)
+ ✓ Compiled in 500ms (910 modules)
+ ✓ Compiled in 148ms (910 modules)
+ ✓ Compiled in 132ms (910 modules)
+ ✓ Compiled /dev/game-session in 143ms (965 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dev/game-session. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dev/game-session 200 in 401ms
+ ✓ Compiled / in 176ms (849 modules)
+ ⨯ [TypeError: Cannot read properties of undefined (reading 'clientModules')] {
+  page: '/'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/jackhaas/Projects/narraitor/.next/server/pages/_document.js'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/jackhaas/Projects/narraitor/.next/server/pages/_document.js'
+}
+ GET / 500 in 908ms
+ ✓ Compiled in 302ms (910 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 216ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 542ms (1749 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/webpack/07bff93e33c58689.webpack.hot-update.json. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/css/app/layout.css. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/main-app.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app-pages-internals.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/error.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /_next/static/chunks/app/page.js. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /_next/static/css/app/layout.css?v=1754156101712 404 in 446ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 441ms
+ GET /_next/static/chunks/main-app.js?v=1754156101712 404 in 444ms
+ GET /_next/static/chunks/app/page.js 404 in 438ms
+ GET /_next/static/chunks/app/error.js 404 in 441ms
+ ✓ Compiled in 141ms (913 modules)
+ ✓ Compiled in 179ms (913 modules)
+ ✓ Compiled in 229ms (908 modules)
+ ✓ Compiled in 144ms (908 modules)
+ ✓ Compiled in 171ms (908 modules)
+ ✓ Compiled in 225ms (908 modules)
+ ✓ Compiled /play in 338ms (1859 modules)
+Using real Gemini client with server-side API key
+ ⚠ Unsupported metadata viewport is configured in metadata export in /play. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /play 200 in 562ms
+ ✓ Compiled / in 141ms (849 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 301ms
+ ✓ Compiled /_not-found in 188ms (1751 modules)
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/css/app/layout.css?v=1754156263002 500 in 267ms
+ GET /_next/static/chunks/app-pages-internals.js 500 in 250ms
+ GET /_next/static/chunks/app/error.js 500 in 249ms
+ GET /_next/static/chunks/main-app.js?v=1754156263002 500 in 246ms
+ GET /_next/static/chunks/app/page.js 500 in 243ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/page.js:1:14745)
+    at Object.<anonymous> (.next/server/app/page.js:1:14808) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/'
+}
+ ⨯ Error: Cannot find module './8548.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/pages/_document.js:1:341)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:384) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET / 500 in 57ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js 500 in 59ms
+ GET /_next/static/chunks/fallback/main.js 500 in 60ms
+ GET /_next/static/chunks/fallback/react-refresh.js 500 in 60ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/pages/_app.js 500 in 27ms
+ GET /_next/static/chunks/fallback/pages/_error.js 500 in 26ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/page.js:1:14745)
+    at Object.<anonymous> (.next/server/app/page.js:1:14808) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/'
+}
+ ⨯ Error: Cannot find module './8548.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/pages/_document.js:1:341)
+    at Object.<anonymous> (.next/server/pages/_document.js:1:384) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET / 500 in 60ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/webpack.js 500 in 18ms
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ Error: Cannot find module './4447.js'
+Require stack:
+- /Users/jackhaas/Projects/narraitor/.next/server/webpack-runtime.js
+- /Users/jackhaas/Projects/narraitor/.next/server/app/_not-found/page.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/require.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/load-components.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/utils.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/options.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/swc/index.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/router-server.js
+- /Users/jackhaas/Projects/narraitor/node_modules/next/dist/server/lib/start-server.js
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:198:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/_not-found/page.js:1:2921)
+    at Object.<anonymous> (.next/server/app/_not-found/page.js:1:2974) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ GET /_next/static/chunks/fallback/main.js 500 in 48ms
+ GET /_next/static/chunks/fallback/react-refresh.js 500 in 48ms
+ GET /_next/static/chunks/fallback/pages/_app.js 500 in 48ms
+ GET /_next/static/chunks/fallback/pages/_error.js 500 in 48ms
+[?25h

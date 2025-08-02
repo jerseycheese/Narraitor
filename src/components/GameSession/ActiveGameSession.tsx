@@ -20,8 +20,6 @@ import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
-import { useAutoSave } from '@/hooks/useAutoSave';
-import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { Button } from '@/components/ui/button';
 
 interface ActiveGameSessionProps {
@@ -89,8 +87,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
-  // Auto-save functionality
-  const autoSave = useAutoSave();
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -358,9 +354,6 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setCurrentDecision(null);
     
     onChoiceSelected(choiceId);
-    
-    // Trigger auto-save after player choice to ensure all state updates are applied
-    autoSave.triggerSave('player-choice');
   };
 
   const handleCustomSubmit = (customText: string) => {
@@ -513,33 +506,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       {/* Character Summary Panel */}
       {character && (
         <div className="mb-6">
-          {/* Responsive layout: stacked on small screens, side-by-side on larger screens */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
-            <div className="flex-1 min-w-0">
-              <CharacterSummary character={character} />
-            </div>
-            {/* Auto-save indicator */}
-            <div className="flex-shrink-0">
-              <SaveIndicator
-                status={autoSave.status}
-                lastSaveTime={autoSave.lastSaveTime}
-                errorMessage={autoSave.errorMessage}
-                totalSaves={autoSave.totalSaves}
-                onManualSave={autoSave.triggerSave}
-                onRetryError={autoSave.retry}
-                retryable={true}
-                compact={true}
-                className="text-sm"
-              />
-            </div>
-          </div>
+          <CharacterSummary character={character} />
         </div>
       )}
       
       {/* Two-column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:grid-rows-[max-content]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]">
         {/* Story Column */}
-        <div className="lg:row-span-1 lg:self-stretch">
+        <div className="lg:row-span-1 lg:self-stretch lg:min-h-[600px]">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}

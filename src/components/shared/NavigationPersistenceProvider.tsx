@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useNavigationPersistence } from '@/hooks/useNavigationPersistence';
 import Logger from '@/lib/utils/logger';
 
 /**
@@ -25,46 +24,24 @@ interface NavigationPersistenceProviderProps {
  */
 export function NavigationPersistenceProvider({ children }: NavigationPersistenceProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
-  const { isHydrated } = useNavigationPersistence();
 
   /**
-   * Initialize navigation persistence once hydration is complete
+   * Immediate initialization
    * 
-   * This effect ensures we only mark initialization as complete after
-   * the navigation store has been properly hydrated from storage.
+   * Skip the complex persistence system entirely and just initialize immediately
+   * to prevent the app from being blocked by navigation persistence issues.
    */
   useEffect(() => {
-    if (isHydrated && !isInitialized) {
-      logger.debug('Navigation persistence initialized');
-      setIsInitialized(true);
-    }
-  }, [isHydrated, isInitialized]);
+    logger.debug('Forcing immediate navigation initialization');
+    setIsInitialized(true);
+  }, []);
 
-  /**
-   * Safety timeout to prevent stuck loading states
-   * 
-   * If initialization doesn't complete within 3 seconds (due to storage
-   * issues, network problems, etc.), force initialization to prevent
-   * the app from being stuck in a loading state indefinitely.
-   */
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!isInitialized) {
-        logger.warn('Navigation initialization timed out, forcing initialization');
-        setIsInitialized(true);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [isInitialized]);
-
-  // Show loading state until navigation is fully hydrated
-  // This prevents flash of incorrect navigation state
+  // Minimal loading state - only show very briefly
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-sm text-gray-600">
-          Initializing navigation...
+          Loading...
         </div>
       </div>
     );

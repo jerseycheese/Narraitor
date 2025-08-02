@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { createIndexedDBStorage } from './persistence';
 import { isStorageAvailable } from '@/utils/storageHelpers';
 import Logger from '@/lib/utils/logger';
 
@@ -450,17 +449,10 @@ export const useNavigationStore = create<NavigationState>()(
     }),
     {
       name: 'narraitor-navigation-store',
-      storage: createIndexedDBStorage(),
       version: 1,
-      // Persist long-term navigation data (history, preferences)
-      // Session-specific data (currentPath, breadcrumbs) are handled via sessionStorage
-      // Flow state is handled via localStorage
       partialize: (state) => ({
         history: state.history,
         preferences: state.preferences,
-        // Don't persist currentPath, breadcrumbs, or flowStep - handled by sessionStorage/localStorage
-        // Don't persist modal states - they should be closed on reload
-        // Don't persist isHydrated - this is runtime state
       }),
     }
   )
