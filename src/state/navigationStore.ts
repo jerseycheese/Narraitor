@@ -202,7 +202,8 @@ const defaultPreferences: NavigationPreferences = {
  * Navigation store for managing navigation state persistence
  */
 export const useNavigationStore = create<NavigationState>()(
-  persist(
+  // Temporarily remove persist middleware to fix initialization blocking
+  // persist(
     (set, get) => ({
       // Initial state
       currentPath: null,
@@ -447,21 +448,16 @@ export const useNavigationStore = create<NavigationState>()(
         const { history } = get();
         return history.some(entry => entry.path === path);
       },
-    }),
-    {
-      name: 'narraitor-navigation-store',
-      storage: createIndexedDBStorage(),
-      version: 1,
-      // Persist long-term navigation data (history, preferences)
-      // Session-specific data (currentPath, breadcrumbs) are handled via sessionStorage
-      // Flow state is handled via localStorage
-      partialize: (state) => ({
-        history: state.history,
-        preferences: state.preferences,
-        // Don't persist currentPath, breadcrumbs, or flowStep - handled by sessionStorage/localStorage
-        // Don't persist modal states - they should be closed on reload
-        // Don't persist isHydrated - this is runtime state
-      }),
-    }
-  )
+    })
+    // Remove persist configuration temporarily to fix initialization blocking
+    // {
+    //   name: 'narraitor-navigation-store',
+    //   storage: createIndexedDBStorage(),
+    //   version: 1,
+    //   partialize: (state) => ({
+    //     history: state.history,
+    //     preferences: state.preferences,
+    //   }),
+    // }
+  // )
 );
