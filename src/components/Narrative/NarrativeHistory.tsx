@@ -175,8 +175,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     );
   };
 
-  // Use min-height instead of fixed height to allow proper centering
-  const heightClass = segments.length >= 2 ? 'min-h-[610px] max-h-[610px]' : 'min-h-[300px]';
+  // Always use a fixed height to ensure scrolling works properly
+  const heightClass = 'h-[580px]'; // Fixed height to enable scrolling
   
   // Get the ScrollArea's viewport element for scroll control
   useEffect(() => {

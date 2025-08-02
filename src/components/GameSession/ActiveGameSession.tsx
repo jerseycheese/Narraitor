@@ -536,9 +536,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
       
       {/* Two-column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:grid-rows-[max-content]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]">
         {/* Story Column */}
-        <div className="lg:row-span-1 lg:self-stretch">
+        <div className="lg:row-span-1 lg:self-stretch lg:min-h-[600px]">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
