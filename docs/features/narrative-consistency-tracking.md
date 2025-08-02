@@ -1,28 +1,16 @@
 # Narrative Consistency Tracking System
 
-## Overview
+This this system solves a key problem with AI storytelling: keeping track of what the player is supposed to be doing and ensuring the AI remembers important story elements. Without this, narratives tend to drift and lose coherence.
 
-The narrative consistency tracking system automatically extracts, tracks, and manages player goals throughout gameplay sessions. It ensures AI-generated content remains consistent with established objectives and story elements.
+## What It Does
 
-## Core Features
+**Automatic Goal Detection** - The AI reads through narrative content and identifies both explicit goals ("Find the Sword of Light") and implicit ones ("The dragon will attack at dawn" implies "Stop the dragon attack"). Falls back to pattern matching if the AI extraction fails.
 
-### Automatic Goal Extraction
-- **AI-Powered Detection**: Uses Gemini AI to identify explicit and implicit goals from narrative content
-- **Pattern Matching Fallback**: Provides reliable goal detection even when AI fails
-- **Context-Aware Processing**: Considers existing goals when extracting new ones
-- **Confidence Scoring**: Tracks extraction quality for reliability assessment
+**Goal Lifecycle** - Tracks goals from creation through completion, abandonment, or blocking. Each goal gets progress notes, mention counts, and timeline data so the AI understands what's currently important.
 
-### Goal Lifecycle Management
-- **Status Tracking**: Manages goals through active, completed, abandoned, and blocked states
-- **Progress Monitoring**: Tracks mention counts, progress notes, and timeline data
-- **Automatic Updates**: Updates goal status based on narrative developments
-- **Session Isolation**: Keeps goals separated by game session
+**Smart Context Building** - When generating new content, the system feeds the AI a prioritized list of current goals within the token budget. Critical and high-priority goals always get included first.
 
-### AI Context Integration
-- **Token Budget Management**: Respects API limits while maximizing context relevance
-- **Priority-Based Inclusion**: Includes critical and high-priority goals first
-- **Dynamic Formatting**: Optimizes goal text for AI consumption
-- **History Tracking**: Maintains context evolution for debugging and analysis
+**Session Separation** - Goals stay isolated by game session so you can have multiple storylines without cross-contamination.
 
 ## Goal Types and Priorities
 

@@ -7,9 +7,9 @@ updated: 2025-06-26
 
 # Error Handling
 
-User-friendly error handling patterns for technical failures.
+This error handling here focuses on being helpful to users rather than just logging technical details. The pattern is to catch errors gracefully, show user-friendly messages, and provide retry options when it makes sense.
 
-## Core Pattern
+## Standard Pattern
 
 ```typescript
 // Component error handling
@@ -37,10 +37,11 @@ const handleAction = async () => {
 />
 ```
 
-## Error Types
+## Error Categories
 
-**Retryable**: Network errors, timeouts, rate limits
-**Non-Retryable**: Authentication errors, invalid requests
+**Retryable errors** - Network issues, timeouts, rate limits. These often resolve themselves, so show a retry button.
+
+**Non-retryable errors** - Authentication failures, invalid requests. These need user action or indicate a bug.
 
 ## Error Mapping
 

@@ -7,27 +7,29 @@ updated: 2025-06-26
 
 # Testing Guide
 
-Comprehensive testing approach using TDD, React Testing Library, and component-driven development.
+This the testing approach here is pretty systematic - TDD with React Testing Library and component-driven development. The goal is to catch issues early and make refactoring safer.
 
-## Testing Strategy
+## Testing Philosophy
 
-### Core Principles
-- **Test-driven development**: Write tests before implementation
-- **Behavior over implementation**: Test what users see and do
-- **Component isolation**: Test components independently first
-- **Focused tests**: One assertion per test when possible
+I've found that focusing on user behavior over implementation details makes tests way more useful. Instead of testing internal state changes, test what users actually see and do. This makes tests resilient to refactoring and actually validates the user experience.
 
-### Testing Levels
-1. **Unit Tests**: Individual functions and hooks
-2. **Component Tests**: React components in isolation  
-3. **Integration Tests**: Component compositions and flows
-4. **E2E Tests**: Complete user journeys (critical paths only)
+**Key principles**:
+- **TDD**: Write tests before implementation: forces you to think about the API first
+- **User-centric**: Test what users see, not how code works internally  
+- **Component isolation**: Test components independently before integration
+- **One thing per test**: Clear, focused assertions that are easy to debug
 
-## Test Types & Tools
+**Testing pyramid**:
+1. **Unit Tests**: Individual functions and hooks (fast, lots of these)
+2. **Component Tests**: React components in isolation (medium speed, moderate quantity)
+3. **Integration Tests**: Component + store interactions (slower, fewer needed)
+4. **E2E Tests**: Complete user flows (slowest, only for critical paths)
 
-### Unit Testing (Jest + React Testing Library)
+## Practical Testing Patterns
+
+**Unit Tests** - Test individual functions and hooks. These are fast and catch logic errors early:
+
 ```typescript
-// Test individual functions and hooks
 import { calculateAttributeTotal } from '@/lib/character';
 
 test('calculates attribute total correctly', () => {
@@ -36,9 +38,9 @@ test('calculates attribute total correctly', () => {
 });
 ```
 
-### Component Testing
+**Component Tests** - Test components in isolation. Focus on what users see, not internal implementation:
+
 ```typescript
-// Test components in isolation
 import { render, screen } from '@testing-library/react';
 import { CharacterCard } from './CharacterCard';
 
@@ -49,9 +51,9 @@ test('displays character name', () => {
 });
 ```
 
-### Integration Testing
+**Integration Tests** - Test components with their data sources. This catches issues with state management:
+
 ```typescript
-// Test component + store interactions
 import { renderWithProviders } from '@/test-utils';
 
 test('creates character and updates store', async () => {
@@ -64,24 +66,26 @@ test('creates character and updates store', async () => {
 });
 ```
 
-## Best Practices
+## What Actually Works
 
-### Writing Good Tests
+**Descriptive test names** save so much debugging time. When a test fails, you should immediately know what broke:
+
 ```typescript
-// ✅ Good: Descriptive test name
+// ✅ Clear: tells you exactly what failed
 test('displays error message when character creation fails', () => {
   // Test implementation
 });
 
-// ❌ Bad: Vague test name  
+// ❌ Vague: have to read the test to understand what it does
 test('handles error', () => {
   // Test implementation
 });
 ```
 
-### Testing User Interactions
+**Test user interactions, not implementation details**. Focus on what users actually do:
+
 ```typescript
-// ✅ Good: Test user behavior
+// ✅ Tests the user experience
 test('navigates to character detail when clicked', async () => {
   const user = userEvent.setup();
   render(<CharacterCard character={mockCharacter} />);
@@ -92,18 +96,19 @@ test('navigates to character detail when clicked', async () => {
 });
 ```
 
-### Mock Strategy
+**Mock sparingly**. Only mock external dependencies, not your own logic:
+
 ```typescript
-// ✅ Good: Mock external dependencies only
+// ✅ Mock API calls and external services
 const mockApiCall = jest.fn();
 jest.mock('@/lib/api', () => ({
   createCharacter: mockApiCall
 }));
 
-// ❌ Bad: Over-mocking internal logic
+// ❌ Don't mock your own functions: test them instead
 const mockCalculateTotal = jest.fn();
 jest.mock('./utils', () => ({
-  calculateTotal: mockCalculateTotal
+  calculateTotal: mockCalculateTotal  // This defeats the purpose of testing
 }));
 ```
 
@@ -276,15 +281,16 @@ npm run test -- --testNamePattern="character"
 - No console errors or warnings
 - Tests run in under 30 seconds
 
-## Storybook Integration
+## Component Development Workflow
 
-### Component Development Flow
-1. **Create component interface** and basic implementation
-2. **Write Storybook stories** for all variants
-3. **Develop component** iteratively in Storybook
-4. **Write unit tests** based on story scenarios
-5. **Test integration** in test harness
-6. **Integrate** into application
+The process I've found that works well:
+
+1. **Start with the interface** - define props and basic component structure
+2. **Build stories first** - create Storybook stories for all the variants you need
+3. **Develop in isolation** - get the component working in Storybook before integrating
+4. **Write tests based on stories** - the stories show you what needs testing
+5. **Test integration** - use test harnesses to verify it works with real data
+6. **Integrate into the app** - by this point, most issues are already caught
 
 ### Story Testing
 ```typescript
@@ -352,24 +358,13 @@ test('has no accessibility violations', async () => {
 });
 ```
 
-## Troubleshooting
+## When Things Go Wrong
 
-### Common Issues
+**Tests timing out** - Usually unresolved promises. Make sure you're awaiting all async operations and using `waitFor` for DOM updates. If you're testing user interactions, don't forget to await the user events.
 
-**Tests timeout**
-- Check for unresolved promises
-- Ensure all async operations are awaited
-- Use `waitFor` for DOM updates
+**Mocks not working** - Check that the mock is set up before the component renders, and that the import path matches exactly. Also, clear mocks between tests or you'll get weird cross-test pollution.
 
-**Mock not working**
-- Verify mock is set up before component renders
-- Check mock import path matches exactly
-- Clear mocks between tests
-
-**Store state persists**
-- Reset store state in `beforeEach`
-- Use isolated test providers
-- Avoid global state mutations
+**Store state bleeding between tests** - Reset store state in `beforeEach`, use isolated test providers, and avoid mutating global state in tests. Each test should start with a clean slate.
 
 ### Debug Techniques
 ```typescript

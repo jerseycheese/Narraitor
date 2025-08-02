@@ -7,28 +7,30 @@ updated: 2025-06-26
 
 # GitHub Integration Guide
 
-Synchronization between GitHub issues and project documentation.
+This I built some automation to keep GitHub issues and project documentation in sync. The goal was to reduce manual work for managing user stories and project tracking.
 
-## Quick Start
+## Getting Started
 
-### Setup GitHub Token
+**GitHub Token Setup** - You'll need a GitHub token with repo access:
+
 ```bash
-# Set up GitHub token
+# Set up access
 export GITHUB_TOKEN=your_github_token
 
-# Verify access
+# Check it works
 gh auth status
 ```
 
-### Basic Sync Commands
+**Main Commands** - These handle the common sync workflows:
+
 ```bash
 # Sync CSV user stories to GitHub issues
 npm run sync-user-stories
 
-# Validate consistency
+# Check everything matches up
 npm run validate-user-stories
 
-# Update issue priorities
+# Update issue priorities based on current roadmap
 npm run update-priorities
 ```
 

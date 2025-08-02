@@ -1,22 +1,12 @@
 # Navigation Loading System
 
-## Overview
-The Navigation Loading System provides comprehensive loading states and user feedback during navigation transitions, ensuring users always know when the application is processing their requests.
+This this system handles one of those user experience details that really matters: showing loading states during navigation. Without it, users click something and wonder if it worked, especially on slower connections.
 
-## Architecture
+## How It Works
 
-### Core Components
-1. **NavigationLoadingProvider** - Global state management
-2. **LoadingOverlay** - Visual loading indicator
-3. **useNavigationLoading** - Navigation hook with loading
-4. **Navigation Component** - Pre-integrated navigation
+**NavigationLoadingProvider** manages global loading state, **LoadingOverlay** shows the visual indicator, and **useNavigationLoading** provides the hook for components to trigger loading states during navigation.
 
-### Flow Diagram
-```
-User Action → useNavigationLoading → NavigationLoadingProvider → LoadingOverlay
-     ↓              ↓                       ↓                    ↓
-Navigation     Router Events        Global State         Visual Feedback
-```
+The flow is: User clicks → Hook triggers loading → Provider updates state → Overlay shows → Navigation completes → Loading clears.
 
 ## Implementation
 

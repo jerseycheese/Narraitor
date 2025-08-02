@@ -7,26 +7,30 @@ updated: 2025-06-26
 
 # React Best Practices
 
-KISS principle: Keep components simple, predictable, and focused on single responsibilities.
+The KISS principle applies especially well to React components. Simple, predictable components are easier to debug, test, and maintain. Focus on single responsibilities and avoid clever abstractions.
 
-## Core Principles
+## What Works
 
-1. **Simple Props** - Minimal, well-typed interfaces
-2. **Flat State** - Predictable state management
-3. **Clear JSX** - Readable, declarative markup
-4. **Focused Effects** - Single concerns with clear dependencies
+**Simple Props** - Keep interfaces minimal and well-typed. If you need more than 5-6 props, consider breaking the component down or grouping related props into objects.
+
+**Flat State** - Avoid deeply nested state. React's reconciliation works better with flat structures, and they're easier to debug.
+
+**Clear JSX** - Readable, declarative markup that explains what's happening. If you need comments to explain JSX, consider extracting components.
+
+**Focused Effects** - One concern per effect, with clear dependencies. Makes debugging much easier.
 
 ## Component Design
 
-### Props Interface
+**Props Interfaces** - Keep them focused. Too many optional props usually means the component is doing too much:
+
 ```typescript
-// ✅ Good: Focused interface
+// ✅ Clear, focused interface
 interface CharacterCardProps {
   character: Character;
   onEdit: (id: string) => void;
 }
 
-// ❌ Bad: Too many optional props
+// ❌ Swiss army knife component: break this down
 interface CharacterCardProps {
   character: Character;
   onEdit?: (id: string) => void;
@@ -37,9 +41,10 @@ interface CharacterCardProps {
 }
 ```
 
-### Single Responsibility
+**Single Responsibility** - Components should have one clear job:
+
 ```typescript
-// ✅ Good: One clear purpose
+// ✅ One purpose: display a character card
 const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
   <div className="character-card">
     <h3>{character.name}</h3>
@@ -48,30 +53,33 @@ const CharacterCard = ({ character, onEdit }: CharacterCardProps) => (
   </div>
 );
 
-// ❌ Bad: Multiple responsibilities
+// ❌ Too many jobs: split this into smaller components
 const CharacterManager = ({ characters, onEdit, onDelete, onAdd }) => {
   // Handles display, editing, deletion, creation, filtering, sorting...
+  // This is asking for bugs
 };
 ```
 
 ## State Management
 
-### Local State
+**Keep state flat**. Nested state objects are harder to update and debug:
+
 ```typescript
-// ✅ Good: Flat, simple state
+// ✅ Simple, predictable updates
 const [character, setCharacter] = useState<Character | null>(null);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState<string | null>(null);
 
-// ❌ Bad: Nested state
+// ❌ Nested state: harder to update safely
 const [state, setState] = useState({
   character: { data: null, meta: { loading: false, error: null } }
 });
 ```
 
-### Store Integration
+**Store integration** should be straightforward. Components grab what they need and render accordingly:
+
 ```typescript
-// ✅ Good: Direct store usage
+// ✅ Direct, clear store usage
 const CharacterList = () => {
   const { characters, loading, error } = useCharacterStore();
   
@@ -90,8 +98,10 @@ const CharacterList = () => {
 
 ## Effect Management
 
+**One concern per effect**. This makes debugging so much easier when something breaks:
+
 ```typescript
-// ✅ Good: Single concern per effect
+// ✅ Clear, focused effects
 useEffect(() => {
   if (characterId) {
     loadCharacter(characterId);
@@ -102,14 +112,16 @@ useEffect(() => {
   return () => cancelPendingRequests();
 }, []);
 
-// ❌ Bad: Multiple concerns in one effect
+// ❌ Kitchen sink effect: nightmare to debug
 useEffect(() => {
   if (characterId) loadCharacter(characterId);
   if (worldId && !world) loadWorld(worldId);
   const interval = setInterval(autosave, 30000);
   return () => { clearInterval(interval); cleanup(); };
-}, [characterId, worldId, world, character]);
+}, [characterId, worldId, world, character]);  // Too many dependencies
 ```
+
+When an effect has more than 2-3 dependencies, it's usually doing too much.
 
 ## JSX Patterns
 

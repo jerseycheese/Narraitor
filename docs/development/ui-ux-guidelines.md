@@ -8,40 +8,17 @@ updated: 2025-04-29
 
 # UI/UX Guidelines
 
-## Overview
+This the UI approach here is about creating immersive experiences that adapt to different fictional worlds while staying accessible and responsive. The challenge is balancing thematic consistency with usability.
 
-This document outlines the user interface and experience guidelines for Narraitor. These guidelines ensure a consistent, accessible, and responsive design that adapts to the selected world theme while providing an intuitive user experience.
+## Design Philosophy
 
-## Core Principles
+**World-Adaptive Design** - The UI should feel appropriate to the fictional setting. A noir detective world gets different typography and colors than a space opera setting. But the underlying structure and usability patterns stay consistent.
 
-### 1. World-Adaptive Design
-- UI elements adapt to the selected world theme
-- Typography, color schemes, and visual elements reflect the world setting
-- Maintain consistent structure while allowing theme-specific styling
-- Create immersive visual experiences appropriate to genre
+**Responsive & Accessible** - Works on all screen sizes with keyboard navigation, screen reader support, and proper contrast. Mobile-first approach because touch interactions are often simpler to design for.
 
-### 2. Responsive Layout
-- Application works across all screen sizes
-- Mobile-first approach to design
-- Optimized for both touch and keyboard/mouse input
-- Graceful degradation for older browsers
-- Design elements scale appropriately with screen size
+**Progressive Disclosure** - Don't overwhelm users with everything at once. Show what's needed for the current task, with clear paths to more complex functionality when needed.
 
-### 3. Accessibility Focus
-- Meet WCAG 2.1 AA standards
-- Keyboard navigation for all interactions
-- Screen reader compatibility
-- Sufficient color contrast
-- Focus management
-- Alt text for all images
-- Proper semantic HTML structure
-
-### 4. Progressive Disclosure
-- Show only what's needed at each step
-- Reveal complexity progressively
-- Provide clear navigation paths
-- Use accordions, tabs, and expandable sections for complex content
-- Guide the user through multi-step processes
+**Intuitive Flow** - Users should understand what to do next without reading documentation. Good design guides behavior through visual hierarchy and familiar patterns.
 
 ## World Theming
 

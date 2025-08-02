@@ -33,7 +33,7 @@ This guide provides step-by-step instructions for setting up the Narraitor Devel
 - ✓ Move newly added pull requests here
 
 ### Ready Column
-No automation needed - issues will be manually moved here when they're ready for implementation
+No automation needed: issues will be manually moved here when they're ready for implementation
 
 ### In Progress Column
 - ✓ Move issues here when they're assigned to someone

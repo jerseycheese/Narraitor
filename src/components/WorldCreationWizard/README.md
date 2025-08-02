@@ -1,17 +1,16 @@
 # World Creation Wizard
 
-A multi-step wizard component for creating game worlds in the Narraitor RPG framework. The wizard guides users through world creation including basic information, detailed descriptions, AI-assisted attribute and skill suggestions, and final confirmation.
+This is the multi-step wizard that guides users through creating custom worlds. The challenge was making world creation approachable for users who just want to start playing, while still allowing deep customization for those who want it.
 
-## Features
+## Key Features
 
-- **Multi-step navigation** with progress tracking
-- **Form validation** at each step
-- **AI-powered analysis** of world descriptions to suggest appropriate attributes and skills
-- **Custom skill creation** with inline SkillEditor integration
-- **Multi-attribute skill linking** with checkbox-based selection
-- **Fallback handling** for AI service failures
-- **State persistence** between wizard steps
-- **Responsive design** for various screen sizes
+**AI-assisted suggestions** - Describe your world and the AI suggests appropriate attributes and skills. Want "Force Sensitivity" for Star Wars? "Sanity" for Lovecraft? The AI understands genre conventions.
+
+**Progressive disclosure** - Start simple with basic info, then dive deeper into attributes and skills. Each step builds on the previous one.
+
+**Fallback handling** - If the AI service fails, you can still create worlds manually. The wizard doesn't break.
+
+**State persistence** - Move between steps without losing your work. All data stays intact until you finish or cancel.
 
 ## Usage
 

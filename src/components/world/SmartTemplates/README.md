@@ -61,7 +61,7 @@ import { TemplatePreview } from '@/components/world/SmartTemplates';
 SmartTemplates is integrated into the WorldCreationWizard TemplateStep:
 
 ```tsx
-// Automatic integration - no additional setup required
+// Automatic integration: no additional setup required
 // Available as "AI Generate ✨" tab in template selection
 ```
 

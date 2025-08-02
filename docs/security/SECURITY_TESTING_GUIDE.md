@@ -42,12 +42,12 @@ npm run dev
 
 ### 3. Test API Key Security
 
-**BEFORE (Insecure - what we fixed):**
+**BEFORE (Insecure: what we fixed):**
 - API keys were visible in Network requests
 - Environment variables exposed via `_next/static/chunks/`
 - Direct calls to Google API with visible keys
 
-**AFTER (Secure - current implementation):**
+**AFTER (Secure: current implementation):**
 - All requests go to `/api/narrative/*` endpoints
 - No Google API URLs visible in Network tab
 - No API keys visible anywhere in requests

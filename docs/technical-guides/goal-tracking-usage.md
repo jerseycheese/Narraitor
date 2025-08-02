@@ -179,7 +179,7 @@ activeGoals.forEach(goal => {
 // Escalate goal priority based on urgency
 goalStore.updateGoal(goalId, {
   priority: 'critical',
-  contextSummary: 'URGENT: Time-sensitive quest - moon setting soon!'
+  contextSummary: 'URGENT: Time-sensitive quest: moon setting soon!'
 });
 ```
 

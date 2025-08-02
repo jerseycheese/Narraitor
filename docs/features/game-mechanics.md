@@ -7,38 +7,24 @@ updated: 2025-06-26
 
 # Game Mechanics
 
-Core gameplay mechanics including choice systems, attributes, and decision weighting.
+This the gameplay here focuses on meaningful choices rather than complex mechanics. The insight was that players needed to understand which decisions actually matter for the story versus routine choices that just move things along.
 
 ## Decision Weight System
 
-Visual prominence indicators for narrative choices based on AI-determined importance levels.
+The AI analyzes each choice and assigns a visual weight so you can see what's actually important:
 
-### Weight Levels
+**Minor Decisions** - Routine stuff that doesn't dramatically affect the story. Subtle styling, no borders. Things like "What will you have for breakfast?" or casual conversation options.
 
-**Minor Decisions**
-- **Visual**: Subtle styling with minimal prominence
-- **CSS**: `border-0 bg-gray-500/5`
-- **Use Cases**: Routine choices, casual conversations, basic exploration
-- **Example**: "What will you have for breakfast?"
+**Major Decisions** - Important story moments with amber borders and shadows. These affect character relationships, story direction, or significant plot points. Like "The dragon offers you a deal. How do you respond?"
 
-**Major Decisions**
-- **Visual**: Amber borders with moderate shadows
-- **CSS**: `border-2 border-amber-400 bg-amber-50/60 shadow-md shadow-amber-200`
-- **Use Cases**: Important story moments, character relationships, significant paths
-- **Example**: "The dragon offers you a deal. How do you respond?"
+**Critical Decisions** - Life-changing moments with prominent red borders. These are climactic choices that determine major story outcomes. "The kingdom's fate hangs in the balance. What is your final choice?"
 
-**Critical Decisions**
-- **Visual**: Red borders with strong shadows for maximum prominence
-- **CSS**: `border-4 border-red-500 bg-red-50/50 shadow-lg shadow-red-200`
-- **Use Cases**: Life-changing moments, climactic choices, fate-determining decisions
-- **Example**: "The kingdom's fate hangs in the balance. What is your final choice?"
+**Smart Context** - Instead of just repeating the story, the AI generates context that explains why the decision matters:
+- "Tension builds as you must choose how to respond to the merchant's accusation"
+- "A critical moment where your response could determine if the alliance forms"
+- "The stranger's offer seems too good to be true"
 
-### AI Context Summaries
-
-AI generates meaningful context explaining why decisions matter:
-- **Focus on Stakes**: "Tension builds as you must choose how to respond to the merchant's accusation."
-- **Relationship Impact**: "A critical moment where your response could determine if the alliance forms."
-- **Consequence Preview**: "The stranger's offer seems too good to be true."
+This helps you understand the stakes without spoiling the outcomes.
 
 ### API Types
 

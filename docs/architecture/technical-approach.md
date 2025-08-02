@@ -7,47 +7,21 @@ updated: 2025-06-26
 
 # Technical Approach
 
-Technical stack and development practices for Narraitor, focused on maintainable code and modern web technologies.
+This the tech stack here prioritizes maintainability and developer experience over being cutting-edge. The goal was to choose technologies that would still make sense in a year, with good TypeScript support and clear upgrade paths.
 
-## Core Technologies
+## Technology Choices
 
-### Framework: Next.js 15+
-- App Router with server and client components
-- Built-in routing with nested layouts
-- Server-side rendering capabilities
-- Strong TypeScript integration
-- Efficient client-side navigation
+**Next.js 15 with App Router** - Went with the latest stable version for better performance with server components and built-in optimizations. The App Router makes routing much cleaner than the old Pages Router, and nested layouts eliminate a lot of layout duplication.
 
-### Language: TypeScript
-- Static type checking for reliability
-- Better developer experience with IDE integration
-- Self-documenting code through types
-- Easier refactoring and maintenance
+**TypeScript everywhere** - Static typing catches so many issues early, especially with complex state management and AI integrations. The IDE integration makes refactoring much safer, and types serve as documentation.
 
-### UI: Tailwind CSS v4 + shadcn/ui
-- Utility-first approach for rapid development
-- Consistent design system with shadcn/ui components
-- World-specific theme customization
-- Small bundle size with optimization
+**Tailwind CSS v4 + shadcn/ui** - Utility-first CSS for rapid development, but shadcn/ui provides consistent component patterns. The combination gives you speed without sacrificing design consistency. Plus Tailwind v4's approach to theming works well for world-specific styling.
 
-### State Management: Zustand
-**Current Implementation** (replaced React Context):
-- Domain-specific stores (World, Character, Narrative, etc.)
-- Simple, lightweight state management
-- Strong TypeScript integration
-- Easy testing with pure store functions
-- IndexedDB persistence integration
+**Zustand for state management** - Replaced React Context early on because it was getting unwieldy. Zustand is lightweight, has excellent TypeScript support, and makes testing much easier since stores are just functions. The IndexedDB persistence integration works smoothly.
 
-### Testing: Jest + React Testing Library + Storybook
-- Unit testing for functions and hooks
-- Component testing with React Testing Library
-- Visual testing with Storybook stories
-- TDD workflow support
-- Test harnesses for complex components
+**Testing stack** - Jest + React Testing Library for the core testing, with Storybook for component development. The TDD workflow really helps with component APIs, and React Testing Library keeps tests focused on user behavior rather than implementation details.
 
-### Data Persistence: IndexedDB
-- Client-side storage for game state
-- Structured data with efficient queries
+**Data persistence** - IndexedDB for client-side storage because game sessions need to persist across browser sessions. It handles structured data well and has good performance for the narrative data structures.
 - Transaction support for data integrity
 - Offline capabilities
 - Async API for performance

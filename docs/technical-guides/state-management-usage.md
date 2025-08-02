@@ -7,11 +7,11 @@ updated: 2025-06-26
 
 # State Management Usage
 
-Practical guide for using Zustand stores in Narraitor.
+This here's how to actually work with the Zustand stores in practice. Each major area of the app has its own store, which keeps things organized and makes it easier to reason about state changes.
 
-## Overview
+## How the Stores Work
 
-Narraitor uses Zustand for state management with domain-specific stores. Each domain (World, Character, Narrative, etc.) has its own store managing related state and operations.
+Each domain gets its own store - World, Character, Narrative, etc. They all follow the same patterns, so once you learn one, the others are predictable. All stores include CRUD operations, loading states, and error handling.
 
 ## Available Stores
 
@@ -27,12 +27,11 @@ Narraitor uses Zustand for state management with domain-specific stores. Each do
 
 ## Basic Usage
 
-### Importing and Using Stores
+**Basic Usage Pattern** - Import the hook and destructure what you need:
 
 ```typescript
 import { useWorldStore } from '@/state/worldStore';
 
-// In a React component
 function MyComponent() {
   const { worlds, createWorld, currentWorldId } = useWorldStore();
   const { characters, createCharacter } = useCharacterStore();
@@ -45,6 +44,8 @@ function MyComponent() {
   );
 }
 ```
+
+Components automatically re-render when the store data they're using changes.
 
 ### Store Actions
 

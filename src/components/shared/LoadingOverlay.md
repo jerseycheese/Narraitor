@@ -18,7 +18,7 @@ interface LoadingOverlayProps {
   variant?: LoadingVariant;
   /** Loading message to display */
   message?: string;
-  /** Optional cancel callback - shows cancel button if provided */
+  /** Optional cancel callback: shows cancel button if provided */
   onCancel?: () => void;
   /** Additional CSS classes for the overlay */
   className?: string;

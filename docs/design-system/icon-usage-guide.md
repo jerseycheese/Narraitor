@@ -308,7 +308,7 @@ const StorageStatusIcon = ({ status }) => {
 Emojis have several limitations in professional applications:
 - **Inconsistent rendering** across different operating systems and browsers
 - **Poor accessibility** for screen readers and assistive technologies
-- **Limited theming** support - can't change colors or respond to dark mode
+- **Limited theming** support: can't change colors or respond to dark mode
 - **Scaling issues** at different sizes
 - **Professional appearance** concerns in business applications
 
@@ -363,7 +363,7 @@ When replacing emoji icons:
 
 ### Don'ts
 
-❌ **Don't use emojis** for interface icons - use lucide-react instead  
+❌ **Don't use emojis** for interface icons: use lucide-react instead  
 ❌ **Don't use arbitrary sizes** - stick to the established sizing scale  
 ❌ **Don't rely on color alone** to convey meaning  
 ❌ **Don't forget accessibility** - always consider screen reader users  

@@ -87,7 +87,7 @@ const CustomButton = ({ children }) => {
 
 ### With Tailwind CSS
 
-Always use Tailwind classes for styling - no inline styles:
+Always use Tailwind classes for styling: no inline styles:
 
 ```tsx
 // Example using only Tailwind classes

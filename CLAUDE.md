@@ -1,7 +1,7 @@
 # Narraitor Project Memory
 
 ## Project Overview
-Narraitor is a Next.js-based web application using AI-driven narrative generation with a domain-driven architecture, strict TDD practices, and component-first development.
+This is an AI-powered storytelling app built with Next.js that lets you play RPG narratives in any fictional universe. The key differentiator is that it's not just generic fantasy: you define your world's rules and tone, and the AI adapts its storytelling to match. Uses domain-driven architecture with strict TDD because keeping things organized matters when you're dealing with complex state management and AI integration.
 
 ## Technical Foundation
 - Next.js 15+ with App Router
@@ -21,20 +21,17 @@ Narraitor is a Next.js-based web application using AI-driven narrative generatio
 - **No Client Exposure**: Zero sensitive data in browser or JavaScript bundles
 
 ## Development Workflow
-- Always write tests first (TDD)
-- Create flow diagrams before complex implementations
-- Develop components in Storybook before integration
-- Keep files under strict size limits (300 lines for components)
-- Follow domain-driven design principles
-- Use PR-based workflow only - no direct commits
-- Follow KISS principle - simplest solution that works
-- Document architectural decisions
-- Write comprehensive tests for critical paths
-- Review and refactor code regularly
-- **NEVER change package versions** unless explicitly requested - maintain existing dependency versions to avoid breaking compatibility
+The approach here is pretty systematic. Always write tests first (TDD) because it forces you to think about the API before implementation. Build components in Storybook isolation before integrating them: this catches UI issues early and makes debugging much easier.
+
+Key practices:
+- **File size limits**: 300 lines max for components. If it's bigger, break it down.
+- **Domain boundaries**: Related functionality stays together. No mixing World logic with Character logic.
+- **PR-based workflow**: No direct commits to main branches. Every change gets reviewed.
+- **KISS principle**: Simple solutions over clever ones. The codebase should be readable six months later.
+- **Package stability**: Don't change versions unless explicitly needed: dependency changes break things in unexpected ways.
 
 ## Automation Workflow System
-Advanced automation capabilities for accelerated development:
+Built some pretty sophisticated automation for handling repetitive development tasks. The goal was to reduce friction for common workflows while maintaining safety guardrails:
 
 ### Automation Modes
 - **Standard Mode**: `claude > /project:do-issue-auto 501` - Automated with verification via tests
@@ -157,28 +154,30 @@ All implementations must go through the Three-Stage Verification process:
 This verification process is MANDATORY - the workflow will not proceed until verification is complete.
 
 ## Testing Principles
-- Focus on testing WHAT the feature does, not HOW it does it
-- Test acceptance criteria and core functionality directly
-- Avoid testing implementation details (styles, classes, etc.)
-- Don't test edge cases beyond MVP requirements
-- Write behavioral tests over structural tests
-- Test the component's API and user interactions
-- Verify rendering and interaction behavior, not the HTML structure
-- Use React Testing Library's user-centric queries (getByRole, getByText) over testId's when possible
+The testing approach focuses on behavior over implementation. Test what users actually experience, not how the code works internally.
 
-This example demonstrates proper testing approach:
+**Core guidelines**:
+- Test WHAT the feature does for users, not HOW the code implements it
+- Focus on acceptance criteria and core functionality
+- Avoid testing implementation details like CSS classes or internal state
+- Don't over-test edge cases beyond MVP needs
+- Use user-centric queries (`getByRole`, `getByText`) over test IDs when possible
+
+Here's the pattern that works well:
 ```javascript
-// GOOD: Tests functionality based on acceptance criteria
+// Good approach: tests user-visible behavior
 test('displays all required world information', () => {
   const mockWorld = { name: 'Test World', description: 'Description', theme: 'Fantasy' };
   render(<WorldCard world={mockWorld} />);
   
-  // Tests presence of required information (what, not how)
+  // Verify what users see, not how it's rendered
   expect(screen.getByText('Test World')).toBeInTheDocument();
   expect(screen.getByText('Description')).toBeInTheDocument();
   expect(screen.getByText('Fantasy')).toBeInTheDocument();
 });
 ```
+
+This approach makes tests more resilient to refactoring and actually validates the user experience.
 
 ## Project Structure
 - `/src/app`: Next.js App Router pages
@@ -193,7 +192,7 @@ test('displays all required world information', () => {
 - Max 300 lines per file
 - Single responsibility for components and functions
 - Domain boundaries must be respected
-- Type safety is mandatory - no any types
+- Type safety is mandatory: no any types
 - Error handling must include recovery mechanisms
 - State updates must be atomic and predictable
 - Performance considerations must be documented
@@ -208,26 +207,23 @@ test('displays all required world information', () => {
   - Import from `@/components/ui/[component]`
 
 ## Documentation Standards
-New documentation should follow these guidelines for consistency and AI-readability:
+Documentation should sound like explaining something to a colleague, not writing for a corporate wiki.
 
-### Content Structure
-- **Lead with essentials**: Start with what/how, skip lengthy introductions
-- **Target length**: 150 lines max per doc, 300 absolute maximum
-- **Focus on implementation**: Practical guidance over theoretical explanations
-- **Use clear headings**: Make content scannable for both humans and AI
+### Writing Style
+- **Context first**: Start with why this exists, then what it does
+- **Conversational tone**: Write like you're talking to someone, not performing for them
+- **Skip corporate language**: No "comprehensive solutions" or "leveraging synergies"
+- **Active voice**: "Configure the API" not "The API should be configured"  
+- **Natural flow**: Use connectors like "So," "basically," "which means"
 
-### Tone Guidelines
-- **Direct and practical**: Write for personal reference and AI consumption
-- **Avoid corporate language**: Skip "This document outlines comprehensive..." style openings
-- **Use active voice**: "Configure the API" not "The API should be configured"
-- **Be concise**: One concept per paragraph, eliminate filler words
+### Content Organization
+- **Keep it practical**: Focus on implementation over theory
+- **Reasonable length**: 150 lines target, 300 max: if it's longer, split it up
+- **Clear headings**: Make it scannable for both humans and AI
+- **Delete outdated stuff**: Remove completed implementation plans (git preserves them)
+- **Consistent naming**: `[feature]-[type].md` pattern
 
-### File Organization
-- **Consolidate related topics**: Don't create separate docs for closely related concepts
-- **Delete completed implementation plans**: Remove outdated docs after feature completion (git history preserves them)
-- **No archive directories**: Delete outdated files rather than archiving (use git history for reference)
-- **Use consistent naming**: `[feature]-[type].md` (e.g., `character-creation-guide.md`)
-- **Update frontmatter**: Keep `updated` dates current, remove unused metadata
+The goal is documentation that's actually useful for development work, not impressive-sounding but hard to parse.
 
 ## GitHub Workflow
 - Always link commits to issues
@@ -372,7 +368,7 @@ GEMINI_API_KEY=your-api-key  # Server-side only, never use NEXT_PUBLIC_*
 NEXT_PUBLIC_DEBUG_LOGGING=true
 GITHUB_TOKEN=your-github-token
 
-# .env.production (Production - set in deployment platform)
+# .env.production (Production: set in deployment platform)
 GEMINI_API_KEY=your-api-key  # Server-side only
 NEXT_PUBLIC_DEBUG_LOGGING=false
 ```
