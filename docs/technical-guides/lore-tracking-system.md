@@ -7,14 +7,15 @@ updated: 2025-06-26
 
 # Lore Tracking System
 
-AI-driven narrative consistency through automatic fact extraction and storage.
+So this system solves a major problem with AI storytelling - the AI forgetting important details from earlier in the story. It automatically tracks characters, locations, events, and world rules so the AI can maintain consistency.
 
-## Core Features
+## What It Does
 
-**Automatic Extraction**: AI extracts characters, locations, events, and rules from narrative
-**Session Filtering**: View facts from current session or all-time
-**World Scoping**: Each world maintains independent lore database
-**Manual Addition**: Players can add important story elements
+**Auto-extracts story facts** - When you play through narratives, the AI automatically identifies and stores important elements like "Sir Gareth" (character), "tavern" (location), "Goldenhaven" (location).
+
+**Filters by context** - You can view facts from just the current session or all-time, and each world keeps its own separate lore database.
+
+**Manual additions** - Players can manually add important story elements the AI might have missed.
 
 ## Architecture
 

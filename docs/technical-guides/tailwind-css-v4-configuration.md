@@ -9,11 +9,11 @@ updated: 2025-06-08
 
 # Tailwind CSS v4 Configuration Guide
 
-This guide documents the configuration setup for Tailwind CSS v4 in the Narraitor project.
+So this documents the Tailwind CSS v4 setup, which required some specific configuration changes to work properly with Next.js 15 and the App Router. The main issue was PostCSS plugin compatibility.
 
-## Overview
+## Why v4 and Configuration Notes
 
-Narraitor uses Tailwind CSS v4 with Next.js 15+ App Router. This configuration addresses the build failures that were previously occurring due to incompatibilities between Tailwind CSS v4 and the PostCSS configuration.
+Using Tailwind v4 for better performance and the new theming approach, but it needed specific PostCSS configuration to avoid build failures. The key change is using `@tailwindcss/postcss` instead of `tailwindcss` directly.
 
 ## Key Files
 

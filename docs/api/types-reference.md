@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # TypeScript Types Reference
 
-Core TypeScript interfaces and types for the Narraitor application.
+So here are the main TypeScript interfaces and types used throughout the app. These define the data structures for worlds, characters, narratives, and other core entities.
 
 ## Base Types
 
