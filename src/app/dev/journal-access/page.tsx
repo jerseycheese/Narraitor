@@ -122,36 +122,39 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'character_event',
-        title: '',
-        content: 'Started work shift at the video store.',
+        title: 'First Day at Work',
+        content: 'Started my work shift at the video store today. The fluorescent lights buzzed overhead as I unlocked the front door, the familiar smell of plastic cases and carpet cleaner greeting me. It\'s going to be another long day of recommending movies to people who never listen anyway. At least the air conditioning works.',
         significance: 'minor',
         isRead: false, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['opening', 'introduction'], automaticEntry: true },
+        relatedEntities: [{ id: 'loc-1', type: 'location', name: 'Video Store' }],
+        metadata: { tags: ['opening', 'introduction', 'work'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       },
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'world_event',
-        title: '',
-        content: 'Marco appeared after dealing with an angry customer.',
+        title: 'Unexpected Encounter',
+        content: 'Marco appeared after dealing with an angry customer who was convinced we had lost his rental of "Citizen Kane." His face was flushed, and he was muttering something about "philistines" under his breath. The customer had been going on for twenty minutes about the cultural significance of Orson Welles before Marco finally convinced him to check his car. Sure enough, the DVD was under the passenger seat. Marco just shook his head and went back to restocking the horror section.',
         significance: 'minor',
         isRead: true, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['dialogue', 'employee'], automaticEntry: true },
+        relatedEntities: [
+          { id: 'char-2', type: 'character', name: 'Marco' },
+          { id: 'char-3', type: 'character', name: 'Angry Customer' }
+        ],
+        metadata: { tags: ['dialogue', 'employee', 'customer-service'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       },
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'discovery',
-        title: '',
-        content: 'Made a life-changing decision about the future.',
+        title: 'The Choice That Changed Everything',
+        content: 'Made a life-changing decision about the future while browsing through the "Staff Picks" section. Something about seeing all those movie covers, each one a different life, a different story, made me realize I\'ve been living in a loop. Same store, same customers, same complaints about late fees. But what if I could be the protagonist of my own story? What if tomorrow, I didn\'t come back? The thought both terrifies and exhilarates me. Maybe it\'s time to return my uniform and never look back.',
         significance: 'critical',
         isRead: false, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['browsing', 'selection'], automaticEntry: true },
+        relatedEntities: [{ id: 'item-1', type: 'item', name: 'Staff Picks Display' }],
+        metadata: { tags: ['browsing', 'selection', 'life-decision', 'epiphany'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       }
     ];
