@@ -12,7 +12,8 @@ export interface JournalEntry extends TimestampedEntity {
   characterId: EntityID;
   type: JournalEntryType;
   title: string;
-  content: string;
+  content: string; // Brief summary for list view
+  detailedContent?: string; // Full narrative for detail view (optional, falls back to content)
   significance: 'minor' | 'major' | 'critical';
   isRead: boolean;
   relatedEntities: RelatedEntity[];

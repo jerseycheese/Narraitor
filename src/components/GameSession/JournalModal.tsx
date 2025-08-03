@@ -77,7 +77,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       <div className="flex-1 overflow-auto">
         <div className="prose prose-amber max-w-none">
           <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-            {entry.content}
+            {entry.detailedContent || entry.content}
           </p>
         </div>
         
