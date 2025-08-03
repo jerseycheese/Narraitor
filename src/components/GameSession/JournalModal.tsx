@@ -22,6 +22,67 @@ interface JournalModalProps {
   sessionId: EntityID;
 }
 
+// EntryDetail component for displaying complete formatted content
+const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
+  <div className="h-full flex flex-col">
+    <div className="border-b border-amber-200 pb-4 mb-4">
+      <h3 className="text-xl font-bold text-amber-900 mb-2">
+        {entry.title || titleCase(entry.type.replace('_', ' '))}
+      </h3>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <StatusBadge
+          variant="significance"
+          state={entry.significance as 'critical' | 'major' | 'minor'}
+          label={capitalize(entry.significance)}
+        />
+        <Badge variant="info" size="sm">
+          {titleCase(entry.type.replace('_', ' '))}
+        </Badge>
+        <span className="text-amber-600">
+          {formatRelativeTime(new Date(entry.createdAt))}
+        </span>
+        {!entry.isRead && (
+          <Badge variant="secondary" size="sm">Unread</Badge>
+        )}
+      </div>
+    </div>
+    
+    <div className="flex-1 overflow-auto">
+      <div className="prose prose-amber max-w-none">
+        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+          {entry.detailedContent || entry.content}
+        </p>
+      </div>
+      
+      {entry.relatedEntities && entry.relatedEntities.length > 0 && (
+        <div className="mt-6 pt-4 border-t border-amber-200">
+          <h4 className="font-semibold text-amber-900 mb-2">Related</h4>
+          <div className="flex flex-wrap gap-2">
+            {entry.relatedEntities.map((entity, index) => (
+              <Badge key={index} variant="outline" size="sm">
+                {titleCase(entity.type)}: {entity.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {entry.metadata.tags && entry.metadata.tags.length > 0 && (
+        <div className="mt-4">
+          <h4 className="font-semibold text-amber-900 mb-2">Tags</h4>
+          <div className="flex flex-wrap gap-2">
+            {entry.metadata.tags.map((tag, index) => (
+              <Badge key={index} variant="secondary" size="sm">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 /**
  * Enhanced JournalModal with list-detail interface for entry selection and viewing
  * Implements Issue #179: Select and view complete journal entry content with formatting
@@ -48,67 +109,6 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       markAsRead(entry.id);
     }
   };
-
-  // EntryDetail component for displaying complete formatted content
-  const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
-    <div className="h-full flex flex-col">
-      <div className="border-b border-amber-200 pb-4 mb-4">
-        <h3 className="text-xl font-bold text-amber-900 mb-2">
-          {entry.title || titleCase(entry.type.replace('_', ' '))}
-        </h3>
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <StatusBadge
-            variant="significance"
-            state={entry.significance as 'critical' | 'major' | 'minor'}
-            label={capitalize(entry.significance)}
-          />
-          <Badge variant="info" size="sm">
-            {titleCase(entry.type.replace('_', ' '))}
-          </Badge>
-          <span className="text-amber-600">
-            {formatRelativeTime(new Date(entry.createdAt))}
-          </span>
-          {!entry.isRead && (
-            <Badge variant="secondary" size="sm">Unread</Badge>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex-1 overflow-auto">
-        <div className="prose prose-amber max-w-none">
-          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-            {entry.detailedContent || entry.content}
-          </p>
-        </div>
-        
-        {entry.relatedEntities && entry.relatedEntities.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-amber-200">
-            <h4 className="font-semibold text-amber-900 mb-2">Related</h4>
-            <div className="flex flex-wrap gap-2">
-              {entry.relatedEntities.map((entity, index) => (
-                <Badge key={index} variant="outline" size="sm">
-                  {titleCase(entity.type)}: {entity.name}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {entry.metadata.tags && entry.metadata.tags.length > 0 && (
-          <div className="mt-4">
-            <h4 className="font-semibold text-amber-900 mb-2">Tags</h4>
-            <div className="flex flex-wrap gap-2">
-              {entry.metadata.tags.map((tag, index) => (
-                <Badge key={index} variant="secondary" size="sm">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div 
