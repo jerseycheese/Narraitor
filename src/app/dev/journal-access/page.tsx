@@ -122,36 +122,42 @@ export default function JournalAccessTestPage() {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'character_event',
-        title: '',
-        content: 'Started work shift at the video store.',
+        title: 'First Day at Work',
+        content: 'Started my work shift at the video store today.',
+        detailedContent: 'Opened the store for another shift. Same fluorescent lights, same carpet cleaner smell. Customers still ignore movie recommendations.',
         significance: 'minor',
-        isRead: false, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['opening', 'introduction'], automaticEntry: true },
+        isRead: false,
+        relatedEntities: [{ id: 'loc-1', type: 'location', name: 'Video Store' }],
+        metadata: { tags: ['opening', 'introduction', 'work'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       },
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'world_event',
-        title: '',
-        content: 'Marco appeared after dealing with an angry customer.',
+        title: 'Unexpected Encounter',
+        content: 'I questioned a caller about the nature of their problem, learning it concerns a missing package.',
+        detailedContent: 'Customer called about missing Citizen Kane rental. Complained for twenty minutes about Orson Welles. Found it in their car after checking. Marco dealt with another difficult customer around the same time.',
         significance: 'minor',
-        isRead: true, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['dialogue', 'employee'], automaticEntry: true },
+        isRead: true,
+        relatedEntities: [
+          { id: 'char-2', type: 'character', name: 'Marco' },
+          { id: 'char-3', type: 'character', name: 'Angry Customer' }
+        ],
+        metadata: { tags: ['dialogue', 'employee', 'customer-service'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       },
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
         type: 'discovery',
-        title: '',
-        content: 'Made a life-changing decision about the future.',
+        title: 'The Choice That Changed Everything',
+        content: 'Learned a package, meant to arrive before the Myposian...',
+        detailedContent: 'Organized Staff Picks section. Realized I\'m stuck in the same routine every day. Same store, same complaints about late fees. Considered not coming back tomorrow.',
         significance: 'critical',
-        isRead: false, // Read status no longer used
-        relatedEntities: [],
-        metadata: { tags: ['browsing', 'selection'], automaticEntry: true },
+        isRead: false,
+        relatedEntities: [{ id: 'item-1', type: 'item', name: 'Staff Picks Display' }],
+        metadata: { tags: ['browsing', 'selection', 'life-decision', 'epiphany'], automaticEntry: true },
         updatedAt: new Date().toISOString()
       }
     ];
