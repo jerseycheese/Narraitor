@@ -9,7 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
-import { generateUniqueId, truncate, safeTrim, getNestedValue, formatDateTime } from '@/lib/utils';
+import { generateUniqueId, truncate, safeTrim, getNestedValue } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { StoryEndingDialog } from '@/components/StoryEndingDialog';
@@ -255,7 +255,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: formatDateTime(new Date())
+          updatedAt: new Date().toISOString()
         });
       } catch (error) {
         console.warn('Failed to create journal entry from narrative segment:', error);
@@ -280,7 +280,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: formatDateTime(new Date())
+          updatedAt: new Date().toISOString()
         });
       } catch (fallbackError) {
         console.warn('Failed to create fallback journal entry:', fallbackError);

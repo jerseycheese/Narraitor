@@ -2,7 +2,7 @@
 
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
-import { capitalize, truncate, safeTrim, getNestedValue, formatDateTime } from '@/lib/utils';
+import { capitalize, truncate, safeTrim, getNestedValue } from '@/lib/utils';
 
 interface PortraitGenerationOptions {
   worldGenre?: string;
@@ -133,7 +133,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       return {
         type: 'ai-generated',
         url: response.image,
-        generatedAt: formatDateTime(new Date()),
+        generatedAt: new Date().toISOString(),
         prompt: response.prompt
       };
     } catch (error) {

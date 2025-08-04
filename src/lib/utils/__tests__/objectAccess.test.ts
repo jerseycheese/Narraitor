@@ -120,7 +120,7 @@ describe('objectAccess', () => {
 
       it('should handle empty paths gracefully', () => {
         expect(getNestedValue(testObject, '', 'default')).toBe('default');
-        expect(getNestedValue(testObject, [])).toEqual(testObject);
+        expect(getNestedValue(testObject, [], 'default')).toBe('default');
       });
 
       it('should handle invalid path formats gracefully', () => {

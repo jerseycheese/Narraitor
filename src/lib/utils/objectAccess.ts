@@ -69,9 +69,9 @@ export function getNestedValue<T = unknown>(
     return defaultValue;
   }
 
-  // Handle empty path
+  // Handle empty path - consistent behavior for both string and array
   if (path === '' || (Array.isArray(path) && path.length === 0)) {
-    return Array.isArray(path) && path.length === 0 ? (obj as T) : defaultValue;
+    return defaultValue;
   }
 
   let keys: (string | number)[];

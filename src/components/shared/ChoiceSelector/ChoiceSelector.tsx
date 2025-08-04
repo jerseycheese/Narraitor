@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { evaluateRequirement } from '@/lib/utils/requirementEvaluator';
 import { resolveSkillData } from '@/lib/utils/gameDataResolver';
-import { safeTrim, getNestedValue } from '@/lib/utils';
+import { safeTrim } from '@/lib/utils';
 
 
 // Local character type definition that matches the actual store structure
@@ -387,8 +387,8 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             {option.skillRequirements && option.skillRequirements.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {option.skillRequirements.map((skillReq, index) => {
-                  const operatorSuffix = getNestedValue(skillReq, 'requirement.operator') === 'gte' ? '+' : '';
-                  const label = `${skillReq.skillName} ${getNestedValue(skillReq, 'requirement.value')}${operatorSuffix}`;
+                  const operatorSuffix = skillReq.requirement?.operator === 'gte' ? '+' : '';
+                  const label = `${skillReq.skillName} ${skillReq.requirement?.value}${operatorSuffix}`;
                   const variant = skillReq.isAvailable ? 'available' : 'unavailable';
                   
                   return (
