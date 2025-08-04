@@ -7,6 +7,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { normalizeText } from '../lib/utils/textNormalization';
 import {
   NarrativeGoal,
   GoalPriority,
@@ -79,13 +80,26 @@ const initialState = {
 
 // Validation function for goal data
 const validateGoalData = (data: Partial<NarrativeGoal>): void => {
-  if (!data.title || data.title.trim() === '') {
+  const normalizedTitle = normalizeText(data.title || '', {
+    normalizeWhitespace: true,
+    normalizeQuotes: true,
+    normalizeSpecialChars: true,
+    preserveStructure: false
+  });
+  if (!normalizedTitle) {
     throw new Error('Goal title is required');
   }
   if (!data.sessionId) {
     throw new Error('Session ID is required');
   }
-  if (!data.description || data.description.trim() === '') {
+  const normalizedDescription = normalizeText(data.description || '', {
+    normalizeWhitespace: true,
+    normalizeLineEndings: true,
+    normalizeQuotes: true,
+    normalizeSpecialChars: true,
+    preserveStructure: true
+  });
+  if (!normalizedDescription) {
     throw new Error('Goal description is required');
   }
 };
@@ -114,6 +128,19 @@ export const useGoalStore = create<GoalStore>()(
 
         const newGoal: NarrativeGoal = {
           ...goalData,
+          title: normalizeText(goalData.title, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          }),
+          description: normalizeText(goalData.description, {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           id: goalId,
           createdAt: now,
           updatedAt: now,

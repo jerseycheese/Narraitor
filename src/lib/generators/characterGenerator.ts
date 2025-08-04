@@ -275,9 +275,9 @@ CRITICAL INSTRUCTIONS:
     jsonString = jsonString.replace(/,\s*([}\]])/g, '$1');
     
     // Fix common JSON issues
-    // Replace smart quotes with regular quotes
-    jsonString = jsonString.replace(/[""]/g, '"');
-    jsonString = jsonString.replace(/['']/g, "'");
+    // Normalize quotes to ensure valid JSON
+    const { normalizeQuotationMarks } = await import('@/lib/utils/textNormalization');
+    jsonString = normalizeQuotationMarks(jsonString);
     
     // Remove any non-printable characters
     jsonString = jsonString.replace(/[\x00-\x1F\x7F-\x9F]/g, '');

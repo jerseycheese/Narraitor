@@ -6,7 +6,7 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
-
+import { normalizeText } from '../lib/utils/textNormalization';
 
 /**
  * World store interface with state and actions
@@ -71,8 +71,22 @@ export const useWorldStore = create<WorldStore>()(
         const worldId = generateUniqueId('world');
         const now = new Date().toISOString();
         
+        // Normalize text fields for consistent storage
         const newWorld: World = {
           ...worldData,
+          name: normalizeText(worldData.name, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          }),
+          description: normalizeText(worldData.description, {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           id: worldId,
           createdAt: now,
           updatedAt: now,
@@ -94,9 +108,29 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
+        // Normalize text fields in updates
+        const normalizedUpdates = { ...updates };
+        if (updates.name) {
+          normalizedUpdates.name = normalizeText(updates.name, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          });
+        }
+        if (updates.description) {
+          normalizedUpdates.description = normalizeText(updates.description, {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          });
+        }
+
         const updatedWorld: World = {
           ...state.worlds[id],
-          ...updates,
+          ...normalizedUpdates,
           updatedAt: new Date().toISOString(),
         };
 
@@ -149,6 +183,19 @@ export const useWorldStore = create<WorldStore>()(
         const attributeId = generateUniqueId('attr');
         const newAttribute: WorldAttribute = {
           ...attributeData,
+          name: normalizeText(attributeData.name, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          }),
+          description: normalizeText(attributeData.description, {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           id: attributeId,
           worldId,
         };
@@ -234,6 +281,19 @@ export const useWorldStore = create<WorldStore>()(
         const skillId = generateUniqueId('skill');
         const newSkill: WorldSkill = {
           ...skillData,
+          name: normalizeText(skillData.name, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          }),
+          description: normalizeText(skillData.description, {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           id: skillId,
           worldId,
         };

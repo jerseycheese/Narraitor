@@ -8,6 +8,7 @@ import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';
 import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './personalization.types';
 import { safeTrim } from '@/lib/utils';
+import { normalizeText } from '../lib/utils/textNormalization';
 
 /**
  * Type guard for World objects
@@ -184,13 +185,22 @@ export function isSafeString(value: unknown, maxLength: number = 200): value is 
 }
 
 /**
- * Sanitizes a string by removing dangerous content
+ * Sanitizes a string by removing dangerous content and normalizing text
  */
 export function sanitizeString(value: unknown, maxLength: number = 200): string | undefined {
   if (typeof value !== 'string' || value.length === 0) return undefined;
   
+  // First normalize the text to handle whitespace, quotes, and special characters
+  let sanitized = normalizeText(value, {
+    normalizeWhitespace: true,
+    normalizeLineEndings: true,
+    normalizeQuotes: true,
+    normalizeSpecialChars: true,
+    preserveStructure: false
+  });
+  
   // Remove HTML tags and dangerous characters
-  const sanitized = safeTrim(value
+  sanitized = safeTrim(sanitized
     .replace(/<[^>]*>/g, '') // Remove HTML tags
     .replace(/[&"']/g, '') // Remove dangerous characters
     .substring(0, maxLength));

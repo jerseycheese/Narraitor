@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/useWorldStore';
+import { useCharacterStore } from '@/state/useCharacterStore';
 import { useRouter } from 'next/navigation';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 
@@ -12,8 +12,8 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock stores
-jest.mock('@/state/worldStore');
-jest.mock('@/state/characterStore');
+jest.mock('@/state/useWorldStore');
+jest.mock('@/state/useCharacterStore');
 
 // Mock auto-save hook
 jest.mock('@/hooks/useCharacterCreationAutoSave');
@@ -93,8 +93,8 @@ describe('CharacterCreationWizard - Navigation to Game Session', () => {
       worlds: { 'world-1': mockWorld },
       getWorld: jest.fn().mockReturnValue(mockWorld),
     };
-    (worldStore as unknown as jest.Mock).mockReturnValue(mockWorldStore);
-    (worldStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockWorldStore);
+    (useWorldStore as unknown as jest.Mock).mockReturnValue(mockWorldStore);
+    (useWorldStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockWorldStore);
     
     // Mock character store with proper state
     const mockCharacterStore = {
@@ -103,8 +103,8 @@ describe('CharacterCreationWizard - Navigation to Game Session', () => {
       currentCharacterId: null,
       characters: {},
     };
-    (characterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStore);
-    (characterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStore);
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStore);
+    (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue(mockCharacterStore);
     
     // Mock auto-save hook with valid character data
     const mockAutoSaveData = {

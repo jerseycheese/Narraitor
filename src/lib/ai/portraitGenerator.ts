@@ -3,6 +3,7 @@
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
 import { capitalize, truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { normalizeText } from '@/lib/utils/textNormalization';
 
 interface PortraitGenerationOptions {
   worldGenre?: string;
@@ -209,10 +210,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           }
           
           if (character.background?.physicalDescription) {
-            const cleanedDesc = character.background.physicalDescription
-              .trim()
-              .replace(/\s+/g, ' ')
-              .replace(/[,\s]+$/, '');
+            const cleanedDesc = normalizeText(character.background.physicalDescription, {
+              normalizeWhitespace: true,
+              normalizeQuotes: true,
+              normalizeSpecialChars: true,
+              preserveStructure: true
+            });
             context.push(cleanedDesc);
           }
           
@@ -261,11 +264,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           }
           
           if (character.background?.physicalDescription) {
-            const cleanedDesc = character.background.physicalDescription
-              .trim()
-              .replace(/\s+/g, ' ')
-              .replace(/[,\s]+$/, '')
-              .toLowerCase();
+            const cleanedDesc = normalizeText(character.background.physicalDescription, {
+              normalizeWhitespace: true,
+              normalizeQuotes: true,
+              normalizeSpecialChars: true,
+              preserveStructure: true
+            }).toLowerCase();
             context.push(cleanedDesc);
           }
           
@@ -305,11 +309,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         // Add physical description to help ensure accuracy
         if (character.background?.physicalDescription) {
-          const cleanedDesc = character.background.physicalDescription
-            .trim()
-            .replace(/\s+/g, ' ')
-            .replace(/[,\s]+$/, '')
-            .toLowerCase();
+          const cleanedDesc = normalizeText(character.background.physicalDescription, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }).toLowerCase();
           context.push(cleanedDesc);
         }
         
@@ -358,10 +363,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         if (physicalDesc) {
-          const cleanedDesc = physicalDesc
-            .trim()
-            .replace(/\s+/g, ' ')
-            .replace(/[,\s]+$/, '');
+          const cleanedDesc = normalizeText(physicalDesc, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          });
           if (cleanedDesc) {
             subject.push(`a ${cleanedDesc}`);
           }
@@ -403,10 +410,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         if (physicalDesc) {
-          const cleanedDesc = physicalDesc
-            .trim()
-            .replace(/\s+/g, ' ')
-            .replace(/[,\s]+$/, '');
+          const cleanedDesc = normalizeText(physicalDesc, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: false
+          });
           if (cleanedDesc) {
             subject.push(`${cleanedDesc}`);
           }
@@ -569,7 +578,13 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Be accurate to their actual appearance. Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        let description = safeTrim(response.content);
+        let description = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeLineEndings: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        });
         
         // Clean up the description
         // Remove character name if it starts with it (case insensitive)
@@ -589,7 +604,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Maximum 40 words. Answer with just the enhanced description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.physicalDescription = safeTrim(response.content).replace(/\.+$/, '.');
+        enhancements.physicalDescription = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }).replace(/\.+$/, '.');
       }
       
       // Generate or enhance personality
@@ -600,7 +620,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.personality = safeTrim(response.content).replace(/\.+$/, '.');
+        enhancements.personality = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
         const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.personality')}"
@@ -608,7 +633,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Maximum 20 words. Answer with just the enhanced description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.personality = safeTrim(response.content).replace(/\.+$/, '.');
+        enhancements.personality = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }).replace(/\.+$/, '.');
       }
       
       // Generate or enhance history
@@ -620,7 +650,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Answer with just one sentence, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.history = safeTrim(response.content).replace(/\.+$/, '.');
+        enhancements.history = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
         const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.history')}"
@@ -629,7 +664,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Keep the user's content but add missing context or details. One sentence maximum. Answer with just the enhanced background, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.history = safeTrim(response.content).replace(/\.+$/, '.');
+        enhancements.history = normalizeText(response.content, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }).replace(/\.+$/, '.');
       }
       
       // Return a new character object with the generated enhancements
@@ -664,7 +704,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       Provide only visual cues that a portrait artist could depict. 20 words max. Answer with just the visual description.`;
       
       const response = await this.aiClient.generateContent(prompt);
-      return safeTrim(response.content);
+      return normalizeText(response.content, {
+        normalizeWhitespace: true,
+        normalizeQuotes: true,
+        normalizeSpecialChars: true,
+        preserveStructure: true
+      });
     } catch {
       // Fallback to simple extraction
       return this.extractKeyTraits(personality);
@@ -708,7 +753,12 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       Keep the original description but add specific imperfections. 50 words max total. Answer with just the enhanced description.`;
       
       const response = await this.aiClient.generateContent(prompt);
-      return safeTrim(response.content);
+      return normalizeText(response.content, {
+        normalizeWhitespace: true,
+        normalizeQuotes: true,
+        normalizeSpecialChars: true,
+        preserveStructure: true
+      });
     } catch {
       // Fallback - add very specific variety based on character name hash
       const hash = characterName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

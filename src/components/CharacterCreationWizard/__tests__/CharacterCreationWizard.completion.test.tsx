@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/useCharacterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock stores
 jest.mock('@/state/worldStore');
-jest.mock('@/state/characterStore');
+jest.mock('@/state/useCharacterStore');
 
 describe.skip('CharacterCreationWizard - Completion Navigation', () => {
   const mockPush = jest.fn();
@@ -25,7 +25,7 @@ describe.skip('CharacterCreationWizard - Completion Navigation', () => {
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
     
     // Mock character store
-    (characterStore.getState as jest.Mock) = jest.fn().mockReturnValue({
+    (useCharacterStore.getState as jest.Mock) = jest.fn().mockReturnValue({
       createCharacter: mockCreateCharacter,
       setCurrentCharacter: mockSetCurrentCharacter,
     });
@@ -51,7 +51,7 @@ describe.skip('CharacterCreationWizard - Completion Navigation', () => {
   it('confirms handleCreate function sets up correct navigation', () => {
     // From the code review:
     // - handleCreate is called when clicking "Create Character" on the last step
-    // - It calls characterStore.getState().setCurrentCharacter(characterId)
+    // - It calls useCharacterStore.getState().setCurrentCharacter(characterId)
     // - Then calls router.push(`/world/${worldId}/play`)
     
     // This confirms the flow is:

@@ -4,14 +4,14 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { characterStore } from '../../../state/characterStore';
-import { worldStore } from '../../../state/worldStore';
+import { useCharacterStore } from '../../../state/useCharacterStore';
+import { useWorldStore } from '../../../state/useWorldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies
-jest.mock('../../../state/characterStore');
-jest.mock('../../../state/worldStore');
+jest.mock('../../../state/useCharacterStore');
+jest.mock('../../../state/useWorldStore');
 // Mock fetch for API routes
 const mockFetch = jest.fn();
 jest.mock('../../../hooks/useCharacterCreationAutoSave', () => ({
@@ -32,8 +32,8 @@ jest.mock('next/navigation', () => ({
   })
 }));
 
-const mockCharacterStore = characterStore as jest.MockedFunction<typeof characterStore>;
-const mockWorldStore = worldStore as jest.MockedFunction<typeof worldStore>;
+const mockCharacterStore = useCharacterStore as jest.MockedFunction<typeof useCharacterStore>;
+const mockWorldStore = useWorldStore as jest.MockedFunction<typeof useWorldStore>;
 
 describe('PortraitStep Component', () => {
   const mockData = {
@@ -198,14 +198,14 @@ describe('Character Creation Wizard with Portrait Integration', () => {
       getState: jest.fn(() => ({
         setCurrentCharacter: jest.fn()
       }))
-    } as unknown as ReturnType<typeof characterStore>);
+    } as unknown as ReturnType<typeof useCharacterStore>);
 
     mockWorldStore.mockReturnValue({
       worlds: { 'world-1': mockWorld },
       currentWorldId: 'world-1',
       error: null,
       loading: false
-    } as unknown as ReturnType<typeof worldStore>);
+    } as unknown as ReturnType<typeof useWorldStore>);
   });
 
   it('should include portrait step in wizard', () => {

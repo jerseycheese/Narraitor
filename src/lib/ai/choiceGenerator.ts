@@ -7,6 +7,7 @@ import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
 import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
+import { normalizeText } from '@/lib/utils/textNormalization';
 
 /**
  * Parameters for choice generation
@@ -482,15 +483,30 @@ CHOICE GENERATION FOCUS:
    * Finalize an option by cleaning up the structure and adding requirements
    */
   private finalizeOption(option: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }>): DecisionOption {
+    // Normalize option text for consistent formatting
+    const normalizedText = normalizeText(option.text || 'Unknown option', {
+      normalizeWhitespace: true,
+      normalizeLineEndings: true,
+      normalizeQuotes: true,
+      normalizeSpecialChars: true,
+      preserveStructure: false // Single line text, no structure needed
+    });
+
     const finalOption: DecisionOption = {
       id: option.id || generateUniqueId('option'),
-      text: option.text || 'Unknown option',
+      text: normalizedText,
       alignment: option.alignment || 'neutral'
     };
 
     // Add hint if present
     if (option.hint && safeTrim(option.hint)) {
-      finalOption.hint = safeTrim(option.hint);
+      finalOption.hint = normalizeText(safeTrim(option.hint), {
+        normalizeWhitespace: true,
+        normalizeLineEndings: true,
+        normalizeQuotes: true,
+        normalizeSpecialChars: true,
+        preserveStructure: true
+      });
     }
 
     // Add requirements if present

@@ -6,6 +6,7 @@ import { generateUniqueId, safeTrim } from '../lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
+import { normalizeText } from '../lib/utils/textNormalization';
 
 
 /**
@@ -87,7 +88,14 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
   // Add segment
   addSegment: (sessionId, segmentData) => {
-    if (!segmentData.content || safeTrim(segmentData.content) === '') {
+    const normalizedContent = normalizeText(segmentData.content || '', {
+      normalizeWhitespace: true,
+      normalizeLineEndings: true,
+      normalizeQuotes: true,
+      normalizeSpecialChars: true,
+      preserveStructure: true
+    });
+    if (!normalizedContent) {
       throw new Error('Segment content is required');
     }
     
@@ -101,6 +109,13 @@ export const useNarrativeStore = create<NarrativeStore>()(
     
     const newSegment: NarrativeSegment = {
       ...segmentData,
+      content: normalizeText(segmentData.content, {
+        normalizeWhitespace: true,
+        normalizeLineEndings: true,
+        normalizeQuotes: true,
+        normalizeSpecialChars: true,
+        preserveStructure: true
+      }),
       id: segmentId,
       sessionId,
       createdAt: now,

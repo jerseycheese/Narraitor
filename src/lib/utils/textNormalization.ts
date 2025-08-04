@@ -355,7 +355,7 @@ export function normalizeLineEndings(text: string, format: 'unix' | 'windows' | 
   if (!text) return '';
 
   // First normalize all to Unix format
-  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const normalized = text.replace(/\r\n?/g, '\n');
 
   // Then convert to requested format if not Unix
   switch (format) {
