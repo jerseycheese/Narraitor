@@ -39,7 +39,7 @@ export interface WatchSubscription {
 }
 
 export class StateInspector {
-  private stores: Record<string, any> = {};
+  private stores: Record<string, unknown> = {};
   private watchers = new Map<string, Set<WatchCallback>>();
   private watcherTimeouts = new Map<string, NodeJS.Timeout>();
   private circularRefs = new WeakSet();
@@ -60,7 +60,7 @@ export class StateInspector {
   /**
    * Register stores for inspection
    */
-  registerStores(stores: Record<string, any>): void {
+  registerStores(stores: Record<string, unknown>): void {
     if (process.env.NODE_ENV !== 'development') {
       return;
     }

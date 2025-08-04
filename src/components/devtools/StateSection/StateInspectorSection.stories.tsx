@@ -105,7 +105,7 @@ the change notification system and history tracking features.
       }
     }
   },
-  play: async ({ canvasElement }) => {
+  play: async () => {
     // Simulate adding watches and state changes
     // This would be implemented with actual user interactions in the story
   }

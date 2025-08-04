@@ -3,7 +3,7 @@
  * Provides type safety for state inspection utilities
  */
 
-export interface ZustandStore<T = any> {
+export interface ZustandStore<T = unknown> {
   getState: () => T;
   setState: (state: T | Partial<T> | ((state: T) => T | Partial<T>)) => void;
   subscribe: (listener: (state: T, prevState: T) => void) => () => void;

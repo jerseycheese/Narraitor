@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { stateInspector, type StateSnapshot, type PathInfo, type WatchSubscription } from '@/lib/utils/stateInspector';
+import { stateInspector, type StateSnapshot, type PathInfo } from '@/lib/utils/stateInspector';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 import * as stores from '@/state';
@@ -76,7 +76,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       });
     } else {
       // Add watch
-      const subscription = stateInspector.watchPath(path, (oldValue, newValue, watchPath) => {
+      stateInspector.watchPath(path, (oldValue, newValue, watchPath) => {
         setChangeNotifications(prev => [
           ...prev.slice(-9), // Keep last 9 notifications
           {
@@ -89,9 +89,6 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       });
 
       setWatchedPaths(prev => new Set([...prev, path]));
-
-      // Store subscription for cleanup (in a real implementation, you'd manage these)
-      // For now, we'll rely on component unmount cleanup
     }
   }, [watchedPaths]);
 
@@ -270,7 +267,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           data-testid="change-history-section"
         >
           <div className="space-y-1 max-h-32 overflow-y-auto">
-            {changeNotifications.slice().reverse().map((notification, index) => (
+            {changeNotifications.slice().reverse().map((notification) => (
               <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-slate-700 p-2 rounded border border-slate-600">
                 <div className="font-medium text-yellow-400">{notification.path}</div>
                 <div className="text-slate-300">
