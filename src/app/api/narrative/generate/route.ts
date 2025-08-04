@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     
     // Call Google's Gemini API from the server using secure header authentication
     const response = await makeGeminiRequest(
-      `https://getNestedValue(generativelanguage, 'googleapis.com')/v1beta/models/gemini-2.0-flash:generateContent`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
       apiKey,
       {
         contents: [{
