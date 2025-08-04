@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
-import { StateSection } from '../StateSection';
+import { EnhancedStateSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
@@ -115,7 +115,7 @@ export const DevToolsPanel = () => {
           className="devtools-panel p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-slate-800 text-slate-200"
         >
           <EnvironmentInfo />
-          <StateSection defaultCollapsed={true} />
+          <EnhancedStateSection defaultCollapsed={true} />
           
           {/* AI Testing Section */}
           <CollapsibleSection title="AI Testing" initialCollapsed={true}>
