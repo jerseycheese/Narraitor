@@ -19,6 +19,7 @@ export interface WorldImage {
  * Represents a game world configuration
  */
 export interface World extends NamedEntity, TimestampedEntity {
+  description: string;
   genre: GenreValue;
   attributes: WorldAttribute[];
   skills: WorldSkill[];
@@ -34,6 +35,7 @@ export interface World extends NamedEntity, TimestampedEntity {
  */
 export interface WorldAttribute extends NamedEntity {
   worldId: EntityID;
+  description: string;
   baseValue: number;
   minValue: number;
   maxValue: number;
@@ -45,6 +47,7 @@ export interface WorldAttribute extends NamedEntity {
  */
 export interface WorldSkill extends NamedEntity {
   worldId: EntityID;
+  description: string;
   attributeIds?: EntityID[];
   difficulty: SkillDifficulty;
   category?: string;

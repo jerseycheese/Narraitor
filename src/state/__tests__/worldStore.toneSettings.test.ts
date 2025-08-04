@@ -1,9 +1,9 @@
-import { worldStore } from '../worldStore';
+import { useWorldStore } from '../worldStore';
 import { ToneSettings } from '@/types/tone-settings.types';
 
 describe('WorldStore Tone Settings', () => {
   beforeEach(() => {
-    worldStore.getState().reset();
+    useWorldStore.getState().reset();
   });
 
   test('should create world with tone settings', () => {
@@ -14,7 +14,7 @@ describe('WorldStore Tone Settings', () => {
       customInstructions: 'Keep dialogue realistic'
     };
 
-    const worldId = worldStore.getState().createWorld({
+    const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
       genre: 'fantasy',
@@ -29,12 +29,12 @@ describe('WorldStore Tone Settings', () => {
       toneSettings
     });
 
-    const world = worldStore.getState().worlds[worldId];
+    const world = useWorldStore.getState().worlds[worldId];
     expect(world.toneSettings).toEqual(toneSettings);
   });
 
   test('should update world tone settings', () => {
-    const worldId = worldStore.getState().createWorld({
+    const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
       genre: 'fantasy',
@@ -55,9 +55,9 @@ describe('WorldStore Tone Settings', () => {
       customInstructions: 'Include mature themes'
     };
 
-    worldStore.getState().updateToneSettings(worldId, newToneSettings);
+    useWorldStore.getState().updateToneSettings(worldId, newToneSettings);
 
-    const world = worldStore.getState().worlds[worldId];
+    const world = useWorldStore.getState().worlds[worldId];
     expect(world.toneSettings).toEqual(newToneSettings);
   });
 
@@ -68,7 +68,7 @@ describe('WorldStore Tone Settings', () => {
       languageComplexity: 'moderate'
     };
 
-    const worldId = worldStore.getState().createWorld({
+    const worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
       description: 'A test world',
       genre: 'fantasy',
@@ -88,9 +88,9 @@ describe('WorldStore Tone Settings', () => {
       customInstructions: 'Add light comedy'
     };
 
-    worldStore.getState().updateToneSettings(worldId, partialUpdate);
+    useWorldStore.getState().updateToneSettings(worldId, partialUpdate);
 
-    const world = worldStore.getState().worlds[worldId];
+    const world = useWorldStore.getState().worlds[worldId];
     expect(world.toneSettings).toEqual({
       ...initialToneSettings,
       ...partialUpdate
@@ -104,8 +104,8 @@ describe('WorldStore Tone Settings', () => {
       languageComplexity: 'moderate'
     };
 
-    worldStore.getState().updateToneSettings('non-existent-id', toneSettings);
+    useWorldStore.getState().updateToneSettings('non-existent-id', toneSettings);
 
-    expect(worldStore.getState().error).toBe('World not found');
+    expect(useWorldStore.getState().error).toBe('World not found');
   });
 });

@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { worldStore } from '@/state/worldStore';
-import { characterStore } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -44,11 +44,11 @@ describe.skip('CharacterCreationWizard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-    (worldStore as unknown as jest.Mock).mockReturnValue({
+    (useWorldStore as unknown as jest.Mock).mockReturnValue({
       worlds: { 'world-1': mockWorld },
       currentWorldId: 'world-1',
     });
-    (characterStore as unknown as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: {},
       createCharacter: jest.fn().mockReturnValue('char-1'),
     });
@@ -92,7 +92,7 @@ describe.skip('CharacterCreationWizard', () => {
 
     it('validates character name uniqueness within world', async () => {
       const user = userEvent.setup();
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {
           'char-existing': { id: 'char-existing', name: 'Existing Hero', worldId: 'world-1' }
         },
@@ -168,7 +168,7 @@ describe.skip('CharacterCreationWizard', () => {
         })),
       };
       
-      (worldStore as unknown as jest.Mock).mockReturnValue({
+      (useWorldStore as unknown as jest.Mock).mockReturnValue({
         worlds: { 'world-1': manySkillsWorld },
         currentWorldId: 'world-1',
       });
@@ -244,7 +244,7 @@ describe.skip('CharacterCreationWizard', () => {
     it('creates character and navigates to character detail on completion', async () => {
       const user = userEvent.setup();
       const mockCreateCharacter = jest.fn().mockReturnValue('char-new');
-      (characterStore as unknown as jest.Mock).mockReturnValue({
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue({
         characters: {},
         createCharacter: mockCreateCharacter,
       });

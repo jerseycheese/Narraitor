@@ -11,6 +11,23 @@ import type {
 import type { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { normalizeText } from '../lib/utils/textNormalization';
+
+/**
+ * Helper function to generate normalized lore keys
+ */
+function generateLoreKey(worldId: string, category: string, name: string, maxLength?: number): string {
+  const normalizedName = normalizeText(name, {
+    normalizeWhitespace: true,
+    normalizeQuotes: true,
+    normalizeSpecialChars: true,
+    normalizeLineEndings: true,
+    preserveStructure: false
+  }).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  
+  const truncatedName = maxLength ? normalizedName.substring(0, maxLength) : normalizedName;
+  return `${worldId}:${category}_${truncatedName}`;
+}
 
 /**
  * Lore store for tracking narrative facts
@@ -115,7 +132,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add characters
         extraction.characters.forEach(char => {
-          const key = `${worldId}:character_${char.name.toLowerCase().replace(/\s+/g, '_')}`;
+          const key = generateLoreKey(worldId, 'character', char.name);
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -136,7 +153,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add locations
         extraction.locations.forEach(loc => {
-          const key = `${worldId}:location_${loc.name.toLowerCase().replace(/\s+/g, '_')}`;
+          const key = generateLoreKey(worldId, 'location', loc.name);
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -157,7 +174,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add events
         extraction.events.forEach(event => {
-          const key = `${worldId}:event_${event.description.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
+          const key = generateLoreKey(worldId, 'event', event.description, 30);
           if (!existingKeys.has(key)) {
             addFact(
               key, 
@@ -177,7 +194,7 @@ export const useLoreStore = create<LoreStore>()(
         
         // Add rules
         extraction.rules.forEach(rule => {
-          const key = `${worldId}:rule_${rule.rule.toLowerCase().replace(/\s+/g, '_').substring(0, 30)}`;
+          const key = generateLoreKey(worldId, 'rule', rule.rule, 30);
           if (!existingKeys.has(key)) {
             addFact(
               key, 

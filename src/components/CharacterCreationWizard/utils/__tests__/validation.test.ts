@@ -1,7 +1,7 @@
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '../validation';
-import { characterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
-// Mock characterStore
+// Mock useCharacterStore
 jest.mock('@/state/characterStore');
 
 describe('Character Creation Validation', () => {
@@ -19,8 +19,8 @@ describe('Character Creation Validation', () => {
           },
         })),
       };
-      (characterStore as unknown as jest.Mock).mockReturnValue(mockStore);
-      (characterStore as unknown as { getState: typeof mockStore.getState }).getState = mockStore.getState;
+      (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockStore);
+      (useCharacterStore as unknown as { getState: typeof mockStore.getState }).getState = mockStore.getState;
     });
 
     it('returns error when name is empty', () => {

@@ -1,6 +1,7 @@
 import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 import { normalizeGenre } from '@/lib/constants/genres';
+import { normalizeText } from '@/lib/utils/textNormalization';
 
 export interface GeneratedWorldData {
   name: string;
@@ -262,7 +263,13 @@ Make the world interesting and playable with concepts appropriate to the setting
         const attrObj = attr as Record<string, unknown>;
         return {
           name: String(attrObj.name || 'Unknown Attribute'),
-          description: String(attrObj.description || ''),
+          description: normalizeText(String(attrObj.description || ''), {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           baseValue: Number(attrObj.defaultValue) || 5,
           minValue: Number(attrObj.minValue) || 1,
           maxValue: Number(attrObj.maxValue) || 10,
@@ -276,7 +283,13 @@ Make the world interesting and playable with concepts appropriate to the setting
         const skillObj = skill as Record<string, unknown>;
         return {
           name: String(skillObj.name || 'Unknown Skill'),
-          description: String(skillObj.description || ''),
+          description: normalizeText(String(skillObj.description || ''), {
+            normalizeWhitespace: true,
+            normalizeLineEndings: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            preserveStructure: true
+          }),
           difficulty: ['easy', 'medium', 'hard'].includes(skillObj.difficulty as string) ? skillObj.difficulty as 'easy' | 'medium' | 'hard' : 'medium',
           category: (skillObj.category as string) || 'General',
           baseValue: 1,
@@ -294,9 +307,20 @@ Make the world interesting and playable with concepts appropriate to the setting
       };
       
       return {
-        name: worldName,
+        name: normalizeText(worldName, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: false
+        }),
         genre: normalizeGenre(String(parsed.genre)),
-        description: String(parsed.description),
+        description: normalizeText(String(parsed.description), {
+          normalizeWhitespace: true,
+          normalizeLineEndings: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: true
+        }),
         attributes,
         skills,
         settings

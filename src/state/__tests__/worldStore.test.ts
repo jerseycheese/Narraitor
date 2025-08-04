@@ -1,13 +1,13 @@
-import { worldStore } from '../worldStore';
+import { useWorldStore } from '../worldStore';
 
-describe('worldStore', () => {
+describe('useWorldStore', () => {
   beforeEach(() => {
-    worldStore.getState().reset();
+    useWorldStore.getState().reset();
   });
 
   describe('initialization', () => {
     test('should initialize with default state', () => {
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       expect(state.worlds).toEqual({});
       expect(state.currentWorldId).toBeNull();
       expect(state.error).toBeNull();
@@ -30,8 +30,8 @@ describe('worldStore', () => {
         }
       };
 
-      const worldId = worldStore.getState().createWorld(worldData);
-      const state = worldStore.getState();
+      const worldId = useWorldStore.getState().createWorld(worldData);
+      const state = useWorldStore.getState();
 
       expect(worldId).toBeDefined();
       expect(state.worlds[worldId]).toBeDefined();
@@ -56,7 +56,7 @@ describe('worldStore', () => {
       };
 
       expect(() => {
-        worldStore.getState().createWorld(invalidWorldData);
+        useWorldStore.getState().createWorld(invalidWorldData);
       }).toThrow('World name is required');
     });
   });
@@ -76,29 +76,29 @@ describe('worldStore', () => {
         }
       };
 
-      const worldId = worldStore.getState().createWorld(worldData);
-      const originalUpdatedAt = worldStore.getState().worlds[worldId].updatedAt;
+      const worldId = useWorldStore.getState().createWorld(worldData);
+      const originalUpdatedAt = useWorldStore.getState().worlds[worldId].updatedAt;
 
       // Add a small delay to ensure different timestamps
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      worldStore.getState().updateWorld(worldId, { name: 'Updated World' });
-      const state = worldStore.getState();
+      useWorldStore.getState().updateWorld(worldId, { name: 'Updated World' });
+      const state = useWorldStore.getState();
 
       expect(state.worlds[worldId].name).toBe('Updated World');
       expect(state.worlds[worldId].updatedAt).not.toBe(originalUpdatedAt);
     });
 
     test('should handle non-existent world', () => {
-      worldStore.getState().updateWorld('non-existent-id', { name: 'Updated' });
-      const state = worldStore.getState();
+      useWorldStore.getState().updateWorld('non-existent-id', { name: 'Updated' });
+      const state = useWorldStore.getState();
       expect(state.error).toBe('World not found');
     });
   });
 
   describe('deleteWorld', () => {
     test('should remove world from store', () => {
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'To Delete',
         genre: 'fantasy',
         attributes: [],
@@ -111,14 +111,14 @@ describe('worldStore', () => {
         }
       });
 
-      worldStore.getState().deleteWorld(worldId);
-      const state = worldStore.getState();
+      useWorldStore.getState().deleteWorld(worldId);
+      const state = useWorldStore.getState();
 
       expect(state.worlds[worldId]).toBeUndefined();
     });
 
     test('should clear currentWorldId if deleted world was current', () => {
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Current World',
         genre: 'fantasy',
         attributes: [],
@@ -131,9 +131,9 @@ describe('worldStore', () => {
         }
       });
 
-      worldStore.getState().setCurrentWorld(worldId);
-      worldStore.getState().deleteWorld(worldId);
-      const state = worldStore.getState();
+      useWorldStore.getState().setCurrentWorld(worldId);
+      useWorldStore.getState().deleteWorld(worldId);
+      const state = useWorldStore.getState();
 
       expect(state.currentWorldId).toBeNull();
     });
@@ -141,7 +141,7 @@ describe('worldStore', () => {
 
   describe('setCurrentWorld', () => {
     test('should set current world ID', () => {
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Current World',
         genre: 'fantasy',
         attributes: [],
@@ -154,15 +154,15 @@ describe('worldStore', () => {
         }
       });
 
-      worldStore.getState().setCurrentWorld(worldId);
-      const state = worldStore.getState();
+      useWorldStore.getState().setCurrentWorld(worldId);
+      const state = useWorldStore.getState();
 
       expect(state.currentWorldId).toBe(worldId);
     });
 
     test('should handle non-existent world', () => {
-      worldStore.getState().setCurrentWorld('non-existent-id');
-      const state = worldStore.getState();
+      useWorldStore.getState().setCurrentWorld('non-existent-id');
+      const state = useWorldStore.getState();
       expect(state.error).toBe('World not found');
       expect(state.currentWorldId).toBeNull();
     });
@@ -172,7 +172,7 @@ describe('worldStore', () => {
     let worldId: string;
 
     beforeEach(() => {
-      worldId = worldStore.getState().createWorld({
+      worldId = useWorldStore.getState().createWorld({
         name: 'Attribute Test World',
         genre: 'fantasy',
         attributes: [],
@@ -195,8 +195,8 @@ describe('worldStore', () => {
         category: 'Physical'
       };
 
-      worldStore.getState().addAttribute(worldId, attributeData);
-      const state = worldStore.getState();
+      useWorldStore.getState().addAttribute(worldId, attributeData);
+      const state = useWorldStore.getState();
       const world = state.worlds[worldId];
 
       expect(world.attributes).toHaveLength(1);
@@ -205,17 +205,17 @@ describe('worldStore', () => {
     });
 
     test('should enforce max attributes limit', () => {
-      const world = worldStore.getState().worlds[worldId];
+      const world = useWorldStore.getState().worlds[worldId];
       world.settings.maxAttributes = 2;
 
       // Add two attributes (should succeed)
-      worldStore.getState().addAttribute(worldId, {
+      useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
       });
-      worldStore.getState().addAttribute(worldId, {
+      useWorldStore.getState().addAttribute(worldId, {
         name: 'Dexterity',
         baseValue: 10,
         minValue: 3,
@@ -223,54 +223,54 @@ describe('worldStore', () => {
       });
 
       // Third attribute should fail
-      worldStore.getState().addAttribute(worldId, {
+      useWorldStore.getState().addAttribute(worldId, {
         name: 'Intelligence',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
       });
 
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       expect(state.worlds[worldId].attributes).toHaveLength(2);
       expect(state.error).toBe('Maximum attributes limit reached');
     });
 
     test('should update attribute', () => {
-      worldStore.getState().addAttribute(worldId, {
+      useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
       });
 
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       const attributeId = state.worlds[worldId].attributes[0].id;
 
-      worldStore.getState().updateAttribute(worldId, attributeId, {
+      useWorldStore.getState().updateAttribute(worldId, attributeId, {
         name: 'Power',
         baseValue: 12
       });
 
-      const updatedState = worldStore.getState();
+      const updatedState = useWorldStore.getState();
       const attribute = updatedState.worlds[worldId].attributes[0];
       expect(attribute.name).toBe('Power');
       expect(attribute.baseValue).toBe(12);
     });
 
     test('should remove attribute', () => {
-      worldStore.getState().addAttribute(worldId, {
+      useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
       });
 
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       const attributeId = state.worlds[worldId].attributes[0].id;
 
-      worldStore.getState().removeAttribute(worldId, attributeId);
+      useWorldStore.getState().removeAttribute(worldId, attributeId);
 
-      const updatedState = worldStore.getState();
+      const updatedState = useWorldStore.getState();
       expect(updatedState.worlds[worldId].attributes).toHaveLength(0);
     });
   });
@@ -279,7 +279,7 @@ describe('worldStore', () => {
     let worldId: string;
 
     beforeEach(() => {
-      worldId = worldStore.getState().createWorld({
+      worldId = useWorldStore.getState().createWorld({
         name: 'Skill Test World',
         genre: 'fantasy',
         attributes: [],
@@ -300,8 +300,8 @@ describe('worldStore', () => {
         category: 'Combat'
       };
 
-      worldStore.getState().addSkill(worldId, skillData);
-      const state = worldStore.getState();
+      useWorldStore.getState().addSkill(worldId, skillData);
+      const state = useWorldStore.getState();
       const world = state.worlds[worldId];
 
       expect(world.skills).toHaveLength(1);
@@ -310,20 +310,20 @@ describe('worldStore', () => {
     });
 
     test('should enforce max skills limit', () => {
-      const world = worldStore.getState().worlds[worldId];
+      const world = useWorldStore.getState().worlds[worldId];
       world.settings.maxSkills = 1;
 
-      worldStore.getState().addSkill(worldId, {
+      useWorldStore.getState().addSkill(worldId, {
         name: 'Skill 1',
         difficulty: 'easy'
       });
 
-      worldStore.getState().addSkill(worldId, {
+      useWorldStore.getState().addSkill(worldId, {
         name: 'Skill 2',
         difficulty: 'easy'
       });
 
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       expect(state.worlds[worldId].skills).toHaveLength(1);
       expect(state.error).toBe('Maximum skills limit reached');
     });
@@ -331,7 +331,7 @@ describe('worldStore', () => {
 
   describe('settings management', () => {
     test('should update world settings', () => {
-      const worldId = worldStore.getState().createWorld({
+      const worldId = useWorldStore.getState().createWorld({
         name: 'Settings Test World',
         genre: 'fantasy',
         attributes: [],
@@ -344,12 +344,12 @@ describe('worldStore', () => {
         }
       });
 
-      worldStore.getState().updateSettings(worldId, {
+      useWorldStore.getState().updateSettings(worldId, {
         maxAttributes: 10,
         attributePointPool: 30
       });
 
-      const state = worldStore.getState();
+      const state = useWorldStore.getState();
       const settings = state.worlds[worldId].settings;
 
       expect(settings.maxAttributes).toBe(10);
@@ -360,28 +360,28 @@ describe('worldStore', () => {
 
   describe('error handling', () => {
     test('should set and clear errors', () => {
-      worldStore.getState().setError('Test error');
-      expect(worldStore.getState().error).toBe('Test error');
+      useWorldStore.getState().setError('Test error');
+      expect(useWorldStore.getState().error).toBe('Test error');
 
-      worldStore.getState().clearError();
-      expect(worldStore.getState().error).toBeNull();
+      useWorldStore.getState().clearError();
+      expect(useWorldStore.getState().error).toBeNull();
     });
   });
 
   describe('loading state', () => {
     test('should set loading state', () => {
-      worldStore.getState().setLoading(true);
-      expect(worldStore.getState().loading).toBe(true);
+      useWorldStore.getState().setLoading(true);
+      expect(useWorldStore.getState().loading).toBe(true);
 
-      worldStore.getState().setLoading(false);
-      expect(worldStore.getState().loading).toBe(false);
+      useWorldStore.getState().setLoading(false);
+      expect(useWorldStore.getState().loading).toBe(false);
     });
   });
 
   describe('reset', () => {
     test('should reset store to initial state', () => {
       // Add some data
-      worldStore.getState().createWorld({
+      useWorldStore.getState().createWorld({
         name: 'Test World',
         genre: 'fantasy',
         attributes: [],
@@ -393,12 +393,12 @@ describe('worldStore', () => {
           skillPointPool: 20
         }
       });
-      worldStore.getState().setError('Some error');
-      worldStore.getState().setLoading(true);
+      useWorldStore.getState().setError('Some error');
+      useWorldStore.getState().setLoading(true);
 
       // Reset
-      worldStore.getState().reset();
-      const state = worldStore.getState();
+      useWorldStore.getState().reset();
+      const state = useWorldStore.getState();
 
       expect(state.worlds).toEqual({});
       expect(state.currentWorldId).toBeNull();

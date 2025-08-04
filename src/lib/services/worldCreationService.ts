@@ -4,6 +4,7 @@ import { GeneratedWorldData } from '@/lib/generators/worldGenerator';
 import { World, WorldAttribute, WorldSkill } from '@/types/world.types';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { worldApi, WorldImageParams } from '@/lib/api/worldApi';
+import { normalizeText } from '@/lib/utils/textNormalization';
 
 export interface CreateWorldFromGenerationParams {
   generatedData: GeneratedWorldData;
@@ -204,22 +205,47 @@ export const worldCreationService = {
   validateWorldData(worldData: Partial<World>): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!worldData.name?.trim()) {
+    const normalizedName = normalizeText(worldData.name || '', {
+      normalizeWhitespace: true,
+      normalizeQuotes: true,
+      normalizeSpecialChars: true,
+      preserveStructure: false
+    });
+    if (!normalizedName) {
       errors.push('World name is required');
     }
 
-    if (!worldData.genre?.trim()) {
+    const normalizedGenre = normalizeText(worldData.genre || '', {
+      normalizeWhitespace: true,
+      normalizeQuotes: true,
+      normalizeSpecialChars: true,
+      preserveStructure: false
+    });
+    if (!normalizedGenre) {
       errors.push('Genre is required');
     }
 
-    if (!worldData.description?.trim()) {
+    const normalizedDescription = normalizeText(worldData.description || '', {
+      normalizeWhitespace: true,
+      normalizeLineEndings: true,
+      normalizeQuotes: true,
+      normalizeSpecialChars: true,
+      preserveStructure: true
+    });
+    if (!normalizedDescription) {
       errors.push('Description is required');
     }
 
     // Validate attributes
     if (worldData.attributes) {
       worldData.attributes.forEach((attr, index) => {
-        if (!attr.name?.trim()) {
+        const normalizedAttrName = normalizeText(attr.name || '', {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: false
+        });
+        if (!normalizedAttrName) {
           errors.push(`Attribute ${index + 1} name is required`);
         }
       });
@@ -228,7 +254,13 @@ export const worldCreationService = {
     // Validate skills
     if (worldData.skills) {
       worldData.skills.forEach((skill, index) => {
-        if (!skill.name?.trim()) {
+        const normalizedSkillName = normalizeText(skill.name || '', {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          preserveStructure: false
+        });
+        if (!normalizedSkillName) {
           errors.push(`Skill ${index + 1} name is required`);
         }
       });
