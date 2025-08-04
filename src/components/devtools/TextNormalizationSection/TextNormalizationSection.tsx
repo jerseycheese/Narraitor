@@ -168,8 +168,9 @@ export function TextNormalizationSection({
 
       {/* Input Text */}
       <div>
-        <label className="block text-sm font-medium mb-2">Input Text:</label>
+        <label htmlFor="input-text" className="block text-sm font-medium mb-2">Input Text:</label>
         <textarea
+          id="input-text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           className="w-full h-32 p-3 border rounded font-mono text-sm"
@@ -182,8 +183,9 @@ export function TextNormalizationSection({
 
       {/* Normalized Output */}
       <div>
-        <label className="block text-sm font-medium mb-2">Normalized Text:</label>
+        <label htmlFor="normalized-text" className="block text-sm font-medium mb-2">Normalized Text:</label>
         <textarea
+          id="normalized-text"
           value={normalizationResult.normalized}
           readOnly
           className="w-full h-32 p-3 border rounded font-mono text-sm bg-gray-50"
