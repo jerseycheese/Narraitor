@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
-import { StateSection } from '../StateSection';
+import { StateSection, StateInspectorSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
@@ -132,6 +132,7 @@ export const DevToolsPanel = () => {
                   State Management
                 </h3>
                 <StateSection defaultCollapsed={true} />
+                <StateInspectorSection defaultCollapsed={true} />
               </div>
             </div>
             
