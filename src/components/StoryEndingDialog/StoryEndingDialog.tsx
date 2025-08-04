@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils/classNames';
+import { safeTrim } from '@/lib/utils';
+
 
 export type EndingType = 'triumphant' | 'bittersweet' | 'tragic' | 'default';
 
@@ -78,7 +80,7 @@ export function StoryEndingDialog({
           id="story-ending-title"
           className="text-xl font-bold text-center mb-4"
         >
-          {(title && title.trim()) || "Story Ending"}
+          {(title && safeTrim(title)) || "Story Ending"}
         </DialogTitle>
         <DialogHeader>
           <DialogDescription className="sr-only">

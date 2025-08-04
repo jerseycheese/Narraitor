@@ -9,8 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
-import { generateUniqueId } from '@/lib/utils/generateId';
-import { truncate } from '@/lib/utils';
+import { generateUniqueId, truncate, safeTrim, getNestedValue, formatDateTime } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
 import { EndingScreen } from './EndingScreen';
 import { StoryEndingDialog } from '@/components/StoryEndingDialog';
@@ -198,9 +197,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Fallback summary method when AI fails
   const createFallbackSummary = (content: string): string => {
     // Extract first sentence and clean it up
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    const sentences = content.split(/[.!?]+/).filter(s => safeTrim(s).length > 10);
     if (sentences.length > 0) {
-      let summary = sentences[0].trim();
+      let summary = safeTrim(sentences[0]);
       // Convert from second person to past tense if needed
       summary = summary.replace(/^You\s+/, '').replace(/\byou\b/g, 'the character');
       // Keep it concise - max 60 characters
@@ -230,7 +229,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           cleanContent = parsed.content;
         }
         if (parsed.metadata?.location && !actualLocation) {
-          actualLocation = parsed.metadata.location;
+          actualLocation = getNestedValue(parsed, 'metadata.location');
           // Update segment metadata if it wasn't already set by the generator
           segment.metadata = { ...segment.metadata, ...parsed.metadata };
         }
@@ -256,7 +255,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: formatDateTime(new Date())
         });
       } catch (error) {
         console.warn('Failed to create journal entry from narrative segment:', error);
@@ -281,7 +280,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             automaticEntry: true,
             narrativeSegmentId: segment.id
           },
-          updatedAt: new Date().toISOString()
+          updatedAt: formatDateTime(new Date())
         });
       } catch (fallbackError) {
         console.warn('Failed to create fallback journal entry:', fallbackError);
@@ -396,7 +395,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Handle newly generated player choices
   const handleChoicesGenerated = (decision: Decision) => {
     
-    if (!decision || !decision.options || decision.options.length === 0) {
+    if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
       setIsGeneratingChoices(false);
       return;
     }

@@ -11,7 +11,7 @@ import {
   GoalPriority,
   GoalStatus,
 } from '../../types/goal.types';
-import { capitalize } from '@/lib/utils';
+import { capitalize, safeTrim, formatDateTime } from '@/lib/utils';
 
 export class GoalExtractor {
   private geminiClient: AIClient;
@@ -209,7 +209,7 @@ Respond with JSON in this exact format:
       "updates": {
         "mentionCount": 2,
         "progressNotes": ["progress note"],
-        "lastMentionedAt": "${new Date().toISOString()}",
+        "lastMentionedAt": "${formatDateTime(new Date())}",
         "completionMethod": "achieved|abandoned|superseded"
       }
     }
@@ -305,7 +305,7 @@ Respond with only: "COMPLETED" or "NOT_COMPLETED"`;
    * Parse completion detection response
    */
   private parseCompletionResponse(content: string): boolean {
-    const cleanContent = content.trim().toLowerCase();
+    const cleanContent = safeTrim(content).toLowerCase();
     return (
       cleanContent.includes('completed') &&
       !cleanContent.includes('not_completed')

@@ -5,6 +5,8 @@ import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
+import { safeTrim } from '@/lib/utils';
+
 
 /**
  * World store interface with state and actions
@@ -62,7 +64,7 @@ export const useWorldStore = create<WorldStore>()(
 
       // Create world
       createWorld: (worldData) => {
-        if (!worldData.name || worldData.name.trim() === '') {
+        if (!worldData.name || safeTrim(worldData.name) === '') {
           throw new Error('World name is required');
         }
 
@@ -140,7 +142,7 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        if (world.attributes.length >= world.settings.maxAttributes) {
+        if ((world.attributes?.length || 0) >= (world.settings?.maxAttributes || 0)) {
           return { error: 'Maximum attributes limit reached' };
         }
 
@@ -173,9 +175,9 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        const updatedAttributes = world.attributes.map((attr) =>
+        const updatedAttributes = world.attributes?.map((attr) =>
           attr.id === attributeId ? { ...attr, ...updates } : attr
-        );
+        ) || [];
 
         const updatedWorld: World = {
           ...world,
@@ -199,9 +201,9 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        const filteredAttributes = world.attributes.filter(
+        const filteredAttributes = world.attributes?.filter(
           (attr) => attr.id !== attributeId
-        );
+        ) || [];
 
         const updatedWorld: World = {
           ...world,
@@ -225,7 +227,7 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        if (world.skills.length >= world.settings.maxSkills) {
+        if ((world.skills?.length || 0) >= (world.settings?.maxSkills || 0)) {
           return { error: 'Maximum skills limit reached' };
         }
 
@@ -258,9 +260,9 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        const updatedSkills = world.skills.map((skill) =>
+        const updatedSkills = world.skills?.map((skill) =>
           skill.id === skillId ? { ...skill, ...updates } : skill
-        );
+        ) || [];
 
         const updatedWorld: World = {
           ...world,
@@ -284,9 +286,9 @@ export const useWorldStore = create<WorldStore>()(
           return { error: 'World not found' };
         }
 
-        const filteredSkills = world.skills.filter(
+        const filteredSkills = world.skills?.filter(
           (skill) => skill.id !== skillId
-        );
+        ) || [];
 
         const updatedWorld: World = {
           ...world,

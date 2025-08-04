@@ -3,6 +3,8 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
+import { safeTrim, getNestedValue } from '@/lib/utils';
+
 
 interface NarrativeDisplayProps {
   segment: NarrativeSegment | null;
@@ -118,15 +120,15 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
     
     // If content is suspiciously short and looks like metadata, return a fallback message
-    if (content.trim().length < 20 && (content.includes('scene') || content.includes('Starting Location'))) {
+    if (safeTrim(content).length < 20 && (content.includes('scene') || content.includes('Starting Location'))) {
       return 'The story is beginning... (Content generation in progress)';
     }
     
     // Check if content starts with ```json
-    if (content.trim().startsWith('```json')) {
+    if (safeTrim(content).startsWith('```json')) {
       try {
         // Extract JSON string between backticks
-        const jsonStr = content.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '');
+        const jsonStr = safeTrim(content).replace(/^```json\s*/, '').replace(/\s*```$/, '');
         
         // Pre-process JSON string to handle bad control characters
         // Replace control characters that would cause JSON.parse to fail
@@ -144,9 +146,9 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
           } else if (parsed && typeof parsed === 'object') {
             // If we have an object but no direct content field, check for nested structure
             // Common for some AI response formats
-            if (parsed.response?.content) return parsed.response.content;
-            if (parsed.narrative?.content) return parsed.narrative.content;
-            if (parsed.scene?.description) return parsed.scene.description;
+            if (parsed.response?.content) return parsed.response.content as string;
+            if (parsed.narrative?.content) return parsed.narrative.content as string;
+            if (parsed.scene?.description) return parsed.scene.description as string;
             
             // If it's just a string property, return the first one we find
             for (const key in parsed) {
@@ -183,7 +185,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
     
     // Final check for raw JSON without code markers
-    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
+    if (safeTrim(content).startsWith('{') && safeTrim(content).endsWith('}')) {
       try {
         const parsed = JSON.parse(content);
         if (parsed && typeof parsed.content === 'string') {
@@ -260,7 +262,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         {segment.metadata?.location && (
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              {segment.metadata.location}
+              {getNestedValue(segment, 'metadata.location')}
             </p>
           </div>
         )}

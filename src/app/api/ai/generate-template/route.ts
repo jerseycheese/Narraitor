@@ -4,6 +4,7 @@ import { TemplateGenerationContext } from '@/lib/ai/templatePrompts';
 import { geminiClient } from '@/lib/ai/geminiClient';
 import Logger from '@/lib/utils/logger';
 
+
 const logger = new Logger('API');
 
 interface GenerateTemplateRequest {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (body.type === 'genre-mix' && (!body.genres || body.genres.length < 2)) {
+    if (body.type === 'genre-mix' && (!body.genres || (body.genres as unknown[]).length < 2)) {
       logger.debug('generate-template API', 'Validation failed: genre-mix without enough genres');
       return NextResponse.json(
         { error: 'At least 2 genres are required for genre-mix generation' },

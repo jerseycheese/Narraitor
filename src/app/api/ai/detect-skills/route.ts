@@ -29,6 +29,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { safeTrim } from '@/lib/utils';
+
 import { 
   handleRateLimiting, 
   validateAPIKey, 
@@ -167,7 +169,7 @@ Example response format:
 
     try {
       // Clean the AI response - remove markdown code blocks if present
-      let cleanContent = content.trim();
+      let cleanContent = safeTrim(content);
       if (cleanContent.startsWith('```json')) {
         cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '');
       } else if (cleanContent.startsWith('```')) {

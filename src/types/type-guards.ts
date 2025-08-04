@@ -7,6 +7,7 @@ import { InventoryItem } from './inventory.types';
 import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';
 import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './personalization.types';
+import { safeTrim } from '@/lib/utils';
 
 /**
  * Type guard for World objects
@@ -189,11 +190,10 @@ export function sanitizeString(value: unknown, maxLength: number = 200): string 
   if (typeof value !== 'string' || value.length === 0) return undefined;
   
   // Remove HTML tags and dangerous characters
-  const sanitized = value
+  const sanitized = safeTrim(value
     .replace(/<[^>]*>/g, '') // Remove HTML tags
     .replace(/[&"']/g, '') // Remove dangerous characters
-    .substring(0, maxLength)
-    .trim();
+    .substring(0, maxLength));
     
   return sanitized.length > 0 ? sanitized : undefined;
 }

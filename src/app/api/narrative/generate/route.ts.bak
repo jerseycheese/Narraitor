@@ -1,7 +1,7 @@
 // src/app/api/narrative/generate/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-
+import { getNestedValue } from '@/lib/utils';
 
 import { 
   handleRateLimiting, 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     
     // Extract content from response
-    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+    if (!data.candidates || !data.candidates[0] || !data.getNestedValue(candidates, '[0].content') || !data.getNestedValue(candidates, '[0].content').parts) {
       console.error('API Response structure issue:', {
         hasCandidates: !!data.candidates,
         candidatesLength: data.candidates?.length,
@@ -105,8 +105,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const content = data.candidates[0].content.parts[0]?.text || '';
-    const finishReason = data.candidates[0].finishReason || 'STOP';
+    const content = data.getNestedValue(candidates, '[0].content').parts[0]?.text || '';
+    const finishReason = data.getNestedValue(candidates, '[0].finishReason') || 'STOP';
     
     // Extract token usage if available
     const promptTokens = data.usageMetadata?.promptTokenCount || undefined;

@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { getNestedValue } from '@/lib/utils';
+
 
 export interface SkillEditorProps {
   worldId: EntityID;
@@ -132,7 +134,7 @@ export function SkillEditor({
     }
 
     // Attribute selection validation
-    if (!formData.attributeIds || formData.attributeIds.length === 0) {
+    if (!formData.attributeIds || (formData.attributeIds?.length || 0) === 0) {
       validationErrors.push('At least one attribute must be selected');
     }
 
@@ -228,7 +230,7 @@ export function SkillEditor({
               id="skill-name"
               type="text"
               value={formData.name || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: getNestedValue(e, 'target.value') }))}
               placeholder="Enter skill name"
               disabled={!canCreateSkill}
               className="mt-1"
@@ -240,7 +242,7 @@ export function SkillEditor({
             <Textarea
               id="skill-description"
               value={formData.description || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: getNestedValue(e, 'target.value') }))}
               placeholder="Describe what this skill represents"
               disabled={!canCreateSkill}
               rows={3}
