@@ -4,13 +4,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { useCharacterStore } from '../../../state/useCharacterStore';
+import { useCharacterStore } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/useWorldStore';
 import { PortraitStep } from '../steps/PortraitStep';
 // Removed AI client imports - using API routes instead
 
 // Mock the dependencies
-jest.mock('../../../state/useCharacterStore');
+jest.mock('../../../state/characterStore');
 jest.mock('../../../state/useWorldStore');
 // Mock fetch for API routes
 const mockFetch = jest.fn();

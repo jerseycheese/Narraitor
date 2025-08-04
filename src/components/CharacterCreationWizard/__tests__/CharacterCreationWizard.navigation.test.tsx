@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useWorldStore } from '@/state/useWorldStore';
-import { useCharacterStore } from '@/state/useCharacterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
 
@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock stores
 jest.mock('@/state/useWorldStore');
-jest.mock('@/state/useCharacterStore');
+jest.mock('@/state/characterStore');
 
 // Mock auto-save hook
 jest.mock('@/hooks/useCharacterCreationAutoSave');

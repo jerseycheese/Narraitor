@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
 import { useWorldStore } from '@/state/useWorldStore';
-import { useCharacterStore } from '@/state/useCharacterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock stores
 jest.mock('@/state/useWorldStore');
-jest.mock('@/state/useCharacterStore');
+jest.mock('@/state/characterStore');
 
 // TODO: Enable these tests after updating them to match the new shared wizard implementation
 describe.skip('CharacterCreationWizard', () => {

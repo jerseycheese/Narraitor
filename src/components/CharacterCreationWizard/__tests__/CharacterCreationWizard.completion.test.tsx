@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { CharacterCreationWizard } from '../CharacterCreationWizard';
-import { useCharacterStore } from '@/state/useCharacterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { useRouter } from 'next/navigation';
 
 // Mock next/navigation
@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
 
 // Mock stores
 jest.mock('@/state/worldStore');
-jest.mock('@/state/useCharacterStore');
+jest.mock('@/state/characterStore');
 
 describe.skip('CharacterCreationWizard - Completion Navigation', () => {
   const mockPush = jest.fn();

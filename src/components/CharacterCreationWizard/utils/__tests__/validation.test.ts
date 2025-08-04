@@ -1,8 +1,8 @@
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from '../validation';
-import { useCharacterStore } from '@/state/useCharacterStore';
+import { useCharacterStore } from '@/state/characterStore';
 
 // Mock useCharacterStore
-jest.mock('@/state/useCharacterStore');
+jest.mock('@/state/characterStore');
 
 describe('Character Creation Validation', () => {
   describe('validateCharacterName', () => {
