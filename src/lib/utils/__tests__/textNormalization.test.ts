@@ -6,8 +6,7 @@ import {
   normalizeLineEndings,
   normalizeSpecialCharacters,
   analyzeText,
-  getWhitespaceStats,
-  type TextNormalizationOptions 
+  getWhitespaceStats
 } from '../textNormalization';
 
 describe('Text Normalization Utilities', () => {
@@ -31,7 +30,7 @@ describe('Text Normalization Utilities', () => {
     });
 
     it('normalizes quotation marks', () => {
-      const input = '"Smart quotes" and 'apostrophes'';
+      const input = '\u201cSmart quotes\u201d and \u2018apostrophes\u2019';
       const result = normalizeText(input);
       expect(result).toBe('"Smart quotes" and \'apostrophes\'');
     });
@@ -76,8 +75,11 @@ describe('Text Normalization Utilities', () => {
       const withoutWhitespace = normalizeText(input, { normalizeWhitespace: false });
       expect(withoutWhitespace).toContain('"Hello    world"');
       
-      // Test with line endings disabled
-      const withoutLineEndings = normalizeText(input, { normalizeLineEndings: false });
+      // Test with line endings disabled - need to also disable whitespace to preserve \r\n
+      const withoutLineEndings = normalizeText(input, { 
+        normalizeLineEndings: false, 
+        normalizeWhitespace: false 
+      });
       expect(withoutLineEndings).toContain('\r\n');
     });
   });
@@ -168,13 +170,13 @@ describe('Text Normalization Utilities', () => {
 
   describe('normalizeQuotationMarks', () => {
     it('converts smart quotes to straight quotes', () => {
-      const input = '"Smart quotes" and 'apostrophes'';
+      const input = '\u201cSmart quotes\u201d and \u2018apostrophes\u2019';
       const result = normalizeQuotationMarks(input);
       expect(result).toBe('"Smart quotes" and \'apostrophes\'');
     });
 
     it('handles mixed quote styles', () => {
-      const input = '"Mixed" and "styles" with 'single' quotes';
+      const input = '\u201cMixed\u201d and \u201dstyles\u201d with \u2018single\u2019 quotes';
       const result = normalizeQuotationMarks(input);
       expect(result).toBe('"Mixed" and "styles" with \'single\' quotes');
     });
@@ -220,7 +222,7 @@ describe('Text Normalization Utilities', () => {
       expect(analysis.characters).toBe(input.length);
       expect(analysis.lines).toBe(4); // 3 lines plus empty line
       expect(analysis.paragraphs).toBe(2);
-      expect(analysis.words).toBe(5);
+      expect(analysis.words).toBe(6); // "Line", "one", "Line", "two", "Paragraph", "two"
       expect(analysis.lineEndingFormat).toBe('unix');
     });
 
@@ -236,7 +238,7 @@ describe('Text Normalization Utilities', () => {
     });
 
     it('detects special characters and smart quotes', () => {
-      const withSpecial = analyzeText('"Smart quotes" and em dash—here');
+      const withSpecial = analyzeText('\u201cSmart quotes\u201d and em dash—here');
       expect(withSpecial.hasSmartQuotes).toBe(true);
       expect(withSpecial.hasSpecialChars).toBe(true);
       
@@ -325,7 +327,7 @@ describe('Text Normalization Utilities', () => {
     });
     
     it('handles nested quotation marks', () => {
-      const input = '"She said, 'Hello there,' to me"';
+      const input = '\u201cShe said, \u2018Hello there,\u2019 to me\u201d';
       const result = normalizeText(input);
       expect(result).toBe('"She said, \'Hello there,\' to me"');
     });

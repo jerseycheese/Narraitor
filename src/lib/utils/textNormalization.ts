@@ -248,7 +248,7 @@ export function normalizeTextWithDetails(
     const before = normalized;
     normalized = normalizeQuotationMarks(normalized);
     if (before !== normalized) {
-      const smartQuotes = (before.match(/[""'']/g) || []).length;
+      const smartQuotes = (before.match(/[\u201c\u201d\u2018\u2019]/g) || []).length;
       
       if (smartQuotes > 0) {
         changes.push({
@@ -388,11 +388,11 @@ export function normalizeQuotationMarks(text: string): string {
   if (!text) return '';
 
   return text
-    // Smart double quotes to straight double quotes
-    .replace(/[""]/g, '"')
-    // Smart single quotes to straight single quotes
+    // Smart double quotes to straight double quotes using Unicode code points
+    .replace(/[\u201c\u201d]/g, '"')
+    // Smart single quotes to straight single quotes using Unicode code points
     // But be careful with contractions - only replace obvious quotation marks
-    .replace(/['']/g, "'");
+    .replace(/[\u2018\u2019]/g, "'");
 }
 
 /**
@@ -478,7 +478,7 @@ export function analyzeText(text: string): TextAnalysis {
     words: words.length,
     lineEndingFormat,
     hasSpecialChars: /[—–…]/.test(text),
-    hasSmartQuotes: /[""'']/.test(text)
+    hasSmartQuotes: /[\u201c\u201d\u2018\u2019]/.test(text)
   };
 }
 
