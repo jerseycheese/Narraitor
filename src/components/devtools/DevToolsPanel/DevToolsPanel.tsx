@@ -9,6 +9,7 @@ import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
+import { TextNormalizationSection } from '../TextNormalizationSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import { Button } from '@/components/ui/button';
 
@@ -148,6 +149,10 @@ export const DevToolsPanel = () => {
                   
                   <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
                     <ConsistencyValidationSection />
+                  </CollapsibleSection>
+                  
+                  <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
+                    <TextNormalizationSection />
                   </CollapsibleSection>
                 </div>
               </div>

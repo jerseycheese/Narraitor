@@ -6,3 +6,4 @@ export * from './StateSection';
 export * from './DevMockState';
 export * from './AITestingPanel';
 export * from './ConsistencyValidationSection';
+export * from './TextNormalizationSection';

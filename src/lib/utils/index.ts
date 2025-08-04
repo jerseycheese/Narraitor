@@ -34,6 +34,28 @@ export {
 /** Type definitions for formatting options */
 export type { DateFormatOptions, DateTimeFormatOptions, NumberFormatOptions } from './formatters';
 
+/** Text normalization utilities for developer tools and debugging */
+export {
+  normalizeText,
+  normalizeTextWithDetails,
+  normalizeWhitespace,
+  normalizeLineEndings,
+  normalizeQuotationMarks,
+  normalizeSpecialCharacters,
+  analyzeText,
+  getWhitespaceStats
+} from './textNormalization';
+
+/** Type definitions for text normalization */
+export type {
+  TextNormalizationOptions,
+  NormalizationResult,
+  NormalizationChange,
+  NormalizationStats,
+  TextAnalysis,
+  WhitespaceStats
+} from './textNormalization';
+
 // Error handling utilities
 export { 
   isRetryableError, 
