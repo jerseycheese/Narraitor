@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { safeTrim } from '@/lib/utils';
+
 
 interface GenerateCharacterDialogProps {
   isOpen: boolean;
@@ -111,7 +113,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           </Button>
           <Button
             onClick={onGenerate}
-            disabled={isGenerating || (generationType === 'specific' && !characterName.trim())}
+            disabled={isGenerating || (generationType === 'specific' && !safeTrim(characterName))}
             className="bg-purple-600 text-white hover:bg-purple-700"
           >
             {isGenerating ? 'Generating...' : 'Generate'}

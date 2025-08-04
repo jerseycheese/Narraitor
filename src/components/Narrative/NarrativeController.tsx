@@ -4,7 +4,7 @@ import { NarrativeGenerator } from '@/lib/ai/narrativeGenerator';
 import { createDefaultGeminiClient } from '@/lib/ai/defaultGeminiClient';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { Decision, NarrativeContext, NarrativeSegment } from '@/types/narrative.types';
-import { truncate } from '@/lib/utils';
+import { truncate, safeTrim } from '@/lib/utils';
 
 interface NarrativeControllerProps {
   worldId: string;
@@ -205,7 +205,7 @@ Respond with JSON format:
         }
         
         // Trim whitespace
-        jsonContent = jsonContent.trim();
+        jsonContent = safeTrim(jsonContent);
         
         const analysis = JSON.parse(jsonContent);
         
@@ -380,7 +380,7 @@ Respond with JSON format:
       }
       
       // Verify decision structure and use fallback if invalid
-      if (!decision || !decision.options || decision.options.length === 0) {
+      if (!decision || !decision.options || (decision.options?.length || 0) === 0) {
         decision = fallbackDecision;
       }
       

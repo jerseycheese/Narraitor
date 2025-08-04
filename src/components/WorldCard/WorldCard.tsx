@@ -119,7 +119,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       let hasSession = false;
       const savedSession = useSessionStore.getState().getSavedSession(
         world.id, 
-        worldCharacters[0].id
+        worldCharacters[0]?.id
       );
       
       if (savedSession) {

@@ -2,10 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
-import { generateUniqueId } from '../lib/utils/generateId';
+import { generateUniqueId, safeTrim } from '../lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
+
 
 /**
  * Narrative store interface with state and actions
@@ -86,7 +87,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
 
   // Add segment
   addSegment: (sessionId, segmentData) => {
-    if (!segmentData.content || segmentData.content.trim() === '') {
+    if (!segmentData.content || safeTrim(segmentData.content) === '') {
       throw new Error('Segment content is required');
     }
     
@@ -447,8 +448,8 @@ export const useNarrativeStore = create<NarrativeStore>()(
     const endingSegment = allSegments.find(seg => 
       seg.sessionId === sessionId &&
       seg.type === 'ending' &&
-      seg.metadata.tags?.includes('ending') && 
-      seg.metadata.endingData
+      seg.metadata?.tags?.includes('ending') && 
+      seg.metadata?.endingData
     );
     
     return endingSegment?.metadata.endingData as StoryEnding || null;

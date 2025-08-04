@@ -6,7 +6,7 @@ import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
-import { truncate } from '@/lib/utils';
+import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
 
 /**
  * Parameters for choice generation
@@ -45,7 +45,7 @@ export class ChoiceGenerator {
       const response = await this.aiClient.generateContent(prompt);
       
       
-      if (!response.content || response.content.trim() === '') {
+      if (!getNestedValue(response, 'content') || safeTrim(getNestedValue(response, 'content', '')) === '') {
         return this.generateFallbackChoices(worldId, narrativeContext);
       }
       
@@ -104,7 +104,7 @@ export class ChoiceGenerator {
       
       
       if (weightMatch && weightMatch[1]) {
-        const weightText = weightMatch[1].trim().toLowerCase();
+        const weightText = safeTrim(weightMatch[1]).toLowerCase();
         if (weightText === 'major') {
           decisionWeight = 'major';
         } else if (weightText === 'critical') {
@@ -144,7 +144,7 @@ export class ChoiceGenerator {
       let contextSummary = '';
       const contextMatch = content.match(/Context Summary:?\s*([^\n]+)/i);
       if (contextMatch && contextMatch[1]) {
-        contextSummary = contextMatch[1].trim();
+        contextSummary = safeTrim(contextMatch[1]);
       }
       
       // Extract the decision prompt from cleaned content
@@ -152,7 +152,7 @@ export class ChoiceGenerator {
       // Look for "Decision:" at the start of a line, followed by the prompt
       const promptMatch = cleanedContent.match(/^Decision:?\s*(.+)$/im);
       if (promptMatch && promptMatch[1]) {
-        prompt = promptMatch[1].trim();
+        prompt = safeTrim(promptMatch[1]);
         
         // If prompt is empty or too short, use fallback
         if (!prompt || prompt.length < 3) {
@@ -172,7 +172,7 @@ export class ChoiceGenerator {
       let currentOption: Partial<DecisionOption & { hint: string | undefined; requirements: { type: string; targetId: string; operator: string; value: number }[] }> | null = null;
       
       for (const line of lines) {
-        const trimmed = line.trim();
+        const trimmed = safeTrim(line);
         
         // Check for numbered option (e.g., "1. Do something")
         const optionMatch = trimmed.match(/^(\d+)\.\s*(.+)$/);
@@ -183,7 +183,7 @@ export class ChoiceGenerator {
           }
           
           // Start new option
-          const optionText = optionMatch[2].trim();
+          const optionText = safeTrim(optionMatch[2]);
           
           // Check for alignment tag in option text
           const alignmentMatch = optionText.match(/^\[([^\]]+)\]\s*(.+)$/);
@@ -191,13 +191,13 @@ export class ChoiceGenerator {
           let text = optionText;
           
           if (alignmentMatch) {
-            const alignmentText = alignmentMatch[1].trim().toLowerCase();
+            const alignmentText = safeTrim(alignmentMatch[1]).toLowerCase();
             if (alignmentText === 'lawful') {
               alignment = 'lawful';
             } else if (alignmentText === 'chaos' || alignmentText === 'chaotic') {
               alignment = 'chaotic';
             }
-            text = alignmentMatch[2].trim();
+            text = safeTrim(alignmentMatch[2]);
           }
           
           currentOption = {
@@ -212,14 +212,14 @@ export class ChoiceGenerator {
         else if (trimmed.match(/^Hint:\s*(.+)$/i)) {
           const hintMatch = trimmed.match(/^Hint:\s*(.+)$/i);
           if (currentOption && hintMatch) {
-            currentOption.hint = hintMatch[1].trim();
+            currentOption.hint = safeTrim(hintMatch[1]);
           }
         }
         // Check for Requirements line
         else if (trimmed.match(/^Requirements?:\s*(.+)$/i)) {
           const reqMatch = trimmed.match(/^Requirements?:\s*(.+)$/i);
           if (currentOption && reqMatch) {
-            const reqText = reqMatch[1].trim();
+            const reqText = safeTrim(reqMatch[1]);
             // Parse requirement format: "SkillName X+"
             const skillMatch = reqText.match(/^(\w+)\s+(\d+)\+?$/);
             if (skillMatch) {
@@ -489,8 +489,8 @@ CHOICE GENERATION FOCUS:
     };
 
     // Add hint if present
-    if (option.hint && option.hint.trim()) {
-      finalOption.hint = option.hint.trim();
+    if (option.hint && safeTrim(option.hint)) {
+      finalOption.hint = safeTrim(option.hint);
     }
 
     // Add requirements if present

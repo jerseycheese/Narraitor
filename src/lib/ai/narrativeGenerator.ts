@@ -22,6 +22,8 @@ import { TemplateGenerationContext } from './templatePrompts';
 import { PersonalizationEngine } from './personalizationEngine';
 import { playerDecisionTracker } from './playerDecisionTracker';
 import { CharacterGoal } from '@/types/personalization.types';
+import { safeTrim, getNestedValue } from '@/lib/utils';
+
 
 export class NarrativeGenerator {
   private choiceGenerator: ChoiceGenerator;
@@ -56,7 +58,7 @@ export class NarrativeGenerator {
         .getState()
         .buildContextForSession(sessionId);
 
-      if (aiContext.goalContext && aiContext.goalContext.trim()) {
+      if (aiContext.goalContext && safeTrim(aiContext.goalContext)) {
         return `${prompt}\n\nCURRENT NARRATIVE GOALS:\n${aiContext.goalContext}\n\nPlease consider these goals when generating the narrative content.`;
       }
 
@@ -236,7 +238,7 @@ export class NarrativeGenerator {
           personalizedContext
         );
 
-      if (enhancementText.trim()) {
+      if (safeTrim(enhancementText)) {
         return `${prompt}\n\n${enhancementText}`;
       }
 
@@ -433,7 +435,7 @@ export class NarrativeGenerator {
 
     // Build character skill context for AI
     let characterSkillContext = '';
-    if (playerCharacter && world.skills && playerCharacter.skills.length > 0) {
+    if (playerCharacter && world.skills && playerCharacter.skills?.length > 0) {
       characterSkillContext = `
 CHARACTER ABILITIES:
 ${playerCharacter.skills
@@ -492,7 +494,7 @@ ${playerCharacter.skills
       actualContent.includes('"content":')
     ) {
       try {
-        let jsonStr = actualContent.trim();
+        let jsonStr = safeTrim(actualContent);
 
         // Handle markdown code blocks
         if (jsonStr.includes('```json')) {
@@ -502,7 +504,7 @@ ${playerCharacter.skills
         }
 
         // Clean up any surrounding text that might interfere
-        jsonStr = jsonStr.trim();
+        jsonStr = safeTrim(jsonStr);
 
         // Find JSON object boundaries if there's surrounding text
         const jsonStart = jsonStr.indexOf('{');
@@ -534,13 +536,13 @@ ${playerCharacter.skills
           }
           if (parsed.metadata) {
             extractedMetadata = {
-              location: parsed.metadata.location,
-              mood: this.validateMood(parsed.metadata.mood),
-              tags: Array.isArray(parsed.metadata.tags)
-                ? parsed.metadata.tags
+              location: getNestedValue(parsed, 'metadata.location'),
+              mood: this.validateMood(getNestedValue(parsed, 'metadata.mood')),
+              tags: Array.isArray(getNestedValue(parsed, 'metadata.tags'))
+                ? getNestedValue(parsed, 'metadata.tags')
                 : [],
-              characterIds: Array.isArray(parsed.metadata.characterIds)
-                ? parsed.metadata.characterIds
+              characterIds: Array.isArray(getNestedValue(parsed, 'metadata.characterIds'))
+                ? getNestedValue(parsed, 'metadata.characterIds')
                 : [],
             };
           }

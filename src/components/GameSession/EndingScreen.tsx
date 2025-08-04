@@ -17,6 +17,7 @@ import { AchievementDialog } from '@/components/AchievementDialog';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
+
 /**
  * EndingScreen displays the story ending with narrative closure
  * Uses shared components (PageLayout, SectionWrapper, CardActionGroup) and existing tone-based styling

@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { safeTrim } from '@/lib/utils';
+
 
 // Simplified character types for MVP implementation
 interface CharacterAttribute {
@@ -116,7 +118,7 @@ export const useCharacterStore = create<CharacterStore>()(
 
       // Create character
       createCharacter: (characterData) => {
-        if (!characterData.name || characterData.name.trim() === '') {
+        if (!characterData.name || safeTrim(characterData.name) === '') {
           throw new Error('Character name is required');
         }
 
@@ -131,14 +133,14 @@ export const useCharacterStore = create<CharacterStore>()(
             ...characterData.inventory,
             characterId: characterId
           },
-          attributes: characterData.attributes.map(attr => ({
+          attributes: characterData.attributes?.map(attr => ({
             ...attr,
             characterId: characterId
-          })),
-          skills: characterData.skills.map(skill => ({
+          })) || [],
+          skills: characterData.skills?.map(skill => ({
             ...skill,
             characterId: characterId
-          })),
+          })) || [],
           createdAt: now,
           updatedAt: now,
         };
@@ -236,9 +238,9 @@ export const useCharacterStore = create<CharacterStore>()(
           return { error: 'Character not found' };
         }
 
-        const updatedAttributes = character.attributes.map((attr) =>
+        const updatedAttributes = character.attributes?.map((attr) =>
           attr.id === attributeId ? { ...attr, ...updates } : attr
-        );
+        ) || [];
 
         const updatedCharacter: Character = {
           ...character,
@@ -262,9 +264,9 @@ export const useCharacterStore = create<CharacterStore>()(
           return { error: 'Character not found' };
         }
 
-        const filteredAttributes = character.attributes.filter(
+        const filteredAttributes = character.attributes?.filter(
           (attr) => attr.id !== attributeId
-        );
+        ) || [];
 
         const updatedCharacter: Character = {
           ...character,
@@ -289,7 +291,7 @@ export const useCharacterStore = create<CharacterStore>()(
         }
 
         // Check max skills limit (simplified for test - normally would check world settings)
-        if (character.skills.length >= 2) {
+        if ((character.skills?.length || 0) >= 2) {
           return { error: 'Maximum skills limit reached' };
         }
 

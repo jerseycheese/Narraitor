@@ -77,3 +77,10 @@ export {
   getSkillAcknowledgmentMood
 } from './skillAcknowledgmentHelper';
 export type { SkillUsageData, CustomActionData } from './skillAcknowledgmentHelper';
+
+// Object access utilities
+export {
+  getNestedValue,
+  hasNestedProperty,
+  getNestedPaths
+} from './objectAccess';

@@ -12,6 +12,8 @@ import { JournalEntry, JournalEntryType } from '../types/journal.types';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
+import { safeTrim } from '@/lib/utils';
+
 
 /**
  * Journal store interface with state and actions
@@ -59,7 +61,7 @@ export const useJournalStore = create<JournalStore>()(
 
   // Add entry
   addEntry: (sessionId, entryData) => {
-    if (!entryData.content || entryData.content.trim() === '') {
+    if (!entryData.content || safeTrim(entryData.content) === '') {
       throw new Error('Entry content is required');
     }
 

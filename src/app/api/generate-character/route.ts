@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
+import { getNestedValue } from '@/lib/utils';
+import { World } from '@/types/world.types';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { characterType, existingNames, suggestedName, world } = body;
+    const characterType = getNestedValue(body, 'characterType');
+    const existingNames = getNestedValue(body, 'existingNames');
+    const suggestedName = getNestedValue(body, 'suggestedName');
+    const world = getNestedValue(body, 'world') as World;
 
     if (!world) {
       return NextResponse.json(
@@ -16,9 +21,9 @@ export async function POST(request: NextRequest) {
     // Generate character using the existing function
     const generatedCharacter = await generateCharacter(
       world,
-      existingNames || [],
-      suggestedName,
-      characterType || 'original'
+      (Array.isArray(existingNames) ? existingNames : []) as string[],
+      suggestedName as string | undefined,
+      (characterType as 'original' | 'known' | 'specific') || 'original'
     );
 
     return NextResponse.json(generatedCharacter);

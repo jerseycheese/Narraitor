@@ -11,7 +11,7 @@ import {
 } from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Star } from 'lucide-react';
-import { truncate } from '@/lib/utils';
+import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
 
 interface CharacterCardProps {
   /** The character data to display */
@@ -93,25 +93,27 @@ export function CharacterCard({
           </h3>
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm text-gray-500">Level {character.level || 1}</span>
-            {character.background?.isKnownFigure !== undefined && (
+            {getNestedValue(character, 'background.isKnownFigure') !== undefined && (
               <Badge
-                icon={character.background.isKnownFigure ? 
+                icon={getNestedValue(character, 'background.isKnownFigure') ? 
                   <Star className="w-3 h-3 text-white" /> : 
                   <Plus className="w-3 h-3 text-white" />
                 }
-                variant={character.background.isKnownFigure ? 'warning' : 'default'}
+                variant={getNestedValue(character, 'background.isKnownFigure') ? 'warning' : 'default'}
               >
-                {character.background.isKnownFigure ? 'Known Figure' : 'Original'}
+                {getNestedValue(character, 'background.isKnownFigure') ? 'Known Figure' : 'Original'}
               </Badge>
             )}
           </div>
           <p className="text-gray-600 text-sm leading-snug">
             {(() => {
-              const text = character.background.history || character.background.personality || 'No description provided';
+              const text = (getNestedValue(character, 'background.history') || 
+                          getNestedValue(character, 'background.personality') || 
+                          'No description provided') as string;
               const sentences = text.split(/[.!?]+/);
               let result = '';
               for (const sentence of sentences) {
-                const trimmed = sentence.trim();
+                const trimmed = safeTrim(sentence);
                 if (!trimmed) continue;
                 if ((result + trimmed + '.').length > 280) break;
                 result += (result ? ' ' : '') + trimmed + '.';

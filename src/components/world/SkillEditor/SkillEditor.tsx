@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
+
 export interface SkillEditorProps {
   worldId: EntityID;
   mode: 'create' | 'edit';
@@ -132,7 +133,7 @@ export function SkillEditor({
     }
 
     // Attribute selection validation
-    if (!formData.attributeIds || formData.attributeIds.length === 0) {
+    if (!formData.attributeIds || (formData.attributeIds?.length || 0) === 0) {
       validationErrors.push('At least one attribute must be selected');
     }
 

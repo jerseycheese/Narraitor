@@ -2,7 +2,7 @@
 
 import { Character, CharacterPortrait } from '../../types/character.types';
 import { AIClient } from './types';
-import { capitalize, truncate } from '@/lib/utils';
+import { capitalize, truncate, safeTrim, getNestedValue } from '@/lib/utils';
 
 interface PortraitGenerationOptions {
   worldGenre?: string;
@@ -104,9 +104,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       
       // If it's a known figure with missing background info, enhance the character data
       if (detection.isKnownFigure && (
-        !character.background.physicalDescription || 
-        !character.background.personality || 
-        !character.background.history
+        !character.background?.physicalDescription || 
+        !character.background?.personality || 
+        !character.background?.history
       )) {
         character = await this.enhanceKnownCharacter(character, detection);
       }
@@ -176,11 +176,11 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       );
     
     // Extract key visual elements for emphasis
-    const physicalDesc = character.background.physicalDescription || '';
+    const physicalDesc = character.background?.physicalDescription || '';
     
     // Extract specific clothing items
     const clothingMatch = physicalDesc.match(/wearing\s+([^,\.]+)/i);
-    const specificClothing = clothingMatch ? clothingMatch[1].trim() : null;
+    const specificClothing = clothingMatch ? safeTrim(clothingMatch[1]) : null;
     
     // Extract distinctive features
     const distinctiveFeatures: string[] = [];
@@ -205,10 +205,10 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           subject.push(`((${options.actorName})) as ${character.name}`);
           
           if (options.detection?.figureName) {
-            subject.push(`from ${options.detection.figureName}`);
+            subject.push(`from ${options.detection?.figureName}`);
           }
           
-          if (character.background.physicalDescription) {
+          if (character.background?.physicalDescription) {
             const cleanedDesc = character.background.physicalDescription
               .trim()
               .replace(/\s+/g, ' ')
@@ -229,8 +229,8 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           if (options.knownFigureContext === 'videogame') {
             // Use detected figureName if available, otherwise try to extract from history
             if (options.detection?.figureName) {
-              subject.push(`from ${options.detection.figureName}`);
-            } else if (character.background.history) {
+              subject.push(`from ${options.detection?.figureName}`);
+            } else if (getNestedValue(character, 'background.history')) {
               // More flexible regex patterns to extract game names
               let gameName = null;
               
@@ -243,9 +243,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
               ];
               
               for (const pattern of patterns) {
-                const match = character.background.history.match(pattern);
+                const match = character.background?.history?.match(pattern);
                 if (match && match[1]) {
-                  gameName = match[1].trim();
+                  gameName = safeTrim(match[1]);
                   break;
                 }
               }
@@ -260,7 +260,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
             }
           }
           
-          if (character.background.physicalDescription) {
+          if (character.background?.physicalDescription) {
             const cleanedDesc = character.background.physicalDescription
               .trim()
               .replace(/\s+/g, ' ')
@@ -274,7 +274,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           context.push(`official character look`);
           
           // Add specific details if present
-          if (hasSpecificDetails && character.background.physicalDescription) {
+          if (hasSpecificDetails && getNestedValue(character, 'background.physicalDescription')) {
             if (specificClothing) {
               context.push(`wearing ${specificClothing}`);
             }
@@ -290,7 +290,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // Add personality converted to visual traits
-        if (character.background.personality) {
+        if (character.background?.personality) {
           const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
           if (visualTraits) {
             context.push(visualTraits);
@@ -304,7 +304,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // Add physical description to help ensure accuracy
-        if (character.background.physicalDescription) {
+        if (character.background?.physicalDescription) {
           const cleanedDesc = character.background.physicalDescription
             .trim()
             .replace(/\s+/g, ' ')
@@ -318,7 +318,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
           context.push(`comedy club or casual setting`);
         } else if (options.knownFigureContext === 'videogame') {
           context.push(`game world environment`);
-        } else if (options.knownFigureContext === 'fictional' && character.background.history) {
+        } else if (options.knownFigureContext === 'fictional' && character.background?.history) {
           // Extract setting context from history
           if (character.background.history.toLowerCase().includes('vacation')) {
             context.push(`vacation resort setting`);
@@ -350,7 +350,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         subject.push(`Fantasy character portrait of ${character.name}`);
         
         // Add physical description with enhanced diversity
-        let physicalDesc = character.background.physicalDescription || '';
+        let physicalDesc = character.background?.physicalDescription || '';
         
         // Enhance diversity for original characters
         if (!options.isKnownFigure || !options.actorName) {
@@ -368,7 +368,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // Extract profession/class from history
-        if (character.background.history) {
+        if (character.background?.history) {
           const professionMatch = character.background.history.match(
             /\b(warrior|mage|wizard|rogue|thief|cleric|priest|ranger|bard|druid|paladin|sorcerer|fighter|monk|archer|knight|barbarian|necromancer)\b/i
           );
@@ -378,7 +378,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // Add personality-based appearance
-        if (character.background.personality) {
+        if (character.background?.personality) {
           const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
           if (visualTraits) {
             context.push(visualTraits);
@@ -387,7 +387,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         
         // CONTEXT: Fantasy setting
         context.push(`${options.worldGenre} world setting`);
-        if (character.background.history && character.background.history.toLowerCase().includes('battle')) {
+        if (character.background?.history && character.background.history.toLowerCase().includes('battle')) {
           context.push(`battle-worn appearance`);
         }
       } else {
@@ -395,7 +395,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         subject.push(`Character portrait of ${character.name}`);
         
         // Add physical description with enhanced diversity for non-actor characters
-        let physicalDesc = character.background.physicalDescription || '';
+        let physicalDesc = character.background?.physicalDescription || '';
         
         // Enhance diversity for original characters (not known figures without actors)
         if (!options.isKnownFigure || !options.actorName) {
@@ -413,7 +413,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         }
         
         // Add personality-based traits
-        if (character.background.personality) {
+        if (character.background?.personality) {
           const visualTraits = await this.convertPersonalityToVisualTraits(character.background.personality);
           if (visualTraits) {
             context.push(visualTraits);
@@ -423,7 +423,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         // CONTEXT: World-appropriate setting
         if (options.worldGenre) {
           // Only add theme context if it's meaningful for the portrait
-          const genreLC = options.worldGenre.toLowerCase();
+          const genreLC = options.worldGenre?.toLowerCase();
           if (genreLC === 'modern' || genreLC === 'contemporary') {
             // Don't add generic "modern setting" - it's not helpful
             // The physical description should provide enough context
@@ -560,7 +560,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       const enhancements: { physicalDescription?: string; personality?: string; history?: string } = {};
       
       // Generate or enhance physical description
-      if (!character.background.physicalDescription || character.background.physicalDescription.trim().length === 0) {
+      if (!getNestedValue(character, 'background.physicalDescription') || safeTrim(getNestedValue(character, 'background.physicalDescription')).length === 0) {
         // No user input - generate from scratch
         const prompt = `Provide an accurate physical description of ${character.name} (the ${contextHint}) in 30-35 words. 
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
@@ -569,7 +569,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Be accurate to their actual appearance. Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        let description = response.content.trim();
+        let description = safeTrim(response.content);
         
         // Clean up the description
         // Remove character name if it starts with it (case insensitive)
@@ -583,36 +583,36 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         enhancements.physicalDescription = description.replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${character.background.physicalDescription}"
+        const prompt = `Enhance this physical description of ${character.name} (the ${contextHint}) with accurate details: "${getNestedValue(character, 'background.physicalDescription')}"
         ${detection.figureType === 'fictional' && detection.actorName ? `As portrayed by ${detection.actorName} in the film/show.` : ''}
         Keep the user's description but add missing details like specific hair length/style/color, facial features, or typical clothing if not specified.
         Maximum 40 words. Answer with just the enhanced description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.physicalDescription = response.content.trim().replace(/\.+$/, '.');
+        enhancements.physicalDescription = safeTrim(response.content).replace(/\.+$/, '.');
       }
       
       // Generate or enhance personality
-      if (!character.background.personality || character.background.personality.trim().length === 0) {
+      if (!getNestedValue(character, 'background.personality') || safeTrim(getNestedValue(character, 'background.personality')).length === 0) {
         // No user input - generate from scratch
         const prompt = `Describe ${character.name}'s (the ${contextHint}) personality in 15 words or less. 
         Focus on their key character traits. 
         Answer with just the description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.personality = response.content.trim().replace(/\.+$/, '.');
+        enhancements.personality = safeTrim(response.content).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${character.background.personality}"
+        const prompt = `Enhance this personality description of ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.personality')}"
         Keep the user's description but add accurate character traits if missing or expand on provided traits.
         Maximum 20 words. Answer with just the enhanced description, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.personality = response.content.trim().replace(/\.+$/, '.');
+        enhancements.personality = safeTrim(response.content).replace(/\.+$/, '.');
       }
       
       // Generate or enhance history
-      if (!character.background.history || character.background.history.trim().length === 0) {
+      if (!getNestedValue(character, 'background.history') || safeTrim(getNestedValue(character, 'background.history')).length === 0) {
         // No user input - generate from scratch
         const prompt = `Provide a one-sentence background for ${character.name} (the ${contextHint}). 
         ${detection.figureType === 'videogame' ? 'MUST include the specific video game title they are from (e.g., "from Red Dead Redemption 2", "from The Legend of Zelda", etc.).' : ''}
@@ -620,16 +620,16 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         Answer with just one sentence, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.history = response.content.trim().replace(/\.+$/, '.');
+        enhancements.history = safeTrim(response.content).replace(/\.+$/, '.');
       } else {
         // User provided input - enhance it with AI knowledge
-        const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${character.background.history}"
+        const prompt = `Enhance this background for ${character.name} (the ${contextHint}): "${getNestedValue(character, 'background.history')}"
         ${detection.figureType === 'videogame' ? 'Add the specific video game title if missing.' : ''}
         ${detection.figureType === 'fictional' ? 'Add the specific movie or TV show title if missing.' : ''}
         Keep the user's content but add missing context or details. One sentence maximum. Answer with just the enhanced background, no extra text.`;
         
         const response = await this.aiClient.generateContent(prompt);
-        enhancements.history = response.content.trim().replace(/\.+$/, '.');
+        enhancements.history = safeTrim(response.content).replace(/\.+$/, '.');
       }
       
       // Return a new character object with the generated enhancements
@@ -637,9 +637,9 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
         ...character,
         background: {
           ...character.background,
-          physicalDescription: character.background.physicalDescription || enhancements.physicalDescription || '',
-          personality: character.background.personality || enhancements.personality || '',
-          history: character.background.history || enhancements.history || ''
+          physicalDescription: getNestedValue(character, 'background.physicalDescription') || enhancements.physicalDescription || '',
+          personality: getNestedValue(character, 'background.personality') || enhancements.personality || '',
+          history: getNestedValue(character, 'background.history') || enhancements.history || ''
         }
       };
     } catch (error) {
@@ -664,7 +664,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       Provide only visual cues that a portrait artist could depict. 20 words max. Answer with just the visual description.`;
       
       const response = await this.aiClient.generateContent(prompt);
-      return response.content.trim();
+      return safeTrim(response.content);
     } catch {
       // Fallback to simple extraction
       return this.extractKeyTraits(personality);
@@ -708,7 +708,7 @@ Answer with JSON only: {"actorName": "actor's full name" or null, "figureName": 
       Keep the original description but add specific imperfections. 50 words max total. Answer with just the enhanced description.`;
       
       const response = await this.aiClient.generateContent(prompt);
-      return response.content.trim();
+      return safeTrim(response.content);
     } catch {
       // Fallback - add very specific variety based on character name hash
       const hash = characterName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
