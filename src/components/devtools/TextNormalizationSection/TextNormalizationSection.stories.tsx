@@ -45,13 +45,13 @@ to validate text normalization behavior with various inputs and option combinati
     ),
   ],
   argTypes: {
-    debugMode: {
+    showAdvanced: {
       control: 'boolean',
-      description: 'Enable debug mode to show additional processing information'
+      description: 'Show advanced analysis options'
     },
-    autoNormalize: {
-      control: 'boolean',
-      description: 'Enable real-time normalization as user types'
+    initialText: {
+      control: 'text',
+      description: 'Initial text to load in the component'
     },
     className: {
       control: 'text',
@@ -97,10 +97,8 @@ Use the "Normalize Text" button to see the normalization in action.
       }
     }
   },
-  play: async ({ canvasElement }) => {
-    // This would be filled by the component with sample problematic text
-    const sampleText = `This    is    sample    text    with    formatting    issues.\r\n\r\n\r\n\r\n"Hello," she said. 'How are you doing today?'\r\n\r\nThe journey—filled with adventure—continues onward.\r\n\r\n\r\n\r\nFinal paragraph with   extra   spaces   everywhere.`;
-    
+  play: async () => {
+    // This story demonstrates the component with sample problematic text
     // The component should allow setting initial text for demonstration
     // This would be implemented in the actual component
   }

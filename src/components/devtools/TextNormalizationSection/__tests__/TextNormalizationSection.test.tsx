@@ -5,24 +5,74 @@ import { TextNormalizationSection } from '../TextNormalizationSection';
 
 // Mock the text normalization utilities
 jest.mock('../../../../lib/utils/textNormalization', () => ({
-  normalizeText: jest.fn((text, options) => {
+  normalizeTextWithDetails: jest.fn((text, options) => {
     // Simple mock implementation for testing
-    if (!text) return '';
+    if (!text) return {
+      normalized: '',
+      changes: [],
+      stats: { originalLength: 0, normalizedLength: 0, totalChanges: 0, processingTime: 0 }
+    };
+    
     let result = text;
+    const changes: any[] = [];
+    
     if (options?.normalizeWhitespace !== false) {
+      if (/\s{2,}/.test(result)) {
+        changes.push({ type: 'whitespace', description: 'Normalized excessive spaces', count: 1 });
+      }
       result = result.replace(/\s+/g, ' ').trim();
     }
+    
     if (options?.normalizeLineEndings !== false) {
+      if (/\r/.test(result)) {
+        changes.push({ type: 'lineEndings', description: 'Normalized line endings', count: 1 });
+      }
       result = result.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     }
+    
     if (options?.normalizeQuotes !== false) {
+      if (/[""'']/.test(result)) {
+        changes.push({ type: 'quotes', description: 'Normalized quotes', count: 1 });
+      }
       result = result.replace(/[""]/g, '"').replace(/['']/g, "'");
     }
-    if (options?.normalizeParagraphs !== false) {
-      result = result.replace(/\n{3,}/g, '\n\n');
+    
+    if (options?.normalizeSpecialChars !== false) {
+      if (/[—–…]/.test(result)) {
+        changes.push({ type: 'specialChars', description: 'Normalized special characters', count: 1 });
+      }
+      result = result.replace(/—/g, '-').replace(/–/g, '-').replace(/…/g, '...');
     }
-    return result;
-  })
+    
+    return {
+      normalized: result,
+      changes,
+      stats: {
+        originalLength: text.length,
+        normalizedLength: result.length,
+        totalChanges: changes.length,
+        processingTime: 1.5
+      }
+    };
+  }),
+  
+  analyzeText: jest.fn((text) => ({
+    characters: text?.length || 0,
+    words: text?.split(/\s+/).filter(w => w.length > 0).length || 0,
+    lines: text?.split('\n').length || 0,
+    paragraphs: text?.split(/\n\n/).length || 0,
+    lineEndingFormat: 'unix' as const,
+    hasSpecialChars: /[—–…]/.test(text || ''),
+    hasSmartQuotes: /[""'']/.test(text || '')
+  })),
+  
+  getWhitespaceStats: jest.fn((text) => ({
+    leading: (text?.match(/^\s*/) || [''])[0].length,
+    trailing: (text?.match(/\s*$/) || [''])[0].length,
+    excessiveSpaces: (text?.match(/\s{2,}/g) || []).length,
+    tabs: (text?.match(/\t/g) || []).length,
+    multipleLineBreaks: (text?.match(/\n{3,}/g) || []).length
+  }))
 }));
 
 describe('TextNormalizationSection', () => {
@@ -30,295 +80,263 @@ describe('TextNormalizationSection', () => {
     jest.clearAllMocks();
   });
 
-  describe('Component Rendering', () => {
-    it('renders the text normalization interface', () => {
+  describe('Basic Rendering', () => {
+    it('renders with default props', () => {
       render(<TextNormalizationSection />);
       
-      // Check for main heading
-      expect(screen.getByText(/text normalization/i)).toBeInTheDocument();
-      
-      // Check for input textarea
-      expect(screen.getByLabelText(/input text/i)).toBeInTheDocument();
-      
-      // Check for output textarea
-      expect(screen.getByLabelText(/normalized text/i)).toBeInTheDocument();
-      
-      // Check for normalize button
-      expect(screen.getByRole('button', { name: /normalize text/i })).toBeInTheDocument();
+      expect(screen.getByText('Text Normalization')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Enter text to normalize...')).toBeInTheDocument();
+      expect(screen.getByText('Export')).toBeInTheDocument();
+      expect(screen.getByText('Copy Result')).toBeInTheDocument();
     });
 
-    it('displays normalization option controls', () => {
-      render(<TextNormalizationSection />);
+    it('renders with initial text', () => {
+      const initialText = 'Hello world';
+      render(<TextNormalizationSection initialText={initialText} />);
       
-      // Check for checkboxes for each normalization option
-      expect(screen.getByLabelText(/normalize paragraphs/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/normalize whitespace/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/normalize quotation marks/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/normalize line endings/i)).toBeInTheDocument();
+      const input = screen.getByDisplayValue(initialText);
+      expect(input).toBeInTheDocument();
     });
 
-    it('shows all options checked by default', () => {
+    it('renders normalization options', () => {
       render(<TextNormalizationSection />);
       
-      const checkboxes = screen.getAllByRole('checkbox');
-      checkboxes.forEach(checkbox => {
-        expect(checkbox).toBeChecked();
-      });
+      expect(screen.getByText('Normalize Whitespace')).toBeInTheDocument();
+      expect(screen.getByText('Normalize Line Endings')).toBeInTheDocument();
+      expect(screen.getByText('Normalize Quotes')).toBeInTheDocument();
+      expect(screen.getByText('Normalize Special Characters')).toBeInTheDocument();
+      expect(screen.getByText('Preserve Structure')).toBeInTheDocument();
     });
   });
 
-  describe('Text Input and Processing', () => {
-    it('allows user to input text', async () => {
+  describe('User Interactions', () => {
+    it('updates input text when user types', async () => {
       const user = userEvent.setup();
       render(<TextNormalizationSection />);
       
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const testText = 'This is sample text with formatting issues.';
+      const input = screen.getByPlaceholderText('Enter text to normalize...');
+      await user.type(input, 'Hello world');
       
-      await user.type(inputTextarea, testText);
-      
-      expect(inputTextarea).toHaveValue(testText);
+      expect(input).toHaveValue('Hello world');
     });
 
-    it('processes text when normalize button is clicked', async () => {
+    it('toggles normalization options when checkboxes are clicked', async () => {
       const user = userEvent.setup();
       render(<TextNormalizationSection />);
       
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      const testText = 'Text    with    extra    spaces.';
+      const whitespaceCheckbox = screen.getByLabelText('Normalize Whitespace');
+      expect(whitespaceCheckbox).toBeChecked();
       
-      await user.type(inputTextarea, testText);
-      await user.click(normalizeButton);
-      
-      const outputTextarea = screen.getByLabelText(/normalized text/i);
-      expect(outputTextarea).toHaveValue('Text with extra spaces.');
+      await user.click(whitespaceCheckbox);
+      expect(whitespaceCheckbox).not.toBeChecked();
     });
 
-    it('updates output in real-time when auto-normalize is enabled', async () => {
+    it('loads sample data when sample buttons are clicked', async () => {
       const user = userEvent.setup();
       render(<TextNormalizationSection />);
       
-      // Enable auto-normalize if there's a toggle for it
-      const autoNormalizeToggle = screen.queryByLabelText(/auto.?normalize/i);
-      if (autoNormalizeToggle) {
-        await user.click(autoNormalizeToggle);
-      }
+      const whitespaceButton = screen.getByText('whitespace');
+      await user.click(whitespaceButton);
       
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const testText = 'Real-time    normalization    test.';
+      const input = screen.getByPlaceholderText('Enter text to normalize...');
+      expect(input).toHaveValue(expect.stringContaining('Hello'));
+    });
+  });
+
+  describe('Normalization Display', () => {
+    it('displays normalized text in output area', () => {
+      render(<TextNormalizationSection initialText="Hello    world" />);
       
-      await user.type(inputTextarea, testText);
+      const output = screen.getByDisplayValue('Hello world');
+      expect(output).toBeInTheDocument();
+      expect(output).toHaveAttribute('readOnly');
+    });
+
+    it('shows text statistics', () => {
+      render(<TextNormalizationSection initialText="Hello world" />);
       
-      // Should update output automatically
+      expect(screen.getByText(/11 characters/)).toBeInTheDocument();
+      expect(screen.getByText(/2 words/)).toBeInTheDocument();
+    });
+
+    it('displays changes summary when changes are made', () => {
+      render(<TextNormalizationSection initialText="Hello    world" />);
+      
+      expect(screen.getByText('Changes Made:')).toBeInTheDocument();
+      expect(screen.getByText(/whitespace:/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Advanced Features', () => {
+    it('shows text analysis when toggle is clicked', async () => {
+      const user = userEvent.setup();
+      render(<TextNormalizationSection showAdvanced={true} />);
+      
+      const analysisButton = screen.getByText('Show Text Analysis');
+      await user.click(analysisButton);
+      
       await waitFor(() => {
-        const outputTextarea = screen.getByLabelText(/normalized text/i);
-        expect(outputTextarea.value).toBe('Real-time normalization test.');
+        expect(screen.getByText('Text Analysis:')).toBeInTheDocument();
+        expect(screen.getByText('Structure:')).toBeInTheDocument();
+        expect(screen.getByText('Format:')).toBeInTheDocument();
       });
     });
 
-    it('handles empty input gracefully', async () => {
+    it('shows whitespace stats when toggle is clicked', async () => {
       const user = userEvent.setup();
-      render(<TextNormalizationSection />);
+      render(<TextNormalizationSection showAdvanced={true} />);
       
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      await user.click(normalizeButton);
+      const statsButton = screen.getByText('Show Whitespace Stats');
+      await user.click(statsButton);
       
-      const outputTextarea = screen.getByLabelText(/normalized text/i);
-      expect(outputTextarea).toHaveValue('');
+      await waitFor(() => {
+        expect(screen.getByText('Whitespace Statistics:')).toBeInTheDocument();
+        expect(screen.getByText('Leading/Trailing:')).toBeInTheDocument();
+        expect(screen.getByText('Internal:')).toBeInTheDocument();
+      });
+    });
+
+    it('hides advanced features when showAdvanced is false', () => {
+      render(<TextNormalizationSection showAdvanced={false} />);
+      
+      expect(screen.queryByText('Show Text Analysis')).not.toBeInTheDocument();
+      expect(screen.queryByText('Show Whitespace Stats')).not.toBeInTheDocument();
     });
   });
 
-  describe('Normalization Options', () => {
-    it('respects individual normalization option toggles', async () => {
+  describe('Export and Copy Features', () => {
+    it('copies normalized text to clipboard when copy button is clicked', async () => {
+      const mockWriteText = jest.fn();
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: mockWriteText,
+        },
+      });
+      
       const user = userEvent.setup();
-      render(<TextNormalizationSection />);
+      render(<TextNormalizationSection initialText="Hello    world" />);
       
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const whitespaceCheckbox = screen.getByLabelText(/normalize whitespace/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
+      const copyButton = screen.getByText('Copy Result');
+      await user.click(copyButton);
       
-      // Disable whitespace normalization
-      await user.uncheck(whitespaceCheckbox);
-      
-      const testText = 'Text    with    extra    spaces.';
-      await user.type(inputTextarea, testText);
-      await user.click(normalizeButton);
-      
-      const outputTextarea = screen.getByLabelText(/normalized text/i);
-      // Should preserve extra spaces since whitespace normalization is disabled
-      expect(outputTextarea.value).toContain('    ');
+      expect(mockWriteText).toHaveBeenCalledWith('Hello world');
     });
 
-    it('allows toggling multiple options independently', async () => {
+    it('creates download link when export button is clicked', async () => {
+      // Mock URL.createObjectURL and related APIs
+      const mockCreateObjectURL = jest.fn(() => 'mock-url');
+      const mockRevokeObjectURL = jest.fn();
+      const mockClick = jest.fn();
+      const mockAppendChild = jest.fn();
+      const mockRemoveChild = jest.fn();
+      
+      Object.assign(window.URL, {
+        createObjectURL: mockCreateObjectURL,
+        revokeObjectURL: mockRevokeObjectURL,
+      });
+      
+      const mockAnchor = {
+        href: '',
+        download: '',
+        click: mockClick,
+      };
+      
+      jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor as any);
+      jest.spyOn(document.body, 'appendChild').mockImplementation(mockAppendChild);
+      jest.spyOn(document.body, 'removeChild').mockImplementation(mockRemoveChild);
+      
       const user = userEvent.setup();
-      render(<TextNormalizationSection />);
+      render(<TextNormalizationSection initialText="Hello world" />);
       
-      const paragraphsCheckbox = screen.getByLabelText(/normalize paragraphs/i);
-      const quotesCheckbox = screen.getByLabelText(/normalize quotation marks/i);
+      const exportButton = screen.getByText('Export');
+      await user.click(exportButton);
       
-      // Test toggling options
-      await user.uncheck(paragraphsCheckbox);
-      expect(paragraphsCheckbox).not.toBeChecked();
-      
-      await user.uncheck(quotesCheckbox);
-      expect(quotesCheckbox).not.toBeChecked();
-      
-      // Re-check one option
-      await user.check(paragraphsCheckbox);
-      expect(paragraphsCheckbox).toBeChecked();
-      expect(quotesCheckbox).not.toBeChecked();
-    });
-  });
-
-  describe('Before/After Comparison', () => {
-    it('shows clear before and after text comparison', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection />);
-      
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      const testText = 'Text    with\r\n\r\n\r\nformatting   issues.';
-      
-      await user.type(inputTextarea, testText);
-      await user.click(normalizeButton);
-      
-      // Input should remain unchanged
-      expect(inputTextarea).toHaveValue(testText);
-      
-      // Output should be normalized
-      const outputTextarea = screen.getByLabelText(/normalized text/i);
-      expect(outputTextarea.value).toBe('Text with\n\nformatting issues.');
-      expect(outputTextarea.value).not.toBe(testText);
-    });
-
-    it('provides visual feedback for changes made', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection />);
-      
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      
-      // Test with text that will have changes
-      const problematicText = '"Curly quotes"    and    extra    spaces.';
-      await user.type(inputTextarea, problematicText);
-      await user.click(normalizeButton);
-      
-      // Should show some indication that changes were made
-      // This could be a changes counter, highlighted differences, or status message
-      const changesIndicator = screen.queryByText(/changes made/i) || 
-                               screen.queryByText(/normalized/i) ||
-                               screen.queryByText(/\d+ changes/i);
-      
-      if (changesIndicator) {
-        expect(changesIndicator).toBeInTheDocument();
-      }
-    });
-  });
-
-  describe('Edge Cases and Error Handling', () => {
-    it('handles very long text input', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection />);
-      
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      
-      // Create a long text string
-      const longText = 'This is a long paragraph. '.repeat(100);
-      
-      await user.type(inputTextarea, longText);
-      await user.click(normalizeButton);
-      
-      const outputTextarea = screen.getByLabelText(/normalized text/i);
-      expect(outputTextarea.value.length).toBeGreaterThan(0);
-      expect(outputTextarea.value.length).toBeLessThanOrEqual(longText.length);
-    });
-
-    it('shows loading state during processing', async () => {
-      const user = userEvent.setup();
-      render(<TextNormalizationSection />);
-      
-      const inputTextarea = screen.getByLabelText(/input text/i);
-      const normalizeButton = screen.getByRole('button', { name: /normalize text/i });
-      
-      await user.type(inputTextarea, 'Test text');
-      
-      // Click and immediately check for loading state
-      fireEvent.click(normalizeButton);
-      
-      // Should show loading indicator (button disabled or loading text)
-      const loadingIndicator = screen.queryByText(/processing/i) ||
-                               screen.queryByText(/normalizing/i);
-      
-      if (loadingIndicator) {
-        expect(loadingIndicator).toBeInTheDocument();
-      } else {
-        // At minimum, button should be disabled during processing
-        expect(normalizeButton).toBeDisabled();
-      }
+      expect(mockCreateObjectURL).toHaveBeenCalled();
+      expect(mockClick).toHaveBeenCalled();
+      expect(mockRevokeObjectURL).toHaveBeenCalled();
     });
   });
 
   describe('Accessibility', () => {
-    it('provides proper labels and ARIA attributes', () => {
+    it('has proper form labels', () => {
       render(<TextNormalizationSection />);
       
-      // Check for proper labeling
-      expect(screen.getByLabelText(/input text/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/normalized text/i)).toBeInTheDocument();
-      
-      // Check for form controls accessibility
-      const checkboxes = screen.getAllByRole('checkbox');
-      checkboxes.forEach(checkbox => {
-        expect(checkbox).toHaveAttribute('aria-describedby');
-      });
+      expect(screen.getByLabelText('Input Text:')).toBeInTheDocument();
+      expect(screen.getByLabelText('Normalized Text:')).toBeInTheDocument();
     });
 
-    it('supports keyboard navigation', async () => {
-      const user = userEvent.setup();
+    it('has accessible buttons', () => {
       render(<TextNormalizationSection />);
       
-      // Tab through the interface
-      await user.tab();
-      expect(screen.getByLabelText(/input text/i)).toHaveFocus();
+      const exportButton = screen.getByRole('button', { name: 'Export' });
+      const copyButton = screen.getByRole('button', { name: 'Copy Result' });
       
-      await user.tab();
-      // Should focus on first checkbox or normalize button
-      const focusedElement = document.activeElement;
-      expect(focusedElement).toBeInTheDocument();
-      expect(focusedElement?.getAttribute('role')).toMatch(/checkbox|button/);
+      expect(exportButton).toBeInTheDocument();
+      expect(copyButton).toBeInTheDocument();
+    });
+
+    it('has accessible checkboxes', () => {
+      render(<TextNormalizationSection />);
+      
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes.length).toBeGreaterThan(0);
+      
+      checkboxes.forEach(checkbox => {
+        expect(checkbox).toHaveAccessibleName();
+      });
     });
   });
 
   describe('Integration with DevTools', () => {
-    it('fits within DevTools panel styling', () => {
-      render(
-        <div className="bg-slate-800 text-slate-200">
-          <TextNormalizationSection />
-        </div>
-      );
+    it('applies custom className', () => {
+      const customClass = 'custom-test-class';
+      render(<TextNormalizationSection className={customClass} />);
       
-      // Component should adapt to dark theme
-      const section = screen.getByText(/text normalization/i).closest('div');
-      expect(section).toBeInTheDocument();
-      
-      // Should not have light theme styling that conflicts
-      expect(section).not.toHaveClass('bg-white');
-      expect(section).not.toHaveClass('text-black');
+      const container = screen.getByText('Text Normalization').closest('.text-normalization-section');
+      expect(container).toHaveClass(customClass);
     });
 
     it('provides debug information when requested', () => {
-      render(<TextNormalizationSection debugMode={true} />);
+      render(<TextNormalizationSection initialText="Test text" />);
       
-      // Should show additional debug information
-      const debugInfo = screen.queryByText(/debug/i) ||
-                       screen.queryByText(/options applied/i) ||
-                       screen.queryByText(/processing time/i);
+      // Should show processing time
+      expect(screen.getByText(/1.5ms/)).toBeInTheDocument();
       
-      if (debugInfo) {
-        expect(debugInfo).toBeInTheDocument();
-      }
+      // Should show character counts
+      expect(screen.getByText(/9 characters/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('handles clipboard API failures gracefully', async () => {
+      const mockWriteText = jest.fn().mockRejectedValue(new Error('Clipboard error'));
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: mockWriteText,
+        },
+      });
+      
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      
+      const user = userEvent.setup();
+      render(<TextNormalizationSection initialText="Hello world" />);
+      
+      const copyButton = screen.getByText('Copy Result');
+      await user.click(copyButton);
+      
+      expect(consoleSpy).toHaveBeenCalledWith('Failed to copy to clipboard:', expect.any(Error));
+      
+      consoleSpy.mockRestore();
+    });
+
+    it('handles empty and invalid input gracefully', () => {
+      render(<TextNormalizationSection initialText="" />);
+      
+      const output = screen.getByDisplayValue('');
+      expect(output).toBeInTheDocument();
+      
+      expect(screen.getByText(/0 characters/)).toBeInTheDocument();
+      expect(screen.getByText(/0 changes made/)).toBeInTheDocument();
     });
   });
 });
