@@ -24,7 +24,7 @@ export interface StateTreeNode {
 export interface StateWatch {
   id: string;
   path: string;
-  callback: WatchCallback;
+  callback: (oldValue: unknown, newValue: unknown, path: string) => void;
   createdAt: number;
   lastTriggered?: number;
   changeCount: number;

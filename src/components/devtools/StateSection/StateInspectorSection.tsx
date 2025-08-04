@@ -173,7 +173,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               <span className="text-slate-400">Breadcrumbs: </span>
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb.path}>
-                  {index > 0 && <span className="text-slate-500"> > </span>}
+                  {index > 0 && <span className="text-slate-500"> &gt; </span>}
                   <button
                     onClick={() => handlePathNavigation(crumb.path)}
                     className="text-blue-400 hover:text-blue-300 underline"
