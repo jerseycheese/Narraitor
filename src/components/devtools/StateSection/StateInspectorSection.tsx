@@ -6,22 +6,54 @@ import { CollapsibleSection } from '../CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 import * as stores from '@/state';
 
+/**
+ * Represents a state change notification for the UI
+ */
 interface StateChangeNotification {
+  /** The path that changed */
   path: string;
+  /** Previous value */
   oldValue: unknown;
+  /** New value */
   newValue: unknown;
+  /** When the change occurred */
   timestamp: number;
 }
 
+/**
+ * Props for the StateInspectorSection component
+ */
 interface StateInspectorSectionProps {
+  /** Whether sections should be collapsed by default */
   defaultCollapsed?: boolean;
 }
 
 /**
  * StateInspectorSection Component
  * 
- * State inspection with hierarchical exploration, change monitoring,
- * and performance safeguards for developer debugging.
+ * Provides a comprehensive UI for inspecting application state with hierarchical
+ * navigation, real-time monitoring, and change history tracking. This component
+ * is designed for development use only and gracefully handles production environments.
+ * 
+ * Features:
+ * - Interactive state tree navigation with breadcrumb support
+ * - Path-based value inspection with type information
+ * - Real-time monitoring of specific state paths
+ * - Change history with timestamped notifications
+ * - Performance warnings and resource usage metrics
+ * - Automatic cleanup of watchers on unmount
+ * 
+ * @param props Component props
+ * @returns JSX element for state inspection interface
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage in DevTools panel
+ * <StateInspectorSection />
+ * 
+ * // With collapsed sections by default
+ * <StateInspectorSection defaultCollapsed={true} />
+ * ```
  */
 export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspectorSectionProps) => {
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
@@ -48,7 +80,10 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
     }
   }, [isInitialized]);
 
-  // Handle path navigation
+  /**
+   * Handles navigation to a specific path in the state tree
+   * Updates the selected path, retrieves its value and metadata
+   */
   const handlePathNavigation = useCallback((path: string) => {
     if (!path) {
       setSelectedPath('');
@@ -65,7 +100,10 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
     setPathMetadata(metadata);
   }, []);
 
-  // Watch/unwatch path functionality
+  /**
+   * Toggles monitoring for a specific path
+   * Adds or removes a watcher and manages change notifications
+   */
   const togglePathWatch = useCallback((path: string) => {
     if (watchedPaths.has(path)) {
       // Remove watch
