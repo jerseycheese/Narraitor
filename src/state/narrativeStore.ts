@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
-import { generateUniqueId, safeTrim } from '../lib/utils';
+import { generateUniqueId } from '../lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
