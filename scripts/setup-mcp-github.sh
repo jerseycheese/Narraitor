@@ -15,12 +15,13 @@ echo "Setting up MCP GitHub tool for Claude Code..."
 # Create MCP config
 cat > "$MCP_CONFIG" << EOL
 {
-  "servers": {
+  "mcpServers": {
     "github": {
-      "name": "github",
-      "type": "github",
-      "url": "https://github.com/modelcontextprotocol/servers/tree/main/src/github",
-      "version": "latest"
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_TOKEN}"
+      }
     }
   }
 }

@@ -13,17 +13,17 @@ interface StateChangeNotification {
   timestamp: number;
 }
 
-interface EnhancedStateSectionProps {
+interface StateInspectorSectionProps {
   defaultCollapsed?: boolean;
 }
 
 /**
- * EnhancedStateSection Component
+ * StateInspectorSection Component
  * 
- * Advanced state inspection with hierarchical exploration, change monitoring,
+ * State inspection with hierarchical exploration, change monitoring,
  * and performance safeguards for developer debugging.
  */
-export const EnhancedStateSection = ({ defaultCollapsed = false }: EnhancedStateSectionProps) => {
+export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspectorSectionProps) => {
   const [snapshot, setSnapshot] = useState<StateSnapshot | null>(null);
   const [selectedPath, setSelectedPath] = useState<string>('');
   const [pathValue, setPathValue] = useState<unknown>(null);

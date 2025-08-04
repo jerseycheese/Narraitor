@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { EnhancedStateSection } from '../EnhancedStateSection';
+import { StateInspectorSection } from '../StateInspectorSection';
 import { StateInspector } from '@/lib/utils/StateInspector';
 
 // Mock the StateInspector
@@ -23,7 +23,7 @@ jest.mock('../../CollapsibleSection', () => ({
   )
 }));
 
-describe('EnhancedStateSection', () => {
+describe('StateInspectorSection', () => {
   let mockStateInspector: jest.Mocked<StateInspector>;
 
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe('EnhancedStateSection', () => {
 
   describe('hierarchical state exploration', () => {
     it('should display current application state in expandable tree structure', () => {
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       expect(screen.getByTestId('enhanced-state-section')).toBeInTheDocument();
       expect(screen.getByText('Application State Inspector')).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('EnhancedStateSection', () => {
         childCount: 3
       });
 
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const expandableNodes = screen.getAllByTestId('expandable-node');
       expect(expandableNodes.length).toBeGreaterThan(0);
@@ -104,7 +104,7 @@ describe('EnhancedStateSection', () => {
         'worldStore.worlds.world-1.name'
       ]);
 
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const expandButton = screen.getByTestId('expand-button');
       await user.click(expandButton);
@@ -121,7 +121,7 @@ describe('EnhancedStateSection', () => {
     it('should navigate to specific paths via breadcrumb navigation', async () => {
       const user = userEvent.setup();
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const pathInput = screen.getByTestId('path-input');
       await user.type(pathInput, 'worldStore.worlds.world-1');
@@ -133,7 +133,7 @@ describe('EnhancedStateSection', () => {
     });
 
     it('should show current navigation path as breadcrumbs', () => {
-      render(<EnhancedStateSection currentPath="worldStore.worlds.world-1" />);
+      render(<StateInspectorSection currentPath="worldStore.worlds.world-1" />);
       
       const breadcrumbs = screen.getByTestId('breadcrumb-navigation');
       expect(breadcrumbs).toBeInTheDocument();
@@ -146,7 +146,7 @@ describe('EnhancedStateSection', () => {
 
   describe('state change monitoring', () => {
     it('should provide options to watch specific paths', () => {
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const watchSection = screen.getByTestId('watch-section');
       expect(watchSection).toBeInTheDocument();
@@ -163,7 +163,7 @@ describe('EnhancedStateSection', () => {
       
       mockStateInspector.watchPath.mockReturnValue(jest.fn()); // Mock unsubscribe function
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const watchInput = screen.getByTestId('watch-path-input');
       const watchButton = screen.getByTestId('add-watch-button');
@@ -190,7 +190,7 @@ describe('EnhancedStateSection', () => {
         return jest.fn();
       });
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       // Add a watch
       const watchInput = screen.getByTestId('watch-path-input');
@@ -215,7 +215,7 @@ describe('EnhancedStateSection', () => {
       const mockUnsubscribe = jest.fn();
       mockStateInspector.watchPath.mockReturnValue(mockUnsubscribe);
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       // Add a watch first
       const watchInput = screen.getByTestId('watch-path-input');
@@ -243,7 +243,7 @@ describe('EnhancedStateSection', () => {
         return jest.fn();
       });
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       // Add a watch
       const watchInput = screen.getByTestId('watch-path-input');
@@ -267,19 +267,19 @@ describe('EnhancedStateSection', () => {
 
   describe('performance considerations', () => {
     it('should not impact application performance when not open', () => {
-      render(<EnhancedStateSection collapsed={true} />);
+      render(<StateInspectorSection collapsed={true} />);
       
       // Should not initialize StateInspector when collapsed
       expect(StateInspector).not.toHaveBeenCalled();
     });
 
     it('should initialize StateInspector only when needed', () => {
-      const { rerender } = render(<EnhancedStateSection collapsed={true} />);
+      const { rerender } = render(<StateInspectorSection collapsed={true} />);
       
       expect(StateInspector).not.toHaveBeenCalled();
       
       // Expand the section
-      rerender(<EnhancedStateSection collapsed={false} />);
+      rerender(<StateInspectorSection collapsed={false} />);
       
       expect(StateInspector).toHaveBeenCalled();
     });
@@ -288,7 +288,7 @@ describe('EnhancedStateSection', () => {
       const mockUnsubscribe = jest.fn();
       mockStateInspector.watchPath.mockReturnValue(mockUnsubscribe);
       
-      const { unmount } = render(<EnhancedStateSection />);
+      const { unmount } = render(<StateInspectorSection />);
       
       // Add a watch to create a subscription
       const watchInput = screen.getByTestId('watch-path-input');
@@ -308,7 +308,7 @@ describe('EnhancedStateSection', () => {
       
       mockStateInspector.watchPath.mockReturnValue(jest.fn());
       
-      render(<EnhancedStateSection maxWatchedPaths={2} />);
+      render(<StateInspectorSection maxWatchedPaths={2} />);
       
       const watchInput = screen.getByTestId('watch-path-input');
       const watchButton = screen.getByTestId('add-watch-button');
@@ -343,7 +343,7 @@ describe('EnhancedStateSection', () => {
       // Test in production environment
       process.env.NODE_ENV = 'production';
       
-      const { container } = render(<EnhancedStateSection />);
+      const { container } = render(<StateInspectorSection />);
       expect(container.firstChild).toBeNull();
       
       // Restore environment
@@ -354,7 +354,7 @@ describe('EnhancedStateSection', () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'test';
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       expect(screen.getByTestId('enhanced-state-section')).toBeInTheDocument();
       
       process.env.NODE_ENV = originalEnv;
@@ -365,7 +365,7 @@ describe('EnhancedStateSection', () => {
         throw new Error('StateInspector not available in production');
       });
       
-      expect(() => render(<EnhancedStateSection />)).not.toThrow();
+      expect(() => render(<StateInspectorSection />)).not.toThrow();
       
       // Should show error state instead of crashing
       expect(screen.getByTestId('inspector-error-state')).toBeInTheDocument();
@@ -377,7 +377,7 @@ describe('EnhancedStateSection', () => {
     it('should be keyboard navigable', async () => {
       const user = userEvent.setup();
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const pathInput = screen.getByTestId('path-input');
       const navigateButton = screen.getByTestId('navigate-path-button');
@@ -391,7 +391,7 @@ describe('EnhancedStateSection', () => {
     });
 
     it('should have proper ARIA labels for screen readers', () => {
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       const pathInput = screen.getByTestId('path-input');
       const watchSection = screen.getByTestId('watch-section');
@@ -409,7 +409,7 @@ describe('EnhancedStateSection', () => {
         return jest.fn();
       });
       
-      render(<EnhancedStateSection />);
+      render(<StateInspectorSection />);
       
       // Add a watch
       const watchInput = screen.getByTestId('watch-path-input');

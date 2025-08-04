@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { EnhancedStateSection } from './EnhancedStateSection';
+import { StateInspectorSection } from './StateInspectorSection';
 
-const meta: Meta<typeof EnhancedStateSection> = {
-  title: 'DevTools/Enhanced State Section',
-  component: EnhancedStateSection,
+const meta: Meta<typeof StateInspectorSection> = {
+  title: 'DevTools/State Inspector Section',
+  component: StateInspectorSection,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
         component: `
-The EnhancedStateSection component provides advanced state inspection capabilities for developer tools.
+The StateInspectorSection component provides advanced state inspection capabilities for developer tools.
 It allows hierarchical exploration of application state, monitoring of specific state paths for changes,
 and provides performance safeguards to ensure it doesn't impact application performance.
 
@@ -48,7 +48,7 @@ and provides performance safeguards to ensure it doesn't impact application perf
 };
 
 export default meta;
-type Story = StoryObj<typeof EnhancedStateSection>;
+type Story = StoryObj<typeof StateInspectorSection>;
 
 /**
  * Default state with basic application state visible

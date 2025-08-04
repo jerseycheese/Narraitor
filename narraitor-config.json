@@ -1,0 +1,55 @@
+{
+  "github": {
+    "repository": "jerseycheese/Narraitor",
+    "defaultBranch": "main",
+    "token": "$GITHUB_TOKEN"
+  },
+  "domains": {
+    "frontend": {
+      "keywords": ["component", "ui", "interface", "page", "hook", "style"],
+      "paths": ["src/components/", "src/app/", "src/hooks/", "src/pages/"]
+    },
+    "backend": {
+      "keywords": ["api", "service", "server", "database", "auth"],
+      "paths": ["src/lib/", "src/utils/", "src/api/"]
+    },
+    "state": {
+      "keywords": ["store", "state", "context", "reducer"],
+      "paths": ["src/state/", "src/context/"]
+    },
+    "types": {  
+      "keywords": ["type", "interface", "schema", "model"],
+      "paths": ["src/types/"]
+    },
+    "testing": {
+      "keywords": ["test", "spec", "mock", "fixture"],
+      "paths": ["__tests__/", "src/__tests__/", "__mocks__/", "tests/"]
+    },
+    "docs": {
+      "keywords": ["documentation", "guide", "readme", "spec"],
+      "paths": ["docs/", "README.md"]
+    }
+  },
+  "domain": {
+    "default": "frontend"
+  },
+  "commands": {
+    "build": "npm run build",
+    "test": "npm test",
+    "lint": "npm run lint",
+    "dev": "npm run dev",
+    "storybook": "npm run storybook"
+  },
+  "testing": {
+    "framework": "jest",
+    "coverage": 80,
+    "patterns": ["*.test.js", "*.test.ts", "*.spec.js", "*.spec.ts"],
+    "setupFiles": ["jest.setup.ts"]
+  },
+  "development": {
+    "packageManager": "npm",
+    "nodeVersion": "18+",
+    "framework": "next.js",
+    "styling": "tailwind"
+  }
+}

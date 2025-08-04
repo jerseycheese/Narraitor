@@ -1,2 +1,2 @@
 export * from './StateSection';
-export * from './EnhancedStateSection';
+export * from './StateInspectorSection';
