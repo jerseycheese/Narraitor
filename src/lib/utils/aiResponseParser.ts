@@ -2,7 +2,10 @@
 
 /**
  * Utility functions for parsing AI responses across different features
+ * Enhanced with type guard validation for runtime type safety
  */
+
+import { ValidationResult } from '@/lib/utils/validationUtils';
 
 export interface AIResponse {
   content?: string;
@@ -119,7 +122,144 @@ export function validateArrayFields(
 }
 
 /**
- * Generic AI response handler with retry logic
+ * Enhanced validation using type guards for runtime type safety
+ */
+export function validateWithTypeGuard<T>(
+  data: unknown,
+  validator: (data: unknown) => ValidationResult,
+  objectName: string = 'object',
+  fallbackData?: T
+): T {
+  const validation = validator(data);
+  
+  if (!validation.valid) {
+    const errorMessage = `Invalid ${objectName}: ${validation.errors[0]}`;
+    
+    if (fallbackData) {
+      console.warn(`${errorMessage}, using fallback data`);
+      return fallbackData;
+    }
+    
+    throw new Error(errorMessage);
+  }
+  
+  return data as T;
+}
+
+/**
+ * Parse and validate AI JSON response with type guard integration
+ */
+export function parseAndValidateAIResponse<T>(
+  response: AIResponse,
+  validator: (data: unknown) => ValidationResult,
+  objectName: string = 'AI response',
+  fallbackData?: T
+): T {
+  const parsed = parseAIJsonResponse<unknown>(response, `Failed to parse ${objectName}`);
+  return validateWithTypeGuard(parsed, validator, objectName, fallbackData);
+}
+
+/**
+ * Validate array elements using type guards
+ */
+export function validateArrayElements<T>(
+  array: unknown[],
+  validator: (data: unknown) => ValidationResult,
+  objectName: string = 'array element',
+  removeInvalid: boolean = false
+): T[] {
+  const results: T[] = [];
+  
+  for (let i = 0; i < array.length; i++) {
+    const element = array[i];
+    const validation = validator(element);
+    
+    if (validation.valid) {
+      results.push(element as T);
+    } else {
+      const errorMessage = `Invalid ${objectName} at index ${i}: ${validation.errors[0]}`;
+      
+      if (removeInvalid) {
+        console.warn(`${errorMessage}, removing from array`);
+        continue; // Skip invalid element
+      } else {
+        throw new Error(errorMessage);
+      }
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * Enhanced field validation with type checking
+ */
+export function validateTypedFields(
+  obj: unknown,
+  fieldValidations: Array<{
+    field: string;
+    type: 'string' | 'number' | 'boolean' | 'array' | 'object';
+    required?: boolean;
+    validator?: (value: unknown) => ValidationResult;
+  }>,
+  objectName: string = 'object'
+): void {
+  if (!obj || typeof obj !== 'object') {
+    throw new Error(`Invalid ${objectName}: must be an object`);
+  }
+  
+  const typedObj = obj as Record<string, unknown>;
+  
+  for (const validation of fieldValidations) {
+    const { field, type, required = true, validator } = validation;
+    const value = typedObj[field];
+    
+    // Check if required field is missing
+    if (required && (value === undefined || value === null)) {
+      throw new Error(`Invalid ${objectName}: missing required field '${field}'`);
+    }
+    
+    // Skip validation if field is optional and not present
+    if (!required && (value === undefined || value === null)) {
+      continue;
+    }
+    
+    // Validate field type
+    let typeValid = false;
+    switch (type) {
+      case 'string':
+        typeValid = typeof value === 'string';
+        break;
+      case 'number':
+        typeValid = typeof value === 'number' && !isNaN(value);
+        break;
+      case 'boolean':
+        typeValid = typeof value === 'boolean';
+        break;
+      case 'array':
+        typeValid = Array.isArray(value);
+        break;
+      case 'object':
+        typeValid = typeof value === 'object' && value !== null && !Array.isArray(value);
+        break;
+    }
+    
+    if (!typeValid) {
+      throw new Error(`Invalid ${objectName}: field '${field}' must be of type ${type}`);
+    }
+    
+    // Run custom validator if provided
+    if (validator) {
+      const validationResult = validator(value);
+      if (!validationResult.valid) {
+        throw new Error(`Invalid ${objectName}: field '${field}' validation failed - ${validationResult.errors[0]}`);
+      }
+    }
+  }
+}
+
+/**
+ * Generic AI response handler with retry logic and validation
  */
 export async function handleAIRequest<T>(
   aiCall: () => Promise<AIResponse>,
