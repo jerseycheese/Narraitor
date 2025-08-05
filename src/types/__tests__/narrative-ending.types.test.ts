@@ -51,8 +51,8 @@ describe('Narrative Ending Types', () => {
         characterLegacy: 'Known throughout the land...',
         worldImpact: 'The kingdom prospered...',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         journalSummary: 'A brave journey...',
         achievements: ['Dragon Slayer', 'Peace Bringer'],
         playTime: 3600
