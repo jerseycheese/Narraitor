@@ -355,6 +355,7 @@ CRITICAL INSTRUCTIONS:
     }
     
     // Validate and clamp all attribute values to world bounds
+    const originalAttributeCount = characterData.attributes.length;
     characterData.attributes = characterData.attributes.map(attr => {
       const worldAttr = world.attributes.find(wa => wa.id === attr.id);
       if (!worldAttr) {
@@ -381,7 +382,14 @@ CRITICAL INSTRUCTIONS:
       return { ...attr, value: clampedValue };
     }).filter(attr => attr !== null); // Remove invalid attributes
     
+    // Log removed attributes count
+    const removedAttributesCount = originalAttributeCount - characterData.attributes.length;
+    if (removedAttributesCount > 0) {
+      logger.info('CharacterGenerator', `Removed ${removedAttributesCount} invalid attribute(s) during validation`);
+    }
+    
     // Validate and clamp all skill levels to 0-10 range
+    const originalSkillCount = characterData.skills.length;
     characterData.skills = characterData.skills.map(skill => {
       const worldSkill = world.skills.find(ws => ws.id === skill.id);
       if (!worldSkill) {
@@ -406,6 +414,12 @@ CRITICAL INSTRUCTIONS:
       
       return { ...skill, level: clampedLevel };
     }).filter(skill => skill !== null); // Remove invalid skills
+    
+    // Log removed skills count
+    const removedSkillsCount = originalSkillCount - characterData.skills.length;
+    if (removedSkillsCount > 0) {
+      logger.info('CharacterGenerator', `Removed ${removedSkillsCount} invalid skill(s) during validation`);
+    }
     
     // Validate the generated character
     if (!characterData.name || typeof characterData.name !== 'string' || characterData.name.trim() === '') {

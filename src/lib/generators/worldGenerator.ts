@@ -4,6 +4,26 @@ import { normalizeGenre } from '@/lib/constants/genres';
 import { normalizeText } from '@/lib/utils/textNormalization';
 import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/types/type-guards';
 
+// Default fallback values for AI validation failures
+const DEFAULT_WORLD_ATTRIBUTE = {
+  name: 'Strength',
+  description: 'Physical power and might',
+  baseValue: 5,
+  minValue: 1,
+  maxValue: 10,
+  category: 'General'
+};
+
+const DEFAULT_WORLD_SKILL = {
+  name: 'Basic Knowledge',
+  description: 'General knowledge and awareness',
+  difficulty: 'easy' as const,
+  category: 'General',
+  baseValue: 1,
+  minValue: 1,
+  maxValue: 5,
+};
+
 export interface GeneratedWorldData {
   name: string;
   genre: string;
@@ -284,14 +304,7 @@ Make the world interesting and playable with concepts appropriate to the setting
         if (!validation.valid) {
           console.warn(`AI generated invalid attribute "${attribute.name}":`, validation.errors[0]);
           // Return a safe default attribute
-          return {
-            name: 'Strength',
-            description: 'Physical power and might',
-            baseValue: 5,
-            minValue: 1,
-            maxValue: 10,
-            category: 'General'
-          };
+          return { ...DEFAULT_WORLD_ATTRIBUTE };
         }
         
         // Return without temp IDs
@@ -332,15 +345,7 @@ Make the world interesting and playable with concepts appropriate to the setting
         if (!validation.valid) {
           console.warn(`AI generated invalid skill "${skillData.name}":`, validation.errors[0]);
           // Return a safe default skill
-          return {
-            name: 'Basic Knowledge',
-            description: 'General knowledge and awareness',
-            difficulty: 'easy' as const,
-            category: 'General',
-            baseValue: 1,
-            minValue: 1,
-            maxValue: 5,
-          };
+          return { ...DEFAULT_WORLD_SKILL };
         }
         
         // Return without temp IDs

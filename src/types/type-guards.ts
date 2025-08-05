@@ -1,6 +1,5 @@
 // src/types/type-guards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import type { World, WorldAttribute, WorldSkill, WorldSettings, WorldImage } from './world.types';
 import type { Character, CharacterAttribute, CharacterSkill, CharacterBackground, CharacterStatus, CharacterPortrait, CharacterRelationship } from './character.types';
@@ -39,17 +38,33 @@ export function validateWorld(obj: unknown, partial: boolean = false): Validatio
   const world = obj as any;
 
   // Required property validation
-  if (typeof world.id !== 'string') {
-    errors.push('Property "id" must be a string');
-  }
-  if (typeof world.name !== 'string') {
-    errors.push('Property "name" must be a string');
-  }
-  if (typeof world.description !== 'string') {
-    errors.push('Property "description" must be a string');
-  }
-  if (typeof world.genre !== 'string') {
-    errors.push('Property "genre" must be a string');
+  if (!partial) {
+    if (typeof world.id !== 'string') {
+      errors.push('Property "id" must be a string');
+    }
+    if (typeof world.name !== 'string') {
+      errors.push('Property "name" must be a string');
+    }
+    if (typeof world.description !== 'string') {
+      errors.push('Property "description" must be a string');
+    }
+    if (typeof world.genre !== 'string') {
+      errors.push('Property "genre" must be a string');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('id' in world && typeof world.id !== 'string') {
+      errors.push('Property "id" must be a string when present');
+    }
+    if ('name' in world && typeof world.name !== 'string') {
+      errors.push('Property "name" must be a string when present');
+    }
+    if ('description' in world && typeof world.description !== 'string') {
+      errors.push('Property "description" must be a string when present');
+    }
+    if ('genre' in world && typeof world.genre !== 'string') {
+      errors.push('Property "genre" must be a string when present');
+    }
   }
 
   // For partial validation, only check present properties
@@ -723,8 +738,8 @@ export function validateCharacterPortrait(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-// Legacy type guards - simple wrappers around validation functions
-// These exist for TypeScript type narrowing compatibility
+// Legacy type guards - separate implementations for TypeScript type narrowing
+// These provide runtime type checking with narrowed return types for compatibility
 
 export function isInventoryItem(obj: unknown): obj is InventoryItem {
   return obj !== null &&
