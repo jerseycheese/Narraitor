@@ -689,3 +689,250 @@ export function formatCompactNumber(value: number): string {
     return value.toString();
   }
 }
+
+// =============================================================================
+// SERIALIZATION AND DEBUGGING UTILITIES
+// =============================================================================
+
+/**
+ * Safely serializes objects for JSON storage, handling functions, dates, and circular references
+ * 
+ * Provides comprehensive serialization with intelligent handling of complex JavaScript types.
+ * Designed for debugging, state inspection, and data persistence scenarios where standard
+ * JSON.stringify would fail or produce unwanted results.
+ * 
+ * @param obj - Object to serialize
+ * @param options - Optional configuration for serialization behavior
+ * @returns Serializable version of the object
+ * 
+ * @example
+ * ```typescript
+ * import { sanitizeForSerialization } from '@/lib/utils';
+ * 
+ * const complexObject = {
+ *   name: 'Example',
+ *   date: new Date(),
+ *   func: () => 'hello',
+ *   circular: null as any
+ * };
+ * complexObject.circular = complexObject;
+ * 
+ * const serialized = sanitizeForSerialization(complexObject);
+ * // {
+ * //   name: 'Example',
+ * //   date: '2024-01-15T10:00:00.000Z',
+ * //   func: '[Function]',
+ * //   circular: '[Circular Reference]'
+ * // }
+ * 
+ * // Safe to use with JSON.stringify
+ * const json = JSON.stringify(serialized);
+ * ```
+ * 
+ * @note This function handles circular references by maintaining a WeakSet during traversal
+ * @see {@link formatForDebug} for debug-specific formatting
+ * @since Enhanced with StateInspector patterns for better development tooling
+ */
+export function sanitizeForSerialization(obj: unknown, options?: {
+  /** Maximum depth to traverse (prevents infinite recursion) */
+  maxDepth?: number;
+  /** Custom handler for functions */
+  functionHandler?: (fn: (...args: unknown[]) => unknown) => string;
+}): unknown {
+  const { maxDepth = 10, functionHandler = () => '[Function]' } = options || {};
+  const circularRefs = new WeakSet();
+  
+  function sanitizeRecursive(value: unknown, depth = 0): unknown {
+    // Prevent infinite recursion and stack overflow
+    if (depth > maxDepth) {
+      return '[Max Depth Exceeded]';
+    }
+    
+    // Handle primitive types and null/undefined
+    if (value === null || value === undefined) {
+      return value;
+    }
+    
+    if (typeof value === 'function') {
+      return functionHandler(value as (...args: unknown[]) => unknown);
+    }
+    
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+    
+    if (typeof value !== 'object') {
+      return value;
+    }
+    
+    // Handle circular references
+    if (circularRefs.has(value as object)) {
+      return '[Circular Reference]';
+    }
+    
+    circularRefs.add(value as object);
+    
+    try {
+      if (Array.isArray(value)) {
+        return value.map(item => sanitizeRecursive(item, depth + 1));
+      }
+      
+      const sanitized: Record<string, unknown> = {};
+      Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
+        sanitized[key] = sanitizeRecursive(val, depth + 1);
+      });
+      
+      return sanitized;
+    } finally {
+      circularRefs.delete(value as object);
+    }
+  }
+  
+  return sanitizeRecursive(obj);
+}
+
+/**
+ * Formats complex objects for debugging and development purposes
+ * 
+ * Provides human-readable formatting specifically designed for debugging scenarios.
+ * Combines serialization safety with enhanced readability for development tools,
+ * error reporting, and state inspection interfaces.
+ * 
+ * @param obj - Object to format for debugging
+ * @param options - Configuration for debug formatting
+ * @returns Debug-friendly string representation
+ * 
+ * @example
+ * ```typescript
+ * import { formatForDebug } from '@/lib/utils';
+ * 
+ * const debugObj = {
+ *   user: { id: 1, name: 'John' },
+ *   settings: { theme: 'dark', notifications: true },
+ *   metadata: { created: new Date(), version: '1.0.0' }
+ * };
+ * 
+ * // Compact formatting for logs
+ * console.log(formatForDebug(debugObj, { compact: true }));
+ * 
+ * // Pretty formatting for development tools
+ * console.log(formatForDebug(debugObj, { indent: 2 }));
+ * ```
+ * 
+ * @note Designed to work seamlessly with DevTools and state inspection utilities
+ * @see {@link sanitizeForSerialization} for safe serialization without formatting
+ */
+export function formatForDebug(obj: unknown, options?: {
+  /** Compact single-line format */
+  compact?: boolean;
+  /** Indentation spaces for pretty printing */
+  indent?: number;
+  /** Maximum string length before truncation */
+  maxStringLength?: number;
+}): string {
+  const { compact = false, indent = 2, maxStringLength = 100 } = options || {};
+  
+  try {
+    // First sanitize the object to handle circular references and special types
+    const sanitized = sanitizeForSerialization(obj, {
+      functionHandler: (fn) => `[Function: ${fn.name || 'anonymous'}]`
+    });
+    
+    // Apply string length limits for readability
+    const limitStrings = (value: unknown): unknown => {
+      if (typeof value === 'string' && value.length > maxStringLength) {
+        return `${value.substring(0, maxStringLength)}...`;
+      }
+      if (Array.isArray(value)) {
+        return value.map(limitStrings);
+      }
+      if (value && typeof value === 'object') {
+        const limited: Record<string, unknown> = {};
+        Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
+          limited[key] = limitStrings(val);
+        });
+        return limited;
+      }
+      return value;
+    };
+    
+    const processed = limitStrings(sanitized);
+    
+    if (compact) {
+      return JSON.stringify(processed);
+    } else {
+      return JSON.stringify(processed, null, indent);
+    }
+  } catch (error) {
+    return `[Debug Format Error: ${error instanceof Error ? error.message : 'Unknown error'}]`;
+  }
+}
+
+/**
+ * Gets detailed type information about a value, useful for debugging and introspection
+ * 
+ * Provides enhanced type detection beyond standard JavaScript typeof operator.
+ * Particularly useful for development tools, state inspection, and debugging scenarios
+ * where understanding the exact nature of values is critical.
+ * 
+ * @param value - Value to analyze
+ * @returns Detailed type information object
+ * 
+ * @example
+ * ```typescript
+ * import { getValueTypeInfo } from '@/lib/utils';
+ * 
+ * getValueTypeInfo(null);           // { type: 'null', constructor: null, isArray: false }
+ * getValueTypeInfo([1, 2, 3]);      // { type: 'array', constructor: 'Array', isArray: true }
+ * getValueTypeInfo(new Date());     // { type: 'date', constructor: 'Date', isArray: false }
+ * getValueTypeInfo(() => {});       // { type: 'function', constructor: 'Function', isArray: false }
+ * getValueTypeInfo({});             // { type: 'object', constructor: 'Object', isArray: false }
+ * ```
+ * 
+ * @note Used internally by StateInspector for hierarchical state navigation
+ * @see {@link formatForDebug} for comprehensive object debugging
+ */
+export function getValueTypeInfo(value: unknown): {
+  type: string;
+  constructor: string | null;
+  isArray: boolean;
+  hasChildren: boolean;
+} {
+  if (value === null) {
+    return { type: 'null', constructor: null, isArray: false, hasChildren: false };
+  }
+  
+  if (value === undefined) {
+    return { type: 'undefined', constructor: null, isArray: false, hasChildren: false };
+  }
+  
+  if (Array.isArray(value)) {
+    return { 
+      type: 'array', 
+      constructor: 'Array', 
+      isArray: true, 
+      hasChildren: value.length > 0 
+    };
+  }
+  
+  if (value instanceof Date) {
+    return { type: 'date', constructor: 'Date', isArray: false, hasChildren: false };
+  }
+  
+  if (typeof value === 'function') {
+    return { type: 'function', constructor: 'Function', isArray: false, hasChildren: false };
+  }
+  
+  if (typeof value === 'object') {
+    const constructor = value.constructor?.name || 'Object';
+    const hasChildren = Object.keys(value as Record<string, unknown>).length > 0;
+    return { type: 'object', constructor, isArray: false, hasChildren };
+  }
+  
+  return { 
+    type: typeof value, 
+    constructor: null, 
+    isArray: false, 
+    hasChildren: false 
+  };
+}

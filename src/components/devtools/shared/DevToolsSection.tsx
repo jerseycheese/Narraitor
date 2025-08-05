@@ -69,7 +69,7 @@ export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
       className
     )}>
       {title && (
-        <h4 className="text-xs font-medium mb-2 text-slate-200">
+        <h4 className="text-xs font-medium mb-2 text-slate-50">
           {title}
         </h4>
       )}

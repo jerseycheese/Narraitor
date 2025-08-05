@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
-import { StateSection } from '../StateSection';
+import { StateSection, StateInspectorSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
@@ -33,10 +33,10 @@ const EnvironmentInfo = () => {
   
   return (
     <DevToolsSection title="Environment Info:" className="mb-4 text-xs">
-      <div className="text-slate-300">NODE_ENV: {nodeEnv}</div>
-      <div className="text-slate-300">Is Client: {String(mounted)}</div>
-      <div className="text-slate-300">Is Development: {String(isDev)}</div>
-      <div className="text-slate-300">Window Location: {location}</div>
+      <div className="text-slate-100">NODE_ENV: {nodeEnv}</div>
+      <div className="text-slate-100">Is Client: {String(mounted)}</div>
+      <div className="text-slate-100">Is Development: {String(isDev)}</div>
+      <div className="text-slate-100">Window Location: {location}</div>
     </DevToolsSection>
   );
 };
@@ -132,6 +132,7 @@ export const DevToolsPanel = () => {
                   State Management
                 </h3>
                 <StateSection defaultCollapsed={true} />
+                <StateInspectorSection defaultCollapsed={true} />
               </div>
             </div>
             
