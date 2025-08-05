@@ -58,7 +58,7 @@ export const StateSection = ({ defaultCollapsed = false }: StateSectionProps) =>
       ))}
       
       {Object.keys(storeStates).length === 0 && (
-        <div className="text-sm text-gray-500 italic">
+        <div className="text-sm text-slate-200 italic">
           No stores available
         </div>
       )}

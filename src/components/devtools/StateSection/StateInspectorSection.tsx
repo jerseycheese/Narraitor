@@ -190,7 +190,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         <div className="space-y-2">
           {/* Path Input */}
           <div>
-            <label className="text-xs font-medium text-slate-300 block mb-1">
+            <label className="text-xs font-medium text-slate-100 block mb-1">
               Path:
             </label>
             <input
@@ -198,7 +198,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               value={selectedPath}
               onChange={(e) => handlePathNavigation(e.target.value)}
               placeholder="e.g., worldStore.entities"
-              className="w-full px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded"
+              className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100 placeholder-slate-400"
               data-testid="path-input"
             />
           </div>
@@ -206,13 +206,13 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Breadcrumbs */}
           {breadcrumbs.length > 0 && (
             <div className="text-xs">
-              <span className="text-slate-400">Breadcrumbs: </span>
+              <span className="text-slate-200">Breadcrumbs: </span>
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb.path}>
-                  {index > 0 && <span className="text-slate-500"> &gt; </span>}
+                  {index > 0 && <span className="text-slate-400"> &gt; </span>}
                   <button
                     onClick={() => handlePathNavigation(crumb.path)}
-                    className="text-blue-400 hover:text-blue-300 underline"
+                    className="text-blue-300 hover:text-blue-200 underline"
                     data-testid={`breadcrumb-${index}`}
                   >
                     {crumb.label}
@@ -224,16 +224,16 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
 
           {/* Path Metadata */}
           {pathMetadata && pathValue !== null && (
-            <div className="text-xs bg-slate-700 p-2 rounded border border-slate-600">
+            <div className="text-xs bg-slate-800 p-2 rounded border border-slate-600 text-slate-100">
               {(() => {
                 const typeInfo = getValueTypeInfo(pathValue);
                 return (
                   <>
-                    <div><strong>Type:</strong> {pathMetadata.type} {typeInfo.constructor && `(${typeInfo.constructor})`}</div>
-                    <div><strong>Depth:</strong> {pathMetadata.depth}</div>
-                    <div><strong>Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
-                    <div><strong>Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
-                    {typeInfo.isArray && <div><strong>Array Length:</strong> {(pathValue as unknown[]).length}</div>}
+                    <div><strong className="text-slate-50">Type:</strong> {pathMetadata.type} {typeInfo.constructor && `(${typeInfo.constructor})`}</div>
+                    <div><strong className="text-slate-50">Depth:</strong> {pathMetadata.depth}</div>
+                    <div><strong className="text-slate-50">Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
+                    <div><strong className="text-slate-50">Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
+                    {typeInfo.isArray && <div><strong className="text-slate-50">Array Length:</strong> {(pathValue as unknown[]).length}</div>}
                   </>
                 );
               })()}
@@ -256,21 +256,21 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Path Value */}
           {pathValue !== null && (
             <div>
-              <div className="text-xs font-medium text-slate-300 mb-1">Value:</div>
-              <JsonViewer data={pathValue} className="bg-slate-700 border border-slate-600" />
+              <div className="text-xs font-medium text-slate-100 mb-1">Value:</div>
+              <JsonViewer data={pathValue} className="bg-slate-800 border border-slate-600" />
             </div>
           )}
 
           {/* Child Paths */}
           {childPaths.length > 0 && (
             <div>
-              <div className="text-xs font-medium text-slate-300 mb-1">Child Paths:</div>
+              <div className="text-xs font-medium text-slate-100 mb-1">Child Paths:</div>
               <div className="max-h-32 overflow-y-auto">
                 {childPaths.map((childPath) => (
                   <button
                     key={childPath}
                     onClick={() => handlePathNavigation(childPath)}
-                    className="block w-full text-left text-xs text-blue-400 hover:text-blue-300 hover:bg-slate-700 px-2 py-1 rounded"
+                    className="block w-full text-left text-xs text-blue-300 hover:text-blue-200 hover:bg-slate-700 px-2 py-1 rounded"
                     data-testid={`child-path-${childPath.split('.').pop()}`}
                   >
                     {childPath}
@@ -291,11 +291,11 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         >
           <div className="space-y-1">
             {Array.from(watchedPaths).map((path) => (
-              <div key={path} className="flex justify-between items-center text-xs bg-slate-700 p-2 rounded">
-                <span className="text-slate-200">{path}</span>
+              <div key={path} className="flex justify-between items-center text-xs bg-slate-800 p-2 rounded">
+                <span className="text-slate-100">{path}</span>
                 <button
                   onClick={() => togglePathWatch(path)}
-                  className="text-red-400 hover:text-red-300 text-xs"
+                  className="text-red-300 hover:text-red-200 text-xs"
                   data-testid={`unwatch-${path}`}
                 >
                   ✕
@@ -315,23 +315,23 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         >
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {changeNotifications.slice().reverse().map((notification) => (
-              <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-slate-700 p-2 rounded border border-slate-600">
-                <div className="font-medium text-yellow-400">{notification.path}</div>
-                <div className="text-slate-300 space-y-1">
+              <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-slate-800 p-2 rounded border border-slate-600">
+                <div className="font-medium text-yellow-300">{notification.path}</div>
+                <div className="text-slate-100 space-y-1">
                   <div className="flex items-start space-x-2">
-                    <span className="text-red-400 font-medium">Old:</span>
-                    <span className="font-mono text-xs bg-slate-800 px-1 rounded">
+                    <span className="text-red-300 font-medium">Old:</span>
+                    <span className="font-mono text-xs bg-slate-900 px-1 rounded text-slate-200">
                       {formatForDebug(notification.oldValue, { compact: true, maxStringLength: 50 })}
                     </span>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <span className="text-green-400 font-medium">New:</span>
-                    <span className="font-mono text-xs bg-slate-800 px-1 rounded">
+                    <span className="text-green-300 font-medium">New:</span>
+                    <span className="font-mono text-xs bg-slate-900 px-1 rounded text-slate-200">
                       {formatForDebug(notification.newValue, { compact: true, maxStringLength: 50 })}
                     </span>
                   </div>
                 </div>
-                <div className="text-slate-400 text-xs mt-1">
+                <div className="text-slate-300 text-xs mt-1">
                   {new Date(notification.timestamp).toLocaleTimeString()}
                 </div>
               </div>
