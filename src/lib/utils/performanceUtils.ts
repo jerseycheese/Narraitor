@@ -39,19 +39,6 @@ export interface PerformanceOptions {
 }
 
 /**
- * Format duration in human-readable format
- */
-export function formatDuration(ms: number): string {
-  if (ms < 1) {
-    return `${(ms * 1000).toFixed(2)}μs`;
-  } else if (ms < 1000) {
-    return `${ms.toFixed(2)}ms`;
-  } else {
-    return `${(ms / 1000).toFixed(2)}s`;
-  }
-}
-
-/**
  * Class-based timer for manual performance timing
  */
 export class PerformanceTimer {
