@@ -7,6 +7,7 @@ import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
+import { validateWorld } from '../types/type-guards';
 
 /**
  * World store interface with state and actions
@@ -450,7 +451,22 @@ export const useWorldStore = create<WorldStore>()(
       // - Add validation of migrated data
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
-        // Simple migration for MVP - just return the state as WorldState
+        // Validate persisted worlds before restoring
+        if (persistedState && typeof persistedState === 'object' && 'worlds' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.worlds && typeof state.worlds === 'object') {
+            // Validate each world in storage
+            for (const [worldId, world] of Object.entries(state.worlds)) {
+              const validation = validateWorld(world);
+              if (!validation.valid) {
+                console.warn(`Invalid world data in storage for ${worldId}:`, validation.errors[0]);
+                // Remove invalid world to prevent crashes
+                delete state.worlds[worldId];
+              }
+            }
+          }
+        }
         return persistedState as WorldStore;
       }
     }
