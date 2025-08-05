@@ -39,6 +39,19 @@ export interface PerformanceOptions {
 }
 
 /**
+ * Format duration in human-readable format
+ */
+export function formatDuration(ms: number): string {
+  if (ms < 1) {
+    return `${(ms * 1000).toFixed(2)}μs`;
+  } else if (ms < 1000) {
+    return `${ms.toFixed(2)}ms`;
+  } else {
+    return `${(ms / 1000).toFixed(2)}s`;
+  }
+}
+
+/**
  * Class-based timer for manual performance timing
  */
 export class PerformanceTimer {
@@ -74,7 +87,7 @@ export class PerformanceTimer {
     // Log if in development environment
     if (process.env.NODE_ENV !== 'production') {
       const contextStr = this.context ? ` [${this.context}]` : '';
-      logger.debug(`${this.name}${contextStr}: ${this.formatDuration(duration)}`);
+      logger.debug(`${this.name}${contextStr}: ${formatDuration(duration)}`);
     }
     
     return duration;
@@ -108,15 +121,6 @@ export class PerformanceTimer {
     return this.endTime - this.startTime;
   }
 
-  private formatDuration(ms: number): string {
-    if (ms < 1) {
-      return `${(ms * 1000).toFixed(2)}μs`;
-    } else if (ms < 1000) {
-      return `${ms.toFixed(2)}ms`;
-    } else {
-      return `${(ms / 1000).toFixed(2)}s`;
-    }
-  }
 }
 
 /**
@@ -146,7 +150,7 @@ export function measureTime<T extends (...args: unknown[]) => unknown>(
       // Log if threshold exceeded or logging enabled
       if (options.logResult || (options.threshold && duration > options.threshold)) {
         const contextStr = options.context ? ` [${options.context}]` : '';
-        logger.info(`${name}${contextStr}: ${timer['formatDuration'](duration)}`);
+        logger.info(`${name}${contextStr}: ${formatDuration(duration)}`);
       }
     }
     
@@ -182,7 +186,7 @@ export function measureAsync<T extends (...args: unknown[]) => Promise<unknown>>
         // Log if threshold exceeded or logging enabled
         if (options.logResult || (options.threshold && duration > options.threshold)) {
           const contextStr = options.context ? ` [${options.context}]` : '';
-          logger.info(`${name}${contextStr}: ${timer['formatDuration'](duration)}`);
+          logger.info(`${name}${contextStr}: ${formatDuration(duration)}`);
         }
       }
       
@@ -258,7 +262,7 @@ export class PerformanceGroup {
         // Log if threshold exceeded or logging enabled
         if (options.logResult || (options.threshold && duration > options.threshold)) {
           const contextStr = options.context || this.name;
-          logger.info(`${measurementName} [${contextStr}]: ${timer['formatDuration'](duration)}`);
+          logger.info(`${measurementName} [${contextStr}]: ${formatDuration(duration)}`);
         }
       }
       
@@ -302,7 +306,7 @@ export class PerformanceGroup {
           // Log if threshold exceeded or logging enabled
           if (options.logResult || (options.threshold && duration > options.threshold)) {
             const contextStr = options.context || this.name;
-            logger.info(`${measurementName} [${contextStr}]: ${timer['formatDuration'](duration)}`);
+            logger.info(`${measurementName} [${contextStr}]: ${formatDuration(duration)}`);
           }
         }
         
