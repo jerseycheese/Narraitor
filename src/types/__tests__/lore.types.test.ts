@@ -16,30 +16,30 @@ describe('Lore Types', () => {
       const loreFact: LoreFact = {
         id: 'fact-1',
         category: 'characters',
-        title: 'Test Character Background',
-        content: 'Character has a mysterious past',
+        key: 'Test Character Background',
+        value: 'Character has a mysterious past',
         source: 'manual',
-        tags: ['mystery', 'background'],
-        isCanonical: true,
-        relatedFacts: [],
         worldId: 'world-1',
         createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: '2023-01-01T00:00:00Z'
+        updatedAt: '2023-01-01T00:00:00Z',
+        metadata: {
+          tags: ['mystery', 'background'],
+          importance: 'high'
+        }
       };
 
       expect(loreFact.id).toBe('fact-1');
       expect(loreFact.category).toBe('characters');
-      expect(loreFact.title).toBe('Test Character Background');
-      expect(loreFact.content).toBe('Character has a mysterious past');
+      expect(loreFact.key).toBe('Test Character Background');
+      expect(loreFact.value).toBe('Character has a mysterious past');
       expect(loreFact.source).toBe('manual');
-      expect(loreFact.tags).toEqual(['mystery', 'background']);
-      expect(loreFact.isCanonical).toBe(true);
+      expect(loreFact.metadata?.tags).toEqual(['mystery', 'background']);
       expect(loreFact.worldId).toBe('world-1');
     });
 
     test('should support all category types', () => {
       const categories: LoreCategory[] = [
-        'characters', 'locations', 'events', 'rules', 'items', 'organizations'
+        'characters', 'locations', 'events', 'rules'
       ];
 
       categories.forEach(category => {
@@ -50,7 +50,7 @@ describe('Lore Types', () => {
 
     test('should support all source types', () => {
       const sources: LoreSource[] = [
-        'narrative', 'manual', 'ai_generated', 'imported'
+        'narrative', 'manual'
       ];
 
       sources.forEach(source => {
@@ -64,19 +64,13 @@ describe('Lore Types', () => {
     test('should support all filter options', () => {
       const searchOptions: LoreSearchOptions = {
         category: 'characters',
-        tags: ['important', 'plot'],
-        source: 'narrative',
-        searchTerm: 'dragon',
         worldId: 'world-1',
-        isCanonical: true
+        sessionId: 'session-1'
       };
 
       expect(searchOptions.category).toBe('characters');
-      expect(searchOptions.tags).toEqual(['important', 'plot']);
-      expect(searchOptions.source).toBe('narrative');
-      expect(searchOptions.searchTerm).toBe('dragon');
       expect(searchOptions.worldId).toBe('world-1');
-      expect(searchOptions.isCanonical).toBe(true);
+      expect(searchOptions.sessionId).toBe('session-1');
     });
 
     test('should allow partial search options', () => {
@@ -85,36 +79,20 @@ describe('Lore Types', () => {
       };
 
       expect(partialSearch.category).toBe('locations');
-      expect(partialSearch.tags).toBeUndefined();
-      expect(partialSearch.searchTerm).toBeUndefined();
+      expect(partialSearch.worldId).toBeUndefined();
+      expect(partialSearch.sessionId).toBeUndefined();
     });
   });
 
   describe('LoreContext', () => {
     test('should structure AI context data', () => {
-      const mockFact: LoreFact = {
-        id: 'fact-1',
-        category: 'characters',
-        title: 'Hero Origin',
-        content: 'The hero was born in the northern mountains',
-        source: 'narrative',
-        tags: ['hero', 'origin'],
-        isCanonical: true,
-        relatedFacts: [],
-        worldId: 'world-1',
-        createdAt: '2023-01-01T00:00:00Z',
-        updatedAt: '2023-01-01T00:00:00Z'
-      };
-
       const loreContext: LoreContext = {
-        relevantFacts: [mockFact],
-        contextSummary: 'Hero background and origin story',
+        facts: ['Hero Origin: The hero was born in the northern mountains'],
         factCount: 1
       };
 
-      expect(loreContext.relevantFacts).toHaveLength(1);
-      expect(loreContext.relevantFacts[0]).toBe(mockFact);
-      expect(loreContext.contextSummary).toBe('Hero background and origin story');
+      expect(loreContext.facts).toHaveLength(1);
+      expect(loreContext.facts[0]).toBe('Hero Origin: The hero was born in the northern mountains');
       expect(loreContext.factCount).toBe(1);
     });
   });

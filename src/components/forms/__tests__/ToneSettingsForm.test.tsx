@@ -16,8 +16,8 @@ jest.mock('@/lib/utils', () => ({
       description
     }))
   ),
-  createFormUpdater: jest.fn((state, onChange) => ({
-    updateField: (field, value) => onChange({ ...state, [field]: value }),
+  createFormUpdater: jest.fn((state: Record<string, unknown>, onChange: (updated: Record<string, unknown>) => void) => ({
+    updateField: (field: string, value: unknown) => onChange({ ...state, [field]: value }),
   })),
 }));
 

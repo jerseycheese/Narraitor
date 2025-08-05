@@ -65,9 +65,9 @@ jest.mock('../../../../lib/utils/textNormalization', () => ({
     };
   }),
   
-  analyzeText: jest.fn((text) => ({
+  analyzeText: jest.fn((text: string) => ({
     characters: text?.length || 0,
-    words: text?.split(/\s+/).filter(w => w.length > 0).length || 0,
+    words: text?.split(/\s+/).filter((w: string) => w.length > 0).length || 0,
     lines: text?.split('\n').length || 0,
     paragraphs: text?.split(/\n\n/).length || 0,
     lineEndingFormat: 'unix' as const,
@@ -75,7 +75,7 @@ jest.mock('../../../../lib/utils/textNormalization', () => ({
     hasSmartQuotes: /[""'']/.test(text || '')
   })),
   
-  getWhitespaceStats: jest.fn((text) => ({
+  getWhitespaceStats: jest.fn((text: string) => ({
     leading: (text?.match(/^\s*/) || [''])[0].length,
     trailing: (text?.match(/\s*$/) || [''])[0].length,
     excessiveSpaces: (text?.match(/\s{2,}/g) || []).length,
@@ -155,7 +155,7 @@ describe('TextNormalizationSection', () => {
       const whitespaceButton = screen.getByText('whitespace');
       await user.click(whitespaceButton);
       
-      const input = screen.getByPlaceholderText('Enter text to normalize...');
+      const input = screen.getByPlaceholderText('Enter text to normalize...') as HTMLInputElement;
       expect(input.value).toBeTruthy();
     });
   });

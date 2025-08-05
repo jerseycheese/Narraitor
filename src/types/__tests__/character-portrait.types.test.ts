@@ -69,9 +69,10 @@ describe('Character Portrait Types', () => {
           relationships: []
         },
         inventory: {
+          characterId: 'char-1',
           items: [],
-          maxWeight: 100,
-          currentWeight: 0
+          capacity: 100,
+          categories: []
         },
         status: {
           health: 100,
