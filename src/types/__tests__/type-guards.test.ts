@@ -23,6 +23,7 @@ describe('Type Guards', () => {
     const validWorld = {
       id: 'world-1',
       name: 'Test World',
+      description: 'A test world for validation',
       genre: 'fantasy',
       attributes: [],
       skills: [],
