@@ -1,28 +1,30 @@
 // src/types/__tests__/type-guards.test.ts
 import { 
-  isWorld, 
-  isCharacter, 
+  validateWorld, 
+  validateCharacter, 
   isInventoryItem,
   isNarrativeSegment,
   isJournalEntry 
 } from '../type-guards';
 
 describe('Type Guards', () => {
-  test('all type guards should return false for falsy values', () => {
+  test('all validation functions should return invalid for falsy values', () => {
     const falsyValues = [null, undefined, false, 0, '', NaN];
     
     falsyValues.forEach(value => {
-      expect(isWorld(value)).toBe(false);
-      expect(isCharacter(value)).toBe(false);
+      expect(validateWorld(value).valid).toBe(false);
+      expect(validateCharacter(value).valid).toBe(false);
       expect(isInventoryItem(value)).toBe(false);
       expect(isNarrativeSegment(value)).toBe(false);
       expect(isJournalEntry(value)).toBe(false);
     });
   });
-  test('isWorld should correctly identify World objects', () => {
+  
+  test('validateWorld should correctly validate World objects', () => {
     const validWorld = {
       id: 'world-1',
       name: 'Test World',
+      description: 'A test world for validation',
       genre: 'fantasy',
       attributes: [],
       skills: [],
@@ -42,11 +44,12 @@ describe('Type Guards', () => {
       // Missing required fields
     };
 
-    expect(isWorld(validWorld)).toBe(true);
-    expect(isWorld(invalidWorld)).toBe(false);
+    expect(validateWorld(validWorld).valid).toBe(true);
+    expect(validateWorld(invalidWorld).valid).toBe(false);
+    expect(validateWorld(invalidWorld).errors.length).toBeGreaterThan(0);
   });
 
-  test('isCharacter should correctly identify Character objects', () => {
+  test('validateCharacter should correctly validate Character objects', () => {
     const validCharacter = {
       id: 'char-1',
       worldId: 'world-1',
@@ -81,8 +84,9 @@ describe('Type Guards', () => {
       // Missing required fields
     };
 
-    expect(isCharacter(validCharacter)).toBe(true);
-    expect(isCharacter(invalidCharacter)).toBe(false);
+    expect(validateCharacter(validCharacter).valid).toBe(true);
+    expect(validateCharacter(invalidCharacter).valid).toBe(false);
+    expect(validateCharacter(invalidCharacter).errors.length).toBeGreaterThan(0);
   });
 
   test('isInventoryItem should correctly identify InventoryItem objects', () => {

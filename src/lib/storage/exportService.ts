@@ -11,6 +11,7 @@ import { useCharacterStore } from '../../state/characterStore';
 import { useSessionStore } from '../../state/sessionStore';
 import { useJournalStore } from '../../state/journalStore';
 import { useNarrativeStore } from '../../state/narrativeStore';
+import { validateWorld } from '../../types/type-guards';
 
 
 export interface GameStateExport {
@@ -188,6 +189,23 @@ export class ExportService {
     for (const field of requiredFields) {
       if (!state[field]) {
         return { valid: false, error: 'Invalid game state format' };
+      }
+    }
+
+    // Validate world data if present
+    if (state.worldState && typeof state.worldState === 'object') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const worldState = state.worldState as any;
+      if (worldState.worlds && typeof worldState.worlds === 'object') {
+        for (const [worldId, worldData] of Object.entries(worldState.worlds)) {
+          const validation = validateWorld(worldData);
+          if (!validation.valid) {
+            return { 
+              valid: false, 
+              error: `Invalid world data for ${worldId}: ${validation.errors[0]}` 
+            };
+          }
+        }
       }
     }
 

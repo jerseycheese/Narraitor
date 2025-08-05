@@ -7,6 +7,7 @@ import { createIndexedDBStorage } from './persistence';
 import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.types';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
+import { validateWorld } from '../types/type-guards';
 
 /**
  * World store interface with state and actions
@@ -450,7 +451,41 @@ export const useWorldStore = create<WorldStore>()(
       // - Add validation of migrated data
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
-        // Simple migration for MVP - just return the state as WorldState
+        // Validate persisted worlds before restoring
+        if (persistedState && typeof persistedState === 'object' && 'worlds' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.worlds && typeof state.worlds === 'object') {
+            // Validate each world in storage
+            const invalidWorlds: Record<string, unknown> = {};
+            for (const [worldId, world] of Object.entries(state.worlds)) {
+              const validation = validateWorld(world);
+              if (!validation.valid) {
+                console.warn(`Invalid world data in storage for ${worldId}:`, validation.errors[0]);
+                // Backup invalid world before removal
+                invalidWorlds[worldId] = world;
+                // Remove invalid world to prevent crashes
+                delete state.worlds[worldId];
+              }
+            }
+            
+            // If any invalid worlds, backup to localStorage and set error state
+            if (Object.keys(invalidWorlds).length > 0) {
+              try {
+                if (typeof window !== 'undefined' && window.localStorage) {
+                  window.localStorage.setItem(
+                    'narraitor-world-store-backup-invalid-worlds',
+                    JSON.stringify(invalidWorlds)
+                  );
+                }
+              } catch (e) {
+                console.error('Failed to backup invalid worlds:', e);
+              }
+              // Set error state to notify user
+              state.error = `${Object.keys(invalidWorlds).length} invalid world(s) were found and removed to prevent crashes. A backup has been saved. Please check the console for details.`;
+            }
+          }
+        }
         return persistedState as WorldStore;
       }
     }
