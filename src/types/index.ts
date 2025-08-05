@@ -58,10 +58,10 @@ export type {
   TestScenario
 } from './ai-testing.types';
 
-// Export type guards
+// Export validation functions and remaining type guards
 export { 
-  isWorld, 
-  isCharacter, 
+  validateWorld,
+  validateCharacter,
   isInventoryItem, 
   isNarrativeSegment, 
   isJournalEntry 

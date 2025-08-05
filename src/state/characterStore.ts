@@ -368,7 +368,27 @@ export const useCharacterStore = create<CharacterStore>()(
       // - Add validation of migrated data
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
-        // Simple migration for MVP - just return the state as CharacterState
+        // Validate persisted characters before restoring
+        if (persistedState && typeof persistedState === 'object' && 'characters' in persistedState) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const state = persistedState as any;
+          if (state.characters && typeof state.characters === 'object') {
+            // Validate each character in storage has required properties
+            for (const [characterId, character] of Object.entries(state.characters)) {
+              if (!character || typeof character !== 'object') {
+                console.warn(`Invalid character data in storage for ${characterId}: not an object`);
+                delete state.characters[characterId];
+                continue;
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const char = character as any;
+              if (!char.id || !char.name || !char.worldId || !char.createdAt) {
+                console.warn(`Invalid character data in storage for ${characterId}: missing required fields`);
+                delete state.characters[characterId];
+              }
+            }
+          }
+        }
         return persistedState as CharacterStore;
       }
     }
