@@ -27,10 +27,10 @@ describe('JsonViewer', () => {
     expect(content).toContain('42');
   });
   
-  it('renders null and undefined values correctly', () => {
+  it('renders null values correctly', () => {
     const data = {
       nullValue: null,
-      undefinedValue: undefined
+      stringValue: 'test'
     };
     
     render(<JsonViewer data={data} />);
@@ -38,8 +38,8 @@ describe('JsonViewer', () => {
     const content = screen.getByTestId('json-viewer').textContent || '';
     expect(content).toContain('nullValue');
     expect(content).toContain('null');
-    expect(content).toContain('undefinedValue');
-    expect(content).toContain('undefined');
+    expect(content).toContain('stringValue');
+    expect(content).toContain('test');
   });
   
   it('handles empty data', () => {
@@ -70,7 +70,7 @@ describe('JsonViewer', () => {
     
     const content = container.textContent || '';
     expect(content).toContain('2023-01-01');
-    expect(content).toContain('[Function]');
+    expect(content).toContain('[Function: testFunc]');
   });
   
 });

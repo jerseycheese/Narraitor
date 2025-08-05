@@ -98,8 +98,8 @@ function syntaxHighlight(json: string): string {
           }
         } else if (/true|false/.test(match)) {
           cls = 'color: #fbbf24;'; // boolean - amber-400
-        } else if (/null|undefined|\[Circular Reference\]|\[Function\]/.test(match)) {
-          cls = 'color: #94a3b8;'; // null, undefined, circular ref - slate-400
+        } else if (/null|undefined|\[Circular Reference\]|\[Function[^\]]*\]/.test(match)) {
+          cls = 'color: #94a3b8;'; // null, undefined, circular ref, functions - slate-400
         }
         return `<span style="${cls}">${match}</span>`;
       }
