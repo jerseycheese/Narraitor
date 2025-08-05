@@ -12,7 +12,43 @@ import { normalizeText } from '../lib/utils/textNormalization';
 import { ValidationResult } from '../lib/utils/validationUtils';
 
 /**
- * Type guard for World objects with comprehensive validation
+ * Type guard for World objects with comprehensive validation.
+ * 
+ * Validates that an unknown object conforms to the World interface structure.
+ * Supports both full validation and partial validation for incomplete objects.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns True if the object is a valid World, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Full validation (all properties required)
+ * const completeWorld = {
+ *   id: 'world-1',
+ *   name: 'Fantasy Realm',
+ *   description: 'A magical world',
+ *   genre: 'fantasy',
+ *   attributes: [],
+ *   skills: [],
+ *   settings: { maxAttributes: 6, maxSkills: 8, attributePointPool: 27, skillPointPool: 20 },
+ *   createdAt: '2025-01-13T10:00:00Z',
+ *   updatedAt: '2025-01-13T10:00:00Z'
+ * };
+ * 
+ * if (isWorld(completeWorld)) {
+ *   // TypeScript now knows this is a World
+ *   console.log(completeWorld.name); // Safe to access
+ * }
+ * 
+ * // Partial validation (only validate present properties)
+ * const partialWorld = { id: 'world-1', name: 'Test World' };
+ * if (isWorld(partialWorld, { partial: true })) {
+ *   // Only validates the properties that are present
+ *   console.log(partialWorld.name);
+ * }
+ * ```
  */
 export function isWorld(obj: unknown, options?: { partial?: boolean }): obj is World {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -54,7 +90,37 @@ export function isWorld(obj: unknown, options?: { partial?: boolean }): obj is W
 }
 
 /**
- * ValidationResult-based World validation with detailed error messages
+ * ValidationResult-based World validation with detailed error messages.
+ * 
+ * Provides comprehensive validation with specific error messages for debugging.
+ * Returns a ValidationResult object containing validation status and detailed error descriptions.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidWorld = { id: 'world-1' }; // Missing required properties
+ * const result = validateWorld(invalidWorld);
+ * 
+ * if (!result.valid) {
+ *   console.log('Validation errors:');
+ *   result.errors.forEach(error => console.log(`- ${error}`));
+ *   // Output:
+ *   // - Property "name" must be a string
+ *   // - Property "description" must be a string
+ *   // - Property "genre" must be a string
+ *   // - etc.
+ * }
+ * 
+ * // Partial validation for form validation
+ * const partialResult = validateWorld({ name: 'Test' }, { partial: true });
+ * if (partialResult.valid) {
+ *   console.log('Partial validation passed');
+ * }
+ * ```
  */
 export function validateWorld(obj: unknown, options?: { partial?: boolean }): ValidationResult {
   const errors: string[] = [];
@@ -155,7 +221,52 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
 }
 
 /**
- * Type guard for Character objects with comprehensive validation
+ * Type guard for Character objects with comprehensive validation.
+ * 
+ * Validates that an unknown object conforms to the Character interface structure.
+ * Supports both full validation and partial validation for form inputs or incomplete data.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns True if the object is a valid Character, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Full character validation
+ * const character = {
+ *   id: 'char-1',
+ *   worldId: 'world-1',
+ *   name: 'Hero',
+ *   attributes: [],
+ *   skills: [],
+ *   background: {
+ *     history: 'Born in a small village',
+ *     personality: 'Brave and kind',
+ *     goals: ['Save the kingdom'],
+ *     fears: ['Dark magic'],
+ *     relationships: []
+ *   },
+ *   inventory: {},
+ *   status: {
+ *     health: 100,
+ *     maxHealth: 100,
+ *     conditions: []
+ *   },
+ *   createdAt: '2025-01-13T10:00:00Z',
+ *   updatedAt: '2025-01-13T10:00:00Z'
+ * };
+ * 
+ * if (isCharacter(character)) {
+ *   console.log(`Character: ${character.name}`);
+ * }
+ * 
+ * // Partial validation for character creation form
+ * const formData = { name: 'New Hero', worldId: 'world-1' };
+ * if (isCharacter(formData, { partial: true })) {
+ *   // Valid for form submission
+ * }
+ * ```
  */
 export function isCharacter(obj: unknown, options?: { partial?: boolean }): obj is Character {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -196,7 +307,36 @@ export function isCharacter(obj: unknown, options?: { partial?: boolean }): obj 
 }
 
 /**
- * ValidationResult-based Character validation with detailed error messages
+ * ValidationResult-based Character validation with detailed error messages.
+ * 
+ * Provides comprehensive validation with specific error messages for debugging character data.
+ * Particularly useful for form validation and data import processes.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidCharacter = {
+ *   id: 'char-1',
+ *   worldId: 'world-1',
+ *   name: 'Hero',
+ *   attributes: 'invalid', // Should be array
+ *   background: 'invalid'  // Should be object
+ * };
+ * 
+ * const result = validateCharacter(invalidCharacter);
+ * if (!result.valid) {
+ *   result.errors.forEach(error => {
+ *     console.log(`Character validation error: ${error}`);
+ *   });
+ *   // Output includes specific nested validation errors:
+ *   // - Property "attributes" must be an array
+ *   // - CharacterBackground: Expected object, got string
+ * }
+ * ```
  */
 export function validateCharacter(obj: unknown, options?: { partial?: boolean }): ValidationResult {
   const errors: string[] = [];
@@ -462,7 +602,31 @@ export function isSafeStringArray(value: unknown, maxItems: number = 10, maxLeng
 // Domain-specific type guards
 
 /**
- * Type guard for WorldAttribute objects
+ * Type guard for WorldAttribute objects.
+ * 
+ * Validates that an object conforms to the WorldAttribute interface,
+ * including range validation for numeric values.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid WorldAttribute, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const attribute = {
+ *   id: 'attr-1',
+ *   name: 'Strength',
+ *   worldId: 'world-1',
+ *   description: 'Physical power',
+ *   baseValue: 10,
+ *   minValue: 1,
+ *   maxValue: 20
+ * };
+ * 
+ * if (isWorldAttribute(attribute)) {
+ *   // TypeScript knows this is a WorldAttribute
+ *   console.log(`${attribute.name}: ${attribute.baseValue}`);
+ * }
+ * ```
  */
 export function isWorldAttribute(obj: unknown): obj is WorldAttribute {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -483,7 +647,30 @@ export function isWorldAttribute(obj: unknown): obj is WorldAttribute {
 }
 
 /**
- * ValidationResult-based WorldAttribute validation
+ * ValidationResult-based WorldAttribute validation with detailed error messages.
+ * 
+ * Validates WorldAttribute objects with comprehensive range checking and
+ * provides specific error messages for each validation failure.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidAttribute = {
+ *   id: 'attr-1',
+ *   name: 'Strength',
+ *   baseValue: 25, // Exceeds maxValue
+ *   minValue: 10,
+ *   maxValue: 20
+ * };
+ * 
+ * const result = validateWorldAttribute(invalidAttribute);
+ * if (!result.valid) {
+ *   // Will include: "Property baseValue must be less than or equal to maxValue"
+ *   console.log(result.errors);
+ * }
+ * ```
  */
 export function validateWorldAttribute(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -524,7 +711,32 @@ export function validateWorldAttribute(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for WorldSkill objects
+ * Type guard for WorldSkill objects.
+ * 
+ * Validates that an object conforms to the WorldSkill interface,
+ * including difficulty level validation and range checking.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid WorldSkill, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const skill = {
+ *   id: 'skill-1',
+ *   name: 'Sword Fighting',
+ *   worldId: 'world-1',
+ *   description: 'Combat with bladed weapons',
+ *   difficulty: 'medium',
+ *   baseValue: 5,
+ *   minValue: 0,
+ *   maxValue: 10,
+ *   attributeIds: ['strength', 'dexterity']
+ * };
+ * 
+ * if (isWorldSkill(skill)) {
+ *   console.log(`${skill.name} (${skill.difficulty})`);
+ * }
+ * ```
  */
 export function isWorldSkill(obj: unknown): obj is WorldSkill {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -549,7 +761,25 @@ export function isWorldSkill(obj: unknown): obj is WorldSkill {
 }
 
 /**
- * ValidationResult-based WorldSkill validation
+ * ValidationResult-based WorldSkill validation with detailed error messages.
+ * 
+ * Validates WorldSkill objects including difficulty enum validation
+ * and numeric range checking.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidSkill = {
+ *   id: 'skill-1',
+ *   difficulty: 'invalid-level', // Must be 'easy', 'medium', 'hard', or 'expert'
+ *   baseValue: -5 // Must be non-negative
+ * };
+ * 
+ * const result = validateWorldSkill(invalidSkill);
+ * // result.errors will include specific validation failures
+ * ```
  */
 export function validateWorldSkill(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -590,7 +820,27 @@ export function validateWorldSkill(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for WorldSettings objects
+ * Type guard for WorldSettings objects.
+ * 
+ * Validates that an object conforms to the WorldSettings interface,
+ * ensuring all numeric values are positive.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid WorldSettings, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const settings = {
+ *   maxAttributes: 6,
+ *   maxSkills: 8,
+ *   attributePointPool: 27,
+ *   skillPointPool: 20
+ * };
+ * 
+ * if (isWorldSettings(settings)) {
+ *   console.log(`Max attributes: ${settings.maxAttributes}`);
+ * }
+ * ```
  */
 export function isWorldSettings(obj: unknown): obj is WorldSettings {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -609,7 +859,26 @@ export function isWorldSettings(obj: unknown): obj is WorldSettings {
 }
 
 /**
- * ValidationResult-based WorldSettings validation
+ * ValidationResult-based WorldSettings validation with detailed error messages.
+ * 
+ * Validates WorldSettings objects with positive number requirements.
+ * Supports partial validation for form inputs.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidSettings = {
+ *   maxAttributes: -1, // Must be positive
+ *   maxSkills: 0       // Must be greater than 0
+ * };
+ * 
+ * const result = validateWorldSettings(invalidSettings);
+ * // result.errors will include specific positive number requirements
+ * ```
  */
 export function validateWorldSettings(obj: unknown, options?: { partial?: boolean }): ValidationResult {
   const errors: string[] = [];
@@ -690,7 +959,29 @@ export function validateWorldSettings(obj: unknown, options?: { partial?: boolea
 }
 
 /**
- * Type guard for WorldImage objects
+ * Type guard for WorldImage objects.
+ * 
+ * Validates that an object conforms to the WorldImage interface,
+ * including type validation and optional property handling.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid WorldImage, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const image = {
+ *   type: 'ai-generated',
+ *   url: 'https://example.com/image.jpg',
+ *   generatedAt: '2025-01-13T10:00:00Z',
+ *   prompt: 'A fantasy castle'
+ * };
+ * 
+ * if (isWorldImage(image)) {
+ *   if (image.url) {
+ *     console.log(`Image URL: ${image.url}`);
+ *   }
+ * }
+ * ```
  */
 export function isWorldImage(obj: unknown): obj is WorldImage {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -705,7 +996,24 @@ export function isWorldImage(obj: unknown): obj is WorldImage {
 }
 
 /**
- * ValidationResult-based WorldImage validation
+ * ValidationResult-based WorldImage validation with detailed error messages.
+ * 
+ * Validates WorldImage objects including type enum validation
+ * and optional property type checking.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidImage = {
+ *   type: 'invalid-type', // Must be 'ai-generated' or 'placeholder'
+ *   url: 123            // Must be string or null
+ * };
+ * 
+ * const result = validateWorldImage(invalidImage);
+ * // result.errors will include type validation failures
+ * ```
  */
 export function validateWorldImage(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -743,7 +1051,25 @@ export function validateWorldImage(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for CharacterAttribute objects
+ * Type guard for CharacterAttribute objects.
+ * 
+ * Validates that an object conforms to the CharacterAttribute interface,
+ * ensuring the value is non-negative.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterAttribute, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const charAttribute = {
+ *   attributeId: 'strength',
+ *   value: 15
+ * };
+ * 
+ * if (isCharacterAttribute(charAttribute)) {
+ *   console.log(`Attribute value: ${charAttribute.value}`);
+ * }
+ * ```
  */
 export function isCharacterAttribute(obj: unknown): obj is CharacterAttribute {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -757,7 +1083,23 @@ export function isCharacterAttribute(obj: unknown): obj is CharacterAttribute {
 }
 
 /**
- * ValidationResult-based CharacterAttribute validation
+ * ValidationResult-based CharacterAttribute validation with detailed error messages.
+ * 
+ * Validates CharacterAttribute objects with non-negative value requirements.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidAttribute = {
+ *   attributeId: 'strength',
+ *   value: -5 // Must be non-negative
+ * };
+ * 
+ * const result = validateCharacterAttribute(invalidAttribute);
+ * // result.errors will include: "Property value must be non-negative"
+ * ```
  */
 export function validateCharacterAttribute(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -788,7 +1130,27 @@ export function validateCharacterAttribute(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for CharacterSkill objects
+ * Type guard for CharacterSkill objects.
+ * 
+ * Validates that an object conforms to the CharacterSkill interface,
+ * including level and experience validation.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterSkill, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const charSkill = {
+ *   skillId: 'sword-fighting',
+ *   level: 3,
+ *   experience: 150,
+ *   isActive: true
+ * };
+ * 
+ * if (isCharacterSkill(charSkill)) {
+ *   console.log(`${charSkill.skillId}: Level ${charSkill.level}`);
+ * }
+ * ```
  */
 export function isCharacterSkill(obj: unknown): obj is CharacterSkill {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -805,7 +1167,24 @@ export function isCharacterSkill(obj: unknown): obj is CharacterSkill {
 }
 
 /**
- * ValidationResult-based CharacterSkill validation
+ * ValidationResult-based CharacterSkill validation with detailed error messages.
+ * 
+ * Validates CharacterSkill objects with non-negative numeric requirements.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidSkill = {
+ *   skillId: 'sword-fighting',
+ *   level: -1,    // Must be non-negative
+ *   experience: 'high' // Must be number
+ * };
+ * 
+ * const result = validateCharacterSkill(invalidSkill);
+ * // result.errors will include specific validation failures
+ * ```
  */
 export function validateCharacterSkill(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -846,7 +1225,32 @@ export function validateCharacterSkill(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for CharacterBackground objects
+ * Type guard for CharacterBackground objects.
+ * 
+ * Validates that an object conforms to the CharacterBackground interface,
+ * including arrays and nested relationship validation.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterBackground, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const background = {
+ *   history: 'Born in a small village',
+ *   personality: 'Brave and compassionate',
+ *   goals: ['Save the kingdom', 'Find my family'],
+ *   fears: ['Dark magic', 'Losing friends'],
+ *   relationships: [
+ *     { characterId: 'npc-1', type: 'ally', strength: 80 }
+ *   ],
+ *   physicalDescription: 'Tall with brown hair',
+ *   isKnownFigure: false
+ * };
+ * 
+ * if (isCharacterBackground(background)) {
+ *   console.log(background.history);
+ * }
+ * ```
  */
 export function isCharacterBackground(obj: unknown): obj is CharacterBackground {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -869,7 +1273,27 @@ export function isCharacterBackground(obj: unknown): obj is CharacterBackground 
 }
 
 /**
- * ValidationResult-based CharacterBackground validation
+ * ValidationResult-based CharacterBackground validation with detailed error messages.
+ * 
+ * Validates CharacterBackground objects including array content validation
+ * and nested relationship validation. Supports partial validation.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidBackground = {
+ *   history: '',  // Cannot be empty
+ *   goals: 'string', // Must be array
+ *   relationships: [{ invalid: 'object' }] // Invalid relationship structure
+ * };
+ * 
+ * const result = validateCharacterBackground(invalidBackground);
+ * // result.errors will include detailed validation failures
+ * ```
  */
 export function validateCharacterBackground(obj: unknown, options?: { partial?: boolean }): ValidationResult {
   const errors: string[] = [];
@@ -962,7 +1386,27 @@ export function validateCharacterBackground(obj: unknown, options?: { partial?: 
 }
 
 /**
- * Type guard for CharacterRelationship objects
+ * Type guard for CharacterRelationship objects.
+ * 
+ * Validates that an object conforms to the CharacterRelationship interface,
+ * including type enum validation and strength range checking.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterRelationship, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const relationship = {
+ *   characterId: 'npc-mentor',
+ *   type: 'ally',
+ *   strength: 75,
+ *   description: 'My trusted mentor who taught me everything'
+ * };
+ * 
+ * if (isCharacterRelationship(relationship)) {
+ *   console.log(`${relationship.type}: ${relationship.strength}%`);
+ * }
+ * ```
  */
 export function isCharacterRelationship(obj: unknown): obj is CharacterRelationship {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -981,7 +1425,25 @@ export function isCharacterRelationship(obj: unknown): obj is CharacterRelations
 }
 
 /**
- * ValidationResult-based CharacterRelationship validation
+ * ValidationResult-based CharacterRelationship validation with detailed error messages.
+ * 
+ * Validates CharacterRelationship objects including type enum validation
+ * and strength range validation (-100 to 100).
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidRelationship = {
+ *   characterId: 'npc-1',
+ *   type: 'invalid-type', // Must be 'ally', 'enemy', 'neutral', 'romantic', or 'family'
+ *   strength: 150         // Must be between -100 and 100
+ * };
+ * 
+ * const result = validateCharacterRelationship(invalidRelationship);
+ * // result.errors will include type and range validation failures
+ * ```
  */
 export function validateCharacterRelationship(obj: unknown): ValidationResult {
   const errors: string[] = [];
@@ -1021,7 +1483,27 @@ export function validateCharacterRelationship(obj: unknown): ValidationResult {
 }
 
 /**
- * Type guard for CharacterStatus objects
+ * Type guard for CharacterStatus objects.
+ * 
+ * Validates that an object conforms to the CharacterStatus interface,
+ * including health range validation and conditions array checking.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterStatus, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const status = {
+ *   health: 75,
+ *   maxHealth: 100,
+ *   conditions: ['blessed', 'well-rested'],
+ *   location: 'Castle Courtyard'
+ * };
+ * 
+ * if (isCharacterStatus(status)) {
+ *   console.log(`Health: ${status.health}/${status.maxHealth}`);
+ * }
+ * ```
  */
 export function isCharacterStatus(obj: unknown): obj is CharacterStatus {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -1040,7 +1522,27 @@ export function isCharacterStatus(obj: unknown): obj is CharacterStatus {
 }
 
 /**
- * ValidationResult-based CharacterStatus validation
+ * ValidationResult-based CharacterStatus validation with detailed error messages.
+ * 
+ * Validates CharacterStatus objects including health range validation
+ * and conditions array validation. Supports partial validation.
+ * 
+ * @param obj - The object to validate
+ * @param options - Validation options
+ * @param options.partial - If true, only validates properties that are present (default: false)
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidStatus = {
+ *   health: 150,    // Cannot exceed maxHealth
+ *   maxHealth: 100,
+ *   conditions: ['poisoned', 123] // All conditions must be strings
+ * };
+ * 
+ * const result = validateCharacterStatus(invalidStatus);
+ * // result.errors will include health range and array content validation
+ * ```
  */
 export function validateCharacterStatus(obj: unknown, options?: { partial?: boolean }): ValidationResult {
   const errors: string[] = [];
@@ -1116,7 +1618,27 @@ export function validateCharacterStatus(obj: unknown, options?: { partial?: bool
 }
 
 /**
- * Type guard for CharacterPortrait objects
+ * Type guard for CharacterPortrait objects.
+ * 
+ * Validates that an object conforms to the CharacterPortrait interface,
+ * including type validation and optional property handling.
+ * 
+ * @param obj - The object to validate
+ * @returns True if the object is a valid CharacterPortrait, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * const portrait = {
+ *   type: 'ai-generated',
+ *   url: 'https://example.com/portrait.jpg',
+ *   generatedAt: '2025-01-13T10:00:00Z',
+ *   prompt: 'A brave knight with kind eyes'
+ * };
+ * 
+ * if (isCharacterPortrait(portrait)) {
+ *   console.log(`Portrait type: ${portrait.type}`);
+ * }
+ * ```
  */
 export function isCharacterPortrait(obj: unknown): obj is CharacterPortrait {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -1131,7 +1653,24 @@ export function isCharacterPortrait(obj: unknown): obj is CharacterPortrait {
 }
 
 /**
- * ValidationResult-based CharacterPortrait validation
+ * ValidationResult-based CharacterPortrait validation with detailed error messages.
+ * 
+ * Validates CharacterPortrait objects including type enum validation
+ * and optional property type checking.
+ * 
+ * @param obj - The object to validate
+ * @returns ValidationResult with `valid` boolean and `errors` array
+ * 
+ * @example
+ * ```typescript
+ * const invalidPortrait = {
+ *   type: 'custom', // Must be 'ai-generated' or 'placeholder'
+ *   url: 123       // Must be string or null
+ * };
+ * 
+ * const result = validateCharacterPortrait(invalidPortrait);
+ * // result.errors will include type validation failures
+ * ```
  */
 export function validateCharacterPortrait(obj: unknown): ValidationResult {
   const errors: string[] = [];

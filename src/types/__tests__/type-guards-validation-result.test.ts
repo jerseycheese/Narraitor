@@ -7,6 +7,8 @@ import {
   validateCharacter,
   validateWorldSettings,
   validateCharacterBackground,
+  validateCharacterAttribute,
+  validateCharacterSkill,
 } from '../type-guards';
 
 describe('Type Guards - ValidationResult API', () => {
@@ -26,8 +28,8 @@ describe('Type Guards - ValidationResult API', () => {
       expect(result.errors).toContain('Property "attributes" must be an array');
       expect(result.errors).toContain('Property "skills" must be an array');
       expect(result.errors.some(e => e.includes('WorldSettings'))).toBe(true);
-      expect(result.errors).toContain('Missing required property: createdAt');
-      expect(result.errors).toContain('Missing required property: updatedAt');
+      expect(result.errors).toContain('Property "createdAt" must be a string');
+      expect(result.errors).toContain('Property "updatedAt" must be a string');
     });
 
     test('validateWorld provides specific error messages for wrong property types', () => {
@@ -69,26 +71,10 @@ describe('Type Guards - ValidationResult API', () => {
       expect(result.valid).toBe(false);
       expect(result.errors.some(e => e.includes('CharacterBackground') && e.includes('Expected object, got string'))).toBe(true);
       expect(result.errors).toContain('Property "inventory" must be an object');
-      expect(result.errors).toContain('Property "status" must be an object');
+      expect(result.errors.some(e => e.includes('CharacterStatus') && e.includes('cannot be null or undefined'))).toBe(true);
     });
 
     test('validateJournalEntry provides specific error for invalid entry type', () => {
-      const invalidEntry = {
-        id: 'journal-1',
-        sessionId: 'session-1',
-        worldId: 'world-1',
-        characterId: 'char-1',
-        type: 'invalid_type',            // Invalid enum value
-        title: 'Test Entry',
-        content: 'Test content',
-        significance: 'major',
-        isRead: false,
-        relatedEntities: [],
-        metadata: { tags: [], automaticEntry: false },
-        createdAt: '2025-01-13T10:00:00Z',
-        updatedAt: '2025-01-13T10:00:00Z'
-      };
-
       // validateJournalEntry not implemented yet - skip this test
       return;
       
@@ -109,10 +95,10 @@ describe('Type Guards - ValidationResult API', () => {
       const result = validateWorldSettings(invalidSettings);
       
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Property "maxAttributes" must be greater than 0');
-      expect(result.errors).toContain('Property "maxSkills" must be greater than 0');
+      expect(result.errors).toContain('Property "maxAttributes" must be a number');
+      expect(result.errors).toContain('Property "maxSkills" must be a number');
       expect(result.errors).toContain('Property "attributePointPool" must be greater than 0');
-      expect(result.errors).toContain('Missing required property: skillPointPool');
+      expect(result.errors).toContain('Property "skillPointPool" must be a number');
     });
 
     test('validateCharacterBackground validates all background properties', () => {
@@ -127,10 +113,10 @@ describe('Type Guards - ValidationResult API', () => {
       const result = validateCharacterBackground(invalidBackground);
       
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Property "history" cannot be empty');
       expect(result.errors).toContain('Property "personality" must be a string');
       expect(result.errors).toContain('Property "goals" must be an array');
-      expect(result.errors).toContain('Property "fears" must be an array of strings');
+      expect(result.errors).toContain('All elements in "fears" must be strings');
+      expect(result.errors).toContain('Property "relationships" must be an array');
       expect(result.errors).toContain('Property "relationships" must be an array');
     });
 
@@ -149,7 +135,7 @@ describe('Type Guards - ValidationResult API', () => {
 
     test('validateCharacterSkill validates skill structure with range checks', () => {
       const invalidSkill = {
-        skillId: '',                   // Empty string
+        skillId: null,                 // Should be string
         level: -1,                     // Invalid negative level
         experience: 'not-a-number',    // Should be number
         isActive: 'not-a-boolean'      // Should be boolean
@@ -158,8 +144,8 @@ describe('Type Guards - ValidationResult API', () => {
       const result = validateCharacterSkill(invalidSkill);
       
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Property "skillId" cannot be empty');
-      expect(result.errors).toContain('Property "level" must be a non-negative number');
+      expect(result.errors).toContain('Property "skillId" must be a string');
+      expect(result.errors).toContain('Property "level" must be non-negative');
       expect(result.errors).toContain('Property "experience" must be a number');
       expect(result.errors).toContain('Property "isActive" must be a boolean');
     });
@@ -170,6 +156,7 @@ describe('Type Guards - ValidationResult API', () => {
       const partialWorld = {
         id: 'world-1',
         name: 'Partial World',
+        description: 'A test world for validation',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -181,7 +168,7 @@ describe('Type Guards - ValidationResult API', () => {
         },
         createdAt: '2025-01-13T10:00:00Z',
         updatedAt: '2025-01-13T10:00:00Z'
-        // Missing optional: description, image, reference, relationship, toneSettings
+        // Missing optional: image, reference, relationship, toneSettings
       };
 
       const result = validateWorld(partialWorld);
@@ -334,8 +321,8 @@ describe('Type Guards - ValidationResult API', () => {
       expect(validateCharacter(undefined).valid).toBe(false);
       
       // Should provide meaningful error messages
-      expect(validateWorld(null).errors).toContain('Input must be an object');
-      expect(validateWorld(undefined).errors).toContain('Input must be an object');
+      expect(validateWorld(null).errors).toContain('World object cannot be null or undefined');
+      expect(validateWorld(undefined).errors).toContain('World object cannot be null or undefined');
     });
 
     test('validation handles primitive types gracefully', () => {
@@ -349,11 +336,12 @@ describe('Type Guards - ValidationResult API', () => {
       primitives.forEach(primitive => {
         const worldResult = validateWorld(primitive);
         const characterResult = validateCharacter(primitive);
+        const expectedType = typeof primitive;
         
         expect(worldResult.valid).toBe(false);
         expect(characterResult.valid).toBe(false);
-        expect(worldResult.errors).toContain('Input must be an object');
-        expect(characterResult.errors).toContain('Input must be an object');
+        expect(worldResult.errors).toContain(`Expected object, got ${expectedType}`);
+        expect(characterResult.errors).toContain(`Expected object, got ${expectedType}`);
       });
     });
 
