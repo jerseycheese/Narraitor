@@ -348,7 +348,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       >
         {snapshot && (
           <div className="space-y-2">
-            <div className="text-xs text-slate-300">
+            <div className="text-xs text-slate-100">
               <div>Total Stores: {snapshot.metadata.totalStores}</div>
               <div>Total Paths: {snapshot.metadata.totalPaths}</div>
               <div>Snapshot Time: {new Date(snapshot.timestamp).toLocaleTimeString()}</div>
