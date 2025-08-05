@@ -2,6 +2,7 @@
 console.log('[__mocks__/worldStore.ts] Mock module loading');
 
 import { World, WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
+import { formatForDebug } from '@/lib/utils';
 
 interface MockWorldState {
   worlds: Record<string, World>;
@@ -19,7 +20,7 @@ let mockState: MockWorldState = {
 };
 
 const mockCreateWorld = jest.fn((worldData: Partial<World>): string => {
-  console.log('[__mocks__/worldStore.ts] mockCreateWorld called with:', JSON.stringify(worldData, null, 2));
+  console.log('[__mocks__/worldStore.ts] mockCreateWorld called with:', formatForDebug(worldData, { indent: 2 }));
   console.log('[__mocks__/worldStore.ts] Checking validation - name is:', worldData.name ? `"${worldData.name}"` : 'empty/null');
   
   // Validate required fields - THROW on validation failure

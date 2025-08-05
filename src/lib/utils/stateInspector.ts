@@ -32,6 +32,24 @@
 
 import { Logger } from './logger';
 
+/**
+ * Interface for Zustand store instances
+ */
+interface ZustandStore {
+  getState: () => unknown;
+  setState?: (partial: unknown) => void;
+  subscribe?: (listener: (state: unknown) => void) => () => void;
+}
+
+/**
+ * Type guard to check if an object is a Zustand store
+ */
+function isZustandStore(obj: unknown): obj is ZustandStore {
+  return typeof obj === 'function' && 
+         obj !== null &&
+         typeof (obj as unknown as ZustandStore).getState === 'function';
+}
+
 const logger = new Logger('StateInspector');
 
 /**
@@ -189,8 +207,8 @@ export class StateInspector {
     // Extract state from each registered store
     Object.entries(this.stores).forEach(([storeName, store]) => {
       try {
-        if (typeof store === 'function' && (store as any).getState) {
-          const state = (store as any).getState();
+        if (isZustandStore(store)) {
+          const state = store.getState();
           storeStates[storeName] = this.sanitizeForSerialization(state);
           totalPaths += this.countPaths(state);
         }
@@ -246,19 +264,24 @@ export class StateInspector {
       }
 
       const store = this.stores[storeName];
-      if (typeof store !== 'function' || !(store as any).getState) {
+      if (!isZustandStore(store)) {
         logger.warn(`Store ${storeName} is not a valid Zustand store`);
         return undefined;
       }
 
-      let value = (store as any).getState();
+      let value = store.getState();
       
       // Navigate through the path
       for (let i = 1; i < pathParts.length; i++) {
         if (value === null || value === undefined) {
           return undefined;
         }
-        value = (value as any)[pathParts[i]];
+        // Safe property access with type checking
+        if (typeof value === 'object' && value !== null && pathParts[i] in value) {
+          value = (value as Record<string, unknown>)[pathParts[i]];
+        } else {
+          return undefined;
+        }
       }
 
       return value;

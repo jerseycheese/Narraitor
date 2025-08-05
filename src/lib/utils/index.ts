@@ -116,3 +116,10 @@ export type {
   WatchCallback, 
   WatchSubscription 
 } from './stateInspector';
+
+// Enhanced serialization and debugging utilities
+export {
+  sanitizeForSerialization,
+  formatForDebug,
+  getValueTypeInfo
+} from './formatters';

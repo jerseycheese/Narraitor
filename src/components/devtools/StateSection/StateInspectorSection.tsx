@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { stateInspector, type StateSnapshot, type PathInfo } from '@/lib/utils/stateInspector';
+import { formatForDebug, getValueTypeInfo } from '@/lib/utils';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { JsonViewer } from '../JsonViewer';
 import * as stores from '@/state';
@@ -169,7 +170,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       <h2 className="text-sm font-bold mb-2">Application State Inspector</h2>
       
       {/* Performance Warnings */}
-      {snapshot?.metadata.performanceWarnings.length > 0 && (
+      {snapshot && snapshot.metadata && snapshot.metadata.performanceWarnings && snapshot.metadata.performanceWarnings.length > 0 && (
         <div className="text-xs text-yellow-400 mb-2">
           <strong>Performance Warnings:</strong>
           <ul className="list-disc list-inside">
@@ -222,12 +223,20 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           )}
 
           {/* Path Metadata */}
-          {pathMetadata && (
+          {pathMetadata && pathValue !== null && (
             <div className="text-xs bg-slate-700 p-2 rounded border border-slate-600">
-              <div><strong>Type:</strong> {pathMetadata.type}</div>
-              <div><strong>Depth:</strong> {pathMetadata.depth}</div>
-              <div><strong>Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
-              <div><strong>Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
+              {(() => {
+                const typeInfo = getValueTypeInfo(pathValue);
+                return (
+                  <>
+                    <div><strong>Type:</strong> {pathMetadata.type} {typeInfo.constructor && `(${typeInfo.constructor})`}</div>
+                    <div><strong>Depth:</strong> {pathMetadata.depth}</div>
+                    <div><strong>Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
+                    <div><strong>Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
+                    {typeInfo.isArray && <div><strong>Array Length:</strong> {(pathValue as unknown[]).length}</div>}
+                  </>
+                );
+              })()}
               {selectedPath && (
                 <button
                   onClick={() => togglePathWatch(selectedPath)}
@@ -308,11 +317,21 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
             {changeNotifications.slice().reverse().map((notification) => (
               <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-slate-700 p-2 rounded border border-slate-600">
                 <div className="font-medium text-yellow-400">{notification.path}</div>
-                <div className="text-slate-300">
-                  <span className="text-red-400">Old:</span> {JSON.stringify(notification.oldValue)} 
-                  <span className="text-green-400 ml-2">New:</span> {JSON.stringify(notification.newValue)}
+                <div className="text-slate-300 space-y-1">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-red-400 font-medium">Old:</span>
+                    <span className="font-mono text-xs bg-slate-800 px-1 rounded">
+                      {formatForDebug(notification.oldValue, { compact: true, maxStringLength: 50 })}
+                    </span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400 font-medium">New:</span>
+                    <span className="font-mono text-xs bg-slate-800 px-1 rounded">
+                      {formatForDebug(notification.newValue, { compact: true, maxStringLength: 50 })}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-slate-400 text-xs">
+                <div className="text-slate-400 text-xs mt-1">
                   {new Date(notification.timestamp).toLocaleTimeString()}
                 </div>
               </div>

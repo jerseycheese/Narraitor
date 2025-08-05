@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { sanitizeForSerialization } from '@/lib/utils';
 
 /**
  * JsonViewer props
@@ -25,37 +26,19 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   // State to track if the component is mounted (client-side only)
   const [isMounted, setIsMounted] = useState(false);
   
-// Format the JSON string with indentation
+// Format the JSON string with indentation using enhanced serialization
   const formattedJson = useMemo(() => {
     try {
-      // Detect circular references
-      const getCircularReplacer = () => {
-        const seen = new WeakSet();
-        return (key: string, value: unknown) => {
-          if (typeof value === 'object' && value !== null) {
-            if (seen.has(value)) {
-              return '[Circular Reference]';
-            }
-            seen.add(value);
-          }
-          // Handle other special cases
-          if (value === undefined) {
-            return 'undefined';
-          }
-          if (value instanceof Date) {
-            return value.toISOString();
-          }
-          if (typeof value === 'function') {
-            return '[Function]';
-          }
-          return value;
-        };
-      };
+      // Use the enhanced sanitization utility for consistent handling
+      const sanitized = sanitizeForSerialization(data, {
+        maxDepth: 8, // Reasonable depth for DevTools display
+        functionHandler: (fn) => `[Function: ${fn.name || 'anonymous'}]`
+      });
       
-      // Use a stable stringify with circular reference handling
-      return JSON.stringify(data, getCircularReplacer(), 2);
+      // Format with indentation
+      return JSON.stringify(sanitized, null, 2);
     } catch (error) {
-      return `Error formatting JSON: ${error}`;
+      return `Error formatting JSON: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
   }, [data]);
 
