@@ -123,3 +123,38 @@ export {
   formatForDebug,
   getValueTypeInfo
 } from './formatters';
+
+// === PERFORMANCE UTILITIES ===
+
+/** 
+ * Performance measurement utilities for development debugging
+ * Lightweight timing, monitoring, and reporting with zero production impact
+ * @see performanceUtils.ts for detailed usage examples
+ */
+export {
+  PerformanceTimer,
+  measureTime,
+  measureAsync,
+  createPerformanceGroup,
+  generatePerformanceReport,
+  getGlobalPerformanceReport,
+  clearGlobalMeasurements,
+  formatDuration,
+  logPerformanceReport,
+  monitorCriticalPath,
+  createCriticalPathMonitor,
+  createAsyncCriticalPathMonitor,
+  trackPerformanceMetrics,
+  getBatchMetrics,
+  clearBatchMetrics,
+  generateBatchReport
+} from './performanceUtils';
+
+/** Type definitions for performance measurement */
+export type {
+  PerformanceMeasurement,
+  PerformanceReport,
+  PerformanceOptions,
+  CriticalPathOptions,
+  BatchMetrics
+} from './performanceUtils';
