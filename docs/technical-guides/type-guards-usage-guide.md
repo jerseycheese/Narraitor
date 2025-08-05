@@ -1,34 +1,32 @@
 # Type Guards Usage Guide
 
-A comprehensive guide to using Narraitor's enhanced type guards for runtime type safety and validation.
+A comprehensive guide to using Narraitor's simplified type validation system for runtime type safety and validation.
 
 ## Overview
 
-The type guards system provides two approaches for validating domain objects:
+The type validation system provides comprehensive validation with detailed error messages for all domain objects:
 
-1. **Type Guards** - Fast boolean checks that narrow TypeScript types
-2. **ValidationResult API** - Detailed validation with specific error messages
+- **ValidationResult API** - Primary validation functions that return detailed results with error messages
+- **Legacy Type Guards** - Simple boolean checks for basic objects (InventoryItem, NarrativeSegment, etc.)
 
-Both approaches support partial validation for form inputs and incomplete data.
+All validation functions support partial validation for form inputs and incomplete data.
 
-## Core Type Guards
+## Core Validation Functions
 
 ### World Validation
 
 ```typescript
-import { isWorld, validateWorld } from '@/types/type-guards';
+import { validateWorld } from '@/types/type-guards';
 
-// Basic type guard - fast boolean check
+// Comprehensive validation with detailed error messages
 const unknownData: unknown = getUserInput();
-if (isWorld(unknownData)) {
-  // TypeScript now knows this is a World
-  console.log(unknownData.name); // Safe to access
-  console.log(unknownData.genre);
-}
-
-// Detailed validation with error messages
 const result = validateWorld(unknownData);
-if (!result.valid) {
+
+if (result.valid) {
+  // Data is valid - safe to use as World type
+  console.log('World is valid');
+  // TypeScript can infer this is valid world data
+} else {
   console.log('Validation failed:');
   result.errors.forEach(error => console.log(`- ${error}`));
 }
@@ -37,19 +35,16 @@ if (!result.valid) {
 ### Character Validation
 
 ```typescript
-import { isCharacter, validateCharacter } from '@/types/type-guards';
+import { validateCharacter } from '@/types/type-guards';
 
 // Validate complete character data
 const character = getCharacterFromAPI();
-if (isCharacter(character)) {
+const validation = validateCharacter(character);
+
+if (validation.valid) {
   // Safe to use character properties
   updateCharacterDisplay(character);
-}
-
-// Form validation with detailed errors
-const formData = getCharacterFormData();
-const validation = validateCharacter(formData);
-if (!validation.valid) {
+} else {
   displayFormErrors(validation.errors);
 }
 ```
@@ -68,15 +63,10 @@ const partialWorld = {
 };
 
 // Partial validation - only checks present properties
-if (isWorld(partialWorld, { partial: true })) {
-  // Valid for this stage of form completion
-  saveFormProgress(partialWorld);
-}
-
-// Detailed partial validation
-const result = validateWorld(partialWorld, { partial: true });
+const result = validateWorld(partialWorld, true);
 if (result.valid) {
   console.log('Form stage is valid');
+  saveFormProgress(partialWorld);
 } else {
   // Show specific errors for present properties
   showValidationErrors(result.errors);
@@ -242,35 +232,35 @@ if (!result.valid) {
 }
 ```
 
-## Available Type Guards
+## Available Validation Functions
 
 ### Core Objects
-- `isWorld` / `validateWorld`
-- `isCharacter` / `validateCharacter`
+- `validateWorld` - Comprehensive World validation
+- `validateCharacter` - Comprehensive Character validation
 
 ### World Components
-- `isWorldAttribute` / `validateWorldAttribute`
-- `isWorldSkill` / `validateWorldSkill`
-- `isWorldSettings` / `validateWorldSettings`
-- `isWorldImage` / `validateWorldImage`
+- `validateWorldAttribute` - World attribute validation with range checking
+- `validateWorldSkill` - World skill validation with difficulty enum validation
+- `validateWorldSettings` - World settings validation with positive number requirements
+- `validateWorldImage` - World image validation with type enum validation
 
 ### Character Components
-- `isCharacterAttribute` / `validateCharacterAttribute`
-- `isCharacterSkill` / `validateCharacterSkill`
-- `isCharacterBackground` / `validateCharacterBackground`
-- `isCharacterStatus` / `validateCharacterStatus`
-- `isCharacterRelationship` / `validateCharacterRelationship`
-- `isCharacterPortrait` / `validateCharacterPortrait`
+- `validateCharacterAttribute` - Character attribute validation with non-negative values
+- `validateCharacterSkill` - Character skill validation with level and experience checks
+- `validateCharacterBackground` - Character background validation with array content validation
+- `validateCharacterStatus` - Character status validation with health constraints
+- `validateCharacterRelationship` - Character relationship validation with type and strength validation
+- `validateCharacterPortrait` - Character portrait validation with type enum validation
 
-### Other Domain Objects
-- `isInventoryItem`
-- `isNarrativeSegment`
-- `isJournalEntry`
-- `isPlayerDecision`
+### Legacy Type Guards (Boolean)
+- `isInventoryItem` - Simple inventory item validation
+- `isNarrativeSegment` - Simple narrative segment validation
+- `isJournalEntry` - Simple journal entry validation
+- `isPlayerDecision` - Simple player decision validation
 
 ## Migration from Basic Type Checking
 
-Replace basic property checks with comprehensive type guards:
+Replace basic property checks with comprehensive validation:
 
 ```typescript
 // Before - manual property checking
@@ -280,17 +270,22 @@ function isValidWorld(obj: any): boolean {
          typeof obj.name === 'string';
 }
 
-// After - comprehensive type guard
-import { isWorld } from '@/types/type-guards';
+// After - comprehensive validation
+import { validateWorld } from '@/types/type-guards';
 
-if (isWorld(data)) {
+const result = validateWorld(data);
+if (result.valid) {
   // Full validation including nested objects and ranges
+  // Use data safely as World type
+} else {
+  // Handle specific errors
+  console.log('Validation errors:', result.errors);
 }
 ```
 
-## Testing with Type Guards
+## Testing with Validation Functions
 
-The type guards are extensively tested and provide reliable validation:
+The validation functions are extensively tested and provide reliable validation:
 
 ```typescript
 import { validateWorld } from '@/types/type-guards';
@@ -307,4 +302,4 @@ test('API returns valid world data', async () => {
 });
 ```
 
-This type guard system ensures runtime type safety while providing excellent developer experience with detailed error messages and TypeScript integration.
+This simplified validation system ensures runtime type safety while providing excellent developer experience with detailed error messages and clean, maintainable APIs.
