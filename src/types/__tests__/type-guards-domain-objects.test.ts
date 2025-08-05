@@ -12,18 +12,10 @@ import {
   isCharacterSkill,
   isCharacterBackground,
   isCharacterStatus,
-  isCharacterPortrait,
   isCharacterRelationship,
   validateWorldAttribute,
-  validateWorldSkill,
-  validateWorldSettings,
-  validateWorldImage,
-  validateCharacterAttribute,
-  validateCharacterSkill,
   validateCharacterBackground,
   validateCharacterStatus,
-  validateCharacterPortrait,
-  validateCharacterRelationship
 } from '../type-guards';
 
 describe('Domain-Specific Type Guards', () => {

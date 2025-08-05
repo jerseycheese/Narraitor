@@ -1,22 +1,12 @@
 // src/types/__tests__/type-guards-validation-result.test.ts
 
-import { ValidationResult } from '@/lib/utils/validationUtils';
-
 // These imports will fail initially since the ValidationResult API doesn't exist yet
 // This is intentional - we're testing the RED phase of TDD
 import {
   validateWorld,
   validateCharacter,
-  validateInventoryItem,
-  validateNarrativeSegment,
-  validateJournalEntry,
-  validateWorldAttribute,
-  validateWorldSkill,
   validateWorldSettings,
-  validateCharacterAttribute,
-  validateCharacterSkill,
   validateCharacterBackground,
-  validateCharacterStatus
 } from '../type-guards';
 
 describe('Type Guards - ValidationResult API', () => {

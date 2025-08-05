@@ -10,7 +10,6 @@ import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './person
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
 import { ValidationResult } from '../lib/utils/validationUtils';
-import { EntityID } from './common.types';
 
 /**
  * Type guard for World objects with comprehensive validation

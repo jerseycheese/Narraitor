@@ -6,17 +6,9 @@ import {
   isInventoryItem,
   isNarrativeSegment,
   isJournalEntry,
-  isPersonalityTrait,
-  isChoiceTypePreference,
   isPlayerDecision,
   isPlayerDecisionArray
 } from '../type-guards';
-import { World, WorldAttribute, WorldSkill, WorldSettings, WorldImage } from '../world.types';
-import { Character, CharacterAttribute, CharacterSkill, CharacterBackground, CharacterStatus, CharacterPortrait } from '../character.types';
-import { InventoryItem } from '../inventory.types';
-import { NarrativeSegment } from '../narrative.types';
-import { JournalEntry } from '../journal.types';
-import { PlayerDecision } from '../personalization.types';
 
 describe('Type Guards - Comprehensive Runtime Type Safety', () => {
   
@@ -448,7 +440,7 @@ describe('Type Guards - Comprehensive Runtime Type Safety', () => {
 
   describe('Performance and Error Resilience', () => {
     test('handles circular references without crashing', () => {
-      const circularObj: any = {
+      const circularObj: Record<string, unknown> = {
         id: 'world-1',
         name: 'Circular World',
         genre: 'fantasy',
@@ -473,7 +465,7 @@ describe('Type Guards - Comprehensive Runtime Type Safety', () => {
     });
 
     test('handles very deep nested objects', () => {
-      let deepObj: any = {
+      const deepObj: Record<string, unknown> = {
         id: 'world-1',
         name: 'Deep World',
         genre: 'fantasy',
