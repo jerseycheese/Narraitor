@@ -1,8 +1,6 @@
 // src/types/type-guards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { World, WorldAttribute, WorldSkill, WorldSettings, WorldImage } from './world.types';
-import type { Character, CharacterAttribute, CharacterSkill, CharacterBackground, CharacterStatus, CharacterPortrait, CharacterRelationship } from './character.types';
 import { InventoryItem } from './inventory.types';
 import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';

@@ -457,7 +457,7 @@ export const useWorldStore = create<WorldStore>()(
           const state = persistedState as any;
           if (state.worlds && typeof state.worlds === 'object') {
             // Validate each world in storage
-            const invalidWorlds: Record<string, any> = {};
+            const invalidWorlds: Record<string, unknown> = {};
             for (const [worldId, world] of Object.entries(state.worlds)) {
               const validation = validateWorld(world);
               if (!validation.valid) {
