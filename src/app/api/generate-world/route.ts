@@ -46,6 +46,15 @@ export async function POST(request: NextRequest) {
       suggestedName: body.suggestedName
     });
     
+    // Validate generated world structure
+    if (!generatedWorld.name || !generatedWorld.description || !generatedWorld.genre) {
+      logger.error('generate-world API', 'Generated world missing required fields:', generatedWorld);
+      return NextResponse.json(
+        { error: 'Generated world data is incomplete' },
+        { status: 500 }
+      );
+    }
+    
     logger.debug('generate-world API', 'World generated:', generatedWorld.name);
 
     return NextResponse.json(generatedWorld);
