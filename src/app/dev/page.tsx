@@ -38,6 +38,7 @@ export default function DevPage() {
     'Development Tools': [
       { href: '/dev/devtools-test', label: 'DevTools Panel', color: 'gray' },
       { href: '/dev/ai-testing', label: 'AI Testing Panel', color: 'gray' },
+      { href: '/dev/performance-utils', label: 'Performance Utils Test Harness', color: 'gray' },
     ],
   };
 
