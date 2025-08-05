@@ -1,61 +1,304 @@
 // src/types/type-guards.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { World } from './world.types';
-import { Character } from './character.types';
+import { World, WorldAttribute, WorldSkill, WorldSettings, WorldImage } from './world.types';
+import { Character, CharacterAttribute, CharacterSkill, CharacterBackground, CharacterStatus, CharacterPortrait, CharacterRelationship } from './character.types';
 import { InventoryItem } from './inventory.types';
 import { NarrativeSegment } from './narrative.types';
 import { JournalEntry, JournalEntryType } from './journal.types';
 import { PlayerDecision, PersonalityTrait, ChoiceTypePreference } from './personalization.types';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
+import { ValidationResult } from '../lib/utils/validationUtils';
+import { EntityID } from './common.types';
 
 /**
- * Type guard for World objects
+ * Type guard for World objects with comprehensive validation
  */
-export function isWorld(obj: unknown): obj is World {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'name' in obj &&
-    'genre' in obj &&
-    'attributes' in obj &&
-    'skills' in obj &&
-    'settings' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    Array.isArray((obj as any).attributes) &&
-    Array.isArray((obj as any).skills) &&
-    typeof (obj as any).settings === 'object' &&
-    'maxAttributes' in (obj as any).settings &&
-    'maxSkills' in (obj as any).settings &&
-    'attributePointPool' in (obj as any).settings &&
-    'skillPointPool' in (obj as any).settings;
+export function isWorld(obj: unknown, options?: { partial?: boolean }): obj is World {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const world = obj as any;
+  const { partial = false } = options || {};
+
+  // Required properties (always checked)
+  const hasRequiredProps = 
+    typeof world.id === 'string' &&
+    typeof world.name === 'string' &&
+    typeof world.description === 'string' &&
+    typeof world.genre === 'string';
+
+  if (!hasRequiredProps) {
+    return false;
+  }
+
+  // For partial objects, only check what's present
+  if (partial) {
+    if ('attributes' in world && !Array.isArray(world.attributes)) return false;
+    if ('skills' in world && !Array.isArray(world.skills)) return false;
+    if ('settings' in world && !isWorldSettings(world.settings)) return false;
+    if ('image' in world && world.image !== null && !isWorldImage(world.image)) return false;
+    return true;
+  }
+
+  // Full validation for complete objects
+  return Array.isArray(world.attributes) &&
+    Array.isArray(world.skills) &&
+    isWorldSettings(world.settings) &&
+    typeof world.createdAt === 'string' &&
+    typeof world.updatedAt === 'string' &&
+    (world.image === undefined || world.image === null || isWorldImage(world.image)) &&
+    (world.reference === undefined || typeof world.reference === 'string') &&
+    (world.relationship === undefined || ['set_within', 'inspired_by'].includes(world.relationship));
 }
 
 /**
- * Type guard for Character objects
+ * ValidationResult-based World validation with detailed error messages
  */
-export function isCharacter(obj: unknown): obj is Character {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'worldId' in obj &&
-    'name' in obj &&
-    'attributes' in obj &&
-    'skills' in obj &&
-    'background' in obj &&
-    'inventory' in obj &&
-    'status' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    Array.isArray((obj as any).attributes) &&
-    Array.isArray((obj as any).skills) &&
-    typeof (obj as any).background === 'object' &&
-    typeof (obj as any).inventory === 'object' &&
-    typeof (obj as any).status === 'object';
+export function validateWorld(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+  const errors: string[] = [];
+  const { partial = false } = options || {};
+
+  if (obj === null || obj === undefined) {
+    errors.push('World object cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const world = obj as any;
+
+  // Required property validation
+  if (typeof world.id !== 'string') {
+    errors.push('Property "id" must be a string');
+  }
+  if (typeof world.name !== 'string') {
+    errors.push('Property "name" must be a string');
+  }
+  if (typeof world.description !== 'string') {
+    errors.push('Property "description" must be a string');
+  }
+  if (typeof world.genre !== 'string') {
+    errors.push('Property "genre" must be a string');
+  }
+
+  // For partial validation, only check present properties
+  if (!partial) {
+    if (!Array.isArray(world.attributes)) {
+      errors.push('Property "attributes" must be an array');
+    } else {
+      world.attributes.forEach((attr: any, index: number) => {
+        if (!isWorldAttribute(attr)) {
+          errors.push(`Invalid WorldAttribute at index ${index}`);
+        }
+      });
+    }
+
+    if (!Array.isArray(world.skills)) {
+      errors.push('Property "skills" must be an array');
+    } else {
+      world.skills.forEach((skill: any, index: number) => {
+        if (!isWorldSkill(skill)) {
+          errors.push(`Invalid WorldSkill at index ${index}`);
+        }
+      });
+    }
+
+    const settingsValidation = validateWorldSettings(world.settings);
+    if (!settingsValidation.valid) {
+      errors.push(...settingsValidation.errors.map(e => `WorldSettings: ${e}`));
+    }
+
+    if (typeof world.createdAt !== 'string') {
+      errors.push('Property "createdAt" must be a string');
+    }
+    if (typeof world.updatedAt !== 'string') {
+      errors.push('Property "updatedAt" must be a string');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('attributes' in world && !Array.isArray(world.attributes)) {
+      errors.push('Property "attributes" must be an array when present');
+    }
+    if ('skills' in world && !Array.isArray(world.skills)) {
+      errors.push('Property "skills" must be an array when present');
+    }
+    if ('settings' in world) {
+      const settingsValidation = validateWorldSettings(world.settings, { partial: true });
+      if (!settingsValidation.valid) {
+        errors.push(...settingsValidation.errors.map(e => `WorldSettings: ${e}`));
+      }
+    }
+  }
+
+  // Optional property validation
+  if (world.image !== undefined && world.image !== null) {
+    const imageValidation = validateWorldImage(world.image);
+    if (!imageValidation.valid) {
+      errors.push(...imageValidation.errors.map(e => `WorldImage: ${e}`));
+    }
+  }
+
+  if (world.reference !== undefined && typeof world.reference !== 'string') {
+    errors.push('Property "reference" must be a string when present');
+  }
+
+  if (world.relationship !== undefined && !['set_within', 'inspired_by'].includes(world.relationship)) {
+    errors.push('Property "relationship" must be "set_within" or "inspired_by" when present');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for Character objects with comprehensive validation
+ */
+export function isCharacter(obj: unknown, options?: { partial?: boolean }): obj is Character {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const character = obj as any;
+  const { partial = false } = options || {};
+
+  // Required properties (always checked)
+  const hasRequiredProps = 
+    typeof character.id === 'string' &&
+    typeof character.worldId === 'string' &&
+    typeof character.name === 'string';
+
+  if (!hasRequiredProps) {
+    return false;
+  }
+
+  // For partial objects, only check what's present
+  if (partial) {
+    if ('attributes' in character && !Array.isArray(character.attributes)) return false;
+    if ('skills' in character && !Array.isArray(character.skills)) return false;
+    if ('background' in character && !isCharacterBackground(character.background)) return false;
+    if ('status' in character && !isCharacterStatus(character.status)) return false;
+    return true;
+  }
+
+  // Full validation for complete objects
+  return Array.isArray(character.attributes) &&
+    Array.isArray(character.skills) &&
+    isCharacterBackground(character.background) &&
+    typeof character.inventory === 'object' &&
+    isCharacterStatus(character.status) &&
+    typeof character.createdAt === 'string' &&
+    typeof character.updatedAt === 'string' &&
+    (character.portrait === undefined || character.portrait === null || isCharacterPortrait(character.portrait));
+}
+
+/**
+ * ValidationResult-based Character validation with detailed error messages
+ */
+export function validateCharacter(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+  const errors: string[] = [];
+  const { partial = false } = options || {};
+
+  if (obj === null || obj === undefined) {
+    errors.push('Character object cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const character = obj as any;
+
+  // Required property validation
+  if (typeof character.id !== 'string') {
+    errors.push('Property "id" must be a string');
+  }
+  if (typeof character.worldId !== 'string') {
+    errors.push('Property "worldId" must be a string');
+  }
+  if (typeof character.name !== 'string') {
+    errors.push('Property "name" must be a string');
+  }
+
+  // For partial validation, only check present properties
+  if (!partial) {
+    if (!Array.isArray(character.attributes)) {
+      errors.push('Property "attributes" must be an array');
+    } else {
+      character.attributes.forEach((attr: any, index: number) => {
+        if (!isCharacterAttribute(attr)) {
+          errors.push(`Invalid CharacterAttribute at index ${index}`);
+        }
+      });
+    }
+
+    if (!Array.isArray(character.skills)) {
+      errors.push('Property "skills" must be an array');
+    } else {
+      character.skills.forEach((skill: any, index: number) => {
+        if (!isCharacterSkill(skill)) {
+          errors.push(`Invalid CharacterSkill at index ${index}`);
+        }
+      });
+    }
+
+    const backgroundValidation = validateCharacterBackground(character.background);
+    if (!backgroundValidation.valid) {
+      errors.push(...backgroundValidation.errors.map(e => `CharacterBackground: ${e}`));
+    }
+
+    const statusValidation = validateCharacterStatus(character.status);
+    if (!statusValidation.valid) {
+      errors.push(...statusValidation.errors.map(e => `CharacterStatus: ${e}`));
+    }
+
+    if (typeof character.inventory !== 'object' || character.inventory === null) {
+      errors.push('Property "inventory" must be an object');
+    }
+
+    if (typeof character.createdAt !== 'string') {
+      errors.push('Property "createdAt" must be a string');
+    }
+    if (typeof character.updatedAt !== 'string') {
+      errors.push('Property "updatedAt" must be a string');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('attributes' in character && !Array.isArray(character.attributes)) {
+      errors.push('Property "attributes" must be an array when present');
+    }
+    if ('skills' in character && !Array.isArray(character.skills)) {
+      errors.push('Property "skills" must be an array when present');
+    }
+    if ('background' in character) {
+      const backgroundValidation = validateCharacterBackground(character.background, { partial: true });
+      if (!backgroundValidation.valid) {
+        errors.push(...backgroundValidation.errors.map(e => `CharacterBackground: ${e}`));
+      }
+    }
+    if ('status' in character) {
+      const statusValidation = validateCharacterStatus(character.status, { partial: true });
+      if (!statusValidation.valid) {
+        errors.push(...statusValidation.errors.map(e => `CharacterStatus: ${e}`));
+      }
+    }
+  }
+
+  // Optional property validation
+  if (character.portrait !== undefined && character.portrait !== null) {
+    const portraitValidation = validateCharacterPortrait(character.portrait);
+    if (!portraitValidation.valid) {
+      errors.push(...portraitValidation.errors.map(e => `CharacterPortrait: ${e}`));
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
 }
 
 /**
@@ -215,4 +458,713 @@ export function isSafeStringArray(value: unknown, maxItems: number = 10, maxLeng
   return Array.isArray(value) && 
          value.length <= maxItems &&
          value.every(item => isSafeString(item, maxLength));
+}
+
+// Domain-specific type guards
+
+/**
+ * Type guard for WorldAttribute objects
+ */
+export function isWorldAttribute(obj: unknown): obj is WorldAttribute {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const attr = obj as any;
+  return typeof attr.id === 'string' &&
+    typeof attr.name === 'string' &&
+    typeof attr.worldId === 'string' &&
+    typeof attr.description === 'string' &&
+    typeof attr.baseValue === 'number' &&
+    typeof attr.minValue === 'number' &&
+    typeof attr.maxValue === 'number' &&
+    attr.minValue <= attr.maxValue &&
+    attr.baseValue >= attr.minValue &&
+    attr.baseValue <= attr.maxValue;
+}
+
+/**
+ * ValidationResult-based WorldAttribute validation
+ */
+export function validateWorldAttribute(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+
+  if (obj === null || obj === undefined) {
+    errors.push('WorldAttribute cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const attr = obj as any;
+
+  if (typeof attr.id !== 'string') errors.push('Property "id" must be a string');
+  if (typeof attr.name !== 'string') errors.push('Property "name" must be a string');
+  if (typeof attr.worldId !== 'string') errors.push('Property "worldId" must be a string');
+  if (typeof attr.description !== 'string') errors.push('Property "description" must be a string');
+  if (typeof attr.baseValue !== 'number') errors.push('Property "baseValue" must be a number');
+  if (typeof attr.minValue !== 'number') errors.push('Property "minValue" must be a number');
+  if (typeof attr.maxValue !== 'number') errors.push('Property "maxValue" must be a number');
+  
+  if (typeof attr.minValue === 'number' && typeof attr.maxValue === 'number' && attr.minValue > attr.maxValue) {
+    errors.push('Property "minValue" must be less than or equal to "maxValue"');
+  }
+  
+  if (typeof attr.baseValue === 'number' && typeof attr.minValue === 'number' && attr.baseValue < attr.minValue) {
+    errors.push('Property "baseValue" must be greater than or equal to "minValue"');
+  }
+  
+  if (typeof attr.baseValue === 'number' && typeof attr.maxValue === 'number' && attr.baseValue > attr.maxValue) {
+    errors.push('Property "baseValue" must be less than or equal to "maxValue"');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for WorldSkill objects
+ */
+export function isWorldSkill(obj: unknown): obj is WorldSkill {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const skill = obj as any;
+  const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
+  
+  return typeof skill.id === 'string' &&
+    typeof skill.name === 'string' &&
+    typeof skill.worldId === 'string' &&
+    typeof skill.description === 'string' &&
+    validDifficulties.includes(skill.difficulty) &&
+    typeof skill.baseValue === 'number' &&
+    typeof skill.minValue === 'number' &&
+    typeof skill.maxValue === 'number' &&
+    skill.minValue <= skill.maxValue &&
+    skill.baseValue >= skill.minValue &&
+    skill.baseValue <= skill.maxValue &&
+    (skill.attributeIds === undefined || Array.isArray(skill.attributeIds));
+}
+
+/**
+ * ValidationResult-based WorldSkill validation
+ */
+export function validateWorldSkill(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+  const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
+
+  if (obj === null || obj === undefined) {
+    errors.push('WorldSkill cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const skill = obj as any;
+
+  if (typeof skill.id !== 'string') errors.push('Property "id" must be a string');
+  if (typeof skill.name !== 'string') errors.push('Property "name" must be a string');
+  if (typeof skill.worldId !== 'string') errors.push('Property "worldId" must be a string');
+  if (typeof skill.description !== 'string') errors.push('Property "description" must be a string');
+  if (!validDifficulties.includes(skill.difficulty)) {
+    errors.push(`Property "difficulty" must be one of: ${validDifficulties.join(', ')}`);
+  }
+  if (typeof skill.baseValue !== 'number') errors.push('Property "baseValue" must be a number');
+  if (typeof skill.minValue !== 'number') errors.push('Property "minValue" must be a number');
+  if (typeof skill.maxValue !== 'number') errors.push('Property "maxValue" must be a number');
+  
+  if (typeof skill.minValue === 'number' && typeof skill.maxValue === 'number' && skill.minValue > skill.maxValue) {
+    errors.push('Property "minValue" must be less than or equal to "maxValue"');
+  }
+  
+  if (skill.attributeIds !== undefined && !Array.isArray(skill.attributeIds)) {
+    errors.push('Property "attributeIds" must be an array when present');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for WorldSettings objects
+ */
+export function isWorldSettings(obj: unknown): obj is WorldSettings {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const settings = obj as any;
+  return typeof settings.maxAttributes === 'number' &&
+    typeof settings.maxSkills === 'number' &&
+    typeof settings.attributePointPool === 'number' &&
+    typeof settings.skillPointPool === 'number' &&
+    settings.maxAttributes > 0 &&
+    settings.maxSkills > 0 &&
+    settings.attributePointPool > 0 &&
+    settings.skillPointPool > 0;
+}
+
+/**
+ * ValidationResult-based WorldSettings validation
+ */
+export function validateWorldSettings(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+  const errors: string[] = [];
+  const { partial = false } = options || {};
+
+  if (obj === null || obj === undefined) {
+    errors.push('WorldSettings cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const settings = obj as any;
+
+  if (!partial) {
+    if (typeof settings.maxAttributes !== 'number') {
+      errors.push('Property "maxAttributes" must be a number');
+    } else if (settings.maxAttributes <= 0) {
+      errors.push('Property "maxAttributes" must be greater than 0');
+    }
+
+    if (typeof settings.maxSkills !== 'number') {
+      errors.push('Property "maxSkills" must be a number');
+    } else if (settings.maxSkills <= 0) {
+      errors.push('Property "maxSkills" must be greater than 0');
+    }
+
+    if (typeof settings.attributePointPool !== 'number') {
+      errors.push('Property "attributePointPool" must be a number');
+    } else if (settings.attributePointPool <= 0) {
+      errors.push('Property "attributePointPool" must be greater than 0');
+    }
+
+    if (typeof settings.skillPointPool !== 'number') {
+      errors.push('Property "skillPointPool" must be a number');
+    } else if (settings.skillPointPool <= 0) {
+      errors.push('Property "skillPointPool" must be greater than 0');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('maxAttributes' in settings) {
+      if (typeof settings.maxAttributes !== 'number') {
+        errors.push('Property "maxAttributes" must be a number when present');
+      } else if (settings.maxAttributes <= 0) {
+        errors.push('Property "maxAttributes" must be greater than 0');
+      }
+    }
+    
+    if ('maxSkills' in settings) {
+      if (typeof settings.maxSkills !== 'number') {
+        errors.push('Property "maxSkills" must be a number when present');
+      } else if (settings.maxSkills <= 0) {
+        errors.push('Property "maxSkills" must be greater than 0');
+      }
+    }
+    
+    if ('attributePointPool' in settings) {
+      if (typeof settings.attributePointPool !== 'number') {
+        errors.push('Property "attributePointPool" must be a number when present');
+      } else if (settings.attributePointPool <= 0) {
+        errors.push('Property "attributePointPool" must be greater than 0');
+      }
+    }
+    
+    if ('skillPointPool' in settings) {
+      if (typeof settings.skillPointPool !== 'number') {
+        errors.push('Property "skillPointPool" must be a number when present');
+      } else if (settings.skillPointPool <= 0) {
+        errors.push('Property "skillPointPool" must be greater than 0');
+      }
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for WorldImage objects
+ */
+export function isWorldImage(obj: unknown): obj is WorldImage {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const image = obj as any;
+  return ['ai-generated', 'placeholder'].includes(image.type) &&
+    (image.url === null || typeof image.url === 'string') &&
+    (image.generatedAt === undefined || typeof image.generatedAt === 'string') &&
+    (image.prompt === undefined || typeof image.prompt === 'string');
+}
+
+/**
+ * ValidationResult-based WorldImage validation
+ */
+export function validateWorldImage(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+  const validTypes = ['ai-generated', 'placeholder'];
+
+  if (obj === null || obj === undefined) {
+    errors.push('WorldImage cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const image = obj as any;
+
+  if (!validTypes.includes(image.type)) {
+    errors.push(`Property "type" must be one of: ${validTypes.join(', ')}`);
+  }
+
+  if (image.url !== null && typeof image.url !== 'string') {
+    errors.push('Property "url" must be null or a string');
+  }
+
+  if (image.generatedAt !== undefined && typeof image.generatedAt !== 'string') {
+    errors.push('Property "generatedAt" must be a string when present');
+  }
+
+  if (image.prompt !== undefined && typeof image.prompt !== 'string') {
+    errors.push('Property "prompt" must be a string when present');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterAttribute objects
+ */
+export function isCharacterAttribute(obj: unknown): obj is CharacterAttribute {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const attr = obj as any;
+  return typeof attr.attributeId === 'string' &&
+    typeof attr.value === 'number' &&
+    attr.value >= 0;
+}
+
+/**
+ * ValidationResult-based CharacterAttribute validation
+ */
+export function validateCharacterAttribute(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterAttribute cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const attr = obj as any;
+
+  if (typeof attr.attributeId !== 'string') {
+    errors.push('Property "attributeId" must be a string');
+  }
+
+  if (typeof attr.value !== 'number') {
+    errors.push('Property "value" must be a number');
+  } else if (attr.value < 0) {
+    errors.push('Property "value" must be non-negative');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterSkill objects
+ */
+export function isCharacterSkill(obj: unknown): obj is CharacterSkill {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const skill = obj as any;
+  return typeof skill.skillId === 'string' &&
+    typeof skill.level === 'number' &&
+    typeof skill.experience === 'number' &&
+    typeof skill.isActive === 'boolean' &&
+    skill.level >= 0 &&
+    skill.experience >= 0;
+}
+
+/**
+ * ValidationResult-based CharacterSkill validation
+ */
+export function validateCharacterSkill(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterSkill cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const skill = obj as any;
+
+  if (typeof skill.skillId !== 'string') {
+    errors.push('Property "skillId" must be a string');
+  }
+
+  if (typeof skill.level !== 'number') {
+    errors.push('Property "level" must be a number');
+  } else if (skill.level < 0) {
+    errors.push('Property "level" must be non-negative');
+  }
+
+  if (typeof skill.experience !== 'number') {
+    errors.push('Property "experience" must be a number');
+  } else if (skill.experience < 0) {
+    errors.push('Property "experience" must be non-negative');
+  }
+
+  if (typeof skill.isActive !== 'boolean') {
+    errors.push('Property "isActive" must be a boolean');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterBackground objects
+ */
+export function isCharacterBackground(obj: unknown): obj is CharacterBackground {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const bg = obj as any;
+  return typeof bg.history === 'string' &&
+    typeof bg.personality === 'string' &&
+    Array.isArray(bg.goals) &&
+    Array.isArray(bg.fears) &&
+    Array.isArray(bg.relationships) &&
+    bg.goals.every((goal: any) => typeof goal === 'string') &&
+    bg.fears.every((fear: any) => typeof fear === 'string') &&
+    bg.relationships.every((rel: any) => isCharacterRelationship(rel)) &&
+    (bg.physicalDescription === undefined || typeof bg.physicalDescription === 'string') &&
+    (bg.isKnownFigure === undefined || typeof bg.isKnownFigure === 'boolean') &&
+    (bg.knownFigureType === undefined || 
+     ['historical', 'fictional', 'celebrity', 'mythological', 'other'].includes(bg.knownFigureType));
+}
+
+/**
+ * ValidationResult-based CharacterBackground validation
+ */
+export function validateCharacterBackground(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+  const errors: string[] = [];
+  const { partial = false } = options || {};
+  const validKnownFigureTypes = ['historical', 'fictional', 'celebrity', 'mythological', 'other'];
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterBackground cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const bg = obj as any;
+
+  if (!partial) {
+    if (typeof bg.history !== 'string') {
+      errors.push('Property "history" must be a string');
+    }
+
+    if (typeof bg.personality !== 'string') {
+      errors.push('Property "personality" must be a string');
+    }
+
+    if (!Array.isArray(bg.goals)) {
+      errors.push('Property "goals" must be an array');
+    } else if (!bg.goals.every((goal: any) => typeof goal === 'string')) {
+      errors.push('All elements in "goals" must be strings');
+    }
+
+    if (!Array.isArray(bg.fears)) {
+      errors.push('Property "fears" must be an array');
+    } else if (!bg.fears.every((fear: any) => typeof fear === 'string')) {
+      errors.push('All elements in "fears" must be strings');
+    }
+
+    if (!Array.isArray(bg.relationships)) {
+      errors.push('Property "relationships" must be an array');
+    } else {
+      bg.relationships.forEach((rel: any, index: number) => {
+        if (!isCharacterRelationship(rel)) {
+          errors.push(`Invalid CharacterRelationship at index ${index}`);
+        }
+      });
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('history' in bg && typeof bg.history !== 'string') {
+      errors.push('Property "history" must be a string when present');
+    }
+    
+    if ('personality' in bg && typeof bg.personality !== 'string') {
+      errors.push('Property "personality" must be a string when present');
+    }
+    
+    if ('goals' in bg) {
+      if (!Array.isArray(bg.goals)) {
+        errors.push('Property "goals" must be an array when present');
+      } else if (!bg.goals.every((goal: any) => typeof goal === 'string')) {
+        errors.push('All elements in "goals" must be strings');
+      }
+    }
+    
+    if ('fears' in bg) {
+      if (!Array.isArray(bg.fears)) {
+        errors.push('Property "fears" must be an array when present');
+      } else if (!bg.fears.every((fear: any) => typeof fear === 'string')) {
+        errors.push('All elements in "fears" must be strings');
+      }
+    }
+  }
+
+  // Optional property validation
+  if (bg.physicalDescription !== undefined && typeof bg.physicalDescription !== 'string') {
+    errors.push('Property "physicalDescription" must be a string when present');
+  }
+
+  if (bg.isKnownFigure !== undefined && typeof bg.isKnownFigure !== 'boolean') {
+    errors.push('Property "isKnownFigure" must be a boolean when present');
+  }
+
+  if (bg.knownFigureType !== undefined && !validKnownFigureTypes.includes(bg.knownFigureType)) {
+    errors.push(`Property "knownFigureType" must be one of: ${validKnownFigureTypes.join(', ')} when present`);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterRelationship objects
+ */
+export function isCharacterRelationship(obj: unknown): obj is CharacterRelationship {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const rel = obj as any;
+  const validTypes = ['ally', 'enemy', 'neutral', 'romantic', 'family'];
+  
+  return typeof rel.characterId === 'string' &&
+    validTypes.includes(rel.type) &&
+    typeof rel.strength === 'number' &&
+    rel.strength >= -100 &&
+    rel.strength <= 100 &&
+    (rel.description === undefined || typeof rel.description === 'string');
+}
+
+/**
+ * ValidationResult-based CharacterRelationship validation
+ */
+export function validateCharacterRelationship(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+  const validTypes = ['ally', 'enemy', 'neutral', 'romantic', 'family'];
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterRelationship cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const rel = obj as any;
+
+  if (typeof rel.characterId !== 'string') {
+    errors.push('Property "characterId" must be a string');
+  }
+
+  if (!validTypes.includes(rel.type)) {
+    errors.push(`Property "type" must be one of: ${validTypes.join(', ')}`);
+  }
+
+  if (typeof rel.strength !== 'number') {
+    errors.push('Property "strength" must be a number');
+  } else if (rel.strength < -100 || rel.strength > 100) {
+    errors.push('Property "strength" must be between -100 and 100');
+  }
+
+  if (rel.description !== undefined && typeof rel.description !== 'string') {
+    errors.push('Property "description" must be a string when present');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterStatus objects
+ */
+export function isCharacterStatus(obj: unknown): obj is CharacterStatus {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const status = obj as any;
+  return typeof status.health === 'number' &&
+    typeof status.maxHealth === 'number' &&
+    Array.isArray(status.conditions) &&
+    status.health >= 0 &&
+    status.maxHealth > 0 &&
+    status.health <= status.maxHealth &&
+    status.conditions.every((condition: any) => typeof condition === 'string') &&
+    (status.location === undefined || typeof status.location === 'string');
+}
+
+/**
+ * ValidationResult-based CharacterStatus validation
+ */
+export function validateCharacterStatus(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+  const errors: string[] = [];
+  const { partial = false } = options || {};
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterStatus cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const status = obj as any;
+
+  if (!partial) {
+    if (typeof status.health !== 'number') {
+      errors.push('Property "health" must be a number');
+    } else if (status.health < 0) {
+      errors.push('Property "health" must be non-negative');
+    }
+
+    if (typeof status.maxHealth !== 'number') {
+      errors.push('Property "maxHealth" must be a number');
+    } else if (status.maxHealth <= 0) {
+      errors.push('Property "maxHealth" must be greater than 0');
+    }
+
+    if (typeof status.health === 'number' && typeof status.maxHealth === 'number' && status.health > status.maxHealth) {
+      errors.push('Property "health" cannot exceed "maxHealth"');
+    }
+
+    if (!Array.isArray(status.conditions)) {
+      errors.push('Property "conditions" must be an array');
+    } else if (!status.conditions.every((condition: any) => typeof condition === 'string')) {
+      errors.push('All elements in "conditions" must be strings');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('health' in status) {
+      if (typeof status.health !== 'number') {
+        errors.push('Property "health" must be a number when present');
+      } else if (status.health < 0) {
+        errors.push('Property "health" must be non-negative');
+      }
+    }
+    
+    if ('maxHealth' in status) {
+      if (typeof status.maxHealth !== 'number') {
+        errors.push('Property "maxHealth" must be a number when present');
+      } else if (status.maxHealth <= 0) {
+        errors.push('Property "maxHealth" must be greater than 0');
+      }
+    }
+    
+    if ('conditions' in status) {
+      if (!Array.isArray(status.conditions)) {
+        errors.push('Property "conditions" must be an array when present');
+      } else if (!status.conditions.every((condition: any) => typeof condition === 'string')) {
+        errors.push('All elements in "conditions" must be strings');
+      }
+    }
+  }
+
+  // Optional property validation
+  if (status.location !== undefined && typeof status.location !== 'string') {
+    errors.push('Property "location" must be a string when present');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Type guard for CharacterPortrait objects
+ */
+export function isCharacterPortrait(obj: unknown): obj is CharacterPortrait {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return false;
+  }
+
+  const portrait = obj as any;
+  return ['ai-generated', 'placeholder'].includes(portrait.type) &&
+    (portrait.url === null || typeof portrait.url === 'string') &&
+    (portrait.generatedAt === undefined || typeof portrait.generatedAt === 'string') &&
+    (portrait.prompt === undefined || typeof portrait.prompt === 'string');
+}
+
+/**
+ * ValidationResult-based CharacterPortrait validation
+ */
+export function validateCharacterPortrait(obj: unknown): ValidationResult {
+  const errors: string[] = [];
+  const validTypes = ['ai-generated', 'placeholder'];
+
+  if (obj === null || obj === undefined) {
+    errors.push('CharacterPortrait cannot be null or undefined');
+    return { valid: false, errors };
+  }
+
+  if (typeof obj !== 'object') {
+    errors.push(`Expected object, got ${typeof obj}`);
+    return { valid: false, errors };
+  }
+
+  const portrait = obj as any;
+
+  if (!validTypes.includes(portrait.type)) {
+    errors.push(`Property "type" must be one of: ${validTypes.join(', ')}`);
+  }
+
+  if (portrait.url !== null && typeof portrait.url !== 'string') {
+    errors.push('Property "url" must be null or a string');
+  }
+
+  if (portrait.generatedAt !== undefined && typeof portrait.generatedAt !== 'string') {
+    errors.push('Property "generatedAt" must be a string when present');
+  }
+
+  if (portrait.prompt !== undefined && typeof portrait.prompt !== 'string') {
+    errors.push('Property "prompt" must be a string when present');
+  }
+
+  return { valid: errors.length === 0, errors };
 }
