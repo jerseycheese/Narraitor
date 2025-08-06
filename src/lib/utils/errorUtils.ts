@@ -36,7 +36,17 @@ export function isRetryableError(error: Error): boolean {
 }
 
 /**
- * Maps technical errors to user-friendly messages
+ * Maps technical errors to user-friendly messages with categorization
+ * 
+ * Categorizes errors by type to enable conditional error handling logic:
+ * - NETWORK: Connection, timeout, and network-related errors
+ * - SERVICE: Rate limiting and service availability errors  
+ * - AUTH: Authentication and authorization errors
+ * - VALIDATION: Input validation and data format errors
+ * - UNKNOWN: Unrecognized or generic errors
+ * 
+ * @param error - The error to map
+ * @returns User-friendly error object with type categorization
  */
 export function getUserFriendlyError(error: Error): UserFriendlyError {
   const message = error.message.toLowerCase();
