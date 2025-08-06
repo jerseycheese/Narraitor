@@ -1,7 +1,8 @@
 import { 
   isRetryableError, 
   getUserFriendlyError, 
-  userFriendlyErrorMessage 
+  userFriendlyErrorMessage,
+  ErrorType 
 } from '../errorUtils';
 
 describe('errorUtils', () => {
@@ -45,6 +46,15 @@ describe('errorUtils', () => {
       expect(result.retryable).toBe(true);
     });
 
+    it('should handle validation errors', () => {
+      const error = new Error('400 bad request: invalid data');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.title).toBe('Validation Error');
+      expect(result.retryable).toBe(false);
+      expect(result.type).toBe(ErrorType.VALIDATION);
+    });
+
     it('should handle unknown errors', () => {
       const error = new Error('Unknown error');
       const result = getUserFriendlyError(error);
@@ -61,6 +71,61 @@ describe('errorUtils', () => {
       
       expect(typeof message).toBe('string');
       expect(message.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('ErrorType categorization', () => {
+    it('should include type property for network errors', () => {
+      const error = new Error('Network connection failed');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.NETWORK);
+    });
+
+    it('should include type property for authentication errors', () => {
+      const error = new Error('401 unauthorized');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.AUTH);
+    });
+
+    it('should include type property for validation errors', () => {
+      const error = new Error('Validation failed: invalid input');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.VALIDATION);
+      expect(result.retryable).toBe(false);
+    });
+
+    it('should include type property for rate limit errors', () => {
+      const error = new Error('Rate limit exceeded');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.SERVICE);
+    });
+
+    it('should include type property for unknown errors', () => {
+      const error = new Error('Something strange happened');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.UNKNOWN);
+    });
+
+    it('should allow conditional error handling based on type', () => {
+      const networkError = new Error('Network timeout');
+      const authError = new Error('401 unauthorized');
+      
+      const networkResult = getUserFriendlyError(networkError);
+      const authResult = getUserFriendlyError(authError);
+      
+      // Conditional handling based on error type
+      if (networkResult.type === ErrorType.NETWORK) {
+        expect(networkResult.retryable).toBe(true);
+      }
+      
+      if (authResult.type === ErrorType.AUTH) {
+        expect(authResult.retryable).toBe(false);
+      }
     });
   });
 });

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserFriendlyError } from '@/lib/utils/errorUtils';
 import { generateCharacter } from '@/lib/ai/characterGenerator';
 import { getNestedValue } from '@/lib/utils';
 import { World } from '@/types/world.types';
@@ -13,8 +14,14 @@ export async function POST(request: NextRequest) {
     const worldData = getNestedValue(body, 'world');
     
     if (!worldData) {
+      const validationError = getUserFriendlyError(new Error('400 bad request: world data is required'));
       return NextResponse.json(
-        { error: 'World data is required' },
+        { 
+          error: validationError.message,
+          title: validationError.title,
+          type: validationError.type,
+          retryable: validationError.retryable
+        },
         { status: 400 }
       );
     }
@@ -22,8 +29,15 @@ export async function POST(request: NextRequest) {
     // Validate world data structure
     const worldValidation = validateWorld(worldData);
     if (!worldValidation.valid) {
+      const validationError = getUserFriendlyError(new Error(`400 bad request: invalid world data - ${worldValidation.errors[0]}`));
       return NextResponse.json(
-        { error: `Invalid world data: ${worldValidation.errors[0]}` },
+        { 
+          error: validationError.message,
+          title: validationError.title,
+          type: validationError.type,
+          retryable: validationError.retryable,
+          details: worldValidation.errors[0]
+        },
         { status: 400 }
       );
     }
@@ -41,8 +55,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(generatedCharacter);
   } catch (error) {
     console.error('Character generation error:', error);
+    
+    const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Character generation failed'));
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Character generation failed' },
+      { 
+        error: friendlyError.message,
+        title: friendlyError.title,
+        type: friendlyError.type,
+        retryable: friendlyError.retryable,
+        details: error instanceof Error ? error.message : 'Character generation failed'
+      },
       { status: 500 }
     );
   }
