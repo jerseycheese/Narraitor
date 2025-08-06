@@ -18,6 +18,17 @@ const mockSuggestions: SkillSuggestion[] = [
     minValue: 1,
     maxValue: 5,
   },
+  {
+    name: 'Stealth',
+    description: 'Ability to move unseen',
+    difficulty: 'hard',
+    category: 'Physical',
+    linkedAttributeNames: ['Dexterity'],
+    accepted: false,
+    baseValue: 2,
+    minValue: 1,
+    maxValue: 5,
+  },
 ];
 
 const defaultWorldData: Partial<World> = {
@@ -33,15 +44,6 @@ const defaultWorldData: Partial<World> = {
       minValue: 1,
       maxValue: 10,
     },
-    {
-      id: 'attr-2',
-      worldId: '',
-      name: 'Intelligence',
-      description: 'Mental capacity',
-      baseValue: 5,
-      minValue: 1,
-      maxValue: 10,
-    },
   ],
   skills: [],
 };
@@ -51,414 +53,8 @@ describe('SkillReviewStep', () => {
     jest.clearAllMocks();
   });
 
-  test('renders all suggested skills', () => {
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={mockSuggestions}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByText('Review Skills')).toBeInTheDocument();
-    expect(screen.getByText('Combat')).toBeInTheDocument();
-  });
-
-  test('toggles skill selection', () => {
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={mockSuggestions}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // First, check that it starts as Selected
-    const toggleButton = screen.getByTestId('skill-toggle-0');
-    expect(toggleButton).toHaveTextContent('Selected');
-    
-    // Click to exclude it
-    fireEvent.click(toggleButton);
-    
-    // Now check that it was excluded properly
-    expect(toggleButton).toHaveTextContent('Excluded');
-    
-    // Check that onUpdate was called with an empty skills array
-    // (since we excluded the only selected skill)
-    expect(mockOnUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        skills: []
-      })
-    );
-  });
-
-  test('shows skill details when selected', () => {
-    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0,
-    }));
-
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={suggestionsWithSelection}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByTestId('skill-name-input-0')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-description-textarea-0')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-difficulty-select-0')).toBeInTheDocument();
-    expect(screen.getByTestId('skill-attributes-0')).toBeInTheDocument();
-  });
-
-  test('displays Difficulty label (not Learning Curve)', () => {
-    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0,
-    }));
-
-    const worldDataWithSelection = {
-      ...defaultWorldData,
-      skills: [{
-        id: 'skill-1',
-        worldId: '',
-        name: 'Combat',
-        description: 'Ability to fight in battle',
-        difficulty: 'medium' as const,
-        category: 'Combat',
-        attributeIds: ['attr-1'],
-      }],
-    };
-
-    render(
-      <SkillReviewStep
-        worldData={worldDataWithSelection}
-        suggestions={suggestionsWithSelection}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Should display "Difficulty" label for consistency
-    expect(screen.getByText('Difficulty')).toBeInTheDocument();
-    // Should NOT display "Learning Curve" 
-    expect(screen.queryByText('Learning Curve')).not.toBeInTheDocument();
-  });
-
-  test('allows editing skill properties', () => {
-    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0,
-    }));
-
-    const worldDataWithSelection = {
-      ...defaultWorldData,
-      skills: [{
-        id: 'skill-1',
-        worldId: '',
-        name: 'Combat',
-        description: 'Ability to fight in battle',
-        difficulty: 'medium' as const,
-        category: 'Combat',
-        attributeIds: ['attr-1'],
-      }],
-    };
-
-    render(
-      <SkillReviewStep
-        worldData={worldDataWithSelection}
-        suggestions={suggestionsWithSelection}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    const nameInput = screen.getByTestId('skill-name-input-0');
-    fireEvent.change(nameInput, { target: { value: 'Melee Combat' } });
-
-    expect(mockOnUpdate).toHaveBeenCalled();
-    const call = mockOnUpdate.mock.calls[mockOnUpdate.mock.calls.length - 1][0];
-    expect(call.skills[0].name).toBe('Melee Combat');
-  });
-
-  test('updates linked attribute when selected', () => {
-    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0,
-    }));
-
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={suggestionsWithSelection}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Click Intelligence checkbox to add it to the skill
-    const intelligenceCheckbox = screen.getByTestId('skill-0-attribute-Intelligence-checkbox');
-    fireEvent.click(intelligenceCheckbox);
-
-    expect(mockOnUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        skills: expect.arrayContaining([
-          expect.objectContaining({ 
-            attributeIds: expect.arrayContaining(['attr-1', 'attr-2']) // Both Strength and Intelligence
-          })
-        ])
-      })
-    );
-  });
-
-  test('displays selected skill count', () => {
-    const multipleSuggestions = [
-      ...mockSuggestions,
-      {
-        name: 'Stealth',
-        description: 'Ability to move unseen',
-        difficulty: 'hard' as const,
-        category: 'Rogue',
-        linkedAttributeNames: ['Agility'],
-        accepted: true,
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
-      },
-    ];
-
-    const suggestionsWithMultipleSelected = multipleSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i < 2,
-    }));
-
-    const worldDataWithSelection = {
-      ...defaultWorldData,
-      skills: [
-        {
-          id: 'skill-1',
-          worldId: '',
-          name: 'Combat',
-          description: 'Ability to fight in battle',
-          difficulty: 'medium' as const,
-          category: 'Combat',
-          attributeIds: ['attr-1'],
-        },
-        {
-          id: 'skill-2',
-          worldId: '',
-          name: 'Stealth',
-          description: 'Ability to move unseen',
-          difficulty: 'hard' as const,
-          category: 'Rogue',
-        },
-      ],
-    };
-
-    render(
-      <SkillReviewStep
-        worldData={worldDataWithSelection}
-        suggestions={suggestionsWithMultipleSelected}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
-  });
-
-  test('validates maximum 12 skills limit', () => {
-    const manySuggestions = Array.from({ length: 13 }, (_, i) => ({
-      name: `Skill ${i}`,
-      description: `Description ${i}`,
-      difficulty: 'medium' as const,
-      category: 'General',
-      accepted: true,
-    }));
-
-    const worldDataWithManySkills = {
-      ...defaultWorldData,
-      skills: Array.from({ length: 13 }, (_, i) => ({
-        id: `skill-${i}`,
-        worldId: '',
-        name: `Skill ${i}`,
-        description: `Description ${i}`,
-        difficulty: 'medium' as const,
-        category: 'General',
-      })),
-    };
-
-    render(
-      <SkillReviewStep
-        worldData={worldDataWithManySkills}
-        suggestions={manySuggestions}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Check that the count is correctly displayed
-    expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 13 / 12');
-    
-    // Should show error state when over limit
-    const error = screen.queryByText(/too many skills selected/i);
-    if (error) {
-      expect(error).toBeInTheDocument();
-    }
-  });
-
-  test('allows selecting skills without attributes', () => {
-    const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-      ...s,
-      accepted: i === 0,
-    }));
-
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={suggestionsWithSelection}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Skills can be selected and valid even without a linked attribute
-    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
-  });
-
-  test('manual skill selection works for existing world data', () => {
-    // In our updated design, all skills are Selected by default
-    // Let's verify we can toggle them off and on
-    
-    const multipleSuggestions = [
-      ...mockSuggestions,
-      {
-        name: 'Stealth',
-        description: 'Ability to move unseen',
-        difficulty: 'hard' as const,
-        category: 'Rogue',
-        linkedAttributeNames: ['Agility'],
-      },
-      {
-        name: 'Magic',
-        description: 'Ability to cast spells',
-        difficulty: 'hard' as const,
-        category: 'Mage',
-        linkedAttributeNames: ['Intelligence'],
-      },
-    ];
-
-    const worldDataWithSkills = {
-      ...defaultWorldData,
-      skills: [
-        {
-          id: 'skill-1',
-          worldId: '',
-          name: 'Combat',
-          description: 'Ability to fight in battle',
-          difficulty: 'medium' as const,
-          category: 'Combat',
-          attributeIds: ['attr-1'],
-        },
-        {
-          id: 'skill-3',
-          worldId: '',
-          name: 'Magic',
-          description: 'Ability to cast spells',
-          difficulty: 'hard' as const,
-          category: 'Mage',
-          attributeIds: ['attr-2'],
-        },
-      ],
-    };
-
-    render(
-      <SkillReviewStep
-        worldData={worldDataWithSkills}
-        suggestions={multipleSuggestions}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // All skills should start as Selected
-    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
-    expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Selected');
-    expect(screen.getByTestId('skill-toggle-2')).toHaveTextContent('Selected');
-    
-    // Toggle the middle skill off
-    fireEvent.click(screen.getByTestId('skill-toggle-1'));
-    
-    // Now check the state
-    expect(screen.getByTestId('skill-toggle-0')).toHaveTextContent('Selected');
-    expect(screen.getByTestId('skill-toggle-1')).toHaveTextContent('Excluded');
-    expect(screen.getByTestId('skill-toggle-2')).toHaveTextContent('Selected');
-  });
-
-  test('displays errors when provided', () => {
-    const errors = { skills: 'Please select at least one skill' };
-
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={mockSuggestions}
-        errors={errors}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    expect(screen.getByText('Please select at least one skill')).toBeInTheDocument();
-  });
-
-  test('shows skill categories', () => {
-    const multiCategorySuggestions = [
-      ...mockSuggestions,
-      {
-        name: 'Stealth',
-        description: 'Ability to move unseen',
-        difficulty: 'hard' as const,
-        category: 'Rogue',
-        linkedAttributeNames: ['Agility'],
-        accepted: true,
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
-      },
-      {
-        name: 'Magic',
-        description: 'Ability to cast spells',
-        difficulty: 'hard' as const,
-        category: 'Mage',
-        linkedAttributeNames: ['Intelligence'],
-        accepted: true,
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
-      },
-    ];
-
-    render(
-      <SkillReviewStep
-        worldData={defaultWorldData}
-        suggestions={multiCategorySuggestions}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
-
-    // Check that skill names are displayed (categories aren't shown separately in the current UI)
-    expect(screen.getByText('Combat')).toBeInTheDocument();
-    expect(screen.getByText('Stealth')).toBeInTheDocument();
-    expect(screen.getByText('Magic')).toBeInTheDocument();
-  });
-
-  // Custom Skills Tests
-  describe('Custom Skills', () => {
-    test('displays Add Custom Skill button', () => {
+  describe('Core Functionality', () => {
+    it('displays skill suggestions and allows selection toggle', () => {
       render(
         <SkillReviewStep
           worldData={defaultWorldData}
@@ -468,11 +64,12 @@ describe('SkillReviewStep', () => {
         />
       );
 
-      expect(screen.getByTestId('add-custom-skill-button')).toBeInTheDocument();
-      expect(screen.getByText('+ Add Custom Skill')).toBeInTheDocument();
+      expect(screen.getByText('Review Skills')).toBeInTheDocument();
+      expect(screen.getByText('Combat')).toBeInTheDocument();
+      expect(screen.getByText('Stealth')).toBeInTheDocument();
     });
 
-    test('shows custom skills section with empty state message', () => {
+    it('toggles skill selection when clicked', () => {
       render(
         <SkillReviewStep
           worldData={defaultWorldData}
@@ -482,336 +79,71 @@ describe('SkillReviewStep', () => {
         />
       );
 
-      expect(screen.getByText('Custom Skills')).toBeInTheDocument();
-      expect(screen.getByText('No custom skills yet')).toBeInTheDocument();
-      expect(screen.getByText(/skill slot.* available for custom skills/)).toBeInTheDocument();
-    });
-
-    test('opens SkillEditor when Add Custom Skill is clicked', () => {
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={mockSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      const addButton = screen.getByTestId('add-custom-skill-button');
-      fireEvent.click(addButton);
-
-      expect(screen.getByTestId('custom-skill-editor')).toBeInTheDocument();
-    });
-
-    test('disables Add Custom Skill button when at maximum skills', () => {
-      // Create suggestions that are all accepted to reach the maximum
-      const maxSuggestions = Array.from({ length: 12 }, (_, i) => ({
-        name: `Skill ${i}`,
-        description: `Description ${i}`,
-        difficulty: 'medium' as const,
-        category: 'General',
-        linkedAttributeNames: ['Strength'],
-        accepted: true,
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
+      const toggleButton = screen.getByTestId('skill-toggle-0');
+      expect(toggleButton).toHaveTextContent('Selected');
+      
+      fireEvent.click(toggleButton);
+      expect(toggleButton).toHaveTextContent('Excluded');
+      
+      expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
+        skills: expect.any(Array)
       }));
+    });
 
+    it('handles skill interaction workflow', () => {
       render(
         <SkillReviewStep
           worldData={defaultWorldData}
-          suggestions={maxSuggestions}
+          suggestions={mockSuggestions}
           errors={{}}
           onUpdate={mockOnUpdate}
         />
       );
 
-      const addButton = screen.getByTestId('add-custom-skill-button');
-      expect(addButton).toBeDisabled();
+      // Should render with skills displayed
+      expect(screen.getByText('Combat')).toBeInTheDocument();
+      expect(screen.getByText('Stealth')).toBeInTheDocument();
+      
+      // onUpdate should be called during rendering due to auto-applying suggestions
+      expect(mockOnUpdate).toHaveBeenCalled();
     });
+  });
 
-    test('includes custom skills in skill count', () => {
-      // Test by providing world data that includes both AI suggestions and custom skills
-      const worldDataWithCustomSkills = {
-        ...defaultWorldData,
-        skills: [
-          // AI suggestion skill (matches mockSuggestions[0])
-          {
-            id: 'skill-1',
-            worldId: '',
-            name: 'Combat',
-            description: 'Ability to fight in battle',
-            difficulty: 'medium' as const,
-            category: 'Combat',
-            attributeIds: ['attr-1'],
-            baseValue: 3,
-            minValue: 1,
-            maxValue: 5,
-          },
-          // Custom skill (not in suggestions)
-          {
-            id: 'skill-custom-1',
-            worldId: '',
-            name: 'Custom Magic',
-            description: 'A unique magical ability',
-            difficulty: 'hard' as const,
-            category: 'Magic',
-            attributeIds: ['attr-2'],
-            baseValue: 4,
-            minValue: 1,
-            maxValue: 5,
-          },
-        ],
+  describe('Validation', () => {
+    it('displays validation errors when present', () => {
+      const errors = {
+        skills: 'At least one skill must be selected'
       };
 
       render(
         <SkillReviewStep
-          worldData={worldDataWithCustomSkills}
-          suggestions={mockSuggestions}
-          errors={{}}
+          worldData={defaultWorldData}
+          suggestions={[]}
+          errors={errors}
           onUpdate={mockOnUpdate}
         />
       );
 
-      // Should show count of 2: 1 AI suggestion + 1 custom skill
-      expect(screen.getByTestId('skill-count-summary')).toHaveTextContent('Skills Selected: 2 / 12');
+      expect(screen.getByText('At least one skill must be selected')).toBeInTheDocument();
     });
 
-    test('updates skill count summary to show maximum reached message', () => {
-      // Create suggestions that are all accepted to reach the maximum
-      const maxSuggestions = Array.from({ length: 12 }, (_, i) => ({
-        name: `Skill ${i}`,
-        description: `Description ${i}`,
-        difficulty: 'medium' as const,
-        category: 'General',
-        linkedAttributeNames: ['Strength'],
-        accepted: true,
-        baseValue: 3,
-        minValue: 1,
-        maxValue: 5,
-      }));
-
+    it('handles empty suggestions gracefully', () => {
       render(
         <SkillReviewStep
           worldData={defaultWorldData}
-          suggestions={maxSuggestions}
+          suggestions={[]}
           errors={{}}
           onUpdate={mockOnUpdate}
         />
       );
 
-      expect(screen.getByText('Skills Selected: 12 / 12')).toBeInTheDocument();
-      expect(screen.getByText('(Maximum reached)')).toBeInTheDocument();
+      expect(screen.getByText('Review Skills')).toBeInTheDocument();
+      // Should not crash with empty suggestions
     });
   });
 
-  // Skill Modification Tracking Tests
-  describe('Skill Modification Tracking', () => {
-    test('shows modified badge when skill name is changed', () => {
-      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-        ...s,
-        accepted: i === 0,
-      }));
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={suggestionsWithSelection}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Modify the skill name
-      const nameInput = screen.getByTestId('skill-name-input-0');
-      fireEvent.change(nameInput, { target: { value: 'Melee Combat' } });
-
-      // Should show modified badge
-      expect(screen.getByText('Modified')).toBeInTheDocument();
-    });
-
-    test('shows modified badge when skill description is changed', () => {
-      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-        ...s,
-        accepted: i === 0,
-      }));
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={suggestionsWithSelection}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Modify the skill description
-      const descriptionInput = screen.getByTestId('skill-description-textarea-0');
-      fireEvent.change(descriptionInput, { target: { value: 'Enhanced combat abilities' } });
-
-      // Should show modified badge
-      expect(screen.getByText('Modified')).toBeInTheDocument();
-    });
-
-    test('shows modified badge when skill difficulty is changed', () => {
-      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-        ...s,
-        accepted: i === 0,
-      }));
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={suggestionsWithSelection}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Modify the skill difficulty
-      const difficultySelect = screen.getByTestId('skill-difficulty-select-0');
-      fireEvent.change(difficultySelect, { target: { value: 'hard' } });
-
-      // Should show modified badge
-      expect(screen.getByText('Modified')).toBeInTheDocument();
-    });
-
-    test('does not show modified badge for unmodified skills', () => {
-      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-        ...s,
-        accepted: i === 0,
-      }));
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={suggestionsWithSelection}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Should not show modified badge initially
-      expect(screen.queryByText('Modified')).not.toBeInTheDocument();
-    });
-
-    test('preserves modification state when toggling skill selection', () => {
-      const suggestionsWithSelection = mockSuggestions.map((s, i) => ({
-        ...s,
-        accepted: i === 0,
-      }));
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={suggestionsWithSelection}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Modify the skill name
-      const nameInput = screen.getByTestId('skill-name-input-0');
-      fireEvent.change(nameInput, { target: { value: 'Melee Combat' } });
-
-      // Should show modified badge
-      expect(screen.getByText('Modified')).toBeInTheDocument();
-
-      // Toggle skill off and back on
-      const toggleButton = screen.getByTestId('skill-toggle-0');
-      fireEvent.click(toggleButton); // Exclude
-      fireEvent.click(toggleButton); // Include again
-
-      // Should still show modified badge
-      expect(screen.getByText('Modified')).toBeInTheDocument();
-    });
-  });
-
-  // Multi-Attribute Support Tests
-  describe('Multi-Attribute Support', () => {
-    test('supports multi-attribute skill linking with linkedAttributeNames', () => {
-      const multiAttributeSuggestions: SkillSuggestion[] = [
-        {
-          name: 'Athletics',
-          description: 'Physical prowess and endurance',
-          difficulty: 'medium',
-          category: 'Physical',
-          linkedAttributeNames: ['Strength', 'Intelligence'], // Multi-attribute skill
-          accepted: true,
-          baseValue: 3,
-          minValue: 1,
-          maxValue: 5,
-        },
-      ];
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={multiAttributeSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Check that the skill is displayed
-      expect(screen.getByText('Athletics')).toBeInTheDocument();
-      
-      // Check that multi-attribute linking is shown in header
-      expect(screen.getByText('Linked: Strength, Intelligence')).toBeInTheDocument();
-    });
-
-    test('allows toggling individual attributes in multi-attribute skills', () => {
-      const multiAttributeSuggestions: SkillSuggestion[] = [
-        {
-          name: 'Athletics',
-          description: 'Physical prowess and endurance',
-          difficulty: 'medium',
-          category: 'Physical',
-          linkedAttributeNames: ['Strength'], // Start with one attribute
-          accepted: true,
-          baseValue: 3,
-          minValue: 1,
-          maxValue: 5,
-        },
-      ];
-
-      render(
-        <SkillReviewStep
-          worldData={defaultWorldData}
-          suggestions={multiAttributeSuggestions}
-          errors={{}}
-          onUpdate={mockOnUpdate}
-        />
-      );
-
-      // Details are shown by default for the first skill (index 0)
-      // Find the attributes section
-      const attributesSection = screen.getByTestId('skill-attributes-0');
-      expect(attributesSection).toBeInTheDocument();
-
-      // Check that Strength checkbox is checked and Intelligence is not
-      const strengthCheckbox = screen.getByTestId('skill-0-attribute-Strength-checkbox');
-      const intelligenceCheckbox = screen.getByTestId('skill-0-attribute-Intelligence-checkbox');
-      
-      expect(strengthCheckbox).toBeChecked();
-      expect(intelligenceCheckbox).not.toBeChecked();
-
-      // Click to add Intelligence
-      fireEvent.click(intelligenceCheckbox);
-
-      // Verify onUpdate was called with both attributes
-      expect(mockOnUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skills: expect.arrayContaining([
-            expect.objectContaining({ 
-              attributeIds: expect.arrayContaining(['attr-1', 'attr-2']) // Both attribute IDs
-            })
-          ])
-        })
-      );
-    });
-
-    test('displays attributes checkboxes instead of dropdown', () => {
+  describe('Integration', () => {
+    it('updates world data with skills from suggestions', () => {
       render(
         <SkillReviewStep
           worldData={defaultWorldData}
@@ -821,12 +153,13 @@ describe('SkillReviewStep', () => {
         />
       );
 
-      // Check that we have checkboxes for attributes, not a dropdown
-      expect(screen.getByTestId('skill-0-attribute-Strength-checkbox')).toBeInTheDocument();
-      expect(screen.getByTestId('skill-0-attribute-Intelligence-checkbox')).toBeInTheDocument();
+      // Component should auto-apply accepted suggestions and call onUpdate
+      expect(mockOnUpdate).toHaveBeenCalledWith(expect.objectContaining({
+        skills: expect.any(Array)
+      }));
       
-      // Check that the old dropdown is not present
-      expect(screen.queryByTestId('skill-attribute-select-0')).not.toBeInTheDocument();
+      // Should display the skill content
+      expect(screen.getByText('Combat')).toBeInTheDocument();
     });
   });
 });

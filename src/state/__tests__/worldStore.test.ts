@@ -19,6 +19,7 @@ describe('useWorldStore', () => {
     test('should create a new world with generated ID', () => {
       const worldData = {
         name: 'Test World',
+        description: 'A test fantasy world',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -383,6 +384,7 @@ describe('useWorldStore', () => {
       // Add some data
       useWorldStore.getState().createWorld({
         name: 'Test World',
+        description: 'A test fantasy world',
         genre: 'fantasy',
         attributes: [],
         skills: [],

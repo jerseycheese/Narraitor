@@ -12,119 +12,18 @@ import { normalizeText } from '../lib/utils/textNormalization';
 import { ValidationResult } from '../lib/utils/validationUtils';
 
 /**
- * Type guard for World objects with comprehensive validation.
+ * Comprehensive World validation with detailed error messages.
  * 
  * Validates that an unknown object conforms to the World interface structure.
- * Supports both full validation and partial validation for incomplete objects.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns True if the object is a valid World, false otherwise
- * 
- * @example
- * ```typescript
- * // Full validation (all properties required)
- * const completeWorld = {
- *   id: 'world-1',
- *   name: 'Fantasy Realm',
- *   description: 'A magical world',
- *   genre: 'fantasy',
- *   attributes: [],
- *   skills: [],
- *   settings: { maxAttributes: 6, maxSkills: 8, attributePointPool: 27, skillPointPool: 20 },
- *   createdAt: '2025-01-13T10:00:00Z',
- *   updatedAt: '2025-01-13T10:00:00Z'
- * };
- * 
- * if (isWorld(completeWorld)) {
- *   // TypeScript now knows this is a World
- *   console.log(completeWorld.name); // Safe to access
- * }
- * 
- * // Partial validation (only validate present properties)
- * const partialWorld = { id: 'world-1', name: 'Test World' };
- * if (isWorld(partialWorld, { partial: true })) {
- *   // Only validates the properties that are present
- *   console.log(partialWorld.name);
- * }
- * ```
- */
-export function isWorld(obj: unknown, options?: { partial?: boolean }): obj is World {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const world = obj as any;
-  const { partial = false } = options || {};
-
-  // Required properties (always checked)
-  const hasRequiredProps = 
-    typeof world.id === 'string' &&
-    typeof world.name === 'string' &&
-    typeof world.description === 'string' &&
-    typeof world.genre === 'string';
-
-  if (!hasRequiredProps) {
-    return false;
-  }
-
-  // For partial objects, only check what's present
-  if (partial) {
-    if ('attributes' in world && !Array.isArray(world.attributes)) return false;
-    if ('skills' in world && !Array.isArray(world.skills)) return false;
-    if ('settings' in world && !isWorldSettings(world.settings)) return false;
-    if ('image' in world && world.image !== null && !isWorldImage(world.image)) return false;
-    return true;
-  }
-
-  // Full validation for complete objects
-  return Array.isArray(world.attributes) &&
-    Array.isArray(world.skills) &&
-    isWorldSettings(world.settings) &&
-    typeof world.createdAt === 'string' &&
-    typeof world.updatedAt === 'string' &&
-    (world.image === undefined || world.image === null || isWorldImage(world.image)) &&
-    (world.reference === undefined || typeof world.reference === 'string') &&
-    (world.relationship === undefined || ['set_within', 'inspired_by'].includes(world.relationship));
-}
-
-/**
- * ValidationResult-based World validation with detailed error messages.
- * 
- * Provides comprehensive validation with specific error messages for debugging.
  * Returns a ValidationResult object containing validation status and detailed error descriptions.
+ * Supports both full validation and partial validation for form inputs.
  * 
  * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
+ * @param partial - If true, only validates properties that are present (default: false)
  * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidWorld = { id: 'world-1' }; // Missing required properties
- * const result = validateWorld(invalidWorld);
- * 
- * if (!result.valid) {
- *   console.log('Validation errors:');
- *   result.errors.forEach(error => console.log(`- ${error}`));
- *   // Output:
- *   // - Property "name" must be a string
- *   // - Property "description" must be a string
- *   // - Property "genre" must be a string
- *   // - etc.
- * }
- * 
- * // Partial validation for form validation
- * const partialResult = validateWorld({ name: 'Test' }, { partial: true });
- * if (partialResult.valid) {
- *   console.log('Partial validation passed');
- * }
- * ```
  */
-export function validateWorld(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+export function validateWorld(obj: unknown, partial: boolean = false): ValidationResult {
   const errors: string[] = [];
-  const { partial = false } = options || {};
 
   if (obj === null || obj === undefined) {
     errors.push('World object cannot be null or undefined');
@@ -139,17 +38,33 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
   const world = obj as any;
 
   // Required property validation
-  if (typeof world.id !== 'string') {
-    errors.push('Property "id" must be a string');
-  }
-  if (typeof world.name !== 'string') {
-    errors.push('Property "name" must be a string');
-  }
-  if (typeof world.description !== 'string') {
-    errors.push('Property "description" must be a string');
-  }
-  if (typeof world.genre !== 'string') {
-    errors.push('Property "genre" must be a string');
+  if (!partial) {
+    if (typeof world.id !== 'string') {
+      errors.push('Property "id" must be a string');
+    }
+    if (typeof world.name !== 'string') {
+      errors.push('Property "name" must be a string');
+    }
+    if (typeof world.description !== 'string') {
+      errors.push('Property "description" must be a string');
+    }
+    if (typeof world.genre !== 'string') {
+      errors.push('Property "genre" must be a string');
+    }
+  } else {
+    // Partial validation - only check present properties
+    if ('id' in world && typeof world.id !== 'string') {
+      errors.push('Property "id" must be a string when present');
+    }
+    if ('name' in world && typeof world.name !== 'string') {
+      errors.push('Property "name" must be a string when present');
+    }
+    if ('description' in world && typeof world.description !== 'string') {
+      errors.push('Property "description" must be a string when present');
+    }
+    if ('genre' in world && typeof world.genre !== 'string') {
+      errors.push('Property "genre" must be a string when present');
+    }
   }
 
   // For partial validation, only check present properties
@@ -158,8 +73,9 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
       errors.push('Property "attributes" must be an array');
     } else {
       world.attributes.forEach((attr: any, index: number) => {
-        if (!isWorldAttribute(attr)) {
-          errors.push(`Invalid WorldAttribute at index ${index}`);
+        const attrValidation = validateWorldAttribute(attr);
+        if (!attrValidation.valid) {
+          errors.push(`Invalid WorldAttribute at index ${index}: ${attrValidation.errors.join(', ')}`);
         }
       });
     }
@@ -168,8 +84,9 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
       errors.push('Property "skills" must be an array');
     } else {
       world.skills.forEach((skill: any, index: number) => {
-        if (!isWorldSkill(skill)) {
-          errors.push(`Invalid WorldSkill at index ${index}`);
+        const skillValidation = validateWorldSkill(skill);
+        if (!skillValidation.valid) {
+          errors.push(`Invalid WorldSkill at index ${index}: ${skillValidation.errors.join(', ')}`);
         }
       });
     }
@@ -194,7 +111,7 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
       errors.push('Property "skills" must be an array when present');
     }
     if ('settings' in world) {
-      const settingsValidation = validateWorldSettings(world.settings, { partial: true });
+      const settingsValidation = validateWorldSettings(world.settings, true);
       if (!settingsValidation.valid) {
         errors.push(...settingsValidation.errors.map(e => `WorldSettings: ${e}`));
       }
@@ -221,126 +138,14 @@ export function validateWorld(obj: unknown, options?: { partial?: boolean }): Va
 }
 
 /**
- * Type guard for Character objects with comprehensive validation.
+ * Comprehensive Character validation with detailed error messages.
  * 
  * Validates that an unknown object conforms to the Character interface structure.
- * Supports both full validation and partial validation for form inputs or incomplete data.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns True if the object is a valid Character, false otherwise
- * 
- * @example
- * ```typescript
- * // Full character validation
- * const character = {
- *   id: 'char-1',
- *   worldId: 'world-1',
- *   name: 'Hero',
- *   attributes: [],
- *   skills: [],
- *   background: {
- *     history: 'Born in a small village',
- *     personality: 'Brave and kind',
- *     goals: ['Save the kingdom'],
- *     fears: ['Dark magic'],
- *     relationships: []
- *   },
- *   inventory: {},
- *   status: {
- *     health: 100,
- *     maxHealth: 100,
- *     conditions: []
- *   },
- *   createdAt: '2025-01-13T10:00:00Z',
- *   updatedAt: '2025-01-13T10:00:00Z'
- * };
- * 
- * if (isCharacter(character)) {
- *   console.log(`Character: ${character.name}`);
- * }
- * 
- * // Partial validation for character creation form
- * const formData = { name: 'New Hero', worldId: 'world-1' };
- * if (isCharacter(formData, { partial: true })) {
- *   // Valid for form submission
- * }
- * ```
+ * Returns a ValidationResult object containing validation status and detailed error descriptions.
+ * Supports both full validation and partial validation for form inputs.
  */
-export function isCharacter(obj: unknown, options?: { partial?: boolean }): obj is Character {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const character = obj as any;
-  const { partial = false } = options || {};
-
-  // Required properties (always checked)
-  const hasRequiredProps = 
-    typeof character.id === 'string' &&
-    typeof character.worldId === 'string' &&
-    typeof character.name === 'string';
-
-  if (!hasRequiredProps) {
-    return false;
-  }
-
-  // For partial objects, only check what's present
-  if (partial) {
-    if ('attributes' in character && !Array.isArray(character.attributes)) return false;
-    if ('skills' in character && !Array.isArray(character.skills)) return false;
-    if ('background' in character && !isCharacterBackground(character.background)) return false;
-    if ('status' in character && !isCharacterStatus(character.status)) return false;
-    return true;
-  }
-
-  // Full validation for complete objects
-  return Array.isArray(character.attributes) &&
-    Array.isArray(character.skills) &&
-    isCharacterBackground(character.background) &&
-    typeof character.inventory === 'object' &&
-    isCharacterStatus(character.status) &&
-    typeof character.createdAt === 'string' &&
-    typeof character.updatedAt === 'string' &&
-    (character.portrait === undefined || character.portrait === null || isCharacterPortrait(character.portrait));
-}
-
-/**
- * ValidationResult-based Character validation with detailed error messages.
- * 
- * Provides comprehensive validation with specific error messages for debugging character data.
- * Particularly useful for form validation and data import processes.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidCharacter = {
- *   id: 'char-1',
- *   worldId: 'world-1',
- *   name: 'Hero',
- *   attributes: 'invalid', // Should be array
- *   background: 'invalid'  // Should be object
- * };
- * 
- * const result = validateCharacter(invalidCharacter);
- * if (!result.valid) {
- *   result.errors.forEach(error => {
- *     console.log(`Character validation error: ${error}`);
- *   });
- *   // Output includes specific nested validation errors:
- *   // - Property "attributes" must be an array
- *   // - CharacterBackground: Expected object, got string
- * }
- * ```
- */
-export function validateCharacter(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+export function validateCharacter(obj: unknown, partial: boolean = false): ValidationResult {
   const errors: string[] = [];
-  const { partial = false } = options || {};
 
   if (obj === null || obj === undefined) {
     errors.push('Character object cannot be null or undefined');
@@ -371,8 +176,9 @@ export function validateCharacter(obj: unknown, options?: { partial?: boolean })
       errors.push('Property "attributes" must be an array');
     } else {
       character.attributes.forEach((attr: any, index: number) => {
-        if (!isCharacterAttribute(attr)) {
-          errors.push(`Invalid CharacterAttribute at index ${index}`);
+        const attrValidation = validateCharacterAttribute(attr);
+        if (!attrValidation.valid) {
+          errors.push(`Invalid CharacterAttribute at index ${index}: ${attrValidation.errors.join(', ')}`);
         }
       });
     }
@@ -381,8 +187,9 @@ export function validateCharacter(obj: unknown, options?: { partial?: boolean })
       errors.push('Property "skills" must be an array');
     } else {
       character.skills.forEach((skill: any, index: number) => {
-        if (!isCharacterSkill(skill)) {
-          errors.push(`Invalid CharacterSkill at index ${index}`);
+        const skillValidation = validateCharacterSkill(skill);
+        if (!skillValidation.valid) {
+          errors.push(`Invalid CharacterSkill at index ${index}: ${skillValidation.errors.join(', ')}`);
         }
       });
     }
@@ -416,13 +223,13 @@ export function validateCharacter(obj: unknown, options?: { partial?: boolean })
       errors.push('Property "skills" must be an array when present');
     }
     if ('background' in character) {
-      const backgroundValidation = validateCharacterBackground(character.background, { partial: true });
+      const backgroundValidation = validateCharacterBackground(character.background, true);
       if (!backgroundValidation.valid) {
         errors.push(...backgroundValidation.errors.map(e => `CharacterBackground: ${e}`));
       }
     }
     if ('status' in character) {
-      const statusValidation = validateCharacterStatus(character.status, { partial: true });
+      const statusValidation = validateCharacterStatus(character.status, true);
       if (!statusValidation.valid) {
         errors.push(...statusValidation.errors.map(e => `CharacterStatus: ${e}`));
       }
@@ -440,238 +247,8 @@ export function validateCharacter(obj: unknown, options?: { partial?: boolean })
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for InventoryItem objects
- */
-export function isInventoryItem(obj: unknown): obj is InventoryItem {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'name' in obj &&
-    'categoryId' in obj &&
-    'quantity' in obj &&
-    typeof (obj as any).quantity === 'number';
-}
+// Domain-specific validation functions
 
-/**
- * Type guard for NarrativeSegment objects
- */
-export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'worldId' in obj &&
-    'sessionId' in obj &&
-    'content' in obj &&
-    'type' in obj &&
-    'characterIds' in obj &&
-    'metadata' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    Array.isArray((obj as any).characterIds) &&
-    typeof (obj as any).metadata === 'object';
-}
-
-/**
- * Valid journal entry types
- */
-const validJournalEntryTypes: JournalEntryType[] = [
-  'character_event',
-  'world_event',
-  'relationship_change',
-  'achievement',
-  'discovery',
-  'combat',
-  'dialogue'
-];
-
-/**
- * Type guard for arrays of PlayerDecisions
- */
-export function isPlayerDecisionArray(obj: unknown): obj is PlayerDecision[] {
-  return Array.isArray(obj) && obj.every(item => isPlayerDecision(item));
-}
-
-/**
- * Type guard for JournalEntry objects
- */
-export function isJournalEntry(obj: unknown): obj is JournalEntry {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'sessionId' in obj &&
-    'worldId' in obj &&
-    'characterId' in obj &&
-    'type' in obj &&
-    'title' in obj &&
-    'content' in obj &&
-    'significance' in obj &&
-    'isRead' in obj &&
-    'relatedEntities' in obj &&
-    'metadata' in obj &&
-    'createdAt' in obj &&
-    'updatedAt' in obj &&
-    validJournalEntryTypes.includes((obj as any).type) &&
-    Array.isArray((obj as any).relatedEntities) &&
-    typeof (obj as any).metadata === 'object';
-}
-
-/**
- * Type guard for PersonalityTrait
- */
-export function isPersonalityTrait(value: unknown): value is PersonalityTrait {
-  const validTraits: PersonalityTrait[] = [
-    'diplomatic', 'patient', 'empathetic', 'direct', 'impulsive', 'brave',
-    'cautious', 'logical', 'loyal', 'optimistic', 'independent', 'ambitious'
-  ];
-  return typeof value === 'string' && validTraits.includes(value as PersonalityTrait);
-}
-
-/**
- * Type guard for ChoiceTypePreference
- */
-export function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
-  const validChoiceTypes: ChoiceTypePreference[] = [
-    'diplomatic', 'aggressive', 'stealthy', 'helpful', 'selfish', 'lawful', 'chaotic', 'neutral'
-  ];
-  return typeof value === 'string' && validChoiceTypes.includes(value as ChoiceTypePreference);
-}
-
-/**
- * Type guard for PlayerDecision
- */
-export function isPlayerDecision(obj: unknown): obj is PlayerDecision {
-  return obj !== null &&
-    obj !== undefined &&
-    typeof obj === 'object' &&
-    'choiceText' in obj &&
-    'choiceType' in obj &&
-    'context' in obj &&
-    'timestamp' in obj &&
-    typeof (obj as any).choiceText === 'string' &&
-    isChoiceTypePreference((obj as any).choiceType) &&
-    typeof (obj as any).context === 'object' &&
-    typeof (obj as any).timestamp === 'string';
-}
-
-/**
- * Safe string validation helper
- */
-export function isSafeString(value: unknown, maxLength: number = 200): value is string {
-  return typeof value === 'string' && 
-         value.length > 0 && 
-         value.length <= maxLength;
-}
-
-/**
- * Sanitizes a string by removing dangerous content and normalizing text
- */
-export function sanitizeString(value: unknown, maxLength: number = 200): string | undefined {
-  if (typeof value !== 'string' || value.length === 0) return undefined;
-  
-  // First normalize the text to handle whitespace, quotes, and special characters
-  let sanitized = normalizeText(value, {
-    normalizeWhitespace: true,
-    normalizeLineEndings: true,
-    normalizeQuotes: true,
-    normalizeSpecialChars: true,
-    preserveStructure: false
-  });
-  
-  // Remove HTML tags and dangerous characters
-  sanitized = safeTrim(sanitized
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/[&"']/g, '') // Remove dangerous characters
-    .substring(0, maxLength));
-    
-  return sanitized.length > 0 ? sanitized : undefined;
-}
-
-/**
- * Safe array validation helper
- */
-export function isSafeStringArray(value: unknown, maxItems: number = 10, maxLength: number = 100): value is string[] {
-  return Array.isArray(value) && 
-         value.length <= maxItems &&
-         value.every(item => isSafeString(item, maxLength));
-}
-
-// Domain-specific type guards
-
-/**
- * Type guard for WorldAttribute objects.
- * 
- * Validates that an object conforms to the WorldAttribute interface,
- * including range validation for numeric values.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid WorldAttribute, false otherwise
- * 
- * @example
- * ```typescript
- * const attribute = {
- *   id: 'attr-1',
- *   name: 'Strength',
- *   worldId: 'world-1',
- *   description: 'Physical power',
- *   baseValue: 10,
- *   minValue: 1,
- *   maxValue: 20
- * };
- * 
- * if (isWorldAttribute(attribute)) {
- *   // TypeScript knows this is a WorldAttribute
- *   console.log(`${attribute.name}: ${attribute.baseValue}`);
- * }
- * ```
- */
-export function isWorldAttribute(obj: unknown): obj is WorldAttribute {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const attr = obj as any;
-  return typeof attr.id === 'string' &&
-    typeof attr.name === 'string' &&
-    typeof attr.worldId === 'string' &&
-    typeof attr.description === 'string' &&
-    typeof attr.baseValue === 'number' &&
-    typeof attr.minValue === 'number' &&
-    typeof attr.maxValue === 'number' &&
-    attr.minValue <= attr.maxValue &&
-    attr.baseValue >= attr.minValue &&
-    attr.baseValue <= attr.maxValue;
-}
-
-/**
- * ValidationResult-based WorldAttribute validation with detailed error messages.
- * 
- * Validates WorldAttribute objects with comprehensive range checking and
- * provides specific error messages for each validation failure.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidAttribute = {
- *   id: 'attr-1',
- *   name: 'Strength',
- *   baseValue: 25, // Exceeds maxValue
- *   minValue: 10,
- *   maxValue: 20
- * };
- * 
- * const result = validateWorldAttribute(invalidAttribute);
- * if (!result.valid) {
- *   // Will include: "Property baseValue must be less than or equal to maxValue"
- *   console.log(result.errors);
- * }
- * ```
- */
 export function validateWorldAttribute(obj: unknown): ValidationResult {
   const errors: string[] = [];
 
@@ -687,6 +264,7 @@ export function validateWorldAttribute(obj: unknown): ValidationResult {
 
   const attr = obj as any;
 
+  // Property validation
   if (typeof attr.id !== 'string') errors.push('Property "id" must be a string');
   if (typeof attr.name !== 'string') errors.push('Property "name" must be a string');
   if (typeof attr.worldId !== 'string') errors.push('Property "worldId" must be a string');
@@ -710,77 +288,6 @@ export function validateWorldAttribute(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for WorldSkill objects.
- * 
- * Validates that an object conforms to the WorldSkill interface,
- * including difficulty level validation and range checking.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid WorldSkill, false otherwise
- * 
- * @example
- * ```typescript
- * const skill = {
- *   id: 'skill-1',
- *   name: 'Sword Fighting',
- *   worldId: 'world-1',
- *   description: 'Combat with bladed weapons',
- *   difficulty: 'medium',
- *   baseValue: 5,
- *   minValue: 0,
- *   maxValue: 10,
- *   attributeIds: ['strength', 'dexterity']
- * };
- * 
- * if (isWorldSkill(skill)) {
- *   console.log(`${skill.name} (${skill.difficulty})`);
- * }
- * ```
- */
-export function isWorldSkill(obj: unknown): obj is WorldSkill {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const skill = obj as any;
-  const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
-  
-  return typeof skill.id === 'string' &&
-    typeof skill.name === 'string' &&
-    typeof skill.worldId === 'string' &&
-    typeof skill.description === 'string' &&
-    validDifficulties.includes(skill.difficulty) &&
-    typeof skill.baseValue === 'number' &&
-    typeof skill.minValue === 'number' &&
-    typeof skill.maxValue === 'number' &&
-    skill.minValue <= skill.maxValue &&
-    skill.baseValue >= skill.minValue &&
-    skill.baseValue <= skill.maxValue &&
-    (skill.attributeIds === undefined || Array.isArray(skill.attributeIds));
-}
-
-/**
- * ValidationResult-based WorldSkill validation with detailed error messages.
- * 
- * Validates WorldSkill objects including difficulty enum validation
- * and numeric range checking.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidSkill = {
- *   id: 'skill-1',
- *   difficulty: 'invalid-level', // Must be 'easy', 'medium', 'hard', or 'expert'
- *   baseValue: -5 // Must be non-negative
- * };
- * 
- * const result = validateWorldSkill(invalidSkill);
- * // result.errors will include specific validation failures
- * ```
- */
 export function validateWorldSkill(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validDifficulties = ['easy', 'medium', 'hard', 'expert'];
@@ -819,70 +326,8 @@ export function validateWorldSkill(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for WorldSettings objects.
- * 
- * Validates that an object conforms to the WorldSettings interface,
- * ensuring all numeric values are positive.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid WorldSettings, false otherwise
- * 
- * @example
- * ```typescript
- * const settings = {
- *   maxAttributes: 6,
- *   maxSkills: 8,
- *   attributePointPool: 27,
- *   skillPointPool: 20
- * };
- * 
- * if (isWorldSettings(settings)) {
- *   console.log(`Max attributes: ${settings.maxAttributes}`);
- * }
- * ```
- */
-export function isWorldSettings(obj: unknown): obj is WorldSettings {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const settings = obj as any;
-  return typeof settings.maxAttributes === 'number' &&
-    typeof settings.maxSkills === 'number' &&
-    typeof settings.attributePointPool === 'number' &&
-    typeof settings.skillPointPool === 'number' &&
-    settings.maxAttributes > 0 &&
-    settings.maxSkills > 0 &&
-    settings.attributePointPool > 0 &&
-    settings.skillPointPool > 0;
-}
-
-/**
- * ValidationResult-based WorldSettings validation with detailed error messages.
- * 
- * Validates WorldSettings objects with positive number requirements.
- * Supports partial validation for form inputs.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidSettings = {
- *   maxAttributes: -1, // Must be positive
- *   maxSkills: 0       // Must be greater than 0
- * };
- * 
- * const result = validateWorldSettings(invalidSettings);
- * // result.errors will include specific positive number requirements
- * ```
- */
-export function validateWorldSettings(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+export function validateWorldSettings(obj: unknown, partial: boolean = false): ValidationResult {
   const errors: string[] = [];
-  const { partial = false } = options || {};
 
   if (obj === null || obj === undefined) {
     errors.push('WorldSettings cannot be null or undefined');
@@ -958,63 +403,6 @@ export function validateWorldSettings(obj: unknown, options?: { partial?: boolea
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for WorldImage objects.
- * 
- * Validates that an object conforms to the WorldImage interface,
- * including type validation and optional property handling.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid WorldImage, false otherwise
- * 
- * @example
- * ```typescript
- * const image = {
- *   type: 'ai-generated',
- *   url: 'https://example.com/image.jpg',
- *   generatedAt: '2025-01-13T10:00:00Z',
- *   prompt: 'A fantasy castle'
- * };
- * 
- * if (isWorldImage(image)) {
- *   if (image.url) {
- *     console.log(`Image URL: ${image.url}`);
- *   }
- * }
- * ```
- */
-export function isWorldImage(obj: unknown): obj is WorldImage {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const image = obj as any;
-  return ['ai-generated', 'placeholder'].includes(image.type) &&
-    (image.url === null || typeof image.url === 'string') &&
-    (image.generatedAt === undefined || typeof image.generatedAt === 'string') &&
-    (image.prompt === undefined || typeof image.prompt === 'string');
-}
-
-/**
- * ValidationResult-based WorldImage validation with detailed error messages.
- * 
- * Validates WorldImage objects including type enum validation
- * and optional property type checking.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidImage = {
- *   type: 'invalid-type', // Must be 'ai-generated' or 'placeholder'
- *   url: 123            // Must be string or null
- * };
- * 
- * const result = validateWorldImage(invalidImage);
- * // result.errors will include type validation failures
- * ```
- */
 export function validateWorldImage(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validTypes = ['ai-generated', 'placeholder'];
@@ -1050,57 +438,6 @@ export function validateWorldImage(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterAttribute objects.
- * 
- * Validates that an object conforms to the CharacterAttribute interface,
- * ensuring the value is non-negative.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterAttribute, false otherwise
- * 
- * @example
- * ```typescript
- * const charAttribute = {
- *   attributeId: 'strength',
- *   value: 15
- * };
- * 
- * if (isCharacterAttribute(charAttribute)) {
- *   console.log(`Attribute value: ${charAttribute.value}`);
- * }
- * ```
- */
-export function isCharacterAttribute(obj: unknown): obj is CharacterAttribute {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const attr = obj as any;
-  return typeof attr.attributeId === 'string' &&
-    typeof attr.value === 'number' &&
-    attr.value >= 0;
-}
-
-/**
- * ValidationResult-based CharacterAttribute validation with detailed error messages.
- * 
- * Validates CharacterAttribute objects with non-negative value requirements.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidAttribute = {
- *   attributeId: 'strength',
- *   value: -5 // Must be non-negative
- * };
- * 
- * const result = validateCharacterAttribute(invalidAttribute);
- * // result.errors will include: "Property value must be non-negative"
- * ```
- */
 export function validateCharacterAttribute(obj: unknown): ValidationResult {
   const errors: string[] = [];
 
@@ -1129,63 +466,6 @@ export function validateCharacterAttribute(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterSkill objects.
- * 
- * Validates that an object conforms to the CharacterSkill interface,
- * including level and experience validation.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterSkill, false otherwise
- * 
- * @example
- * ```typescript
- * const charSkill = {
- *   skillId: 'sword-fighting',
- *   level: 3,
- *   experience: 150,
- *   isActive: true
- * };
- * 
- * if (isCharacterSkill(charSkill)) {
- *   console.log(`${charSkill.skillId}: Level ${charSkill.level}`);
- * }
- * ```
- */
-export function isCharacterSkill(obj: unknown): obj is CharacterSkill {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const skill = obj as any;
-  return typeof skill.skillId === 'string' &&
-    typeof skill.level === 'number' &&
-    typeof skill.experience === 'number' &&
-    typeof skill.isActive === 'boolean' &&
-    skill.level >= 0 &&
-    skill.experience >= 0;
-}
-
-/**
- * ValidationResult-based CharacterSkill validation with detailed error messages.
- * 
- * Validates CharacterSkill objects with non-negative numeric requirements.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidSkill = {
- *   skillId: 'sword-fighting',
- *   level: -1,    // Must be non-negative
- *   experience: 'high' // Must be number
- * };
- * 
- * const result = validateCharacterSkill(invalidSkill);
- * // result.errors will include specific validation failures
- * ```
- */
 export function validateCharacterSkill(obj: unknown): ValidationResult {
   const errors: string[] = [];
 
@@ -1224,80 +504,8 @@ export function validateCharacterSkill(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterBackground objects.
- * 
- * Validates that an object conforms to the CharacterBackground interface,
- * including arrays and nested relationship validation.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterBackground, false otherwise
- * 
- * @example
- * ```typescript
- * const background = {
- *   history: 'Born in a small village',
- *   personality: 'Brave and compassionate',
- *   goals: ['Save the kingdom', 'Find my family'],
- *   fears: ['Dark magic', 'Losing friends'],
- *   relationships: [
- *     { characterId: 'npc-1', type: 'ally', strength: 80 }
- *   ],
- *   physicalDescription: 'Tall with brown hair',
- *   isKnownFigure: false
- * };
- * 
- * if (isCharacterBackground(background)) {
- *   console.log(background.history);
- * }
- * ```
- */
-export function isCharacterBackground(obj: unknown): obj is CharacterBackground {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const bg = obj as any;
-  return typeof bg.history === 'string' &&
-    typeof bg.personality === 'string' &&
-    Array.isArray(bg.goals) &&
-    Array.isArray(bg.fears) &&
-    Array.isArray(bg.relationships) &&
-    bg.goals.every((goal: any) => typeof goal === 'string') &&
-    bg.fears.every((fear: any) => typeof fear === 'string') &&
-    bg.relationships.every((rel: any) => isCharacterRelationship(rel)) &&
-    (bg.physicalDescription === undefined || typeof bg.physicalDescription === 'string') &&
-    (bg.isKnownFigure === undefined || typeof bg.isKnownFigure === 'boolean') &&
-    (bg.knownFigureType === undefined || 
-     ['historical', 'fictional', 'celebrity', 'mythological', 'other'].includes(bg.knownFigureType));
-}
-
-/**
- * ValidationResult-based CharacterBackground validation with detailed error messages.
- * 
- * Validates CharacterBackground objects including array content validation
- * and nested relationship validation. Supports partial validation.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidBackground = {
- *   history: '',  // Cannot be empty
- *   goals: 'string', // Must be array
- *   relationships: [{ invalid: 'object' }] // Invalid relationship structure
- * };
- * 
- * const result = validateCharacterBackground(invalidBackground);
- * // result.errors will include detailed validation failures
- * ```
- */
-export function validateCharacterBackground(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+export function validateCharacterBackground(obj: unknown, partial: boolean = false): ValidationResult {
   const errors: string[] = [];
-  const { partial = false } = options || {};
   const validKnownFigureTypes = ['historical', 'fictional', 'celebrity', 'mythological', 'other'];
 
   if (obj === null || obj === undefined) {
@@ -1337,8 +545,9 @@ export function validateCharacterBackground(obj: unknown, options?: { partial?: 
       errors.push('Property "relationships" must be an array');
     } else {
       bg.relationships.forEach((rel: any, index: number) => {
-        if (!isCharacterRelationship(rel)) {
-          errors.push(`Invalid CharacterRelationship at index ${index}`);
+        const relValidation = validateCharacterRelationship(rel);
+        if (!relValidation.valid) {
+          errors.push(`Invalid CharacterRelationship at index ${index}: ${relValidation.errors.join(', ')}`);
         }
       });
     }
@@ -1385,66 +594,6 @@ export function validateCharacterBackground(obj: unknown, options?: { partial?: 
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterRelationship objects.
- * 
- * Validates that an object conforms to the CharacterRelationship interface,
- * including type enum validation and strength range checking.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterRelationship, false otherwise
- * 
- * @example
- * ```typescript
- * const relationship = {
- *   characterId: 'npc-mentor',
- *   type: 'ally',
- *   strength: 75,
- *   description: 'My trusted mentor who taught me everything'
- * };
- * 
- * if (isCharacterRelationship(relationship)) {
- *   console.log(`${relationship.type}: ${relationship.strength}%`);
- * }
- * ```
- */
-export function isCharacterRelationship(obj: unknown): obj is CharacterRelationship {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const rel = obj as any;
-  const validTypes = ['ally', 'enemy', 'neutral', 'romantic', 'family'];
-  
-  return typeof rel.characterId === 'string' &&
-    validTypes.includes(rel.type) &&
-    typeof rel.strength === 'number' &&
-    rel.strength >= -100 &&
-    rel.strength <= 100 &&
-    (rel.description === undefined || typeof rel.description === 'string');
-}
-
-/**
- * ValidationResult-based CharacterRelationship validation with detailed error messages.
- * 
- * Validates CharacterRelationship objects including type enum validation
- * and strength range validation (-100 to 100).
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidRelationship = {
- *   characterId: 'npc-1',
- *   type: 'invalid-type', // Must be 'ally', 'enemy', 'neutral', 'romantic', or 'family'
- *   strength: 150         // Must be between -100 and 100
- * };
- * 
- * const result = validateCharacterRelationship(invalidRelationship);
- * // result.errors will include type and range validation failures
- * ```
- */
 export function validateCharacterRelationship(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validTypes = ['ally', 'enemy', 'neutral', 'romantic', 'family'];
@@ -1482,71 +631,8 @@ export function validateCharacterRelationship(obj: unknown): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterStatus objects.
- * 
- * Validates that an object conforms to the CharacterStatus interface,
- * including health range validation and conditions array checking.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterStatus, false otherwise
- * 
- * @example
- * ```typescript
- * const status = {
- *   health: 75,
- *   maxHealth: 100,
- *   conditions: ['blessed', 'well-rested'],
- *   location: 'Castle Courtyard'
- * };
- * 
- * if (isCharacterStatus(status)) {
- *   console.log(`Health: ${status.health}/${status.maxHealth}`);
- * }
- * ```
- */
-export function isCharacterStatus(obj: unknown): obj is CharacterStatus {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const status = obj as any;
-  return typeof status.health === 'number' &&
-    typeof status.maxHealth === 'number' &&
-    Array.isArray(status.conditions) &&
-    status.health >= 0 &&
-    status.maxHealth > 0 &&
-    status.health <= status.maxHealth &&
-    status.conditions.every((condition: any) => typeof condition === 'string') &&
-    (status.location === undefined || typeof status.location === 'string');
-}
-
-/**
- * ValidationResult-based CharacterStatus validation with detailed error messages.
- * 
- * Validates CharacterStatus objects including health range validation
- * and conditions array validation. Supports partial validation.
- * 
- * @param obj - The object to validate
- * @param options - Validation options
- * @param options.partial - If true, only validates properties that are present (default: false)
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidStatus = {
- *   health: 150,    // Cannot exceed maxHealth
- *   maxHealth: 100,
- *   conditions: ['poisoned', 123] // All conditions must be strings
- * };
- * 
- * const result = validateCharacterStatus(invalidStatus);
- * // result.errors will include health range and array content validation
- * ```
- */
-export function validateCharacterStatus(obj: unknown, options?: { partial?: boolean }): ValidationResult {
+export function validateCharacterStatus(obj: unknown, partial: boolean = false): ValidationResult {
   const errors: string[] = [];
-  const { partial = false } = options || {};
 
   if (obj === null || obj === undefined) {
     errors.push('CharacterStatus cannot be null or undefined');
@@ -1617,61 +703,6 @@ export function validateCharacterStatus(obj: unknown, options?: { partial?: bool
   return { valid: errors.length === 0, errors };
 }
 
-/**
- * Type guard for CharacterPortrait objects.
- * 
- * Validates that an object conforms to the CharacterPortrait interface,
- * including type validation and optional property handling.
- * 
- * @param obj - The object to validate
- * @returns True if the object is a valid CharacterPortrait, false otherwise
- * 
- * @example
- * ```typescript
- * const portrait = {
- *   type: 'ai-generated',
- *   url: 'https://example.com/portrait.jpg',
- *   generatedAt: '2025-01-13T10:00:00Z',
- *   prompt: 'A brave knight with kind eyes'
- * };
- * 
- * if (isCharacterPortrait(portrait)) {
- *   console.log(`Portrait type: ${portrait.type}`);
- * }
- * ```
- */
-export function isCharacterPortrait(obj: unknown): obj is CharacterPortrait {
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return false;
-  }
-
-  const portrait = obj as any;
-  return ['ai-generated', 'placeholder'].includes(portrait.type) &&
-    (portrait.url === null || typeof portrait.url === 'string') &&
-    (portrait.generatedAt === undefined || typeof portrait.generatedAt === 'string') &&
-    (portrait.prompt === undefined || typeof portrait.prompt === 'string');
-}
-
-/**
- * ValidationResult-based CharacterPortrait validation with detailed error messages.
- * 
- * Validates CharacterPortrait objects including type enum validation
- * and optional property type checking.
- * 
- * @param obj - The object to validate
- * @returns ValidationResult with `valid` boolean and `errors` array
- * 
- * @example
- * ```typescript
- * const invalidPortrait = {
- *   type: 'custom', // Must be 'ai-generated' or 'placeholder'
- *   url: 123       // Must be string or null
- * };
- * 
- * const result = validateCharacterPortrait(invalidPortrait);
- * // result.errors will include type validation failures
- * ```
- */
 export function validateCharacterPortrait(obj: unknown): ValidationResult {
   const errors: string[] = [];
   const validTypes = ['ai-generated', 'placeholder'];
@@ -1705,4 +736,145 @@ export function validateCharacterPortrait(obj: unknown): ValidationResult {
   }
 
   return { valid: errors.length === 0, errors };
+}
+
+// Boolean type guards for TypeScript type narrowing
+// These provide runtime type checking with narrowed return types for compatibility
+
+export function isWorld(obj: unknown): obj is World {
+  const result = validateWorld(obj);
+  return result.valid;
+}
+
+export function isCharacter(obj: unknown): obj is Character {
+  const result = validateCharacter(obj);
+  return result.valid;
+}
+
+export function isInventoryItem(obj: unknown): obj is InventoryItem {
+  return obj !== null &&
+    obj !== undefined &&
+    typeof obj === 'object' &&
+    'id' in obj &&
+    'name' in obj &&
+    'categoryId' in obj &&
+    'quantity' in obj &&
+    typeof (obj as any).quantity === 'number';
+}
+
+export function isNarrativeSegment(obj: unknown): obj is NarrativeSegment {
+  return obj !== null &&
+    obj !== undefined &&
+    typeof obj === 'object' &&
+    'id' in obj &&
+    'worldId' in obj &&
+    'sessionId' in obj &&
+    'content' in obj &&
+    'type' in obj &&
+    'characterIds' in obj &&
+    'metadata' in obj &&
+    'createdAt' in obj &&
+    'updatedAt' in obj &&
+    Array.isArray((obj as any).characterIds) &&
+    typeof (obj as any).metadata === 'object';
+}
+
+// Valid journal entry types
+const validJournalEntryTypes: JournalEntryType[] = [
+  'character_event',
+  'world_event',
+  'relationship_change',
+  'achievement',
+  'discovery',
+  'combat',
+  'dialogue'
+];
+
+export function isPlayerDecisionArray(obj: unknown): obj is PlayerDecision[] {
+  return Array.isArray(obj) && obj.every(item => isPlayerDecision(item));
+}
+
+export function isJournalEntry(obj: unknown): obj is JournalEntry {
+  return obj !== null &&
+    obj !== undefined &&
+    typeof obj === 'object' &&
+    'id' in obj &&
+    'sessionId' in obj &&
+    'worldId' in obj &&
+    'characterId' in obj &&
+    'type' in obj &&
+    'title' in obj &&
+    'content' in obj &&
+    'significance' in obj &&
+    'isRead' in obj &&
+    'relatedEntities' in obj &&
+    'metadata' in obj &&
+    'createdAt' in obj &&
+    'updatedAt' in obj &&
+    validJournalEntryTypes.includes((obj as any).type) &&
+    Array.isArray((obj as any).relatedEntities) &&
+    typeof (obj as any).metadata === 'object';
+}
+
+export function isPersonalityTrait(value: unknown): value is PersonalityTrait {
+  const validTraits: PersonalityTrait[] = [
+    'diplomatic', 'patient', 'empathetic', 'direct', 'impulsive', 'brave',
+    'cautious', 'logical', 'loyal', 'optimistic', 'independent', 'ambitious'
+  ];
+  return typeof value === 'string' && validTraits.includes(value as PersonalityTrait);
+}
+
+export function isChoiceTypePreference(value: unknown): value is ChoiceTypePreference {
+  const validChoiceTypes: ChoiceTypePreference[] = [
+    'diplomatic', 'aggressive', 'stealthy', 'helpful', 'selfish', 'lawful', 'chaotic', 'neutral'
+  ];
+  return typeof value === 'string' && validChoiceTypes.includes(value as ChoiceTypePreference);
+}
+
+export function isPlayerDecision(obj: unknown): obj is PlayerDecision {
+  return obj !== null &&
+    obj !== undefined &&
+    typeof obj === 'object' &&
+    'choiceText' in obj &&
+    'choiceType' in obj &&
+    'context' in obj &&
+    'timestamp' in obj &&
+    typeof (obj as any).choiceText === 'string' &&
+    isChoiceTypePreference((obj as any).choiceType) &&
+    typeof (obj as any).context === 'object' &&
+    typeof (obj as any).timestamp === 'string';
+}
+
+// Utility functions
+export function isSafeString(value: unknown, maxLength: number = 200): value is string {
+  return typeof value === 'string' && 
+         value.length > 0 && 
+         value.length <= maxLength;
+}
+
+export function sanitizeString(value: unknown, maxLength: number = 200): string | undefined {
+  if (typeof value !== 'string' || value.length === 0) return undefined;
+  
+  // First normalize the text to handle whitespace, quotes, and special characters
+  let sanitized = normalizeText(value, {
+    normalizeWhitespace: true,
+    normalizeLineEndings: true,
+    normalizeQuotes: true,
+    normalizeSpecialChars: true,
+    preserveStructure: false
+  });
+  
+  // Remove HTML tags and dangerous characters
+  sanitized = safeTrim(sanitized
+    .replace(/<[^>]*>/g, '') // Remove HTML tags
+    .replace(/[&"']/g, '') // Remove dangerous characters
+    .substring(0, maxLength));
+    
+  return sanitized.length > 0 ? sanitized : undefined;
+}
+
+export function isSafeStringArray(value: unknown, maxItems: number = 10, maxLength: number = 100): value is string[] {
+  return Array.isArray(value) && 
+         value.length <= maxItems &&
+         value.every(item => isSafeString(item, maxLength));
 }

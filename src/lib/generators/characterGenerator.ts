@@ -1,6 +1,7 @@
 import { World } from '@/types/world.types';
 import Logger from '../utils/logger';
 import { truncate } from '../utils';
+import { validateWorld } from '@/types/type-guards';
 
 const logger = new Logger('CharacterGenerator');
 
@@ -138,6 +139,13 @@ function generateFromTemplate(options: CharacterGenerationOptions): GeneratedCha
  */
 async function generateWithAI(options: CharacterGenerationOptions): Promise<GeneratedCharacterData> {
   const { world, existingNames = [], suggestedName, generationType = 'known' } = options;
+  
+  // Validate the world data first
+  const worldValidation = validateWorld(world);
+  if (!worldValidation.valid) {
+    logger.error('CharacterGenerator', 'Invalid world data provided:', worldValidation.errors[0]);
+    throw new Error(`Cannot generate character: Invalid world data - ${worldValidation.errors[0]}`);
+  }
   
   logger.debug('CharacterGenerator', `Generating ${generationType} character for world:`, {
     worldName: world.name,
@@ -347,9 +355,23 @@ CRITICAL INSTRUCTIONS:
     }
     
     // Validate and clamp all attribute values to world bounds
+    const originalAttributeCount = characterData.attributes.length;
     characterData.attributes = characterData.attributes.map(attr => {
       const worldAttr = world.attributes.find(wa => wa.id === attr.id);
-      if (!worldAttr) return attr;
+      if (!worldAttr) {
+        logger.warn('CharacterGenerator', `AI generated attribute with unknown ID "${attr.id}", removing from character`);
+        return null; // Mark for removal
+      }
+      
+      // Validate attribute structure
+      if (!attr.id || typeof attr.value !== 'number') {
+        logger.warn('CharacterGenerator', `AI generated invalid attribute structure:`, attr);
+        // Create a safe default based on world attribute
+        return {
+          id: worldAttr.id,
+          value: worldAttr.baseValue || Math.floor((worldAttr.minValue + worldAttr.maxValue) / 2)
+        };
+      }
       
       // Clamp value to valid range
       const clampedValue = Math.max(worldAttr.minValue, Math.min(worldAttr.maxValue, attr.value));
@@ -358,29 +380,85 @@ CRITICAL INSTRUCTIONS:
       }
       
       return { ...attr, value: clampedValue };
-    });
+    }).filter(attr => attr !== null); // Remove invalid attributes
+    
+    // Log removed attributes count
+    const removedAttributesCount = originalAttributeCount - characterData.attributes.length;
+    if (removedAttributesCount > 0) {
+      logger.info('CharacterGenerator', `Removed ${removedAttributesCount} invalid attribute(s) during validation`);
+    }
     
     // Validate and clamp all skill levels to 0-10 range
+    const originalSkillCount = characterData.skills.length;
     characterData.skills = characterData.skills.map(skill => {
+      const worldSkill = world.skills.find(ws => ws.id === skill.id);
+      if (!worldSkill) {
+        logger.warn('CharacterGenerator', `AI generated skill with unknown ID "${skill.id}", removing from character`);
+        return null; // Mark for removal
+      }
+      
+      // Validate skill structure
+      if (!skill.id || typeof skill.level !== 'number') {
+        logger.warn('CharacterGenerator', `AI generated invalid skill structure:`, skill);
+        // Create a safe default based on world skill
+        return {
+          id: worldSkill.id,
+          level: 1 // Default to beginner level
+        };
+      }
+      
       const clampedLevel = Math.max(0, Math.min(10, skill.level));
       if (clampedLevel !== skill.level) {
         logger.debug('CharacterGenerator', `Clamped skill ${skill.id}: ${skill.level} -> ${clampedLevel} (range: 0-10)`);
       }
       
       return { ...skill, level: clampedLevel };
-    });
+    }).filter(skill => skill !== null); // Remove invalid skills
+    
+    // Log removed skills count
+    const removedSkillsCount = originalSkillCount - characterData.skills.length;
+    if (removedSkillsCount > 0) {
+      logger.info('CharacterGenerator', `Removed ${removedSkillsCount} invalid skill(s) during validation`);
+    }
     
     // Validate the generated character
-    if (!characterData.name) {
-      throw new Error('Generated character has no name');
+    if (!characterData.name || typeof characterData.name !== 'string' || characterData.name.trim() === '') {
+      throw new Error('Generated character has no valid name');
     }
     
     if (!characterData.attributes || characterData.attributes.length === 0) {
-      throw new Error('Generated character has no attributes');
+      logger.error('CharacterGenerator', 'Generated character has no valid attributes after validation');
+      throw new Error('Generated character has no valid attributes');
     }
     
     if (!characterData.skills || characterData.skills.length === 0) {
-      throw new Error('Generated character has no skills');
+      logger.error('CharacterGenerator', 'Generated character has no valid skills after validation');
+      throw new Error('Generated character has no valid skills');
+    }
+    
+    // Validate background structure
+    if (!characterData.background || typeof characterData.background !== 'object') {
+      logger.warn('CharacterGenerator', 'AI generated invalid background, using defaults');
+      characterData.background = {
+        description: 'A mysterious character with an unknown past.',
+        personality: 'Determined and resourceful.',
+        motivation: 'Seeking their place in the world.',
+        fears: ['The unknown', 'Being forgotten']
+      };
+    }
+    
+    // Ensure background has required fields
+    if (!characterData.background.description || typeof characterData.background.description !== 'string') {
+      characterData.background.description = 'A mysterious character with an unknown past.';
+    }
+    if (!characterData.background.personality || typeof characterData.background.personality !== 'string') {
+      characterData.background.personality = 'Determined and resourceful.';
+    }
+    if (!characterData.background.motivation || typeof characterData.background.motivation !== 'string') {
+      characterData.background.motivation = 'Seeking their place in the world.';
+    }
+    if (!Array.isArray(characterData.background.fears) || characterData.background.fears.length === 0) {
+      characterData.background.fears = ['The unknown', 'Being forgotten'];
     }
     
     // Check for duplicate names (case-insensitive)

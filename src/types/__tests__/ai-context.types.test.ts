@@ -11,6 +11,7 @@ describe('AI Context Types', () => {
         world: {
           id: 'world-1',
           name: 'Western World',
+          description: 'A classic western world',
           genre: 'western',
           attributes: [],
           skills: [],
@@ -27,6 +28,7 @@ describe('AI Context Types', () => {
           id: 'char-1',
           worldId: 'world-1',
           name: 'John Doe',
+          description: 'A lone gunslinger',
           attributes: [],
           skills: [],
           background: {

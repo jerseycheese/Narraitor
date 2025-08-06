@@ -2,6 +2,27 @@ import { WorldAttribute, WorldSkill, WorldSettings } from '@/types/world.types';
 import { parseAIJsonResponse, validateRequiredFields, validateArrayFields } from '@/lib/utils/aiResponseParser';
 import { normalizeGenre } from '@/lib/constants/genres';
 import { normalizeText } from '@/lib/utils/textNormalization';
+import { validateWorldAttribute, validateWorldSkill, validateWorldSettings } from '@/types/type-guards';
+
+// Default fallback values for AI validation failures
+const DEFAULT_WORLD_ATTRIBUTE = {
+  name: 'Strength',
+  description: 'Physical power and might',
+  baseValue: 5,
+  minValue: 1,
+  maxValue: 10,
+  category: 'General'
+};
+
+const DEFAULT_WORLD_SKILL = {
+  name: 'Basic Knowledge',
+  description: 'General knowledge and awareness',
+  difficulty: 'easy' as const,
+  category: 'General',
+  baseValue: 1,
+  minValue: 1,
+  maxValue: 5,
+};
 
 export interface GeneratedWorldData {
   name: string;
@@ -261,7 +282,9 @@ Make the world interesting and playable with concepts appropriate to the setting
       const attributesArray = parsed.attributes as unknown[];
       const attributes = attributesArray.map((attr: unknown) => {
         const attrObj = attr as Record<string, unknown>;
-        return {
+        const attribute = {
+          id: 'temp-id', // Temporary ID for validation
+          worldId: 'temp-world-id', // Temporary worldId for validation
           name: String(attrObj.name || 'Unknown Attribute'),
           description: normalizeText(String(attrObj.description || ''), {
             normalizeWhitespace: true,
@@ -275,13 +298,33 @@ Make the world interesting and playable with concepts appropriate to the setting
           maxValue: Number(attrObj.maxValue) || 10,
           category: String(attrObj.category || 'General')
         };
+        
+        // Validate the constructed attribute
+        const validation = validateWorldAttribute(attribute);
+        if (!validation.valid) {
+          console.warn(`AI generated invalid attribute "${attribute.name}":`, validation.errors[0]);
+          // Return a safe default attribute
+          return { ...DEFAULT_WORLD_ATTRIBUTE };
+        }
+        
+        // Return without temp IDs
+        return {
+          name: attribute.name,
+          description: attribute.description,
+          baseValue: attribute.baseValue,
+          minValue: attribute.minValue,
+          maxValue: attribute.maxValue,
+          category: attribute.category
+        };
       });
       
       // Validate and clean skills
       const skillsArray = parsed.skills as unknown[];
       const skills = skillsArray.map((skill: unknown) => {
         const skillObj = skill as Record<string, unknown>;
-        return {
+        const skillData = {
+          id: 'temp-id', // Temporary ID for validation
+          worldId: 'temp-world-id', // Temporary worldId for validation
           name: String(skillObj.name || 'Unknown Skill'),
           description: normalizeText(String(skillObj.description || ''), {
             normalizeWhitespace: true,
@@ -296,15 +339,45 @@ Make the world interesting and playable with concepts appropriate to the setting
           minValue: 1,
           maxValue: 5,
         };
+        
+        // Validate the constructed skill
+        const validation = validateWorldSkill(skillData);
+        if (!validation.valid) {
+          console.warn(`AI generated invalid skill "${skillData.name}":`, validation.errors[0]);
+          // Return a safe default skill
+          return { ...DEFAULT_WORLD_SKILL };
+        }
+        
+        // Return without temp IDs
+        return {
+          name: skillData.name,
+          description: skillData.description,
+          difficulty: skillData.difficulty,
+          category: skillData.category,
+          baseValue: skillData.baseValue,
+          minValue: skillData.minValue,
+          maxValue: skillData.maxValue,
+        };
       });
       
-      // Ensure settings have proper defaults
+      // Ensure settings have proper defaults and validate
       const settings: WorldSettings = {
         maxAttributes: attributes.length,
         maxSkills: skills.length,
         attributePointPool: 30,
         skillPointPool: 50
       };
+      
+      // Validate the constructed settings
+      const settingsValidation = validateWorldSettings(settings);
+      if (!settingsValidation.valid) {
+        console.warn('AI generated invalid world settings:', settingsValidation.errors[0]);
+        // Use safe default settings
+        settings.maxAttributes = Math.max(4, attributes.length);
+        settings.maxSkills = Math.max(6, skills.length);
+        settings.attributePointPool = 30;
+        settings.skillPointPool = 50;
+      }
       
       return {
         name: normalizeText(worldName, {
