@@ -1,0 +1,233 @@
+# Decision Relevance Scoring System
+
+## What This Actually Does
+The basic problem is that when the AI is generating narrative content, it needs to know which of the player's past decisions actually matter to the current situation. If you made 50 decisions over the course of your adventure, probably only 3-4 of them are relevant to what's happening right now.
+
+This system figures out which past decisions are worth paying attention to by scoring them on multiple factors - how recent they are, whether they happened in the same location, if the same characters are involved, that kind of thing. The AI can then focus on the decisions that actually matter instead of getting distracted by every little choice you made.
+
+## How It Works
+
+### The Core Calculator
+The `DecisionRelevanceCalculator` is where the magic happens. You pass it a past decision and the current narrative context, and it spits out a relevance score between 0 and 1:
+
+```typescript
+import { DecisionRelevanceCalculator } from '@/lib/ai/decisionRelevanceCalculator';
+
+const calculator = new DecisionRelevanceCalculator();
+const score = calculator.calculateRelevanceScore(decision, currentContext);
+```
+
+Pretty straightforward to use, but there's actually quite a bit going on under the hood.
+
+### The Five Scoring Factors
+
+The algorithm looks at five different things when deciding how relevant a past decision is:
+
+**Recency (25% of the final score)**
+This one's pretty obvious - more recent decisions matter more. But it's not linear - there's an exponential decay, so a decision from an hour ago is way more relevant than one from yesterday. Decisions that happened in the last hour actually get a 1.5x boost because they're probably still directly affecting the current situation.
+
+**Context Matching (30% of the final score)**
+This is the biggest factor, which makes sense. It looks at whether the decision happened in the same location, involved the same characters, or was in a similar type of situation. If you made a decision about talking to the tavern keeper while in the tavern, that's super relevant if you're currently... also in that tavern talking to someone.
+
+**Decision Impact (20% of the final score)**
+Some decisions just matter more than others. Choosing to attack someone is probably more relevant to the current story than choosing what to eat for breakfast. The system classifies choices as aggressive (high impact), diplomatic (medium-high), neutral (low impact), etc.
+
+**Tag Matching (15% of the final score)**
+This looks at thematic connections. If your current situation involves mystery and investigation tags, and you made a past decision that also involved those themes, that bumps up the relevance even if the specific details are different.
+
+**Character Relationships (10% of the final score)**
+If the same characters are involved in both the past decision and current situation, that adds some relevance. It's the smallest factor because the context matching already covers a lot of this, but it helps with edge cases.
+
+### Tweaking the Algorithm
+
+If the default weights don't work for your specific game style, you can adjust them:
+
+```typescript
+const customConfig: RelevanceScoringConfig = {
+  weights: {
+    recency: 0.3,     // Make recent decisions even more important
+    context: 0.4,     // Location/character matching gets more weight
+    impact: 0.2,      // Decision impact stays the same
+    tagMatch: 0.05,   // Theme matching becomes less important
+    character: 0.05   // Character relationships become less important
+  },
+  recencyDecayRate: 0.1,        // How quickly old decisions become irrelevant
+  maxDaysRelevant: 30,          // Ignore anything older than 30 days
+  minRelevanceScore: 0.1        // Don't bother with decisions scored below 0.1
+};
+
+const calculator = new DecisionRelevanceCalculator(customConfig);
+```
+
+So if you're running a game where location really matters (like a murder mystery in a mansion), you might bump up the context weight. If you're doing a character-driven political intrigue, maybe character relationships should get more weight.
+
+## Actually Using This Thing
+
+The `PlayerDecisionTracker` already existed, but now it's got some new methods that use this relevance scoring:
+
+### Getting the Most Relevant Decisions
+
+```typescript
+import { playerDecisionTracker } from '@/lib/ai/playerDecisionTracker';
+
+// Get the top 10 most relevant decisions for the current situation
+const relevantDecisions = playerDecisionTracker.getRelevantDecisions(
+  currentContext, 
+  10
+);
+```
+
+This is probably what you'll use most often - just ask for the most relevant decisions and the system handles all the scoring behind the scenes.
+
+### When You Need to Debug
+
+If the relevance scoring isn't working the way you expect, you can get the full breakdown:
+
+```typescript
+// Get decisions with all the scoring details
+const decisionsWithScores = playerDecisionTracker.getDecisionsWithRelevanceScores(
+  currentContext
+);
+
+decisionsWithScores.forEach(({ decision, relevanceScore }) => {
+  console.log(`Decision ${decision.id}:`);
+  console.log(`  Overall: ${relevanceScore.overallScore}`);
+  console.log(`  Recency: ${relevanceScore.recencyScore}`);
+  console.log(`  Context: ${relevanceScore.contextScore}`);
+  console.log(`  Impact: ${relevanceScore.impactScore}`);
+});
+```
+
+This is really helpful when you're trying to figure out why a particular decision is ranking higher or lower than you'd expect.
+
+## The Type Definitions
+
+If you're working with this stuff directly, here's what the score objects look like:
+
+```typescript
+interface DecisionRelevanceScore {
+  decisionId: EntityID;
+  overallScore: number;        // The final score (0.0 to 1.0)
+  recencyScore: number;        // How the time factor contributed
+  contextScore: number;        // How the context matching contributed
+  impactScore: number;         // How the decision impact contributed
+  tagMatchScore: number;       // How the tag matching contributed
+  characterScore: number;      // How the character overlap contributed
+  calculatedAt: string;        // When this score was calculated
+  metadata?: {
+    daysSinceDecision: number; // How long ago this decision happened
+    matchedTags: string[];     // Which tags actually matched
+    contextSimilarity: number; // Raw context similarity before weighting
+    impactCategory: string;    // What type of decision this was
+  };
+}
+```
+
+The metadata is optional but super useful for debugging - you can see exactly which tags matched, how similar the contexts were, etc.
+
+And here's what you need to provide as the current context:
+
+```typescript
+interface CurrentNarrativeContext {
+  location?: string;           // Where the current action is happening
+  charactersPresent: string[]; // Who's involved right now
+  situation?: string;          // What's currently going on
+  recentEvents: string[];      // What just happened
+  activeTags: string[];        // Current themes/categories
+  worldId: EntityID;          // Which world we're in
+  sessionId: EntityID;        // Which session this is
+  timestamp: string;          // When this context applies
+}
+```
+
+Most of these are optional except for the IDs and timestamp, but the more context you provide, the better the relevance scoring will be.
+
+## Performance Notes
+
+The performance is actually pretty good - it's O(n) complexity where n is the number of decisions, and in practice it scores 100+ decisions in under 100ms. That's fast enough to use in real-time AI context building without the player noticing any lag.
+
+The algorithm is memory efficient too, so you don't have to worry about it eating up resources if you have a lot of decision history.
+
+## Some Usage Examples
+
+### Basic Scoring
+```typescript
+const context: CurrentNarrativeContext = {
+  location: 'Town Square',
+  charactersPresent: ['Guard Captain'],
+  situation: 'Investigation',
+  recentEvents: ['Crime reported'],
+  activeTags: ['mystery', 'social'],
+  worldId: 'world-1',
+  sessionId: 'session-1',
+  timestamp: new Date().toISOString()
+};
+
+const score = calculator.calculateRelevanceScore(decision, context);
+console.log(`Relevance: ${(score.overallScore * 100).toFixed(1)}%`);
+```
+
+### Analyzing Multiple Decisions at Once
+```typescript
+const analysis = calculator.analyzeDecisionRelevance(allDecisions, context);
+console.log(`Analyzed ${analysis.totalDecisions} decisions`);
+console.log(`${analysis.relevantDecisions} above threshold`);
+console.log(`Average score: ${(analysis.averageScore * 100).toFixed(1)}%`);
+```
+
+### Integrating with AI Context Building
+This is probably the most common use case - getting the most relevant decisions to include in your AI prompts:
+
+```typescript
+// Get the top 5 most relevant decisions for the current situation
+const relevantDecisions = calculator.getMostRelevantDecisions(
+  playerDecisions,
+  currentContext,
+  5
+);
+
+// Use them when building the AI prompt
+const contextPrompt = buildAIPrompt({
+  currentSituation: context.situation,
+  relevantHistory: relevantDecisions.map(d => d.choiceText),
+  // ... other context stuff
+});
+```
+
+This way the AI focuses on the decisions that actually matter instead of trying to remember every single thing the player ever did.
+
+## Why This Actually Helps
+
+### Better AI Responses
+The AI gets to focus on the decisions that actually matter to the current situation instead of getting overwhelmed by irrelevant history. That means more consistent storytelling and better narrative flow.
+
+### Easier Debugging
+When the AI is doing something weird, you can actually see which past decisions it's paying attention to and whether that makes sense. The score breakdowns make it easy to figure out if the relevance algorithm needs tweaking.
+
+### Performance That Doesn't Suck
+The whole thing is designed to be fast enough for real-time use. You can score hundreds of decisions without the player noticing any lag, which means you can be more aggressive about including relevant context.
+
+## Testing
+
+This thing has pretty comprehensive testing - 39 tests across 3 different test suites that cover all the acceptance criteria, performance benchmarks, edge cases, and configuration options. The tests actually validate that the scoring makes sense, not just that the code runs without errors.
+
+## Future Ideas
+
+There's some stuff that could make this even better down the road:
+
+**Machine Learning Integration** - Eventually you could train models on player behavior to learn better relevance patterns specific to different types of games or players.
+
+**Semantic Analysis** - Right now the context matching is pretty basic string comparison. Could enhance that with actual semantic understanding of what the situations mean.
+
+**Adaptive Weights** - The algorithm could learn to adjust the weights based on what actually works well for a particular game or player.
+
+**Visual Debugging Tools** - A UI for seeing relevance scores and understanding why certain decisions are ranking high or low would be pretty useful for game masters.
+
+**Smart Caching** - For decisions that get scored frequently, some intelligent caching could make things even faster.
+
+## Related Stuff
+
+If you're working with this system, you'll probably also want to look at:
+- Player Decision Tracking System (the base system this builds on)
+- AI Context Management (how this integrates with AI prompt building)  
+- Personalization Engine (the broader context of how we personalize narratives)

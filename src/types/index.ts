@@ -63,6 +63,12 @@ export type {
   ExtractionResult,
   ExtractionConfig
 } from './response-extraction.types';
+export type {
+  DecisionRelevanceScore,
+  RelevanceScoringConfig,
+  CurrentNarrativeContext,
+  DecisionRelevanceResult
+} from './relevance.types';
 
 // Export validation functions and remaining type guards
 export { 

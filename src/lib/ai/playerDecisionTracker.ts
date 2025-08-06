@@ -26,6 +26,11 @@ import {
 } from '@/types/personalization.types';
 import { EntityID } from '@/types/common.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
+import { DecisionRelevanceCalculator } from './decisionRelevanceCalculator';
+import { 
+  CurrentNarrativeContext, 
+  DecisionRelevanceScore 
+} from '@/types/relevance.types';
 
 /**
  * Interface for decision tracking configuration
@@ -63,9 +68,11 @@ const DEFAULT_CONFIG: DecisionTrackerConfig = {
 export class PlayerDecisionTracker {
   private config: DecisionTrackerConfig;
   private decisions: PlayerDecision[] = [];
+  private relevanceCalculator: DecisionRelevanceCalculator;
 
   constructor(config: Partial<DecisionTrackerConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.relevanceCalculator = new DecisionRelevanceCalculator();
     this.loadDecisions();
   }
 
@@ -286,6 +293,39 @@ export class PlayerDecisionTracker {
   clearSessionDecisions(sessionId: EntityID): void {
     this.decisions = this.decisions.filter(decision => decision.sessionId !== sessionId);
     this.saveDecisions();
+  }
+
+  /**
+   * Gets most relevant decisions based on current narrative context
+   */
+  getRelevantDecisions(
+    currentContext: CurrentNarrativeContext,
+    maxDecisions: number = 10
+  ): PlayerDecision[] {
+    return this.relevanceCalculator.getMostRelevantDecisions(
+      this.decisions,
+      currentContext,
+      maxDecisions
+    );
+  }
+
+  /**
+   * Gets decisions with their calculated relevance scores for debugging
+   */
+  getDecisionsWithRelevanceScores(
+    currentContext: CurrentNarrativeContext
+  ): Array<{ decision: PlayerDecision; relevanceScore: DecisionRelevanceScore }> {
+    const scores = this.relevanceCalculator.scoreDecisions(this.decisions, currentContext);
+    
+    const decisionsWithScores = this.decisions.map((decision, index) => ({
+      decision,
+      relevanceScore: scores[index]
+    }));
+
+    // Sort by relevance score descending
+    decisionsWithScores.sort((a, b) => b.relevanceScore.overallScore - a.relevanceScore.overallScore);
+    
+    return decisionsWithScores;
   }
 
   /**
