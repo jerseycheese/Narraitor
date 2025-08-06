@@ -49,6 +49,15 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     });
   };
 
+  const handlePhysicalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onUpdate({
+      background: {
+        ...data.characterData.background,
+        physicalDescription: e.target.value,
+      },
+    });
+  };
+
   const validation = data.validation[3];
   const showErrors = validation?.touched && !validation?.valid;
 
@@ -96,6 +105,23 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
         />
         <p className={wizardStyles.form.helpText}>
           {data.characterData.background.personality.length} / 30 characters minimum
+        </p>
+      </div>
+
+      <div className={wizardStyles.form.group}>
+        <label htmlFor="character-physical-description" className={wizardStyles.form.label}>
+          Physical Appearance (Optional)
+        </label>
+        <textarea
+          id="character-physical-description"
+          value={data.characterData.background.physicalDescription || ''}
+          onChange={handlePhysicalDescriptionChange}
+          rows={4}
+          className={wizardStyles.form.textarea}
+          placeholder="Describe your character's physical appearance... (optional)"
+        />
+        <p className={wizardStyles.form.helpText}>
+          Optional field to describe how your character looks
         </p>
       </div>
 
