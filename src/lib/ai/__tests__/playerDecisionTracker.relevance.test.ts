@@ -232,7 +232,7 @@ describe('PlayerDecisionTracker - Relevance Integration', () => {
       };
       
       // Add it directly to tracker's decisions array for controlled testing
-      const tracker_private = tracker as any;
+      const tracker_private = tracker as unknown as { decisions: typeof differentWorldDecision[] };
       tracker_private.decisions.push(differentWorldDecision);
 
       const relevantDecisions = tracker.getRelevantDecisions(mockCurrentContext, 2);
