@@ -36,7 +36,7 @@ describe('BackgroundStep - Physical Description', () => {
       />
     );
 
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
     expect(physicalDescriptionField).toBeInTheDocument();
     expect(physicalDescriptionField).toHaveAttribute('placeholder', 'Describe your character\'s physical appearance... (optional)');
   });
@@ -62,7 +62,7 @@ describe('BackgroundStep - Physical Description', () => {
       />
     );
 
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
     expect(physicalDescriptionField).toHaveValue('Tall with dark hair and piercing blue eyes');
   });
 
@@ -76,7 +76,7 @@ describe('BackgroundStep - Physical Description', () => {
       />
     );
 
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
     fireEvent.change(physicalDescriptionField, {
       target: { value: 'A mysterious figure with a hooded cloak' }
     });
@@ -99,7 +99,7 @@ describe('BackgroundStep - Physical Description', () => {
       />
     );
 
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
     const multilineDescription = 'Tall and lean with weathered hands.\nScar across the left cheek from an old battle.\nEyes that seem to hold ancient wisdom.';
     
     fireEvent.change(physicalDescriptionField, {
@@ -124,12 +124,12 @@ describe('BackgroundStep - Physical Description', () => {
       />
     );
 
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
     
     // Field should not have required attribute
     expect(physicalDescriptionField).not.toHaveAttribute('required');
     
-    // No asterisk (*) should be present for required field indicator
+    // No asterisk (*) should be present for required field indicator (already handled by "(Optional)" suffix)
     expect(screen.queryByText('Physical Appearance *')).not.toBeInTheDocument();
   });
 
@@ -144,8 +144,8 @@ describe('BackgroundStep - Physical Description', () => {
     );
 
     const personalityField = screen.getByLabelText(/Personality/);
-    const physicalDescriptionField = screen.getByLabelText('Physical Appearance');
-    const motivationField = screen.getByLabelText('Motivation (optional)');
+    const physicalDescriptionField = screen.getByLabelText('Physical Appearance (Optional)');
+    const motivationField = screen.getByLabelText('Motivation');
 
     // Check that physical description comes after personality in DOM order
     expect(personalityField.compareDocumentPosition(physicalDescriptionField) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
