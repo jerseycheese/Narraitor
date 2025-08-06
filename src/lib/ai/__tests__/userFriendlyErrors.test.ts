@@ -1,4 +1,5 @@
 import { getUserFriendlyError } from '../userFriendlyErrors';
+import { ErrorType } from '@/lib/utils/errorUtils';
 
 describe('getUserFriendlyError', () => {
   test('should map network error to user-friendly message', () => {
@@ -9,7 +10,8 @@ describe('getUserFriendlyError', () => {
       title: 'Connection Problem',
       message: 'Unable to connect to the AI service. Please check your internet connection.',
       actionLabel: 'Try Again',
-      retryable: true
+      retryable: true,
+      type: ErrorType.NETWORK
     });
   });
 
@@ -21,7 +23,8 @@ describe('getUserFriendlyError', () => {
       title: 'Request Timed Out',
       message: 'The AI service is taking too long to respond. Please try again.',
       actionLabel: 'Try Again',
-      retryable: true
+      retryable: true,
+      type: ErrorType.NETWORK
     });
   });
 
@@ -33,7 +36,8 @@ describe('getUserFriendlyError', () => {
       title: 'Too Many Requests',
       message: 'You have made too many requests. Please wait a moment before trying again.',
       actionLabel: 'Try Again Later',
-      retryable: true
+      retryable: true,
+      type: ErrorType.SERVICE
     });
   });
 
@@ -44,7 +48,8 @@ describe('getUserFriendlyError', () => {
     expect(result).toEqual({
       title: 'Authentication Error',
       message: 'Unable to authenticate with the AI service. Please check your API key.',
-      retryable: false
+      retryable: false,
+      type: ErrorType.AUTH
     });
   });
 
@@ -56,7 +61,8 @@ describe('getUserFriendlyError', () => {
       title: 'Something Went Wrong',
       message: 'An unexpected error occurred. Please try again.',
       actionLabel: 'Try Again',
-      retryable: false
+      retryable: false,
+      type: ErrorType.UNKNOWN
     });
   });
 });
