@@ -3,11 +3,23 @@
  * Simple, focused functions for common error scenarios
  */
 
+/**
+ * Error type categories for consistent error handling throughout the application
+ */
+export enum ErrorType {
+  NETWORK = 'network',
+  SERVICE = 'service', 
+  VALIDATION = 'validation',
+  AUTH = 'auth',
+  UNKNOWN = 'unknown'
+}
+
 export interface UserFriendlyError {
   title: string;
   message: string;
   actionLabel?: string;
   retryable: boolean;
+  type: ErrorType;
 }
 
 /**
@@ -35,7 +47,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       title: 'Connection Problem',
       message: 'Unable to connect. Please check your internet connection.',
       actionLabel: 'Try Again',
-      retryable: true
+      retryable: true,
+      type: ErrorType.NETWORK
     };
   }
 
@@ -45,7 +58,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       title: 'Request Timed Out', 
       message: 'The request is taking too long. Please try again.',
       actionLabel: 'Try Again',
-      retryable: true
+      retryable: true,
+      type: ErrorType.NETWORK
     };
   }
 
@@ -55,7 +69,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
       title: 'Too Many Requests',
       message: 'Too many requests. Please wait a moment before trying again.',
       actionLabel: 'Try Again Later',
-      retryable: true
+      retryable: true,
+      type: ErrorType.SERVICE
     };
   }
 
@@ -64,7 +79,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     return {
       title: 'Authentication Error',
       message: 'Authentication failed. Please check your credentials.',
-      retryable: false
+      retryable: false,
+      type: ErrorType.AUTH
     };
   }
 
@@ -73,7 +89,8 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     title: 'Something Went Wrong',
     message: 'An unexpected error occurred. Please try again.',
     actionLabel: 'Try Again',
-    retryable: isRetryableError(error)
+    retryable: isRetryableError(error),
+    type: ErrorType.UNKNOWN
   };
 }
 
