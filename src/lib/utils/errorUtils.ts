@@ -94,6 +94,18 @@ export function getUserFriendlyError(error: Error): UserFriendlyError {
     };
   }
 
+  // Validation errors
+  if (message.includes('validation') || message.includes('invalid') || 
+      message.includes('malformed') || message.includes('bad request') ||
+      message.includes('400')) {
+    return {
+      title: 'Validation Error',
+      message: 'The provided data is invalid. Please check your input and try again.',
+      retryable: false,
+      type: ErrorType.VALIDATION
+    };
+  }
+
   // Default for unknown errors
   return {
     title: 'Something Went Wrong',

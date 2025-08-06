@@ -46,6 +46,15 @@ describe('errorUtils', () => {
       expect(result.retryable).toBe(true);
     });
 
+    it('should handle validation errors', () => {
+      const error = new Error('400 bad request: invalid data');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.title).toBe('Validation Error');
+      expect(result.retryable).toBe(false);
+      expect(result.type).toBe(ErrorType.VALIDATION);
+    });
+
     it('should handle unknown errors', () => {
       const error = new Error('Unknown error');
       const result = getUserFriendlyError(error);
@@ -78,6 +87,14 @@ describe('errorUtils', () => {
       const result = getUserFriendlyError(error);
       
       expect(result.type).toBe(ErrorType.AUTH);
+    });
+
+    it('should include type property for validation errors', () => {
+      const error = new Error('Validation failed: invalid input');
+      const result = getUserFriendlyError(error);
+      
+      expect(result.type).toBe(ErrorType.VALIDATION);
+      expect(result.retryable).toBe(false);
     });
 
     it('should include type property for rate limit errors', () => {
