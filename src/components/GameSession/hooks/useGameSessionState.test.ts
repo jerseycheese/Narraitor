@@ -29,13 +29,30 @@ const mockCharacterStoreState = {
     'test-character-id': {
       id: 'test-character-id',
       name: 'Test Character',
+      description: 'A test character',
       worldId: 'test-world',
       level: 1,
       attributes: [],
       skills: [],
-      background: { description: '', personality: '', motivation: '' },
+      background: { 
+        history: '', 
+        personality: '', 
+        goals: [],
+        fears: [],
+        relationships: []
+      },
       isPlayer: true,
-      status: { hp: 100, mp: 50, stamina: 100 },
+      inventory: {
+        characterId: 'test-character-id',
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: { 
+        health: 100, 
+        maxHealth: 100, 
+        conditions: []
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

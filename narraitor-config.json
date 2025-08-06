@@ -86,5 +86,22 @@
     "sameDomainRisk": "MEDIUM",
     "differentDomainRisk": "LOW", 
     "sharedPathRisk": "HIGH"
+  },
+  "workflow": {
+    "framework": {
+      "name": "Development Framework",
+      "template_path": "/Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue-auto.template.md",
+      "workflow_structure_file": ".claude/workflow-structure.json",
+      "enforce_structure": true
+    },
+    "commands": {
+      "claude-auto": "do-issue-auto",
+      "do-issue-auto": "structured_workflow"
+    },
+    "validation": {
+      "require_framework_structure": true,
+      "validate_todo_compliance": true,
+      "fail_on_custom_todos": true
+    }
   }
 }

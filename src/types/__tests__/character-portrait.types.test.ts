@@ -58,6 +58,7 @@ describe('Character Portrait Types', () => {
       const character: Character = {
         id: 'char-1',
         name: 'Test Hero',
+        description: 'A test character for portrait testing',
         worldId: 'world-1',
         attributes: [],
         skills: [],
