@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getUserFriendlyError } from '@/lib/utils/errorUtils';
 import { generateWorld } from '@/lib/generators/worldGenerator';
 import Logger from '@/lib/utils/logger';
 
@@ -62,9 +63,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('generate-world API', 'World generation failed:', error);
     
+    const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Failed to generate world'));
     return NextResponse.json(
       { 
-        error: 'Failed to generate world',
+        error: friendlyError.message,
+        title: friendlyError.title,
+        type: friendlyError.type,
+        retryable: friendlyError.retryable,
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }

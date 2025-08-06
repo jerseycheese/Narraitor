@@ -6,6 +6,7 @@
  */
 
 import { StateCreator } from 'zustand';
+import { getUserFriendlyError, UserFriendlyError } from '@/lib/utils/errorUtils';
 import { generateUniqueId } from '@/lib/utils';
 
 export interface BaseEntity {
@@ -17,7 +18,7 @@ export interface BaseEntity {
 export interface CrudStoreState<T extends BaseEntity> {
   entities: Record<string, T>;
   currentEntityId: string | null;
-  error: string | null;
+  error: UserFriendlyError | null;
   loading: boolean;
 }
 
@@ -29,7 +30,7 @@ export interface CrudStoreActions<T extends BaseEntity> {
   getById: (id: string) => T | undefined;
   getAll: () => T[];
   reset: () => void;
-  setError: (error: string | null) => void;
+  setError: (error: UserFriendlyError | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
 }
@@ -113,8 +114,8 @@ export function createCrudStore<T extends BaseEntity>(
 
         return id;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to create entity';
-        set({ error: errorMessage });
+        const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Failed to create entity'));
+        set({ error: friendlyError });
         throw error;
       }
     },
@@ -123,8 +124,8 @@ export function createCrudStore<T extends BaseEntity>(
       const entity = get().entities[id];
       
       if (!entity) {
-        const error = `${entityName} not found`;
-        set({ error });
+        const friendlyError = getUserFriendlyError(new Error(`${entityName} not found`));
+        set({ error: friendlyError });
         return;
       }
 
@@ -157,8 +158,8 @@ export function createCrudStore<T extends BaseEntity>(
           onAfterUpdate(updatedEntity);
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to update entity';
-        set({ error: errorMessage });
+        const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Failed to update entity'));
+        set({ error: friendlyError });
         throw error;
       }
     },
@@ -192,15 +193,16 @@ export function createCrudStore<T extends BaseEntity>(
           onAfterDelete(id);
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to delete entity';
-        set({ error: errorMessage });
+        const friendlyError = getUserFriendlyError(error instanceof Error ? error : new Error('Failed to delete entity'));
+        set({ error: friendlyError });
         throw error;
       }
     },
 
     setCurrent: (id) => {
       if (id && !get().entities[id]) {
-        set({ error: `${entityName} not found` });
+        const friendlyError = getUserFriendlyError(new Error(`${entityName} not found`));
+        set({ error: friendlyError });
         return;
       }
       set({ currentEntityId: id, error: null });
