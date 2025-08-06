@@ -212,12 +212,14 @@ describe('useWorldStore', () => {
       // Add two attributes (should succeed)
       useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
+        description: 'Physical strength attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
       });
       useWorldStore.getState().addAttribute(worldId, {
         name: 'Dexterity',
+        description: 'Agility and dexterity attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
@@ -226,6 +228,7 @@ describe('useWorldStore', () => {
       // Third attribute should fail
       useWorldStore.getState().addAttribute(worldId, {
         name: 'Intelligence',
+        description: 'Mental acuity attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
@@ -239,6 +242,7 @@ describe('useWorldStore', () => {
     test('should update attribute', () => {
       useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
+        description: 'Physical strength attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
@@ -261,6 +265,7 @@ describe('useWorldStore', () => {
     test('should remove attribute', () => {
       useWorldStore.getState().addAttribute(worldId, {
         name: 'Strength',
+        description: 'Physical strength attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18
@@ -282,6 +287,7 @@ describe('useWorldStore', () => {
     beforeEach(() => {
       worldId = useWorldStore.getState().createWorld({
         name: 'Skill Test World',
+        description: 'A test world for skill management',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -316,12 +322,20 @@ describe('useWorldStore', () => {
 
       useWorldStore.getState().addSkill(worldId, {
         name: 'Skill 1',
-        difficulty: 'easy'
+        description: 'First test skill',
+        difficulty: 'easy',
+        baseValue: 1,
+        minValue: 0,
+        maxValue: 5
       });
 
       useWorldStore.getState().addSkill(worldId, {
         name: 'Skill 2',
-        difficulty: 'easy'
+        description: 'Second test skill',
+        difficulty: 'easy',
+        baseValue: 1,
+        minValue: 0,
+        maxValue: 5
       });
 
       const state = useWorldStore.getState();
@@ -334,6 +348,7 @@ describe('useWorldStore', () => {
     test('should update world settings', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'Settings Test World',
+        description: 'A test world for settings management',
         genre: 'fantasy',
         attributes: [],
         skills: [],

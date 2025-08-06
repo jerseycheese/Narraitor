@@ -150,6 +150,15 @@ export {
   generateBatchReport
 } from './performanceUtils';
 
+// === RESPONSE EXTRACTION UTILITIES ===
+
+/** 
+ * Response information extraction utilities for developer tools and debugging
+ * Extract structured data from AI-generated responses with error handling
+ * @see responseExtractor.ts for detailed usage examples
+ */
+export { ResponseExtractor } from './responseExtractor';
+
 /** Type definitions for performance measurement */
 export type {
   PerformanceMeasurement,

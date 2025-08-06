@@ -512,3 +512,54 @@ This architecture allows:
 - **Reusable Tools**: Same automation scripts work across different projects
 - **Domain Configuration**: Each project defines its own domain structure and patterns
 - **Consistent Workflows**: Standardized development processes while maintaining project-specific customization
+
+## Structured Workflow Enforcement
+To ensure consistency with the Development Framework, Narraitor enforces a structured 8-phase workflow for all `claude-auto` and `do-issue-auto` commands:
+
+### Workflow Structure Configuration
+The project includes workflow structure enforcement to prevent ad-hoc todo creation:
+- **Structure File**: `.claude/workflow-structure.json` - Defines the exact 8-phase workflow from the Development Framework template
+- **Project Config**: `narraitor-config.json` includes workflow enforcement settings
+- **Initialization Script**: `.claude/scripts/init-workflow-structure.sh` - Generates proper todo structure
+
+### Required Workflow Phases
+All `claude-auto` implementations MUST follow these exact phases:
+
+1. **Step 1: Analysis & Planning** - Fetch issue, create technical spec, define scope
+2. **Step 2: Test Definition** - Create TDD tests focusing on acceptance criteria
+3. **Step 2b: Capture Before Screenshots** - Document current state for PR comparison
+4. **Step 3: Implementation** - Implement feature using TDD, follow existing patterns
+5. **Step 4: Build Verification** - Verify build success, no compilation errors
+6. **Step 5: Test Verification** - Run tests, ensure implementation passes without rigging
+7. **Step 5b: Playwright MCP Testing** - Browser automation testing
+8. **Step 5c: Screenshot Processing & Git Commit** - Process and commit screenshots
+9. **Step 6: Code Review & Optimization** - Automated code review, linting, security
+10. **Step 7: Documentation & Cleanup** - Update docs, clean dead code
+11. **Step 7b: Capture After Screenshots & Comparison** - Generate before/after comparison
+12. **Step 8: GitHub Management** - Create PR, update issue
+
+### Usage Instructions
+When running `claude-auto` or `do-issue-auto`:
+
+```bash
+# Initialize proper workflow structure for an issue
+./.claude/scripts/init-workflow-structure.sh 105
+
+# This generates the exact TodoWrite JSON that should be used
+# Copy the output and use it with TodoWrite tool instead of creating custom todos
+```
+
+### Enforcement Rules
+- **NO Custom Todos**: Never create ad-hoc todo lists - always use the structured workflow
+- **Phase Dependencies**: Each phase must complete before the next can begin
+- **Framework Compliance**: Structure matches `/Users/jackhaas/Projects/Development/frameworks/claude-code/commands/do-issue-auto.template.md`
+- **Validation Required**: Project config enforces structure validation
+
+### Benefits of Structured Workflow
+- **Consistency**: Every implementation follows the same proven methodology
+- **Quality**: Structured phases ensure comprehensive testing and documentation
+- **Traceability**: Clear progression through development stages
+- **Framework Alignment**: Direct compliance with Development Framework standards
+- **No Deviation**: Prevents shortcuts that compromise implementation quality
+
+This structured approach ensures that every `claude-auto` execution follows the exact methodology defined in the Development Framework, eliminating inconsistent workflow variations.

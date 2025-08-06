@@ -32,7 +32,8 @@ describe('JournalModal', () => {
       tags: ['prophecy', 'elder'],
       automaticEntry: true
     },
-    createdAt: '2023-01-01T12:00:00Z'
+    createdAt: '2023-01-01T12:00:00Z',
+    updatedAt: '2023-01-01T12:00:00Z'
   };
 
   beforeEach(() => {

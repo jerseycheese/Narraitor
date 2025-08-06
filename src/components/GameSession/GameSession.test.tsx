@@ -139,7 +139,7 @@ describe('GameSession', () => {
   test('renders error state', () => {
     mockedUseGameSessionState.mockReturnValue({
       sessionState: { status: "ended" },
-      error: 'Test error',
+      error: new Error('Test error'),
       worldExists: true,
       world: undefined,
       worldCharacters: [],
@@ -176,14 +176,16 @@ describe('GameSession', () => {
         attributes: [],
         skills: [],
         background: {
-          description: 'Test background',
+          history: 'Test background',
           personality: 'Test personality',
-          motivation: 'Test motivation'
+          goals: ['Test goal'],
+          fears: ['Test fear'],
+          relationships: []
         },
         status: {
-          hp: 100,
-          mp: 50,
-          stamina: 75
+          health: 100,
+          maxHealth: 100,
+          conditions: []
         },
         portrait: {
           type: 'placeholder',
