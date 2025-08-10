@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -111,7 +112,7 @@ async function generateCharacterPortrait(
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = useCharacterStore();
+  const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
   const { worlds, currentWorldId } = useWorldStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
@@ -299,7 +300,9 @@ export default function CharactersPage() {
     
     try {
       const characterName = deleteDialog.characterName;
-      deleteCharacter(deleteDialog.characterId);
+      
+      // Use service layer for decoupled deletion with journal cleanup
+      await CharacterDeletionService.deleteCharacterWithCleanup(deleteDialog.characterId);
       
       // Success toast
       addToast({

@@ -70,8 +70,8 @@ describe('CharacterStore - Related Data Cleanup', () => {
     });
   });
 
-  describe('Character Deletion with Journal Cleanup', () => {
-    test('deletes character and cleans up related journal entries', () => {
+  describe('Character Deletion', () => {
+    test('deletes character from store', () => {
       const { result } = renderHook(() => useCharacterStore());
 
       // Create test characters
@@ -146,14 +146,12 @@ describe('CharacterStore - Related Data Cleanup', () => {
         result.current.deleteCharacter(testCharacterId1);
       });
 
-      // Verify character is deleted
+      // Verify character is deleted from the store
       expect(result.current.characters[testCharacterId1]).toBeUndefined();
       expect(result.current.characters[testCharacterId2]).toBeDefined();
 
-      // Verify journal cleanup was called for character's sessions
-      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith('session-1');
-      expect(mockJournalStore.deleteSessionEntries).toHaveBeenCalledWith('session-2');
-      expect(mockJournalStore.deleteSessionEntries).not.toHaveBeenCalledWith('session-3');
+      // Note: Journal cleanup is now handled by CharacterDeletionService
+      // and should be tested separately
     });
 
     test('clears currentCharacterId when active character is deleted', () => {
@@ -286,22 +284,22 @@ describe('CharacterStore - Related Data Cleanup', () => {
     test('handles deletion gracefully when character does not exist', () => {
       const { result } = renderHook(() => useCharacterStore());
 
+      const initialCharacterCount = Object.keys(result.current.characters).length;
+
       // Try to delete non-existent character
       act(() => {
         result.current.deleteCharacter('non-existent-id');
       });
 
-      // Should not throw error or call journal cleanup
-      expect(mockJournalStore.deleteSessionEntries).not.toHaveBeenCalled();
+      // Should not throw error and characters should remain unchanged
+      expect(Object.keys(result.current.characters)).toHaveLength(initialCharacterCount);
+      
+      // Note: Journal cleanup is now handled by CharacterDeletionService
+      // and tested separately
     });
 
-    test('continues deletion even if journal cleanup fails', () => {
+    test('handles deletion gracefully and reliably', () => {
       const { result } = renderHook(() => useCharacterStore());
-
-      // Mock journal cleanup to fail
-      mockJournalStore.deleteSessionEntries.mockImplementation(() => {
-        throw new Error('Journal cleanup failed');
-      });
 
       let characterId: string;
 
@@ -335,13 +333,16 @@ describe('CharacterStore - Related Data Cleanup', () => {
         });
       });
 
-      // Delete should still work even if cleanup fails
+      // Delete character - this should always work at the store level
       act(() => {
         result.current.deleteCharacter(characterId);
       });
 
-      // Character should still be deleted despite journal cleanup failure
+      // Character should be deleted from the store
       expect(result.current.characters[characterId]).toBeUndefined();
+      
+      // Note: Journal cleanup failures are now handled by CharacterDeletionService
+      // and should be tested at the service layer, not the store layer
     });
   });
 });

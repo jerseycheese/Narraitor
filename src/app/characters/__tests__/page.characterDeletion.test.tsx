@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import CharactersPage from '../page';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { CharacterDeletionService } from '@/services/characterDeletionService';
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -25,6 +26,13 @@ jest.mock('@/state/worldStore');
 // Mock utility functions
 jest.mock('@/lib/utils/generateId', () => ({
   generateUniqueId: jest.fn(() => 'test-id')
+}));
+
+// Mock CharacterDeletionService
+jest.mock('@/services/characterDeletionService', () => ({
+  CharacterDeletionService: {
+    deleteCharacterWithCleanup: jest.fn()
+  }
 }));
 
 // Mock components
@@ -142,6 +150,9 @@ describe('CharactersPage - Character Deletion', () => {
     (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
     (useCharacterStore as unknown as jest.Mock).mockReturnValue(mockCharacterStore);
     (useWorldStore as unknown as jest.Mock).mockReturnValue(mockWorldStore);
+    
+    // Reset service mock to success by default
+    (CharacterDeletionService.deleteCharacterWithCleanup as jest.Mock).mockResolvedValue(undefined);
   });
 
   describe('Delete Button Accessibility', () => {
@@ -194,7 +205,7 @@ describe('CharactersPage - Character Deletion', () => {
       fireEvent.click(screen.getByTestId('confirm-delete'));
       
       await waitFor(() => {
-        expect(mockCharacterStore.deleteCharacter).toHaveBeenCalledWith('char-1');
+        expect(CharacterDeletionService.deleteCharacterWithCleanup).toHaveBeenCalledWith('char-1');
       });
     });
 
@@ -250,9 +261,7 @@ describe('CharactersPage - Character Deletion', () => {
 
   describe('Error Handling', () => {
     test('handles deletion errors gracefully', async () => {
-      mockCharacterStore.deleteCharacter.mockImplementation(() => {
-        throw new Error('Deletion failed');
-      });
+      (CharacterDeletionService.deleteCharacterWithCleanup as jest.Mock).mockRejectedValue(new Error('Deletion failed'));
 
       render(<CharactersPage />);
       

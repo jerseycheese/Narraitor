@@ -5,7 +5,6 @@ import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
-import { useJournalStore } from './journalStore';
 
 // Simplified character types for MVP implementation
 interface CharacterAttribute {
@@ -215,34 +214,6 @@ export const useCharacterStore = create<CharacterStore>()(
         const character = state.characters[id];
         if (!character) {
           return state; // Character doesn't exist, no-op
-        }
-
-        try {
-          // Clean up related journal entries
-          const journalStore = useJournalStore.getState();
-          
-          // Find all journal entries for this character using the characterId field
-          const allEntries = Object.values(journalStore.entries);
-          const characterSessions = new Set<string>();
-          
-          // Find sessions that have entries for this character
-          allEntries.forEach((entry) => {
-            if (entry.characterId === id) {
-              characterSessions.add(entry.sessionId);
-            }
-          });
-          
-          // Delete all sessions for this character
-          characterSessions.forEach(sessionId => {
-            try {
-              journalStore.deleteSessionEntries(sessionId);
-            } catch (error) {
-              console.warn('Failed to clean up journal session:', sessionId, error);
-            }
-          });
-        } catch (error) {
-          console.warn('Failed to clean up journal entries for character:', id, error);
-          // Continue with deletion even if journal cleanup fails
         }
 
         // Remove character from store
