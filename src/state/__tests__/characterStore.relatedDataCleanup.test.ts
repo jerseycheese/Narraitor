@@ -10,7 +10,12 @@ describe('CharacterStore - Related Data Cleanup', () => {
   let testCharacterId2: string;
 
   const mockJournalStore = {
-    entries: {} as Record<string, any>,
+    entries: {} as Record<string, {
+      id: string;
+      sessionId: string;
+      characterId: string;
+      content: string;
+    }>,
     sessionEntries: {
       'session-1': ['entry-1'],
       'session-2': ['entry-2'],
@@ -70,8 +75,6 @@ describe('CharacterStore - Related Data Cleanup', () => {
       const { result } = renderHook(() => useCharacterStore());
 
       // Create test characters
-      let characterId1: string;
-      let characterId2: string;
 
       act(() => {
         testCharacterId1 = result.current.createCharacter({
