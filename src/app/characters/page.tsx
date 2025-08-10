@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -12,6 +13,8 @@ import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 // Using API routes for secure AI operations
 import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
+import { Toast } from '@/components/ui/toast';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -109,7 +112,7 @@ async function generateCharacterPortrait(
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { characters, currentCharacterId, setCurrentCharacter, deleteCharacter, createCharacter, updateCharacter } = useCharacterStore();
+  const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
   const { worlds, currentWorldId } = useWorldStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
@@ -117,6 +120,19 @@ export default function CharactersPage() {
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [characterName, setCharacterName] = useState('');
   const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    characterId: null as string | null,
+    characterName: '',
+    isDeleting: false
+  });
+  const [toasts, setToasts] = useState<Array<{
+    id: string;
+    title: string;
+    description?: string;
+    variant: 'success' | 'error';
+    duration?: number;
+  }>>([]);
   
   // Use worldId from URL if provided, otherwise use the current world
   const worldIdFromUrl = searchParams.get('worldId');
@@ -126,6 +142,22 @@ export default function CharactersPage() {
   const worldCharacters = Object.values(characters).filter(
     char => char.worldId === effectiveWorldId
   );
+
+  // Toast management
+  const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    const newToast = { ...toast, id };
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, toast.duration || 3000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
 
   const handleCreateCharacter = () => {
     router.push('/characters/create');
@@ -250,9 +282,61 @@ export default function CharactersPage() {
   };
 
   const handleDeleteCharacter = (characterId: string) => {
-    if (confirm('Are you sure you want to delete this character?')) {
-      deleteCharacter(characterId);
+    const character = characters[characterId];
+    if (!character) return;
+    
+    setDeleteDialog({
+      isOpen: true,
+      characterId,
+      characterName: character.name,
+      isDeleting: false
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteDialog.characterId) return;
+    
+    setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+    
+    try {
+      const characterName = deleteDialog.characterName;
+      
+      // Use service layer for decoupled deletion with journal cleanup
+      await CharacterDeletionService.deleteCharacterWithCleanup(deleteDialog.characterId);
+      
+      // Success toast
+      addToast({
+        title: 'Character Deleted',
+        description: `${characterName} has been permanently deleted`,
+        variant: 'success'
+      });
+      
+      // Close dialog
+      setDeleteDialog({ 
+        isOpen: false, 
+        characterId: null, 
+        characterName: '', 
+        isDeleting: false 
+      });
+    } catch {
+      // Error toast
+      addToast({
+        title: 'Delete Failed',
+        description: 'Failed to delete character. Please try again.',
+        variant: 'error'
+      });
+      
+      setDeleteDialog(prev => ({ ...prev, isDeleting: false }));
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialog({ 
+      isOpen: false, 
+      characterId: null, 
+      characterName: '', 
+      isDeleting: false 
+    });
   };
 
   if (!effectiveWorldId || !currentWorld) {
@@ -442,6 +526,33 @@ export default function CharactersPage() {
         onCharacterNameChange={setCharacterName}
         onGenerationTypeChange={setGenerationType}
       />
+
+      {/* Character Deletion Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete Character"
+        description="This action cannot be undone. All associated game sessions and journal entries will also be permanently deleted."
+        itemName={deleteDialog.characterName}
+        confirmButtonText="Delete Character"
+        cancelButtonText="Cancel"
+        isDeleting={deleteDialog.isDeleting}
+      />
+
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 space-y-2 z-50">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            title={toast.title}
+            description={toast.description}
+            variant={toast.variant}
+            duration={toast.duration}
+            onDismiss={() => removeToast(toast.id)}
+          />
+        ))}
+      </div>
     </PageLayout>
   );
 }

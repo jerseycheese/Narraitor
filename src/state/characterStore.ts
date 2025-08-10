@@ -211,6 +211,12 @@ export const useCharacterStore = create<CharacterStore>()(
 
       // Delete character
       deleteCharacter: (id) => set((state) => {
+        const character = state.characters[id];
+        if (!character) {
+          return state; // Character doesn't exist, no-op
+        }
+
+        // Remove character from store
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [id]: _deletedCharacter, ...remainingCharacters } = state.characters;
         
