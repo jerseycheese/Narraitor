@@ -208,7 +208,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     return 'Something happened in the adventure.';
   };
 
-  // Helper function to create decision journal entries (Issue #174)
+  // Regex patterns for cleaning decision prompts
+  const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
+  const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
+
+  /**
+   * Creates a journal entry for a decision made by the character.
+   *
+   * @param {Decision} decision - The decision object containing options and prompt.
+   * @param {string} selectedChoiceId - The ID of the selected choice, or the custom choice text if isCustomChoice is true.
+   * @param {boolean} isCustomChoice - If true, indicates that the selected choice is a custom user input rather than a predefined option.
+   *   When true, selectedChoiceId is treated as the custom choice text itself.
+   */
   const createDecisionJournalEntry = (decision: Decision, selectedChoiceId: string, isCustomChoice: boolean) => {
     if (!characterId) return;
     
@@ -219,7 +230,10 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     // Format decision content for readability
     const formatDecisionContent = (choice: string, prompt: string): string => {
       const cleanChoice = choice.toLowerCase();
-      const cleanPrompt = prompt.toLowerCase().replace(/^you\s+/, '').replace(/\?$/, '');
+      const cleanPrompt = prompt
+        .toLowerCase()
+        .replace(YOU_PREFIX_REGEX, '')
+        .replace(QUESTION_MARK_SUFFIX_REGEX, '');
       return `Chose to ${cleanChoice} when ${cleanPrompt}`;
     };
     
