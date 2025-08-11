@@ -25,18 +25,18 @@ jest.mock('@/state/characterStore');
 jest.mock('@/components/Narrative/NarrativeController', () => {
   return {
     NarrativeController: ({ onDecisionGenerated }: { onDecisionGenerated: (decision: Decision) => void }) => {
-      const mockDecision: Decision = {
-        id: 'test-decision',
-        prompt: 'You encounter a suspicious stranger. What do you do?',
-        options: [
-          { id: 'option-1', text: 'Help the stranger', alignment: 'lawful' },
-          { id: 'option-2', text: 'Ignore the stranger', alignment: 'neutral' }
-        ],
-        decisionWeight: 'major',
-        contextSummary: 'Encounter at the tavern'
-      };
-
       React.useEffect(() => {
+        const mockDecision: Decision = {
+          id: 'test-decision',
+          prompt: 'You encounter a suspicious stranger. What do you do?',
+          options: [
+            { id: 'option-1', text: 'Help the stranger', alignment: 'lawful' },
+            { id: 'option-2', text: 'Ignore the stranger', alignment: 'neutral' }
+          ],
+          decisionWeight: 'major',
+          contextSummary: 'Encounter at the tavern'
+        };
+        
         onDecisionGenerated(mockDecision);
       }, [onDecisionGenerated]);
 
