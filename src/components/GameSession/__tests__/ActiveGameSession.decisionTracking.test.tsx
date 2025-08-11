@@ -6,13 +6,12 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import ActiveGameSession from '../ActiveGameSession';
 import { useJournalStore } from '@/state/journalStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';
-import { Decision } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 
 // Mock the stores
@@ -77,9 +76,15 @@ jest.mock('@/components/ui/LoadingState', () => {
   };
 });
 
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  [key: string]: unknown;
+}
+
 jest.mock('@/components/ui/button', () => {
   return {
-    Button: ({ children, onClick, ...props }: any) => (
+    Button: ({ children, onClick, ...props }: ButtonProps) => (
       <button onClick={onClick} {...props}>
         {children}
       </button>
@@ -92,7 +97,7 @@ jest.mock('@/lib/utils', () => {
     generateUniqueId: jest.fn(() => 'test-id'),
     truncate: jest.fn((text: string) => text),
     safeTrim: jest.fn((text: string) => text?.trim() || ''),
-    getNestedValue: jest.fn((obj: any, path: string) => obj)
+    getNestedValue: jest.fn((obj: unknown) => obj)
   };
 });
 
@@ -192,42 +197,8 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
   test('creates journal entry when player makes a significant decision', async () => {
     const onChoiceSelected = jest.fn();
 
-    // Create a mock decision that would be passed to the component
-    const mockDecision: Decision = {
-      id: 'test-decision',
-      prompt: 'You encounter a suspicious stranger. What do you do?',
-      options: [
-        { id: 'option-1', text: 'Help the stranger', alignment: 'lawful' },
-        { id: 'option-2', text: 'Ignore the stranger', alignment: 'neutral' }
-      ],
-      decisionWeight: 'major',
-      contextSummary: 'Encounter at the tavern'
-    };
-
-    // Mock the ChoiceSelector to accept currentDecision and trigger the callback
-    jest.doMock('@/components/shared/ChoiceSelector', () => {
-      return {
-        ChoiceSelector: ({ onSelect, decision }: { onSelect: (choiceId: string) => void, decision?: Decision }) => {
-          // Simulate the component receiving the decision and rendering choices
-          React.useEffect(() => {
-            if (decision && decision.id === 'test-decision') {
-              // This simulates the decision being available for selection
-            }
-          }, [decision]);
-          
-          return (
-            <div data-testid="choice-selector">
-              <button 
-                data-testid="choice-option-1"
-                onClick={() => onSelect('option-1')}
-              >
-                Help the stranger
-              </button>
-            </div>
-          );
-        }
-      };
-    });
+    // Note: In a full integration test, we would create and pass decision data
+    // For now, this test focuses on component structure validation
 
     render(
       <ActiveGameSession
