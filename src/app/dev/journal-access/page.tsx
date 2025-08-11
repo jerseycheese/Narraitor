@@ -22,7 +22,7 @@ import { JournalEntry } from '@/types/journal.types';
 export default function JournalAccessTestPage() {
   const [hasCharacter, setHasCharacter] = React.useState(true);
   const [gameStatus, setGameStatus] = React.useState<'active' | 'paused' | 'ended'>('active');
-  const [entryCount, setEntryCount] = React.useState(2);
+  const [entryCount, setEntryCount] = React.useState(3);
 
   // Setup stores
   React.useEffect(() => {
@@ -150,6 +150,28 @@ export default function JournalAccessTestPage() {
       {
         worldId: 'test-world-1',
         characterId: 'test-char-1',
+        type: 'decision',
+        title: 'Help the Stranger',
+        content: 'Chose to help the stranger when you encounter a suspicious person at the tavern',
+        detailedContent: 'A cloaked figure approached asking about rare books. Despite their suspicious appearance, I decided to provide directions to the library. This could lead to interesting developments.',
+        significance: 'major',
+        isRead: false,
+        relatedEntities: [
+          { id: 'char-4', type: 'character', name: 'Cloaked Stranger' },
+          { id: 'loc-2', type: 'location', name: 'Village Tavern' }
+        ],
+        metadata: { 
+          tags: ['decision', 'stranger', 'tavern'], 
+          automaticEntry: true,
+          decisionId: 'decision-help-stranger',
+          choiceText: 'Help the stranger',
+          decisionPrompt: 'You encounter a suspicious person at the tavern. What do you do?'
+        },
+        updatedAt: new Date().toISOString()
+      },
+      {
+        worldId: 'test-world-1',
+        characterId: 'test-char-1',
         type: 'discovery',
         title: 'The Choice That Changed Everything',
         content: 'Learned a package, meant to arrive before the Myposian...',
@@ -210,7 +232,7 @@ export default function JournalAccessTestPage() {
             <input
               type="range"
               min="0"
-              max="3"
+              max="4"
               value={entryCount}
               onChange={(e) => setEntryCount(parseInt(e.target.value))}
               className="w-full"
@@ -227,7 +249,7 @@ export default function JournalAccessTestPage() {
                 useJournalStore.getState().reset();
                 // Force re-creation with proper content
                 setEntryCount(0);
-                setTimeout(() => setEntryCount(2), 100);
+                setTimeout(() => setEntryCount(3), 100);
               }}
               className="w-full px-3 py-2 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
             >
