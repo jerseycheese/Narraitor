@@ -787,7 +787,8 @@ const validJournalEntryTypes: JournalEntryType[] = [
   'achievement',
   'discovery',
   'combat',
-  'dialogue'
+  'dialogue',
+  'decision'
 ];
 
 export function isPlayerDecisionArray(obj: unknown): obj is PlayerDecision[] {

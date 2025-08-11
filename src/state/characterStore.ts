@@ -212,6 +212,9 @@ export const useCharacterStore = create<CharacterStore>()(
       // Delete character
       deleteCharacter: (id) => set((state) => {
         const character = state.characters[id];
+        // Unlike other methods, we return early (no-op) if the character doesn't exist,
+        // rather than throwing an error. This is intentional because deleting a non-existent
+        // character is considered a harmless operation in this context.
         if (!character) {
           return state; // Character doesn't exist, no-op
         }

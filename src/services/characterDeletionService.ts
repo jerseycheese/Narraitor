@@ -7,8 +7,13 @@ import { useCharacterStore } from '@/state/characterStore';
  */
 export class CharacterDeletionService {
   /**
-   * Deletes a character and all related journal entries
-   * @param characterId - The ID of the character to delete
+   * Deletes a character and all related journal entries.
+   *
+   * This method attempts to clean up all journal entries associated with the given character.
+   * If an error occurs during journal cleanup, a warning is logged, but the character will still be deleted.
+   * This ensures that character deletion proceeds even if related journal entries cannot be fully cleaned up.
+   *
+   * @param characterId - The ID of the character to delete.
    * @returns Promise<void>
    */
   static async deleteCharacterWithCleanup(characterId: string): Promise<void> {

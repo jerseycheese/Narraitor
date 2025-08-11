@@ -30,7 +30,8 @@ export type JournalEntryType =
   | 'achievement'
   | 'discovery'
   | 'combat'
-  | 'dialogue';
+  | 'dialogue'
+  | 'decision';
 
 /**
  * Represents an entity related to a journal entry
@@ -48,4 +49,9 @@ export interface JournalMetadata {
   tags: string[];
   automaticEntry: boolean;
   narrativeSegmentId?: EntityID;
+  // Decision-specific metadata for issue #174
+  decisionId?: EntityID;
+  choiceText?: string;
+  decisionPrompt?: string;
+  outcomeSegmentId?: EntityID;
 }

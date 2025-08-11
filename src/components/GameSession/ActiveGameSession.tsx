@@ -208,6 +208,62 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     return 'Something happened in the adventure.';
   };
 
+  // Regex patterns for cleaning decision prompts
+  const YOU_PREFIX_REGEX = /^you\s+/i; // Remove leading "you" (case-insensitive) and following whitespace
+  const QUESTION_MARK_SUFFIX_REGEX = /\?$/; // Remove trailing question mark
+
+  /**
+   * Creates a journal entry for a decision made by the character.
+   *
+   * @param {Decision} decision - The decision object containing options and prompt.
+   * @param {string} selectedChoiceId - The ID of the selected choice, or the custom choice text if isCustomChoice is true.
+   * @param {boolean} isCustomChoice - If true, indicates that the selected choice is a custom user input rather than a predefined option.
+   *   When true, selectedChoiceId is treated as the custom choice text itself.
+   */
+  const createDecisionJournalEntry = (decision: Decision, selectedChoiceId: string, isCustomChoice: boolean) => {
+    if (!characterId) return;
+    
+    // Find the selected choice
+    const selectedChoice = decision.options.find(option => option.id === selectedChoiceId);
+    const choiceText = selectedChoice?.text || (isCustomChoice ? selectedChoiceId : 'Unknown choice');
+    
+    // Format decision content for readability
+    const formatDecisionContent = (choice: string, prompt: string): string => {
+      const cleanChoice = choice.toLowerCase();
+      const cleanPrompt = prompt
+        .toLowerCase()
+        .replace(YOU_PREFIX_REGEX, '')
+        .replace(QUESTION_MARK_SUFFIX_REGEX, '');
+      return `Chose to ${cleanChoice} when ${cleanPrompt}`;
+    };
+    
+    // Map decision weight to significance
+    const significance: 'minor' | 'major' | 'critical' = decision.decisionWeight || 'minor';
+    
+    try {
+      addEntry(sessionId, {
+        worldId: worldId,
+        characterId: characterId,
+        type: 'decision',
+        title: '', // No title for MVP - content is sufficient
+        content: formatDecisionContent(choiceText, decision.prompt),
+        significance: significance,
+        isRead: false,
+        relatedEntities: [],
+        metadata: {
+          tags: ['decision'],
+          automaticEntry: true,
+          decisionId: decision.id,
+          choiceText: choiceText,
+          decisionPrompt: decision.prompt
+        },
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.warn('Failed to create decision journal entry:', error);
+    }
+  };
+
   // Helper function to create journal entries from narrative segments
   const createJournalEntryFromSegment = (segment: NarrativeSegment, relatedDecisionWeight?: 'minor' | 'major' | 'critical') => {
     if (!characterId) return;
@@ -344,6 +400,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     setLocalSelectedChoiceId(choiceId);
     setShouldTriggerGeneration(true); // Trigger narrative generation
     
+    // Create decision journal entry (Issue #174)
+    if (currentDecision && characterId) {
+      createDecisionJournalEntry(currentDecision, choiceId, false);
+    }
+    
     // If we have a current decision, update its selected option
     if (currentDecision) {
       useNarrativeStore.getState().selectDecisionOption(currentDecision.id, choiceId, characterId || undefined);
@@ -363,6 +424,11 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Handle custom player input
     const customChoiceId = generateUniqueId('custom');
+    
+    // Create decision journal entry for custom choice (Issue #174)
+    if (currentDecision && characterId) {
+      createDecisionJournalEntry(currentDecision, customText, true);
+    }
     
     // Create a custom decision option and add it to the current decision in the store
     if (currentDecision) {
