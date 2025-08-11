@@ -78,7 +78,18 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
   const mockWorld = {
     id: 'world-123',
     name: 'Test World',
-    theme: 'Fantasy'
+    description: 'A test world for decision tracking',
+    genre: 'fantasy',
+    attributes: [],
+    skills: [],
+    settings: {
+      maxAttributes: 6,
+      maxSkills: 10,
+      attributePointPool: 30,
+      skillPointPool: 50
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const mockAddEntry = jest.fn();
@@ -99,7 +110,9 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
     });
 
     (useNarrativeStore.getState as jest.Mock) = jest.fn().mockReturnValue({
-      selectDecisionOption: mockSelectDecisionOption
+      selectDecisionOption: mockSelectDecisionOption,
+      getSessionDecisions: jest.fn().mockReturnValue([]),
+      updateDecision: jest.fn()
     });
 
     // Mock session store
@@ -127,7 +140,9 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
         worldId="world-123"
         sessionId="session-123"
         world={mockWorld as World}
+        status="active"
         onChoiceSelected={onChoiceSelected}
+        onEnd={() => {}}
       />
     );
 
@@ -227,7 +242,9 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
         worldId="world-123"
         sessionId="session-123"
         world={mockWorld as World}
+        status="active"
         onChoiceSelected={onChoiceSelected}
+        onEnd={() => {}}
       />
     );
 
