@@ -6,6 +6,7 @@ import { World } from '@/types/world.types';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { DEFAULT_TONE_SETTINGS } from '@/types/tone-settings.types';
 import { getDetailedToneInstructions } from './toneSettingsGuidance';
+import { getLoreContextForPrompt } from './loreContextHelper';
 import { truncate, safeTrim, getNestedValue } from '@/lib/utils';
 import { normalizeText } from '@/lib/utils/textNormalization';
 
@@ -40,7 +41,8 @@ export class ChoiceGenerator {
       
       const context = this.buildContext(world, narrativeContext, characterIds);
       const basePrompt = template(context);
-      const prompt = this.enhancePromptWithToneSettings(basePrompt, world);
+      const loreEnhancedPrompt = this.enhancePromptWithLore(basePrompt, worldId);
+      const prompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
 
 
       const response = await this.aiClient.generateContent(prompt);
@@ -418,6 +420,14 @@ export class ChoiceGenerator {
 
 
     return context;
+  }
+
+  /**
+   * Enhances a prompt with lore context for the given world
+   */
+  private enhancePromptWithLore(prompt: string, worldId: string): string {
+    const loreContext = getLoreContextForPrompt(worldId);
+    return prompt + loreContext;
   }
 
   /**
