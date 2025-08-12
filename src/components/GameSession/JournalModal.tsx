@@ -17,6 +17,24 @@ import {
   formatAIResponse 
 } from '@/lib/utils';
 
+/**
+ * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
+ * Addresses security concern: XSS prevention for HTML rendering
+ * @param html - HTML content to sanitize
+ * @returns Sanitized HTML with only allowed tags
+ */
+const sanitizeFormattedContent = (html: string): string => {
+  // Allow only the specific tags that formatAIResponse generates: p, br, em
+  // Remove any other HTML tags while preserving the allowed ones and their content
+  return html
+    // Remove any script, style, or other potentially dangerous tags completely
+    .replace(/<(script|style|object|embed|form|input|button)[^>]*>.*?<\/\1>/gi, '')
+    // Remove any attributes from allowed tags (keep only the tag itself)
+    .replace(/<(p|br|em)([^>]*?)>/gi, '<$1>')
+    // Remove any other HTML tags while preserving their text content
+    .replace(/<(?!\/?(?:p|br|em)\b)[^>]*>/gi, '');
+};
+
 interface JournalModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,10 +72,10 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
           {entry.type === 'discovery' ? (
             <div 
               dangerouslySetInnerHTML={{ 
-                __html: formatAIResponse(entry.detailedContent || entry.content, {
+                __html: sanitizeFormattedContent(formatAIResponse(entry.detailedContent || entry.content, {
                   paragraphSpacing: 'single',
                   outputFormat: 'html'
-                })
+                }))
               }}
             />
           ) : (
