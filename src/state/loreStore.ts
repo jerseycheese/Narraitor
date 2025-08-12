@@ -408,7 +408,7 @@ export const useLoreStore = create<LoreStore>()(
             }
           });
         } catch (error) {
-          console.error('Failed to import facts:', error);
+          // Re-throw the error for the caller to handle
           throw error;
         }
       },
