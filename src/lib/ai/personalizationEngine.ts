@@ -674,7 +674,6 @@ export class PersonalizationEngine {
 
       // Get all NPCs affected by this decision type
       const affectedNPCs = typeDecisions.flatMap(d => d.context?.charactersPresent || []);
-      const locations = typeDecisions.map(d => d.context?.location).filter(Boolean);
       const referencedChoices = typeDecisions.map(d => d.choiceText).join(', ');
 
       // Generate context-driven instructions based on decision type
@@ -773,7 +772,7 @@ export class PersonalizationEngine {
     const contextRichness = [
       decision.context?.location,
       decision.context?.situation,
-      decision.context?.charactersPresent?.length > 0
+      decision.context?.charactersPresent && decision.context.charactersPresent.length > 0
     ].filter(Boolean).length;
     score += contextRichness;
     
