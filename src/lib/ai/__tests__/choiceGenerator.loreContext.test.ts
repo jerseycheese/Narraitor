@@ -121,7 +121,7 @@ rules: travel_rule = The marshlands cannot be crossed at night
 
     mockGetLoreContextForPrompt.mockReturnValue(loreContext);
 
-    // Mock AI response that respects lore
+    // Mock AI response that respects the lore
     mockAIClient.generateContent.mockResolvedValue({
       content: `What will you do?
 
