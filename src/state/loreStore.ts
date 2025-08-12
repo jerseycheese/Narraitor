@@ -30,16 +30,49 @@ function generateLoreKey(worldId: string, category: string, name: string, maxLen
 }
 
 /**
+ * Fact validation structure
+ */
+interface FactValidation {
+  key: string;
+  value: string;
+  category: LoreCategory;
+  worldId: EntityID;
+}
+
+/**
+ * Fact history tracking
+ */
+interface FactHistory {
+  factId: EntityID;
+  versions: LoreFact[];
+}
+
+/**
  * Lore store for tracking narrative facts
  */
 export interface LoreStore {
   // State
   facts: Record<EntityID, LoreFact>;
+  factHistory: Record<EntityID, FactHistory>;
   
   // Core Operations
   addFact: (key: string, value: string, category: LoreCategory, source: LoreSource, worldId: EntityID, sessionId?: EntityID, metadata?: LoreFact['metadata']) => void;
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
+  
+  // Enhanced Developer Operations
+  updateFact: (id: EntityID, updates: Partial<LoreFact>) => void;
+  deleteFact: (id: EntityID) => void;
+  validateFactUniqueness: (worldId: EntityID, key: string, value: string) => boolean;
+  findSimilarFacts: (worldId: EntityID, value: string) => LoreFact[];
+  searchFacts: (query: string, options?: LoreSearchOptions) => LoreFact[];
+  exportFacts: (worldId: EntityID) => string;
+  importFacts: (worldId: EntityID, jsonData: string) => void;
+  getFactHistory: (id: EntityID) => LoreFact[];
+  
+  // Validation
+  validateFact: (fact: Partial<FactValidation>) => boolean;
+  validateKey: (key: string) => boolean;
   
   // AI Integration
   getLoreContext: (worldId: EntityID, limit?: number) => LoreContext;
@@ -56,6 +89,7 @@ export const useLoreStore = create<LoreStore>()(
   persist(
     (set, get) => ({
       facts: {},
+      factHistory: {},
 
       addFact: (key, value, category, source, worldId, sessionId, metadata) => {
         const id = generateUniqueId();
@@ -75,7 +109,11 @@ export const useLoreStore = create<LoreStore>()(
         };
 
         set((state) => ({
-          facts: { ...state.facts, [id]: newFact }
+          facts: { ...state.facts, [id]: newFact },
+          factHistory: { 
+            ...state.factHistory, 
+            [id]: { factId: id, versions: [newFact] } 
+          }
         }));
       },
 
@@ -212,11 +250,202 @@ export const useLoreStore = create<LoreStore>()(
           }
         });
       },
+
+      // Enhanced Developer Operations
+      updateFact: (id, updates) => {
+        const { facts, factHistory } = get();
+        const existingFact = facts[id];
+        
+        if (!existingFact) return;
+
+        const updatedFact = {
+          ...existingFact,
+          ...updates,
+          id: existingFact.id, // Preserve ID
+          createdAt: existingFact.createdAt, // Preserve creation time
+          updatedAt: new Date().toISOString()
+        };
+
+        const history = factHistory[id] || { factId: id, versions: [] };
+        history.versions.push(updatedFact);
+
+        set((state) => ({
+          facts: { ...state.facts, [id]: updatedFact },
+          factHistory: { ...state.factHistory, [id]: history }
+        }));
+      },
+
+      deleteFact: (id) => {
+        const { facts } = get();
+        if (!facts[id]) return;
+        
+        set((state) => {
+          const newFacts = { ...state.facts };
+          const newHistory = { ...state.factHistory };
+          delete newFacts[id];
+          delete newHistory[id];
+          return {
+            facts: newFacts,
+            factHistory: newHistory
+          };
+        });
+      },
+
+      validateFactUniqueness: (worldId, key, value) => {
+        const { facts } = get();
+        const worldFacts = Object.values(facts).filter(f => f.worldId === worldId);
+        
+        // Check for exact duplicate
+        const hasDuplicate = worldFacts.some(f => 
+          f.key === key && f.value === value
+        );
+        
+        return !hasDuplicate; // Return true if unique, false if duplicate
+      },
+
+      findSimilarFacts: (worldId, value) => {
+        const { facts } = get();
+        const worldFacts = Object.values(facts).filter(f => f.worldId === worldId);
+        const normalizedValue = normalizeText(value, {
+          normalizeWhitespace: true,
+          normalizeQuotes: true,
+          normalizeSpecialChars: true,
+          normalizeLineEndings: true,
+          preserveStructure: false
+        }).toLowerCase();
+        
+        return worldFacts.filter(fact => {
+          const normalizedFactValue = normalizeText(fact.value, {
+            normalizeWhitespace: true,
+            normalizeQuotes: true,
+            normalizeSpecialChars: true,
+            normalizeLineEndings: true,
+            preserveStructure: false
+          }).toLowerCase();
+          
+          return normalizedFactValue === normalizedValue;
+        });
+      },
+
+      searchFacts: (query, options) => {
+        const { facts } = get();
+        let results = Object.values(facts);
+        
+        // Apply search options filters first
+        if (options?.worldId) {
+          results = results.filter(fact => fact.worldId === options.worldId);
+        }
+        
+        if (options?.category) {
+          results = results.filter(fact => fact.category === options.category);
+        }
+        
+        if (options?.sessionId) {
+          results = results.filter(fact => fact.sessionId === options.sessionId);
+        }
+        
+        // Apply text search
+        const normalizedQuery = query.toLowerCase();
+        results = results.filter(fact => 
+          fact.value.toLowerCase().includes(normalizedQuery) ||
+          fact.key.toLowerCase().includes(normalizedQuery) ||
+          fact.metadata?.description?.toLowerCase().includes(normalizedQuery) ||
+          fact.metadata?.tags?.some(tag => tag.toLowerCase().includes(normalizedQuery))
+        );
+        
+        return results.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      },
+
+      exportFacts: (worldId) => {
+        const facts = get().getFacts({ worldId });
+        const exportData = {
+          worldId,
+          exportedAt: new Date().toISOString(),
+          facts: facts.map(fact => ({
+            key: fact.key,
+            value: fact.value,
+            category: fact.category,
+            source: fact.source,
+            metadata: fact.metadata
+          }))
+        };
+        
+        return JSON.stringify(exportData, null, 2);
+      },
+
+      importFacts: (worldId, jsonData) => {
+        try {
+          const data = JSON.parse(jsonData);
+          const { addFact, validateFactUniqueness } = get();
+          
+          if (!data.facts || !Array.isArray(data.facts)) {
+            throw new Error('Invalid import data structure');
+          }
+          
+          data.facts.forEach((fact: {
+            key: string;
+            value: string;
+            category: LoreCategory;
+            source?: LoreSource;
+            metadata?: {
+              description?: string;
+              importance?: 'low' | 'medium' | 'high';
+              tags?: string[];
+              relatedEntities?: string[];
+              type?: string;
+            };
+          }) => {
+            // Check if fact already exists
+            if (validateFactUniqueness(worldId, fact.key, fact.value)) {
+              addFact(
+                fact.key,
+                fact.value,
+                fact.category,
+                fact.source || 'manual',
+                worldId,
+                undefined,
+                fact.metadata
+              );
+            }
+          });
+        } catch (error) {
+          // Wrap the error with additional context about the import operation
+          throw new Error(`Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`);
+        }
+      },
+
+      getFactHistory: (id) => {
+        const { factHistory } = get();
+        const history = factHistory[id];
+        return history ? history.versions : [];
+      },
+
+      validateFact: (fact) => {
+        const validCategories: LoreCategory[] = ['characters', 'locations', 'events', 'rules'];
+        
+        if (!fact.key || fact.key.trim() === '') return false;
+        if (!fact.value || fact.value.trim() === '') return false;
+        if (!fact.category || !validCategories.includes(fact.category)) return false;
+        if (!fact.worldId || fact.worldId.trim() === '') return false;
+        
+        return true;
+      },
+
+      validateKey: (key) => {
+        // Key should be alphanumeric with underscores, not starting with a number
+        const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+        return keyPattern.test(key);
+      },
     }),
     {
       name: 'lore-store',
       storage: createIndexedDBStorage(),
-      partialize: (state) => ({ facts: state.facts }),
+      partialize: (state) => ({ 
+        facts: state.facts,
+        factHistory: state.factHistory 
+      }),
     }
   )
 );
