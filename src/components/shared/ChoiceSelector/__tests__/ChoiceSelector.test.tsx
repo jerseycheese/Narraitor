@@ -45,12 +45,12 @@ describe('ChoiceSelector', () => {
       { 
         id: 'stealth-opt', 
         text: 'Sneak past', 
-        requirements: [{ type: 'skill', skill: 'Stealth', level: 5 }] 
+        requirements: [{ type: 'skill', targetId: 'Stealth', operator: 'gte', value: 5 }] 
       },
       { 
         id: 'intimidate-opt', 
         text: 'Intimidate the guard', 
-        requirements: [{ type: 'skill', skill: 'Intimidation', level: 7 }] 
+        requirements: [{ type: 'skill', targetId: 'Intimidation', operator: 'gte', value: 7 }] 
       },
       { id: 'direct-opt', text: 'Walk directly' },
     ],

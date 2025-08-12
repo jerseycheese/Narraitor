@@ -5,6 +5,11 @@ export const resolveSkillData = (
   skillId: EntityID,
   worldSkills: WorldSkill[]
 ): WorldSkill | undefined => {
+  // Handle undefined/null skillId
+  if (!skillId) {
+    return undefined;
+  }
+  
   // First try exact ID match
   let skill = worldSkills.find(skill => skill.id === skillId);
   
