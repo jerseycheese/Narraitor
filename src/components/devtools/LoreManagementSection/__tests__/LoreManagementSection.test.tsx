@@ -101,8 +101,8 @@ describe('LoreManagementSection', () => {
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
       
-      // Navigate to Create tab
-      const createTab = screen.getByRole('tab', { name: /create/i });
+      // Navigate to Create tab (custom tabs are buttons, not semantic tabs)
+      const createTab = screen.getByRole('button', { name: /create/i });
       await user.click(createTab);
       
       // Check form elements (these are from FactEditor component)
@@ -120,7 +120,7 @@ describe('LoreManagementSection', () => {
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
       
-      const createTab = screen.getByRole('tab', { name: /create/i });
+      const createTab = screen.getByRole('button', { name: /create/i });
       await user.click(createTab);
       
       // Try to submit empty form
@@ -140,7 +140,7 @@ describe('LoreManagementSection', () => {
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
       
-      const createTab = screen.getByRole('tab', { name: /create/i });
+      const createTab = screen.getByRole('button', { name: /create/i });
       await user.click(createTab);
       
       // Fill form
@@ -171,7 +171,7 @@ describe('LoreManagementSection', () => {
       // Select world and navigate to Create tab
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
       
-      const createTab = screen.getByRole('tab', { name: /create/i });
+      const createTab = screen.getByRole('button', { name: /create/i });
       await user.click(createTab);
       
       // Fill form
@@ -334,7 +334,7 @@ describe('LoreManagementSection', () => {
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
       
       // Navigate to Search tab
-      const searchTab = screen.getByRole('tab', { name: /search/i });
+      const searchTab = screen.getByRole('button', { name: /search/i });
       await user.click(searchTab);
       
       // Enter search query
@@ -373,7 +373,7 @@ describe('LoreManagementSection', () => {
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
       
       // Navigate to Import/Export tab
-      const importExportTab = screen.getByRole('tab', { name: /import\/export/i });
+      const importExportTab = screen.getByRole('button', { name: /import\/export/i });
       await user.click(importExportTab);
       
       // Click export button
@@ -393,7 +393,7 @@ describe('LoreManagementSection', () => {
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
       
       // Navigate to Import/Export tab
-      const importExportTab = screen.getByRole('tab', { name: /import\/export/i });
+      const importExportTab = screen.getByRole('button', { name: /import\/export/i });
       await user.click(importExportTab);
       
       // Click import button to show import UI
