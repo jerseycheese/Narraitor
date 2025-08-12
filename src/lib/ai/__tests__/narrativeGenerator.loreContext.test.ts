@@ -1,0 +1,219 @@
+/**
+ * Tests for narrative generator lore context integration
+ */
+
+import { NarrativeGenerator } from '../narrativeGenerator';
+import { getLoreContextForPrompt } from '../loreContextHelper';
+import { useWorldStore } from '@/state/worldStore';
+import { useCharacterStore } from '@/state/characterStore';
+import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
+
+// Mock dependencies
+jest.mock('../loreContextHelper');
+jest.mock('@/state/worldStore');
+jest.mock('@/state/characterStore');
+jest.mock('../../promptTemplates/narrativeTemplateManager');
+
+const mockWorld = {
+  id: 'world-123',
+  name: 'Epic Fantasy World',
+  description: 'A world of magic and adventure',
+  genre: 'fantasy',
+  toneSettings: {
+    contentRating: 'teen',
+    narrativeStyle: 'epic',
+    languageComplexity: 'medium'
+  }
+};
+
+describe('NarrativeGenerator lore context integration', () => {
+  let narrativeGenerator: NarrativeGenerator;
+  let mockAIClient: { generateContent: jest.Mock };
+  let mockGetLoreContextForPrompt: jest.MockedFunction<typeof getLoreContextForPrompt>;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    mockAIClient = {
+      generateContent: jest.fn()
+    };
+
+    narrativeGenerator = new NarrativeGenerator(mockAIClient);
+
+    // Setup mocks
+    mockGetLoreContextForPrompt = getLoreContextForPrompt as jest.MockedFunction<typeof getLoreContextForPrompt>;
+    
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
+      worlds: { 'world-123': mockWorld }
+    });
+
+    (useCharacterStore.getState as jest.Mock).mockReturnValue({
+      characters: {}
+    });
+
+    (narrativeTemplateManager.getTemplate as jest.Mock).mockReturnValue(
+      jest.fn().mockReturnValue('Base narrative template')
+    );
+  });
+
+  it('should include lore context when generating narrative segments', async () => {
+    const loreContext = `
+Established World Facts:
+characters: mentor = Gandalf the Wise
+locations: current_location = Rivendell
+events: recent_event = The Council has been called
+rules: world_rule = Elven magic protects this realm
+`;
+
+    mockGetLoreContextForPrompt.mockReturnValue(loreContext);
+
+    mockAIClient.generateContent.mockResolvedValue({
+      content: 'The ancient halls of Rivendell echo with whispered discussions as Gandalf approaches...'
+    });
+
+    const request = {
+      worldId: 'world-123',
+      sessionId: 'session-456',
+      characterIds: ['char-1'],
+      generationParameters: {
+        segmentType: 'scene' as const,
+        desiredLength: 'medium' as const
+      }
+    };
+
+    await narrativeGenerator.generateSegment(request);
+
+    // Verify lore context was requested
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+
+    // Verify the AI was called with enhanced prompt including lore
+    const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
+    expect(capturedPrompt).toContain('Established World Facts:');
+    expect(capturedPrompt).toContain('characters: mentor = Gandalf the Wise');
+    expect(capturedPrompt).toContain('locations: current_location = Rivendell');
+    expect(capturedPrompt).toContain('rules: world_rule = Elven magic protects this realm');
+  });
+
+  it('should include lore context in initial scene generation', async () => {
+    const loreContext = `
+Established World Facts:
+characters: protagonist = Hero of Legend
+locations: starting_location = Village of Beginnings
+rules: journey_rule = Every hero must start their journey at dawn
+`;
+
+    mockGetLoreContextForPrompt.mockReturnValue(loreContext);
+
+    mockAIClient.generateContent.mockResolvedValue({
+      content: 'As dawn breaks over the Village of Beginnings, the Hero of Legend prepares for the journey ahead...'
+    });
+
+    await narrativeGenerator.generateInitialScene('world-123', ['char-1']);
+
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+
+    const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
+    expect(capturedPrompt).toContain('Established World Facts:');
+    expect(capturedPrompt).toContain('Hero of Legend');
+    expect(capturedPrompt).toContain('Village of Beginnings');
+  });
+
+  it('should handle narrative generation with empty lore gracefully', async () => {
+    mockGetLoreContextForPrompt.mockReturnValue('');
+
+    mockAIClient.generateContent.mockResolvedValue({
+      content: 'A new adventure begins in an unexplored realm...'
+    });
+
+    const request = {
+      worldId: 'world-123',
+      sessionId: 'session-456',
+      characterIds: ['char-1'],
+      generationParameters: {
+        segmentType: 'scene' as const,
+        desiredLength: 'short' as const
+      }
+    };
+
+    const result = await narrativeGenerator.generateSegment(request);
+
+    expect(result.content).toBe('A new adventure begins in an unexplored realm...');
+    expect(mockGetLoreContextForPrompt).toHaveBeenCalledWith('world-123');
+  });
+
+  it('should generate narrative consistent with established lore', async () => {
+    const loreContext = `
+Established World Facts:
+characters: villain = The Shadow King
+characters: ally = Princess Luna
+locations: fortress = Tower of Shadows
+rules: magic_system = Light magic weakens shadow magic
+events: prophecy = The chosen one will bring balance
+`;
+
+    mockGetLoreContextForPrompt.mockReturnValue(loreContext);
+
+    // Mock AI response that respects established lore
+    mockAIClient.generateContent.mockResolvedValue({
+      content: `Princess Luna raises her staff, casting brilliant light magic that begins to weaken the Shadow King's dark enchantments around the Tower of Shadows. The ancient prophecy seems to be unfolding before your eyes.`
+    });
+
+    const request = {
+      worldId: 'world-123',
+      sessionId: 'session-789',
+      characterIds: ['char-1'],
+      narrativeContext: {
+        currentLocation: 'Tower of Shadows',
+        currentSituation: 'Final confrontation with the Shadow King',
+        recentSegments: []
+      },
+      generationParameters: {
+        segmentType: 'action' as const,
+        desiredLength: 'medium' as const
+      }
+    };
+
+    const result = await narrativeGenerator.generateSegment(request);
+
+    expect(result.content).toContain('Princess Luna');
+    expect(result.content).toContain('Shadow King');
+    expect(result.content).toContain('Tower of Shadows');
+    expect(result.content).toContain('light magic');
+    expect(result.content).toContain('prophecy');
+  });
+
+  it('should preserve lore context order in AI prompts', async () => {
+    const loreContext = `
+Established World Facts:
+characters: hero = The Chosen One
+locations: sanctuary = Sacred Grove
+rules: power_source = Ancient crystals amplify magic
+events: ritual = Monthly blessing ceremony
+`;
+
+    mockGetLoreContextForPrompt.mockReturnValue(loreContext);
+
+    mockAIClient.generateContent.mockResolvedValue({
+      content: 'The narrative continues...'
+    });
+
+    const request = {
+      worldId: 'world-123',
+      characterIds: ['char-1'],
+      generationParameters: {
+        segmentType: 'scene' as const
+      }
+    };
+
+    await narrativeGenerator.generateSegment(request);
+
+    const capturedPrompt = mockAIClient.generateContent.mock.calls[0][0];
+    
+    // Verify lore context appears after base template but before other enhancements
+    const baseTemplateIndex = capturedPrompt.indexOf('Base narrative template');
+    const loreContextIndex = capturedPrompt.indexOf('Established World Facts:');
+    
+    expect(baseTemplateIndex).toBeLessThan(loreContextIndex);
+    expect(loreContextIndex).toBeGreaterThan(-1);
+  });
+});

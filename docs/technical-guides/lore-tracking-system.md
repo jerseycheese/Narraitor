@@ -53,9 +53,17 @@ const facts = await extractStructuredLore(narrative);
 ## Integration
 
 **Narrative Generation**: Lore context automatically enhances AI prompts for consistency
+**Choice Generation**: Lore facts are included in choice generation prompts for context-aware options
 **Goal System**: Works alongside goal tracking for comprehensive narrative consistency
 **Session Scoping**: Facts can be filtered by session or world-wide
 **Error Handling**: Graceful degradation when AI services unavailable
+
+### AI Prompt Enhancement
+The lore system integrates with both narrative and choice generation:
+
+- **NarrativeGenerator**: Includes lore in `generateSegment()` and `generateInitialScene()`
+- **ChoiceGenerator**: Includes lore in `generateChoices()` for context-aware player options
+- **Context Formatting**: Facts are formatted as "Established World Facts:" for AI consumption
 
 ### Relationship with Goal Tracking
 The lore tracking system complements the goal tracking system:
@@ -79,5 +87,9 @@ Continue the story...
 
 ## Testing
 
-Development harness: `/dev/lore-viewer`
-Unit tests: `npm test -- loreStore.test.ts`
+**Development harness**: `/dev/lore-viewer`  
+**Unit tests**:
+- `npm test -- loreStore.test.ts` - Core lore storage functionality
+- `npm test -- loreContextHelper.test.ts` - AI prompt context formatting
+- `npm test -- choiceGenerator.loreContext.test.ts` - Choice generation integration
+- `npm test -- narrativeGenerator.loreContext.test.ts` - Narrative generation integration
