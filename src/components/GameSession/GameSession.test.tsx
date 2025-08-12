@@ -170,11 +170,18 @@ describe('GameSession', () => {
       worldCharacters: [{
         id: 'char-1',
         name: 'Test Character',
+        description: 'Test character description',
         worldId: 'test-world-id',
         level: 1,
         isPlayer: true,
         attributes: [],
         skills: [],
+        inventory: {
+          characterId: 'char-1',
+          items: [],
+          capacity: 10,
+          categories: []
+        },
         background: {
           history: 'Test background',
           personality: 'Test personality',

@@ -13,7 +13,8 @@ import {
   capitalize, 
   formatRelativeTime, 
   titleCase, 
-  truncate 
+  truncate,
+  formatAIResponse 
 } from '@/lib/utils';
 
 interface JournalModalProps {
@@ -49,9 +50,22 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
     
     <div className="flex-1 overflow-auto">
       <div className="prose prose-amber max-w-none">
-        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-          {entry.detailedContent || entry.content}
-        </p>
+        <div className="text-gray-700 leading-relaxed">
+          {entry.type === 'discovery' ? (
+            <div 
+              dangerouslySetInnerHTML={{ 
+                __html: formatAIResponse(entry.detailedContent || entry.content, {
+                  paragraphSpacing: 'single',
+                  outputFormat: 'html'
+                })
+              }}
+            />
+          ) : (
+            <p className="whitespace-pre-wrap">
+              {entry.detailedContent || entry.content}
+            </p>
+          )}
+        </div>
       </div>
       
       {entry.relatedEntities && entry.relatedEntities.length > 0 && (

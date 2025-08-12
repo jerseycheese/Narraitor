@@ -147,12 +147,12 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
     jest.clearAllMocks();
 
     // Mock journal store
-    (useJournalStore as jest.Mock).mockReturnValue({
+    (useJournalStore as unknown as jest.Mock).mockReturnValue({
       addEntry: mockAddEntry
     });
 
     // Mock narrative store
-    (useNarrativeStore as jest.Mock).mockReturnValue({
+    (useNarrativeStore as unknown as jest.Mock).mockReturnValue({
       currentEnding: null,
       isGeneratingEnding: false,
       generateEnding: jest.fn(),
@@ -171,7 +171,7 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
     });
 
     // Mock session store
-    (useSessionStore as jest.Mock).mockReturnValue({
+    (useSessionStore as unknown as jest.Mock).mockReturnValue({
       characterId: 'char-123'
     });
 
@@ -183,7 +183,7 @@ describe('ActiveGameSession - Decision Tracking Integration', () => {
     });
 
     // Mock character store
-    (useCharacterStore as jest.Mock).mockReturnValue({
+    (useCharacterStore as unknown as jest.Mock).mockReturnValue({
       characters: {
         'char-123': {
           id: 'char-123',

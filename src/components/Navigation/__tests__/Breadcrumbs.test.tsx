@@ -16,7 +16,7 @@ jest.mock('next/navigation', () => ({
 const mockWorldStore = {
   worlds: {
     'world-1': { id: 'world-1', name: 'Fantasy World' }
-  },
+  } as Record<string, { id: string; name: string }>,
   currentWorldId: 'world-1',
   getWorld: (id: string) => mockWorldStore.worlds[id],
 };
@@ -24,7 +24,7 @@ const mockWorldStore = {
 const mockCharacterStore = {
   characters: {
     'char-1': { id: 'char-1', name: 'Hero Character', worldId: 'world-1' }
-  },
+  } as Record<string, { id: string; name: string; worldId: string }>,
   getCharacter: (id: string) => mockCharacterStore.characters[id],
 };
 
