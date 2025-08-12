@@ -9,6 +9,9 @@ describe('NarrativeDisplay', () => {
       id: 'seg-1',
       content: 'The ancient forest whispered secrets in the moonlight.',
       type: 'scene' as const,
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       metadata: {
         characterIds: [],
         mood: 'mysterious' as const,
@@ -27,6 +30,9 @@ describe('NarrativeDisplay', () => {
       id: 'seg-2',
       content: '"Hello there," said the mysterious stranger.',
       type: 'dialogue' as const,
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       metadata: {
         characterIds: ['char-1'],
         mood: 'neutral' as const,
@@ -41,6 +47,9 @@ describe('NarrativeDisplay', () => {
       id: 'seg-3',
       content: 'The hero leapt across the chasm.',
       type: 'action' as const,
+      timestamp: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       metadata: {
         characterIds: ['hero'],
         mood: 'action' as const,

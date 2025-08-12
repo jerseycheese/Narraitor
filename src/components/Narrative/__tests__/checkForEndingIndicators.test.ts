@@ -110,7 +110,11 @@ describe('Pure AI Ending Detection', () => {
     type: 'scene',
     timestamp: new Date(),
     sessionId: 'test-session',
-    metadata: {}
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    metadata: {
+      tags: []
+    }
   });
 
   describe('AI Analysis Without Keywords', () => {

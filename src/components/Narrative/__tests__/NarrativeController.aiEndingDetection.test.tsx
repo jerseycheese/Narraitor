@@ -47,7 +47,7 @@ describe('NarrativeController - AI Ending Detection Integration', () => {
     jest.clearAllMocks();
     
     // Setup narrative store mock
-    (useNarrativeStore as jest.Mock).mockImplementation((selector) => {
+    (useNarrativeStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         addSegment: mockAddSegment,
         getSessionSegments: mockGetSessionSegments

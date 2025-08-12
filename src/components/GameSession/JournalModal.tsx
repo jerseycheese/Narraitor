@@ -13,8 +13,27 @@ import {
   capitalize, 
   formatRelativeTime, 
   titleCase, 
-  truncate 
+  truncate,
+  formatAIResponse 
 } from '@/lib/utils';
+
+/**
+ * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
+ * Addresses security concern: XSS prevention for HTML rendering
+ * @param html - HTML content to sanitize
+ * @returns Sanitized HTML with only allowed tags
+ */
+const sanitizeFormattedContent = (html: string): string => {
+  // Allow only the specific tags that formatAIResponse generates: p, br, em
+  // Remove any other HTML tags while preserving the allowed ones and their content
+  return html
+    // Remove any script, style, or other potentially dangerous tags completely
+    .replace(/<(script|style|object|embed|form|input|button)[^>]*>.*?<\/\1>/gi, '')
+    // Remove any attributes from allowed tags (keep only the tag itself)
+    .replace(/<(p|br|em)([^>]*?)>/gi, '<$1>')
+    // Remove any other HTML tags while preserving their text content
+    .replace(/<(?!\/?(?:p|br|em)\b)[^>]*>/gi, '');
+};
 
 interface JournalModalProps {
   isOpen: boolean;
@@ -49,9 +68,22 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
     
     <div className="flex-1 overflow-auto">
       <div className="prose prose-amber max-w-none">
-        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-          {entry.detailedContent || entry.content}
-        </p>
+        <div className="text-gray-700 leading-relaxed">
+          {entry.type === 'discovery' ? (
+            <div 
+              dangerouslySetInnerHTML={{ 
+                __html: sanitizeFormattedContent(formatAIResponse(entry.detailedContent || entry.content, {
+                  paragraphSpacing: 'single',
+                  outputFormat: 'html'
+                }))
+              }}
+            />
+          ) : (
+            <p className="whitespace-pre-wrap">
+              {entry.detailedContent || entry.content}
+            </p>
+          )}
+        </div>
       </div>
       
       {entry.relatedEntities && entry.relatedEntities.length > 0 && (
