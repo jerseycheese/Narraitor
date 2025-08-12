@@ -25,7 +25,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
   const { facts, getFactHistory } = useLoreStore();
   
   const fact = facts[factId];
-  const history = getFactHistory(factId);
+  const history = getFactHistory(factId) || { factId, versions: [] };
 
   if (!fact) {
     return null;

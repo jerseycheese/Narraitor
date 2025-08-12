@@ -104,8 +104,9 @@ export const LoreManagementSection: React.FC = () => {
       setImportData('');
       setShowImportDialog(false);
       setMessage({ type: 'success', text: 'Facts imported successfully' });
-    } catch {
-      setMessage({ type: 'error', text: 'Failed to import facts. Check the JSON format.' });
+    } catch (e) {
+      console.error('Error importing facts:', e);
+      setMessage({ type: 'error', text: `Failed to import facts: ${e instanceof Error ? e.message : 'Check the JSON format.'}` });
     }
   };
 

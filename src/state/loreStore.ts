@@ -276,6 +276,9 @@ export const useLoreStore = create<LoreStore>()(
       },
 
       deleteFact: (id) => {
+        const { facts } = get();
+        if (!facts[id]) return;
+        
         set((state) => {
           const newFacts = { ...state.facts };
           const newHistory = { ...state.factHistory };
@@ -408,8 +411,8 @@ export const useLoreStore = create<LoreStore>()(
             }
           });
         } catch (error) {
-          // Re-throw the error for the caller to handle
-          throw error;
+          // Wrap the error with additional context about the import operation
+          throw new Error(`Failed to import facts for worldId "${worldId}": ${error instanceof Error ? error.message : String(error)}`);
         }
       },
 
