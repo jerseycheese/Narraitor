@@ -42,6 +42,12 @@ describe('LoreManagementSection', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
+    // Mock window.confirm to prevent jsdom errors
+    Object.defineProperty(window, 'confirm', {
+      writable: true,
+      value: jest.fn(() => true)
+    });
+    
     (useLoreStore as unknown as jest.Mock).mockReturnValue({
       addFact: mockAddFact,
       updateFact: mockUpdateFact,
@@ -87,30 +93,38 @@ describe('LoreManagementSection', () => {
   });
 
   describe('Fact Creation', () => {
-    test('should display fact creation form', () => {
+    test('should display fact creation form', async () => {
+      const user = userEvent.setup();
       render(<LoreManagementSection />);
       
       // Select a world first
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
       
-      // Check form elements
+      // Navigate to Create tab
+      const createTab = screen.getByRole('tab', { name: /create/i });
+      await user.click(createTab);
+      
+      // Check form elements (these are from FactEditor component)
       expect(screen.getByLabelText(/fact key/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/fact value/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/category/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /add fact/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
     });
 
     test('should validate fact before adding', async () => {
       const user = userEvent.setup();
       render(<LoreManagementSection />);
       
-      // Select world
+      // Select world and navigate to Create tab
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
       
+      const createTab = screen.getByRole('tab', { name: /create/i });
+      await user.click(createTab);
+      
       // Try to submit empty form
-      const submitButton = screen.getByRole('button', { name: /add fact/i });
+      const submitButton = screen.getByRole('button', { name: /save/i });
       await user.click(submitButton);
       
       // Should show validation errors
@@ -122,9 +136,12 @@ describe('LoreManagementSection', () => {
       const user = userEvent.setup();
       render(<LoreManagementSection />);
       
-      // Select world
+      // Select world and navigate to Create tab
       const selector = screen.getByLabelText(/select world/i);
       fireEvent.change(selector, { target: { value: 'world-1' } });
+      
+      const createTab = screen.getByRole('tab', { name: /create/i });
+      await user.click(createTab);
       
       // Fill form
       await user.type(screen.getByLabelText(/fact key/i), 'hero_name');
@@ -132,7 +149,7 @@ describe('LoreManagementSection', () => {
       fireEvent.change(screen.getByLabelText(/category/i), { target: { value: 'characters' } });
       
       // Submit
-      await user.click(screen.getByRole('button', { name: /add fact/i }));
+      await user.click(screen.getByRole('button', { name: /save/i }));
       
       expect(mockAddFact).toHaveBeenCalledWith(
         'hero_name',
@@ -151,8 +168,13 @@ describe('LoreManagementSection', () => {
       
       render(<LoreManagementSection />);
       
-      // Select world and fill form
+      // Select world and navigate to Create tab
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
+      
+      const createTab = screen.getByRole('tab', { name: /create/i });
+      await user.click(createTab);
+      
+      // Fill form
       await user.type(screen.getByLabelText(/fact key/i), 'duplicate_key');
       await user.type(screen.getByLabelText(/fact value/i), 'Duplicate Value');
       
@@ -275,6 +297,9 @@ describe('LoreManagementSection', () => {
   describe('Fact Deletion', () => {
     test('should allow deleting facts with confirmation', async () => {
       const user = userEvent.setup();
+      const mockConfirm = jest.fn().mockReturnValue(true);
+      window.confirm = mockConfirm;
+      
       const mockFact = {
         id: 'fact-1',
         key: 'hero_name',
@@ -295,12 +320,8 @@ describe('LoreManagementSection', () => {
       const deleteButton = screen.getByRole('button', { name: /delete/i });
       await user.click(deleteButton);
       
-      // Confirmation should appear
-      expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
-      
-      // Confirm deletion
-      await user.click(screen.getByRole('button', { name: /confirm/i }));
-      
+      // Confirmation dialog should have been called
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to delete this fact?');
       expect(mockDeleteFact).toHaveBeenCalledWith('fact-1');
     });
   });
@@ -311,6 +332,10 @@ describe('LoreManagementSection', () => {
       render(<LoreManagementSection />);
       
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
+      
+      // Navigate to Search tab
+      const searchTab = screen.getByRole('tab', { name: /search/i });
+      await user.click(searchTab);
       
       // Enter search query
       const searchInput = screen.getByPlaceholderText(/search facts/i);
@@ -347,6 +372,10 @@ describe('LoreManagementSection', () => {
       
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
       
+      // Navigate to Import/Export tab
+      const importExportTab = screen.getByRole('tab', { name: /import\/export/i });
+      await user.click(importExportTab);
+      
       // Click export button
       const exportButton = screen.getByRole('button', { name: /export/i });
       await user.click(exportButton);
@@ -362,6 +391,10 @@ describe('LoreManagementSection', () => {
       render(<LoreManagementSection />);
       
       fireEvent.change(screen.getByLabelText(/select world/i), { target: { value: 'world-1' } });
+      
+      // Navigate to Import/Export tab
+      const importExportTab = screen.getByRole('tab', { name: /import\/export/i });
+      await user.click(importExportTab);
       
       // Click import button to show import UI
       const importButton = screen.getByRole('button', { name: /import/i });
