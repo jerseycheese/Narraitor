@@ -10,6 +10,7 @@ import { PortraitDebugSection } from '../PortraitDebugSection';
 import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { TextNormalizationSection } from '../TextNormalizationSection';
+import { LoreManagementSection } from '../LoreManagementSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import { Button } from '@/components/ui/button';
 
@@ -154,6 +155,10 @@ export const DevToolsPanel = () => {
                   
                   <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
                     <TextNormalizationSection />
+                  </CollapsibleSection>
+                  
+                  <CollapsibleSection title="Lore Management" initialCollapsed={true}>
+                    <LoreManagementSection />
                   </CollapsibleSection>
                 </div>
               </div>
