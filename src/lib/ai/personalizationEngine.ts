@@ -213,8 +213,41 @@ export class PersonalizationEngine {
       }
     }
 
-    // Add decision patterns analysis
+    // Add specific decision context and consequences
     if (context.character.recentDecisions.length > 0) {
+      // Prioritize decisions by significance and recency
+      const prioritizedDecisions = this.prioritizeDecisionsBySignificance(context.character.recentDecisions);
+      const recentDecisions = prioritizedDecisions.slice(0, 5); // Top 5 most significant decisions
+      
+      // Create specific decision reference section
+      const decisionDetails = recentDecisions.map(decision => {
+        const location = decision.context?.location ? ` at ${decision.context.location}` : '';
+        const npcs = decision.context?.charactersPresent ? ` (involving: ${decision.context.charactersPresent.join(', ')})` : '';
+        const timeAgo = this.formatTimeAgo(decision.timestamp);
+        return `• ${decision.choiceText}${location}${npcs} [${timeAgo}, ${decision.choiceType}]`;
+      }).join('\n');
+      
+      enhancements.push(`PAST PLAYER DECISIONS:\n${decisionDetails}`);
+      
+      // Add explicit AI instructions for referencing decisions
+      enhancements.push(`REFERENCE PAST DECISIONS: Build upon these previous choices in the narrative. NPCs should remember their interactions with the player character. Create consequences of actions based on established patterns.`);
+      
+      // Add decision type-specific consequences
+      const decisionTypes = [...new Set(recentDecisions.map(d => d.choiceType))];
+      const consequenceInstructions = this.generateConsequenceInstructions(decisionTypes, recentDecisions);
+      if (consequenceInstructions) {
+        enhancements.push(consequenceInstructions);
+      }
+      
+      // Add compound consequence analysis for multiple decision types
+      if (decisionTypes.length > 1) {
+        const compoundAnalysis = this.generateCompoundConsequenceAnalysis(decisionTypes);
+        if (compoundAnalysis) {
+          enhancements.push(compoundAnalysis);
+        }
+      }
+      
+      // Add pattern analysis for variety
       const preferredTypes = context.playerPreferences.preferredChoiceTypes
         .filter(type => type && typeof type === 'string')
         .slice(0, 3); // Top 3 preferred types
@@ -603,5 +636,173 @@ export class PersonalizationEngine {
     }
     
     return baseContext;
+  }
+
+  /**
+   * Formats timestamp as relative time for decision context
+   */
+  private formatTimeAgo(timestamp: string | Date): string {
+    const now = new Date();
+    const timestampDate = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+    const diffMs = now.getTime() - timestampDate.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    
+    if (diffDays > 0) {
+      return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    } else if (diffHours > 0) {
+      return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    } else {
+      return 'recently';
+    }
+  }
+
+  /**
+   * Generates context-driven consequence instructions based on decision patterns
+   */
+  private generateConsequenceInstructions(decisionTypes: string[], decisions: PlayerDecision[]): string {
+    const instructions: string[] = [];
+    
+    // Group decisions by type for pattern analysis
+    const typeGroups = decisionTypes.reduce((acc, type) => {
+      acc[type] = decisions.filter(d => d.choiceType === type);
+      return acc;
+    }, {} as Record<string, PlayerDecision[]>);
+
+    Object.entries(typeGroups).forEach(([type, typeDecisions]) => {
+      if (typeDecisions.length === 0) return;
+
+      // Get all NPCs affected by this decision type
+      const affectedNPCs = typeDecisions.flatMap(d => d.context?.charactersPresent || []);
+      const locations = typeDecisions.map(d => d.context?.location).filter(Boolean);
+      const referencedChoices = typeDecisions.map(d => d.choiceText).join(', ');
+
+      // Generate context-driven instructions based on decision type
+      switch (type) {
+        case 'heroic':
+        case 'compassionate':
+          if (affectedNPCs.length > 0) {
+            instructions.push(`HEROIC CONSEQUENCES: Your heroic and compassionate actions have built a positive reputation. The following NPCs remember your help and protection: ${affectedNPCs.join(', ')}. They should react with trust, gratitude, and willingness to help. Word of your protective nature spreads among those you've aided. NPCs seek your protection and trust your judgment. References: ${referencedChoices}.`);
+          }
+          break;
+        case 'merciful':
+          if (affectedNPCs.length > 0) {
+            instructions.push(`MERCIFUL CONSEQUENCES: Your merciful decisions have established moral authority through showing restraint when others expected justice. The following NPCs were affected by your mercy: ${affectedNPCs.join(', ')}. Even those you spared may respect your sense of justice. Your reputation for mercy and balanced judgment precedes you. References: ${referencedChoices}.`);
+          }
+          break;
+        case 'diplomatic':
+          instructions.push(`DIPLOMATIC CONSEQUENCES: Your diplomatic approach has created peaceful alternatives and strong relationships. NPCs involved: ${affectedNPCs.join(', ')}. They offer negotiation before conflict and seek peaceful solutions when dealing with you. References: ${referencedChoices}.`);
+          break;
+        case 'cunning':
+        case 'strategic':
+          instructions.push(`STRATEGIC CONSEQUENCES: Your cunning and strategic thinking has earned respect for intelligence and planning. NPCs involved: ${affectedNPCs.join(', ')}. They seek your counsel and offer information, recognizing your tactical abilities. References: ${referencedChoices}.`);
+          break;
+        default:
+          // Generic pattern-based consequence for any decision type
+          instructions.push(`${type.toUpperCase()} CONSEQUENCES: Your ${type} choices have shaped how NPCs perceive and interact with you. NPCs who witnessed these actions: ${affectedNPCs.join(', ')}. They react based on these established patterns of behavior. References: ${referencedChoices}.`);
+      }
+    });
+
+    return instructions.length > 0 ? instructions.join('\n\n') : '';
+  }
+
+  /**
+   * Prioritizes decisions by significance and recency
+   */
+  private prioritizeDecisionsBySignificance(decisions: PlayerDecision[]): PlayerDecision[] {
+    return [...decisions].sort((a, b) => {
+      // Calculate significance score based on context and impact
+      const significanceA = this.calculateDecisionSignificance(a);
+      const significanceB = this.calculateDecisionSignificance(b);
+      
+      // If significance is equal, sort by recency (newer first)
+      if (significanceA === significanceB) {
+        const timestampA = new Date(a.timestamp).getTime();
+        const timestampB = new Date(b.timestamp).getTime();
+        return timestampB - timestampA;
+      }
+      
+      return significanceB - significanceA; // Higher significance first
+    });
+  }
+
+  /**
+   * Calculates significance score for a decision based on context and impact
+   */
+  private calculateDecisionSignificance(decision: PlayerDecision): number {
+    let score = 0;
+    
+    // Base score by choice type impact (genre-neutral)
+    const impactScores: Record<string, number> = {
+      'heroic': 10,
+      'world-changing': 15,
+      'merciful': 8,
+      'diplomatic': 7,
+      'compassionate': 8,
+      'strategic': 6,
+      'cunning': 5,
+      'action': 3
+    };
+    
+    score += impactScores[decision.choiceType] || 2;
+    
+    // Boost score for world-changing contexts (situation-based)
+    if (decision.context?.situation === 'world-changing') {
+      score += 10;
+    }
+    
+    // Score by number of affected parties (not their titles)
+    const npcCount = decision.context?.charactersPresent?.length || 0;
+    score += Math.min(npcCount * 2, 10); // Max 10 points for NPC involvement
+    
+    // Score by having a location (not what it is)
+    if (decision.context?.location) {
+      score += 3;
+    }
+    
+    // Score by action scope words (genre-neutral)
+    const scopeWords = ['all', 'everyone', 'entire', 'whole', 'many', 'multiple', 'save', 'protect', 'rescue'];
+    const hasWideScope = scopeWords.some(word => 
+      decision.choiceText.toLowerCase().includes(word)
+    );
+    if (hasWideScope) {
+      score += 5;
+    }
+    
+    // Score by context richness (more context = likely more important)
+    const contextRichness = [
+      decision.context?.location,
+      decision.context?.situation,
+      decision.context?.charactersPresent?.length > 0
+    ].filter(Boolean).length;
+    score += contextRichness;
+    
+    return score;
+  }
+
+  /**
+   * Generates compound consequence analysis for multiple decision types
+   */
+  private generateCompoundConsequenceAnalysis(decisionTypes: string[]): string {
+    const combinations: string[] = [];
+    
+    // Check for specific powerful combinations
+    if (decisionTypes.includes('heroic') && decisionTypes.includes('merciful')) {
+      combinations.push(`COMPOUND CONSEQUENCES: Your heroic and merciful nature creates a unique reputation. You've shown both the strength to take decisive action and the wisdom to show restraint when appropriate. NPCs see you as someone with both the power to protect and the judgment to show mercy. This balanced approach makes both allies and those you've spared respect your decisions.`);
+    }
+    
+    if (decisionTypes.includes('diplomatic') && decisionTypes.includes('compassionate')) {
+      combinations.push(`COMPOUND CONSEQUENCES: Your diplomatic compassion has established you as a peacemaker. NPCs turn to you for conflict resolution, knowing you'll find solutions that consider everyone's wellbeing.`);
+    }
+    
+    if (decisionTypes.includes('heroic') && decisionTypes.includes('strategic')) {
+      combinations.push(`COMPOUND CONSEQUENCES: Your combination of heroism and strategic thinking makes you a respected leader. NPCs seek both your protection and your counsel when facing complex challenges.`);
+    }
+    
+    if (decisionTypes.includes('cunning') && decisionTypes.includes('diplomatic')) {
+      combinations.push(`COMPOUND CONSEQUENCES: Your cunning diplomacy has earned you a reputation as a skilled negotiator. NPCs respect your ability to find clever solutions through discussion rather than force.`);
+    }
+    
+    return combinations.join('\n\n');
   }
 }
