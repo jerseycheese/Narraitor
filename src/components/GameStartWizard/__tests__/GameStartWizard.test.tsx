@@ -19,7 +19,8 @@ jest.mock('@/state/sessionStore');
 // Mock child components
 jest.mock('../steps/WorldSelectionStep', () => ({
   WorldSelectionStep: ({ onNext }: { onNext: (worldId: string) => void }) => (
-    <div data-testid="world-selection-step">
+    <div>
+      <h2>Select a World</h2>
       <button onClick={() => onNext('world-1')}>Select World</button>
     </div>
   ),
@@ -35,7 +36,8 @@ jest.mock('../steps/CharacterSelectionStep', () => ({
     onNext: (characterId: string) => void; 
     onBack: () => void;
   }) => (
-    <div data-testid="character-selection-step">
+    <div>
+      <h2>Select a Character</h2>
       <div>World: {worldId}</div>
       <button onClick={() => onNext('char-1')}>Select Character</button>
       <button onClick={onBack}>Back</button>
@@ -55,7 +57,8 @@ jest.mock('../steps/GameReadyStep', () => ({
     onStart: () => void; 
     onBack: () => void;
   }) => (
-    <div data-testid="game-ready-step">
+    <div>
+      <h2>Ready to Play</h2>
       <div>World: {worldId}</div>
       <div>Character: {characterId}</div>
       <button onClick={onStart}>Start Playing</button>
@@ -91,9 +94,9 @@ describe('GameStartWizard', () => {
   it('should start at world selection step', () => {
     render(<GameStartWizard />);
     
-    expect(screen.getByTestId('world-selection-step')).toBeInTheDocument();
-    expect(screen.queryByTestId('character-selection-step')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('game-ready-step')).not.toBeInTheDocument();
+    expect(screen.getByText('Select a World')).toBeInTheDocument();
+    expect(screen.queryByText('Select a Character')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ready to Play')).not.toBeInTheDocument();
   });
 
   it('should show progress indicator for current step', () => {
@@ -108,8 +111,8 @@ describe('GameStartWizard', () => {
     
     fireEvent.click(screen.getByText('Select World'));
     
-    expect(screen.queryByTestId('world-selection-step')).not.toBeInTheDocument();
-    expect(screen.getByTestId('character-selection-step')).toBeInTheDocument();
+    expect(screen.queryByText('Select a World')).not.toBeInTheDocument();
+    expect(screen.getByText('Select a Character')).toBeInTheDocument();
     expect(screen.getByText(/step 2 of 3/i)).toBeInTheDocument();
     expect(screen.getByText(/select character/i, { selector: 'span' })).toBeInTheDocument();
   });
@@ -130,8 +133,8 @@ describe('GameStartWizard', () => {
     // Select character
     fireEvent.click(screen.getByText('Select Character'));
     
-    expect(screen.queryByTestId('character-selection-step')).not.toBeInTheDocument();
-    expect(screen.getByTestId('game-ready-step')).toBeInTheDocument();
+    expect(screen.queryByText('Select a Character')).not.toBeInTheDocument();
+    expect(screen.getByText('Ready to Play')).toBeInTheDocument();
     expect(screen.getByText(/step 3 of 3/i)).toBeInTheDocument();
     expect(screen.getByText(/ready to play/i, { selector: 'span' })).toBeInTheDocument();
   });
@@ -151,20 +154,20 @@ describe('GameStartWizard', () => {
     
     // Go to character selection
     fireEvent.click(screen.getByText('Select World'));
-    expect(screen.getByTestId('character-selection-step')).toBeInTheDocument();
+    expect(screen.getByText('Select a Character')).toBeInTheDocument();
     
     // Go back to world selection
     fireEvent.click(screen.getByText('Back'));
-    expect(screen.getByTestId('world-selection-step')).toBeInTheDocument();
+    expect(screen.getByText('Select a World')).toBeInTheDocument();
     
     // Go forward again
     fireEvent.click(screen.getByText('Select World'));
     fireEvent.click(screen.getByText('Select Character'));
-    expect(screen.getByTestId('game-ready-step')).toBeInTheDocument();
+    expect(screen.getByText('Ready to Play')).toBeInTheDocument();
     
     // Go back to character selection
     fireEvent.click(screen.getByText('Back'));
-    expect(screen.getByTestId('character-selection-step')).toBeInTheDocument();
+    expect(screen.getByText('Select a Character')).toBeInTheDocument();
   });
 
   it('should initialize session and navigate to play when starting game', async () => {
@@ -197,8 +200,8 @@ describe('GameStartWizard', () => {
     render(<GameStartWizard initialWorldId="world-1" />);
     
     // Should skip world selection and go directly to character selection
-    expect(screen.queryByTestId('world-selection-step')).not.toBeInTheDocument();
-    expect(screen.getByTestId('character-selection-step')).toBeInTheDocument();
+    expect(screen.queryByText('Select a World')).not.toBeInTheDocument();
+    expect(screen.getByText('Select a Character')).toBeInTheDocument();
     expect(screen.getByText('World: world-1')).toBeInTheDocument();
   });
 
@@ -206,9 +209,9 @@ describe('GameStartWizard', () => {
     render(<GameStartWizard initialWorldId="world-1" initialCharacterId="char-1" />);
     
     // Should skip to game ready step
-    expect(screen.queryByTestId('world-selection-step')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('character-selection-step')).not.toBeInTheDocument();
-    expect(screen.getByTestId('game-ready-step')).toBeInTheDocument();
+    expect(screen.queryByText('Select a World')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a Character')).not.toBeInTheDocument();
+    expect(screen.getByText('Ready to Play')).toBeInTheDocument();
     expect(screen.getByText('World: world-1')).toBeInTheDocument();
     expect(screen.getByText('Character: char-1')).toBeInTheDocument();
   });

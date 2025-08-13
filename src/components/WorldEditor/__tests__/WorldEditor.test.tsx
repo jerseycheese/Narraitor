@@ -42,7 +42,7 @@ interface MockSettingsFormProps {
 jest.mock('@/components/forms/WorldBasicInfoForm', () => {
   return function MockWorldBasicInfoForm({ onChange }: MockBasicInfoFormProps) {
     return (
-      <div data-testid="world-basic-info-form">
+      <div>
         Basic Info Form
         <button onClick={() => onChange({ name: 'Updated Name' })}>
           Update Name
@@ -55,7 +55,7 @@ jest.mock('@/components/forms/WorldBasicInfoForm', () => {
 jest.mock('@/components/forms/WorldAttributesForm', () => {
   return function MockWorldAttributesForm({ onChange }: MockAttributesFormProps) {
     return (
-      <div data-testid="world-attributes-form">
+      <div>
         Attributes Form
         <button onClick={() => onChange([])}>
           Update Attributes
@@ -68,7 +68,7 @@ jest.mock('@/components/forms/WorldAttributesForm', () => {
 jest.mock('@/components/forms/WorldSkillsForm', () => {
   return function MockWorldSkillsForm({ onChange }: MockSkillsFormProps) {
     return (
-      <div data-testid="world-skills-form">
+      <div>
         Skills Form
         <button onClick={() => onChange([])}>
           Update Skills
@@ -81,7 +81,7 @@ jest.mock('@/components/forms/WorldSkillsForm', () => {
 jest.mock('@/components/forms/WorldSettingsForm', () => {
   return function MockWorldSettingsForm({ settings, onChange }: MockSettingsFormProps) {
     return (
-      <div data-testid="world-settings-form">
+      <div>
         Settings Form
         <button onClick={() => onChange(settings)}>
           Update Settings
@@ -127,10 +127,10 @@ describe('WorldEditor - MVP Level Tests', () => {
 
     // Should display all form sections immediately since we're using synchronous store access
     await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-attributes-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-skills-form')).toBeInTheDocument();
-      expect(screen.getByTestId('world-settings-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
+      expect(screen.getByText('Attributes Form')).toBeInTheDocument();
+      expect(screen.getByText('Skills Form')).toBeInTheDocument();
+      expect(screen.getByText('Settings Form')).toBeInTheDocument();
     });
   });
 
@@ -140,16 +140,16 @@ describe('WorldEditor - MVP Level Tests', () => {
 
     await waitFor(() => {
       // Basic info form is present
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
       
       // Attributes form is present
-      expect(screen.getByTestId('world-attributes-form')).toBeInTheDocument();
+      expect(screen.getByText('Attributes Form')).toBeInTheDocument();
       
       // Skills form is present
-      expect(screen.getByTestId('world-skills-form')).toBeInTheDocument();
+      expect(screen.getByText('Skills Form')).toBeInTheDocument();
       
       // Settings form is present
-      expect(screen.getByTestId('world-settings-form')).toBeInTheDocument();
+      expect(screen.getByText('Settings Form')).toBeInTheDocument();
     });
   });
 
@@ -158,7 +158,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     render(<WorldEditor worldId="world-123" />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
     });
 
     // Click save button
@@ -181,7 +181,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     render(<WorldEditor worldId="world-123" />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
     });
 
     // Click cancel button
@@ -216,7 +216,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     render(<WorldEditor worldId="world-123" />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
     });
 
     // Update basic info
@@ -243,7 +243,7 @@ describe('WorldEditor - MVP Level Tests', () => {
     render(<WorldEditor worldId="world-123" />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('world-basic-info-form')).toBeInTheDocument();
+      expect(screen.getByText('Basic Info Form')).toBeInTheDocument();
     });
 
     const saveButton = screen.getByText('Save Changes');

@@ -76,7 +76,7 @@ describe('BasicInfoStep', () => {
             errors={{}}
             onUpdate={setWorldData}
           />
-          <div data-testid="world-preview">
+          <div aria-label="World preview">
             Name: {worldData.name || 'Not set'} | 
             Genre: {worldData.genre} | 
             Description: {worldData.description || 'Not set'}
@@ -88,27 +88,27 @@ describe('BasicInfoStep', () => {
     render(<TestWrapper />);
 
     // Initially should show empty values
-    expect(screen.getByTestId('world-preview')).toHaveTextContent('Name: Not set');
-    expect(screen.getByTestId('world-preview')).toHaveTextContent('Genre: fantasy');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Name: Not set');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Genre: fantasy');
 
     // Change name
     fireEvent.change(screen.getByPlaceholderText(/enter your world's name/i), {
       target: { value: 'My New World' },
     });
-    expect(screen.getByTestId('world-preview')).toHaveTextContent('Name: My New World');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Name: My New World');
 
     // Change description
     fireEvent.change(screen.getByPlaceholderText(/provide a brief description/i), {
       target: { value: 'A detailed description' },
     });
-    expect(screen.getByTestId('world-preview')).toHaveTextContent('Description: A detailed description');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Description: A detailed description');
 
     // Change genre
     const genreSelect = screen.getByTestId('world-genre-select');
     fireEvent.change(genreSelect, {
       target: { value: 'sci-fi' },
     });
-    expect(screen.getByTestId('world-preview')).toHaveTextContent('Genre: sci-fi');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Genre: sci-fi');
   });
 
   test('renders with valid data', () => {
