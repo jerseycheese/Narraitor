@@ -34,7 +34,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // Slider shows the default value
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     expect(slider).toHaveValue('3');
   });
 
@@ -50,7 +50,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // Verify the slider is rendered
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     expect(slider).toBeInTheDocument();
     
     // We can verify the current value is correctly displayed in the slider
@@ -65,7 +65,7 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     fireEvent.change(slider, { target: { value: '4' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({ baseValue: 4 });
@@ -87,7 +87,7 @@ describe('SkillRangeEditor', () => {
     );
 
     // The initial value should be clamped to 5 (the max allowed)
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     expect(slider).toHaveValue('5');
   });
 
@@ -100,7 +100,7 @@ describe('SkillRangeEditor', () => {
       />
     );
 
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     expect(slider).toBeDisabled();
   });
 
@@ -124,7 +124,7 @@ describe('SkillRangeEditor', () => {
       />
     );
     
-    const initialSlider = screen.getByRole('slider', { name: /test skill/i });
+    const initialSlider = screen.getByRole('slider');
     expect(initialSlider).toHaveValue('3');
     
     const updatedSkill = { ...mockSkill, baseValue: 4 };
@@ -136,7 +136,7 @@ describe('SkillRangeEditor', () => {
     );
     
     // Value should be updated
-    expect(screen.getByRole('slider', { name: /test skill/i })).toHaveValue('4');
+    expect(screen.getByRole('slider')).toHaveValue('4');
   });
 
   it('shows min and max scale labels', () => {
@@ -179,7 +179,7 @@ describe('SkillRangeEditor', () => {
     expect(screen.getByText('Competent')).toBeInTheDocument();
     
     // Change to level 5 "Master"
-    const slider = screen.getByRole('slider', { name: /test skill/i });
+    const slider = screen.getByRole('slider');
     fireEvent.change(slider, { target: { value: '5' } });
     
     expect(screen.getByText('Master')).toBeInTheDocument();

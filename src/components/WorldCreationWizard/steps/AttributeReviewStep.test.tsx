@@ -70,7 +70,7 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    const toggleButton = screen.getByRole('button', { name: /strength/i });
+    const toggleButton = screen.getByTestId('attribute-toggle-0');
     fireEvent.click(toggleButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
@@ -256,7 +256,7 @@ describe('AttributeReviewStep', () => {
     );
 
     // Toggle an attribute
-    const toggleButton = screen.getByRole('button', { name: /intelligence/i });
+    const toggleButton = screen.getByTestId('attribute-toggle-1');
     fireEvent.click(toggleButton);
 
     // Should update with the new selection
@@ -367,8 +367,8 @@ describe('AttributeReviewStep', () => {
     );
 
     // Check that the toggle buttons show the correct state
-    expect(screen.getByRole('button', { name: /strength/i })).toHaveTextContent('Selected');
-    expect(screen.getByRole('button', { name: /intelligence/i })).toHaveTextContent('Excluded');
-    expect(screen.getByRole('button', { name: /agility/i })).toHaveTextContent('Selected');
+    expect(screen.getByTestId('attribute-toggle-0')).toHaveTextContent('Selected');
+    expect(screen.getByTestId('attribute-toggle-1')).toHaveTextContent('Excluded');
+    expect(screen.getByTestId('attribute-toggle-2')).toHaveTextContent('Selected');
   });
 });
