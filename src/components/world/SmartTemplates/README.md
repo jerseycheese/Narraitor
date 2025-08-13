@@ -1,30 +1,32 @@
 # SmartTemplates Component
 
-Smart world template generation with AI assistance for the Narraitor application.
+This is where the magic happens - AI-powered world template generation that actually understands what you're trying to build. The idea was to give people three different ways to get inspiration when they're stuck staring at a blank world creation form.
 
-## Overview
+## The Three Approaches
 
-The SmartTemplates component provides three AI-powered methods for generating world templates:
+We settled on three different generation methods because people think about worlds differently:
 
-1. **"I want something like..."** - Generate worlds based on user descriptions
-2. **Genre Mixer** - Combine 2+ genres to create unique world blends  
-3. **Surprise Me** - Generate completely unexpected world concepts
+1. **"I want something like..."** - For when you know exactly what you want ("like Game of Thrones but steampunk")
+2. **Genre Mixer** - For when you want to experiment ("what if we mixed cyberpunk with medieval fantasy?")
+3. **Surprise Me** - For when you just want the AI to go wild and show you something unexpected
 
-## Features
+## What It Does
 
-- ✅ AI-powered world template generation
-- ✅ Template preview before committing
-- ✅ Template history (last 5 generations)
-- ✅ Mobile-responsive design
-- ✅ Error handling and loading states
-- ✅ Integration with World Creation Wizard
-- ✅ Performance optimized with React.memo and useCallback
+The component handles all the complexity of AI world generation while keeping the UI simple:
+
+- Generates complete world templates with attributes, skills, and detailed explanations
+- Lets you preview templates before committing (because AI sometimes gets creative in unexpected ways)
+- Keeps a history of your last 5 generations so you can go back to that cool idea from earlier
+- Works great on mobile (world building doesn't just happen at desks)
+- Handles errors gracefully (AI services can be finicky)
+- Integrates seamlessly with the World Creation Wizard
+- Performance optimized because nobody likes laggy UIs
 
 ## Components
 
 ### SmartTemplates
 
-Main component providing the template generation interface.
+This is the main component that handles the generation interface. Pretty straightforward to use:
 
 ```tsx
 import { SmartTemplates } from '@/components/world/SmartTemplates';
@@ -33,11 +35,11 @@ import { SmartTemplates } from '@/components/world/SmartTemplates';
 ```
 
 **Props:**
-- `onTemplateGenerated: (template: WorldTemplate) => void` - Callback when template is generated and selected
+- `onTemplateGenerated: (template: WorldTemplate) => void` - Gets called when user picks a template
 
 ### TemplatePreview
 
-Preview component for reviewing generated templates before use.
+The preview component is crucial because AI can generate some... interesting results. Always let users see what they're getting:
 
 ```tsx
 import { TemplatePreview } from '@/components/world/SmartTemplates';
@@ -51,8 +53,8 @@ import { TemplatePreview } from '@/components/world/SmartTemplates';
 
 **Props:**
 - `template: WorldTemplate` - The template to preview
-- `onUse: () => void` - Callback when template is accepted
-- `onBack: () => void` - Callback to return to template selection
+- `onUse: () => void` - Called when user accepts the template
+- `onBack: () => void` - Called when user wants to generate something else
 
 ## Integration
 

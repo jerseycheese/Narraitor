@@ -1,12 +1,12 @@
 # Navigation Loading System
 
-This this system handles one of those user experience details that really matters: showing loading states during navigation. Without it, users click something and wonder if it worked, especially on slower connections.
+So this system handles one of those user experience details that really matters: showing loading states during navigation. Without it, users click something and wonder if it worked, especially on slower connections or when there's a lot of data to load.
 
 ## How It Works
 
-**NavigationLoadingProvider** manages global loading state, **LoadingOverlay** shows the visual indicator, and **useNavigationLoading** provides the hook for components to trigger loading states during navigation.
+There are three main pieces: **NavigationLoadingProvider** manages global loading state, **LoadingOverlay** shows the visual indicator, and **useNavigationLoading** provides the hook for components to trigger loading states during navigation.
 
-The flow is: User clicks → Hook triggers loading → Provider updates state → Overlay shows → Navigation completes → Loading clears.
+The flow is pretty straightforward: User clicks → Hook triggers loading → Provider updates state → Overlay shows → Navigation completes → Loading clears.
 
 ## Implementation
 
@@ -48,24 +48,16 @@ function MyComponent() {
 ## Features
 
 ### Debounced Loading
-- **Minimum Duration**: 150ms to prevent flashing
-- **Debounce Delay**: 100ms before showing loading
-- **Smart Timing**: Only shows for operations that need it
+The system is smart about when to show loading indicators. There's a **minimum duration** of 150ms to prevent flashing, a **debounce delay** of 100ms before showing loading, and **smart timing** that only shows for operations that actually need it. This prevents the jarring experience of seeing a loading spinner flash for 50ms.
 
 ### Accessibility
-- **Focus Trapping**: Keeps keyboard focus in loading modal
-- **ARIA Support**: Screen reader announcements
-- **Keyboard Controls**: Escape key cancellation
+**Focus Trapping** keeps keyboard focus in the loading modal, **ARIA Support** provides screen reader announcements, and **Keyboard Controls** let users hit Escape to cancel. Accessibility was built in from the start, not added as an afterthought.
 
 ### Error Handling
-- **Automatic Cleanup**: 30-second safety timeout
-- **Graceful Degradation**: Continues navigation even if loading fails
-- **Error Boundaries**: Integration with Next.js error handling
+There's **automatic cleanup** with a 30-second safety timeout in case something goes wrong, **graceful degradation** that continues navigation even if loading fails, and **error boundaries** that integrate with Next.js error handling. Basically, it fails gracefully instead of breaking the user experience.
 
 ### Router Integration
-- **Next.js App Router**: Direct integration with router events
-- **Route Changes**: Automatic detection of navigation start/end
-- **Client-Side Navigation**: Works with all Next.js navigation methods
+**Next.js App Router** integration works directly with router events, **route changes** are automatically detected for navigation start/end, and **client-side navigation** works with all Next.js navigation methods. It hooks into the router instead of trying to guess when navigation happens.
 
 ## Usage Patterns
 
@@ -166,9 +158,11 @@ jest.mock('@/hooks/useNavigationLoading', () => ({
 ## Troubleshooting
 
 ### Common Issues
-1. **Stuck Loading**: Check for unmatched startLoading/stopLoading calls
-2. **No Loading Display**: Ensure NavigationLoadingProvider is at app root
-3. **Flash of Loading**: Adjust debounce timing for your use case
+**Stuck Loading** usually means you have unmatched startLoading/stopLoading calls - every start needs a stop.
+
+**No Loading Display** typically means the NavigationLoadingProvider isn't at the app root, so the context isn't available to child components.
+
+**Flash of Loading** means you might need to adjust the debounce timing for your specific use case.
 
 ### Debug Tools
 ```tsx
@@ -179,7 +173,7 @@ if (process.env.NODE_ENV === 'development') {
 ```
 
 ### Testing Page
-Visit `/dev/navigation-loading` to test all loading states and scenarios.
+Visit `/dev/navigation-loading` to test all loading states and scenarios. This is super helpful for debugging timing issues.
 
 ## Migration Guide
 

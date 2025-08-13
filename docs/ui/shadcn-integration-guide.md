@@ -1,7 +1,7 @@
 # shadcn/ui Integration Guide
 
 ## Overview
-This guide documents the integration of shadcn/ui component library into the Narraitor project, providing a foundation for accessible, themeable UI components.
+The shadcn/ui integration gives us a solid foundation of accessible, well-designed components that work great with Tailwind CSS. Instead of building everything from scratch, we get professional components that just work.
 
 ## Setup Completed
 
@@ -56,7 +56,7 @@ function MyComponent() {
 
 ### Icon Integration with Components
 
-shadcn/ui components work seamlessly with lucide-react icons following Narraitor's icon usage standards:
+The shadcn/ui components play nicely with our lucide-react icon standards:
 
 #### Button with Icons
 ```tsx
@@ -160,12 +160,16 @@ Dark mode variables are included and can be activated with the `dark` class on t
 ## Migration Strategy
 
 ### For Future Components
+When adding new shadcn/ui components:
+
 1. Install component using manual creation (adapted for Tailwind v4)
 2. Create Storybook stories following naming convention
 3. Test integration with existing styles
 4. Document any custom modifications needed
 
 ### Existing Components
+We're not throwing away what works:
+
 - Keep existing components as-is initially
 - Gradually migrate to shadcn/ui equivalents in separate issues
 - Maintain parallel implementations during transition
@@ -191,16 +195,22 @@ src/
 ## Troubleshooting
 
 ### Build Issues
+Common build problems and fixes:
+
 - Ensure Tailwind CSS v4 compatibility
 - Check that all dependencies are installed
 - Verify CSS variables are properly defined
 
 ### Styling Issues
+When components don't look right:
+
 - Use browser dev tools to inspect CSS variable values
 - Check that `cn()` utility is being used for className merging
 - Verify Tailwind classes are being generated
 
 ### Component Issues
+When components don't work as expected:
+
 - Check that components are imported from correct path
 - Ensure all required props are provided
 - Verify TypeScript types are correct
@@ -210,7 +220,8 @@ src/
 - **Next Steps**: #501 (Command Palette), #502 (Dialogs), #503 (Form Migration)
 
 ## Accessibility
-Dialog components built with shadcn/ui must follow WCAG accessibility standards:
+shadcn/ui components come with good accessibility built-in, but there are still rules to follow:
+
 - DialogTitle must be a direct child of DialogContent (not nested in DialogHeader)
 - Proper ARIA labeling with aria-labelledby and aria-describedby
 - Keyboard navigation support and focus management

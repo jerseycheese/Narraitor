@@ -11,7 +11,7 @@ updated: 2025-06-08
 
 ## Overview
 
-The World Creation Wizard is a multi-step React component that guides users through the process of creating a new game world in the Narraitor RPG system. It features AI-powered analysis of world descriptions to suggest appropriate attributes and skills.
+Creating a new RPG world can be overwhelming - do you need a Strength attribute? What skills make sense for a cyberpunk setting? The World Creation Wizard walks you through the process step by step, and even uses AI to analyze your world description and suggest appropriate attributes and skills.
 
 ## Architecture
 
@@ -45,7 +45,8 @@ The wizard uses local React state for managing:
 
 ### AI-Powered Suggestions
 
-When users provide a detailed world description, the wizard:
+This is where the wizard gets smart. Describe a post-apocalyptic wasteland and it suggests skills like "Radiation Resistance" and "Scavenging". Here's how it works:
+
 1. Sends the description to the AI analyzer
 2. Receives suggested attributes and skills
 3. Presents suggestions for user review
@@ -53,13 +54,16 @@ When users provide a detailed world description, the wizard:
 
 ### Validation
 
-Each step includes appropriate validation:
+We keep the validation reasonable but firm - enough to prevent obviously broken worlds:
+
 - Name: 3+ characters required
 - Description: 10+ characters (basic), 50-3000 characters (detailed)
 - Attributes: 1-6 must be selected
 - Skills: 1-12 must be selected
 
 ### Error Handling
+
+Everything's designed to fail gracefully so users never get stuck:
 
 - Form validation errors display inline
 - AI failures gracefully fallback to defaults

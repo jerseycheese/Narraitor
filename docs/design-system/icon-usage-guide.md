@@ -2,18 +2,19 @@
 
 ## Overview
 
-This guide establishes standards for icon usage throughout the Narraitor application. All icons should use the lucide-react library to ensure consistency, accessibility, and themeable integration with our design system.
+Icons should be consistent, accessible, and professional throughout the app. That means no more random emojis - we use lucide-react for everything. This guide covers how to pick the right icon, size it properly, and make it accessible.
 
 ## Icon Library Standards
 
 ### Primary Icon System: lucide-react
 
-**Why lucide-react:**
-- **Accessibility**: Proper React components provide better screen reader support than emojis
-- **Consistency**: Vector-based icons that scale perfectly at all sizes
-- **Performance**: Tree-shaking friendly imports reduce bundle size
-- **Theming**: Icons inherit CSS colors and respect dark/light mode themes
-- **Maintenance**: Single source of truth for all icon usage
+We chose lucide-react because it solves all the problems emojis create:
+
+- **Accessibility**: Proper React components work with screen readers
+- **Consistency**: Vector icons look the same on every device
+- **Performance**: Tree-shaking means we only load the icons we use
+- **Theming**: Icons inherit colors and work with dark mode
+- **Maintenance**: One library, one style, no surprises
 
 ### Installation & Import
 
@@ -27,7 +28,7 @@ import { Home, Globe, Star, Plus, Settings } from 'lucide-react'
 
 ### Standard Size Classes
 
-Follow these established sizing patterns based on context:
+Don't guess at icon sizes - we have established patterns for different contexts:
 
 #### **Badge Icons: `w-3 h-3` (12px)**
 For compact badge and tag elements where space is limited:
@@ -305,18 +306,19 @@ const StorageStatusIcon = ({ status }) => {
 
 ### Why Migrate from Emojis
 
-Emojis have several limitations in professional applications:
-- **Inconsistent rendering** across different operating systems and browsers
-- **Poor accessibility** for screen readers and assistive technologies
-- **Limited theming** support: can't change colors or respond to dark mode
-- **Scaling issues** at different sizes
-- **Professional appearance** concerns in business applications
+Emojis seem convenient, but they cause real problems in production apps:
+
+- **Inconsistent rendering** - looks different on Mac vs Windows vs mobile
+- **Poor accessibility** - screen readers often can't interpret them properly
+- **Limited theming** - can't change colors or adapt to dark mode
+- **Scaling issues** - look terrible at small or large sizes
+- **Professional appearance** - users expect real interface icons, not emojis
 
 ### Migration Process
 
-When replacing emoji icons:
+When you find an emoji in the code, here's how to fix it:
 
-1. **Identify the semantic meaning** of the emoji
+1. **Identify the semantic meaning** - what is this emoji actually trying to communicate?
 2. **Find appropriate lucide-react icon** that conveys the same meaning
 3. **Apply proper sizing** based on context (badge, button, dialog, etc.)
 4. **Add appropriate colors** following our semantic color guidelines

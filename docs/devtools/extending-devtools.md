@@ -7,23 +7,24 @@ updated: 2025-06-08
 
 # Extending DevTools Panel
 
-Guide for adding new debugging sections to the DevTools panel.
+The DevTools panel is your window into what's happening under the hood during development. Adding a new section is straightforward once you know the patterns.
 
 ## Architecture
 
-**Core Components:**
-- `DevToolsContext`: Manages panel visibility state
-- `DevToolsPanel`: Main panel UI with toggle functionality
-- `CollapsibleSection`: Reusable collapsible sections
-- `DevToolsSection`: Reusable container with consistent styling
-- `JsonViewer`: JSON display with syntax highlighting
-- `StateSection`: Shows Zustand store states
-- `ConsistencyValidationSection`: AI consistency validation debugging
+The DevTools system is built from a few key components:
+
+- `DevToolsContext`: Controls whether the panel is open or closed
+- `DevToolsPanel`: The main panel that holds everything else
+- `CollapsibleSection`: Lets you group related debug info that can be expanded/collapsed
+- `DevToolsSection`: Provides consistent styling so all sections look the same
+- `JsonViewer`: Pretty-prints JSON with syntax highlighting
+- `StateSection`: Shows what's in your Zustand stores
+- `ConsistencyValidationSection`: Debug the AI consistency validation system
 
 ## Adding a New Section
 
 ### Step 1: Create Component
-Create component in `src/components/devtools/` using consistent patterns:
+Build your component in `src/components/devtools/` following the established patterns:
 
 ```typescript
 import { DevToolsSection } from '../shared/DevToolsSection';
@@ -51,7 +52,7 @@ export * from './MyNewSection';
 ```
 
 ### Step 2: Add Tests
-Follow TDD approach:
+Write tests first because debugging tools need to be reliable:
 
 ```typescript
 // MyNewSection.test.tsx
@@ -107,18 +108,18 @@ export const DevToolsPanel = () => {
 
 ## Best Practices
 
-1. **Keep it simple** - Focus on essential debugging information
-2. **Use collapsible sections** - Group related information
-3. **Ensure good performance** - Avoid expensive operations
-4. **Development-only** - Check environment in components
-5. **Follow TDD** - Write tests before implementation
-6. **300-line limit** - Keep components small
-7. **Use Storybook** - Develop in isolation first
+1. **Keep it simple** - Show what developers need to debug, nothing more
+2. **Use collapsible sections** - Nobody wants a wall of debug info
+3. **Ensure good performance** - Debug tools shouldn't slow down development
+4. **Development-only** - Check environment to avoid shipping debug code
+5. **Follow TDD** - Buggy debug tools are worse than no debug tools
+6. **300-line limit** - If your debug component is huge, split it up
+7. **Use Storybook** - Develop debug tools in isolation first
 
 ## Hydration Handling
 
 ### Client-Side Only Pattern
-For dynamic content that differs between server and client:
+When your debug info changes between server and client rendering, use this pattern to avoid hydration mismatches:
 
 ```tsx
 export const MyComponent = ({ data }) => {
@@ -216,11 +217,13 @@ import { DevToolsSection } from '../shared/DevToolsSection';
 
 ## Common Extension Ideas
 
-1. **Performance Monitoring** - Render times, re-renders
-2. **State History** - Track state changes over time
-3. **Network Requests** - Monitor API calls and responses
-4. **Error Tracking** - Show recent errors and warnings
-5. **Component Tree** - Visualize component hierarchy
-6. **Event Logging** - Log user interactions
-7. **AI Prompt Analysis** - Debug AI prompt generation and responses
+Need inspiration for what to build next? Here are some ideas:
+
+1. **Performance Monitoring** - Track render times and expensive re-renders
+2. **State History** - See how store state changes over time
+3. **Network Requests** - Monitor API calls, especially to AI services
+4. **Error Tracking** - Collect and display recent errors and warnings
+5. **Component Tree** - Visualize the component hierarchy
+6. **Event Logging** - Track user interactions and their effects
+7. **AI Prompt Analysis** - Debug what prompts are being sent to AI
 8. **Lore Management** - CRUD operations for lore facts during development

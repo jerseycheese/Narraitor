@@ -1,79 +1,102 @@
-# Narraitor Type System
+# Type System
 
-This directory contains all TypeScript type definitions for the Narraitor application's core domains.
+This directory contains all the TypeScript type definitions for the major domains in Narraitor. The basic idea is to have type-safe interfaces for everything so you catch errors at compile time instead of runtime, and to keep all the type definitions organized by what they're used for.
 
-## Overview
+## Why This Matters
 
-The type system provides type-safe interfaces for all major domains in the application:
+When you're dealing with complex state management and AI integration, having solid types is crucial. You want to know that a Character object has all the required fields, that a World's attributes match what the AI expects, and that you can't accidentally pass a Skill where an Attribute is expected. The type system catches these mistakes before they become bugs.
 
-- **Common Types**: Base types and interfaces used across domains
-- **World Configuration**: Types for game world settings and attributes
-- **Character System**: Character, attributes, skills, and inventory
-- **Narrative Engine**: Story segments, decisions, and consequences
-- **Journal System**: Event tracking and categorization
-- **Session Management**: Game state and save points
-- **AI Context**: Integration types for AI services
+## How It's Organized
 
-## Quick Start
+The types are split up by domain - World, Character, Narrative, Journal, etc. Each domain has its own file with related interfaces, plus some common types that get used everywhere:
+
+- **Common Types**: Base interfaces like `EntityID`, timestamps, and shared patterns
+- **World Configuration**: Types for game worlds, attributes, skills, and settings
+- **Character System**: Character sheets, backgrounds, inventory, relationships
+- **Narrative Engine**: Story segments, choices, consequences, AI context
+- **Journal System**: Event tracking, categorization, filtering
+- **Session Management**: Game state, save points, session data
+
+## Basic Usage
+
+Most of the time you'll just import the types you need:
 
 ```typescript
-// Import specific types
 import { World, Character, NarrativeSegment } from '@/types';
 
-// Import type guards for runtime validation
-import { isWorld, isCharacter } from '@/types';
-
-// Import all types
-import * as Types from '@/types';
+// Use them in your components or stores
+interface GameState {
+  currentWorld: World | null;
+  activeCharacter: Character | null;
+  narrativeHistory: NarrativeSegment[];
+}
 ```
 
-## Type Structure
-
-### Common Types
-- `EntityID`: String identifier used across all entities
-- `Timestamp`: ISO 8601 date string
-- `TimestampedEntity`: Base interface with createdAt/updatedAt
-- `NamedEntity`: Base interface with id, name, and optional description
-
-### Domain-Specific Types
-
-Each domain has its own type file with related interfaces:
-
-```typescript
-// World types
-interface World extends NamedEntity, TimestampedEntity
-interface WorldAttribute extends NamedEntity
-interface WorldSkill extends NamedEntity
-interface WorldSettings
-
-// Character types
-interface Character extends NamedEntity, TimestampedEntity
-interface CharacterAttribute
-interface CharacterSkill
-interface CharacterStatus
-interface CharacterBackground
-interface CharacterRelationship
-
-// And more...
-```
-
-## Type Guards
-
-Runtime type checking is available for major interfaces:
+There are also type guards available for runtime validation, which is useful when you're dealing with data from external sources or local storage:
 
 ```typescript
 import { isWorld, isCharacter } from '@/types';
 
 // Validate unknown data
-if (isWorld(data)) {
-  // TypeScript knows data is a World
-  console.log(data.theme);
+const data = JSON.parse(localStorage.getItem('savedGame'));
+if (isWorld(data.world)) {
+  // TypeScript knows data.world is a World
+  console.log(data.world.theme);
 }
 ```
 
-## Usage Examples
+## Common Type Patterns
 
-### Creating a New Character
+### Base Types
+
+Most entities share common patterns:
+
+```typescript
+// Every entity has a unique ID
+type EntityID = string;
+
+// Timestamped entities track when they were created/updated
+interface TimestampedEntity {
+  createdAt: string; // ISO 8601 date string
+  updatedAt: string;
+}
+
+// Named entities have basic identity fields
+interface NamedEntity {
+  id: EntityID;
+  name: string;
+  description?: string;
+}
+```
+
+### Domain Objects
+
+Each domain builds on these base patterns:
+
+```typescript
+// World extends both base patterns
+interface World extends NamedEntity, TimestampedEntity {
+  theme: string;
+  attributes: WorldAttribute[];
+  skills: WorldSkill[];
+  settings: WorldSettings;
+}
+
+// Character does the same
+interface Character extends NamedEntity, TimestampedEntity {
+  worldId: EntityID;
+  attributes: CharacterAttribute[];
+  skills: CharacterSkill[];
+  background: CharacterBackground;
+  inventory: CharacterInventory;
+}
+```
+
+## Working with the Types
+
+### Creating New Objects
+
+When you're creating new entities, you'll typically use the full interface:
 
 ```typescript
 import { Character, EntityID } from '@/types';
@@ -81,7 +104,7 @@ import { generateUniqueId } from '@/lib/utils';
 
 const newCharacter: Character = {
   id: generateUniqueId('char'),
-  worldId: worldId,
+  worldId: selectedWorldId,
   name: "Hero",
   attributes: [],
   skills: [],
@@ -108,7 +131,9 @@ const newCharacter: Character = {
 };
 ```
 
-### Working with Decisions
+### Handling Choices and Decisions
+
+The decision system types are designed to work with the AI narrative engine:
 
 ```typescript
 import { Decision, DecisionOption } from '@/types';
@@ -141,48 +166,86 @@ const decision: Decision = {
 };
 ```
 
-## Best Practices
+## State Management Integration
 
-1. **Use Type Guards**: Always validate external data with type guards
-2. **Prefer Interfaces**: Use interfaces over type aliases for object shapes
-3. **Document Types**: Add JSDoc comments to all public interfaces
-4. **Keep Types Pure**: Don't include business logic in type files
-5. **Use Discriminated Unions**: For types with multiple variants
-
-## Extending Types
-
-When adding new features:
-
-1. Add new interfaces to the appropriate domain file
-2. Update the index.ts exports
-3. Create corresponding type guards if needed
-4. Add tests for new types
-5. Update this README with new types
-
-## Integration with State Management
-
-These types are designed to work seamlessly with Zustand state management:
+These types work directly with Zustand stores. The typical pattern is to have a Record mapping IDs to entities:
 
 ```typescript
-import { World, Character } from '@/types';
+import { World, Character, EntityID } from '@/types';
 
-interface GameState {
+interface WorldState {
   worlds: Record<EntityID, World>;
-  characters: Record<EntityID, Character>;
-  // ...
+  currentWorldId: EntityID | null;
+  createWorld: (worldData: Omit<World, 'id' | 'createdAt' | 'updatedAt'>) => EntityID;
+  updateWorld: (id: EntityID, updates: Partial<World>) => void;
+  deleteWorld: (id: EntityID) => void;
 }
 ```
 
-## Testing
+This pattern makes it easy to look up entities by ID and ensures the store methods have the right types.
 
-All types have comprehensive tests in `__tests__/`. Run tests with:
+## Type Guards
 
-```bash
-npm test src/types
+When you're dealing with data from external sources - localStorage, API responses, user uploads - you can use type guards to validate the shape:
+
+```typescript
+import { isWorld, isCharacter } from '@/types';
+
+const handleFileUpload = (file: File) => {
+  const data = JSON.parse(await file.text());
+  
+  if (isWorld(data)) {
+    // Safe to use as World
+    importWorld(data);
+  } else if (isCharacter(data)) {
+    // Safe to use as Character
+    importCharacter(data);
+  } else {
+    throw new Error('Unknown file format');
+  }
+};
 ```
 
-## Related Documentation
+## Extending the Type System
 
-- [Type System Design](/docs/api/types.md)
-- [State Management](/docs/architecture/state-management.md)
-- [Development Roadmap](/docs/development-roadmap.md)
+When you need to add new features:
+
+1. **Add the interface** to the appropriate domain file
+2. **Update the index.ts** to export the new types
+3. **Create type guards** if the type needs runtime validation
+4. **Add tests** for the new types
+5. **Update any related store interfaces**
+
+For example, if you're adding a new inventory item type:
+
+```typescript
+// In inventory.ts
+interface MagicalItem extends InventoryItem {
+  type: 'magical';
+  magicalProperties: {
+    spellType: string;
+    manaCost: number;
+    cooldown: number;
+  };
+}
+
+// In index.ts
+export type { MagicalItem } from './inventory';
+export { isMagicalItem } from './inventory';
+```
+
+## Best Practices
+
+**Use interfaces over type aliases** for object shapes. Interfaces can be extended and merged, which makes them more flexible.
+
+**Prefer composition over inheritance**. Use `extends` to combine base interfaces rather than creating deep hierarchies.
+
+**Add JSDoc comments** to any interface that's not self-explanatory, especially for complex business logic types.
+
+**Keep types pure**. Don't include functions or business logic in type files - just the data shapes.
+
+**Use discriminated unions** when you have types with multiple variants. This makes TypeScript's type narrowing work better.
+
+**Validate external data**. Always use type guards when dealing with data from outside the app.
+
+The type system is designed to grow with the app, so don't hesitate to add new types or refactor existing ones as requirements change.

@@ -9,16 +9,16 @@ updated: 2025-06-08
 
 # Narraitor Global Styles
 
-This document explains the global styling system implemented for the Narraitor application. The system provides a wireframe-like foundation for MVP development while setting up an extensible structure for future theming.
+The global styling system is designed to get us to MVP fast while laying groundwork for a proper design system later. Think of it as wireframes that actually work - clean, functional, and ready to be styled properly when we have more time.
 
 ## CSS Architecture
 
-The global styles use Tailwind CSS v4 as a foundation and are organized into several key sections:
+Built on Tailwind CSS v4, the styles are organized to stay maintainable:
 
-1. **CSS Variables**: Core variables for colors, typography, spacing, and design elements
-2. **Base Styles**: Default styling for HTML elements
-3. **Component Classes**: Minimal reusable component styles
-4. **Utility Classes**: Essential utility helpers
+1. **CSS Variables**: The foundation colors, fonts, and spacing that everything builds on
+2. **Base Styles**: Sensible defaults for HTML elements so things look decent out of the box
+3. **Component Classes**: A few reusable classes for common patterns
+4. **Utility Classes**: Custom utilities that Tailwind doesn't provide
 
 ## CSS Variables
 
@@ -49,11 +49,14 @@ Our CSS variables can be used directly in JSX component styles or in CSS files. 
 
 ### Style Guidelines
 
-**Important: No Inline Styles**
+**The Golden Rule: No Inline Styles**
+
+We stick to Tailwind classes because inline styles are the enemy of maintainable code:
+
 - Always use Tailwind CSS utility classes for styling
 - Never use inline styles (style prop) in components
 - If Tailwind doesn't provide what you need, create a custom CSS class
-- This ensures consistency and maintainability across the codebase
+- This keeps everything consistent and easy to refactor later
 
 ### In Tailwind Classes
 
@@ -105,7 +108,7 @@ If you need to use CSS variables, create a custom CSS class instead of using inl
 
 ## Semantic HTML
 
-The global styles are designed to work with semantic HTML elements, improving accessibility and SEO. Key semantic elements include:
+Good HTML structure helps with accessibility and SEO, plus it makes the CSS easier to reason about. Use these semantic elements:
 
 - `<main>`: Primary content area
 - `<header>`: Introductory content
@@ -163,11 +166,13 @@ const AccessibleComponent = () => {
 
 ## Future Theming
 
-The CSS variable structure provides a foundation for future theming. To implement theming in the future:
+The CSS variables are set up so we can add proper theming later without rewriting everything:
 
 1. Create theme CSS files with custom variable values
 2. Apply theme classes to the root element
 3. Define theme variable values within the appropriate selectors
+
+When we're ready for dark mode or custom themes, the foundation is already there.
 
 ## Testing and Development
 

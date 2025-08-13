@@ -1,14 +1,14 @@
 # GameSession Components
 
-This folder contains the game session components that were split up to keep files under 300 lines (issue #361). The main challenge was organizing complex state management and AI interactions into manageable pieces.
+This folder contains the game session components that were split up to keep files under 300 lines (issue #361). The main challenge was organizing complex state management and AI interactions into manageable pieces without losing the flow between components.
 
 ## How It's Organized
 
-Using a Container/Presenter pattern where the main GameSession component orchestrates everything, and smaller components handle specific responsibilities:
+We're using a Container/Presenter pattern where the main GameSession component orchestrates everything, and smaller components handle specific responsibilities:
 
 ### Main Components
 
-- **GameSession** (`GameSession.tsx`): The main container component that orchestrates state and child components
+- **GameSession** (`GameSession.tsx`): The main container that orchestrates state and child components
 - **ActiveGameSession** (`ActiveGameSession.tsx`): Handles the active game session with AI-driven narrative and choice generation
   - Manages `localSelectedChoiceId` state to track player choice selection and trigger narrative progression
 - **GameSessionError** (`GameSessionError.tsx`): Error state component
@@ -24,21 +24,24 @@ Using a Container/Presenter pattern where the main GameSession component orchest
 ## Component Responsibilities
 
 ### GameSession
+The main container that:
 - Manages client-side rendering detection
 - Handles accessibility features (focus management, screen reader announcements)
 - Routes to appropriate state components (loading, error, active)
-- Maintains component under 250 lines
+- Keeps the component under 250 lines
 
 ### PlayerChoices
-- Renders player choice buttons with radio button semantics
-- Handles choice selection
-- Supports disabled state
-- Maintains proper accessibility attributes
+Handles player interaction by:
+- Rendering choice buttons with radio button semantics
+- Managing choice selection
+- Supporting disabled states
+- Maintaining proper accessibility attributes
 
 ### SessionControls
-- Renders pause/resume/end buttons
-- Handles session state transitions
-- Provides visual feedback for current state
+Provides session management with:
+- Pause/resume/end buttons
+- Session state transitions
+- Visual feedback for current state
 
 ### State Components
 - **GameSessionLoading**: Shows loading spinner with customizable message
@@ -46,10 +49,11 @@ Using a Container/Presenter pattern where the main GameSession component orchest
 - **ActiveGameSession**: Enhanced active session component with integrated AI narrative generation and contextual choice systems
 
 ### useGameSessionState Hook
-- Encapsulates all state management logic
-- Handles polling for session state updates
-- Manages pause/resume functionality
-- Provides all handlers for user interactions
+This hook encapsulates:
+- All state management logic
+- Polling for session state updates
+- Pause/resume functionality
+- All handlers for user interactions
 
 ## Usage Example
 
@@ -63,7 +67,7 @@ Using a Container/Presenter pattern where the main GameSession component orchest
 
 ## Testing
 
-Each component has:
+Each component has comprehensive testing:
 - Unit tests in `.test.tsx` files
 - Storybook stories in `.stories.tsx` files
 - Integration tests in `__tests__/integration.test.tsx`
@@ -81,7 +85,7 @@ A test harness is available at `/dev/game-session-components` for interactive te
 
 ## AI Choice Generation Features
 
-The `ActiveGameSession` component includes:
+The `ActiveGameSession` component includes some pretty sophisticated AI features:
 
 ### Core AI Features
 - **Automated Choice Generation**: AI-powered player choices based on narrative context
@@ -90,19 +94,21 @@ The `ActiveGameSession` component includes:
 - **Error Recovery**: Graceful fallbacks when AI generation fails
 
 ### Technical Implementation
+We're using:
 - **Google Gemini AI**: Primary choice generation service
 - **Context Assembly**: Recent narrative segments provide story context
 - **Fallback System**: Pre-defined choices when AI is unavailable
 - **State Management**: Integrated with narrativeStore and sessionStore
 
 ### User Experience
+The system provides:
 - **No Jarring Transitions**: Eliminated "choice flashing" through proper loading states
 - **Contextual Choices**: AI generates options relevant to current story situation
 - **Error Resilience**: System continues functioning even with AI service issues
 
 ## Journal System Integration
 
-The GameSession includes a fully integrated journal system that:
+The GameSession includes a fully integrated journal system that handles persistent story tracking:
 
 ### Core Journal Features
 - **Persistent Storage**: Journal entries persist across browser sessions using IndexedDB
@@ -116,7 +122,7 @@ The GameSession includes a fully integrated journal system that:
 - **AI Summarization**: Automatic journal entry generation from narrative segments
 - **Performance**: Fast loading with synchronous data access
 
-### Usage
+### How It Works
 - Journal button appears when character is present
 - Click to open modal showing all session entries
 - Entries automatically created during story progression
@@ -124,6 +130,7 @@ The GameSession includes a fully integrated journal system that:
 
 ## Future Improvements
 
+We're considering:
 - Context API for deeper component nesting
 - Performance optimization for narrative rendering
 - Enhanced loading states with progress indicators

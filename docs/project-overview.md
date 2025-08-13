@@ -16,6 +16,8 @@ Whether you want noir detective stories, space opera adventures, or something se
 The core functionality is working and stable. All the main systems (world creation, character building, AI narrative generation, session persistence) are operational. Currently in the polish phase: fixing UI edge cases, optimizing performance, and preparing for broader use.
 
 ## Technical Foundation
+
+Built on a solid foundation of modern tools:
 - **Framework**: Next.js 15+ with App Router
 - **AI Integration**: Google Gemini (secure server-side)
 - **State Management**: Zustand stores with IndexedDB persistence

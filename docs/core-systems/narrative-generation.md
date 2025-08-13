@@ -9,23 +9,23 @@ updated: 2025-06-08
 
 # Narrative Generation System
 
-The Narrative Generation System is a core component of Narraitor that provides AI-powered, dynamically generated narrative content that adapts to the world's theme, player choices, and game context.
+This is the heart of what makes Narraitor special - AI that doesn't just generate random text, but actually creates coherent stories that feel like they belong in your world. Whether you're in a cyberpunk dystopia or a medieval fantasy realm, the AI adapts its language, tone, and content to match.
 
 ## Overview
 
-The system consists of several interconnected components:
+The narrative system is built from several pieces that work together to create consistent, engaging stories:
 
-1. **NarrativeGenerator Service**: Core service responsible for generating narrative content using AI
-2. **Template Manager**: Provides prompt templates for different narrative segment types
-3. **Context Management**: Maintains narrative continuity by tracking context
-4. **Component System**: React components that manage and display narrative content
-5. **State Management**: Persists narrative segments using Zustand stores
+1. **NarrativeGenerator Service**: The AI engine that actually creates the story content
+2. **Template Manager**: Different prompt templates for different story moments (openings, transitions, etc.)
+3. **Context Management**: Keeps track of what's happened so far so the story makes sense
+4. **Component System**: React components that handle the UI side of storytelling
+5. **State Management**: Stores all the narrative content using Zustand
 
 ## Usage Guide
 
 ### Basic Usage
 
-To generate and display narrative content in a game session:
+The simplest way to add narrative generation to a game session:
 
 ```tsx
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
@@ -74,23 +74,23 @@ import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistory
 
 ### World-Specific Adaptation
 
-The narrative generation system adapts content based on the world's properties:
+This is where the magic happens - the AI actually understands what kind of world you've created and adapts accordingly:
 
-1. **Theme-Based Content**: Different worlds (Fantasy, Western, Sci-Fi, etc.) get appropriate narrative styles
-2. **Location Adaptation**: Starting locations are selected based on world theme:
+1. **Theme-Based Content**: A Western world feels like the Wild West, not generic fantasy
+2. **Smart Starting Locations**: No more starting in taverns when you're on a space station:
    - Western worlds start in "Frontier Town"
    - Fantasy worlds start in "Enchanted Forest"
    - Sci-Fi worlds start in "Space Station"
-3. **Tone Settings Integration**: Comprehensive tone control through content rating, narrative style, and language complexity
-4. **Attribute Integration**: World attributes influence content and narrative possibilities
+3. **Tone Settings Integration**: Whether you want family-friendly adventures or gritty noir stories
+4. **Attribute Integration**: Your world's custom attributes actually matter in the narrative
 
 ### Prompt Template System
 
-The system uses different templates for different narrative needs:
+Different moments in the story need different approaches, so we have specialized templates:
 
-1. **Initial Scene Template**: Generates the opening scene for a game session
-2. **Scene Template**: Creates standard narrative scenes
-3. **Transition Template**: Handles transitions between different narrative states
+1. **Initial Scene Template**: Sets the stage for a new adventure
+2. **Scene Template**: Handles the main story beats
+3. **Transition Template**: Smoothly connects different narrative moments
 
 ### Tone Settings System
 

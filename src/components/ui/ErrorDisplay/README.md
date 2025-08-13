@@ -1,10 +1,12 @@
 # ErrorDisplay Component
 
-A unified error display system that replaces various error message implementations across the application.
+So here's the thing - we had error messages scattered all over the app, each doing their own styling and behavior. Some were red text, some were bordered boxes, some had retry buttons, some didn't. It was a mess to maintain and users got inconsistent experiences.
+
+This component consolidates all that into one system that handles errors consistently. Basically, instead of writing custom error markup everywhere, you just pick the right variant and you're done.
 
 ## Usage
 
-Replace existing error implementations with the appropriate ErrorDisplay variant:
+Here's how to replace the old scattered error implementations:
 
 ### Before (various implementations):
 ```tsx
@@ -50,18 +52,24 @@ import { InlineError, SectionError, PageError } from '@/components/ui/ErrorDispl
 
 ## Variants
 
-- **inline**: Small error messages for form fields
-- **section**: Error blocks within a page section
-- **page**: Full page error states
-- **toast**: Temporary notification popups
+We've got four main patterns that cover pretty much every error scenario:
+
+- **inline**: Those little red messages under form fields when validation fails
+- **section**: Bigger error blocks when a whole section can't load or has issues
+- **page**: Full page errors like 404s or when the whole app breaks
+- **toast**: Those notification popups that appear and disappear automatically
 
 ## Severity Levels
 
-- **error**: Red theme for errors (default)
-- **warning**: Yellow theme for warnings
-- **info**: Blue theme for informational messages
+The color coding is pretty intuitive:
+
+- **error**: Red theme for actual errors (this is the default)
+- **warning**: Yellow theme for "hey, something's not quite right but it's not broken"
+- **info**: Blue theme for informational messages that aren't really problems
 
 ## Common Use Cases
+
+Here are the patterns you'll use most often:
 
 ### Form Validation
 ```tsx
@@ -126,7 +134,9 @@ import { InlineError, SectionError, PageError } from '@/components/ui/ErrorDispl
 
 ## Accessibility
 
-- All variants include appropriate ARIA attributes
-- Toast notifications use `aria-live="assertive"`
-- Other variants use `aria-live="polite"`
-- Inline errors can be associated with form fields via `fieldName`
+We've baked in all the accessibility stuff so you don't have to think about it:
+
+- All variants get the right ARIA attributes automatically
+- Toast notifications use `aria-live="assertive"` because they're urgent interruptions
+- Other variants use `aria-live="polite"` since they're less disruptive
+- Inline errors link to their form fields through the `fieldName` prop, which helps screen readers connect the error to the right input

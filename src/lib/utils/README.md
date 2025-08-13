@@ -1,12 +1,12 @@
 # Utility Functions
 
-A collection of utility functions used throughout the Narraitor application.
+A collection of utility functions used throughout the Narraitor application. These handle common tasks like ID generation, text formatting, and date/time display so you don't have to write the same code over and over.
 
 ## ID Generation
 
 ### generateUniqueId(prefix?: string): EntityID
 
-Generates a unique identifier (UUID v4) with an optional prefix.
+Generates a unique identifier (UUID v4) with an optional prefix. Useful for creating IDs for worlds, characters, sessions, etc.
 
 ```typescript
 import { generateUniqueId } from '@/lib/utils';
@@ -19,7 +19,7 @@ const prefixedId = generateUniqueId('user'); // "user_550e8400-e29b-41d4-a716-44
 
 ### formatAIResponse(text: string, options?: FormattingOptions): string
 
-Formats AI-generated text for display with proper paragraphs, dialogue, and emphasis.
+Formats AI-generated text for display with proper paragraphs, dialogue, and emphasis. This is especially useful for narrative content since AI often returns raw text that needs formatting.
 
 ```typescript
 import { formatAIResponse } from '@/lib/utils';
@@ -43,15 +43,13 @@ const combined = formatAIResponse(
 // Output: 'He said, "Look at <em>that</em>!"\n\nAmazing!'
 ```
 
-#### Options
-
+**Options:**
 - `preserveLineBreaks?: boolean` - Keep single line breaks as-is (default: false)
 - `formatDialogue?: boolean` - Add quotation marks to dialogue (default: false)  
 - `enableItalics?: boolean` - Convert *asterisks* to `<em>` tags (default: false)
 - `paragraphSpacing?: 'single' | 'double'` - Not currently implemented
 
-#### Features
-
+**What it does:**
 - **Whitespace normalization**: Removes extra spaces, tabs, and trailing whitespace
 - **Paragraph formatting**: Normalizes multiple line breaks to double
 - **Dialogue formatting**: Adds quotes around speech (said, replied, asked, etc.)
@@ -62,7 +60,7 @@ const combined = formatAIResponse(
 
 ### formatRelativeTime(date: Date | string): string
 
-Formats dates as human-readable relative time (e.g., "2 hours ago", "yesterday").
+Formats dates as human-readable relative time. Much more user-friendly than showing raw timestamps.
 
 ```typescript
 import { formatRelativeTime } from '@/lib/utils';
@@ -86,7 +84,7 @@ formatDate(new Date('2024-01-15'), { month: 'long', weekday: 'long' }); // "Mond
 
 ### formatTime(date: Date | string, includeSeconds?: boolean): string
 
-Formats the time portion of a date.
+Formats just the time portion of a date.
 
 ```typescript
 import { formatTime } from '@/lib/utils';
@@ -110,7 +108,7 @@ formatDateTime(new Date('2024-01-15T14:30:00'), { hour12: false }); // "Jan 15, 
 
 ### truncate(text: string, maxLength: number, suffix?: string): string
 
-Intelligently truncates text at word boundaries when possible.
+Intelligently truncates text at word boundaries when possible. Better than just chopping off at a character limit.
 
 ```typescript
 import { truncate } from '@/lib/utils';
@@ -155,7 +153,7 @@ sentenceCase('hello! how are you?'); // "Hello! How are you?"
 
 ### safeTrim(text: string | null | undefined): string
 
-Safely trims whitespace, handling null/undefined values.
+Safely trims whitespace, handling null/undefined values so you don't get runtime errors.
 
 ```typescript
 import { safeTrim } from '@/lib/utils';
@@ -239,7 +237,7 @@ npm test src/lib/utils/__tests__
 
 ## Storybook
 
-The text formatter has visual examples in Storybook:
+The text formatter has visual examples in Storybook for seeing how the formatting works:
 
 ```bash
 npm run storybook

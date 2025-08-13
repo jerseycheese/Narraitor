@@ -1,15 +1,20 @@
 # ChoiceSelector Component
 
-A unified choice selector component that handles both simple choices and complex decisions with optional custom player input functionality.
+This handles player choice selection in all its forms - from simple "go left or right" decisions to complex scenarios with custom player input. The challenge was creating one component that works for both AI-generated choices and player creativity without feeling cluttered.
 
-## Features
+## What It Handles
 
-- **Unified Interface**: Handles both simple choices and Decision objects
-- **Custom Player Input**: Optional textarea for custom player actions
-- **Visual Hierarchy**: Custom input prominent at top, suggested actions below
-- **Character Limits**: Configurable character counting with visual feedback
-- **Accessibility**: Full keyboard navigation and screen reader support
-- **Validation**: Prevents empty submissions and enforces character limits
+**Multiple choice types** - Works with simple choice lists ("Go north", "Go south") and complex decision objects with hints and requirements.
+
+**Custom player input** - Optional text area where players can type their own creative responses instead of picking from suggested options.
+
+**Smart visual hierarchy** - Custom input gets prominent placement at the top, suggested choices appear below with less visual weight.
+
+**Character counting** - Live character counter with color-coded warnings as you approach the limit.
+
+**Full accessibility** - Keyboard navigation, screen reader support, proper ARIA labels throughout.
+
+**Input validation** - Prevents empty submissions, enforces character limits, handles edge cases gracefully.
 
 ## Basic Usage
 
@@ -48,9 +53,9 @@ const decision = {
 />
 ```
 
-## Custom Player Input
+## Custom Input Examples
 
-### Basic Custom Input
+**Basic setup** - Enable custom input alongside regular choices:
 ```tsx
 <ChoiceSelector
   choices={choices}
@@ -60,7 +65,7 @@ const decision = {
 />
 ```
 
-### Advanced Custom Input
+**Advanced configuration** - Customize the experience with hints, length limits, and placeholder text:
 ```tsx
 <ChoiceSelector
   decision={decision}
@@ -175,27 +180,15 @@ Or choose a suggested action:
 - **Large Targets**: Touch-friendly button and input sizes
 - **Responsive**: Works across all viewport sizes
 
-## Custom Input Features
+## Custom Input Details
 
-### Character Counting
-- **Live Updates**: Counter updates as user types
-- **Color Coding**: 
-  - Gray: Normal state (0-80% of limit)
-  - Amber: Warning state (80-99% of limit)  
-  - Red: At limit (100% of limit)
-- **Limit Enforcement**: Hard limit prevents typing beyond maximum
+**Live character counting** - Updates as you type with color-coded warnings. Gray for normal, amber when you're getting close to the limit, red when you hit the maximum.
 
-### Input Validation
-- **Empty Prevention**: Submit button disabled for empty input
-- **Whitespace Handling**: Trims whitespace, prevents space-only submissions
-- **Character Limits**: Enforced during typing and submission
-- **Sanitization**: Input escaped to prevent XSS
+**Smart validation** - Submit button stays disabled for empty input. Trims whitespace so you can't submit just spaces. Hard character limit prevents typing beyond the maximum.
 
-### Submission Methods
-- **Submit Button**: Click to submit custom input
-- **Enter Key**: Press Enter in textarea to submit
-- **Shift+Enter**: Creates line break in textarea
-- **Auto-clear**: Input field clears after successful submission
+**Multiple submission methods** - Click the submit button, press Enter in the text area, or use Shift+Enter for line breaks. Input clears automatically after successful submission.
+
+**Security built-in** - Input is properly escaped to prevent XSS attacks, so players can't inject malicious content through custom responses.
 
 ## Integration Examples
 

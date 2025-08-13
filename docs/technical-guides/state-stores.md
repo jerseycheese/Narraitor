@@ -7,23 +7,23 @@ updated: 2025-06-08
 
 # State Store Implementation
 
-Zustand store implementations for domain-driven state management in Narraitor.
+State management in Narraitor follows domain-driven design - each major feature area gets its own Zustand store. This keeps things organized and makes it easier to reason about data flow.
 
 ## Store Overview
 
 **7 Domain Stores:**
-1. **World Store** - Game worlds and configurations
-2. **Character Store** - Player and NPC characters  
-3. **Inventory Store** - Character items and equipment
-4. **Narrative Store** - Story segments and progression
+1. **World Store** - Game worlds, attributes, and configuration settings
+2. **Character Store** - Player and NPC characters with their stats  
+3. **Inventory Store** - Character items and equipment management
+4. **Narrative Store** - Story segments and narrative progression
 5. **Journal Store** - Journal entries and quest tracking
-6. **Session Store** - Active game sessions
-7. **AI Context Store** - AI prompt contexts and constraints
+6. **Session Store** - Active game sessions linking worlds and characters
+7. **AI Context Store** - Context management for AI prompt generation
 
 ## Common Patterns
 
 ### Store Interface
-All stores follow consistent structure:
+Every store follows the same basic pattern so you know what to expect:
 
 ```typescript
 interface StoreInterface {
@@ -47,7 +47,7 @@ interface StoreInterface {
 ```
 
 ### Error Handling
-Consistent error handling across stores:
+All stores handle errors the same way - check if the operation is valid before doing it:
 
 ```typescript
 addSkill: (characterId, skillData) => set((state) => {
@@ -208,25 +208,29 @@ it('should create character in existing world', async () => {
 
 ## Best Practices
 
-1. **Use Selectors**: Don't access nested state directly
-2. **Handle Errors**: Check return values and state.error
-3. **Validate Input**: Ensure data validity before updates
-4. **Clean Up**: Remove related data when deleting entities
-5. **Test Thoroughly**: Write tests for all scenarios
+1. **Use Selectors**: Don't dig into nested state - use selectors to get what you need
+2. **Handle Errors**: Always check if the operation succeeded
+3. **Validate Input**: Make sure data is valid before trying to save it
+4. **Clean Up**: When you delete something, clean up related data too
+5. **Test Thoroughly**: State bugs are hard to track down - test everything
 
 ## Performance Tips
 
-1. **Subscribe Selectively**: Only subscribe to needed state
-2. **Memoize Selectors**: Use useMemo for complex calculations
-3. **Batch Updates**: Combine multiple updates when possible
-4. **Avoid Subscriptions in Loops**: Use a single subscription
+Keep your stores fast:
+
+1. **Subscribe Selectively**: Only listen to the state you actually need
+2. **Memoize Selectors**: Use useMemo for expensive calculations
+3. **Batch Updates**: Don't make 10 separate updates when you can make 1
+4. **Avoid Subscriptions in Loops**: One subscription is better than many
 
 ## Common Pitfalls
 
-1. **Direct State Mutation**: Always create new objects
-2. **Missing Error Handling**: Check for entity existence
-3. **Orphaned Data**: Clean up relationships
-4. **Race Conditions**: Be careful with async operations
+Things that will bite you if you're not careful:
+
+1. **Direct State Mutation**: Never mutate state directly - always create new objects
+2. **Missing Error Handling**: Check if entities exist before trying to update them
+3. **Orphaned Data**: Don't leave references to deleted entities hanging around
+4. **Race Conditions**: Be careful with async operations that might complete out of order
 
 ## Debugging
 

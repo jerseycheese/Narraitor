@@ -1,12 +1,12 @@
 # Narrative Component System
 
-These components handle the core AI storytelling functionality: generating, displaying, and managing narrative content that adapts to your specific world and player choices. This is where the magic happens in terms of creating stories that feel authentic to your setting.
+This is the heart of the storytelling engine - where your choices turn into new story segments and the AI keeps everything feeling consistent with your world's tone and rules. The challenge was building something that feels like playing with a really good game master who remembers everything.
 
 ## Components Overview
 
 ### NarrativeController
 
-The main orchestrator that handles AI narrative generation. It manages the flow from player choices to new story segments, keeps track of what's already been generated, and automatically generates contextual player choices after each story segment.
+This is the orchestrator that turns your choices into new story content. So when you pick "Investigate the mysterious door," it takes that choice, combines it with everything that's happened so far, and generates the next part of your story. It also creates new choices for you automatically, which keeps the game flowing without awkward pauses.
 
 **Props:**
 - `worldId` (string, required): The ID of the current world
@@ -18,60 +18,59 @@ The main orchestrator that handles AI narrative generation. It manages the flow 
 - `generateChoices` (boolean, optional): Whether to generate player choices after narrative segments, defaults to `true`
 - `className` (string, optional): Additional CSS classes
 
-**Behavior:**
-- Automatically generates an initial narrative when mounted if no existing narrative is found
-- Generates new narrative segments in response to player choices
-- **AI Choice Generation**: Automatically generates contextual player choices after narrative segments (when `generateChoices` is enabled)
-- Prevents duplicate generations through session tracking and choice tracking
-- Ensures segments are deduplicated in local state
-- Persists narrative segments and generated choices to the narrativeStore
-- Provides rich narrative context to AI choice generation system
+**How it behaves:**
+- Creates an opening scene automatically when you start a new session
+- Takes your choices and generates the next story beat
+- **Smart choice generation**: After each story segment, it creates new options that make sense in context (when enabled)
+- Prevents duplicates through careful tracking - you won't see the same story segment twice
+- Saves everything to the store so your progress is never lost
+- Feeds rich context to the AI so it knows what's happened and can make better choices
 
 ### NarrativeDisplay
 
-A component that renders a single narrative segment with appropriate styling.
+This handles showing individual story segments with the right formatting and style. Basically, it takes a piece of generated narrative and makes it look good on screen.
 
 **Props:**
-- `segment` (NarrativeSegment | null): The narrative segment to display
-- `isLoading` (boolean, optional): Whether narrative is being generated, defaults to `false`
-- `error` (string, optional): Error message if narrative generation failed
+- `segment` (NarrativeSegment | null): The story segment to show
+- `isLoading` (boolean, optional): Whether we're waiting for AI generation
+- `error` (string, optional): Error message if something went wrong
 
-**Behavior:**
-- Displays different segment types with appropriate styling
-- Shows loading animation when narrative is being generated
-- Shows error messages if generation fails
-- Handles content parsing to extract narrative from JSON responses
-- Displays location metadata when available
+**What it does:**
+- Formats different types of content appropriately (description, dialogue, action)
+- Shows a nice loading animation while the AI is thinking
+- Handles errors gracefully with clear messages
+- Parses content that comes back as JSON and extracts the actual story text
+- Displays location info when the AI includes it
 
 ### NarrativeHistory
 
-A component that displays a history of narrative segments.
+This shows your complete story so far - all the segments in order, like reading through a conversation log or game transcript.
 
 **Props:**
-- `segments` (NarrativeSegment[]): Array of narrative segments to display
-- `isLoading` (boolean, optional): Whether more segments are being loaded, defaults to `false`
-- `error` (string, optional): Error message to display
-- `className` (string, optional): Additional CSS classes
+- `segments` (NarrativeSegment[]): The story segments to display
+- `isLoading` (boolean, optional): Whether we're loading more content
+- `error` (string, optional): Error message if loading fails
+- `className` (string, optional): Additional styling
 
-**Behavior:**
-- Renders all narrative segments in sequence
-- Shows loading indicator when loading more segments
-- Shows error messages if segment loading fails
-- Maintains stable height to prevent layout shifts
+**What it does:**
+- Displays all your story segments in chronological order
+- Shows loading indicators without disrupting the flow
+- Handles errors without breaking the reading experience
+- Keeps stable layout so the page doesn't jump around as content loads
 
 ### NarrativeHistoryManager
 
-A component that manages the display of existing narrative segments without generating new ones.
+This loads and displays your existing story without generating anything new. It's for when you want to see what's happened so far without triggering more AI content.
 
 **Props:**
-- `sessionId` (string, required): The ID of the current game session
-- `className` (string, optional): Additional CSS classes
+- `sessionId` (string, required): Which game session to load
+- `className` (string, optional): Additional styling
 
-**Behavior:**
-- Loads existing narrative segments from the narrativeStore
-- Deduplicates narrative segments to prevent duplicates
-- Handles initial scene deduplication specifically
-- Ensures stable rendering of narrative content without flashing
+**What it handles:**
+- Pulls existing story segments from storage
+- Removes duplicates so you don't see the same content twice
+- Deals with edge cases like duplicate opening scenes
+- Renders everything smoothly without flashing or layout jumps
 
 ## Usage Examples
 
@@ -122,39 +121,53 @@ The narrative components handle several error cases:
 3. **Duplicate Segments**: Multiple safeguards prevent duplicate segment generation and display
 4. **Component Unmount During Generation**: All async operations check if the component is still mounted before updating state
 
-## World-Specific Narrative Generation
+## How It Adapts to Your World
 
-The narrative generation system adapts to the specific world's theme and attributes:
+The system actually pays attention to the world you've created and generates content that fits:
 
-- **Theme-Based Content**: Narrative segments reflect the world's theme (Fantasy, Western, Sci-Fi, etc.)
-- **Location Adaptation**: Starting locations are automatically selected based on world theme (e.g., "Frontier Town" for Western, "Enchanted Forest" for Fantasy)
-- **Tone Matching**: The narrative tone matches the world description
-- **Attribute Integration**: World attributes influence the generated content
-- **Context Preservation**: Each narrative segment maintains context from previous segments
+**Theme awareness** - If you're in a Western setting, you get saloons and sheriffs, not wizards and dragons. The AI reads your world's theme and generates appropriate content.
 
-## Performance Considerations
+**Smart starting locations** - First scenes automatically pick sensible places: frontier towns for Westerns, space stations for sci-fi, enchanted forests for fantasy. You don't start your cowboy adventure in a castle.
 
-- The system uses a combination of local state and global store to maintain narrative history
-- Only one narrative segment is generated at a time
-- Segments are deduplicated to prevent unnecessary storage
-- Components prevent unnecessary re-renders through careful state management
-- JSON parsing optimization handles different response formats from the AI service
+**Tone matching** - Serious worlds stay serious, humorous ones stay light. The AI tries to match the mood you've established in your world description.
 
-## AI Choice Generation System
+**Integrated attributes** - World-specific skills and attributes actually matter in the stories. If your world has "Hacking" as a skill, the AI will create situations where that's relevant.
 
-The narrative system now includes integrated AI choice generation:
+**Memory consistency** - Each new segment remembers what came before. Characters maintain their personalities, plot threads continue, and the world feels coherent.
 
-### Core Features
-- **Contextual Choice Generation**: AI generates player choices based on recent narrative context
-- **World-Aware Choices**: Generated options reflect the world's theme and setting
-- **Fallback Mechanisms**: System provides default choices when AI generation fails
-- **Smart Context Assembly**: Uses last 5 narrative segments to provide rich context
+## Performance Notes
 
-### Technical Integration
-- **Choice Generation Pipeline**: Automatically triggered after narrative segments
-- **Context Management**: Assembles world data, recent narrative, and character information
-- **Error Resilience**: Graceful fallbacks ensure game continuity
-- **Store Integration**: Generated choices are persisted in narrativeStore
+**State management** - Uses local state for immediate UI updates and global store for persistence. This keeps the interface responsive while ensuring nothing gets lost.
+
+**Sequential generation** - Only generates one story segment at a time to avoid overwhelming the AI or creating conflicting content.
+
+**Smart deduplication** - Automatically prevents duplicate content from being stored or displayed, which keeps sessions clean.
+
+**Optimized rendering** - Components are built to avoid unnecessary re-renders, which keeps things smooth even with long story histories.
+
+**Flexible parsing** - Handles different AI response formats gracefully, so slight variations in the AI's output don't break the experience.
+
+## AI Choice Generation
+
+The system also creates your next set of choices automatically, which keeps the game flowing smoothly:
+
+### How It Works
+**Context-aware generation** - The AI looks at what just happened and creates choices that make sense. If you just entered a tavern, you might get options like "Order a drink," "Ask about rumors," or "Look for a quiet corner."
+
+**World-appropriate options** - Choices fit your world's theme and rules. A sci-fi world generates different options than a fantasy one, even in similar situations.
+
+**Smart fallbacks** - If the AI choice generation fails for any reason, the system provides reasonable default options so you're never stuck.
+
+**Rich context** - Uses the last several story segments to understand the current situation, not just the most recent one.
+
+### Technical Details
+**Automatic pipeline** - Choice generation happens automatically after each story segment, no manual trigger needed.
+
+**Complete context** - Assembles world data, recent narrative history, and character info to give the AI the full picture.
+
+**Resilient design** - Built to handle failures gracefully so one broken AI call doesn't stop your game.
+
+**Persistent storage** - Generated choices are saved to the store so they survive page refreshes and can be referenced later.
 
 ### Usage with GameSession
 The AI choice generation is primarily used through `GameSessionActiveWithNarrative`:

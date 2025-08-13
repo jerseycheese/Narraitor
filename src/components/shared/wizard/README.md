@@ -1,8 +1,10 @@
 # Shared Wizard Components
 
-A reusable wizard component system for creating multi-step forms with consistent styling and behavior.
+So we had wizard components scattered all over the place, each doing things slightly differently. This is the unified wizard system that brings consistency to multi-step forms across the app.
 
-## Quick Start
+## The Basic Pattern
+
+Here's how you build a wizard with these components. The hook handles all the state management, so you just focus on your content:
 
 ```typescript
 import {
@@ -17,7 +19,7 @@ function MyWizard() {
   const wizard = useWizardState({
     initialData: { /* your data */ },
     totalSteps: 3,
-    persistKey: 'my-wizard-session',
+    persistKey: 'my-wizard-session', // automatically saves progress
   });
 
   return (
@@ -28,7 +30,7 @@ function MyWizard() {
       />
       
       <WizardStep title="Step 1">
-        {/* Your step content */}
+        {/* Your step content goes here */}
       </WizardStep>
 
       <WizardNavigation {...wizard} />
@@ -37,32 +39,32 @@ function MyWizard() {
 }
 ```
 
-## Components
+## What's In The Box
 
 ### Layout Components
 - **WizardContainer** - Main wrapper with consistent styling
-- **WizardStep** - Individual step container
-- **WizardProgress** - Visual progress indicator
-- **WizardNavigation** - Previous/Next/Cancel buttons
+- **WizardStep** - Individual step container (handles the step-by-step flow)
+- **WizardProgress** - Visual progress indicator (because people like to know where they are)
+- **WizardNavigation** - Previous/Next/Cancel buttons with smart enable/disable logic
 
 ### Form Components
-- **WizardFormSection** - Form section with heading
-- **CollapsibleCard** - Expandable content sections
-- **ToggleButton** - Styled toggle switches
+- **WizardFormSection** - Form section with proper heading hierarchy
+- **CollapsibleCard** - Expandable content sections (great for optional settings)
+- **ToggleButton** - Styled toggle switches that actually look good
 
-### Hooks
-- **useWizardState** - Complete state management
+### Hooks That Do The Heavy Lifting
+- **useWizardState** - Complete state management (saves you from prop drilling hell)
 - **useWizardValidation** - Step validation logic
-- **useWizardAI** - AI suggestion integration
+- **useWizardAI** - AI suggestion integration (for the fancy stuff)
 
-## Features
+## Why Use This Instead of Rolling Your Own
 
-- 📱 Responsive design
-- 💾 Automatic session persistence
-- ✅ Built-in validation
-- 🎨 Consistent styling via `wizardStyles`
-- ♿ Accessible by default
-- 🧪 Fully tested
+- Responsive design that actually works on mobile
+- Automatic session persistence (users can close browser and come back)
+- Built-in validation patterns that make sense
+- Consistent styling via `wizardStyles` (no more "does this look right?" questions)
+- Accessible by default (screen readers, keyboard navigation, etc.)
+- Fully tested (because wizards have lots of edge cases)
 
 ## Examples
 

@@ -4,20 +4,16 @@
 Accepted - Implemented
 
 ## Context
-New users visiting Narraitor faced several barriers to engagement:
-- Complex world creation process requiring understanding of attributes, skills, and settings
-- No clear starting point for first-time users
-- High cognitive load leading to user drop-off before experiencing core features
-- Lack of guided flow from world creation to character creation and gameplay
+So we had a problem with new users hitting Narraitor and just bouncing. The world creation process was asking too much of them upfront - they needed to understand attributes, skills, and settings before they could even get started. There wasn't a clear path for first-time users, and the cognitive load was just too high. People were dropping off before they got to experience what the app actually does.
 
 ## Decision
-Implement a comprehensive guided onboarding system that:
+We decided to build a comprehensive guided onboarding system that basically does the heavy lifting for new users:
 
 1. **Automatically detects first-time users** using session state analysis
-2. **Simplifies world creation** to 2 essential steps (concept + details)
-3. **Uses AI to enhance user input** with contextually appropriate defaults
-4. **Provides seamless progression** from world to character creation
-5. **Maintains professional UX standards** with responsive design and error handling
+2. **Simplifies world creation** to just 2 essential steps (concept + details) instead of the full complex flow
+3. **Uses AI to enhance user input** with contextually appropriate defaults so they don't have to figure everything out
+4. **Provides seamless progression** from world to character creation so there's no dead ends
+5. **Maintains professional UX standards** with responsive design and proper error handling
 
 ## Implementation Architecture
 
@@ -30,35 +26,35 @@ Implement a comprehensive guided onboarding system that:
 ### Technical Decisions
 
 #### State Management
-- **Choice**: Integrate with existing sessionStore rather than separate state
-- **Rationale**: Leverages existing auto-save infrastructure and persistence
-- **Implementation**: Added onboarding completion tracking to session state
+- **Choice**: Integrate with existing sessionStore rather than creating separate state
+- **Rationale**: Why reinvent the wheel? We already had auto-save infrastructure and persistence working
+- **Implementation**: Just added onboarding completion tracking to the existing session state
 
 #### AI Integration Strategy
 - **Choice**: Multiple AI enhancement points (names, attributes, skills, images)
-- **Rationale**: Reduces user effort while providing rich, personalized content
+- **Rationale**: The goal was to reduce user effort while still giving them rich, personalized content
 - **Implementation**: 
   - Context-aware name generation using world description
   - Existing world analyzer for attributes/skills
-  - Background image generation to avoid blocking UX
+  - Background image generation that happens async so it doesn't block the UX
 
 #### UX Pattern Consistency
 - **Choice**: Use shared wizard framework and error components
-- **Rationale**: Maintains design system consistency and reduces development overhead
-- **Implementation**: WizardContainer, ErrorBlock, responsive placeholder patterns
+- **Rationale**: Keep things consistent with the design system and don't write the same code twice
+- **Implementation**: WizardContainer, ErrorBlock, responsive placeholder patterns that work everywhere
 
 #### Progressive Enhancement Approach
-- **Choice**: Essential functionality works without AI, enhanced with AI
-- **Rationale**: Ensures reliability even if AI services are temporarily unavailable
-- **Implementation**: Fallback systems for name generation, default attributes/skills
+- **Choice**: Essential functionality works without AI, but gets better with AI
+- **Rationale**: We learned from other projects that AI services can be flaky, so the core experience has to work without them
+- **Implementation**: Fallback systems for name generation, default attributes/skills that make sense
 
 ## Benefits
 
 ### User Experience
-- **Reduced Time-to-Value**: Users creating worlds within 2 minutes
-- **Lower Cognitive Load**: Only 2 essential decisions required initially
-- **Contextual Guidance**: Examples and hints specific to fictional universe RPGs
-- **Seamless Flow**: Automatic progression from world to character creation
+- **Reduced Time-to-Value**: Users can create a world and start playing within 2 minutes instead of getting stuck in setup
+- **Lower Cognitive Load**: Only 2 essential decisions required upfront instead of overwhelming them with options
+- **Contextual Guidance**: Examples and hints that actually relate to fictional universe RPGs, not generic stuff
+- **Seamless Flow**: Automatic progression from world to character creation so they never hit a dead end
 
 ### Technical Benefits
 - **Reusable Patterns**: Wizard framework applicable to other complex flows
@@ -80,29 +76,29 @@ Implement a comprehensive guided onboarding system that:
 - Reduces barrier to entry for new users
 
 ### Negative
-- Additional complexity in session state management
-- Dependency on AI services for optimal experience
-- Need to maintain onboarding flow as core features evolve
+- Additional complexity in session state management (though we kept it minimal)
+- Dependency on AI services for the optimal experience (though it works without them)
+- Need to maintain the onboarding flow as core features evolve (this is the big ongoing cost)
 
 ### Mitigation Strategies
-- Comprehensive test coverage (26 tests) for reliability
-- Graceful fallback systems for AI service failures
-- Three-stage verification process for quality assurance
-- Documentation and Storybook coverage for maintainability
+- Comprehensive test coverage (26 tests) because onboarding is critical and can't be broken
+- Graceful fallback systems so AI service failures don't kill the experience
+- Three-stage verification process (Storybook → Test Harness → System Integration) for quality assurance
+- Documentation and Storybook coverage so future developers can understand what's happening
 
 ## Alternatives Considered
 
 ### 1. Multi-page Tutorial
-- **Rejected**: Would interrupt user flow and feel disconnected from actual world creation
-- **Rationale**: Users prefer learning by doing rather than separate tutorial modes
+- **Rejected**: Would interrupt the flow and feel disconnected from actually creating a world
+- **Rationale**: People want to learn by doing, not sit through a tutorial first
 
 ### 2. Modal-based Tooltips
-- **Rejected**: Would overlay complex interface, not actually simplify the process
-- **Rationale**: Need to reduce complexity, not just explain existing complexity
+- **Rejected**: Would just overlay the existing complex interface instead of actually simplifying it
+- **Rationale**: The problem isn't explaining the complexity, it's reducing the complexity
 
 ### 3. Simplified Static Form
-- **Rejected**: Would miss opportunity to demonstrate AI capabilities and personalization
-- **Rationale**: AI enhancement is core value proposition of the platform
+- **Rejected**: Would miss the chance to show off what the AI can do and provide personalization
+- **Rationale**: The AI enhancement is basically our main selling point, so we need to demonstrate it early
 
 ## Monitoring and Success Metrics
 - User completion rate of onboarding flow

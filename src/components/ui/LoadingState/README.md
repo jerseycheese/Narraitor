@@ -1,10 +1,12 @@
 # LoadingState Component
 
-A unified loading state component system for consistent loading indicators across the Narraitor application.
+You know how loading indicators were all over the place? Some components had spinners, others had pulsing text, some had those skeleton placeholder things. Each one looked different and behaved differently. Users couldn't tell if something was actually loading or if the app was broken.
+
+This component gives you one consistent way to show loading states throughout the app. Pick the variant that makes sense for your context and you're done.
 
 ## Usage
 
-Replace existing loading implementations with the appropriate LoadingState variant:
+Here's how to replace those scattered loading patterns:
 
 ### Before (various implementations):
 ```tsx
@@ -36,10 +38,12 @@ import { LoadingSpinner, LoadingPulse } from '@/components/ui/LoadingState';
 
 ## Variants
 
-- **Spinner**: Classic spinning circle indicator
-- **Dots**: Three animated dots for processing states
-- **Skeleton**: Placeholder lines for content loading
-- **Pulse**: Animated placeholder with optional avatar
+Each variant works best in different situations:
+
+- **Spinner**: The classic spinning circle - works great for general loading
+- **Dots**: Those three bouncing dots that say "something's happening" - perfect for AI processing
+- **Skeleton**: Placeholder lines that show where content will appear - great for lists and cards
+- **Pulse**: Animated placeholder that can include an avatar - nice for profile-type content
 
 ## Common Use Cases
 

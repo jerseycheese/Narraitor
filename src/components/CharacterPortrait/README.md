@@ -1,8 +1,10 @@
 # CharacterPortrait Component
 
-A reusable component for displaying character portraits throughout the Narraitor application.
+This component handles displaying character portraits throughout the app. The challenge was balancing AI-generated portrait features with reliable fallbacks, since AI image generation can be slow or fail entirely.
 
-## Features
+## What It Does
+
+The component shows character portraits using actual AI-generated images when available, but gracefully handles all the edge cases:
 
 - **Real AI-Generated Portraits**: Uses Google's Imagen 3.0 API for actual character portraits
 - **Intelligent Fallbacks**: Character-specific SVG placeholders when API unavailable
@@ -12,7 +14,7 @@ A reusable component for displaying character portraits throughout the Narraitor
 - **Multiple Sizes**: Small, medium, and large variants
 - **Interactive**: Optional click handler for user interactions
 
-## Usage
+## Basic Usage
 
 ```tsx
 import { CharacterPortrait } from '@/components/CharacterPortrait';
@@ -52,7 +54,7 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 />
 ```
 
-## Props
+## Component Props
 
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
@@ -74,22 +76,22 @@ interface CharacterPortrait {
 }
 ```
 
-## Sizes
+## Size Options
 
-- **Small**: 32x32px (`w-8 h-8`) - Used in game sessions and compact lists
-- **Medium**: 64x64px (`w-16 h-16`) - Used in character cards and forms
-- **Large**: 96x96px (`w-24 h-24`) - Used in character creation and detailed views
+- **Small** (32x32px): Used in game sessions and compact lists
+- **Medium** (64x64px): Used in character cards and forms  
+- **Large** (96x96px): Used in character creation and detailed views
 
-## Integration Points
+## Where It's Used
 
-The CharacterPortrait component is integrated throughout the application:
+You'll see this component throughout the app:
 
 1. **Character Creation Wizard**: Optional portrait generation step
 2. **Character Cards**: Display on character selection pages
 3. **Game Sessions**: Show current character during gameplay
 4. **Character Lists**: Visual identification in character management
 
-## Accessibility
+## Accessibility Features
 
 - Proper alt text for screen readers
 - ARIA attributes for loading states
@@ -98,11 +100,6 @@ The CharacterPortrait component is integrated throughout the application:
 
 ## Storybook Stories
 
-The component includes comprehensive Storybook stories demonstrating:
-- All size variations
-- Loading and error states
-- Different character name lengths
-- Interactive variants
-- AI-generated vs placeholder states
+The component includes comprehensive Storybook stories showing all size variations, loading and error states, different character name lengths, interactive variants, and AI-generated vs placeholder states.
 
-Run `npm run storybook` and navigate to "Components/CharacterPortrait" to view all examples.
+Run `npm run storybook` and navigate to "Components/CharacterPortrait" to see all the examples in action.

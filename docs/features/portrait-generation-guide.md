@@ -7,11 +7,13 @@ updated: 2025-06-26
 
 # Portrait Generation Guide
 
-Generate AI-powered character portraits integrated with the narrative system.
+Let's be honest - character portraits make everything better. There's something about seeing your character's face that makes the whole experience more immersive. This system generates AI-powered portraits that actually fit with your character's description and the world they live in.
 
-## Quick Start
+The challenge was making this work seamlessly with character creation while handling all the things that can go wrong with AI image generation - rate limits, failed generations, inappropriate content, and the like.
 
-Basic portrait generation in a component:
+## Getting Started
+
+The simplest way to add portrait generation to any component:
 
 ```tsx
 import { CharacterPortrait } from '@/components/CharacterPortrait';
@@ -25,11 +27,15 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 />
 ```
 
-## API Integration
+This component handles all the complexity - loading states, error handling, fallbacks, the works. You just pass in a character and world, and it figures out the rest.
 
-### Generate Portrait
+## How the AI Magic Happens
+
+### Generating Portraits
+The API call is straightforward, but there's a lot happening behind the scenes:
+
 ```typescript
-// Use secure server-side API
+// Everything goes through the secure server-side API
 const generatePortrait = async (character: Character, world: World) => {
   const response = await fetch('/api/generate-portrait', {
     method: 'POST',
@@ -45,6 +51,8 @@ const generatePortrait = async (character: Character, world: World) => {
 };
 ```
 
+The system takes your character description and world context, feeds it to the AI image generation service, and returns a portrait that actually fits your character. No generic fantasy warrior #47 - this is your specific character.
+
 ### Portrait Types
 ```typescript
 interface Portrait {
@@ -55,9 +63,11 @@ interface Portrait {
 }
 ```
 
-## Character Creation Integration
+## Smart Character Creation Integration
 
-### Auto-Generate During Creation
+### How It Works During Character Creation
+The portrait system hooks into character creation seamlessly - no extra steps required:
+
 ```tsx
 import { useCharacterStore } from '@/state/characterStore';
 
@@ -69,18 +79,19 @@ const CharacterCreationWizard = () => {
     setGeneratingPortrait(true);
     
     try {
-      // Create character first
+      // Create the character first
       const character = createCharacter(characterData);
       
-      // Generate portrait
+      // Then generate the portrait based on their description
       const portrait = await generatePortrait(character, world);
       
-      // Update character with portrait
+      // Update the character with their new portrait
       updateCharacter(character.id, { portrait });
       
     } catch (error) {
       console.error('Portrait generation failed:', error);
-      // Character still created, just without portrait
+      // Character still gets created, just without a portrait
+      // They can always generate one later
     } finally {
       setGeneratingPortrait(false);
     }
@@ -88,16 +99,17 @@ const CharacterCreationWizard = () => {
 
   return (
     <div>
-      {/* Character creation form */}
       <CharacterForm onSubmit={handleSubmit} />
       
       {generatingPortrait && (
-        <div>Generating portrait...</div>
+        <div>Creating your character's portrait...</div>
       )}
     </div>
   );
 };
 ```
+
+The beauty of this approach is that character creation never fails just because portrait generation does. If the AI service is down or hits rate limits, you still get your character - they just don't have a picture yet.
 
 ## Display Components
 

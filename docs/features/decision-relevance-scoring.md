@@ -1,9 +1,9 @@
 # Decision Relevance Scoring System
 
-## What This Actually Does
-The basic problem is that when the AI is generating narrative content, it needs to know which of the player's past decisions actually matter to the current situation. If you made 50 decisions over the course of your adventure, probably only 3-4 of them are relevant to what's happening right now.
+## The Problem This Solves
+Here's the challenge: your player has made 50 decisions during their adventure, but right now they're negotiating with the tavern keeper about room prices. The AI doesn't need to remember that time they chose oatmeal for breakfast three sessions ago - but it absolutely should remember when they helped that merchant earlier today, or when they had a heated argument with this same tavern keeper last week.
 
-This system figures out which past decisions are worth paying attention to by scoring them on multiple factors - how recent they are, whether they happened in the same location, if the same characters are involved, that kind of thing. The AI can then focus on the decisions that actually matter instead of getting distracted by every little choice you made.
+The AI needs to be smart about which past decisions actually matter to the current moment. This system does the heavy lifting by scoring every past decision based on how relevant it is to what's happening right now. The result? The AI focuses on the decisions that matter instead of getting overwhelmed by irrelevant history.
 
 ## How It Works
 

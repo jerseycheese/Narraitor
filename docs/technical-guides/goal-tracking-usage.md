@@ -1,5 +1,7 @@
 # Goal Tracking System Usage Guide
 
+The goal tracking system keeps track of what your character is trying to accomplish, so the AI can weave those objectives into the story naturally. Here's how to use it effectively.
+
 ## Basic Usage
 
 ### Creating Goals
@@ -52,6 +54,7 @@ goalStore.addProgressNote(goalId, 'Discovered secret passage');
 ## AI Integration
 
 ### Automatic Goal Extraction
+The real magic happens when the AI reads narrative content and automatically detects goals:
 ```typescript
 import { goalExtractor } from '@/lib/ai/goalExtractor';
 
@@ -75,6 +78,7 @@ for (const update of extractionResult.updatedGoals) {
 ```
 
 ### Context Building for AI
+When generating new narrative content, the AI needs to know what goals are active:
 ```typescript
 import { aiContextStore } from '@/state/aiContextStore';
 
@@ -186,6 +190,7 @@ goalStore.updateGoal(goalId, {
 ## Performance Optimization
 
 ### Token Budget Management
+AI tokens cost money, so manage them carefully:
 ```typescript
 // Build context with strict token limits
 const lightweightContext = aiContextStore.buildContextForSession(sessionId, {

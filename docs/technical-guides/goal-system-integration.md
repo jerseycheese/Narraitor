@@ -1,18 +1,20 @@
 # Goal System Integration Guide
 
+So the goal tracking system was built to solve the problem of AI narratives that wander aimlessly. Players would start with clear objectives, but the AI would gradually drift away from them because it had no memory of what the player was trying to achieve.
+
 ## Architecture Overview
 
-The goal tracking system integrates with existing stores through well-defined interfaces, maintaining separation of concerns while enabling narrative consistency tracking.
+The goal tracking system integrates with existing stores through well-defined interfaces, maintaining separation of concerns while enabling narrative consistency tracking. The idea is that each store handles what it's good at, but they work together to maintain story coherence.
 
 ### Store Integration Pattern
-```
-narrativeStore (segments) → goalStore (extraction) → aiContextStore (context building)
-```
+The flow is: `narrativeStore (segments) → goalStore (extraction) → aiContextStore (context building)`
+
+Basically, as new story segments are created, the goal store processes them to extract and update goals, then the AI context store includes those goals in future prompts.
 
 ## Integration Points
 
 ### Narrative Store Integration
-Goals are extracted from narrative segments automatically when content is processed.
+Goals are extracted from narrative segments automatically when content is processed. This happens behind the scenes - when a new narrative segment gets created, the goal system reads it and looks for mentions of objectives, completed tasks, new quests, etc.
 
 ```typescript
 // In narrativeStore or segment processing
@@ -34,7 +36,7 @@ const processNewSegment = async (segment: NarrativeSegment) => {
 ```
 
 ### AI Context Integration
-Goals are automatically included in AI prompts through the context building system.
+Goals are automatically included in AI prompts through the context building system. This is where the magic happens - the AI gets a summary of active goals along with the regular prompt, so it can generate content that's actually relevant to what the player is trying to achieve.
 
 ```typescript
 // In narrative generation or AI calls
@@ -63,7 +65,7 @@ Based on these active goals, continue the story...
 ```
 
 ### Session Management Integration
-Goals are tied to sessions and cleaned up when sessions end.
+Goals are tied to sessions and cleaned up when sessions end. When a game session ends, the system marks active goals as either completed or abandoned, depending on the context. This keeps the goal database from getting cluttered with stale objectives.
 
 ```typescript
 // In session management
@@ -90,36 +92,36 @@ const endGameSession = (sessionId: string) => {
 ## Data Flow Patterns
 
 ### Goal Extraction Flow
-```
+Here's what happens when new content is generated:
+
 1. New narrative segment created
-2. goalStore.processSegmentForGoals() called
-3. goalExtractor.extractGoalsFromNarrative() processes content
+2. `goalStore.processSegmentForGoals()` called automatically
+3. `goalExtractor.extractGoalsFromNarrative()` processes the content
 4. New goals created, existing goals updated
-5. AI context automatically includes updated goals
-```
+5. AI context automatically includes updated goals for next generation
 
 ### Context Building Flow
-```
+When the AI needs to generate new content:
+
 1. AI generation requested for session
-2. aiContextStore.buildContextForSession() called
+2. `aiContextStore.buildContextForSession()` called
 3. Goals fetched from goalStore
 4. Goals prioritized and formatted within token budget
 5. Context returned for AI prompt
 6. Context saved to history for tracking
-```
 
 ### Goal Lifecycle Flow
-```
+A goal's journey through the system:
+
 1. Goal extracted from narrative → status: 'active'
 2. Goal mentioned in subsequent segments → mentionCount++
 3. Goal progress tracked → progressNotes added
 4. Goal completed/abandoned → status updated, completedAt set
-```
 
 ## Persistence Integration
 
 ### IndexedDB Storage
-Goals persist automatically through Zustand middleware.
+Goals persist automatically through Zustand middleware. This means your goals survive browser refreshes and are available when you come back to the app later.
 
 ```typescript
 // goalStore.ts persistence configuration
@@ -141,7 +143,7 @@ export const useGoalStore = create<GoalStore>()(
 ```
 
 ### State Hydration
-Goals load automatically when the application starts.
+Goals load automatically when the application starts. The persistence middleware handles this seamlessly, but you can add integrity checks to clean up any corrupted data.
 
 ```typescript
 // Application initialization
@@ -165,7 +167,7 @@ const initializeStores = async () => {
 ## Error Handling Integration
 
 ### Graceful Degradation
-The system continues to function even when goal operations fail.
+The system continues to function even when goal operations fail. The philosophy is that goal tracking enhances the experience but shouldn't break it if something goes wrong.
 
 ```typescript
 // In narrative generation
@@ -188,7 +190,7 @@ const generateWithFailsafes = async (sessionId: string) => {
 ```
 
 ### Error Propagation
-Errors are captured and reported without breaking the user experience.
+Errors are captured and reported without breaking the user experience. The goal is to log what went wrong for debugging purposes while keeping the story flowing for the user.
 
 ```typescript
 // Goal extraction with error handling
@@ -217,7 +219,7 @@ const processSegmentSafely = async (segmentId: string) => {
 ## Performance Considerations
 
 ### Lazy Loading
-Goals are loaded on-demand to minimize memory usage.
+Goals are loaded on-demand to minimize memory usage. No point in loading all goals from all sessions if you're only working with the current one.
 
 ```typescript
 // Load goals only when needed
@@ -230,7 +232,7 @@ const getRelevantGoals = (sessionId: string) => {
 ```
 
 ### Token Budget Management
-Context building respects token limits to prevent API cost overruns.
+Context building respects token limits to prevent API cost overruns. The system is smart about prioritizing recent or important goals when it hits the token budget limit.
 
 ```typescript
 // Adaptive token budgeting
@@ -246,7 +248,7 @@ const getContextForAI = (sessionId: string, complexityLevel: 'simple' | 'complex
 ```
 
 ### Batch Operations
-Multiple goal operations can be batched for efficiency.
+Multiple goal operations can be batched for efficiency. When you need to update several goals at once, it's better to batch them instead of triggering multiple re-renders.
 
 ```typescript
 // Batch goal updates

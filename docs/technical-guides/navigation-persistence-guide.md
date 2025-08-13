@@ -7,7 +7,7 @@ updated: 2025-06-26
 
 # Navigation Persistence
 
-Maintain navigation context across browser sessions.
+Users hate losing their place when they refresh the browser or come back later. The navigation persistence system keeps track of where they've been and helps them get back to their work quickly.
 
 ## Core Usage
 
@@ -35,9 +35,11 @@ useEffect(() => {
 
 ## Storage Strategy
 
-- **IndexedDB**: Long-term history (Zustand persistence)
-- **sessionStorage**: Current session breadcrumbs
-- **localStorage**: User preferences
+Different types of navigation data need different storage approaches:
+
+- **IndexedDB**: Long-term history that persists across browser restarts
+- **sessionStorage**: Current session breadcrumbs that reset on new tabs
+- **localStorage**: User preferences that stick around
 
 ## URL State Persistence
 
@@ -62,7 +64,9 @@ const useURLState = <T>(key: string, defaultValue: T) => {
 
 ## Best Practices
 
-- Limit history size (last 50 entries)
-- Use shallow routing for URL updates
-- Store minimal data in navigation state
-- Handle storage quota limits gracefully
+Keep the navigation system fast and reliable:
+
+- Limit history size (last 50 entries) to avoid bloating storage
+- Use shallow routing for URL updates to avoid full page reloads
+- Store minimal data in navigation state - just what you need to reconstruct context
+- Handle storage quota limits gracefully with fallbacks

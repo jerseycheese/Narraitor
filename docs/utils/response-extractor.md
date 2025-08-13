@@ -1,6 +1,6 @@
 # ResponseExtractor Utility
 
-A utility for extracting structured information from AI-generated responses with error handling and fallback strategies.
+AI responses can be messy and unpredictable. The ResponseExtractor utility helps you pull structured data out of free-form AI text with graceful error handling when things go wrong.
 
 ## Basic Usage
 
@@ -26,20 +26,21 @@ console.log('List items:', listResult.data);
 
 ## Key Features
 
-- **JSON Block Extraction**: Parses `\`\`\`json` code blocks from AI responses
-- **Key-Value Parsing**: Extracts "key: value" formatted data
-- **List Parsing**: Handles bulleted (`- item`) and numbered (`1. item`) lists
-- **Error Resilience**: Graceful error handling with clear error messages
-- **Performance Tracking**: Built-in timing and confidence metrics
+- **JSON Block Extraction**: Finds and parses `\`\`\`json` code blocks from AI responses
+- **Key-Value Parsing**: Extracts "key: value" formatted data from text
+- **List Parsing**: Handles both bulleted (`- item`) and numbered (`1. item`) lists
+- **Error Resilience**: When extraction fails, you get clear error messages
+- **Performance Tracking**: Built-in timing and confidence scoring
 
 ## Error Handling
 
-All extraction methods return an `ExtractionResult` with:
-- `data`: The extracted data or null if extraction failed
-- `errors`: Array of error messages explaining failures
-- `confidence`: Confidence score (0-1) of the extraction quality
-- `metadata`: Processing information including timing and pattern used
+Every extraction method returns an `ExtractionResult` so you always know what happened:
+
+- `data`: The extracted data, or null if extraction failed
+- `errors`: Array of error messages explaining what went wrong
+- `confidence`: Confidence score (0-1) indicating extraction quality
+- `metadata`: Processing information including timing and which pattern worked
 
 ## Integration with Existing Code
 
-The ResponseExtractor is designed to work alongside existing extraction utilities like `goalExtractor` and `structuredLoreExtractor`, providing a standardized foundation for response parsing throughout the application.
+ResponseExtractor works alongside existing extraction utilities like `goalExtractor` and `structuredLoreExtractor`. Think of it as the shared foundation that handles the common patterns of AI response parsing.

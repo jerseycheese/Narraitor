@@ -9,11 +9,11 @@ updated: 2025-06-08
 
 # Tailwind CSS v4 Configuration Guide
 
-This this documents the Tailwind CSS v4 setup, which required some specific configuration changes to work properly with Next.js 15 and the App Router. The main issue was PostCSS plugin compatibility.
+Getting Tailwind CSS v4 to work with Next.js 15 and the App Router required some specific PostCSS configuration changes. This guide documents the setup so you don't have to figure it out again.
 
 ## Why v4 and Configuration Notes
 
-Using Tailwind v4 for better performance and the new theming approach, but it needed specific PostCSS configuration to avoid build failures. The key change is using `@tailwindcss/postcss` instead of `tailwindcss` directly.
+Tailwind v4 promises better performance and a cleaner theming system, but the migration wasn't straightforward. The main gotcha is PostCSS configuration - you need to use `@tailwindcss/postcss` instead of the regular `tailwindcss` plugin.
 
 ## Key Files
 
@@ -121,10 +121,10 @@ The `globals.css` file includes the necessary Tailwind CSS v4 directives:
 }
 ```
 
-**Important Note:** Tailwind CSS v4 has changed the directive structure:
-- `@tailwind base` is replaced with `@import "tailwindcss/preflight"`
-- `@tailwind components` is no longer needed (or available) in v4
-- `@tailwind utilities` is replaced with `@import "tailwindcss/utilities"`
+**Important Note:** Tailwind CSS v4 changed how you import styles:
+- `@tailwind base` becomes `@import "tailwindcss/preflight"`
+- `@tailwind components` doesn't exist in v4 (you don't need it)
+- `@tailwind utilities` becomes `@import "tailwindcss/utilities"`
 
 ## Usage Guidelines
 
@@ -224,7 +224,7 @@ These changes ensure that Tailwind CSS styles are properly applied in Storybook 
 
 ### Regression Testing
 
-Before making any changes to the configuration:
+Before making any changes to the configuration, verify everything still works:
 
 1. Run `npm run build` to verify the build process works
 2. Run tests with `npm test -- src/config-tests`
