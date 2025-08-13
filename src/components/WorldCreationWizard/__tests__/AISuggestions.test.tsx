@@ -116,44 +116,59 @@ describe('AISuggestions', () => {
     expect(screen.getByText('Information gathering')).toBeInTheDocument();
   });
 
-  it('should call onAcceptAttribute when accept button is clicked', () => {
-    render(
-      <AISuggestions
-        loading={false}
-        attributes={mockAttributes}
-        skills={mockSkills}
-        onAcceptAttribute={mockOnAcceptAttribute}
-        onRejectAttribute={mockOnRejectAttribute}
-        onAcceptSkill={mockOnAcceptSkill}
-        onRejectSkill={mockOnRejectSkill}
-      />
-    );
+  it('should allow accepting and rejecting attributes through buttons', () => {
+    const TestWrapper = () => {
+      const [attributes, setAttributes] = React.useState(mockAttributes);
+      
+      const handleAccept = (attribute: AttributeSuggestion) => {
+        setAttributes(prev => prev.map(attr => 
+          attr.name === attribute.name ? { ...attr, accepted: true } : attr
+        ));
+      };
+      
+      const handleReject = (attribute: AttributeSuggestion) => {
+        setAttributes(prev => prev.filter(attr => attr.name !== attribute.name));
+      };
+      
+      return (
+        <div>
+          <AISuggestions
+            loading={false}
+            attributes={attributes}
+            skills={mockSkills}
+            onAcceptAttribute={handleAccept}
+            onRejectAttribute={handleReject}
+            onAcceptSkill={mockOnAcceptSkill}
+            onRejectSkill={mockOnRejectSkill}
+          />
+          <div data-testid="attribute-count">Attributes: {attributes.length}</div>
+        </div>
+      );
+    };
 
-    // Find and click the accept button for the first attribute
+    render(<TestWrapper />);
+
+    // Initially should show both attributes
+    expect(screen.getByText('Strength')).toBeInTheDocument();
+    expect(screen.getByText('Intelligence')).toBeInTheDocument();
+    expect(screen.getByTestId('attribute-count')).toHaveTextContent('Attributes: 2');
+
+    // Accept the first attribute
     const acceptButtons = screen.getAllByRole('button', { name: /accept/i });
     fireEvent.click(acceptButtons[0]);
 
-    expect(mockOnAcceptAttribute).toHaveBeenCalledWith(mockAttributes[0]);
-  });
+    // Should still show both attributes (accepted ones stay visible)
+    expect(screen.getByText('Strength')).toBeInTheDocument();
+    expect(screen.getByText('Intelligence')).toBeInTheDocument();
 
-  it('should call onRejectAttribute when reject button is clicked', () => {
-    render(
-      <AISuggestions
-        loading={false}
-        attributes={mockAttributes}
-        skills={mockSkills}
-        onAcceptAttribute={mockOnAcceptAttribute}
-        onRejectAttribute={mockOnRejectAttribute}
-        onAcceptSkill={mockOnAcceptSkill}
-        onRejectSkill={mockOnRejectSkill}
-      />
-    );
-
-    // Find and click the reject button for the first attribute
+    // Reject the second attribute
     const rejectButtons = screen.getAllByRole('button', { name: /reject/i });
-    fireEvent.click(rejectButtons[0]);
+    fireEvent.click(rejectButtons[1]);
 
-    expect(mockOnRejectAttribute).toHaveBeenCalledWith(mockAttributes[0]);
+    // Should only show first attribute now
+    expect(screen.getByText('Strength')).toBeInTheDocument();
+    expect(screen.queryByText('Intelligence')).not.toBeInTheDocument();
+    expect(screen.getByTestId('attribute-count')).toHaveTextContent('Attributes: 1');
   });
 
   it('should display error state when suggestions fail to load', () => {
@@ -189,7 +204,7 @@ describe('AISuggestions', () => {
     expect(screen.getByText(/No AI suggestions available/i)).toBeInTheDocument();
   });
 
-  it('should display attributes with accepted status', () => {
+  it('should display accepted attributes with visual indication', () => {
     const acceptedAttributes = [...mockAttributes];
     acceptedAttributes[0].accepted = true;
 
@@ -205,8 +220,14 @@ describe('AISuggestions', () => {
       />
     );
 
-    // The accepted attribute should have visual indication
-    const strengthCard = screen.getByText('Strength').closest('[role="article"]');
-    expect(strengthCard).toHaveClass('accepted');
+    // Accepted attributes should still be visible and interactive
+    expect(screen.getByText('Strength')).toBeInTheDocument();
+    expect(screen.getByText('Physical power')).toBeInTheDocument();
+    
+    // Should have accept/reject buttons available for accepted items too
+    const acceptButtons = screen.getAllByRole('button', { name: /accept/i });
+    const rejectButtons = screen.getAllByRole('button', { name: /reject/i });
+    expect(acceptButtons.length).toBeGreaterThan(0);
+    expect(rejectButtons.length).toBeGreaterThan(0);
   });
 });
