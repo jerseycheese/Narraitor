@@ -1,16 +1,22 @@
 # Prompt Context Module
 
-This module provides structured world and character context for AI prompts in the Narraitor project. It ensures AI-generated content is consistent with the game world and character state.
+This module provides structured world and character context for AI prompts in Narraitor. The basic problem it solves is making sure AI-generated content is consistent with the game world and character state - so if your character is a wizard in a fantasy world, the AI doesn't suddenly start talking about spaceships.
 
-## Overview
+## Why This Exists
 
-The prompt context system consists of three main components:
+When you're generating narrative content with AI, context is everything. Without proper context, the AI might generate a story that completely ignores your character's abilities, the world's rules, or recent events. This module takes all that scattered information and formats it into something the AI can understand and use effectively.
 
-1. **ContextBuilder** - Formats raw data into structured markdown
-2. **ContextPrioritizer** - Manages token limits and element prioritization
-3. **PromptContextManager** - Orchestrates context generation
+## How It Works
 
-## Quick Start
+The system has three main components that work together:
+
+**ContextBuilder** - Takes raw data from your world and character objects and formats it into structured markdown that's easy for AI to parse.
+
+**ContextPrioritizer** - Manages token limits by prioritizing different pieces of context. If you're hitting token limits, it'll keep the most important stuff (like character attributes) and drop less critical details.
+
+**PromptContextManager** - The main orchestrator that brings everything together and generates the final context based on what type of prompt you're creating.
+
+## Basic Usage
 
 ```typescript
 import { PromptContextManager } from '@/lib/promptContext';
@@ -27,61 +33,37 @@ const context = manager.generateContext({
 });
 ```
 
-## Components
+## Working with Individual Components
 
-### ContextBuilder
-
-Formats world and character data into AI-readable markdown sections:
+If you need more control, you can use the components directly:
 
 ```typescript
 const builder = new ContextBuilder();
 
-// Format world data
+// Format just world data
 const worldContext = builder.buildWorldContext(worldData);
 
-// Format character data  
+// Format just character data  
 const characterContext = builder.buildCharacterContext(characterData);
 
 // Or combine both
 const combined = builder.buildCombinedContext(worldData, characterData);
 ```
 
-### ContextPrioritizer
-
-Manages token limits and prioritizes context elements:
+For prioritization with custom weights:
 
 ```typescript
-const prioritizer = new ContextPrioritizer();
+const prioritizer = new ContextPrioritizer({
+  'character.attributes': 5,    // High priority
+  'world.description': 2        // Lower priority
+});
 
-// Use default weights
 const prioritized = prioritizer.prioritize(elements, tokenLimit);
-
-// Or provide custom weights
-const customPrioritizer = new ContextPrioritizer({
-  'character.attributes': 5,
-  'world.description': 2
-});
-```
-
-### PromptContextManager
-
-Main entry point that coordinates context generation:
-
-```typescript
-const manager = new PromptContextManager();
-
-const context = manager.generateContext({
-  promptType: 'decision',    // Context varies by prompt type
-  world: worldData,          // World configuration
-  character: characterData,  // Character state
-  currentSituation: 'Facing a dragon',
-  tokenLimit: 300
-});
 ```
 
 ## Context Format
 
-The generated context uses markdown formatting:
+The generated context uses markdown formatting that's designed to be clear for both humans and AI:
 
 ```markdown
 # World: Eldoria
@@ -105,24 +87,24 @@ A wise and powerful wizard
 - Healing Potion x3
 ```
 
-## Prioritization
+## Smart Prioritization
 
-The system prioritizes different context elements based on prompt type:
+The system prioritizes different context elements based on what type of prompt you're creating:
 
-- **Narrative prompts** - Prioritize recent events
-- **Decision prompts** - Prioritize character attributes  
-- **Summary prompts** - Prioritize events over world details
+- **Narrative prompts** - Recent events matter most for story continuity
+- **Decision prompts** - Character attributes are crucial for determining available options
+- **Summary prompts** - Events take priority over detailed world descriptions
 
 Default priority weights:
-- `character.current_state`: 5
+- `character.current_state`: 5 (highest)
 - `character.attributes`: 4
 - `world.rules`: 4
 - `event`: 3
-- `world.description`: 2
+- `world.description`: 2 (lowest)
 
-## Integration
+## Integration with Templates
 
-Integrates seamlessly with the existing prompt template system:
+This works seamlessly with the existing prompt template system:
 
 ```typescript
 // Generate context
@@ -135,32 +117,20 @@ const processed = templateManager.processTemplate('narrative-1', {
 });
 ```
 
-## Testing
-
-Full test coverage is provided:
-- Unit tests for each component
-- Integration tests for the complete flow
-- Edge case handling for missing data
-- Token limit validation
-
-Run tests with:
-```bash
-npm test src/lib/promptContext
-```
+So you can have templates that include `{{context}}` placeholders, and this module fills them with all the relevant world and character information.
 
 ## Token Management
 
-The prompt context system includes token management capabilities to ensure generated context fits within specified token limits:
+The system includes token management to ensure generated context fits within AI service limits:
 
 ```typescript
 import { PromptContextManager, estimateTokenCount } from '@/lib/promptContext';
 
-// Estimate tokens for any text string
+// Estimate tokens for any text
 const text = "This is a sample text to estimate token count.";
-const tokens = estimateTokenCount(text); // Returns approximate token count
+const tokens = estimateTokenCount(text);
 
-// Generate context with token metrics
-const manager = new PromptContextManager();
+// Generate context with metrics
 const result = await manager.generateContext({
   promptType: 'narrative',
   world: worldData,
@@ -169,18 +139,26 @@ const result = await manager.generateContext({
   tokenLimit: 500
 });
 
-// Access token metrics
+// Check how well it fit
 console.log(`Estimated tokens: ${result.estimatedTokenCount}`);
 console.log(`Final tokens: ${result.finalTokenCount}`);
 console.log(`Retention percentage: ${result.contextRetentionPercentage}%`);
 ```
 
-The token management system provides:
+The token management provides:
 - Token estimation for any text string
-- Automatic prioritization of content to fit token limits
+- Automatic prioritization to fit token limits
 - Metrics on original vs. final token counts
 - Percentage of context retained after prioritization
 
-## API Documentation
+## Testing
 
-For detailed API documentation, see [Prompt Context API Guide](/docs/technical-guides/prompt-context-api.md).
+Full test coverage is included:
+
+```bash
+npm test src/lib/promptContext
+```
+
+The tests cover unit tests for each component, integration tests for the complete flow, edge case handling for missing data, and token limit validation.
+
+This system makes it much easier to generate consistent, contextually-appropriate AI content without having to manually format context for every request.

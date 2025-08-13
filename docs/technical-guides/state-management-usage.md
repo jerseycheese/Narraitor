@@ -5,13 +5,13 @@ created: 2025-05-13
 updated: 2025-06-26
 ---
 
-# State Management Usage
+# Working with State Management
 
-This here's how to actually work with the Zustand stores in practice. Each major area of the app has its own store, which keeps things organized and makes it easier to reason about state changes.
+So here's how to actually work with the Zustand stores in practice. The idea is that each major area of the app gets its own store - World stuff, Character stuff, Narrative stuff - which keeps things organized and makes it easier to reason about what's changing and why.
 
 ## How the Stores Work
 
-Each domain gets its own store - World, Character, Narrative, etc. They all follow the same patterns, so once you learn one, the others are predictable. All stores include CRUD operations, loading states, and error handling.
+Each domain gets its own store - World, Character, Narrative, etc. They all follow the same patterns, so once you learn one, the others are predictable. All stores include CRUD operations, loading states, and error handling because those are the things you need in pretty much every store.
 
 ## Available Stores
 
@@ -27,7 +27,7 @@ Each domain gets its own store - World, Character, Narrative, etc. They all foll
 
 ## Basic Usage
 
-**Basic Usage Pattern** - Import the hook and destructure what you need:
+The pattern is simple - import the hook and destructure what you need:
 
 ```typescript
 import { useWorldStore } from '@/state/worldStore';
@@ -45,7 +45,7 @@ function MyComponent() {
 }
 ```
 
-Components automatically re-render when the store data they're using changes.
+Components automatically re-render when the store data they're using changes, which is the magic of Zustand.
 
 ### Store Actions
 
@@ -69,7 +69,7 @@ setCurrentWorld(worldId);
 
 ### Persistence
 
-All stores automatically persist to IndexedDB:
+All stores automatically persist to IndexedDB, so your data survives browser refreshes:
 
 ```typescript
 // State is automatically saved to IndexedDB
@@ -200,8 +200,12 @@ const useWorldStats = (worldId: string) => {
 
 ## Best Practices
 
-1. **Use selectors** for performance optimization
-2. **Reset state** in tests to avoid test pollution
-3. **Handle errors** gracefully with error states
-4. **Batch updates** when making multiple changes
-5. **Use TypeScript** for type safety throughout
+**Use selectors** for performance optimization - only subscribe to the data you actually need.
+
+**Reset state** in tests to avoid test pollution - one test's data shouldn't affect another.
+
+**Handle errors** gracefully with error states - the stores provide error handling, use it.
+
+**Batch updates** when making multiple changes - don't trigger a re-render for every tiny change.
+
+**Use TypeScript** for type safety throughout - the stores are fully typed, so take advantage of it.

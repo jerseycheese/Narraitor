@@ -7,11 +7,11 @@ updated: 2025-06-26
 
 # GitHub Integration Guide
 
-This I built some automation to keep GitHub issues and project documentation in sync. The goal was to reduce manual work for managing user stories and project tracking.
+So I built some automation to keep GitHub issues and project documentation in sync. The goal was to reduce the manual work involved in managing user stories and project tracking.
 
 ## Getting Started
 
-**GitHub Token Setup** - You'll need a GitHub token with repo access:
+**GitHub Token Setup** - First thing you'll need is a GitHub token with repo access:
 
 ```bash
 # Set up access
@@ -21,7 +21,7 @@ export GITHUB_TOKEN=your_github_token
 gh auth status
 ```
 
-**Main Commands** - These handle the common sync workflows:
+**Main Commands** - These handle the common sync workflows you'll actually use:
 
 ```bash
 # Sync CSV user stories to GitHub issues
@@ -45,7 +45,7 @@ node scripts/update-user-stories.js
 # - Reads CSV files from scripts/user-stories/
 # - Creates GitHub issues for new user stories
 # - Updates existing issues with CSV data
-# - Ensures complexity and priority match
+# - Makes sure complexity and priority stay in sync
 ```
 
 ### Issue Validation
@@ -55,8 +55,8 @@ node scripts/validate-user-stories.js
 
 # Checks:
 # - CSV stories have corresponding GitHub issues
-# - Issue data matches CSV data
-# - No duplicate issues exist
+# - Issue data actually matches CSV data
+# - No duplicate issues exist (this happens more than you'd think)
 # - Implementation links are valid
 ```
 
@@ -65,14 +65,14 @@ node scripts/validate-user-stories.js
 ### CSV to GitHub Issues
 1. **Update CSV files** in `scripts/user-stories/`
 2. **Run sync script** to create/update issues
-3. **Validate** synchronization was successful
+3. **Validate** that synchronization actually worked
 4. **Commit changes** to both CSV and any generated files
 
 ### GitHub Issues to Documentation
-1. **Update issues** in GitHub interface
-2. **Export issue data** if needed for documentation
-3. **Update CSV files** to reflect changes
-4. **Re-sync** to ensure consistency
+1. **Update issues** in the GitHub interface
+2. **Export issue data** if you need it for documentation
+3. **Update CSV files** to reflect the changes
+4. **Re-sync** to make sure everything stays consistent
 
 ## Configuration
 
@@ -103,21 +103,21 @@ World,World Setup,As a player I want to set up a world,8,High,#124
 
 ### Issue Templates
 GitHub issues use templates from `.github/ISSUE_TEMPLATE/`:
-- **Feature Request** - New functionality
-- **Bug Report** - Issues and fixes
-- **User Story** - From CSV synchronization
+- **Feature Request** - For new functionality
+- **Bug Report** - For issues and fixes
+- **User Story** - Auto-generated from CSV synchronization
 
 ### Labels and Organization
-- **Domain labels**: `character`, `world`, `narrative`, `journal`
-- **Priority labels**: `priority/high`, `priority/medium`, `priority/low`
-- **Type labels**: `feature`, `bug`, `enhancement`, `documentation`
+- **Domain labels**: `character`, `world`, `narrative`, `journal` (keeps things organized)
+- **Priority labels**: `priority/high`, `priority/medium`, `priority/low` (synced from CSV)
+- **Type labels**: `feature`, `bug`, `enhancement`, `documentation` (helps with filtering)
 
 ### Project Boards
-Issues are automatically organized into project boards:
-- **Backlog** - Planned but not started
+Issues get automatically organized into project boards:
+- **Backlog** - Planned but not started yet
 - **In Progress** - Currently being worked on
 - **Review** - Ready for review
-- **Done** - Completed
+- **Done** - Completed (the satisfying column)
 
 ## Automation
 
@@ -207,41 +207,41 @@ node scripts/export-issues.js
 ## Error Handling
 
 ### Common Issues
-- **Rate limiting**: Script includes automatic retry with backoff
-- **Authentication**: Verify GitHub token has correct permissions
-- **Duplicate issues**: Validation script identifies and reports duplicates
+- **Rate limiting**: The script includes automatic retry with backoff because GitHub gets cranky
+- **Authentication**: Make sure your GitHub token actually has the right permissions
+- **Duplicate issues**: The validation script catches these and reports them (they happen more than you'd expect)
 
 ### Troubleshooting
 ```bash
-# Debug mode
+# Debug mode - shows you what's happening
 DEBUG=true node scripts/update-user-stories.js
 
-# Check API rate limits
+# Check API rate limits - helpful when things slow down
 node scripts/check-rate-limits.js
 
-# Validate GitHub token
+# Validate GitHub token - make sure it's working
 gh auth token
 ```
 
 ## Best Practices
 
 ### CSV Management
-- Keep CSV files focused by domain
-- Use consistent naming conventions
+- Keep CSV files focused by domain (don't mix character and world stuff)
+- Use consistent naming conventions (future you will thank you)
 - Include clear descriptions and acceptance criteria
-- Regularly validate against GitHub issues
+- Regularly validate against GitHub issues (things drift apart)
 
 ### Issue Management
-- Use descriptive titles that match CSV entries
-- Apply consistent labeling
+- Use descriptive titles that actually match CSV entries
+- Apply consistent labeling (the automation depends on it)
 - Link related issues and documentation
-- Keep issue descriptions up to date
+- Keep issue descriptions up to date (stale info is worse than no info)
 
 ### Synchronization
-- Run sync after CSV changes
-- Validate after sync operations
+- Run sync after CSV changes (don't forget this step)
+- Validate after sync operations (trust but verify)
 - Commit changes together (CSV + generated files)
-- Monitor for sync failures in automation
+- Monitor for sync failures in automation (they happen)
 
 ## Related
 - `/scripts/user-stories/` - CSV files

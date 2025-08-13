@@ -1,27 +1,32 @@
 # WorldTypeSelector
 
-A reusable component for consistent world type selection across all world creation entry points in the Narraitor application.
+We had world type selection logic scattered across multiple components, each implementing it slightly differently. This component centralizes all that logic so we get consistent behavior everywhere.
 
-## Overview
+## The Three World Types
 
-The WorldTypeSelector component provides a standardized interface for users to choose between three world creation types:
+Users can create worlds in three different ways, and each needs different information:
 
-- **Original World**: Generate a completely original world
-- **Inspired By**: Generate a world inspired by existing fiction/settings  
-- **Set Within**: Generate a world directly within existing fiction/settings
+- **Original World**: Generate a completely original world (just needs additional details)
+- **Inspired By**: Generate a world inspired by existing fiction/settings ("like Star Wars but...")
+- **Set Within**: Generate a world directly within existing fiction/settings ("in the Star Wars universe")
 
-## Features
+## What Problem This Solves
 
-- ✅ **Consistent UI/UX** across all world creation flows
-- ✅ **Conditional field rendering** based on selected world type
-- ✅ **Built-in validation** with clear error messages
-- ✅ **Flexible sizing and layout** options
-- ✅ **TypeScript support** with full type safety
-- ✅ **Business logic abstraction** with utility functions
+Before this component, we had world type selection scattered across the guided experience, generate world modal, and wizard components. Each one handled validation differently, combined the reference fields differently, and had slightly different UIs. This was a maintenance nightmare.
+
+Now we have:
+- **Consistent UI/UX** across all world creation flows
+- **Smart field rendering** - reference field only shows up when needed
+- **Unified validation** with clear error messages
+- **Flexible sizing and layout** options for different contexts
+- **Full TypeScript support** so you can't mess up the data flow
+- **Business logic abstraction** - all the gnarly reference combination logic is hidden away
 
 ## Usage
 
 ### Basic Usage
+
+The simplest way to use this is just drop it in and let it manage its own state:
 
 ```tsx
 import { WorldTypeSelector, WorldTypeData, createInitialWorldTypeData } from '@/components/shared/WorldTypeSelector';
@@ -57,13 +62,15 @@ function MyComponent() {
 
 ### Generate World with Abstracted Logic
 
+This is where the real value is - the conversion logic handles all the tricky reference field combination:
+
 ```tsx
 import { convertToGenerationParams } from '@/components/shared/WorldTypeSelector';
 
 // Convert user selections to API parameters
 const { reference, relationship } = convertToGenerationParams(data);
 
-// Call world generation API
+// Call world generation API - no need to worry about combining fields
 const world = await generateWorld({
   method: 'ai',
   reference,

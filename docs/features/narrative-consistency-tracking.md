@@ -1,16 +1,18 @@
 # Narrative Consistency Tracking System
 
-This this system solves a key problem with AI storytelling: keeping track of what the player is supposed to be doing and ensuring the AI remembers important story elements. Without this, narratives tend to drift and lose coherence.
+Here's what happens without this system: you're in the middle of a tense investigation, trying to find the murderer before they strike again, and suddenly the AI is asking if you want to go shopping for hats. The story has completely lost track of what was actually important.
 
-## What It Does
+This system solves that by automatically detecting and tracking goals throughout your narrative. It figures out what the player is supposed to be doing and makes sure the AI keeps those objectives front and center when generating new content.
 
-**Automatic Goal Detection** - The AI reads through narrative content and identifies both explicit goals ("Find the Sword of Light") and implicit ones ("The dragon will attack at dawn" implies "Stop the dragon attack"). Falls back to pattern matching if the AI extraction fails.
+## How This Actually Works
 
-**Goal Lifecycle** - Tracks goals from creation through completion, abandonment, or blocking. Each goal gets progress notes, mention counts, and timeline data so the AI understands what's currently important.
+**The AI Reads Between the Lines** - It's pretty smart about picking up both obvious goals ("Find the Sword of Light") and implied ones. When the wizard says "The dragon will attack at dawn," the system figures out that means "Stop the dragon attack" even though nobody explicitly said that. If the AI extraction fails for some reason, it falls back to pattern matching so you don't lose functionality.
 
-**Smart Context Building** - When generating new content, the system feeds the AI a prioritized list of current goals within the token budget. Critical and high-priority goals always get included first.
+**Goals Have Lives** - Every goal gets tracked from birth to death. Whether it gets completed, abandoned, or blocked by circumstances, the system keeps notes on progress, tracks how often it gets mentioned, and maintains a timeline. This helps the AI understand what's currently hot and what's gone cold.
 
-**Session Separation** - Goals stay isolated by game session so you can have multiple storylines without cross-contamination.
+**Smart Context Management** - When the AI is generating new content, this system feeds it a prioritized list of active goals within the token budget. Critical and high-priority stuff always makes the cut first - no more forgetting about the ticking time bomb because you ran out of prompt space.
+
+**No Story Mixing** - Goals stay locked to their game sessions, so your cyberpunk investigation doesn't accidentally bleed into your fantasy quest. Each storyline stays clean and focused.
 
 ## Goal Types and Priorities
 

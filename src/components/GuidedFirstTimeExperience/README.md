@@ -1,20 +1,28 @@
 # GuidedFirstTimeExperience Component
 
-A streamlined onboarding flow that guides new players through creating their first world in under 2 minutes.
+This gets new players from "I have no idea what this app does" to "I'm playing a story" in under 2 minutes. The challenge was making onboarding fast enough that people don't bounce, while still explaining what makes this different from other story apps.
 
-## Overview
+## How It Works
 
-The `GuidedFirstTimeExperience` component provides a 3-step wizard interface specifically designed for first-time users to quickly create their first world and start playing. It replaces the generic "Start New Game" button for new users with a guided experience that includes smart defaults and AI suggestions.
+**Just three steps** - Welcome (explains the value), World Concept (describe what you want), World Details (pick a name and theme). That's it.
 
-## Features
+**Smart defaults everywhere** - Most settings are pre-filled with sensible choices, so you only have to make the decisions that actually matter for your experience.
 
-- **3-Step Process**: Welcome → World Concept → World Details
-- **Smart Defaults**: Pre-filled settings to minimize required input
-- **Validation**: Real-time validation using shared wizard utilities
-- **Mobile Optimized**: Large touch targets and responsive design
-- **Persistent State**: Uses localStorage to preserve progress
-- **Skip Option**: Allows users to bypass onboarding if desired
-- **Integration**: Seamlessly integrates with existing wizard framework
+**Real-time validation** - No surprises at the end. If something's wrong, you know immediately.
+
+**Mobile-first design** - Large touch targets and responsive layout work well on phones and tablets.
+
+**Progress preservation** - Uses localStorage to save your progress, so you can take a break and come back without losing your work.
+
+**Easy escape hatch** - Skip button for people who just want to jump into the full creation process.
+
+## What You Get
+
+**Streamlined experience** - Replaces the generic "Start New Game" button with something that actually helps newcomers understand what they're getting into.
+
+**AI-assisted setup** - Suggestions and smart defaults based on what you're trying to create, rather than overwhelming you with every possible option.
+
+**Immediate validation** - No dead ends or confusing error states. The system guides you toward valid choices.
 
 ## Usage
 
@@ -35,24 +43,23 @@ export function QuickPlay() {
 }
 ```
 
-## State Management
+## How It's Built
 
-The component uses the existing `useWizardState` hook for:
-- Step navigation and validation
-- Form data persistence (`narraitor-onboarding` localStorage key)
-- Error handling and loading states
+**Reuses existing wizard infrastructure** - Built on the same `useWizardState` hook that powers the full world creation wizard, so it handles step navigation, validation, and persistence automatically.
 
-It also integrates with `sessionStore` for:
-- First-time user detection (`isFirstTimeUser()`)
-- Onboarding completion tracking (`setOnboardingCompleted()`)
+**Smart user detection** - Hooks into the session store to detect first-time users and track when they've completed onboarding.
 
-## Step Flow
+**Simple three-step flow** - Welcome (sets expectations), Concept (captures your idea), Details (finalizes the basics). Then you're off to character creation with your new world ready to go.
 
-1. **Welcome Step**: Displays value proposition and sets expectations
-2. **Concept Step**: Collects world description with AI suggestions
-3. **Details Step**: Gathers world name and theme selection
+## Step Breakdown
 
-After completion, users are navigated to character creation with their newly created world selected.
+**Welcome step** - Explains what makes this app different and what you're about to create. Sets expectations for the experience.
+
+**Concept step** - Single text area where you describe what kind of story world you want. The AI uses this to suggest appropriate themes and settings.
+
+**Details step** - Pick a name for your world and confirm the theme. Most of the complex settings are handled automatically based on your concept.
+
+After completion, you land in character creation with your newly minted world already selected and ready for your first adventure.
 
 ## Validation
 

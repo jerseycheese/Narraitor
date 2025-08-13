@@ -7,9 +7,13 @@ updated: 2025-06-26
 
 # TypeScript Types Reference
 
-This here are the main TypeScript interfaces and types used throughout the app. These define the data structures for worlds, characters, narratives, and other core entities.
+This is your complete guide to the TypeScript types that make the app work. Think of this as the data contract - these interfaces define how worlds, characters, narratives, and everything else is structured in memory and storage.
+
+If you're wondering "what properties does a Character have?" or "how do I create a new World?", this is where you'll find your answers.
 
 ## Base Types
+
+Everything in the app builds on these foundation types. Every world, character, and narrative entry extends from BaseEntity:
 
 ```typescript
 // Common types used throughout the app
@@ -29,6 +33,8 @@ interface NamedEntity extends BaseEntity {
 ```
 
 ## World Types
+
+Worlds define the setting and rules for storytelling. They're like game systems - each world has its own attributes, skills, and tone settings:
 
 ```typescript
 interface World extends NamedEntity {
@@ -55,6 +61,8 @@ interface WorldSettings {
 
 ## Character Types
 
+Characters are player avatars with stats, skills, and personality. They're tied to a specific world and inherit that world's attribute system:
+
 ```typescript
 interface Character extends NamedEntity {
   worldId: EntityID;
@@ -75,6 +83,8 @@ interface Portrait {
 ```
 
 ## Narrative Types
+
+These handle the actual storytelling content - the back-and-forth between AI and player that creates the story:
 
 ```typescript
 interface NarrativeEntry extends BaseEntity {
@@ -304,7 +314,8 @@ const isCharacter = (obj: any): obj is Character => {
 
 ## File Locations
 
-Types are organized by domain:
+Types are split across domain-specific files to keep things organized. If you're looking for a specific type, check the most relevant domain:
+
 - `/src/types/common.types.ts` - Base and utility types
 - `/src/types/world.types.ts` - World-related types
 - `/src/types/character.types.ts` - Character-related types
@@ -314,6 +325,8 @@ Types are organized by domain:
 - `/src/types/inventory.types.ts` - Inventory and items
 
 ## Usage Examples
+
+Here's how these types work in practice:
 
 ```typescript
 // Type-safe store usage

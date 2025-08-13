@@ -98,7 +98,7 @@ The AI system routes everything through Next.js API endpoints (`/api/narrative/g
 GEMINI_API_KEY=your-api-key
 ```
 
-**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part: it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
+**Security measures**: Rate limiting prevents abuse, input gets sanitized, and all requests are validated server-side. The AI context system is probably the most interesting part - it builds prompts that include your world's rules, character details, and recent story events so the generated content stays consistent with your setting.
 
 **Portrait Generation**: There's also an AI portrait system for character images. Check `docs/features/portrait-generation/` for details on how that works.
 

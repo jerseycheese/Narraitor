@@ -7,15 +7,15 @@ updated: 2025-06-26
 
 # Lore Tracking System
 
-This this system solves a major problem with AI storytelling: the AI forgetting important details from earlier in the story. It automatically tracks characters, locations, events, and world rules so the AI can maintain consistency.
+So this system solves a major problem with AI storytelling: the AI forgetting important details from earlier in the story. You know how you're playing through a narrative and suddenly the AI forgets that your character's name is Marcus, or that the tavern you've been staying at is called The Prancing Pony? This tracks characters, locations, events, and world rules automatically so the AI can maintain consistency.
 
 ## What It Does
 
-**Auto-extracts story facts** - When you play through narratives, the AI automatically identifies and stores important elements like "Sir Gareth" (character), "tavern" (location), "Goldenhaven" (location).
+**Auto-extracts story facts** - When you play through narratives, the AI automatically identifies and stores important elements like "Sir Gareth" (character), "tavern" (location), "Goldenhaven" (location). It's basically reading along and taking notes.
 
-**Filters by context** - You can view facts from just the current session or all-time, and each world keeps its own separate lore database.
+**Filters by context** - You can view facts from just the current session or all-time, and each world keeps its own separate lore database. So your fantasy world facts don't get mixed up with your sci-fi world facts.
 
-**Manual additions** - Players can manually add important story elements the AI might have missed.
+**Manual additions** - Players can manually add important story elements the AI might have missed. Sometimes you know something is important that the AI doesn't pick up on.
 
 ## Architecture
 
@@ -52,24 +52,35 @@ const facts = await extractStructuredLore(narrative);
 
 ## Integration
 
-**Narrative Generation**: Lore context automatically enhances AI prompts for consistency
-**Choice Generation**: Lore facts are included in choice generation prompts for context-aware options
-**Goal System**: Works alongside goal tracking for comprehensive narrative consistency
-**Session Scoping**: Facts can be filtered by session or world-wide
-**Error Handling**: Graceful degradation when AI services unavailable
+The lore system plugs into several places to maintain consistency:
+
+**Narrative Generation** - Lore context automatically enhances AI prompts so it remembers what happened before.
+
+**Choice Generation** - Lore facts are included in choice generation prompts for context-aware options. So if you met Sir Gareth earlier, the AI can offer choices that reference him.
+
+**Goal System** - Works alongside goal tracking for comprehensive narrative consistency. Goals track what you're trying to do, lore tracks what's happened.
+
+**Session Scoping** - Facts can be filtered by session or world-wide, depending on what context you need.
+
+**Error Handling** - Graceful degradation when AI services are unavailable. The story continues even if lore extraction fails.
 
 ### AI Prompt Enhancement
 The lore system integrates with both narrative and choice generation:
 
-- **NarrativeGenerator**: Includes lore in `generateSegment()` and `generateInitialScene()`
-- **ChoiceGenerator**: Includes lore in `generateChoices()` for context-aware player options
-- **Context Formatting**: Facts are formatted as "Established World Facts:" for AI consumption
+**NarrativeGenerator** includes lore in `generateSegment()` and `generateInitialScene()` so the AI knows what's happened before.
+
+**ChoiceGenerator** includes lore in `generateChoices()` for context-aware player options - choices that make sense given what's already established.
+
+**Context Formatting** formats facts as "Established World Facts:" for AI consumption. This gives the AI a clear section to reference.
 
 ### Relationship with Goal Tracking
-The lore tracking system complements the goal tracking system:
-- **Lore Facts**: Track world state, characters, locations, and events
-- **Goals**: Track player objectives and story progression
-- **Combined Context**: Both systems contribute to AI prompt context for maximum consistency
+The lore tracking system complements the goal tracking system in a way that makes sense:
+
+**Lore Facts** track world state, characters, locations, and events - basically what exists and what's happened.
+
+**Goals** track player objectives and story progression - what you're trying to achieve.
+
+**Combined Context** means both systems contribute to AI prompt context for maximum consistency. The AI knows both what's happened and what you're trying to do.
 
 ```typescript
 // Combined context includes both lore facts and active goals
@@ -87,9 +98,12 @@ Continue the story...
 
 ## Testing
 
-**Development harness**: `/dev/lore-viewer`  
-**Unit tests**:
+**Development harness** - Visit `/dev/lore-viewer` to see the lore system in action and test different scenarios.
+
+**Unit tests** cover the key functionality:
 - `npm test -- loreStore.test.ts` - Core lore storage functionality
-- `npm test -- loreContextHelper.test.ts` - AI prompt context formatting
+- `npm test -- loreContextHelper.test.ts` - AI prompt context formatting  
 - `npm test -- choiceGenerator.loreContext.test.ts` - Choice generation integration
 - `npm test -- narrativeGenerator.loreContext.test.ts` - Narrative generation integration
+
+This gives you confidence that the lore extraction and context building actually works as expected.

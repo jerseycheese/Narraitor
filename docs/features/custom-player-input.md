@@ -7,15 +7,17 @@ updated: 2025-06-08
 
 # Custom Player Input
 
-This this feature addresses a key limitation of most AI narrative systems: being stuck with whatever choices the AI generates. Sometimes you want to try something completely different, and the AI should be able to respond to creative player input.
+The problem with most AI narrative games is that you're stuck with whatever choices the AI dreams up. Want to try climbing through the window instead of going through the front door? Want to seduce the dragon instead of fighting it? Tough luck - you only get the three options the AI thought of.
 
-## How It Works
+This feature fixes that. Players can type whatever they want to try, and the AI will respond to it. It's basically "yes, and..." for AI storytelling.
 
-**Always Available Input** - There's a prominent text area above the suggested actions where you can type anything you want to try. 250 character limit keeps responses focused while allowing creative freedom.
+## How This Actually Works
 
-**Smart Validation** - Prevents empty submissions and shows a live character counter with color feedback (amber when getting close to the limit, red when you hit it).
+**The Input Field That's Always There** - There's a text area sitting right above the suggested actions where you can type whatever crazy idea you've got. We cap it at 250 characters to keep things focused - enough for creative freedom, but not so much that you're writing novels.
 
-**Prioritized Display** - The custom input field is more prominent than the suggested actions, with suggested choices appearing below under "Or choose a suggested action." This encourages creativity while still providing fallback options.
+**Smart Enough to Stop You from Breaking Things** - It won't let you submit empty text, and it shows you a live character counter that turns amber when you're getting close to the limit and red when you hit it. Basically, it's got your back.
+
+**Creativity First, Suggestions Second** - The custom input field is bigger and more prominent than the suggested actions. The AI's suggestions show up below under "Or choose a suggested action" - this way the game encourages you to think outside the box first, then fall back on the AI's ideas if you're stuck.
 
 ## Technical Implementation
 

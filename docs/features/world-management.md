@@ -7,33 +7,35 @@ updated: 2025-06-26
 
 # World Management
 
-This world creation is where users define the rules and tone for their narrative experiences. The challenge was making this flexible enough for any fictional universe while keeping it approachable for users who just want to jump in and play.
+World creation is where the magic starts - it's where players define the rules and tone that make their narrative experience unique. The challenge was building something flexible enough for any fictional universe (Star Wars, Lovecraft, your own weird sci-fi thing) while keeping it simple enough that someone can just jump in and start playing.
 
-## How World Configuration Works
+So whether you want "Force Sensitivity" for Star Wars or "Sanity" for horror games, the system adapts to what you need while keeping character creation from becoming a spreadsheet nightmare.
 
-**Basic Setup** - Name, description, genre, and visual theme. This gives the AI context about what kind of stories to generate.
+## The Building Blocks of Your World
 
-**Custom Attributes** - These are the core characteristics that matter in your world. Want "Force Sensitivity" for Star Wars? "Sanity" for Lovecraft? You define what's important. Range is 1-10 for simplicity.
+**Basic Setup** - Name, description, genre, and visual theme. This is like giving the AI a style guide for your universe so it knows whether to write like Star Trek or Game of Thrones.
 
-**World-Specific Skills** - Abilities that make sense for your setting. "Lightsaber Combat" for Star Wars, "Occult Knowledge" for horror settings. Range is 1-5 to keep character creation manageable.
+**Custom Attributes** - Here's where you define what makes your world special. These are the core characteristics that actually matter in your setting. Want "Force Sensitivity" for Star Wars? "Sanity" for Lovecraft horror? "Cybernetic Integration" for your cyberpunk game? You define what's important. We keep the range simple (1-10) because nobody wants to calculate the difference between level 47 and level 53.
 
-**Tone Settings** - This controls how the AI generates content:
-- **Content rating** from G to NC-17 with clear content guidelines
-- **Narrative style** - serious, humorous, dramatic, mysterious, action-packed
-- **Language complexity** and **pacing** to match your preferences
+**World-Specific Skills** - The abilities that make sense in your setting. "Lightsaber Combat" for Star Wars, "Occult Knowledge" for horror, "Zero-G Maneuvering" for space opera. Range is 1-5 to keep character creation from turning into homework.
 
-**Constraints** - Up to 6 attributes and 12 skills max. This keeps character creation from becoming overwhelming while allowing enough customization for most settings.
+**Tone Settings** - This is how you tell the AI what kind of story you want:
+- **Content rating** from G to NC-17 with clear guidelines about what that means
+- **Narrative style** - whether you want serious drama, comedy, action-packed adventure, mysterious investigation, whatever fits your mood
+- **Language complexity** and **pacing** so the AI matches how you like your stories told
 
-## World Creation
+**Smart Constraints** - We cap things at 6 attributes and 12 skills max. This prevents choice paralysis while still giving you enough customization for pretty much any setting you can think of.
 
-Multi-step wizard with AI assistance for creating new worlds.
+## Creating New Worlds
 
-### Creation Flow
-1. **World Type**: Choose Original, Set Within, or Inspired By
-2. **Basic Info**: Name, description, genre selection
-3. **AI Suggestions**: Review and accept/reject AI-generated attributes and skills
-4. **Customization**: Manual editing of accepted suggestions
-5. **Review**: Final world configuration review
+The world creation wizard walks you through everything step by step, with AI assistance to speed things up. No more staring at blank forms wondering what attributes your cyberpunk world should have.
+
+### How the Wizard Works
+1. **Pick Your Starting Point**: Original creation, setting it within an existing universe, or inspired by something you love
+2. **Basic Info**: Give it a name, description, and genre - this is where you paint the big picture
+3. **AI Does the Heavy Lifting**: The AI suggests attributes and skills based on your description. You can accept, reject, or modify any of them
+4. **Make It Yours**: Edit the suggestions to match your vision exactly
+5. **Final Review**: Make sure everything looks right before you start creating characters
 
 ### AI Integration
 ```typescript
@@ -55,15 +57,15 @@ const world = createWorld({
 });
 ```
 
-## World Editing
+## Editing Your Worlds
 
-Complete editing interface for modifying existing worlds after creation.
+Sometimes you create a world and then realize you want to tweak things. Maybe you forgot that "Hacking" skill for your cyberpunk setting, or you want to bump up the content rating. The editing interface lets you change anything about your world after creation.
 
-### Editing Features
-- **Basic Information**: Name, description, theme modifications
-- **Attributes**: Add, edit, remove world attributes
-- **Skills**: Add, edit, remove skills and attribute linkings
-- **Settings**: Configure world limits and point pools
+### What You Can Change
+- **Basic Information**: Name, description, theme - maybe you want a darker tone or different genre emphasis
+- **Attributes**: Add new ones, edit existing ones, remove the ones that aren't working out
+- **Skills**: Add, edit, remove skills and change which attributes they're linked to
+- **Settings**: Adjust world limits and point pools if your game balance needs tweaking
 
 ### Architecture
 ```
@@ -102,34 +104,30 @@ const handleSave = (worldData: Partial<World>) => {
 5. Save changes with optimistic updates
 6. Return to world list or continue editing
 
-## World Deletion
+## Deleting Worlds (Safely)
 
-Safe world deletion with confirmation dialog to prevent accidental loss.
+We all create worlds we later decide we don't want. The deletion system makes sure you don't accidentally lose something important while still making it easy to clean up your world list.
 
-### Deletion Components
+### How It Protects You
 
-**DeleteConfirmationDialog**
-- Location: `/src/components/DeleteConfirmationDialog`
-- Reusable modal dialog with cancel/confirm actions
-- Shows world name for verification
-- Supports keyboard navigation (Escape to cancel)
+**The Confirmation Dialog**
+- Shows up as a modal with the world name clearly displayed - no guessing what you're about to delete
+- Multiple ways to cancel: click "Cancel", press Escape, or click outside the dialog
+- Only proceeds if you explicitly click "Delete"
 
-**WorldCard Integration**
-- Delete button on world cards
-- Triggers confirmation dialog before deletion
-- Visual feedback during deletion process
+**Smart Integration**
+- Delete button appears on each world card
+- Shows visual feedback while the deletion is happening
+- Updates your world list immediately so there's no confusion
 
-### User Flow
-1. User clicks delete button on world card
-2. Confirmation dialog displays with world name
-3. User options:
-   - Click "Cancel" to abort
-   - Click "Delete" to confirm
-   - Press Escape to cancel
-   - Click outside dialog to cancel
-4. If confirmed, world is deleted from store
-5. World list updates immediately
-6. Deletion persists between sessions
+### The Deletion Process
+1. You click the delete button on a world card
+2. Dialog pops up showing the exact world name you're about to delete
+3. You have multiple ways to back out or confirm
+4. If you confirm, the world disappears from your list immediately
+5. The deletion saves permanently - no recovering deleted worlds from the recycle bin
+
+The goal is making deletion feel safe and predictable. You should never be surprised by what gets deleted or when.
 
 ### Implementation
 ```typescript
@@ -156,33 +154,34 @@ const { deleteWorld } = useWorldStore();
 - **Multiple Cancellation Options**: Easy to abort deletion
 - **Immediate UI Update**: No confusion about deletion status
 
-## World Templates
+## World Templates - Skip the Setup
 
-Pre-configured worlds for quick start and inspiration.
+Sometimes you just want to start playing without spending an hour configuring attributes and skills. Templates give you ready-made worlds that you can use immediately or modify to fit your vision.
 
-### Template Types
-- **Genre Templates**: Fantasy, Western, Sci-Fi, Modern, Historical
-- **Custom Templates**: User-saved world configurations
-- **AI-Generated**: Smart templates based on user input
+### What's Available
+- **Genre Templates**: Classic setups for Fantasy, Western, Sci-Fi, Modern, and Historical settings with all the expected attributes and skills
+- **Custom Templates**: Save your own world configurations to reuse later or share with friends
+- **AI-Generated**: The AI can create templates based on your description - just tell it "cyberpunk with magic" and it'll build something appropriate
 
-### Template Features
-- Complete attribute and skill configurations
-- Genre-appropriate tone settings
-- Thematic descriptions and naming
-- Ready-to-use world foundations
+### What You Get
+- **Complete Configuration**: All attributes, skills, and settings already done
+- **Genre-Appropriate Settings**: Tone and content ratings that make sense for the setting
+- **Thematic Consistency**: Descriptions and naming that fit the world type
+- **Ready to Play**: Create a character and jump straight into the story
 
-## Data Management
+## Behind the Scenes Data Handling
 
-### Persistence
-- **IndexedDB Storage**: All worlds persisted locally
-- **Automatic Saving**: Changes saved immediately
-- **State Synchronization**: Zustand store with persistence middleware
+### How Your Worlds Get Saved
+- **Local Storage**: Everything saves to your browser's IndexedDB - no server required, works offline
+- **Instant Saving**: Changes save as you make them, no "save" button needed
+- **State Management**: Uses Zustand with persistence so your worlds survive browser restarts
 
-### Validation
-- **Attribute Limits**: Maximum 6 attributes per world
-- **Skill Limits**: Maximum 12 skills per world
-- **Range Validation**: Attributes 1-10, skills 1-5
-- **Required Fields**: Name and description mandatory
+### What Gets Validated
+The system enforces some sensible limits to keep things manageable:
+- **Attribute Limits**: 6 attributes max per world - enough for complexity without overwhelming character creation
+- **Skill Limits**: 12 skills max per world - plenty of variety without choice paralysis  
+- **Value Ranges**: Attributes 1-10, skills 1-5 for easy mental math
+- **Required Fields**: Name and description are mandatory because worlds need context
 
 ### Export/Import
 ```typescript

@@ -1,6 +1,6 @@
 # World Creation Wizard
 
-This is the multi-step wizard that guides users through creating custom worlds. The challenge was making world creation approachable for users who just want to start playing, while still allowing deep customization for those who want it.
+This is the multi-step wizard that guides users through creating custom worlds. The main challenge was making world creation approachable for users who just want to start playing, while still allowing deep customization for those who want it.
 
 ## Key Features
 
@@ -27,7 +27,9 @@ import WorldCreationWizard from '@/components/WorldCreationWizard';
 />
 ```
 
-## Steps
+## How the Wizard Works
+
+The wizard walks you through 5 steps:
 
 1. **Basic Information** - Name, brief description, and genre selection
 2. **World Description** - Detailed description for AI analysis
@@ -44,7 +46,7 @@ import WorldCreationWizard from '@/components/WorldCreationWizard';
 
 ## Implementation Details
 
-The wizard maintains its own internal state using React hooks and integrates with:
+The wizard maintains its own internal state using React hooks and integrates with a few key systems:
 - `worldStore` for persisting created worlds
 - `worldAnalyzer` for AI-powered description analysis
 - Next.js router for navigation
@@ -69,6 +71,7 @@ Each step includes validation:
 
 ### Error Handling
 
+The wizard handles errors gracefully:
 - Form validation errors display inline
 - AI failures gracefully fallback to default suggestions
 - Network errors are caught and displayed to users

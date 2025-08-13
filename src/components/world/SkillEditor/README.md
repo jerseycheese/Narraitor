@@ -1,14 +1,18 @@
 # SkillEditor Component
 
-The SkillEditor component provides a comprehensive interface for creating and editing skills within a world, with full support for multi-attribute skill linking.
+Skills are where world building gets really interesting. This component handles creating and editing skills, but the tricky part is that skills can link to multiple attributes now - think "Persuasion" linking to both "Charisma" and "Intelligence".
 
-## Features
+## What Makes This Complex
 
-- **Multi-Attribute Linking**: Skills can be connected to one or more attributes via checkbox selection
-- **Skill Validation**: Prevents duplicate names and validates value ranges
-- **Skill Limit Enforcement**: Enforces a maximum of 12 skills per world
-- **Delete Confirmation**: Shows warnings when deleting skills linked to multiple attributes
-- **Form State Management**: Clears validation errors when user makes changes
+The challenge was supporting multi-attribute skill linking without making the UI confusing. In the old system, each skill was tied to exactly one attribute. Simple, but limiting. Now a skill like "Stealth" might use both "Dexterity" and "Intelligence" (for knowing where guards patrol), so we needed checkboxes instead of a dropdown.
+
+## Key Features
+
+- **Multi-Attribute Linking**: Skills connect to one or more attributes via checkbox selection
+- **Smart Validation**: Prevents duplicate names and validates value ranges
+- **Skill Limits**: Enforces a maximum of 12 skills per world (because nobody wants to manage 50 skills)
+- **Delete Safety**: Shows warnings when deleting skills linked to multiple attributes
+- **Clean Error Handling**: Clears validation errors when user starts making changes
 
 ## Usage
 
@@ -51,9 +55,9 @@ import { SkillEditor } from '@/components/world/SkillEditor';
 | `existingAttributes` | `WorldAttribute[]` | ❌ | Available attributes for linking (default: []) |
 | `existingSkills` | `WorldSkill[]` | ❌ | Existing skills for validation (default: []) |
 
-## Data Structure Changes
+## The Data Structure Evolution
 
-This component implements the multi-attribute skill linking system. The updated `WorldSkill` interface supports multiple attribute connections:
+Here's the big change: we moved from single attribute linking to multi-attribute support. The updated `WorldSkill` interface now has an array of attribute IDs instead of just one:
 
 ```typescript
 interface WorldSkill extends NamedEntity {
@@ -67,14 +71,16 @@ interface WorldSkill extends NamedEntity {
 }
 ```
 
-## Validation Rules
+## Validation Logic
+
+The validation rules are pretty straightforward, but there are a few gotchas:
 
 - **Name**: Required (1-100 characters), must be unique within the world
-- **Description**: Required (1-500 characters)
-- **Attribute Links**: At least one attribute must be selected
-- **Value Ranges**: minValue must be less than maxValue
+- **Description**: Required (1-500 characters) 
+- **Attribute Links**: At least one attribute must be selected (this catches people sometimes)
+- **Value Ranges**: minValue must be less than maxValue (seems obvious, but you'd be surprised)
 - **Base Value**: Must be between minValue and maxValue
-- **Skill Limit**: Configurable maximum skills per world (default: 12)
+- **Skill Limit**: Configurable maximum skills per world (default: 12, because managing more gets unwieldy)
 
 ## Testing
 

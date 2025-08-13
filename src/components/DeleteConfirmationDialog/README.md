@@ -1,6 +1,8 @@
 # DeleteConfirmationDialog
 
-A reusable confirmation dialog component for delete operations with a clean, accessible interface.
+You know that moment when a user clicks "Delete" and you realize you should probably ask them if they're sure? This component handles that conversation. It's designed to be both user-friendly and hard to dismiss accidentally - because nobody wants to explain to a user why their important data just vanished.
+
+The key thing here is making deletion feel intentional, not accidental. So we use clear language, show what's about to be deleted, and make the dangerous action visually distinct from the safe one.
 
 ## Usage
 
@@ -55,11 +57,13 @@ function MyComponent() {
 
 ## Features
 
-- **Accessibility**: Fully keyboard navigable with ARIA attributes
-- **Loading State**: Shows "Deleting..." and disables buttons during operation
-- **Backdrop Click**: Closes dialog when clicking outside
-- **Escape Key**: Closes dialog on Escape key press
-- **Custom Button Text**: Supports custom button labels
+This dialog does all the things you'd expect:
+
+- **Accessibility**: Works perfectly with keyboards and screen readers
+- **Loading State**: Shows "Deleting..." and prevents double-clicks during the actual deletion
+- **Backdrop Click**: Clicking outside closes it (but only if it's not currently deleting)
+- **Escape Key**: Press Escape to bail out quickly
+- **Custom Button Text**: You can change the button labels if "Delete" and "Cancel" don't fit your context
 
 ## Storybook Stories
 

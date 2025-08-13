@@ -1,43 +1,49 @@
-# `scripts/` Directory
+# Scripts Directory
 
-This directory contains utility scripts that support ongoing development workflows for the Narraitor project, including GitHub issue management, user story processing, and testing.
+This directory contains utility scripts that support ongoing development workflows for the Narraitor project. Basically, these are automation scripts for GitHub issue management, user story processing, and testing workflows that save a lot of manual work.
 
-## Contents
+## What's In Here
 
-The scripts are organized into categories based on their primary function.
+The scripts are organized by what they actually do rather than by file type.
 
 ### GitHub Label Management
 
-Scripts and directories related to managing GitHub labels for the repository.
+Scripts for managing GitHub labels across the repository. Setting up consistent labels manually is tedious, so these automate it:
 
-*   [`scripts/github-label-creator.js`](scripts/github-label-creator.js): A script to create or manage GitHub labels.
-*   [`scripts/setup-github-labels.js`](scripts/setup-github-labels.js): A script specifically for setting up standard GitHub labels for the repository.
-*   [`scripts/github/`](scripts/github/): Contains additional GitHub-related utility scripts.
+- **`github-label-creator.js`** - Creates or manages GitHub labels
+- **`setup-github-labels.js`** - Sets up the standard set of labels we use 
+- **`github/`** - Additional GitHub-related utility scripts
 
 ### Issue Processing and Utilities
 
-Scripts and directories focused on interacting with and processing GitHub issues.
+Scripts focused on working with GitHub issues programmatically. When you're dealing with dozens of issues, manual processing gets old fast:
 
-*   [`scripts/github-issue-utils.js`](scripts/github-issue-utils.js): Provides utility functions for common GitHub issue operations.
-*   [`scripts/process-issues.js`](scripts/process-issues.js): A script to process GitHub issues, potentially extracting or updating information.
-*   [`scripts/utils/`](scripts/utils/): Contains general utility modules used by various scripts, including those for issue processing.
+- **`github-issue-utils.js`** - Common GitHub issue operations (utilities for other scripts)
+- **`process-issues.js`** - Processes GitHub issues in bulk, extracting or updating information
+- **`utils/`** - General utility modules used by various scripts
 
-### User-Story Parsing and Sync
+### User Story Parsing and Sync
 
-Scripts and directories for processing, validating, and synchronizing user stories, often linked with GitHub issues and CSV files.
+Scripts for processing, validating, and synchronizing user stories. The workflow connects GitHub issues with CSV files, and keeping them in sync manually is error-prone:
 
-*   [`scripts/story-validation-utils.js`](scripts/story-validation-utils.js): Offers utility functions for validating user story formats and content.
-*   [`scripts/update-user-stories.js`](scripts/update-user-stories.js): A script to update user stories, likely synchronizing between different sources like CSV and GitHub.
-*   [`scripts/validate-user-stories.js`](scripts/validate-user-stories.js): A script to run validation checks on user stories.
-*   [`scripts/user-stories/`](scripts/user-stories/): Contains modules and scripts specifically for user story management and processing workflows.
+- **`story-validation-utils.js`** - Validates user story formats and content
+- **`update-user-stories.js`** - Updates user stories, syncing between CSV and GitHub
+- **`validate-user-stories.js`** - Runs validation checks on user stories
+- **`user-stories/`** - Modules specifically for user story management workflows
 
 ### Testing and Debugging Helpers
 
-Scripts and directories that assist with testing various parts of the project, particularly those involving data processing or script execution.
+Scripts that help with testing various parts of the project, especially data processing or script execution. Useful when you're debugging complex workflows:
 
-*   [`scripts/test-update-stories.sh`](scripts/test-update-stories.sh): A shell script to facilitate testing the user story update process.
-*   [`scripts/testing/`](scripts/testing/): Contains test files and utilities for testing the scripts in this directory.
+- **`test-update-stories.sh`** - Shell script to test the user story update process
+- **`testing/`** - Test files and utilities for testing the scripts themselves
 
 ### Documentation
 
-*   [`scripts/github-project-setup.md`](scripts/github-project-setup.md): Documentation related to setting up GitHub projects for this repository.
+- **`github-project-setup.md`** - Documentation for setting up GitHub projects for this repository
+
+## How to Use These
+
+Most of these scripts are designed to be run from the project root. They typically expect environment variables (like `GITHUB_TOKEN`) to be set up, and many require Node.js since they're using the GitHub API.
+
+The general pattern is that you run them when you need to do bulk operations on issues, labels, or user stories that would be tedious to do manually through the GitHub web interface.

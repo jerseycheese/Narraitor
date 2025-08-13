@@ -1,9 +1,13 @@
 # Goal System API Reference
 
+The goal system is what makes our AI storytelling actually smart about tracking narrative threads. Instead of just generating random content, it remembers what your character is trying to accomplish and weaves those objectives into the story naturally.
+
+Think of it like having a really good dungeon master who never forgets that you're looking for your missing sister, trying to earn enough gold for new armor, and investigating those weird disappearances in town. The system tracks all of that automatically.
+
 ## Core Components
 
 ### goalStore.ts
-Zustand store managing narrative goals with session tracking and persistence.
+The main Zustand store that handles all goal management. This is where goals live, get updated, and connect to game sessions.
 
 #### State Interface
 ```typescript
@@ -17,6 +21,8 @@ interface GoalStore {
 ```
 
 #### Core Actions
+The basic CRUD operations, but with some smart validation and cleanup built in:
+
 ```typescript
 // Create goal with validation
 createGoal(goalData: Omit<NarrativeGoal, 'id' | 'createdAt' | 'updatedAt'>): EntityID
@@ -29,6 +35,8 @@ deleteGoal(goalId: EntityID): void
 ```
 
 #### Query Actions
+These are the methods you'll use most often to get goals for AI context building:
+
 ```typescript
 // Get active goals for specific session
 getActiveGoalsBySession(sessionId: EntityID): NarrativeGoal[]
@@ -41,6 +49,8 @@ getRecentlyMentionedGoals(withinMs: number): NarrativeGoal[]
 ```
 
 #### Goal Management
+These help track goal relevance and progress over time:
+
 ```typescript
 // Increment mention count and update timestamp
 incrementMentionCount(goalId: EntityID): void
@@ -53,6 +63,8 @@ clearSessionGoals(sessionId: EntityID): void
 ```
 
 #### AI Integration
+This is where the magic happens - automatically detecting goals from narrative content:
+
 ```typescript
 // Process narrative segment for goal extraction
 processSegmentForGoals(segmentId: EntityID, characterId?: EntityID): Promise<ProcessSegmentResult>
@@ -66,7 +78,7 @@ interface ProcessSegmentResult {
 ```
 
 ### goalExtractor.ts
-AI-powered goal extraction and analysis service.
+The AI service that reads narrative content and figures out what goals the character might have. It's pretty good at detecting when someone mentions wanting to find something, kill someone, or solve a mystery.
 
 #### Core Methods
 ```typescript
@@ -81,13 +93,15 @@ buildGoalContext(goals: NarrativeGoal[], maxTokens: number): GoalContext
 ```
 
 #### Configuration
+The extractor is built to be resilient because AI can be unpredictable:
+
 - Supports fallback pattern matching when AI fails
 - Validates and cleans AI responses
 - Handles token budget constraints
 - Provides confidence scoring
 
 ### aiContextStore.ts Goal Integration
-AI context building with goal integration features.
+This is how goals get fed into the AI system. When generating new narrative content, the AI needs to know what the character is trying to accomplish so it can create relevant story beats.
 
 #### Goal Context Building
 ```typescript
@@ -181,17 +195,23 @@ interface GoalExtractionResult {
 
 ## Error Handling
 
+The goal system is designed to fail gracefully because we're dealing with AI that can be unpredictable and user content that can be messy.
+
 ### Validation
 - Goal creation requires title, description, and sessionId
 - Status transitions tracked automatically
 - Corrupted goals filtered from context building
 
 ### Fallback Mechanisms
+When the AI fails to extract goals properly, we fall back to pattern matching. It's not as smart, but it's reliable:
+
 - Pattern matching when AI extraction fails
 - Graceful degradation for missing data
 - Silent failures for non-critical operations
 
 ### Error States
+Errors are tracked at multiple levels so you can debug issues:
+
 - Store-level error tracking with `error` state
 - Detailed error messages in processing results
 - Context building errors isolated per session

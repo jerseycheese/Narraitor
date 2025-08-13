@@ -1,16 +1,20 @@
 # RangeSlider Component
 
-A reusable range slider component for the Narraitor project, designed to handle both numeric values and level-based descriptions.
+This component handles all the slider needs in the app. The thing is, we needed sliders that could work with both simple numbers (like percentages) and more complex level systems (like skill proficiency). So instead of building separate components, this one does both.
+
+The key insight was that sometimes you want a slider that just shows "1 to 10", but other times you want "Novice" to "Master" with descriptions of what each level means. This component handles both cases elegantly.
 
 ## Features
 
-- Customizable min/max values
-- Support for level descriptions with labels and descriptions
-- Visual current value indicator
-- Optional labels and descriptions
-- Disabled state
-- Custom value formatting
-- Consistent styling with the design system
+Here's what makes this slider flexible:
+
+- Works with any min/max range you throw at it
+- Can show descriptive labels instead of just numbers (like "Expert" instead of "4")
+- Displays the current value clearly so users know where they are
+- Optional help text and descriptions for each level
+- Handles disabled states properly
+- Custom formatting for values (like adding "%" or "$" symbols)
+- Matches the design system styling automatically
 
 ## Usage
 

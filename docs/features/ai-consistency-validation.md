@@ -1,62 +1,62 @@
 # AI Consistency Validation System
 
-## Overview
+## What This Actually Solves
 
-The AI Consistency Validation system provides debugging tools for analyzing how the AI processes lore facts and generates consistency instructions for narrative generation. This DevTools-only feature helps developers understand and troubleshoot the consistency validation pipeline.
+Ever wonder why the AI suddenly forgets that your medieval world doesn't have spaceships? Or why it starts talking about magic when you're running a hard sci-fi campaign? This debugging tool is for figuring out what's going wrong when the AI goes off the rails.
 
-## Features
+The challenge with AI storytelling is that the AI needs constant reminders about your world's rules, and sometimes those reminders don't work as expected. This system lets you peek under the hood and see exactly how the AI is processing your lore facts and what consistency instructions it's generating for itself.
 
-### Lore Context Analysis
-- **Real-time Processing**: View how lore facts are categorized and structured
-- **Importance Ranking**: Validate the AI's importance assessment of lore elements
-- **Categorization View**: See how facts are organized into characters, locations, world rules, and historical events
+## What You Can Actually See
 
-### Consistency Instructions
-- **Live Generation**: Preview the AI-generated consistency instructions based on lore context
-- **Template Validation**: Verify that instructions follow the expected format and structure
-- **Context Sensitivity**: Observe how different lore combinations affect instruction generation
+### How Your Lore Gets Processed
+Watch in real-time as the system takes your lore facts and sorts them into buckets - characters, locations, world rules, historical events. You can see exactly which facts the AI thinks are important and which ones it's ignoring. Super helpful when you're wondering why the AI isn't paying attention to that crucial detail about your magic system.
 
-### Statistics Dashboard
-- **Fact Counts**: Overview of total lore facts per category
-- **Importance Metrics**: High-importance item counts and distribution
-- **World Coverage**: Analysis of lore coverage across different worlds
+### The Instructions the AI Gives Itself
+This is the really interesting part - you get to see the actual consistency instructions the AI generates based on your lore. It's basically the AI talking to itself, saying "remember, in this world, magic comes from crystals" or "don't let characters teleport because that's not how this universe works."
 
-## Usage
+### Numbers That Actually Matter
+The statistics dashboard shows you the practical stuff - how many lore facts you have per category, which ones are ranked as high-importance, and whether you've got decent coverage across different aspects of your world. It's not just pretty charts; it's actionable data about whether your lore setup is working.
 
-### Accessing the Tool
-1. Enable DevTools (development mode only)
-2. Navigate to "AI Tools & Validation" section
-3. Expand "Consistency Validation"
+## How to Actually Use This Thing
 
-### Basic Workflow
-1. **Select World**: Choose a world with existing lore facts from the dropdown
-2. **Review Statistics**: Check the lore statistics panel for overview metrics
-3. **Analyze Instructions**: Examine the generated consistency instructions
-4. **Inspect Context**: View the structured lore context breakdown
-5. **Debug Categorization**: Review how individual facts are categorized
+### Getting Started
+You'll find this buried in the DevTools (development mode only) under "AI Tools & Validation" - expand the "Consistency Validation" section and you're in business. It's a developer tool, so don't expect your players to see this in the main interface.
 
-### Debugging Scenarios
-- **Missing Instructions**: Check if world has sufficient lore facts
-- **Incorrect Categorization**: Verify lore fact content and tags
-- **Importance Issues**: Review how facts are ranked for importance
-- **Context Problems**: Examine the structured lore context output
+### The Detective Work Process
+Here's the typical workflow when something's gone wrong with your AI:
 
-## Technical Architecture
+1. **Pick Your Problem World** - Select the world where the AI is acting weird from the dropdown
+2. **Check the Numbers** - Look at the statistics panel to see if you actually have enough lore facts to work with
+3. **Read the AI's Mind** - Examine those consistency instructions to see what the AI thinks it should be doing
+4. **Dig Into the Details** - Check the structured context breakdown to see how your lore is being organized
+5. **Find the Smoking Gun** - Review the categorization to see which facts are getting filed where
 
-### Components
-- **ConsistencyValidationSection**: Main debugging interface
-- **DevToolsSection**: Reusable UI component for consistent styling
-- **JsonViewer**: Displays structured data with syntax highlighting
+### When Things Go Wrong
+The most common debugging scenarios and what to look for:
 
-### Integration Points
-- **LoreStore**: Accesses stored lore facts via `useLoreStore`
-- **Context Builder**: Uses `buildLoreContext` to structure lore data
-- **Instruction Generator**: Calls `generateConsistencyInstructions` for live preview
+**The AI isn't following your rules**: Check if you actually have enough lore facts. The AI can't follow rules it doesn't know about.
 
-### Data Flow
-```
-Lore Facts (Store) → Context Building → Categorization → Instruction Generation → Debug Display
-```
+**Facts are getting categorized wrong**: Look at your lore fact content and tags. Maybe that "magical sword" is being filed under "locations" instead of "items" because of how you described it.
+
+**Important stuff is being ignored**: Review the importance rankings. Sometimes what you think is crucial isn't getting the weight it deserves in the algorithm.
+
+**Instructions are gibberish**: Check the structured context output. If the raw data is messy, the instructions will be too.
+
+## How This Actually Works Behind the Scenes
+
+### The Components That Do the Work
+- **ConsistencyValidationSection**: The main interface where all the debugging magic happens
+- **DevToolsSection**: Keeps everything looking consistent with the rest of the DevTools
+- **JsonViewer**: Makes all that structured data readable instead of just a wall of JSON
+
+### Where It Plugs Into Everything Else
+The system taps into three key places to do its job:
+- **LoreStore**: Grabs your stored lore facts via `useLoreStore` - this is where all your world-building lives
+- **Context Builder**: Uses `buildLoreContext` to organize that lore into something the AI can actually work with
+- **Instruction Generator**: Calls `generateConsistencyInstructions` to see what the AI would actually tell itself about your world
+
+### The Data Pipeline
+It's pretty straightforward: your lore facts flow through context building, get categorized and ranked, then turn into instructions that the AI can understand. The debug display just shows you each step of that process so you can see where things might be going wrong.
 
 ## Development Notes
 

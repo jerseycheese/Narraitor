@@ -1,6 +1,6 @@
 # Narrative Generator Usage Guide
 
-The `NarrativeGenerator` class is responsible for generating AI-powered narrative content for the game. It handles interactions with the AI service and formats responses appropriately.
+The `NarrativeGenerator` class handles generating AI-powered narrative content for the game. It's the main interface between your app and the AI service, handling all the prompt building and response formatting.
 
 ## Basic Usage
 
@@ -45,53 +45,62 @@ const transition = await narrativeGenerator.generateTransition(
 );
 ```
 
-## API Reference
+## Key Methods
 
-### `generateInitialScene(worldId: string, characterIds: string[]): Promise<NarrativeGenerationResult>`
+### generateInitialScene()
 
-Generates the initial narrative scene to start a game session.
+Generates the opening narrative scene to start a game session. This is typically the first thing you call when starting a new game.
 
-**Parameters:**
-- `worldId`: The ID of the world to generate content for
-- `characterIds`: Array of character IDs involved in the scene
-
-**Returns:**
-- A Promise that resolves to a `NarrativeGenerationResult` object
-
-### `generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult>`
-
-Generates a narrative segment based on the specified request parameters.
+```typescript
+generateInitialScene(worldId: string, characterIds: string[]): Promise<NarrativeGenerationResult>
+```
 
 **Parameters:**
-- `request`: A `NarrativeGenerationRequest` object with the following properties:
-  - `worldId`: The ID of the world
-  - `sessionId`: The ID of the current game session
-  - `characterIds`: Array of character IDs involved
-  - `narrativeContext`: Context information for generation
-    - `recentSegments`: Previous narrative segments for context
-    - `currentSituation`: Description of the current game state
-    - `currentLocation`: (optional) The current location
-  - `generationParameters`: Parameters to control generation
-    - `segmentType`: Type of segment to generate ('scene', 'dialogue', etc.)
-    - `includedTopics`: Topics to include in the generated content
+- `worldId` - The ID of the world to generate content for
+- `characterIds` - Array of character IDs involved in the scene
 
-**Returns:**
-- A Promise that resolves to a `NarrativeGenerationResult` object
+**Returns:** A Promise that resolves to a `NarrativeGenerationResult` object
 
-### `generateTransition(from: NarrativeSegment, to: NarrativeGenerationRequest): Promise<NarrativeGenerationResult>`
+### generateSegment()
 
-Generates a transition between narrative segments.
+This is the workhorse method - generates narrative segments based on your current game state and what the player just did.
+
+```typescript
+generateSegment(request: NarrativeGenerationRequest): Promise<NarrativeGenerationResult>
+```
 
 **Parameters:**
-- `from`: The source segment to transition from
-- `to`: A `NarrativeGenerationRequest` with details about the target state
+The `request` object needs these properties:
+- `worldId` - The ID of the world
+- `sessionId` - The ID of the current game session
+- `characterIds` - Array of character IDs involved
+- `narrativeContext` - Context information for generation:
+  - `recentSegments` - Previous narrative segments for context
+  - `currentSituation` - Description of what just happened
+  - `currentLocation` - (optional) Where this is taking place
+- `generationParameters` - Parameters to control generation:
+  - `segmentType` - Type of segment ('scene', 'dialogue', etc.)
+  - `includedTopics` - Topics to include in the generated content
 
-**Returns:**
-- A Promise that resolves to a `NarrativeGenerationResult` object
+**Returns:** A Promise that resolves to a `NarrativeGenerationResult` object
+
+### generateTransition()
+
+Generates smooth transitions between narrative segments. Useful when you need to move the story from one scene to another.
+
+```typescript
+generateTransition(from: NarrativeSegment, to: NarrativeGenerationRequest): Promise<NarrativeGenerationResult>
+```
+
+**Parameters:**
+- `from` - The source segment to transition from
+- `to` - A `NarrativeGenerationRequest` with details about where you're going
+
+**Returns:** A Promise that resolves to a `NarrativeGenerationResult` object
 
 ## Response Format
 
-All generator methods return a `NarrativeGenerationResult` with the following structure:
+All generator methods return a `NarrativeGenerationResult` with this structure:
 
 ```typescript
 interface NarrativeGenerationResult {
@@ -107,13 +116,15 @@ interface NarrativeGenerationResult {
 }
 ```
 
+So you get the actual narrative text plus useful metadata about what kind of content was generated and which characters were involved.
+
 ## Error Handling
 
 The narrative generator includes error handling for common scenarios:
 
-1. **World Not Found**: If the specified `worldId` doesn't exist, an error is thrown
-2. **Generation Failure**: If AI content generation fails, errors are propagated with context
-3. **Template Not Found**: If a prompt template for the requested segment type is missing, an error is thrown
+**World Not Found**: If the specified `worldId` doesn't exist, an error is thrown
+**Generation Failure**: If AI content generation fails, errors are propagated with context
+**Template Not Found**: If a prompt template for the requested segment type is missing, an error is thrown
 
 Example error handling:
 
@@ -127,11 +138,14 @@ try {
 }
 ```
 
-## Customization
+## World Theme Adaptation
 
-The narrative generator adapts to world themes automatically, providing genre-appropriate content. For example:
-- Fantasy worlds get mystical forest locations
-- Science fiction worlds take place on space stations
-- Western worlds are set in frontier towns
+One of the cool things about the narrative generator is that it automatically adapts to world themes. You don't need to do anything special - just provide the world ID and it handles the rest.
 
-This theming happens automatically based on the world configuration.
+For example:
+- Fantasy worlds get mystical forest locations and magical elements
+- Science fiction worlds take place on space stations with futuristic technology
+- Western worlds are set in frontier towns with period-appropriate language
+- Horror worlds emphasize tension and atmospheric descriptions
+
+This theming happens automatically based on the world configuration, so the same generation code works for any genre.

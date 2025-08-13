@@ -7,12 +7,12 @@ updated: 2025-06-08
 
 # Prompt Context API
 
-System for providing structured world and character information to AI prompts. Handles token limits and context prioritization for narrative generation.
+The AI needs to understand your world and character to generate good stories, but it can only process so much information at once. The prompt context system handles the tricky job of deciding what information to include and how to format it for the AI.
 
 ## Core Components
 
 ### ContextBuilder
-Formats world and character data into structured markdown for AI consumption.
+Takes your world and character data and formats it into clean, structured markdown that AI models can understand easily.
 
 ```typescript
 import { ContextBuilder } from '@/lib/promptContext';
@@ -29,7 +29,7 @@ const combinedContext = builder.buildCombinedContext(worldData, characterData);
 - `buildCombinedContext(world, character): string` - Creates combined context
 
 ### ContextPrioritizer
-Manages token limits and prioritizes context elements by importance.
+When you have more information than the AI can handle, this decides what to keep and what to drop. It uses importance weights to make smart choices.
 
 ```typescript
 import { ContextPrioritizer } from '@/lib/promptContext';
@@ -62,7 +62,7 @@ const prioritized = prioritizer.prioritize(contextElements, tokenLimit);
 - `world.history`: 1 (lowest)
 
 ### PromptContextManager
-Main entry point for context generation.
+The main class you'll use - it brings together the builder and prioritizer to create the final context for AI prompts.
 
 ```typescript
 import { PromptContextManager } from '@/lib/promptContext';
@@ -137,7 +137,7 @@ const prompt = templateManager.processTemplate('narrative-1', {
 
 ## Context Format
 
-Generated context uses structured markdown:
+The system outputs clean, structured markdown that AI models can parse easily:
 
 ```markdown
 # World: Eldoria
@@ -200,9 +200,11 @@ const result = await manager.generateContext({
 
 ## Error Handling
 
-- Missing world/character data: Returns partial context
-- Invalid token limits: Defaults to 1000 tokens  
-- Empty data structures: Returns empty strings without errors
+The system is designed to fail gracefully:
+
+- Missing world/character data: Returns partial context with what's available
+- Invalid token limits: Defaults to 1000 tokens and keeps going
+- Empty data structures: Returns empty strings without throwing errors
 
 ## Performance Notes
 

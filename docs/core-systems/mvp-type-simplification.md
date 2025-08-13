@@ -9,16 +9,20 @@ updated: 2025-06-08
 
 # MVP Type Simplification Summary
 
-This document summarizes the changes made to simplify the type system for MVP scope.
+Early in development, we realized our type system was getting way too complex for an MVP. Instead of building everything we dreamed of, we stripped back to what actually matters for the first version. This is the story of what got cut and why.
 
 ## Changes Made
 
 ### 1. Inventory System - RESTORED to MVP
+We almost cut inventory entirely, then realized that's like making a character sheet without equipment. So we brought it back, but kept it simple:
+
 - Initially removed but restored after clarification
 - Kept simplified version with only essential properties
 - Added to Phase 1.6 in roadmap
 
 ### 2. Simplified InventoryItem
+We cut out all the fancy RPG mechanics that would take months to implement properly:
+
 **Removed Properties:**
 - `weight` - Advanced encumbrance system (Post-MVP)
 - `value` - Economy/trading system (Post-MVP)
@@ -71,10 +75,11 @@ This document summarizes the changes made to simplify the type system for MVP sc
 
 ## Type Complexity Reduction
 
-The simplification reduces:
-- Number of optional properties
-- Complex nested structures
-- Advanced feature dependencies
-- Overall type complexity
+By cutting the complex stuff, we ended up with:
 
-This makes the MVP implementation more focused and achievable while maintaining extensibility for future features.
+- Fewer optional properties to handle
+- Simpler nested structures
+- No advanced feature dependencies
+- Much lower overall type complexity
+
+The result? An MVP that's actually achievable instead of a six-month type engineering project. We can always add the complex stuff back later when we have users who actually want it.

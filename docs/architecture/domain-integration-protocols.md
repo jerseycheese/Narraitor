@@ -7,11 +7,11 @@ updated: 2025-06-26
 
 # Domain Integration
 
-This the different parts of the app need to work together, but without creating tight coupling. The approach here is independent stores that components can access as needed, with clear boundaries between domains.
+So the challenge was getting different parts of the app to work together without creating a tangled mess of dependencies. The approach we landed on is independent stores that components can access as needed, with clear boundaries between domains.
 
 ## Domain Structure
 
-Each major area has its own responsibilities:
+Basically, each major area of the app has its own responsibilities:
 
 - **World**: World configuration, custom attributes, skills, and rules
 - **Character**: Character creation, progression, and attribute management
@@ -23,13 +23,13 @@ Each major area has its own responsibilities:
 
 ## How They Work Together
 
-**Store independence** - Each domain manages its own state without directly depending on others. This makes testing easier and prevents cascading failures.
+The key insight is that **stores stay independent** - each domain manages its own state without directly depending on others. This makes testing way easier and prevents cascading failures where one broken thing breaks everything else.
 
-**Cross-domain access** - Components can read from multiple stores when they need data from different domains. For example, a game session needs world rules, character data, and narrative state.
+For **cross-domain access**, components can read from multiple stores when they need data from different domains. So a game session component needs world rules, character data, and narrative state - it just reads from all three stores.
 
-**Consistent patterns** - All stores follow the same CRUD structure, so learning one store makes the others predictable.
+We keep **consistent patterns** across all stores - they all follow the same CRUD structure, so once you learn one store, the others are predictable.
 
-**Error containment** - If the AI service fails, it doesn't break world creation or character management.
+The real win is **error containment** - if the AI service craps out, it doesn't break world creation or character management. Those keep working fine.
 
 ## Integration Patterns
 
@@ -109,7 +109,7 @@ function generateNarrativeWithJournal(sessionId: string, choice: string) {
 
 ## Error Handling
 
-Each store manages its own error state:
+Each store handles its own error state, which keeps problems from spreading:
 
 ```typescript
 // Store-level error handling
@@ -136,7 +136,7 @@ const createCharacterSafely = (worldId: string, data: any) => {
 
 ## Integration Testing
 
-Test cross-domain functionality with realistic scenarios:
+For testing cross-domain stuff, we use realistic scenarios that actually matter:
 
 ```typescript
 test('character creation with world validation', () => {

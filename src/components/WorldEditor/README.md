@@ -1,6 +1,10 @@
 # WorldEditor Component
 
-The WorldEditor component provides a comprehensive interface for editing existing worlds in the Narraitor application.
+This component handles editing existing worlds after they've been created. The challenge was making world editing feel as smooth as the creation wizard while dealing with much more complex state.
+
+## The Problem We're Solving
+
+So you've got a world created through the wizard, but now you want to tweak it. Maybe add a new skill, adjust some attributes, or just fix a typo in the description. The tricky part is that we're not starting fresh like in the wizard - we're working with existing data that might have characters and stories already attached to it.
 
 ## Usage
 
@@ -17,36 +21,38 @@ import WorldEditor from '@/components/WorldEditor/WorldEditor';
 |------|------|----------|-------------|
 | worldId | string | Yes | The ID of the world to edit |
 
-## Features
+## How It Works
 
-- Loads world data from the store
-- Provides forms for editing all world aspects
-- Handles save/cancel operations
-- Shows loading and error states
+The editor breaks editing into four logical chunks:
 
-## Form Sections
-
-The editor includes four main sections:
-
-1. **Basic Information** - Name, description, and theme
+1. **Basic Information** - Name, description, and theme (the easy stuff)
 2. **Attributes** - Add, edit, and remove world attributes
-3. **Skills** - Manage skills with attribute linking
+3. **Skills** - Manage skills with attribute linking (this gets complex fast)
 4. **Settings** - Configure limits and point pools
 
-## State Management
+## State Management Approach
 
-The component manages its own form state and only commits changes to the store when the user clicks save.
+Here's where it gets interesting. The component keeps all changes in its own local form state until you hit save. Why? Because we don't want half-edited worlds sitting in the store if you decide to bail out.
 
-## Navigation
+The flow is basically:
+1. Load world data from store into local form state
+2. Let user make changes to the form
+3. Only commit back to store when they explicitly save
+4. Discard everything if they cancel
 
-- Save: Commits changes and navigates to `/worlds`
-- Cancel: Discards changes and navigates to `/worlds`
+## Navigation Logic
+
+- **Save**: Commits changes and navigates to `/worlds`
+- **Cancel**: Discards changes and navigates to `/worlds`
+
+Both actions take you back to the worlds list because that's usually where you came from.
 
 ## Error Handling
 
-- Shows error message if world not found
-- Provides button to return to worlds list
-- Handles save errors gracefully
+We handle a few different error scenarios:
+- World not found (shows error message with a "go back" button)
+- Save errors (keeps you on the page so you can try again)
+- Loading states (because nobody likes blank screens)
 
 ## Example
 
