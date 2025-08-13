@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-// Removed unused imports: waitFor, userEvent, LoreManagementSection, useLoreStore, useWorldStore
+import userEvent from '@testing-library/user-event';
 
 // Mock stores
 jest.mock('../../../../state/loreStore');
