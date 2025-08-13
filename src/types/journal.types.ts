@@ -31,7 +31,9 @@ export type JournalEntryType =
   | 'discovery'
   | 'combat'
   | 'dialogue'
-  | 'decision';
+  | 'decision'
+  | 'session_start'
+  | 'session_end';
 
 /**
  * Represents an entity related to a journal entry
