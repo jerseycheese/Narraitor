@@ -223,14 +223,18 @@ export class PersonalizationEngine {
       const decisionDetails = recentDecisions.map(decision => {
         const location = decision.context?.location ? ` at ${decision.context.location}` : '';
         const npcs = decision.context?.charactersPresent ? ` (involving: ${decision.context.charactersPresent.join(', ')})` : '';
+        const situation = decision.context?.situation ? ` (${decision.context.situation})` : '';
         const timeAgo = this.formatTimeAgo(decision.timestamp);
-        return `• ${decision.choiceText}${location}${npcs} [${timeAgo}, ${decision.choiceType}]`;
+        return `• ${decision.choiceText}${location}${npcs}${situation} [${timeAgo}, ${decision.choiceType}]`;
       }).join('\n');
       
       enhancements.push(`PAST PLAYER DECISIONS:\n${decisionDetails}`);
       
       // Add explicit AI instructions for referencing decisions
-      enhancements.push(`REFERENCE PAST DECISIONS: Build upon these previous choices in the narrative. NPCs should remember their interactions with the player character. Create consequences of actions based on established patterns.`);
+      enhancements.push(`REFERENCE PAST DECISIONS: Build upon these previous choices in the narrative. NPCs should remember their interactions with the player character. Create consequences of past actions based on established patterns.`);
+      
+      // Add specific NPC reaction instructions
+      enhancements.push(`NPC REACTIONS: NPCs should react based on past interactions with the player character. Their attitudes and behaviors should reflect the consequences of previous decisions.`);
       
       // Add decision type-specific consequences
       const decisionTypes = [...new Set(recentDecisions.map(d => d.choiceType))];
@@ -681,7 +685,7 @@ export class PersonalizationEngine {
         case 'heroic':
         case 'compassionate':
           if (affectedNPCs.length > 0) {
-            instructions.push(`HEROIC CONSEQUENCES: Your heroic and compassionate actions have built a positive reputation. The following NPCs remember your help and protection: ${affectedNPCs.join(', ')}. They should react with trust, gratitude, and willingness to help. Word of your protective nature spreads among those you've aided. NPCs seek your protection and trust your judgment. References: ${referencedChoices}.`);
+            instructions.push(`HEROIC CONSEQUENCES: Your heroic and compassionate actions have built a positive reputation. The following NPCs remember you helped them: ${affectedNPCs.join(', ')}. They should react with trust, gratitude, and willingness to help. Word of your protective nature spreads among those you've aided. NPCs seek your protection and trust your judgment. References: ${referencedChoices}.`);
           }
           break;
         case 'merciful':
