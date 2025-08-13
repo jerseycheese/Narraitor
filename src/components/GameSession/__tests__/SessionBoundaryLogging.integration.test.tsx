@@ -12,6 +12,22 @@ jest.mock('@/state/journalStore');
 const mockUseSessionStore = useSessionStore as jest.MockedFunction<typeof useSessionStore>;
 const mockUseJournalStore = useJournalStore as jest.MockedFunction<typeof useJournalStore>;
 
+// Add getState and subscribe method mocks for the sessionStore
+Object.defineProperty(mockUseSessionStore, 'getState', {
+  value: jest.fn(() => ({
+    id: null,
+    status: 'initializing',
+    worldId: null,
+    characterId: null
+  })),
+  writable: true
+});
+
+Object.defineProperty(mockUseSessionStore, 'subscribe', {
+  value: jest.fn(() => jest.fn()), // return unsubscribe function
+  writable: true
+});
+
 // Mock other dependencies
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: () => ({
@@ -167,7 +183,7 @@ describe('Session Boundary Logging Integration', () => {
 
     it('handles session start callback and journal entry creation workflow', async () => {
       const sessionStartTime = new Date('2024-01-15T10:30:00Z');
-      const mockDate = jest.spyOn(global, 'Date').mockImplementation(() => sessionStartTime as any);
+      const mockDate = jest.spyOn(global, 'Date').mockImplementation(() => sessionStartTime as unknown as string);
       
       const mockAddEntry = jest.fn().mockReturnValue('session-start-entry');
       

@@ -134,6 +134,48 @@ export const useSessionStore = create<SessionStore>()(
       
       logger.debug('State updated to active:', get());
       
+      // Create session start journal entry (Issue #176)
+      try {
+        const { useJournalStore } = await import('./journalStore');
+        const { useWorldStore } = await import('./worldStore');
+        const { useCharacterStore } = await import('./characterStore');
+        
+        const journalStore = useJournalStore.getState();
+        const worldStore = useWorldStore.getState();
+        const characterStore = useCharacterStore.getState();
+        
+        const world = worldStore.worlds[worldId];
+        const character = characterStore.characters[characterId];
+        
+        const sessionStartTime = new Date().toISOString();
+        
+        journalStore.addEntry(sessionId, {
+          type: 'session_start',
+          worldId,
+          characterId,
+          title: 'Adventure Begins',
+          content: `A new journey starts${world ? ` in ${world.name}` : ''}`,
+          significance: 'minor' as const,
+          isRead: false,
+          relatedEntities: [],
+          metadata: {
+            tags: ['system', 'session'],
+            automaticEntry: true,
+            sessionStartTime,
+            sessionContext: {
+              worldName: world?.name || 'Unknown World',
+              characterName: character?.name || 'Unknown Character',
+              sessionNumber: Object.keys(get().savedSessions).length + 1
+            }
+          },
+          updatedAt: sessionStartTime
+        });
+        
+        logger.debug('📓 Session start journal entry created');
+      } catch (error) {
+        logger.warn('Failed to create session start journal entry:', error);
+      }
+      
       if (onComplete) {
         logger.debug('Calling onComplete callback');
         onComplete();
@@ -148,7 +190,7 @@ export const useSessionStore = create<SessionStore>()(
   },
 
   // End the current session (save it instead of destroying)
-  endSession: () => {
+  endSession: async () => {
     const state = get();
     
     // Add stack trace to debug unexpected calls
@@ -163,6 +205,79 @@ export const useSessionStore = create<SessionStore>()(
     
     if (state.id && state.worldId && state.characterId) {
       logger.debug('Saving session before ending:', state.id);
+      
+      // Create session end journal entry (Issue #176)
+      try {
+        const sessionEndTime = new Date().toISOString();
+        const sessionId = state.id;
+        
+        // Calculate session duration by looking for session start entry
+        let sessionDuration = 0;
+        try {
+          const { useJournalStore } = await import('./journalStore');
+          const journalStore = useJournalStore.getState();
+          const sessionEntries = journalStore.getSessionEntries(sessionId);
+          
+          const sessionStartEntry = sessionEntries.find(entry => entry.type === 'session_start');
+          if (sessionStartEntry?.metadata.sessionStartTime) {
+            const startTime = new Date(sessionStartEntry.metadata.sessionStartTime);
+            const endTime = new Date(sessionEndTime);
+            sessionDuration = endTime.getTime() - startTime.getTime();
+          }
+          
+          const { useWorldStore } = await import('./worldStore');
+          const { useCharacterStore } = await import('./characterStore');
+          const { useNarrativeStore } = await import('./narrativeStore');
+          
+          const worldStore = useWorldStore.getState();
+          const characterStore = useCharacterStore.getState();
+          const narrativeStore = useNarrativeStore.getState();
+          
+          const world = worldStore.worlds[state.worldId];
+          const character = characterStore.characters[state.characterId];
+          const narrativeSegments = narrativeStore.getSessionSegments(sessionId);
+          
+          const formatDuration = (ms: number): string => {
+            const minutes = Math.floor(ms / 60000);
+            const hours = Math.floor(minutes / 60);
+            if (hours > 0) {
+              return `${hours}h ${minutes % 60}m`;
+            }
+            return `${minutes}m`;
+          };
+          
+          const durationText = sessionDuration > 0 ? formatDuration(sessionDuration) : 'unknown duration';
+          const segmentCount = narrativeSegments.length;
+          
+          journalStore.addEntry(sessionId, {
+            type: 'session_end',
+            worldId: state.worldId,
+            characterId: state.characterId,
+            title: 'Adventure Concluded',
+            content: `Session completed after ${durationText}${segmentCount > 0 ? ` with ${segmentCount} story segment${segmentCount !== 1 ? 's' : ''}` : ''}`,
+            significance: 'minor' as const,
+            isRead: false,
+            relatedEntities: [],
+            metadata: {
+              tags: ['system', 'session'],
+              automaticEntry: true,
+              sessionDuration,
+              sessionContext: {
+                worldName: world?.name || 'Unknown World',
+                characterName: character?.name || 'Unknown Character',
+                sessionNumber: Object.keys(state.savedSessions).length + 1
+              }
+            },
+            updatedAt: sessionEndTime
+          });
+          
+          logger.debug('📓 Session end journal entry created with duration:', durationText);
+        } catch (journalError) {
+          logger.warn('Failed to access journal store for session end entry:', journalError);
+        }
+      } catch (error) {
+        logger.warn('Failed to create session end journal entry:', error);
+      }
       
       // Save session info without narrative count for now
       // We'll update it separately to avoid circular dependency

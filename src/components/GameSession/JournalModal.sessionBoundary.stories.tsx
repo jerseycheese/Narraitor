@@ -62,14 +62,7 @@ const sessionEndEntry: JournalEntry = {
     tags: ['system', 'session', 'chapter-end'],
     automaticEntry: true,
     sessionStartTime: '2024-01-15T10:30:00Z',
-    sessionEndTime: '2024-01-15T11:15:00Z',
-    sessionDuration: 2700000, // 45 minutes in milliseconds
-    sessionStats: {
-      decisionsCount: 8,
-      narrativeSegments: 12,
-      locationsVisited: 3,
-      charactersEncountered: 5
-    }
+    sessionDuration: 2700000 // 45 minutes in milliseconds
   },
   createdAt: '2024-01-15T11:15:00Z',
   updatedAt: '2024-01-15T11:15:00Z'

@@ -250,7 +250,7 @@ describe('JournalModal - Session Boundary Display', () => {
 
       // Select session end entry to verify type badge appears in detail view
       fireEvent.click(screen.getByText('Chapter Closes'));
-      expect(screen.getByText('Session End')).toBeInTheDocument();
+      expect(screen.getByText('System: Session End')).toBeInTheDocument();
       
       // Select discovery entry to verify type badge appears in detail view
       fireEvent.click(screen.getByText('Ancient Discovery'));
@@ -392,8 +392,8 @@ describe('JournalModal - Session Boundary Display', () => {
       // Select entry to see type information
       fireEvent.click(screen.getByText('Adventure Begins'));
       
-      // Entry types should be readable by screen readers
-      expect(screen.getByText('Session Start')).toBeInTheDocument();
+      // Entry types should be readable by screen readers  
+      expect(screen.getByText('System: Session Start')).toBeInTheDocument();
     });
   });
 });

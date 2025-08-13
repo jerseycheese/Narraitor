@@ -56,4 +56,12 @@ export interface JournalMetadata {
   choiceText?: string;
   decisionPrompt?: string;
   outcomeSegmentId?: EntityID;
+  // Session-specific metadata for issue #176
+  sessionDuration?: number;
+  sessionStartTime?: string;
+  sessionContext?: {
+    worldName?: string;
+    characterName?: string;
+    sessionNumber?: number;
+  };
 }
