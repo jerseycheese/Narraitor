@@ -52,12 +52,7 @@ describe('JournalModal - Session Boundary Display', () => {
       tags: ['system', 'session'],
       automaticEntry: true,
       sessionStartTime: '2024-01-15T10:30:00Z',
-      sessionEndTime: '2024-01-15T11:15:00Z',
-      sessionDuration: 2700000, // 45 minutes
-      sessionStats: {
-        decisionsCount: 8,
-        narrativeSegments: 12
-      }
+      sessionDuration: 2700000 // 45 minutes
     },
     createdAt: '2024-01-15T11:15:00Z',
     updatedAt: '2024-01-15T11:15:00Z'
