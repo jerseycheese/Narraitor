@@ -563,3 +563,4 @@ When running `claude-auto` or `do-issue-auto`:
 - **No Deviation**: Prevents shortcuts that compromise implementation quality
 
 This structured approach ensures that every `claude-auto` execution follows the exact methodology defined in the Development Framework, eliminating inconsistent workflow variations.
+- The screenshots directory should only contain actual screenshot image files, not markdown documentation.
