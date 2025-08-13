@@ -4,11 +4,8 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { LoreManagementSection } from '../LoreManagementSection';
-import { useLoreStore } from '../../../../state/loreStore';
-import { useWorldStore } from '../../../../state/worldStore';
+import { render, screen, fireEvent } from '@testing-library/react';
+// Removed unused imports: waitFor, userEvent, LoreManagementSection, useLoreStore, useWorldStore
 
 // Mock stores
 jest.mock('../../../../state/loreStore');
@@ -17,7 +14,7 @@ jest.mock('../../../../state/worldStore');
 // Create a TestWrapper for managing lore state
 const TestWrapper = () => {
   const [selectedWorld, setSelectedWorld] = React.useState<string>('');
-  const [facts, setFacts] = React.useState<any[]>([]);
+  const [facts, setFacts] = React.useState<Array<{ id: string; type: string; content: string; worldId: string; sessionId: string; timestamp: string; context: string }>>([]);
   const [activeTab, setActiveTab] = React.useState('browse');
 
   const mockWorlds = {

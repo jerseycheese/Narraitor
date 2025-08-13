@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// import userEvent from '@testing-library/user-event'; // Removed as not used in current tests
 import { Navigation } from '../Navigation';
 
 // Mock next/navigation

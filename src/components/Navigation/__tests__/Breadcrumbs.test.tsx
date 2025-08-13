@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// import userEvent from '@testing-library/user-event'; // Removed as not used in current tests
 import { Breadcrumbs } from '../Breadcrumbs';
 
 // Mock next/navigation
@@ -78,7 +78,7 @@ describe('Breadcrumbs', () => {
     });
 
     it('makes parent breadcrumbs clickable and accessible', async () => {
-      const user = userEvent.setup();
+      // const user = userEvent.setup(); // Removed as click behavior is tested elsewhere
       render(<Breadcrumbs />);
       
       // Verify breadcrumbs are rendered as clickable links
@@ -137,7 +137,7 @@ describe('Breadcrumbs', () => {
 
   describe('Keyboard Navigation', () => {
     it('provides keyboard accessible navigation', async () => {
-      const user = userEvent.setup();
+      // const user = userEvent.setup(); // Removed as click behavior is tested elsewhere
       render(<Breadcrumbs />);
       
       // Verify breadcrumb links are keyboard accessible
@@ -158,7 +158,7 @@ describe('Breadcrumbs', () => {
     });
 
     it('handles keyboard interaction correctly', async () => {
-      const user = userEvent.setup();
+      // const user = userEvent.setup(); // Removed as click behavior is tested elsewhere
       render(<Breadcrumbs />);
       
       // Find focusable breadcrumb elements
