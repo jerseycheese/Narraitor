@@ -111,8 +111,8 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('attribute-name-input-0')).toBeInTheDocument();
-    expect(screen.getByTestId('attribute-description-textarea-0')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Strength')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Physical power and endurance')).toBeInTheDocument();
     // In the MVP, we only have a range editor with fixed min and max values
     // No explicit min/max inputs are present anymore
   });
@@ -146,7 +146,7 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    const nameInput = screen.getByTestId('attribute-name-input-0');
+    const nameInput = screen.getByDisplayValue('Strength');
     fireEvent.change(nameInput, { target: { value: 'Physical Strength' } });
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
@@ -199,7 +199,7 @@ describe('AttributeReviewStep', () => {
       />
     );
 
-    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Attributes Selected: 2 / 6');
+    expect(screen.getByText(/attributes selected: 2 \/ 6/i)).toBeInTheDocument();
   });
 
   test('enforces maximum 6 attributes limit', () => {
@@ -237,7 +237,7 @@ describe('AttributeReviewStep', () => {
 
     // Note: We're not enforcing max limit in the component itself anymore
     // Just checking that the count is correctly displayed
-    expect(screen.getByTestId('attribute-count-summary')).toHaveTextContent('Attributes Selected: 8 / 6');
+    expect(screen.getByText(/attributes selected: 8 \/ 6/i)).toBeInTheDocument();
   });
 
   test('allows toggling attributes on and off', () => {
@@ -274,7 +274,7 @@ describe('AttributeReviewStep', () => {
     );
 
     // Check for attribute count summary
-    expect(screen.getByTestId('attribute-count-summary')).toBeInTheDocument();
+    expect(screen.getByText(/attributes selected:/i)).toBeInTheDocument();
   });
 
   test('can expand and collapse attribute details', () => {
@@ -307,7 +307,7 @@ describe('AttributeReviewStep', () => {
     );
 
     // Should show the details for the selected attribute
-    expect(screen.getByTestId('attribute-name-input-0')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Strength')).toBeInTheDocument();
   });
 
   test('displays errors when provided', () => {

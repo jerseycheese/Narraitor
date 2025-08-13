@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
 import { WorldAttribute } from '@/types/world.types';
+
+// Test wrapper to track value changes
+const TestWrapper = ({ initialAttribute, disabled = false }: { 
+  initialAttribute: WorldAttribute; 
+  disabled?: boolean; 
+}) => {
+  const [attribute, setAttribute] = useState(initialAttribute);
+  
+  const handleChange = (updates: Partial<WorldAttribute>) => {
+    setAttribute(prev => ({ ...prev, ...updates }));
+  };
+
+  return (
+    <div>
+      <AttributeRangeEditor 
+        attribute={attribute} 
+        onChange={handleChange}
+        disabled={disabled}
+      />
+      <div data-testid="current-value">Current: {attribute.baseValue}</div>
+    </div>
+  );
+};
 
 describe('AttributeRangeEditor', () => {
   const mockAttribute: WorldAttribute = {
@@ -14,102 +37,75 @@ describe('AttributeRangeEditor', () => {
     maxValue: 10,
   };
 
-  const mockOnChange = jest.fn();
+  test('displays attribute information and current value', () => {
+    render(<TestWrapper initialAttribute={mockAttribute} />);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test('renders with attribute default value', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Check that the range slider shows the default value
+    // Should show the current value in the slider
     const rangeInput = screen.getByRole('slider');
     expect(rangeInput).toHaveValue('5');
-  });
-
-  test('updates when slider is moved', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    const rangeInput = screen.getByRole('slider');
-    fireEvent.change(rangeInput, { target: { value: '7' } });
-
-    expect(mockOnChange).toHaveBeenCalledWith({
-      baseValue: 7
-    });
-  });
-
-  test('prevents values outside the allowed range', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange} 
-      />
-    );
-
-    // Try to set a value too low
-    const rangeInput = screen.getByRole('slider');
-    fireEvent.change(rangeInput, { target: { value: '0' } });
-
-    // Should be clamped to min value
-    expect(mockOnChange).toHaveBeenCalledWith({
-      baseValue: 1
-    });
-
-    // Try to set a value too high
-    fireEvent.change(rangeInput, { target: { value: '11' } });
-
-    // Should be clamped to max value
-    expect(mockOnChange).toHaveBeenCalledWith({
-      baseValue: 10
-    });
-  });
-
-  test('displays min and max values', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange} 
-      />
-    );
-
+    
+    // Should display min and max values for user reference
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('10')).toBeInTheDocument();
+    
+    // Should show current value
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 5');
   });
 
-  test('renders in disabled state when specified', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange}
-        disabled={true}
-      />
-    );
+  test('allows user to change value within valid range', () => {
+    render(<TestWrapper initialAttribute={mockAttribute} />);
+
+    const rangeInput = screen.getByRole('slider');
+    
+    // User moves slider to 7
+    fireEvent.change(rangeInput, { target: { value: '7' } });
+    
+    // Value should update in the component
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 7');
+    expect(rangeInput).toHaveValue('7');
+  });
+
+  test('constrains values to valid range', () => {
+    render(<TestWrapper initialAttribute={mockAttribute} />);
+
+    const rangeInput = screen.getByRole('slider');
+    
+    // Try to set value below minimum
+    fireEvent.change(rangeInput, { target: { value: '0' } });
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 1');
+    
+    // Try to set value above maximum  
+    fireEvent.change(rangeInput, { target: { value: '15' } });
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 10');
+  });
+
+  test('cannot be modified when disabled', () => {
+    render(<TestWrapper initialAttribute={mockAttribute} disabled={true} />);
 
     const rangeInput = screen.getByRole('slider');
     expect(rangeInput).toBeDisabled();
+    
+    // Value should remain unchanged
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 5');
   });
 
-  test('shows basic slider interface', () => {
-    render(
-      <AttributeRangeEditor 
-        attribute={mockAttribute} 
-        onChange={mockOnChange} 
-      />
-    );
+  test('works with different attribute ranges', () => {
+    const wideRangeAttribute: WorldAttribute = {
+      ...mockAttribute,
+      baseValue: 50,
+      minValue: 0,
+      maxValue: 100,
+    };
+    
+    render(<TestWrapper initialAttribute={wideRangeAttribute} />);
 
-    const slider = screen.getByTestId('attribute-range-editor-slider');
-    expect(slider).toBeInTheDocument();
-    expect(slider).toHaveValue('5');
+    const rangeInput = screen.getByRole('slider');
+    expect(rangeInput).toHaveValue('50');
+    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.getByText('100')).toBeInTheDocument();
+    
+    // Test movement in larger range
+    fireEvent.change(rangeInput, { target: { value: '75' } });
+    expect(screen.getByTestId('current-value')).toHaveTextContent('Current: 75');
   });
 });

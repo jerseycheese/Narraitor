@@ -27,6 +27,7 @@ describe('BasicInfoStep', () => {
 
     expect(screen.getByPlaceholderText(/enter your world's name/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/provide a brief description/i)).toBeInTheDocument();
+    // Genre select - using test ID as fallback since component doesn't have proper label
     expect(screen.getByTestId('world-genre-select')).toBeInTheDocument();
   });
 
@@ -64,42 +65,50 @@ describe('BasicInfoStep', () => {
     expect(screen.getByText('Description must be at least 10 characters')).toBeInTheDocument();
   });
 
-  test('updates world data on input change', () => {
-    render(
-      <BasicInfoStep
-        worldData={mockWorldData}
-        errors={{}}
-        onUpdate={mockOnUpdate}
-      />
-    );
+  test('updates world data through form interactions', () => {
+    const TestWrapper = () => {
+      const [worldData, setWorldData] = React.useState(mockWorldData);
+      
+      return (
+        <div>
+          <BasicInfoStep
+            worldData={worldData}
+            errors={{}}
+            onUpdate={setWorldData}
+          />
+          <div aria-label="World preview">
+            Name: {worldData.name || 'Not set'} | 
+            Genre: {worldData.genre} | 
+            Description: {worldData.description || 'Not set'}
+          </div>
+        </div>
+      );
+    };
+
+    render(<TestWrapper />);
+
+    // Initially should show empty values
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Name: Not set');
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Genre: fantasy');
 
     // Change name
     fireEvent.change(screen.getByPlaceholderText(/enter your world's name/i), {
       target: { value: 'My New World' },
     });
-    expect(mockOnUpdate).toHaveBeenCalledWith({
-      ...mockWorldData,
-      name: 'My New World',
-    });
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Name: My New World');
 
     // Change description
     fireEvent.change(screen.getByPlaceholderText(/provide a brief description/i), {
-      target: { value: 'A detailed description of my world' },
+      target: { value: 'A detailed description' },
     });
-    expect(mockOnUpdate).toHaveBeenCalledWith({
-      ...mockWorldData,
-      description: 'A detailed description of my world',
-    });
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Description: A detailed description');
 
-    // Change genre - find by test id since multiple genre selects exist
-    const worldGenreSelect = screen.getByTestId('world-genre-select');
-    fireEvent.change(worldGenreSelect, {
+    // Change genre
+    const genreSelect = screen.getByTestId('world-genre-select');
+    fireEvent.change(genreSelect, {
       target: { value: 'sci-fi' },
     });
-    expect(mockOnUpdate).toHaveBeenCalledWith({
-      ...mockWorldData,
-      genre: 'sci-fi',
-    });
+    expect(screen.getByLabelText('World preview')).toHaveTextContent('Genre: sci-fi');
   });
 
   test('renders with valid data', () => {
@@ -117,7 +126,7 @@ describe('BasicInfoStep', () => {
 
     expect(screen.getByDisplayValue('Valid World Name')).toBeInTheDocument();
     expect(screen.getByDisplayValue('This is a valid description for our world')).toBeInTheDocument();
-    // Check that genre select has the correct value by finding the option that's selected
+    // Check that genre select has the correct value
     const genreSelect = screen.getByTestId('world-genre-select');
     expect(genreSelect).toHaveValue('fantasy');
   });
