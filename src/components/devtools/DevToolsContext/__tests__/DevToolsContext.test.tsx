@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { DevToolsProvider, useDevTools } from '../DevToolsContext';
 
 // Mock localStorage

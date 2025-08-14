@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { 
   loadSectionVisibility, 
-  saveSectionVisibility, 
   toggleSectionVisibility as toggleStoredSectionVisibility,
   setSectionVisibility as setStoredSectionVisibility,
   isSectionVisible,
