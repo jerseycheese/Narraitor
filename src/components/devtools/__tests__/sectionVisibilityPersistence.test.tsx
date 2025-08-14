@@ -33,7 +33,10 @@ jest.mock('@/lib/utils/logger', () => {
 describe('DevTools Section Visibility Persistence', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      configurable: true
+    });
   });
 
   describe('localStorage Integration', () => {

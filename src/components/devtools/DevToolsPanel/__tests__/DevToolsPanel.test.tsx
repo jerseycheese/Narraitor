@@ -78,7 +78,10 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Set NODE_ENV to development for these tests
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      configurable: true
+    });
     // Mock window.location
     Object.defineProperty(window, 'location', {
       value: { pathname: '/test' },
@@ -131,7 +134,7 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
       render(
         <DevToolsProvider 
           initialIsOpen={true}
-          initialSectionVisibility={{
+          defaultSectionVisibility={{
             stateSection: false,
             aiTestingPanel: true,
           }}
@@ -190,7 +193,7 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
       render(
         <DevToolsProvider 
           initialIsOpen={true}
-          initialSectionVisibility={{
+          defaultSectionVisibility={{
             stateSection: false,
             aiTestingPanel: false,
             testDataGenerator: false,
@@ -238,7 +241,7 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
       render(
         <DevToolsProvider 
           initialIsOpen={true}
-          initialSectionVisibility={{
+          defaultSectionVisibility={{
             stateSection: false,
             // Keep state inspector visible
             stateInspectorSection: true,
@@ -260,7 +263,7 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
       render(
         <DevToolsProvider 
           initialIsOpen={true}
-          initialSectionVisibility={{
+          defaultSectionVisibility={{
             stateSection: false,
             stateInspectorSection: false,
           }}
@@ -325,7 +328,7 @@ describe('DevToolsPanel - Component Visibility Controls', () => {
       render(
         <DevToolsProvider 
           initialIsOpen={true}
-          initialSectionVisibility={{
+          defaultSectionVisibility={{
             stateSection: false,
             aiTestingPanel: false,
           }}

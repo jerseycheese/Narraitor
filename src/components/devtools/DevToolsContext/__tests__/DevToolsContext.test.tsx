@@ -54,14 +54,27 @@ const TestComponent = () => {
 };
 
 describe('DevToolsContext - Component Visibility Toggles', () => {
+  let originalEnv: string | undefined;
+
   beforeEach(() => {
     jest.clearAllMocks();
     // Set NODE_ENV to development for these tests
-    process.env.NODE_ENV = 'development';
+    originalEnv = process.env.NODE_ENV;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      configurable: true
+    });
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    // Restore original NODE_ENV
+    if (originalEnv !== undefined) {
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: originalEnv,
+        configurable: true
+      });
+    }
   });
 
   describe('Section Visibility Management', () => {
@@ -240,7 +253,7 @@ describe('DevToolsContext - Component Visibility Toggles', () => {
       };
 
       render(
-        <DevToolsProvider initialSectionVisibility={initialSectionVisibility}>
+        <DevToolsProvider defaultSectionVisibility={initialSectionVisibility}>
           <TestComponent />
         </DevToolsProvider>
       );
@@ -265,7 +278,7 @@ describe('DevToolsContext - Component Visibility Toggles', () => {
       };
 
       render(
-        <DevToolsProvider initialSectionVisibility={initialSectionVisibility}>
+        <DevToolsProvider defaultSectionVisibility={initialSectionVisibility}>
           <TestComponent />
         </DevToolsProvider>
       );
