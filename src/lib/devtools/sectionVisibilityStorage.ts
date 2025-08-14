@@ -121,7 +121,7 @@ export function isSectionVisible(sectionId: string, visibility: SectionVisibilit
     );
     return true;
   }
-  return visibility[sectionId as DevToolsSection];
+  return visibility[sectionId as DevToolsSection] ?? true;
 }
 
 /**
