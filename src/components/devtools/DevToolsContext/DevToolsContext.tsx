@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { 
   loadSectionVisibility, 
   loadSectionVisibilityWithDefaults,
@@ -66,17 +66,21 @@ export const DevToolsProvider = ({
   const [isDev, setIsDev] = useState(false);
   const [sectionVisibility, setSectionVisibilityState] = useState<SectionVisibility>({});
   
+  // Use ref to stabilize defaultSectionVisibility to prevent unnecessary re-runs
+  const defaultSectionVisibilityRef = useRef(defaultSectionVisibility);
+  defaultSectionVisibilityRef.current = defaultSectionVisibility;
+  
   // Set client-side flag and check environment, load section visibility
   useEffect(() => {
     setIsDev(process.env.NODE_ENV === 'development');
     
     // Load section visibility from localStorage on mount
     // Use custom defaults if provided, otherwise use standard defaults
-    const loadedVisibility = defaultSectionVisibility 
-      ? loadSectionVisibilityWithDefaults(defaultSectionVisibility)
+    const loadedVisibility = defaultSectionVisibilityRef.current
+      ? loadSectionVisibilityWithDefaults(defaultSectionVisibilityRef.current)
       : loadSectionVisibility();
     setSectionVisibilityState(loadedVisibility);
-  }, [initialIsOpen, defaultSectionVisibility]);
+  }, [initialIsOpen]);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {

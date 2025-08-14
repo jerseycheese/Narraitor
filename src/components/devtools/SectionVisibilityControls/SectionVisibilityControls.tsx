@@ -42,7 +42,7 @@ const SECTION_TEST_IDS = {
  * Includes dropdown menu with individual toggles and show all/hide all actions.
  */
 export const SectionVisibilityControls = () => {
-  const { sectionVisibility, toggleSectionVisibility, setSectionVisibility } = useDevTools();
+  const { sectionVisibility, toggleSectionVisibility, setSectionVisibility, isSectionVisible } = useDevTools();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const visibleCount = Object.values(sectionVisibility).filter(Boolean).length;
@@ -122,7 +122,7 @@ export const SectionVisibilityControls = () => {
           {/* Individual section toggles */}
           <div className="max-h-64 overflow-y-auto">
             {Object.entries(SECTION_INFO).map(([sectionId, displayName]) => {
-              const isVisible = sectionVisibility[sectionId] ?? true;
+              const isVisible = isSectionVisible?.(sectionId) ?? true;
               
               return (
                 <button

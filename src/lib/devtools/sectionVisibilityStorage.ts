@@ -24,8 +24,9 @@ export enum DevToolsSection {
 
 /**
  * Type for section visibility state
+ * Uses Partial to allow subset updates while maintaining type safety
  */
-export type SectionVisibility = Record<string, boolean>;
+export type SectionVisibility = Partial<Record<DevToolsSection, boolean>>;
 
 /**
  * Default visibility state for all sections
@@ -114,7 +115,13 @@ export function saveSectionVisibility(visibility: SectionVisibility): void {
  * Get visibility state for a specific section
  */
 export function isSectionVisible(sectionId: string, visibility: SectionVisibility): boolean {
-  return visibility[sectionId] ?? true; // Default to visible for unknown sections
+  if (!(sectionId in visibility)) {
+    console.warn(
+      `[DevTools] Unknown section ID "${sectionId}" accessed in isSectionVisible. Defaulting to visible.`
+    );
+    return true;
+  }
+  return visibility[sectionId as DevToolsSection];
 }
 
 /**
