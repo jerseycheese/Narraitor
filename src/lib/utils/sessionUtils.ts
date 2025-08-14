@@ -30,15 +30,14 @@ export const getSystemEventIcon = (type: string): string => {
 };
 
 /**
- * Calculates the next session number based on existing saved sessions
- * @param savedSessions Map of saved sessions
+ * Calculates the next session number based on existing journal entries with session context
+ * @param journalEntries Array of journal entries to check for session numbers
  * @returns Next sequential session number
  */
-export const calculateNextSessionNumber = (savedSessions: Record<string, { sessionNumber?: number }>): number => {
-  const sessions = Object.values(savedSessions);
-  const numbers = sessions
-    .map(s => s.sessionNumber)
-    .filter(n => typeof n === 'number' && !isNaN(n));
-  const max = numbers.length > 0 ? Math.max(...numbers) : 0;
+export const calculateNextSessionNumber = (journalEntries: Array<{ metadata?: { sessionContext?: { sessionNumber?: number } } }>): number => {
+  const sessionNumbers = journalEntries
+    .map(entry => entry.metadata?.sessionContext?.sessionNumber)
+    .filter((n): n is number => typeof n === 'number' && !isNaN(n));
+  const max = sessionNumbers.length > 0 ? Math.max(...sessionNumbers) : 0;
   return max + 1;
 };

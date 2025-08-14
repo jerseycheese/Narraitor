@@ -168,7 +168,10 @@ export const useSessionStore = create<SessionStore>()(
         const character = characterStore.characters[characterId];
         
         const sessionStartTime = new Date().toISOString();
-        const sessionNumber = calculateNextSessionNumber(get().savedSessions);
+        
+        // Get all journal entries to calculate session number
+        const allEntries = Object.values(journalStore.entries).flat();
+        const sessionNumber = calculateNextSessionNumber(allEntries);
         
         journalStore.addEntry(sessionId, {
           type: 'session_start',
@@ -291,7 +294,7 @@ export const useSessionStore = create<SessionStore>()(
               sessionContext: {
                 worldName: world?.name || 'Unknown World',
                 characterName: character?.name || 'Unknown Character',
-                sessionNumber: sessionStartEntry?.metadata.sessionContext?.sessionNumber ?? calculateNextSessionNumber(state.savedSessions)
+                sessionNumber: sessionStartEntry?.metadata.sessionContext?.sessionNumber ?? calculateNextSessionNumber(Object.values(journalStore.entries).flat())
               }
             },
             updatedAt: sessionEndTime
