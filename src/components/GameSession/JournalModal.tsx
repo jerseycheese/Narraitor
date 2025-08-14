@@ -16,6 +16,7 @@ import {
   truncate,
   formatAIResponse 
 } from '@/lib/utils';
+import { formatSessionDuration, getSystemEventIcon } from '@/lib/utils/sessionUtils';
 
 /**
  * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
@@ -42,29 +43,56 @@ interface JournalModalProps {
 }
 
 // EntryDetail component for displaying complete formatted content
-const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
-  <div className="h-full flex flex-col">
-    <div className="border-b border-amber-200 pb-4 mb-4">
-      <h3 className="text-xl font-bold text-amber-900 mb-2">
-        {entry.title || titleCase(entry.type.replace('_', ' '))}
-      </h3>
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <StatusBadge
-          variant="significance"
-          state={entry.significance as 'critical' | 'major' | 'minor'}
-          label={capitalize(entry.significance)}
-        />
-        <Badge variant="info" size="sm">
-          {titleCase(entry.type.replace('_', ' '))}
-        </Badge>
-        <span className="text-amber-600">
-          {formatRelativeTime(new Date(entry.createdAt))}
-        </span>
-        {!entry.isRead && (
-          <Badge variant="secondary" size="sm">Unread</Badge>
-        )}
+const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
+  // Detect system events (Issue #176)
+  const isSystemEvent = entry.metadata.automaticEntry && 
+    (entry.type === 'session_start' || entry.type === 'session_end');
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className={`border-b pb-4 mb-4 ${
+        isSystemEvent 
+          ? 'border-slate-300 bg-slate-50 rounded-t p-4 -m-4 mb-4' 
+          : 'border-amber-200'
+      }`}>
+        <h3 className={`text-xl font-bold mb-2 ${
+          isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+        }`}>
+          {isSystemEvent && (
+            <span className="mr-2" role="img" aria-label="System event">
+              {getSystemEventIcon(entry.type)}
+            </span>
+          )}
+          {entry.title || titleCase(entry.type.replace('_', ' '))}
+        </h3>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <StatusBadge
+            variant="significance"
+            state={entry.significance as 'critical' | 'major' | 'minor'}
+            label={capitalize(entry.significance)}
+          />
+          <Badge 
+            variant={isSystemEvent ? "secondary" : "info"} 
+            size="sm"
+            className={isSystemEvent ? "bg-slate-200 text-slate-700" : ""}
+          >
+            {isSystemEvent && "System: "}
+            {titleCase(entry.type.replace('_', ' '))}
+          </Badge>
+          <span className={isSystemEvent ? "text-slate-600" : "text-amber-600"}>
+            {formatRelativeTime(new Date(entry.createdAt))}
+          </span>
+          {!entry.isRead && (
+            <Badge variant="secondary" size="sm">Unread</Badge>
+          )}
+          {/* Show session duration for session_end events */}
+          {entry.type === 'session_end' && entry.metadata.sessionDuration && (
+            <Badge variant="outline" size="sm" className="text-slate-600 border-slate-300">
+              Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
+            </Badge>
+          )}
+        </div>
       </div>
-    </div>
     
     <div className="flex-1 overflow-auto">
       <div className="prose prose-amber max-w-none">
@@ -114,6 +142,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => (
     </div>
   </div>
 );
+};
 
 /**
  * Enhanced JournalModal with list-detail interface for entry selection and viewing
@@ -206,50 +235,71 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                   )}
                 </div>
                 <div className="flex-1 overflow-auto p-4 space-y-2">
-                  {entries.map(entry => (
-                    <Card 
-                      key={entry.id} 
-                      className={`p-3 border cursor-pointer transition-all duration-200 ${
-                        selectedEntryId === entry.id
-                          ? 'bg-amber-100 border-amber-300 shadow-md'
-                          : 'bg-white border-amber-200 hover:bg-amber-50 hover:border-amber-300'
-                      }`}
-                      onClick={() => handleEntrySelect(entry)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleEntrySelect(entry);
-                        }
-                      }}
-                      aria-label={`Select entry: ${entry.title || entry.type}`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-amber-900 text-sm leading-tight">
-                          {entry.title || titleCase(entry.type.replace('_', ' '))}
-                        </h4>
-                        {!entry.isRead && (
-                          <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
-                        )}
-                      </div>
-                      
-                      <p className="text-gray-600 text-xs leading-relaxed mb-2">
-                        {truncate(entry.content, 60)}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <StatusBadge
-                          variant="significance"
-                          state={entry.significance as 'critical' | 'major' | 'minor'}
-                          label={capitalize(entry.significance)}
-                        />
-                        <span className="text-xs text-amber-600">
-                          {formatRelativeTime(new Date(entry.createdAt))}
-                        </span>
-                      </div>
-                    </Card>
-                  ))}
+                  {entries.map(entry => {
+                    // Detect system events for list styling (Issue #176)
+                    const isSystemEvent = entry.metadata.automaticEntry && 
+                      (entry.type === 'session_start' || entry.type === 'session_end');
+
+                    return (
+                      <Card 
+                        key={entry.id} 
+                        className={`p-3 border cursor-pointer transition-all duration-200 ${
+                          isSystemEvent
+                            ? selectedEntryId === entry.id
+                              ? 'bg-slate-100 border-slate-300 shadow-md'
+                              : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                            : selectedEntryId === entry.id
+                              ? 'bg-amber-100 border-amber-300 shadow-md'
+                              : 'bg-white border-amber-200 hover:bg-amber-50 hover:border-amber-300'
+                        }`}
+                        onClick={() => handleEntrySelect(entry)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleEntrySelect(entry);
+                          }
+                        }}
+                        aria-label={`Select entry: ${entry.title || entry.type}`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className={`font-medium text-sm leading-tight flex items-center ${
+                            isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+                          }`}>
+                            {isSystemEvent && (
+                              <span className="mr-1.5 text-xs" role="img" aria-label="System event">
+                                {getSystemEventIcon(entry.type)}
+                              </span>
+                            )}
+                            {entry.title || titleCase(entry.type.replace('_', ' '))}
+                          </h4>
+                          {!entry.isRead && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></div>
+                          )}
+                        </div>
+                        
+                        <p className={`text-xs leading-relaxed mb-2 ${
+                          isSystemEvent ? 'text-slate-600' : 'text-gray-600'
+                        }`}>
+                          {truncate(entry.content, 60)}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <StatusBadge
+                            variant="significance"
+                            state={entry.significance as 'critical' | 'major' | 'minor'}
+                            label={capitalize(entry.significance)}
+                          />
+                          <span className={`text-xs ${
+                            isSystemEvent ? 'text-slate-500' : 'text-amber-600'
+                          }`}>
+                            {formatRelativeTime(new Date(entry.createdAt))}
+                          </span>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
 

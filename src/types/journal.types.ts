@@ -31,7 +31,9 @@ export type JournalEntryType =
   | 'discovery'
   | 'combat'
   | 'dialogue'
-  | 'decision';
+  | 'decision'
+  | 'session_start'
+  | 'session_end';
 
 /**
  * Represents an entity related to a journal entry
@@ -54,4 +56,12 @@ export interface JournalMetadata {
   choiceText?: string;
   decisionPrompt?: string;
   outcomeSegmentId?: EntityID;
+  // Session-specific metadata for issue #176
+  sessionDuration?: number;
+  sessionStartTime?: string;
+  sessionContext?: {
+    worldName?: string;
+    characterName?: string;
+    sessionNumber?: number;
+  };
 }
