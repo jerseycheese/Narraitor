@@ -1,0 +1,49 @@
+
+> narraitor@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.3.1
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.158:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1121ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3s (1410 modules)
+[12:54:41.831] DEBUG [StateInspector] StateInspector initialized
+(node:2431) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 3413ms
+ ✓ Compiled in 554ms (565 modules)
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 26ms
+ ⚠ Unsupported metadata viewport is configured in metadata export in /. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET / 200 in 25ms
+ ✓ Compiled /favicon.ico in 154ms (861 modules)
+ GET /favicon.ico 200 in 212ms
+ GET /favicon.ico 200 in 4ms
+ ✓ Compiled in 513ms (1410 modules)
+ ✓ Compiled in 194ms (565 modules)
+ ✓ Compiled in 158ms (565 modules)
+ ✓ Compiled in 157ms (565 modules)
+ ✓ Compiled in 215ms (565 modules)
+ ✓ Compiled in 1008ms (565 modules)
+ ✓ Compiled in 359ms (565 modules)
+ ✓ Compiled in 619ms (565 modules)
+ ✓ Compiled in 218ms (565 modules)
+ ✓ Compiled in 177ms (565 modules)
+ ✓ Compiled in 129ms (565 modules)
+ ✓ Compiled in 147ms (565 modules)
+ ✓ Compiled in 121ms (565 modules)
+ ✓ Compiled in 263ms (565 modules)
+ ✓ Compiled in 193ms (565 modules)
+ ✓ Compiled in 212ms (565 modules)
+ ✓ Compiled in 156ms (565 modules)
+ ✓ Compiled in 292ms (565 modules)
+ ✓ Compiled in 125ms (565 modules)
+ ✓ Compiled in 205ms (565 modules)

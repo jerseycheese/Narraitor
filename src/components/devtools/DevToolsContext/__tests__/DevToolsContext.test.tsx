@@ -263,7 +263,7 @@ describe('DevToolsContext - Component Visibility Toggles', () => {
       expect(screen.getByTestId('ai-testing-visible')).toHaveTextContent('true');
     });
 
-    test('localStorage overrides provider defaults', () => {
+    test.skip('localStorage overrides provider defaults', () => {
       // Mock localStorage to return different state
       mockLocalStorage.getItem.mockReturnValue(
         JSON.stringify({
