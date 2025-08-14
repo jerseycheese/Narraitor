@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { 
   loadSectionVisibility, 
+  loadSectionVisibilityWithDefaults,
   toggleSectionVisibility as toggleStoredSectionVisibility,
   setSectionVisibility as setStoredSectionVisibility,
   isSectionVisible,
@@ -47,6 +48,7 @@ export const DevToolsContext = createContext<DevToolsContextType>(defaultContext
 interface DevToolsProviderProps {
   children: ReactNode;
   initialIsOpen?: boolean;
+  defaultSectionVisibility?: SectionVisibility;
 }
 
 /**
@@ -57,7 +59,8 @@ interface DevToolsProviderProps {
  */
 export const DevToolsProvider = ({ 
   children, 
-  initialIsOpen = false 
+  initialIsOpen = false,
+  defaultSectionVisibility
 }: DevToolsProviderProps) => {
   const [isOpen, setIsOpen] = useState(initialIsOpen);
   const [isDev, setIsDev] = useState(false);
@@ -68,9 +71,12 @@ export const DevToolsProvider = ({
     setIsDev(process.env.NODE_ENV === 'development');
     
     // Load section visibility from localStorage on mount
-    const loadedVisibility = loadSectionVisibility();
+    // Use custom defaults if provided, otherwise use standard defaults
+    const loadedVisibility = defaultSectionVisibility 
+      ? loadSectionVisibilityWithDefaults(defaultSectionVisibility)
+      : loadSectionVisibility();
     setSectionVisibilityState(loadedVisibility);
-  }, [initialIsOpen]);
+  }, [initialIsOpen, defaultSectionVisibility]);
 
   // Toggle function to show/hide DevTools
   const toggleDevTools = () => {

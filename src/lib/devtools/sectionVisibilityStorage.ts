@@ -64,27 +64,34 @@ function isStorageAvailable(): boolean {
  * Load section visibility state from localStorage
  */
 export function loadSectionVisibility(): SectionVisibility {
+  return loadSectionVisibilityWithDefaults(DEFAULT_SECTION_VISIBILITY);
+}
+
+/**
+ * Load section visibility state from localStorage with custom defaults
+ */
+export function loadSectionVisibilityWithDefaults(defaultVisibility: SectionVisibility): SectionVisibility {
   if (!isStorageAvailable()) {
-    return { ...DEFAULT_SECTION_VISIBILITY };
+    return { ...defaultVisibility };
   }
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      return { ...DEFAULT_SECTION_VISIBILITY };
+      return { ...defaultVisibility };
     }
 
     const parsed = JSON.parse(stored);
     
     // Ensure parsed data is valid and merge with defaults
     if (typeof parsed === 'object' && parsed !== null) {
-      return { ...DEFAULT_SECTION_VISIBILITY, ...parsed };
+      return { ...defaultVisibility, ...parsed };
     }
     
-    return { ...DEFAULT_SECTION_VISIBILITY };
+    return { ...defaultVisibility };
   } catch (error) {
     console.warn('Failed to load DevTools section visibility from localStorage:', error);
-    return { ...DEFAULT_SECTION_VISIBILITY };
+    return { ...defaultVisibility };
   }
 }
 

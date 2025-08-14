@@ -21,6 +21,21 @@ const SECTION_INFO = {
 } as const;
 
 /**
+ * Mapping for test IDs to match test expectations
+ */
+const SECTION_TEST_IDS = {
+  [DevToolsSection.STATE_SECTION]: 'toggle-state-section',
+  [DevToolsSection.STATE_INSPECTOR]: 'toggle-state-inspector',
+  [DevToolsSection.AI_TESTING]: 'toggle-ai-testing',
+  [DevToolsSection.TEST_DATA_GENERATOR]: 'toggle-test-data-generator',
+  [DevToolsSection.PORTRAIT_DEBUG]: 'toggle-portrait-debug',
+  [DevToolsSection.ENDING_IMAGE_DEBUG]: 'toggle-ending-image-debug',
+  [DevToolsSection.CONSISTENCY_VALIDATION]: 'toggle-consistency-validation',
+  [DevToolsSection.TEXT_NORMALIZATION]: 'toggle-text-normalization',
+  [DevToolsSection.LORE_MANAGEMENT]: 'toggle-lore-management',
+} as const;
+
+/**
  * SectionVisibilityControls Component
  * 
  * Provides controls for toggling visibility of individual DevTools sections.
@@ -66,7 +81,8 @@ export const SectionVisibilityControls = () => {
         className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
         aria-expanded={isDropdownOpen}
         aria-haspopup="menu"
-        data-testid="visibility-controls-button"
+        aria-label="Section visibility controls"
+        data-testid="visibility-controls-dropdown"
       >
         Sections ({visibleCount}/{totalCount}) ▼
       </Button>
@@ -113,9 +129,10 @@ export const SectionVisibilityControls = () => {
                   key={sectionId}
                   onClick={() => handleSectionToggle(sectionId)}
                   className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-600 flex items-center gap-2"
-                  data-testid={`toggle-section-${sectionId}`}
+                  data-testid={SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]}
                   role="menuitemcheckbox"
                   aria-checked={isVisible}
+                  aria-label={`Toggle ${displayName} visibility`}
                 >
                   <span className={`w-4 h-4 border border-slate-400 rounded flex items-center justify-center ${
                     isVisible ? 'bg-slate-500' : 'bg-transparent'
