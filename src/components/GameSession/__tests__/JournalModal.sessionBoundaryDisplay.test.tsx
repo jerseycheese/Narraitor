@@ -114,7 +114,7 @@ describe('JournalModal - Session Boundary Display', () => {
       fireEvent.click(entryButton);
       
       // Verify type badge appears in detail view
-      expect(screen.getByText('Session Start')).toBeInTheDocument();
+      expect(screen.getByText('System: Session Start')).toBeInTheDocument();
       
       // Verify system tags are displayed
       expect(screen.getByText('system')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('JournalModal - Session Boundary Display', () => {
 
       // Verify detailed content is shown
       expect(screen.getAllByText('A new journey starts in the Kingdom of Eldara')).toHaveLength(2); // List and detail views
-      expect(screen.getByText('Session Start')).toBeInTheDocument();
+      expect(screen.getByText('System: Session Start')).toBeInTheDocument();
     });
   });
 
@@ -178,7 +178,7 @@ describe('JournalModal - Session Boundary Display', () => {
       
       // Select the entry to see detailed content and type badge
       fireEvent.click(screen.getByText('Chapter Closes'));
-      expect(screen.getByText('Session End')).toBeInTheDocument();
+      expect(screen.getByText('System: Session End')).toBeInTheDocument();
       expect(screen.getAllByText('Session completed after 45 minutes of adventure')).toHaveLength(2); // List and detail views
     });
 
@@ -249,11 +249,11 @@ describe('JournalModal - Session Boundary Display', () => {
       
       // Select discovery entry to verify type badge appears in detail view
       fireEvent.click(screen.getByText('Ancient Discovery'));
-      expect(screen.getByText('Discovery')).toBeInTheDocument();
+      expect(screen.getByText('Character Event')).toBeInTheDocument();
       
       // Select session start entry to verify type badge appears in detail view
       fireEvent.click(screen.getByText('Adventure Begins'));
-      expect(screen.getByText('Session Start')).toBeInTheDocument();
+      expect(screen.getByText('System: Session Start')).toBeInTheDocument();
     });
 
     it('shows different tag types when entries are selected', () => {

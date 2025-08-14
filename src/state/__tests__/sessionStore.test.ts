@@ -54,7 +54,7 @@ describe('useSessionStore', () => {
     await useSessionStore.getState().initializeSession(worldId, characterId);
     
     // Act - end the session
-    useSessionStore.getState().endSession();
+    await useSessionStore.getState().endSession();
     
     // Assert
     const state = useSessionStore.getState();
