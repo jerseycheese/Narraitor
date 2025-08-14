@@ -66,22 +66,32 @@ describe('DevTools Section Visibility Persistence', () => {
 
       const { result } = renderHook(() => useDevTools(), { wrapper });
 
-      // Toggle multiple sections
+      // Toggle multiple sections individually to ensure each toggle is processed
       act(() => {
         result.current.toggleSectionVisibility?.('stateSection');
+      });
+      act(() => {
         result.current.toggleSectionVisibility?.('aiTestingPanel');
+      });
+      act(() => {
         result.current.toggleSectionVisibility?.('testDataGenerator');
       });
 
-      // Should save final state to localStorage
-      const lastCall = mockLocalStorage.setItem.mock.calls[mockLocalStorage.setItem.mock.calls.length - 1];
+      // Should save final state to localStorage - verify we have calls
+      const allCalls = mockLocalStorage.setItem.mock.calls;
+      expect(allCalls.length).toBeGreaterThan(0);
+      
+      const lastCall = allCalls[allCalls.length - 1];
       const savedState = JSON.parse(lastCall[1]);
       
-      expect(savedState).toEqual({
-        stateSection: false,
-        aiTestingPanel: false,
-        testDataGenerator: false,
-      });
+      // Should save complete state - all toggled sections should be false
+      expect(savedState.stateSection).toBe(false);
+      expect(savedState.aiTestingPanel).toBe(false);
+      expect(savedState.testDataGenerator).toBe(false);
+      
+      // Other sections should remain true (default)
+      expect(savedState.stateInspectorSection).toBe(true);
+      expect(savedState.portraitDebug).toBe(true);
     });
 
     test('restores section visibility state from localStorage on initialization', () => {

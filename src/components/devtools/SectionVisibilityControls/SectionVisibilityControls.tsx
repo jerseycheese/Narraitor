@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 const SECTION_INFO = {
   [DevToolsSection.STATE_SECTION]: 'State Section',
   [DevToolsSection.STATE_INSPECTOR]: 'State Inspector',
-  [DevToolsSection.AI_TESTING]: 'AI Testing',
+  [DevToolsSection.AI_TESTING]: 'AI Testing Panel',
   [DevToolsSection.TEST_DATA_GENERATOR]: 'Test Data Generator',
   [DevToolsSection.PORTRAIT_DEBUG]: 'Portrait Debug',
   [DevToolsSection.ENDING_IMAGE_DEBUG]: 'Ending Image Debug',
