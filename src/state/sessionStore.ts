@@ -3,11 +3,20 @@ import { persist } from 'zustand/middleware';
 import { SessionStore, TemplateHistoryEntry } from '../types/game.types';
 import Logger from '@/lib/utils/logger';
 import { createIndexedDBStorage } from './persistence';
+import { formatSessionDuration, calculateNextSessionNumber } from '@/lib/utils/sessionUtils';
 
 /**
  * Create logger instance for this store
  */
 const logger = new Logger('SessionStore');
+
+/**
+ * Cached store modules to avoid repeated dynamic imports
+ */
+let journalStoreModule: typeof import('./journalStore') | null = null;
+let worldStoreModule: typeof import('./worldStore') | null = null;
+let characterStoreModule: typeof import('./characterStore') | null = null;
+let narrativeStoreModule: typeof import('./narrativeStore') | null = null;
 
 /**
  * Initial state for the session store
@@ -136,9 +145,20 @@ export const useSessionStore = create<SessionStore>()(
       
       // Create session start journal entry (Issue #176)
       try {
-        const { useJournalStore } = await import('./journalStore');
-        const { useWorldStore } = await import('./worldStore');
-        const { useCharacterStore } = await import('./characterStore');
+        // Cache imported store modules to avoid repeated dynamic imports
+        if (!journalStoreModule) {
+          journalStoreModule = await import('./journalStore');
+        }
+        if (!worldStoreModule) {
+          worldStoreModule = await import('./worldStore');
+        }
+        if (!characterStoreModule) {
+          characterStoreModule = await import('./characterStore');
+        }
+        
+        const { useJournalStore } = journalStoreModule;
+        const { useWorldStore } = worldStoreModule;
+        const { useCharacterStore } = characterStoreModule;
         
         const journalStore = useJournalStore.getState();
         const worldStore = useWorldStore.getState();
@@ -148,6 +168,7 @@ export const useSessionStore = create<SessionStore>()(
         const character = characterStore.characters[characterId];
         
         const sessionStartTime = new Date().toISOString();
+        const sessionNumber = calculateNextSessionNumber(get().savedSessions);
         
         journalStore.addEntry(sessionId, {
           type: 'session_start',
@@ -165,7 +186,7 @@ export const useSessionStore = create<SessionStore>()(
             sessionContext: {
               worldName: world?.name || 'Unknown World',
               characterName: character?.name || 'Unknown Character',
-              sessionNumber: Object.keys(get().savedSessions).length + 1
+              sessionNumber
             }
           },
           updatedAt: sessionStartTime
@@ -214,7 +235,25 @@ export const useSessionStore = create<SessionStore>()(
         // Calculate session duration by looking for session start entry
         let sessionDuration = 0;
         try {
-          const { useJournalStore } = await import('./journalStore');
+          // Use cached imports to improve performance
+          if (!journalStoreModule) {
+            journalStoreModule = await import('./journalStore');
+          }
+          if (!worldStoreModule) {
+            worldStoreModule = await import('./worldStore');
+          }
+          if (!characterStoreModule) {
+            characterStoreModule = await import('./characterStore');
+          }
+          if (!narrativeStoreModule) {
+            narrativeStoreModule = await import('./narrativeStore');
+          }
+          
+          const { useJournalStore } = journalStoreModule;
+          const { useWorldStore } = worldStoreModule;
+          const { useCharacterStore } = characterStoreModule;
+          const { useNarrativeStore } = narrativeStoreModule;
+          
           const journalStore = useJournalStore.getState();
           const sessionEntries = journalStore.getSessionEntries(sessionId);
           
@@ -225,10 +264,6 @@ export const useSessionStore = create<SessionStore>()(
             sessionDuration = endTime.getTime() - startTime.getTime();
           }
           
-          const { useWorldStore } = await import('./worldStore');
-          const { useCharacterStore } = await import('./characterStore');
-          const { useNarrativeStore } = await import('./narrativeStore');
-          
           const worldStore = useWorldStore.getState();
           const characterStore = useCharacterStore.getState();
           const narrativeStore = useNarrativeStore.getState();
@@ -237,16 +272,7 @@ export const useSessionStore = create<SessionStore>()(
           const character = characterStore.characters[state.characterId];
           const narrativeSegments = narrativeStore.getSessionSegments(sessionId);
           
-          const formatDuration = (ms: number): string => {
-            const minutes = Math.floor(ms / 60000);
-            const hours = Math.floor(minutes / 60);
-            if (hours > 0) {
-              return `${hours}h ${minutes % 60}m`;
-            }
-            return `${minutes}m`;
-          };
-          
-          const durationText = sessionDuration > 0 ? formatDuration(sessionDuration) : 'unknown duration';
+          const durationText = sessionDuration > 0 ? formatSessionDuration(sessionDuration) : 'unknown duration';
           const segmentCount = narrativeSegments.length;
           
           journalStore.addEntry(sessionId, {
@@ -265,7 +291,7 @@ export const useSessionStore = create<SessionStore>()(
               sessionContext: {
                 worldName: world?.name || 'Unknown World',
                 characterName: character?.name || 'Unknown Character',
-                sessionNumber: Object.keys(state.savedSessions).length + 1
+                sessionNumber: sessionStartEntry?.metadata.sessionContext?.sessionNumber ?? calculateNextSessionNumber(state.savedSessions)
               }
             },
             updatedAt: sessionEndTime

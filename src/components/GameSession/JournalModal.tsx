@@ -16,6 +16,7 @@ import {
   truncate,
   formatAIResponse 
 } from '@/lib/utils';
+import { formatSessionDuration, getSystemEventIcon } from '@/lib/utils/sessionUtils';
 
 /**
  * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
@@ -46,14 +47,6 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
   // Detect system events (Issue #176)
   const isSystemEvent = entry.metadata.automaticEntry && 
     (entry.type === 'session_start' || entry.type === 'session_end');
-  
-  const getSystemEventIcon = (type: string): string => {
-    switch (type) {
-      case 'session_start': return '🎮';
-      case 'session_end': return '⏹️';
-      default: return '⚙️';
-    }
-  };
 
   return (
     <div className="h-full flex flex-col">
@@ -95,7 +88,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
             <Badge variant="outline" size="sm" className="text-slate-600 border-slate-300">
-              Duration: {Math.floor(entry.metadata.sessionDuration / 60000)}m
+              Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
         </div>
@@ -246,14 +239,6 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                     // Detect system events for list styling (Issue #176)
                     const isSystemEvent = entry.metadata.automaticEntry && 
                       (entry.type === 'session_start' || entry.type === 'session_end');
-                    
-                    const getSystemEventIcon = (type: string): string => {
-                      switch (type) {
-                        case 'session_start': return '🎮';
-                        case 'session_end': return '⏹️';
-                        default: return '⚙️';
-                      }
-                    };
 
                     return (
                       <Card 
