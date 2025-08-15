@@ -221,7 +221,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
     } catch (error) {
       setModificationError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, [selectedPath, editValue, pathValue]);
+  }, [selectedPath, editValue, pathValue, parseBoolean]);
 
   // Get child paths for hierarchical navigation
   const childPaths = useMemo(() => {

@@ -724,7 +724,7 @@ export class StateInspector {
    * @param value The value to set at the end of the path
    * @returns Update object or function suitable for setState
    */
-  private createNestedUpdate(pathParts: string[], value: unknown): Record<string, unknown> | ((state: any) => any) {
+  private createNestedUpdate(pathParts: string[], value: unknown): Record<string, unknown> | ((state: Record<string, unknown>) => Record<string, unknown>) {
     if (pathParts.length === 1) {
       return { [pathParts[0]]: value };
     }
