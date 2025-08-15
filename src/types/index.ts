@@ -70,6 +70,17 @@ export type {
   DecisionRelevanceResult
 } from './relevance.types';
 
+// Export runtime error types
+export type {
+  RuntimeError,
+  ErrorSeverity,
+  ErrorCategory,
+  ErrorComponentContext,
+  ErrorStateSnapshot,
+  ErrorFilter,
+  ErrorStatistics
+} from './runtime-error.types';
+
 // Export validation functions and remaining type guards
 export { 
   validateWorld,

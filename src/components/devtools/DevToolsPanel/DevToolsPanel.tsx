@@ -11,6 +11,7 @@ import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { TextNormalizationSection } from '../TextNormalizationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
+import { ErrorSection } from '../ErrorSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import { SectionVisibilityControls } from '../SectionVisibilityControls';
 import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
@@ -130,7 +131,7 @@ export const DevToolsPanel = () => {
           
           {/* Two-column grid layout organized by function */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column: State Management */}
+            {/* Left Column: State Management & Error Tracking */}
             <div className="space-y-4">
               {/* State Management Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.STATE_SECTION) || isSectionVisible(SectionId.STATE_INSPECTOR)) && (
@@ -144,6 +145,18 @@ export const DevToolsPanel = () => {
                   {isSectionVisible(SectionId.STATE_INSPECTOR) && (
                     <StateInspectorSection defaultCollapsed={true} />
                   )}
+                </div>
+              )}
+
+              {/* Error Tracking Group */}
+              {isSectionVisible(SectionId.ERROR_SECTION) && (
+                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                    Error Tracking
+                  </h3>
+                  <CollapsibleSection title="Runtime Errors" initialCollapsed={true}>
+                    <ErrorSection />
+                  </CollapsibleSection>
                 </div>
               )}
             </div>
