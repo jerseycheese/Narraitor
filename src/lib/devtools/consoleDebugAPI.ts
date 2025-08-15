@@ -2,8 +2,12 @@
  * Console Debug API for Narraitor
  * 
  * Provides programmatic access to debugging functions via browser console.
+ * Integrates with existing StateInspector and RequestLogger utilities for comprehensive debugging.
  * Only available in development environment.
  */
+
+import { stateInspector } from '../utils/stateInspector';
+import { requestLogger } from '../ai/requestLogger';
 
 export interface DebugAPIInterface {
   clearLogs: () => void;
@@ -25,11 +29,24 @@ declare global {
  */
 class ConsoleDebugAPI implements DebugAPIInterface {
   /**
-   * Clear browser console logs
+   * Clear browser console and AI request logs
    */
   clearLogs(): void {
     console.clear();
-    console.log('🧹 Console cleared via NARRAITOR_DEBUG.clearLogs()');
+    
+    // Also clear AI request logs using existing RequestLogger
+    try {
+      const initialLogCount = requestLogger.getLogs().length;
+      requestLogger.clearLogs();
+      
+      console.log(`🧹 Console cleared via NARRAITOR_DEBUG.clearLogs()`);
+      if (initialLogCount > 0) {
+        console.log(`🗑️ Cleared ${initialLogCount} AI request logs`);
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not clear AI request logs:', error);
+      console.log('🧹 Console cleared via NARRAITOR_DEBUG.clearLogs()');
+    }
   }
 
   /**
@@ -65,21 +82,44 @@ class ConsoleDebugAPI implements DebugAPIInterface {
   }
 
   /**
-   * Access current store state for debugging
+   * Access current store state for debugging using StateInspector
    */
   getStoreState(): string {
-    console.log('📊 Accessing store state...');
+    console.log('📊 Accessing store state via StateInspector...');
     
-    // In a real implementation, this would access actual Zustand stores
-    const mockStoreState = {
-      worldStore: 'Available via window.__ZUSTAND_STORES__?.worldStore',
-      characterStore: 'Available via window.__ZUSTAND_STORES__?.characterStore',
-      narrativeStore: 'Available via window.__ZUSTAND_STORES__?.narrativeStore',
-      sessionStore: 'Available via window.__ZUSTAND_STORES__?.sessionStore'
-    };
-    
-    console.table(mockStoreState);
-    return 'Store state logged to console. Use console.table() for better formatting.';
+    try {
+      // Use existing StateInspector to get comprehensive state snapshot
+      const snapshot = stateInspector.getStateSnapshot();
+      
+      if (snapshot.storeStates && Object.keys(snapshot.storeStates).length > 0) {
+        console.table(snapshot.storeStates);
+        console.log(`📈 Snapshot metadata:`, {
+          stores: snapshot.metadata.totalStores,
+          paths: snapshot.metadata.totalPaths,
+          timestamp: new Date(snapshot.timestamp).toLocaleTimeString()
+        });
+        
+        if (snapshot.metadata.performanceWarnings.length > 0) {
+          console.warn('⚠️ Performance warnings:', snapshot.metadata.performanceWarnings);
+        }
+        
+        return `State snapshot captured with ${snapshot.metadata.totalStores} stores and ${snapshot.metadata.totalPaths} paths`;
+      } else {
+        // Fallback for when StateInspector hasn't been initialized with stores
+        console.log('💡 StateInspector not initialized with stores. Checking global store access...');
+        const fallbackStoreInfo = {
+          worldStore: 'Available via window.__ZUSTAND_STORES__?.worldStore',
+          characterStore: 'Available via window.__ZUSTAND_STORES__?.characterStore',
+          narrativeStore: 'Available via window.__ZUSTAND_STORES__?.narrativeStore',
+          sessionStore: 'Available via window.__ZUSTAND_STORES__?.sessionStore'
+        };
+        console.table(fallbackStoreInfo);
+        return 'No stores registered with StateInspector. Use window.__ZUSTAND_STORES__ for manual access.';
+      }
+    } catch (error) {
+      console.error('❌ Error accessing state:', error);
+      return 'Error accessing store state. Check console for details.';
+    }
   }
 
   /**
@@ -105,7 +145,7 @@ class ConsoleDebugAPI implements DebugAPIInterface {
 🛠️ NARRAITOR DEBUG API - Available Functions:
 
 📝 NARRAITOR_DEBUG.clearLogs()
-   Clear browser console logs
+   Clear browser console logs and AI request logs
 
 ⚠️ NARRAITOR_DEBUG.triggerError(message?)
    Trigger a test error with optional custom message
@@ -117,7 +157,7 @@ class ConsoleDebugAPI implements DebugAPIInterface {
    - 'api_error': Simulate API failures
 
 📊 NARRAITOR_DEBUG.getStoreState()
-   Access current Zustand store state
+   Access current Zustand store state via StateInspector
 
 🔄 NARRAITOR_DEBUG.resetStores()
    Reset all stores to initial state

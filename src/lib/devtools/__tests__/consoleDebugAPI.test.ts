@@ -1,5 +1,23 @@
 import { consoleDebugAPI, type DebugAPIInterface } from '../consoleDebugAPI';
 
+// Mock the integrated utilities
+jest.mock('../../utils/stateInspector', () => ({
+  stateInspector: {
+    getStateSnapshot: jest.fn(() => ({
+      timestamp: Date.now(),
+      storeStates: { worldStore: { test: 'data' }, characterStore: { test: 'data' } },
+      metadata: { totalStores: 2, totalPaths: 4, performanceWarnings: [] }
+    }))
+  }
+}));
+
+jest.mock('../../ai/requestLogger', () => ({
+  requestLogger: {
+    getLogs: jest.fn(() => []),
+    clearLogs: jest.fn()
+  }
+}));
+
 // Mock window object
 const mockWindow = {
   NARRAITOR_DEBUG: undefined as DebugAPIInterface | undefined
@@ -64,12 +82,15 @@ describe('consoleDebugAPI', () => {
         expect(typeof mockWindow.NARRAITOR_DEBUG?.clearLogs).toBe('function');
       });
 
-      it('should clear console when called', () => {
+      it('should clear console and AI request logs when called', () => {
         const consoleClearSpy = jest.spyOn(console, 'clear').mockImplementation(() => {});
+        const { requestLogger } = require('../../ai/requestLogger');
         
         mockWindow.NARRAITOR_DEBUG?.clearLogs();
         
         expect(consoleClearSpy).toHaveBeenCalled();
+        expect(requestLogger.getLogs).toHaveBeenCalled();
+        expect(requestLogger.clearLogs).toHaveBeenCalled();
         consoleClearSpy.mockRestore();
       });
     });
@@ -125,9 +146,22 @@ describe('consoleDebugAPI', () => {
         expect(typeof mockWindow.NARRAITOR_DEBUG?.getStoreState).toBe('function');
       });
 
-      it('should return message about store access', () => {
+      it('should use StateInspector to get store state', () => {
+        const { stateInspector } = require('../../utils/stateInspector');
         const result = mockWindow.NARRAITOR_DEBUG?.getStoreState();
-        expect(result).toContain('Store state');
+        
+        expect(stateInspector.getStateSnapshot).toHaveBeenCalled();
+        expect(result).toContain('State snapshot captured with 2 stores and 4 paths');
+      });
+      
+      it('should handle StateInspector errors gracefully', () => {
+        const { stateInspector } = require('../../utils/stateInspector');
+        stateInspector.getStateSnapshot.mockImplementationOnce(() => {
+          throw new Error('StateInspector error');
+        });
+        
+        const result = mockWindow.NARRAITOR_DEBUG?.getStoreState();
+        expect(result).toContain('Error accessing store state');
       });
     });
 
@@ -147,12 +181,14 @@ describe('consoleDebugAPI', () => {
         expect(typeof mockWindow.NARRAITOR_DEBUG?.help).toBe('function');
       });
 
-      it('should return help documentation', () => {
+      it('should return help documentation with integration details', () => {
         const result = mockWindow.NARRAITOR_DEBUG?.help();
         expect(result).toContain('Available Functions');
         expect(result).toContain('clearLogs');
+        expect(result).toContain('AI request logs');
         expect(result).toContain('triggerError');
         expect(result).toContain('simulateCondition');
+        expect(result).toContain('StateInspector');
       });
     });
   });
