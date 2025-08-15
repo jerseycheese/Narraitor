@@ -339,7 +339,30 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
             <div className="space-y-2">
               <div className="text-xs font-medium text-slate-100">Modify Value:</div>
               
-              {!isEditing ? (
+              {typeof pathValue === 'boolean' ? (
+                // Direct toggle for boolean values
+                <button
+                  onClick={() => {
+                    const newValue = !pathValue;
+                    const success = stateInspector.setValueAtPath(selectedPath, newValue);
+                    if (success) {
+                      const updatedValue = stateInspector.getValueAtPath(selectedPath);
+                      setPathValue(updatedValue);
+                    } else {
+                      setModificationError('Failed to toggle boolean value');
+                    }
+                  }}
+                  className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                  data-testid="toggle-boolean-button"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.currentTarget.click();
+                    }
+                  }}
+                >
+                  Toggle to {(!pathValue).toString()}
+                </button>
+              ) : !isEditing ? (
                 <button
                   onClick={startEditing}
                   className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"

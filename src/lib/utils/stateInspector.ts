@@ -379,9 +379,9 @@ export class StateInspector {
           return false;
         }
 
-        // Create the update object for nested path
-        const updateObject = this.createNestedUpdate(pathParts.slice(1), newValue);
-        store.setState(updateObject);
+        // Create the update function for nested path
+        const updateFunction = this.createNestedUpdate(pathParts.slice(1), newValue);
+        store.setState(updateFunction);
         logger.debug(`Successfully updated ${path} to:`, newValue);
         return true;
       }
@@ -711,28 +711,11 @@ export class StateInspector {
       return false;
     }
 
-    // For primitive values, allow same type or compatible types
+    // For primitive values, only allow same type
     const currentType = typeof currentValue;
     const newType = typeof newValue;
 
-    // Same type is always allowed
-    if (currentType === newType) {
-      return true;
-    }
-
-    // Allow number -> string conversion (common for form inputs)
-    if (currentType === 'string' && newType === 'number') {
-      return true;
-    }
-
-    // Allow string -> number conversion if it's a valid number
-    if (currentType === 'number' && newType === 'string') {
-      const parsed = parseFloat(newValue as string);
-      return !isNaN(parsed);
-    }
-
-    // Disallow other type mismatches
-    return false;
+    return currentType === newType;
   }
 
   /**
@@ -746,18 +729,30 @@ export class StateInspector {
       return { [pathParts[0]]: value };
     }
 
-    // For nested paths, we need to preserve the existing structure
-    // This is a simplified approach - in practice, you might want to use immer or similar
-    const result: Record<string, unknown> = {};
-    let current = result;
+    // For nested paths, we need to use a function that preserves existing state
+    // This creates an updater function that Zustand can use
+    const result = (prevState: Record<string, unknown>) => {
+      const newState = { ...prevState };
+      let current = newState;
+      
+      // Navigate to the parent of the target property
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        const key = pathParts[i];
+        if (current[key] && typeof current[key] === 'object') {
+          current[key] = { ...(current[key] as Record<string, unknown>) };
+          current = current[key] as Record<string, unknown>;
+        } else {
+          // If path doesn't exist, we can't create it safely
+          return prevState;
+        }
+      }
+      
+      // Set the final value
+      current[pathParts[pathParts.length - 1]] = value;
+      return newState;
+    };
     
-    for (let i = 0; i < pathParts.length - 1; i++) {
-      current[pathParts[i]] = {};
-      current = current[pathParts[i]] as Record<string, unknown>;
-    }
-    
-    current[pathParts[pathParts.length - 1]] = value;
-    return result;
+    return result as unknown as Record<string, unknown>;
   }
 }
 

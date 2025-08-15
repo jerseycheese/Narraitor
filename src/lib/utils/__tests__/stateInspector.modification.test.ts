@@ -101,8 +101,13 @@ describe('StateInspector.setValueAtPath', () => {
   let stateInspector: StateInspector;
   let testStore: ReturnType<typeof createTestStore>;
   let readOnlyStore: ReadOnlyTestStore;
+  let originalNodeEnv: string | undefined;
 
   beforeEach(() => {
+    // Set NODE_ENV to development for tests
+    originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    
     // Create fresh instances for each test
     stateInspector = new StateInspector();
     testStore = createTestStore();
@@ -117,6 +122,12 @@ describe('StateInspector.setValueAtPath', () => {
 
   afterEach(() => {
     stateInspector.clearAllWatchers();
+    // Restore original NODE_ENV
+    if (originalNodeEnv !== undefined) {
+      process.env.NODE_ENV = originalNodeEnv;
+    } else {
+      delete process.env.NODE_ENV;
+    }
   });
 
   describe('successful state modifications', () => {
@@ -291,14 +302,16 @@ describe('StateInspector.setValueAtPath', () => {
 
     it('should allow null and undefined for any type when originally null/undefined', () => {
       // Set values to null/undefined initially
-      stateInspector.setValueAtPath('testStore.stringValue', null);
-      stateInspector.setValueAtPath('testStore.numberValue', undefined);
+      expect(stateInspector.setValueAtPath('testStore.stringValue', null)).toBe(true);
+      expect(stateInspector.setValueAtPath('testStore.numberValue', undefined)).toBe(true);
       
-      // These should now accept any type since they're nullable
+      // When current value is null/undefined, should accept any type
       expect(stateInspector.setValueAtPath('testStore.stringValue', 'string')).toBe(true);
-      expect(stateInspector.setValueAtPath('testStore.stringValue', 123)).toBe(true);
-      expect(stateInspector.setValueAtPath('testStore.numberValue', 'string')).toBe(true);
       expect(stateInspector.setValueAtPath('testStore.numberValue', 456)).toBe(true);
+      
+      // But after setting to a specific type, should maintain type safety
+      expect(stateInspector.setValueAtPath('testStore.stringValue', 123)).toBe(false);
+      expect(stateInspector.setValueAtPath('testStore.numberValue', 'string')).toBe(false);
     });
   });
 

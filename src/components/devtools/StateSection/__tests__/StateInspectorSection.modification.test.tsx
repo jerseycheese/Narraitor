@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StateInspectorSection } from '../StateInspectorSection';
 import { stateInspector } from '@/lib/utils/stateInspector';
-import { create } from 'zustand';
 
 // Mock the state inspector
 jest.mock('@/lib/utils/stateInspector', () => ({
@@ -36,7 +35,7 @@ jest.mock('@/lib/utils', () => ({
 
 // Mock CollapsibleSection
 jest.mock('../../CollapsibleSection', () => ({
-  CollapsibleSection: ({ title, children, initialCollapsed, ...props }: any) => (
+  CollapsibleSection: ({ title, children, ...props }: { title: string; children: React.ReactNode; [key: string]: unknown }) => (
     <div data-testid={`collapsible-${title.replace(/\s+/g, '-').toLowerCase()}`} {...props}>
       <h3>{title}</h3>
       <div>{children}</div>
@@ -46,7 +45,7 @@ jest.mock('../../CollapsibleSection', () => ({
 
 // Mock JsonViewer
 jest.mock('../../JsonViewer', () => ({
-  JsonViewer: ({ data, ...props }: any) => (
+  JsonViewer: ({ data, ...props }: { data: unknown; [key: string]: unknown }) => (
     <pre data-testid="json-viewer" {...props}>
       {JSON.stringify(data, null, 2)}
     </pre>
@@ -564,7 +563,7 @@ describe('StateInspectorSection - Modification Controls', () => {
     });
 
     it('should work with path watchers to show real-time updates', async () => {
-      const watchCallback = jest.fn();
+      jest.fn(); // Mock watch callback
       mockStateInspector.watchPath.mockReturnValue({ unsubscribe: jest.fn() });
 
       mockStateInspector.getPathMetadata.mockReturnValue({
