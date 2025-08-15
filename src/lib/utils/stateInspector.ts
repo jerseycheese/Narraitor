@@ -722,16 +722,15 @@ export class StateInspector {
    * Creates a nested update object for Zustand setState
    * @param pathParts Array of path parts (excluding store name)
    * @param value The value to set at the end of the path
-   * @returns Update object suitable for setState
+   * @returns Update object or function suitable for setState
    */
-  private createNestedUpdate(pathParts: string[], value: unknown): Record<string, unknown> {
+  private createNestedUpdate(pathParts: string[], value: unknown): Record<string, unknown> | ((state: any) => any) {
     if (pathParts.length === 1) {
       return { [pathParts[0]]: value };
     }
 
-    // For nested paths, we need to use a function that preserves existing state
-    // This creates an updater function that Zustand can use
-    const result = (prevState: Record<string, unknown>) => {
+    // For nested paths, return an updater function that preserves existing state
+    return (prevState: Record<string, unknown>) => {
       const newState = { ...prevState };
       let current = newState;
       
@@ -751,8 +750,6 @@ export class StateInspector {
       current[pathParts[pathParts.length - 1]] = value;
       return newState;
     };
-    
-    return result as unknown as Record<string, unknown>;
   }
 }
 

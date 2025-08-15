@@ -146,6 +146,20 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
   }, []);
 
   /**
+   * Parses boolean values from string input with flexible formats
+   */
+  const parseBoolean = useCallback((input: string): boolean | undefined => {
+    const normalized = input.trim().toLowerCase();
+    if (normalized === 'true' || normalized === '1' || normalized === 'yes') {
+      return true;
+    }
+    if (normalized === 'false' || normalized === '0' || normalized === 'no') {
+      return false;
+    }
+    return undefined;
+  }, []);
+
+  /**
    * Starts editing mode for a value
    */
   const startEditing = useCallback(() => {
@@ -183,7 +197,12 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         }
         newValue = parsed;
       } else if (typeof pathValue === 'boolean') {
-        newValue = editValue.toLowerCase() === 'true';
+        const parsed = parseBoolean(editValue);
+        if (parsed === undefined) {
+          setModificationError('Invalid boolean format (use: true/false, 1/0, yes/no)');
+          return;
+        }
+        newValue = parsed;
       }
 
       // Attempt to set the value
@@ -379,15 +398,8 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   </div>
                   {/* Type-specific input */}
                   {typeof pathValue === 'boolean' ? (
-                    <select
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100"
-                      data-testid="boolean-editor"
-                    >
-                      <option value="true">true</option>
-                      <option value="false">false</option>
-                    </select>
+                    // No additional editor for boolean; toggle button above is used
+                    null
                   ) : (
                     <input
                       type={typeof pathValue === 'number' ? 'number' : 'text'}
