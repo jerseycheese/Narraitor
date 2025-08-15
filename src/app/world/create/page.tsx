@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import WorldCreationWizard from '@/components/WorldCreationWizard/WorldCreationWizard';
-import { truncate } from '@/lib/utils';
 
 export default function CreateWorldPage() {
   const router = useRouter();
