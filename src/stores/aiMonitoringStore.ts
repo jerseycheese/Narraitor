@@ -8,7 +8,7 @@
 import { create } from 'zustand';
 import type { AIMonitoringState, AIMonitoringEntry } from '@/types/aiMonitoring';
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = () => Math.random().toString(36).substring(2, 11);
 
 export const useAIMonitoringStore = create<AIMonitoringState>((set, get) => ({
   // Initial state

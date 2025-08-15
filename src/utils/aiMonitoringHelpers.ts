@@ -29,7 +29,14 @@ export function initializeAIMonitoring(store: NonNullable<typeof monitoringStore
  * Check if AI monitoring is available and enabled
  */
 export function isAIMonitoringEnabled(): boolean {
-  return monitoringStore !== null && process.env.NODE_ENV === 'development';
+  // Only enable monitoring if in development mode AND running on a development hostname
+  const isDevEnv = process.env.NODE_ENV === 'development';
+  let isDevHost = false;
+  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+    const devHosts = ['localhost', '127.0.0.1', '[::1]'];
+    isDevHost = devHosts.includes(window.location.hostname) || window.location.hostname.startsWith('192.168.');
+  }
+  return monitoringStore !== null && isDevEnv && (isDevHost || typeof window === 'undefined');
 }
 
 interface GeminiPayload {
@@ -98,7 +105,8 @@ export function createMonitoredGeminiRequest(
     };
     
     // Add entry to monitoring store
-    const entryId = monitoringStore!.addEntry(monitoringEntry);
+    if (!monitoringStore) throw new Error("AI Monitoring store is not initialized.");
+    const entryId = monitoringStore.addEntry(monitoringEntry);
     
     try {
       // Make the actual request
@@ -126,20 +134,24 @@ export function createMonitoredGeminiRequest(
         };
         
         // Update monitoring entry with success data
-        monitoringStore!.completeEntry(entryId, monitoringResponse, {
-          endTime,
-          duration: endTime - startTime
-        });
+        if (monitoringStore) {
+          monitoringStore.completeEntry(entryId, monitoringResponse, {
+            endTime,
+            duration: endTime - startTime
+          });
+        }
       } catch {
         // If we can't parse the response, still record the completion
-        monitoringStore!.completeEntry(entryId, {
-          content: '[Unable to parse response]',
-          finishReason: 'PARSE_ERROR',
-          statusCode: response.status
-        }, {
-          endTime,
-          duration: endTime - startTime
-        });
+        if (monitoringStore) {
+          monitoringStore.completeEntry(entryId, {
+            content: '[Unable to parse response]',
+            finishReason: 'PARSE_ERROR',
+            statusCode: response.status
+          }, {
+            endTime,
+            duration: endTime - startTime
+          });
+        }
       }
       
       return response;
@@ -156,10 +168,12 @@ export function createMonitoredGeminiRequest(
       };
       
       // Update monitoring entry with error data
-      monitoringStore!.errorEntry(entryId, monitoringError, {
-        endTime,
-        duration: endTime - startTime
-      });
+      if (monitoringStore) {
+        monitoringStore.errorEntry(entryId, monitoringError, {
+          endTime,
+          duration: endTime - startTime
+        });
+      }
       
       // Re-throw the original error
       throw error;
