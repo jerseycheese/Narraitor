@@ -7,3 +7,5 @@ export * from './DevMockState';
 export * from './AITestingPanel';
 export * from './ConsistencyValidationSection';
 export * from './TextNormalizationSection';
+export * from './ErrorSection';
+export * from './ErrorBoundary';

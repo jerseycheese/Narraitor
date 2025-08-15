@@ -12,6 +12,7 @@ import { DevToolsSection } from '../shared/DevToolsSection';
 import { FactEditor } from './FactEditor';
 import { FactInspector } from './FactInspector';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -303,8 +304,8 @@ export const LoreManagementSection: React.FC = () => {
                   <Button onClick={() => setShowImportDialog(true)}>Import from JSON</Button>
                 ) : (
                   <div className="space-y-2">
-                    <textarea
-                      className="w-full h-48 p-2 border rounded font-mono text-sm"
+                    <Textarea
+                      className="w-full h-48 font-mono text-sm"
                       placeholder="Paste JSON data here..."
                       value={importData}
                       onChange={(e) => setImportData(e.target.value)}
