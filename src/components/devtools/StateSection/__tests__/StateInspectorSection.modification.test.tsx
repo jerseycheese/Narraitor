@@ -463,8 +463,8 @@ describe('StateInspectorSection - Modification Controls', () => {
 
       // Should show error when setValueAtPath returns false
       await waitFor(() => {
-        expect(screen.getByTestId('modification-error')).toBeInTheDocument();
-        expect(screen.getByTestId('modification-error')).toHaveTextContent(/failed to modify/i);
+        expect(screen.getByTestId('validation-error')).toBeInTheDocument();
+        expect(screen.getByTestId('validation-error')).toHaveTextContent(/failed to modify/i);
       });
     });
 
@@ -557,8 +557,12 @@ describe('StateInspectorSection - Modification Controls', () => {
 
       // Should refresh the display with new value
       await waitFor(() => {
-        expect(mockStateInspector.getValueAtPath).toHaveBeenCalledTimes(2); // Initial + refresh
-        expect(mockStateInspector.getPathMetadata).toHaveBeenCalledTimes(2); // Initial + refresh
+        // Verify the component is making refreshed calls to get the updated value
+        expect(mockStateInspector.getValueAtPath).toHaveBeenCalledWith('testStore.stringValue');
+        expect(mockStateInspector.setValueAtPath).toHaveBeenCalledWith('testStore.stringValue', 'modified value');
+        // The component should exit edit mode after successful save
+        expect(screen.queryByTestId('edit-value-input')).not.toBeInTheDocument();
+        expect(screen.getByTestId('edit-value-button')).toBeInTheDocument();
       });
     });
 

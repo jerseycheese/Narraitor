@@ -367,11 +367,16 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   onClick={startEditing}
                   className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
                   data-testid="edit-value-button"
+                  aria-label={`Edit ${typeof pathValue} value`}
                 >
                   Edit Value
                 </button>
               ) : (
                 <div className="space-y-2">
+                  {/* Edit mode indicator */}
+                  <div className="text-xs text-yellow-300" data-testid="edit-mode-indicator">
+                    Editing {typeof pathValue} value
+                  </div>
                   {/* Type-specific input */}
                   {typeof pathValue === 'boolean' ? (
                     <select
@@ -387,10 +392,17 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                     <input
                       type={typeof pathValue === 'number' ? 'number' : 'text'}
                       value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
+                      onChange={(e) => {
+                        setEditValue(e.target.value);
+                        // Clear validation errors when user starts typing
+                        if (modificationError) {
+                          setModificationError('');
+                        }
+                      }}
                       placeholder="Enter new value"
                       className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100 placeholder-slate-400"
-                      data-testid={typeof pathValue === 'number' ? 'number-editor' : 'string-editor'}
+                      data-testid="edit-value-input"
+                      autoFocus
                     />
                   )}
                   
@@ -399,7 +411,8 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                     <button
                       onClick={saveEdit}
                       className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
-                      data-testid="save-edit-button"
+                      data-testid="save-value-button"
+                      aria-label="Save edited value"
                     >
                       Save
                     </button>
@@ -407,6 +420,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                       onClick={cancelEditing}
                       className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded"
                       data-testid="cancel-edit-button"
+                      aria-label="Cancel editing"
                     >
                       Cancel
                     </button>
@@ -414,7 +428,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   
                   {/* Error display */}
                   {modificationError && (
-                    <div className="text-xs text-red-400" data-testid="modification-error">
+                    <div className="text-xs text-red-400" data-testid="validation-error">
                       {modificationError}
                     </div>
                   )}
