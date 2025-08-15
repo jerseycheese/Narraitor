@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
 import { StateSection, StateInspectorSection } from '../StateSection';
 import { AITestingPanel } from '../AITestingPanel';
+import { AIMonitoringSection } from '../AIMonitoringSection';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { TestDataGeneratorSection } from '../TestDataGeneratorSection';
 import { PortraitDebugSection } from '../PortraitDebugSection';
@@ -165,6 +166,7 @@ export const DevToolsPanel = () => {
             <div className="space-y-4">
               {/* AI Tools Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.AI_TESTING) || 
+                isSectionVisible(SectionId.AI_MONITORING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) || 
                 isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
@@ -176,6 +178,12 @@ export const DevToolsPanel = () => {
                     {isSectionVisible(SectionId.AI_TESTING) && (
                       <CollapsibleSection title="AI Testing" initialCollapsed={true}>
                         <AITestingPanel />
+                      </CollapsibleSection>
+                    )}
+                    
+                    {isSectionVisible(SectionId.AI_MONITORING) && (
+                      <CollapsibleSection title="AI Service Monitoring" initialCollapsed={true}>
+                        <AIMonitoringSection />
                       </CollapsibleSection>
                     )}
                     
