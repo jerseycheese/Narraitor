@@ -64,6 +64,11 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
   const [watchedPaths, setWatchedPaths] = useState<Set<string>>(new Set());
   const [changeNotifications, setChangeNotifications] = useState<StateChangeNotification[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // State for modification controls
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState<string>('');
+  const [modificationError, setModificationError] = useState<string>('');
 
   // Initialize StateInspector with stores
   useEffect(() => {
@@ -130,6 +135,74 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       setWatchedPaths(prev => new Set([...prev, path]));
     }
   }, [watchedPaths]);
+
+  /**
+   * Determines if a value can be modified (primitive types only)
+   */
+  const canModifyValue = useCallback((value: unknown): boolean => {
+    if (value === null || value === undefined) return true;
+    const type = typeof value;
+    return type === 'string' || type === 'number' || type === 'boolean';
+  }, []);
+
+  /**
+   * Starts editing mode for a value
+   */
+  const startEditing = useCallback(() => {
+    if (!canModifyValue(pathValue)) return;
+    
+    setIsEditing(true);
+    setEditValue(String(pathValue ?? ''));
+    setModificationError('');
+  }, [pathValue, canModifyValue]);
+
+  /**
+   * Cancels editing mode
+   */
+  const cancelEditing = useCallback(() => {
+    setIsEditing(false);
+    setEditValue('');
+    setModificationError('');
+  }, []);
+
+  /**
+   * Saves the edited value to the state
+   */
+  const saveEdit = useCallback(() => {
+    if (!selectedPath) return;
+
+    try {
+      // Convert string input to appropriate type
+      let newValue: unknown = editValue;
+      
+      if (typeof pathValue === 'number') {
+        const parsed = parseFloat(editValue);
+        if (isNaN(parsed)) {
+          setModificationError('Invalid number format');
+          return;
+        }
+        newValue = parsed;
+      } else if (typeof pathValue === 'boolean') {
+        newValue = editValue.toLowerCase() === 'true';
+      }
+
+      // Attempt to set the value
+      const success = stateInspector.setValueAtPath(selectedPath, newValue);
+      
+      if (success) {
+        // Refresh the displayed value
+        const updatedValue = stateInspector.getValueAtPath(selectedPath);
+        setPathValue(updatedValue);
+        setIsEditing(false);
+        setEditValue('');
+        setModificationError('');
+      } else {
+        setModificationError('Failed to modify state value');
+      }
+    } catch (error) {
+      setModificationError(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }, [selectedPath, editValue, pathValue]);
 
   // Get child paths for hierarchical navigation
   const childPaths = useMemo(() => {
@@ -258,6 +331,72 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
             <div>
               <div className="text-xs font-medium text-slate-100 mb-1">Value:</div>
               <JsonViewer data={pathValue} className="bg-slate-800 border border-slate-600" />
+            </div>
+          )}
+
+          {/* State Modification Controls */}
+          {pathValue !== null && selectedPath && canModifyValue(pathValue) && (
+            <div className="space-y-2">
+              <div className="text-xs font-medium text-slate-100">Modify Value:</div>
+              
+              {!isEditing ? (
+                <button
+                  onClick={startEditing}
+                  className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
+                  data-testid="edit-value-button"
+                >
+                  Edit Value
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  {/* Type-specific input */}
+                  {typeof pathValue === 'boolean' ? (
+                    <select
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100"
+                      data-testid="boolean-editor"
+                    >
+                      <option value="true">true</option>
+                      <option value="false">false</option>
+                    </select>
+                  ) : (
+                    <input
+                      type={typeof pathValue === 'number' ? 'number' : 'text'}
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      placeholder="Enter new value"
+                      className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100 placeholder-slate-400"
+                      data-testid={typeof pathValue === 'number' ? 'number-editor' : 'string-editor'}
+                    />
+                  )}
+                  
+                  {/* Action buttons */}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={saveEdit}
+                      className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                      data-testid="save-edit-button"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={cancelEditing}
+                      className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded"
+                      data-testid="cancel-edit-button"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  
+                  {/* Error display */}
+                  {modificationError && (
+                    <div className="text-xs text-red-400" data-testid="modification-error">
+                      {modificationError}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

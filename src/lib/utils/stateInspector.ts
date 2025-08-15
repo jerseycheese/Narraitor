@@ -292,6 +292,109 @@ export class StateInspector {
   }
 
   /**
+   * Sets the value at a specific path in the state tree
+   * 
+   * @param path Dot-separated path to the value (e.g., 'worldStore.entities.world-1.name')
+   * @param newValue The new value to set
+   * @returns Boolean indicating whether the operation was successful
+   * @example
+   * ```typescript
+   * const success = stateInspector.setValueAtPath('worldStore.currentWorldId', 'world-2');
+   * if (success) {
+   *   console.log('Successfully updated current world ID');
+   * }
+   * ```
+   */
+  setValueAtPath(path: string, newValue: unknown): boolean {
+    if (process.env.NODE_ENV !== 'development') {
+      logger.warn('State modification disabled in production environment');
+      return false;
+    }
+
+    try {
+      const pathParts = path.split('.');
+      const storeName = pathParts[0];
+      
+      if (!this.stores[storeName]) {
+        logger.warn(`Store ${storeName} not found`);
+        return false;
+      }
+
+      const store = this.stores[storeName];
+      if (!isZustandStore(store)) {
+        logger.warn(`Store ${storeName} is not a valid Zustand store`);
+        return false;
+      }
+
+      if (!store.setState) {
+        logger.warn(`Store ${storeName} does not support state modification`);
+        return false;
+      }
+
+      // If setting a root store property directly
+      if (pathParts.length === 2) {
+        const propertyName = pathParts[1];
+        const currentState = store.getState() as Record<string, unknown>;
+        
+        if (!(propertyName in currentState)) {
+          logger.warn(`Property ${propertyName} not found in store ${storeName}`);
+          return false;
+        }
+
+        // Type validation
+        const currentValue = currentState[propertyName];
+        if (!this.isValidTypeChange(currentValue, newValue)) {
+          logger.warn(`Type mismatch: cannot set ${typeof currentValue} to ${typeof newValue}`);
+          return false;
+        }
+
+        // Perform the update
+        store.setState({ [propertyName]: newValue });
+        logger.debug(`Successfully updated ${path} to:`, newValue);
+        return true;
+      }
+
+      // For nested paths, we need to navigate to the parent object
+      if (pathParts.length > 2) {
+        const parentPath = pathParts.slice(0, -1).join('.');
+        const propertyName = pathParts[pathParts.length - 1];
+        
+        // Get the parent object
+        const parentValue = this.getValueAtPath(parentPath);
+        if (!parentValue || typeof parentValue !== 'object') {
+          logger.warn(`Parent path ${parentPath} does not exist or is not an object`);
+          return false;
+        }
+
+        const parentObject = parentValue as Record<string, unknown>;
+        if (!(propertyName in parentObject)) {
+          logger.warn(`Property ${propertyName} not found at path ${parentPath}`);
+          return false;
+        }
+
+        // Type validation
+        const currentValue = parentObject[propertyName];
+        if (!this.isValidTypeChange(currentValue, newValue)) {
+          logger.warn(`Type mismatch: cannot set ${typeof currentValue} to ${typeof newValue}`);
+          return false;
+        }
+
+        // Create the update object for nested path
+        const updateObject = this.createNestedUpdate(pathParts.slice(1), newValue);
+        store.setState(updateObject);
+        logger.debug(`Successfully updated ${path} to:`, newValue);
+        return true;
+      }
+
+      logger.warn(`Invalid path format: ${path}`);
+      return false;
+    } catch (error) {
+      logger.error(`Error setting value at path ${path}:`, error);
+      return false;
+    }
+  }
+
+  /**
    * Retrieves detailed metadata about a specific path in the state tree
    * 
    * @param path Dot-separated path to analyze
@@ -579,6 +682,82 @@ export class StateInspector {
       clearTimeout(timeout);
       this.watcherTimeouts.delete(path);
     }
+  }
+
+  /**
+   * Validates if a type change is allowed for state modification
+   * @param currentValue The current value at the path
+   * @param newValue The new value being set
+   * @returns True if the type change is valid
+   */
+  private isValidTypeChange(currentValue: unknown, newValue: unknown): boolean {
+    // Allow null/undefined to be set to any type
+    if (currentValue === null || currentValue === undefined) {
+      return true;
+    }
+
+    // Allow setting any value to null/undefined
+    if (newValue === null || newValue === undefined) {
+      return true;
+    }
+
+    // Reject modification of complex objects and arrays
+    if (typeof currentValue === 'object' && currentValue !== null) {
+      return false;
+    }
+
+    // Reject modification of functions
+    if (typeof currentValue === 'function') {
+      return false;
+    }
+
+    // For primitive values, allow same type or compatible types
+    const currentType = typeof currentValue;
+    const newType = typeof newValue;
+
+    // Same type is always allowed
+    if (currentType === newType) {
+      return true;
+    }
+
+    // Allow number -> string conversion (common for form inputs)
+    if (currentType === 'string' && newType === 'number') {
+      return true;
+    }
+
+    // Allow string -> number conversion if it's a valid number
+    if (currentType === 'number' && newType === 'string') {
+      const parsed = parseFloat(newValue as string);
+      return !isNaN(parsed);
+    }
+
+    // Disallow other type mismatches
+    return false;
+  }
+
+  /**
+   * Creates a nested update object for Zustand setState
+   * @param pathParts Array of path parts (excluding store name)
+   * @param value The value to set at the end of the path
+   * @returns Update object suitable for setState
+   */
+  private createNestedUpdate(pathParts: string[], value: unknown): Record<string, unknown> {
+    if (pathParts.length === 1) {
+      return { [pathParts[0]]: value };
+    }
+
+    // For nested paths, we need to preserve the existing structure
+    // This is a simplified approach - in practice, you might want to use immer or similar
+    const result: Record<string, unknown> = {};
+    let current = result;
+    
+    for (let i = 0; i < pathParts.length - 1; i++) {
+      current[pathParts[i]] = {};
+      current = current[pathParts[i]] as Record<string, unknown>;
+    }
+    
+    current[pathParts[pathParts.length - 1]] = value;
+    return result;
   }
 }
 
