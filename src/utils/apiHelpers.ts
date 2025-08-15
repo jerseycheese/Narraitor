@@ -105,12 +105,15 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
   const contentRatingMatch = prompt.match(/((?:PG-13|NC-17|[A-Z]+))-RATED CONTENT GUIDELINES/i);
   const contentRating = contentRatingMatch?.[1]?.toLowerCase() || '';
 
-  console.log('🔒 API SAFETY SETTINGS DEBUG:', {
-    promptLength: prompt.length,
-    foundContentRating: contentRating || '(none detected)',
-    extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
-    rawMatch: contentRatingMatch?.[0] || '(no match)'
-  });
+  // Debug information available in development mode only
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔒 API SAFETY SETTINGS DEBUG:', {
+      promptLength: prompt.length,
+      foundContentRating: contentRating || '(none detected)',
+      extractionPattern: 'Looking for "[RATING]-RATED CONTENT GUIDELINES"',
+      rawMatch: contentRatingMatch?.[0] || '(no match)'
+    });
+  }
 
   // Map content ratings to safety thresholds
   switch (contentRating) {
@@ -122,7 +125,9 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
       ];
-      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: 'G', threshold: 'BLOCK_MEDIUM_AND_ABOVE', settingsApplied: '4 categories' });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: 'G', threshold: 'BLOCK_MEDIUM_AND_ABOVE', settingsApplied: '4 categories' });
+      }
       return gSettings;
     case 'pg':
     case 'pg-13':
@@ -133,7 +138,9 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
-      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      }
       return pgSettings;
     case 'r':
     case 'nc-17':
@@ -144,7 +151,9 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' }
       ];
-      console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔒 APPLIED SAFETY SETTINGS:', { contentRating: contentRating.toUpperCase(), threshold: 'BLOCK_ONLY_HIGH', settingsApplied: '4 categories' });
+      }
       return rSettings;
     default:
       // Default: Medium filtering for safety
@@ -155,11 +164,13 @@ export function getSafetySettingsFromPrompt(prompt: string): Array<{
         { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
       ];
       
-      console.log('🔒 APPLIED SAFETY SETTINGS:', {
-        contentRating: contentRating || 'default',
-        threshold: contentRating ? getThresholdForRating(contentRating) : 'BLOCK_MEDIUM_AND_ABOVE',
-        settingsApplied: defaultSettings.length + ' categories'
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔒 APPLIED SAFETY SETTINGS:', {
+          contentRating: contentRating || 'default',
+          threshold: contentRating ? getThresholdForRating(contentRating) : 'BLOCK_MEDIUM_AND_ABOVE',
+          settingsApplied: defaultSettings.length + ' categories'
+        });
+      }
       
       return defaultSettings;
   }
