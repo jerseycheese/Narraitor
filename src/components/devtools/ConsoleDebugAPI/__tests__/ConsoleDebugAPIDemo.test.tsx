@@ -17,7 +17,12 @@ const originalEnv = process.env.NODE_ENV;
 
 describe('ConsoleDebugAPIDemo', () => {
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    // Reset NODE_ENV using Object.defineProperty
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true
+    });
     // Clean up window mock
     if (window.NARRAITOR_DEBUG) {
       delete window.NARRAITOR_DEBUG;
@@ -26,7 +31,11 @@ describe('ConsoleDebugAPIDemo', () => {
 
   describe('in production environment', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'production',
+        writable: true,
+        configurable: true
+      });
     });
 
     it('should show production environment message', () => {
@@ -46,16 +55,21 @@ describe('ConsoleDebugAPIDemo', () => {
 
   describe('in development environment', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true
+      });
       
       // Mock window with debug API
       window.NARRAITOR_DEBUG = {
         clearLogs: jest.fn(),
-        triggerError: jest.fn().mockImplementation((message: string) => {
-          throw new Error(message);
+        triggerError: jest.fn().mockImplementation((message?: string): never => {
+          throw new Error(message || 'Test error');
         }),
         simulateCondition: jest.fn().mockReturnValue('Simulated condition'),
         getStoreState: jest.fn().mockReturnValue('Store state accessed'),
+        resetStores: jest.fn().mockReturnValue('Stores reset'),
         help: jest.fn().mockReturnValue('Help text')
       };
     });
@@ -150,7 +164,11 @@ describe('ConsoleDebugAPIDemo', () => {
 
   describe('when not initialized', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', {
+        value: 'development',
+        writable: true,
+        configurable: true
+      });
       // Ensure no NARRAITOR_DEBUG on window
       delete window.NARRAITOR_DEBUG;
     });

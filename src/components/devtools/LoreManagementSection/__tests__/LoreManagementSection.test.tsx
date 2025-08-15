@@ -14,7 +14,7 @@ jest.mock('../../../../state/worldStore');
 // Create a TestWrapper for managing lore state
 const TestWrapper = () => {
   const [selectedWorld, setSelectedWorld] = React.useState<string>('');
-  const [facts, setFacts] = React.useState<Array<{ id: string; type: string; content: string; worldId: string; sessionId: string; timestamp: string; context: string }>>([]);
+  const [facts, setFacts] = React.useState<Array<{ id: string; key: string; value: string; category: string; source: string; worldId: string }>>([]);
   const [activeTab, setActiveTab] = React.useState('browse');
 
   const mockWorlds = {

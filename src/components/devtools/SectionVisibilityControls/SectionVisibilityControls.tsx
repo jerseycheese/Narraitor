@@ -125,10 +125,12 @@ export const SectionVisibilityControls = () => {
               const isVisible = isSectionVisible?.(sectionId) ?? true;
               
               return (
-                <button
+                <Button
                   key={sectionId}
                   onClick={() => handleSectionToggle(sectionId)}
-                  className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-600 flex items-center gap-2"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-600 flex items-center gap-2 justify-start h-auto"
                   data-testid={SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]}
                   role="menuitemcheckbox"
                   aria-checked={isVisible}
@@ -140,20 +142,22 @@ export const SectionVisibilityControls = () => {
                     {isVisible && <span className="text-slate-200">✓</span>}
                   </span>
                   <span>{displayName}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Footer */}
           <div className="p-2 border-t border-slate-600">
-            <button
+            <Button
               onClick={() => setIsDropdownOpen(false)}
-              className="w-full text-xs text-slate-400 hover:text-slate-200"
+              variant="ghost"
+              size="sm"
+              className="w-full text-xs text-slate-400 hover:text-slate-200 h-auto"
               data-testid="close-dropdown"
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       )}
