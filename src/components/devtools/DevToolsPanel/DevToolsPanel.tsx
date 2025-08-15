@@ -12,6 +12,8 @@ import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { TextNormalizationSection } from '../TextNormalizationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
+import { SectionVisibilityControls } from '../SectionVisibilityControls';
+import { DevToolsSection as SectionId } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -64,7 +66,7 @@ const EnvironmentInfo = () => {
  * @see /docs/devtools/extending-devtools.md for more information
  */
 export const DevToolsPanel = () => {
-  const { isOpen, toggleDevTools } = useDevTools();
+  const { isOpen, toggleDevTools, isSectionVisible } = useDevTools();
   const [mounted, setMounted] = useState(false);
   const [isTestPage, setIsTestPage] = useState(false);
   
@@ -104,15 +106,18 @@ export const DevToolsPanel = () => {
           Narraitor DevTools
           {isTestPage && ' (Test Page Mode)'}
         </div>
-        <Button
-          data-testid="devtools-panel-toggle"
-          onClick={toggleDevTools}
-          variant="ghost"
-          size="sm"
-          className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
-        >
-          {isOpen ? 'Hide DevTools' : 'Show DevTools'}
-        </Button>
+        <div className="flex gap-2 items-center">
+          {isOpen && <SectionVisibilityControls />}
+          <Button
+            data-testid="devtools-panel-toggle"
+            onClick={toggleDevTools}
+            variant="ghost"
+            size="sm"
+            className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
+          >
+            {isOpen ? 'Hide DevTools' : 'Show DevTools'}
+          </Button>
+        </div>
       </div>
 
       {/* Content area - only rendered when open */}
@@ -127,63 +132,86 @@ export const DevToolsPanel = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column: State Management */}
             <div className="space-y-4">
-              {/* State Management Group */}
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
-                  State Management
-                </h3>
-                <StateSection defaultCollapsed={true} />
-                <StateInspectorSection defaultCollapsed={true} />
-              </div>
+              {/* State Management Group - only show if any child sections are visible */}
+              {(isSectionVisible(SectionId.STATE_SECTION) || isSectionVisible(SectionId.STATE_INSPECTOR)) && (
+                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                    State Management
+                  </h3>
+                  {isSectionVisible(SectionId.STATE_SECTION) && (
+                    <StateSection defaultCollapsed={true} />
+                  )}
+                  {isSectionVisible(SectionId.STATE_INSPECTOR) && (
+                    <StateInspectorSection defaultCollapsed={true} />
+                  )}
+                </div>
+              )}
             </div>
             
             {/* Right Column: AI Tools, Test Data & Content Generation */}
             <div className="space-y-4">
-              {/* AI Tools Group */}
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
-                  AI Tools & Validation
-                </h3>
-                <div className="space-y-3">
-                  <CollapsibleSection title="AI Testing" initialCollapsed={true}>
-                    <AITestingPanel />
-                  </CollapsibleSection>
-                  
-                  <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
-                    <ConsistencyValidationSection />
-                  </CollapsibleSection>
-                  
-                  <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
-                    <TextNormalizationSection />
-                  </CollapsibleSection>
-                  
-                  <CollapsibleSection title="Lore Management" initialCollapsed={true}>
-                    <LoreManagementSection />
+              {/* AI Tools Group - only show if any child sections are visible */}
+              {(isSectionVisible(SectionId.AI_TESTING) || 
+                isSectionVisible(SectionId.CONSISTENCY_VALIDATION) || 
+                isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
+                isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
+                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                    AI Tools & Validation
+                  </h3>
+                  <div className="space-y-3">
+                    {isSectionVisible(SectionId.AI_TESTING) && (
+                      <CollapsibleSection title="AI Testing" initialCollapsed={true}>
+                        <AITestingPanel />
+                      </CollapsibleSection>
+                    )}
+                    
+                    {isSectionVisible(SectionId.CONSISTENCY_VALIDATION) && (
+                      <CollapsibleSection title="Consistency Validation" initialCollapsed={true}>
+                        <ConsistencyValidationSection />
+                      </CollapsibleSection>
+                    )}
+                    
+                    {isSectionVisible(SectionId.TEXT_NORMALIZATION) && (
+                      <CollapsibleSection title="Text Normalization" initialCollapsed={true}>
+                        <TextNormalizationSection />
+                      </CollapsibleSection>
+                    )}
+                    
+                    {isSectionVisible(SectionId.LORE_MANAGEMENT) && (
+                      <CollapsibleSection title="Lore Management" initialCollapsed={true}>
+                        <LoreManagementSection />
+                      </CollapsibleSection>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {/* Test Data Group - only show if child section is visible */}
+              {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
+                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                    Test Data & Generators
+                  </h3>
+                  <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
+                    <TestDataGeneratorSection />
                   </CollapsibleSection>
                 </div>
-              </div>
+              )}
               
-              {/* Test Data Group */}
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
-                  Test Data & Generators
-                </h3>
-                <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
-                  <TestDataGeneratorSection />
-                </CollapsibleSection>
-              </div>
-              
-              {/* Content Generation Group */}
-              <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
-                  Content Generation
-                </h3>
-                <div className="space-y-3">
-                  <PortraitDebugSection />
-                  
-                  <EndingImageDebugSection />
+              {/* Content Generation Group - only show if any child sections are visible */}
+              {(isSectionVisible(SectionId.PORTRAIT_DEBUG) || isSectionVisible(SectionId.ENDING_IMAGE_DEBUG)) && (
+                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                    Content Generation
+                  </h3>
+                  <div className="space-y-3">
+                    {isSectionVisible(SectionId.PORTRAIT_DEBUG) && <PortraitDebugSection />}
+                    
+                    {isSectionVisible(SectionId.ENDING_IMAGE_DEBUG) && <EndingImageDebugSection />}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
