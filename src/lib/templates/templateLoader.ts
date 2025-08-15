@@ -88,8 +88,7 @@ export const applyWorldTemplate = (templateOrId: WorldTemplate | string, worldNa
     return newState;
   });
 
-  // Add debug outputs for testing
-  console.log(`Applied template ${template.id} to create world ${worldId}`);
+  // Template applied successfully
   
   return worldId;
 };

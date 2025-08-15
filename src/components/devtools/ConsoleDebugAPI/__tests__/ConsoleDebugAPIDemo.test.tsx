@@ -16,13 +16,12 @@ jest.mock('@/lib/devtools/consoleDebugAPI', () => ({
 const originalEnv = process.env.NODE_ENV;
 
 describe('ConsoleDebugAPIDemo', () => {
-  beforeEach(() => {
-    // Clear any existing global state
-    delete (global as unknown as { window?: unknown }).window;
-  });
-
   afterEach(() => {
     process.env.NODE_ENV = originalEnv;
+    // Clean up window mock
+    if (window.NARRAITOR_DEBUG) {
+      delete window.NARRAITOR_DEBUG;
+    }
   });
 
   describe('in production environment', () => {
@@ -50,14 +49,14 @@ describe('ConsoleDebugAPIDemo', () => {
       process.env.NODE_ENV = 'development';
       
       // Mock window with debug API
-      (global as unknown as { window: typeof window }).window = {
-        NARRAITOR_DEBUG: {
-          clearLogs: jest.fn(),
-          triggerError: jest.fn(),
-          simulateCondition: jest.fn().mockReturnValue('Simulated condition'),
-          getStoreState: jest.fn().mockReturnValue('Store state accessed'),
-          help: jest.fn().mockReturnValue('Help text')
-        }
+      window.NARRAITOR_DEBUG = {
+        clearLogs: jest.fn(),
+        triggerError: jest.fn().mockImplementation((message: string) => {
+          throw new Error(message);
+        }),
+        simulateCondition: jest.fn().mockReturnValue('Simulated condition'),
+        getStoreState: jest.fn().mockReturnValue('Store state accessed'),
+        help: jest.fn().mockReturnValue('Help text')
       };
     });
 
@@ -152,7 +151,8 @@ describe('ConsoleDebugAPIDemo', () => {
   describe('when not initialized', () => {
     beforeEach(() => {
       process.env.NODE_ENV = 'development';
-      (global as unknown as { window: typeof window }).window = {} as typeof window; // No NARRAITOR_DEBUG
+      // Ensure no NARRAITOR_DEBUG on window
+      delete window.NARRAITOR_DEBUG;
     });
 
     it('should show not available message', () => {
