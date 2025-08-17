@@ -60,9 +60,6 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    
-    // Disable animations globally for stable visual tests
-    reducedMotion: 'reduce',
   },
 
   // Configure projects for major browsers
