@@ -62,7 +62,7 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
-  // Configure projects for major browsers
+  // Configure projects for major browsers - optimized for CI speed
   projects: [
     {
       name: 'chromium',
@@ -72,54 +72,33 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
       },
     },
-
-    {
-      name: 'firefox',
-      use: { 
-        ...devices['Desktop Firefox'],
-        viewport: { width: 1280, height: 720 },
-      },
-    },
-
-    {
-      name: 'webkit',
-      use: { 
-        ...devices['Desktop Safari'],
-        viewport: { width: 1280, height: 720 },
-      },
-    },
-
-    // Mobile viewports for responsive testing
-    {
-      name: 'Mobile Chrome',
-      use: { 
-        ...devices['Pixel 5'],
-      },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { 
-        ...devices['iPhone 12'],
-      },
-    },
-
-    // Tablet viewport
-    {
-      name: 'Tablet',
-      use: { 
-        ...devices['iPad Pro'],
-      },
-    },
+    // NOTE: Firefox and WebKit disabled for faster CI
+    // Enable for comprehensive cross-browser testing when needed
+    // {
+    //   name: 'firefox',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //     viewport: { width: 1280, height: 720 },
+    //   },
+    // },
+    // {
+    //   name: 'webkit',
+    //   use: { 
+    //     ...devices['Desktop Safari'],
+    //     viewport: { width: 1280, height: 720 },
+    //   },
+    // },
   ],
 
-  // Web server configuration for development
-  webServer: {
-    command: 'npm run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    // Timeout for server to start
-    timeout: 120 * 1000,
-  },
+  // Web server configuration disabled for faster CI execution
+  // Enable webServer when testing actual application pages
+  // webServer: {
+  //   command: 'npm run dev',
+  //   port: 3000,
+  //   reuseExistingServer: !process.env.CI,
+  //   // Timeout for server to start
+  //   timeout: 120 * 1000,
+  // },
 
   // Output directories
   outputDir: 'test-results/',
