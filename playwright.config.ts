@@ -35,7 +35,7 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
   
-  // Auto-update snapshots in CI when missing (for cross-platform compatibility)
+  // More flexible snapshot handling for cross-platform compatibility
   updateSnapshots: process.env.CI ? 'missing' : 'none',
   
   // Opt out of parallel tests on CI
