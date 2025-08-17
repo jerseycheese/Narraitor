@@ -93,15 +93,14 @@ export default defineConfig({
     // },
   ],
 
-  // Web server configuration disabled for faster CI execution
-  // Enable webServer when testing actual application pages
-  // webServer: {
-  //   command: 'npm run dev',
-  //   port: 3000,
-  //   reuseExistingServer: !process.env.CI,
-  //   // Timeout for server to start
-  //   timeout: 120 * 1000,
-  // },
+  // Web server configuration for testing actual application pages
+  webServer: {
+    command: 'npm run dev',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+    // Timeout for server to start
+    timeout: 120 * 1000,
+  },
 
   // Output directories
   outputDir: 'test-results/',
