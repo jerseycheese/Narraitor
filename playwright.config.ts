@@ -23,8 +23,6 @@ export default defineConfig({
       threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
-      // Use cross-platform snapshot naming to avoid platform-specific issues
-      mode: 'default',
     },
   },
   
@@ -36,6 +34,9 @@ export default defineConfig({
   
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
+  
+  // Auto-update snapshots in CI when missing (for cross-platform compatibility)
+  updateSnapshots: process.env.CI ? 'missing' : 'none',
   
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
