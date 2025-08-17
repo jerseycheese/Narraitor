@@ -23,6 +23,8 @@ export default defineConfig({
       threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
+      // Use cross-platform snapshot naming to avoid platform-specific issues
+      mode: 'default',
     },
   },
   
