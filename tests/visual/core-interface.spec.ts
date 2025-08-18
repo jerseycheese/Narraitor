@@ -7,13 +7,46 @@ import { test, expect } from '@playwright/test';
  * Tests key pages and components to catch visual regressions in the main user flows.
  */
 
+/**
+ * Wait for the Narraitor application to be fully loaded and ready
+ */
+async function waitForAppReady(page) {
+  // Wait for page to fully load
+  await page.waitForLoadState('networkidle');
+  
+  // Wait for any loading states to disappear
+  try {
+    await page.waitForSelector('text=Loading...', { state: 'hidden', timeout: 45000 });
+  } catch (e) {
+    // If no loading text found, continue - app might already be loaded
+  }
+  
+  // Check for React root to be hydrated
+  try {
+    await page.waitForFunction(() => {
+      // Check if React has loaded
+      return window.React !== undefined || document.querySelector('[data-reactroot]') !== null;
+    }, { timeout: 15000 });
+  } catch (e) {
+    // Continue if React detection fails
+  }
+  
+  // Wait for main navigation or content to appear
+  try {
+    await page.waitForSelector('nav, main, h1, [data-testid]', { timeout: 15000 });
+  } catch (e) {
+    // Continue if no standard elements found
+  }
+  
+  // Additional wait for React hydration and dynamic content
+  await page.waitForTimeout(3000);
+}
+
 test.describe('Narraitor Core Interface Visual Tests', () => {
   test('landing page layout and navigation', async ({ page }) => {
     // Navigate to the main landing page
     await page.goto('/');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Take full page screenshot of landing page
     await expect(page).toHaveScreenshot('landing-page-full.png', {
@@ -31,10 +64,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('worlds listing and cards layout', async ({ page }) => {
     // Navigate to worlds page
     await page.goto('/worlds');
-    
-    // Wait for page to fully load and any data to render
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000); // Additional wait for any async data loading
+    await waitForAppReady(page);
     
     // Take full page screenshot
     await expect(page).toHaveScreenshot('worlds-page-full.png', {
@@ -52,10 +82,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('characters listing and creation flow', async ({ page }) => {
     // Navigate to characters page
     await page.goto('/characters');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take full page screenshot
     await expect(page).toHaveScreenshot('characters-page-full.png', {
@@ -73,10 +100,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('world creation wizard interface', async ({ page }) => {
     // Navigate to world creation
     await page.goto('/world/create');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of initial wizard step
     await expect(page).toHaveScreenshot('world-creation-wizard-start.png', {
@@ -94,10 +118,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('character creation interface', async ({ page }) => {
     // Navigate to character creation
     await page.goto('/characters/create');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of character creation form
     await expect(page).toHaveScreenshot('character-creation-form.png', {

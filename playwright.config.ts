@@ -10,8 +10,8 @@ export default defineConfig({
   // Test directory for visual regression tests
   testDir: './tests/visual',
   
-  // Global timeout for each test
-  timeout: 30 * 1000,
+  // Global timeout for each test (increased for app loading)
+  timeout: 60 * 1000,
   
   // Expect timeout for assertions
   expect: {
@@ -55,9 +55,9 @@ export default defineConfig({
     // Base URL for all tests
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     
-    // Browser settings for consistent screenshots
-    actionTimeout: 10 * 1000,
-    navigationTimeout: 30 * 1000,
+    // Browser settings for consistent screenshots (increased for app loading)
+    actionTimeout: 15 * 1000,
+    navigationTimeout: 45 * 1000,
     
     // Visual consistency settings
     trace: 'on-first-retry',
@@ -95,11 +95,15 @@ export default defineConfig({
 
   // Web server configuration for testing actual application pages
   webServer: {
-    command: 'npm run dev',
+    command: 'npm start',
     port: 3000,
     reuseExistingServer: !process.env.CI,
-    // Timeout for server to start
-    timeout: 120 * 1000,
+    // Increased timeout for server to start (especially in CI and app build)
+    timeout: 240 * 1000,
+    // Ensure server is fully ready before tests start
+    env: {
+      NODE_ENV: 'production',
+    },
   },
 
   // Output directories

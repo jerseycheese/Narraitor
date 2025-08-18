@@ -8,14 +8,46 @@ import { test, expect } from '@playwright/test';
  * primary user experience of Narraitor.
  */
 
+/**
+ * Wait for the Narraitor application to be fully loaded and ready
+ */
+async function waitForAppReady(page) {
+  // Wait for page to fully load
+  await page.waitForLoadState('networkidle');
+  
+  // Wait for any loading states to disappear
+  try {
+    await page.waitForSelector('text=Loading...', { state: 'hidden', timeout: 45000 });
+  } catch (e) {
+    // If no loading text found, continue - app might already be loaded
+  }
+  
+  // Check for React root to be hydrated
+  try {
+    await page.waitForFunction(() => {
+      // Check if React has loaded
+      return window.React !== undefined || document.querySelector('[data-reactroot]') !== null;
+    }, { timeout: 15000 });
+  } catch (e) {
+    // Continue if React detection fails
+  }
+  
+  // Wait for main navigation or content to appear
+  try {
+    await page.waitForSelector('nav, main, h1, [data-testid]', { timeout: 15000 });
+  } catch (e) {
+    // Continue if no standard elements found
+  }
+  
+  // Additional wait for React hydration and dynamic content
+  await page.waitForTimeout(3000);
+}
+
 test.describe('Game Session Visual Interface Tests', () => {
   test('game session startup and loading states', async ({ page }) => {
     // Navigate to the play page
     await page.goto('/play');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of play page initial state
     await expect(page).toHaveScreenshot('play-page-initial.png', {
@@ -33,10 +65,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('narrative display and text formatting', async ({ page }) => {
     // Use dev harness for testing narrative components
     await page.goto('/dev/game-session');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of game session test harness
     await expect(page).toHaveScreenshot('game-session-dev-harness.png', {
@@ -60,10 +89,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('game controls and interface elements', async ({ page }) => {
     // Test dev tools interface for game controls
     await page.goto('/dev/devtools-test');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of dev tools test interface
     await expect(page).toHaveScreenshot('devtools-test-interface.png', {
@@ -81,10 +107,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('journal and progress tracking interface', async ({ page }) => {
     // Test journal access dev interface
     await page.goto('/dev/journal-access');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of journal interface
     await expect(page).toHaveScreenshot('journal-interface.png', {
@@ -102,10 +125,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('ending and completion screens', async ({ page }) => {
     // Test ending screen interface
     await page.goto('/dev/ending-screen');
-    
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
     
     // Take screenshot of ending screen
     await expect(page).toHaveScreenshot('ending-screen-interface.png', {
