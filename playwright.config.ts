@@ -35,20 +35,16 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
   
-  // More flexible snapshot handling for cross-platform compatibility
-  updateSnapshots: process.env.CI ? 'missing' : 'none',
+  // Snapshot handling - create missing snapshots only in CI
+  updateSnapshots: 'missing',
   
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
   
   // Reporter configuration
-  reporter: [
-    ['html'],
-    // Add JUnit reporter for CI integration
-    ['junit', { outputFile: 'test-results/visual-tests.xml' }],
-    // Add line reporter for development
-    ['line'],
-  ],
+  reporter: process.env.CI 
+    ? [['github'], ['html']]
+    : [['list'], ['html']],
   
   // Global test setup
   use: {
@@ -95,14 +91,14 @@ export default defineConfig({
 
   // Web server configuration for testing actual application pages
   webServer: {
-    command: 'npm start',
+    command: 'npm run dev',
     port: 3000,
     reuseExistingServer: !process.env.CI,
     // Increased timeout for server to start (especially in CI and app build)
     timeout: 240 * 1000,
     // Ensure server is fully ready before tests start
     env: {
-      NODE_ENV: 'production',
+      NODE_ENV: 'development',
     },
   },
 
