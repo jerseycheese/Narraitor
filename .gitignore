@@ -8,6 +8,12 @@ node_modules
 # testing
 /coverage
 
+# playwright
+/playwright-report/
+/test-results/
+/data/
+index.html
+
 # next.js
 /.next/
 /out/
