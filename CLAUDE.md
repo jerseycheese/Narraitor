@@ -83,8 +83,6 @@ Documentation should sound like explaining something to a colleague, not writing
 - **Keep it practical**: Focus on implementation over theory
 - **Reasonable length**: 150 lines target, 300 max: if it's longer, split it up
 
-For all documentation and technical writing, use `docs/voice-writing-profile.md` for voice and style guidelines.
-
 ## GitHub Workflow
 - Always link commits to issues
 - Use semantic commit messages
