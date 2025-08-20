@@ -34,7 +34,9 @@ jobs:
         if [ -n "$(git status --porcelain tests/visual)" ]; then
           git add tests/visual/**/*-linux.png
           git commit -m "ci: Update Linux snapshots from Playwright tests"
-          git push origin HEAD:${{ github.head_ref }}
+          git fetch origin
+          git rebase origin/${{ github.head_ref }} || echo "Rebase conflicts, using force push"
+          git push origin HEAD:${{ github.head_ref }} --force-with-lease
         else
           echo "No snapshot changes to commit"
         fi
