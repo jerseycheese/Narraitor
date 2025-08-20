@@ -17,10 +17,10 @@ export default defineConfig({
   expect: {
     // Visual comparison settings
     toHaveScreenshot: {
-      // Allow more pixels difference to handle cross-platform rendering variations
-      maxDiffPixels: 500,
-      // Threshold for pixel comparison (0.3 = 30% tolerance for cross-platform)
-      threshold: 0.3,
+      // Increased tolerance for cross-platform font rendering differences
+      maxDiffPixels: 1000,
+      // Higher threshold to handle Linux vs Darwin font differences
+      threshold: 0.4,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
     },
@@ -35,8 +35,8 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
   
-  // Snapshot handling - create missing snapshots in CI, ignore platform differences
-  updateSnapshots: process.env.CI ? 'missing' : 'missing',
+  // Snapshot handling - compare against Darwin snapshots only
+  updateSnapshots: process.env.CI ? 'none' : 'missing',
   
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
