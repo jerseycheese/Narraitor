@@ -4,6 +4,9 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   test:
     timeout-minutes: 60
