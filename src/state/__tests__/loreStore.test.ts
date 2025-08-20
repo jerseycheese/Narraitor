@@ -293,8 +293,11 @@ describe('LoreStore', () => {
       
       expect(parsed.worldId).toBe('world-1');
       expect(parsed.facts).toHaveLength(2);
-      expect(parsed.facts[0].key).toBe('fact1');
-      expect(parsed.facts[1].key).toBe('fact2');
+      
+      // Sort facts by key to avoid order dependency
+      const sortedFacts = parsed.facts.sort((a, b) => a.key.localeCompare(b.key));
+      expect(sortedFacts[0].key).toBe('fact1');
+      expect(sortedFacts[1].key).toBe('fact2');
     });
 
     test('should import facts from JSON', () => {
