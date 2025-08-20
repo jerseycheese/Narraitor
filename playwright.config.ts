@@ -95,13 +95,14 @@ export default defineConfig({
   // Web server configuration for testing actual application pages
   webServer: {
     command: 'npm run dev',
-    port: 3000,
+    url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     // Increased timeout for server to start (especially in CI and app build)
     timeout: 240 * 1000,
     // Ensure server is fully ready before tests start
     env: {
       NODE_ENV: 'development',
+      PORT: '3000',
     },
   },
 
