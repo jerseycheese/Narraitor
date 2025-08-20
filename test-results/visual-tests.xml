@@ -1,8 +1,0 @@
-<testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="0.960916">
-<testsuite name="basic-snapshots.spec.ts" timestamp="2025-08-17T21:34:25.084Z" hostname="chromium" tests="2" failures="0" skipped="0" time="0.757" errors="0">
-<testcase name="Basic Visual Snapshots › basic page snapshot" classname="basic-snapshots.spec.ts" time="0.384">
-</testcase>
-<testcase name="Basic Visual Snapshots › simple element snapshot" classname="basic-snapshots.spec.ts" time="0.373">
-</testcase>
-</testsuite>
-</testsuites>

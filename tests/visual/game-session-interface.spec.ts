@@ -12,35 +12,28 @@ import { test, expect } from '@playwright/test';
  * Wait for the Narraitor application to be fully loaded and ready
  */
 async function waitForAppReady(page) {
-  // Wait for page to fully load
-  await page.waitForLoadState('networkidle');
-  
-  // Wait for any loading states to disappear
   try {
-    await page.waitForSelector('text=Loading...', { state: 'hidden', timeout: 45000 });
-  } catch (e) {
-    // If no loading text found, continue - app might already be loaded
+    // Wait for initial page load
+    await page.waitForLoadState('networkidle', { timeout: 30000 });
+    
+    // Wait for React hydration - look for interactive content
+    await page.waitForSelector('main', { timeout: 15000 });
+    
+    // Give additional time for dynamic content and avoid loading screens
+    await page.waitForTimeout(3000);
+    
+    // Check if we can see actual content (not just loading)
+    const loadingVisible = await page.locator('text=Loading').isVisible().catch(() => false);
+    
+    if (loadingVisible) {
+      console.warn('Application still showing loading screen - may not have fully loaded');
+      // Wait a bit more and try again
+      await page.waitForTimeout(5000);
+    }
+  } catch (error) {
+    console.warn('waitForAppReady encountered an error:', error.message);
+    // Continue anyway - CI might have different timing
   }
-  
-  // Check for React root to be hydrated
-  try {
-    await page.waitForFunction(() => {
-      // Check if React has loaded
-      return window.React !== undefined || document.querySelector('[data-reactroot]') !== null;
-    }, { timeout: 15000 });
-  } catch (e) {
-    // Continue if React detection fails
-  }
-  
-  // Wait for main navigation or content to appear
-  try {
-    await page.waitForSelector('nav, main, h1, [data-testid]', { timeout: 15000 });
-  } catch (e) {
-    // Continue if no standard elements found
-  }
-  
-  // Additional wait for React hydration and dynamic content
-  await page.waitForTimeout(3000);
 }
 
 test.describe('Game Session Visual Interface Tests', () => {

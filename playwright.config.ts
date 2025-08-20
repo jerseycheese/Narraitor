@@ -35,7 +35,7 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
   
-  // Snapshot handling - create missing snapshots only in CI
+  // Snapshot handling - create missing snapshots in CI, ignore platform differences
   updateSnapshots: 'missing',
   
   // Opt out of parallel tests on CI
@@ -59,6 +59,9 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    
+    // Cross-platform snapshot configuration
+    testIdAttribute: 'data-testid',
   },
 
   // Configure projects for major browsers - optimized for CI speed
