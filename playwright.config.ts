@@ -36,7 +36,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   
   // Snapshot handling - create missing snapshots in CI, ignore platform differences
-  updateSnapshots: 'missing',
+  updateSnapshots: process.env.CI ? 'missing' : 'missing',
   
   // Opt out of parallel tests on CI
   workers: process.env.CI ? 1 : undefined,
