@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DevToolsProvider } from "@/components/devtools";
 import { ClientOnlyDevTools } from "@/components/ClientOnlyDevTools";
@@ -11,12 +11,13 @@ import { ToastProvider, Toaster } from "@/components/ui/toast";
 export const metadata: Metadata = {
   title: "Narraitor",
   description: "A narrative-driven RPG framework using AI",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 interface RootLayoutProps {
