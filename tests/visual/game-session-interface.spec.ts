@@ -19,6 +19,16 @@ async function waitForAppReady(page) {
     // Wait for React hydration - look for interactive content
     await page.waitForSelector('main', { timeout: 15000 });
     
+    // Wait for fonts to load - critical for consistent cross-platform screenshots
+    await page.waitForFunction(() => {
+      return document.fonts.ready;
+    }, { timeout: 10000 }).catch(() => {
+      console.warn('Font loading timeout - continuing anyway');
+    });
+    
+    // Additional wait for font rendering to stabilize
+    await page.waitForTimeout(2000);
+    
     // Give additional time for dynamic content and avoid loading screens
     await page.waitForTimeout(3000);
     
