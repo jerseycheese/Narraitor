@@ -17,10 +17,10 @@ export default defineConfig({
   expect: {
     // Visual comparison settings
     toHaveScreenshot: {
-      // Increased tolerance for cross-platform font rendering differences
-      maxDiffPixels: 1000,
-      // Higher threshold to handle Linux vs Darwin font differences
-      threshold: 0.4,
+      // Tolerance for minor rendering differences on Darwin platform
+      maxDiffPixels: 500,
+      // Consistent threshold for Darwin-only snapshot comparisons
+      threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
     },
@@ -35,7 +35,7 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
   
-  // Snapshot handling - compare against Darwin snapshots only
+  // Snapshot handling - Darwin-only strategy for consistent visual comparisons
   updateSnapshots: process.env.CI ? 'none' : 'missing',
   
   // Opt out of parallel tests on CI
@@ -63,9 +63,9 @@ export default defineConfig({
     // Cross-platform snapshot configuration
     testIdAttribute: 'data-testid',
     
-    // Force consistent font rendering across platforms
+    // Force consistent font rendering on Darwin platform
     extraHTTPHeaders: {
-      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     },
   },
 
