@@ -186,7 +186,7 @@ TASK FOR VERIFICATION COORDINATOR:
 Coordinate comprehensive automated testing.
 
 OBJECTIVES:
-1. Run BrowserMCP automated testing suite
+1. Run Playwright automated testing suite
 2. Execute Three-Stage Verification process
 3. Analyze verification reports for critical issues
 4. Generate comprehensive findings report
@@ -199,8 +199,8 @@ THREE-STAGE VERIFICATION:
 - Stage 3: System Integration (full context, real data)
 
 TOOLS TO USE:
-- ./scripts/browsermcp-verify.sh for automated testing
-- Browser MCP tools for interactive testing
+- ./scripts/playwright-verify.sh for automated testing
+- Playwright MCP tools for interactive testing
 - Screenshot and content analysis tools
 
 DELIVERABLES:

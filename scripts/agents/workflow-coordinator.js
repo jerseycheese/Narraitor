@@ -190,12 +190,12 @@ Focus on integration points and ensure all components work together seamlessly w
         description: 'Coordinate comprehensive automated testing',
         template: `You are a Verification Coordinator subagent responsible for comprehensive testing. Your task is to:
 
-1. Coordinate BrowserMCP automated testing suite for issue #{issueNumber}
+1. Coordinate Playwright automated testing suite for issue #{issueNumber}
 2. Run Three-Stage Verification process:
    - Stage 1: Storybook Testing (component isolation, visual verification, interactions)
    - Stage 2: Test Harness Verification (integration testing, realistic data, edge cases)  
    - Stage 3: System Integration (full application context, real data, cross-component interactions)
-3. Use the existing ./scripts/browsermcp-verify.sh script with appropriate parameters
+3. Use the existing ./scripts/playwright-verify.sh script with appropriate parameters
 4. Analyze verification reports for critical issues requiring immediate attention
 5. Generate comprehensive findings report with specific recommendations
 6. Return verification status and prioritized list of any fixes needed

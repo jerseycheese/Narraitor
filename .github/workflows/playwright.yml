@@ -1,0 +1,48 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Configure Git for snapshots
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+    - name: Run Playwright tests
+      run: npx playwright test --update-snapshots
+    - name: Commit updated snapshots
+      run: |
+        if [ -n "$(git status --porcelain tests/visual)" ]; then
+          git add tests/visual/**/*-linux.png
+          git commit -m "ci: Update Linux snapshots from Playwright tests"
+          git fetch origin
+          git rebase origin/${{ github.head_ref }} || echo "Rebase conflicts, using force push"
+          git push origin HEAD:${{ github.head_ref }} --force-with-lease
+        else
+          echo "No snapshot changes to commit"
+        fi
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

@@ -161,17 +161,17 @@ Please mark "Automated Verification Phase" as in_progress and use the Task tool 
 Description: Coordinate comprehensive automated testing
 Prompt: You are a Verification Coordinator subagent responsible for comprehensive testing. Your task is to:
 
-1. Coordinate BrowserMCP automated testing suite for issue #591
+1. Coordinate Playwright automated testing suite for issue #591
 2. Run Three-Stage Verification process:
    - Stage 1: Storybook Testing (component isolation, visual verification, interactions)
    - Stage 2: Test Harness Verification (integration testing, realistic data, edge cases)  
    - Stage 3: System Integration (full application context, real data, cross-component interactions)
-3. Use the existing ./scripts/browsermcp-verify.sh script with appropriate parameters
+3. Use the existing ./scripts/playwright-verify.sh script with appropriate parameters
 4. Analyze verification reports for critical issues requiring immediate attention
 5. Generate comprehensive findings report with specific recommendations
 6. Return verification status and prioritized list of any fixes needed
 
-Run: ./scripts/browsermcp-verify.sh 591 full
+Run: ./scripts/playwright-verify.sh 591 full
 
 Focus on identifying blocking issues that prevent the feature from meeting acceptance criteria.
 ```
