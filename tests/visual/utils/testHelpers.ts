@@ -59,14 +59,39 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
     // Give additional time for dynamic content and avoid loading screens
     await page.waitForTimeout(3000);
     
-    // Check if we can see actual content (not just loading)
-    const loadingVisible = await page.locator('text=Loading').isVisible().catch(() => false);
+    // Wait for loading states to disappear (AI content generation can take time)
+    console.log('Waiting for loading states to disappear...');
     
-    if (loadingVisible) {
-      console.warn('Application still showing loading screen - may not have fully loaded');
-      // Wait a bit more and try again
-      await page.waitForTimeout(5000);
-    }
+    // Wait for "Loading..." text to disappear (up to 30 seconds for AI generation)
+    await page.waitForFunction(() => {
+      const loadingElements = document.querySelectorAll('*');
+      for (let elem of loadingElements) {
+        if (elem.textContent && elem.textContent.includes('Loading')) {
+          return false;
+        }
+      }
+      return true;
+    }, { timeout: 30000 }).catch(() => {
+      console.warn('Loading text still visible after 30s timeout');
+    });
+    
+    // Wait for "Thinking up some options..." to disappear
+    await page.waitForFunction(() => {
+      const thinkingElements = document.querySelectorAll('*');
+      for (let elem of thinkingElements) {
+        if (elem.textContent && elem.textContent.includes('Thinking up some options')) {
+          return false;
+        }
+      }
+      return true;
+    }, { timeout: 30000 }).catch(() => {
+      console.warn('AI choice generation still in progress after 30s timeout');
+    });
+    
+    // Additional wait for final content stabilization
+    await page.waitForTimeout(2000);
+    
+    console.log('Game session appears to be fully loaded');
   } catch (error) {
     console.warn('waitForGameSessionReady encountered an error:', error instanceof Error ? error.message : 'Unknown error');
     // Continue anyway - CI might have different timing
