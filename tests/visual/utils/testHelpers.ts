@@ -37,7 +37,7 @@ export async function waitForAppReady(page: Page): Promise<void> {
     // Additional wait for font rendering to stabilize
     await page.waitForTimeout(2000);
   } catch (error) {
-    console.warn('waitForAppReady encountered an error:', error.message);
+    console.warn('waitForAppReady encountered an error:', error instanceof Error ? error.message : 'Unknown error');
     // Continue anyway - CI might have different timing
   }
 }
@@ -68,7 +68,7 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
       await page.waitForTimeout(5000);
     }
   } catch (error) {
-    console.warn('waitForGameSessionReady encountered an error:', error.message);
+    console.warn('waitForGameSessionReady encountered an error:', error instanceof Error ? error.message : 'Unknown error');
     // Continue anyway - CI might have different timing
   }
 }
