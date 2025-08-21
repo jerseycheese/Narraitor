@@ -35,7 +35,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
               {/* Toast notification system - provides context for all toast notifications */}
               <ToastProvider>
                 <Navigation />
-                <main id="main-content" tabIndex={-1} className="min-h-screen pb-12 md:pb-14">
+                <main 
+                  id="main-content" 
+                  tabIndex={-1} 
+                  className={`min-h-screen pb-12 md:pb-14 ${
+                    process.env.NODE_ENV === 'development' ? 'pt-12' : ''
+                  }`}
+                >
                   {children}
                 </main>
                 {/* Only render dev tools in development */}
