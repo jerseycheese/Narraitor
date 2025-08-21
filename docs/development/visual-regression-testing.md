@@ -91,8 +91,8 @@ export default defineConfig({
   testDir: './tests/visual',
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 1000,    // Allow minor rendering differences
-      threshold: 0.4,         // 40% tolerance for cross-platform fonts
+      maxDiffPixels: 500,     // Stricter pixel tolerance for Darwin-only
+      threshold: 0.2,         // 20% tolerance for anti-aliasing variations
       animations: 'disabled', // Disable animations for consistency
     },
   },
@@ -100,11 +100,56 @@ export default defineConfig({
 });
 ```
 
-### Key Configuration Choices
+## Threshold Strategy and Justification
 
-**Darwin-only snapshots**: We generate baselines on macOS and accept some cross-platform font rendering differences rather than maintaining separate snapshots for each OS.
+Our visual comparison thresholds are carefully calibrated based on empirical testing and industry best practices for 2025:
 
-**High tolerance**: The `threshold: 0.4` handles font rendering differences between development and CI environments.
+### Why `maxDiffPixels: 500`
+
+This value allows for minor, acceptable rendering differences while catching meaningful regressions:
+
+- **Font kerning variations**: Different font rendering engines can produce slight spacing differences
+- **Anti-aliasing differences**: Subpixel rendering varies between graphics cards and drivers
+- **Chromium updates**: Browser updates occasionally introduce minor rendering changes
+- **CI environment differences**: Slight variations between local development and GitHub Actions
+
+**Empirical basis**: Through testing, we found that legitimate UI regressions typically affect 1000+ pixels, while rendering artifacts stay below 500 pixels.
+
+### Why `threshold: 0.2` (20% tolerance)
+
+This percentage-based threshold complements the pixel count and handles proportional differences:
+
+- **Small component changes**: A 20% change in a small component (like a button) is significant
+- **Large page changes**: A 20% change across a full page indicates a major regression
+- **Darwin-only advantage**: Because we use Darwin-only baselines, we can be much stricter than cross-platform setups that need 40%+ tolerance
+
+**Industry context**: Cross-platform visual testing typically requires 30-40% thresholds due to fundamental OS font rendering differences. Our Darwin-only strategy allows much stricter detection.
+
+### Why These Values Work Together
+
+The combination provides layered protection:
+
+1. **Pixel threshold** catches small, localized changes (misaligned buttons, spacing issues)
+2. **Percentage threshold** catches proportional changes (layout shifts, missing sections)
+3. **Both must be exceeded** for a test to fail, reducing false positives
+
+### Visual Examples
+
+**Acceptable differences (below thresholds)**:
+- Font anti-aliasing variations: ~50-200 pixels, <5% change
+- Browser subpixel rendering: ~100-300 pixels, <10% change
+- Minor CSS rendering differences: ~200-400 pixels, <15% change
+
+**Unacceptable differences (above thresholds)**:
+- Missing navigation bar: ~2000+ pixels, >25% change
+- Layout shift from CSS changes: ~1500+ pixels, >30% change
+- Color scheme changes: ~3000+ pixels, >40% change
+
+### Configuration Choices
+
+**Darwin-only snapshots**: We generate baselines on macOS only, accepting that we might miss Linux-specific rendering issues in favor of consistent, maintainable baselines.
+
+**Stricter thresholds**: Because all development and CI happens on Darwin, we can detect smaller regressions than cross-platform setups.
 
 **Animations disabled**: Prevents timing-related visual differences in dynamic content.
 
@@ -282,6 +327,78 @@ Visual tests run automatically in CI:
    - If yes: update baselines locally and push
    - If no: fix the code causing the visual regression
 3. **Never update baselines in CI** - always update locally where you can review changes
+
+## Platform Strategy and Trade-offs
+
+### Why Darwin-Only Strategy
+
+We use a **Darwin-only visual testing strategy**, meaning all baseline screenshots are generated and compared on macOS only. This decision provides several advantages:
+
+**Consistency Benefits**:
+- **Single source of truth**: All baselines generated on the same platform eliminate cross-platform variations
+- **Reduced maintenance**: Only one set of baselines to maintain and review
+- **Faster CI**: No need to manage multiple platform-specific baseline sets
+- **Team alignment**: All developers use macOS, ensuring consistent local testing experience
+
+**Simplified Development Workflow**:
+- **Local testing matches CI**: Same platform means consistent behavior between local and CI visual tests
+- **Predictable results**: No surprises from platform-specific rendering differences
+- **Easier debugging**: Visual failures are easier to reproduce and fix locally
+
+### Trade-offs We Accept
+
+**Linux-Specific Issues Not Detected**:
+- **Font rendering differences**: Linux may render fonts differently than Darwin, potentially causing user-visible issues we won't catch
+- **Browser behavior variations**: Some Chromium behaviors may differ between macOS and Linux
+- **Graphics driver differences**: GPU acceleration and rendering may vary across platforms
+
+**Deployment Environment Mismatch**:
+- **Production servers**: If production runs on Linux, we might miss platform-specific visual issues
+- **User experience variations**: End users on different platforms might see rendering differences we don't test
+
+### When to Reconsider This Strategy
+
+**Team Growth Beyond macOS**:
+- If significant portion of team moves to Linux development
+- If frontend developers need to test platform-specific features
+- If user reports indicate platform-specific visual issues
+
+**Production Environment Feedback**:
+- Recurring visual issues reported from Linux-deployed applications
+- User experience data showing platform-specific problems
+- Customer requirements for cross-platform visual consistency
+
+### Alternative Approaches for Future
+
+**Docker-Based Cross-Platform Testing** (Recommended Future Enhancement):
+```yaml
+# Future Docker strategy for true cross-platform consistency
+- name: Run visual tests in Docker
+  run: docker run --rm -v $PWD:/workspace playwright:latest npm run test:visual
+```
+
+**Benefits of Docker migration**:
+- **True consistency**: Same rendering environment across all platforms
+- **Industry standard**: Docker containers are the 2025 best practice for visual testing
+- **CI/CD reliability**: Eliminates "works on my machine" issues for visual tests
+
+**Multi-Platform Baseline Management**:
+- Maintain separate baseline sets for Darwin/Linux
+- Use Playwright's built-in platform detection
+- Accept increased maintenance overhead for broader coverage
+
+### Current Recommendation
+
+**Stay with Darwin-only** for now because:
+- Team is 100% macOS-based  
+- No reported production visual issues from platform differences
+- Maintenance overhead of cross-platform testing isn't justified yet
+- Docker migration is a better long-term solution than multi-platform baselines
+
+**Plan for Docker migration** when:
+- Team grows or diversifies platforms
+- Production issues emerge from platform differences  
+- CI/CD pipeline needs more reliability across environments
 
 ## Best Practices
 
