@@ -2,7 +2,7 @@
 title: Visual Regression Testing with Playwright
 tags: [testing, playwright, visual-testing, ci-cd]
 created: 2025-08-20
-updated: 2025-08-20
+updated: 2025-08-21
 ---
 
 # Visual Regression Testing with Playwright
@@ -91,8 +91,8 @@ export default defineConfig({
   testDir: './tests/visual',
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 500,     // Stricter pixel tolerance for Darwin-only
-      threshold: 0.2,         // 20% tolerance for anti-aliasing variations
+      maxDiffPixels: 2000,    // Global default for most tests
+      threshold: 0.3,         // 30% tolerance for general cases
       animations: 'disabled', // Disable animations for consistency
     },
   },
@@ -100,32 +100,51 @@ export default defineConfig({
 });
 ```
 
-## Threshold Strategy and Justification
+## Split Testing Strategy (2025 Best Practice)
 
-Our visual comparison thresholds are carefully calibrated based on empirical testing and industry best practices for 2025:
+We use different tolerance levels depending on content type, following 2025 best practices for AI-driven applications:
 
-### Why `maxDiffPixels: 500`
+### Dynamic Content Tests (AI/Variable Content)
 
-This value allows for minor, acceptable rendering differences while catching meaningful regressions:
+**Configuration**:
+```typescript
+await expect(page).toHaveScreenshot('game-session-dynamic.png', {
+  mask: dynamicContentAreas,        // Hide AI-generated content
+  maxDiffPixels: 410000,           // High tolerance for content variation
+  threshold: 0.46                  // 46% tolerance for environment differences
+});
+```
 
-- **Font kerning variations**: Different font rendering engines can produce slight spacing differences
-- **Anti-aliasing differences**: Subpixel rendering varies between graphics cards and drivers
-- **Chromium updates**: Browser updates occasionally introduce minor rendering changes
-- **CI environment differences**: Slight variations between local development and GitHub Actions
+**Use for**:
+- Pages with AI-generated narratives, choices, or content
+- Screens with timestamps, session IDs, or user-specific data
+- Full-page screenshots that include dynamic elements
 
-**Empirical basis**: Through testing, we found that legitimate UI regressions typically affect 1000+ pixels, while rendering artifacts stay below 500 pixels.
+### Static UI Tests (Stable Components)
 
-### Why `threshold: 0.2` (20% tolerance)
+**Configuration**:
+```typescript
+await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
+  maxDiffPixels: 500,              // Low tolerance for static elements  
+  threshold: 0.2                   // 20% tolerance - catch real regressions
+});
+```
 
-This percentage-based threshold complements the pixel count and handles proportional differences:
+**Use for**:
+- Navigation components, headers, footers
+- Form layouts and input components
+- Button states and UI controls
+- Component-level screenshots
 
-- **Small component changes**: A 20% change in a small component (like a button) is significant
-- **Large page changes**: A 20% change across a full page indicates a major regression
-- **Darwin-only advantage**: Because we use Darwin-only baselines, we can be much stricter than cross-platform setups that need 40%+ tolerance
+### Threshold Strategy Rationale
 
-**Industry context**: Cross-platform visual testing typically requires 30-40% thresholds due to fundamental OS font rendering differences. Our Darwin-only strategy allows much stricter detection.
+**Why split approaches work better**:
+- **AI content varies significantly** between test runs, requiring high tolerance
+- **Static UI should be stable**, allowing strict regression detection
+- **Masking dynamic areas** focuses tests on layout structure, not content accuracy
+- **Environment differences** are handled appropriately for each content type
 
-### Why These Values Work Together
+**Industry context**: Traditional visual testing uses uniform thresholds (20-30%), but AI-driven applications need content-aware strategies to balance stability with meaningful regression detection.
 
 The combination provides layered protection:
 

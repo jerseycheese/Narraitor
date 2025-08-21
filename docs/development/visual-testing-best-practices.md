@@ -2,7 +2,7 @@
 title: Visual Testing Best Practices
 tags: [testing, best-practices, visual-testing, playwright, guidelines]
 created: 2025-08-20
-updated: 2025-08-20
+updated: 2025-08-21
 ---
 
 # Visual Testing Best Practices
@@ -26,6 +26,42 @@ This guide provides practical guidelines for writing and maintaining effective v
 - **Internal admin interfaces**: Unless visual consistency is business-critical
 
 ## Writing Effective Visual Tests
+
+### Split Testing Strategy (2025 Best Practice)
+
+**Use different tolerance levels for different content types**:
+
+```typescript
+test('AI content with permissive thresholds', async ({ page }) => {
+  // For pages with AI-generated content that varies between runs
+  const dynamicContentAreas = [
+    page.locator('p').filter({ hasText: /The .* (adventure|quest|journey)/ }),
+    page.locator('[role="radiogroup"] label'), // AI-generated choices
+  ];
+  
+  await expect(page).toHaveScreenshot('game-session-dynamic.png', {
+    mask: dynamicContentAreas,
+    maxDiffPixels: 410000,  // High tolerance for AI content variation
+    threshold: 0.46         // 46% tolerance for environment differences
+  });
+});
+
+test('static UI with strict thresholds', async ({ page }) => {
+  // For stable UI components that should not change
+  const staticComponent = page.locator('[data-testid="navigation-header"]');
+  
+  await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
+    maxDiffPixels: 500,     // Low tolerance for static elements
+    threshold: 0.2          // 20% tolerance - catch real regressions
+  });
+});
+```
+
+**Key principles**:
+- **AI/Dynamic content**: Use permissive thresholds (40-50%) with content masking
+- **Static UI elements**: Use strict thresholds (10-20%) to catch real regressions
+- **Mask dynamic areas**: Hide timestamps, session IDs, and AI-generated text
+- **Focus on structure**: Test layout and UI components, not content accuracy
 
 ### Test Structure and Organization
 
@@ -216,6 +252,38 @@ test('responsive navigation component', async ({ page }) => {
   }
 });
 ```
+
+## Development Environment Considerations
+
+### DevTools Positioning
+
+**Visual tests include development tools**:
+- DevTools panel is positioned at **top of page** (not bottom)
+- Main content has automatic top padding (`pt-12`) in development mode
+- All visual test baselines include the devtools header
+- This ensures consistent positioning across all screenshots
+
+**Environment-specific settings**:
+```typescript
+// Layout automatically adjusts for development environment
+<main className={`min-h-screen pb-12 md:pb-14 ${
+  process.env.NODE_ENV === 'development' ? 'pt-12' : ''
+}`}>
+```
+
+### CI/Local Environment Differences
+
+**Handling baseline mismatches**:
+- Local baselines generated with development environment setup
+- CI environment may have slight rendering differences
+- Tolerance settings account for environment-specific variations
+- Focus on major layout issues, not pixel-perfect matching
+
+**Recommended approach**:
+1. **Generate baselines locally** where you can see changes
+2. **Use appropriate tolerances** for CI environment differences  
+3. **Test locally first** before pushing to CI
+4. **Review visual diffs** in test results when CI fails
 
 ## Baseline Management and Review Process
 
