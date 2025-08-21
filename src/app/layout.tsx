@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DevToolsProvider } from "@/components/devtools";
 import { ClientOnlyDevTools } from "@/components/ClientOnlyDevTools";
@@ -11,12 +11,13 @@ import { ToastProvider, Toaster } from "@/components/ui/toast";
 export const metadata: Metadata = {
   title: "Narraitor",
   description: "A narrative-driven RPG framework using AI",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 interface RootLayoutProps {
@@ -34,7 +35,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
               {/* Toast notification system - provides context for all toast notifications */}
               <ToastProvider>
                 <Navigation />
-                <main id="main-content" tabIndex={-1} className="min-h-screen pb-12 md:pb-14">
+                <main 
+                  id="main-content" 
+                  tabIndex={-1} 
+                  className={`min-h-screen pb-12 md:pb-14 ${
+                    process.env.NODE_ENV === 'development' ? 'pt-12' : ''
+                  }`}
+                >
                   {children}
                 </main>
                 {/* Only render dev tools in development */}

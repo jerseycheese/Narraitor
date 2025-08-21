@@ -1,8 +1,8 @@
 ---
 title: Testing Guide
-tags: [testing, development, best-practices, tdd]
+tags: [testing, development, best-practices, tdd, visual-testing]
 created: 2025-06-26
-updated: 2025-06-26
+updated: 2025-08-20
 ---
 
 # Testing Guide
@@ -23,7 +23,107 @@ I've found that focusing on user behavior over implementation details makes test
 1. **Unit Tests**: Individual functions and hooks (fast, lots of these)
 2. **Component Tests**: React components in isolation (medium speed, moderate quantity)
 3. **Integration Tests**: Component + store interactions (slower, fewer needed)
-4. **E2E Tests**: Complete user flows (slowest, only for critical paths)
+4. **Visual Tests**: Screenshot-based regression testing (medium speed, selective coverage)
+5. **E2E Tests**: Complete user flows (slowest, only for critical paths)
+
+## Visual Regression Testing
+
+Visual testing catches issues that other test types miss - layout breaks, styling regressions, and cross-browser rendering differences. We use Playwright's built-in screenshot comparison to automatically detect visual changes.
+
+**When to use visual tests:**
+- **New UI components** with visual complexity
+- **Layout changes** or responsive behavior
+- **Cross-browser compatibility** requirements
+- **Critical user interfaces** like navigation and forms
+
+**When NOT to use visual tests:**
+- **Simple text-only components** (test with unit/component tests)
+- **Purely functional components** with no visual output
+- **Frequently changing content** (use mocked stable data)
+
+### Visual Testing in the Testing Strategy
+
+Visual tests complement other test types by focusing on the user experience:
+
+```
+┌─────────────────┬──────────────────┬───────────────────┐
+│ Test Type       │ What It Catches  │ Visual Testing    │
+├─────────────────┼──────────────────┼───────────────────┤
+│ Unit Tests      │ Logic errors     │ N/A               │
+│ Component Tests │ Rendering issues │ Basic structure   │
+│ Integration     │ Data flow bugs   │ State changes     │
+│ Visual Tests    │ Layout breaks    │ ✅ PRIMARY        │
+│ E2E Tests       │ User workflows   │ Full journeys     │
+└─────────────────┴──────────────────┴───────────────────┘
+```
+
+### Quick Visual Testing Commands
+
+```bash
+# Run visual tests (fast, Chromium only)
+npm run test:visual
+
+# Update baselines after intentional changes
+npm run test:visual:update
+
+# Debug visual failures
+npm run test:visual:headed
+```
+
+### Basic Visual Test Pattern
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Helper for app stability
+async function waitForAppReady(page) {
+  await page.waitForLoadState('networkidle', { timeout: 30000 });
+  await page.waitForSelector('main', { timeout: 15000 });
+  await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 });
+  await page.waitForTimeout(2000);
+}
+
+test('component visual test', async ({ page }) => {
+  await page.goto('/component-page');
+  await waitForAppReady(page);
+  
+  // Full page screenshot
+  await expect(page).toHaveScreenshot('component-page.png');
+  
+  // Or component-specific screenshot
+  const component = page.locator('[data-testid="my-component"]');
+  await expect(component).toHaveScreenshot('my-component.png');
+});
+```
+
+### Visual Testing Best Practices
+
+**Focus on user-critical interfaces:**
+- Landing pages and navigation
+- Form layouts and validation states  
+- Game session interfaces
+- Modal dialogs and overlays
+
+**Keep tests stable:**
+- Use `waitForAppReady()` to ensure content is fully loaded
+- Wait for fonts to load before taking screenshots
+- Mock dynamic content (dates, random data) for consistency
+
+**Organize by interface area:**
+```
+tests/visual/
+├── core-interface.spec.ts      # Navigation, homepage
+├── character-creation.spec.ts  # Character forms
+├── game-session.spec.ts       # Game interfaces
+└── modals.spec.ts             # Dialog overlays
+```
+
+**Handle visual failures appropriately:**
+1. **If it's a bug** → Fix the code, don't update baseline
+2. **If it's intentional** → Update baseline with `npm run test:visual:update`
+3. **If it's environmental** → Check CI artifacts, adjust thresholds
+
+For complete visual testing guidance, see the [Visual Regression Testing Guide](./visual-regression-testing.md).
 
 ## Practical Testing Patterns
 

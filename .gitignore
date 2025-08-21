@@ -8,6 +8,12 @@ node_modules
 # testing
 /coverage
 
+# playwright
+/playwright-report/
+/test-results/
+/data/
+index.html
+
 # next.js
 /.next/
 /out/
@@ -67,6 +73,7 @@ docs/.obsidian
 # Docs
 docs/development/workflows
 docs/voice-profile.md
+docs/voice-writing-profile.md
 
 # Claude Code
 .claude/*

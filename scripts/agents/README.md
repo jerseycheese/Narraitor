@@ -99,7 +99,7 @@ Prompt: [Detailed specialist prompt]
 
 ### Verification Coordinator
 - **Purpose**: Automated testing coordination
-- **Capabilities**: BrowserMCP orchestration, Three-Stage Verification
+- **Capabilities**: Playwright orchestration, Three-Stage Verification
 - **Deliverables**: Comprehensive verification reports and fix recommendations
 
 ### Code Review Specialist
@@ -173,8 +173,8 @@ node scripts/agents/workflow-coordinator.js status [issue-number]
 
 ## Integration with Existing Tools
 
-### BrowserMCP Integration
-- **Verification Coordinator** automatically runs `./scripts/browsermcp-verify.sh`
+### Playwright Integration
+- **Verification Coordinator** automatically runs `./scripts/playwright-verify.sh`
 - **Three-Stage Verification** (Storybook → Test Harness → Integration)
 - **Automated report analysis** and fix recommendations
 
@@ -219,7 +219,7 @@ See `example-workflow-591.md` for a complete step-by-step example showing:
 
 ### Integration Benefits
 - **Existing Tool Leverage**: Builds on established helper scripts
-- **BrowserMCP Coordination**: Automated testing with comprehensive reporting
+- **Playwright Coordination**: Automated testing with comprehensive reporting
 - **GitHub Workflow**: Seamless integration with existing PR/issue management
 
 ## Troubleshooting
