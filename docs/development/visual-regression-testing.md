@@ -5,20 +5,15 @@ created: 2025-08-20
 updated: 2025-08-21
 ---
 
-# Visual Regression Testing with Playwright
+# Getting visual regression testing working properly
 
-Visual regression testing catches unintended changes to your UI by taking screenshots and comparing them to baseline images. This guide covers how we implement visual testing in Narraitor using Playwright's built-in screenshot comparison capabilities.
+This addresses the visual testing gap in the CI pipeline - turns out there were some interesting challenges with AI-generated content that made this more complex than expected.
 
-## Why Visual Regression Testing?
+## Why this was needed
 
-Traditional testing validates functionality but can miss visual issues like:
-- Layout shifts from CSS changes
-- Font rendering differences
-- Color changes or missing styles  
-- Responsive design breakpoints
-- Cross-browser rendering inconsistencies
+Regular testing catches functional bugs but completely misses when your UI breaks visually. You might have a perfectly working login form that's shifted 200 pixels to the right, or buttons that changed color, or responsive layouts that collapsed unexpectedly. 
 
-Visual tests catch these issues automatically by comparing pixel-perfect screenshots against known-good baselines.
+Visual tests solve this by taking screenshots and comparing them to baseline images. If anything changes beyond acceptable thresholds, the test fails. It's like having a designer review every UI change automatically.
 
 ## How It Works
 

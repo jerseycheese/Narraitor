@@ -5,9 +5,9 @@ created: 2025-08-20
 updated: 2025-08-21
 ---
 
-# Visual Testing Best Practices
+# What actually works for visual testing
 
-This guide provides practical guidelines for writing and maintaining effective visual regression tests with Playwright in the Narraitor project.
+Here's what I've learned about writing visual tests that catch real issues without driving you crazy with false positives.
 
 ## When to Add Visual Tests
 
