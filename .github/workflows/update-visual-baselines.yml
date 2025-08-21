@@ -1,0 +1,45 @@
+name: Update Visual Baselines
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to update baselines for'
+        required: true
+        default: 'feature/issue-384-playwright-visual-regression'
+        
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-baselines:
+    timeout-minutes: 60
+    runs-on: macos-latest
+    env:
+      CI: true
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.branch }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Update Visual Baselines
+      run: npx playwright test --update-snapshots
+    - name: Commit updated baselines
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add tests/visual/**/*.png
+        if git diff --staged --quiet; then
+          echo "No baseline changes to commit"
+        else
+          git commit -m "chore: Update visual regression baselines from CI environment"
+          git push origin ${{ github.event.inputs.branch }}
+        fi
