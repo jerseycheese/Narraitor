@@ -62,7 +62,10 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
     // Wait for loading states to disappear (AI content generation can take time)
     console.log('Waiting for loading states to disappear...');
     
-    // Wait for "Loading..." text to disappear (up to 30 seconds for AI generation)
+    // AI content generation can take longer in CI - use extended timeout for CI environments
+    const aiTimeout = process.env.CI ? 60000 : 30000; // 60s in CI, 30s locally
+    
+    // Wait for "Loading..." text to disappear
     await page.waitForFunction(() => {
       const loadingElements = document.querySelectorAll('*');
       for (let elem of loadingElements) {
@@ -71,8 +74,8 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
         }
       }
       return true;
-    }, { timeout: 30000 }).catch(() => {
-      console.warn('Loading text still visible after 30s timeout');
+    }, { timeout: aiTimeout }).catch(() => {
+      console.warn(`Loading text still visible after ${aiTimeout/1000}s timeout`);
     });
     
     // Wait for "Thinking up some options..." to disappear
@@ -84,8 +87,8 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
         }
       }
       return true;
-    }, { timeout: 30000 }).catch(() => {
-      console.warn('AI choice generation still in progress after 30s timeout');
+    }, { timeout: aiTimeout }).catch(() => {
+      console.warn(`AI choice generation still in progress after ${aiTimeout/1000}s timeout`);
     });
     
     // Additional wait for final content stabilization
