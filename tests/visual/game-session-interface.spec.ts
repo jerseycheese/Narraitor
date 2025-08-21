@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForGameSessionReady } from './utils/testHelpers';
 
 /**
  * Game Session Interface Visual Tests
@@ -8,49 +9,11 @@ import { test, expect } from '@playwright/test';
  * primary user experience of Narraitor.
  */
 
-/**
- * Wait for the Narraitor application to be fully loaded and ready
- */
-async function waitForAppReady(page) {
-  try {
-    // Wait for initial page load
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
-    
-    // Wait for React hydration - look for interactive content
-    await page.waitForSelector('main', { timeout: 15000 });
-    
-    // Wait for fonts to load - critical for consistent cross-platform screenshots
-    await page.waitForFunction(() => {
-      return document.fonts.ready;
-    }, { timeout: 10000 }).catch(() => {
-      console.warn('Font loading timeout - continuing anyway');
-    });
-    
-    // Additional wait for font rendering to stabilize
-    await page.waitForTimeout(2000);
-    
-    // Give additional time for dynamic content and avoid loading screens
-    await page.waitForTimeout(3000);
-    
-    // Check if we can see actual content (not just loading)
-    const loadingVisible = await page.locator('text=Loading').isVisible().catch(() => false);
-    
-    if (loadingVisible) {
-      console.warn('Application still showing loading screen - may not have fully loaded');
-      // Wait a bit more and try again
-      await page.waitForTimeout(5000);
-    }
-  } catch (error) {
-    console.warn('waitForAppReady encountered an error:', error.message);
-    // Continue anyway - CI might have different timing
-  }
-}
-
 test.describe('Game Session Visual Interface Tests', () => {
   test('game session startup and loading states', async ({ page }) => {
     // Navigate to the play page
     await page.goto('/play');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of play page initial state
     await expect(page).toHaveScreenshot('play-page-initial.png', {
@@ -68,7 +31,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('narrative display and text formatting', async ({ page }) => {
     // Use dev harness for testing narrative components
     await page.goto('/dev/game-session');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of game session test harness
     await expect(page).toHaveScreenshot('game-session-dev-harness.png', {
@@ -92,7 +55,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('game controls and interface elements', async ({ page }) => {
     // Test dev tools interface for game controls
     await page.goto('/dev/devtools-test');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of dev tools test interface
     await expect(page).toHaveScreenshot('devtools-test-interface.png', {
@@ -110,7 +73,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('journal and progress tracking interface', async ({ page }) => {
     // Test journal access dev interface
     await page.goto('/dev/journal-access');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of journal interface
     await expect(page).toHaveScreenshot('journal-interface.png', {
@@ -128,7 +91,7 @@ test.describe('Game Session Visual Interface Tests', () => {
   test('ending and completion screens', async ({ page }) => {
     // Test ending screen interface
     await page.goto('/dev/ending-screen');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of ending screen
     await expect(page).toHaveScreenshot('ending-screen-interface.png', {

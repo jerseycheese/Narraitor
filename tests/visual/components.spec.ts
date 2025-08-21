@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForAppReady } from './utils/testHelpers';
 
 /**
  * Component Visual Tests
@@ -7,44 +8,6 @@ import { test, expect } from '@playwright/test';
  * These tests provide faster feedback on component changes and make
  * it easier to pinpoint visual regressions to specific components.
  */
-
-/**
- * Wait for the Narraitor application to be fully loaded and ready
- */
-async function waitForAppReady(page) {
-  try {
-    // Wait for initial page load
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
-    
-    // Wait for React hydration - look for interactive content
-    await page.waitForSelector('main', { timeout: 15000 });
-    
-    // Wait for fonts to load - critical for consistent screenshots
-    await page.waitForFunction(() => {
-      return document.fonts.ready;
-    }, { timeout: 10000 }).catch(() => {
-      console.warn('Font loading timeout - continuing anyway');
-    });
-    
-    // Additional wait for font rendering to stabilize
-    await page.waitForTimeout(2000);
-  } catch (error) {
-    console.warn('waitForAppReady encountered an error:', error.message);
-    // Continue anyway - CI might have different timing
-  }
-}
-
-/**
- * Navigate to a Storybook story for isolated component testing
- */
-async function gotoStory(page, storyPath: string) {
-  await page.goto(`/dev/storybook?path=/story/${storyPath}`);
-  await waitForAppReady(page);
-  
-  // Wait for Storybook to load the story
-  await page.waitForSelector('[data-testid="story-content"], .sb-story, #story-root', { timeout: 10000 });
-  await page.waitForTimeout(1000); // Additional stabilization
-}
 
 test.describe('UI Component Visual Tests', () => {
   

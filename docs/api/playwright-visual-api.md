@@ -22,8 +22,8 @@ export default defineConfig({
   timeout: 60 * 1000,
   expect: {
     toHaveScreenshot: {
-      maxDiffPixels: 1000,
-      threshold: 0.4,
+      maxDiffPixels: 500,
+      threshold: 0.2,
       animations: 'disabled',
     },
   },
@@ -35,7 +35,7 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `maxDiffPixels` | `number` | `100` | Maximum allowed pixel differences |
+| `maxDiffPixels` | `number` | `500` | Maximum allowed pixel differences |
 | `threshold` | `number` | `0.2` | Pixel difference threshold (0-1) |
 | `animations` | `'disabled' \| 'allow'` | `'allow'` | Animation handling during screenshots |
 | `clip` | `{x, y, width, height}` | `undefined` | Clip screenshot to specific region |

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForGameSessionReady } from './utils/testHelpers';
 
 /**
  * Narraitor MVP Visual Regression Tests
@@ -7,49 +8,11 @@ import { test, expect } from '@playwright/test';
  * Tests key pages and components to catch visual regressions in the main user flows.
  */
 
-/**
- * Wait for the Narraitor application to be fully loaded and ready
- */
-async function waitForAppReady(page) {
-  try {
-    // Wait for initial page load
-    await page.waitForLoadState('networkidle', { timeout: 30000 });
-    
-    // Wait for React hydration - look for interactive content
-    await page.waitForSelector('main', { timeout: 15000 });
-    
-    // Wait for fonts to load - critical for consistent cross-platform screenshots
-    await page.waitForFunction(() => {
-      return document.fonts.ready;
-    }, { timeout: 10000 }).catch(() => {
-      console.warn('Font loading timeout - continuing anyway');
-    });
-    
-    // Additional wait for font rendering to stabilize
-    await page.waitForTimeout(2000);
-    
-    // Give additional time for dynamic content and avoid loading screens
-    await page.waitForTimeout(3000);
-    
-    // Check if we can see actual content (not just loading)
-    const loadingVisible = await page.locator('text=Loading').isVisible().catch(() => false);
-    
-    if (loadingVisible) {
-      console.warn('Application still showing loading screen - may not have fully loaded');
-      // Wait a bit more and try again
-      await page.waitForTimeout(5000);
-    }
-  } catch (error) {
-    console.warn('waitForAppReady encountered an error:', error.message);
-    // Continue anyway - CI might have different timing
-  }
-}
-
 test.describe('Narraitor Core Interface Visual Tests', () => {
   test('landing page layout and navigation', async ({ page }) => {
     // Navigate to the main landing page
     await page.goto('/');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take full page screenshot of landing page
     await expect(page).toHaveScreenshot('landing-page-full.png', {
@@ -67,7 +30,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('worlds listing and cards layout', async ({ page }) => {
     // Navigate to worlds page
     await page.goto('/worlds');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take full page screenshot
     await expect(page).toHaveScreenshot('worlds-page-full.png', {
@@ -85,7 +48,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('characters listing and creation flow', async ({ page }) => {
     // Navigate to characters page
     await page.goto('/characters');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take full page screenshot
     await expect(page).toHaveScreenshot('characters-page-full.png', {
@@ -103,7 +66,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('world creation wizard interface', async ({ page }) => {
     // Navigate to world creation
     await page.goto('/world/create');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of initial wizard step
     await expect(page).toHaveScreenshot('world-creation-wizard-start.png', {
@@ -121,7 +84,7 @@ test.describe('Narraitor Core Interface Visual Tests', () => {
   test('character creation interface', async ({ page }) => {
     // Navigate to character creation
     await page.goto('/characters/create');
-    await waitForAppReady(page);
+    await waitForGameSessionReady(page);
     
     // Take screenshot of character creation form
     await expect(page).toHaveScreenshot('character-creation-form.png', {
