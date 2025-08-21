@@ -33,7 +33,10 @@ test.describe('Game Session Visual Interface Tests', () => {
     await page.goto('/dev/game-session');
     await waitForGameSessionReady(page);
     
-    // Focus on testing the UI structure, not AI content (2025 best practice)
+    // Focus on testing the UI structure, not AI content.
+    // As per 2025 best practice for visual testing: AI-generated content is highly variable between runs,
+    // which can cause false positives in screenshot comparisons. By masking dynamic content areas,
+    // we ensure that visual tests only fail on meaningful UI/layout regressions, not on expected content changes.
     // Mask the entire dynamic content areas that contain AI-generated text
     const dynamicContentAreas = [
       // Mask the entire narrative paragraph content (AI-generated)
@@ -53,9 +56,9 @@ test.describe('Game Session Visual Interface Tests', () => {
       animations: 'disabled',
       // Mask all dynamic AI content areas
       mask: dynamicContentAreas,
-      // Very permissive settings for AI content that changes between runs
-      maxDiffPixels: 50000, // Extremely high tolerance for AI content variations
-      threshold: 0.8        // 80% tolerance for differences - focuses on major layout issues only
+      // Moderately permissive settings - balanced approach for AI content
+      maxDiffPixels: 2000,  // Allow for some AI content variation
+      threshold: 0.3        // 30% tolerance - catches layout issues while allowing content changes
     });
     
     // Test static UI components separately for better stability
