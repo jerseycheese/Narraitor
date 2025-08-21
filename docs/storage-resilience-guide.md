@@ -217,6 +217,145 @@ A: Large datasets in memory may impact performance: consider data pruning
 **Q: Status not updating in UI**
 A: Ensure useStorageStatus hook is used and component is properly mounted
 
+## Character Creation Auto-Save
+
+The character creation wizard includes specialized auto-save functionality for user workflow protection:
+
+### useCharacterCreationAutoSave Hook
+
+Provides automatic saving and recovery for character creation sessions:
+
+```typescript
+import { useCharacterCreationAutoSave } from '@/hooks/useCharacterCreationAutoSave';
+
+function CharacterCreationWizard({ worldId }) {
+  const {
+    data,              // Current character creation state
+    setData,           // Update function (triggers auto-save)
+    clearAutoSave,     // Cleanup function
+    hasRecoveryData,   // Recovery data detection
+    saveStatus         // 'idle' | 'saving' | 'saved'
+  } = useCharacterCreationAutoSave(worldId);
+
+  // Show recovery dialog when data detected
+  if (hasRecoveryData) {
+    return <RecoveryNotification onRecover={...} onDismiss={...} />;
+  }
+
+  return (
+    <div>
+      <SaveIndicator status={saveStatus} lastSaveTime={data?.lastSaved} />
+      {/* Character creation form */}
+    </div>
+  );
+}
+```
+
+**Key Features:**
+- **Debounced Auto-Save**: 300ms delay prevents excessive localStorage writes
+- **Recovery Detection**: Automatically detects previous session data on mount
+- **Visual Feedback**: Real-time save status through SaveIndicator component
+- **User Choice**: RecoveryNotification dialog for user-controlled recovery
+- **Migration Support**: Seamless upgrade from sessionStorage to localStorage
+
+### Recovery Notification Dialog
+
+Modal dialog component for recovery data user choice:
+
+```typescript
+<RecoveryNotification
+  isVisible={hasRecoveryData}
+  lastSaved="2024-01-15T10:30:00.000Z"
+  onRecover={() => {
+    // Keep existing data, hide dialog
+    setShowRecoveryDialog(false);
+  }}
+  onDismiss={() => {
+    // Clear saved data, start fresh
+    clearAutoSave();
+    setShowRecoveryDialog(false);
+  }}
+/>
+```
+
+**Features:**
+- **Accessible Dialog**: ARIA labels and keyboard navigation
+- **Auto-Focus**: Primary action button receives focus
+- **Formatted Timestamps**: User-friendly last save time display
+- **Clear Actions**: Recover data or dismiss and start fresh
+
+### Save Status Indicator
+
+Visual feedback component for auto-save operations:
+
+```typescript
+<SaveIndicator
+  status={saveStatus}         // Current operation status
+  lastSaveTime={data?.lastSaved}  // ISO timestamp of last save
+  compact={true}              // Compact mode for minimal UI
+/>
+```
+
+**Display States:**
+- **Idle**: ○ "Auto-save ready" (gray circle)
+- **Saving**: 🔄 "Saving..." (spinner animation)
+- **Saved**: ✓ "Saved at 2:30 PM" (green checkmark)
+- **Error**: ⚠️ Error message with retry option
+
+### localStorage Migration
+
+The system automatically upgrades from sessionStorage to localStorage:
+
+```typescript
+// Character creation auto-save uses localStorage for persistence
+const saveKey = `character-creation-${worldId}`;
+localStorage.setItem(saveKey, JSON.stringify(characterData));
+
+// Game session data still uses sessionStorage for temporary state
+const sessionKey = `game-session-${sessionId}`;
+sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+```
+
+**Benefits:**
+- **Cross-Session Recovery**: Data survives browser restarts
+- **World-Specific Storage**: Each world gets isolated save data
+- **Automatic Cleanup**: Completed characters clear their auto-save data
+- **Performance**: Debounced saves prevent excessive storage operations
+
+### Auto-Save Data Structure
+
+```typescript
+interface CharacterCreationState {
+  currentStep: number;        // Wizard step index
+  worldId: EntityID;          // Associated world
+  characterData: CharacterCreationData;  // Form data
+  validation: ValidationState;           // Step validation results
+  pointPools: PointPoolState;           // Attribute/skill points
+  lastSaved: string;          // ISO timestamp
+}
+```
+
+### Best Practices for Auto-Save
+
+1. **Clear on Completion**: Always call `clearAutoSave()` when character creation completes
+2. **User Choice**: Present recovery dialog for user control over data restoration
+3. **Visual Feedback**: Show save status for user confidence
+4. **Error Handling**: Gracefully handle storage failures with user feedback
+5. **World Isolation**: Keep auto-save data separate per world
+
+### Testing Auto-Save Features
+
+```bash
+# Test auto-save hook functionality
+npm test -- --testPathPattern="useCharacterCreationAutoSave"
+
+# Test recovery dialog integration
+npm test -- --testPathPattern="RecoveryNotification"
+
+# Test save indicator component
+npm test -- --testPathPattern="SaveIndicator"
+```
+
 ## Integration Points
 
 The storage resilience system integrates with:
@@ -226,3 +365,5 @@ The storage resilience system integrates with:
 - **Error Reporting**: Structured error information for monitoring
 - **User Interface**: Visual feedback through StorageStatus component
 - **Health Monitoring**: Periodic background checks and manual triggers
+- **Character Creation**: Specialized auto-save for wizard workflows
+- **Recovery Dialogs**: User-controlled data restoration workflows
