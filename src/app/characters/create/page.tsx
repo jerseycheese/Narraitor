@@ -30,13 +30,8 @@ export default function CharacterCreatePage() {
     }
   }, [worldIdFromUrl, currentWorldId, setCurrentWorld]);
   
-  // Clear any existing auto-save data when starting a new character
-  useEffect(() => {
-    if (effectiveWorldId) {
-      const saveKey = `character-creation-${effectiveWorldId}`;
-      sessionStorage.removeItem(saveKey);
-    }
-  }, [effectiveWorldId]);
+  // Note: Auto-save data clearing is now handled by the CharacterCreationWizard
+  // to allow for recovery dialog functionality
 
   if (!effectiveWorldId) {
     return (

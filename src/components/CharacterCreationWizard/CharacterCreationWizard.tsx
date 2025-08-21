@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -14,6 +14,8 @@ import {
   WizardNavigation, 
   WizardStep
 } from '@/components/shared/wizard';
+import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -79,7 +81,15 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { createCharacter } = useCharacterStore();
   const world = worlds[worldId];
   
-  const { data, setData, handleFieldBlur, clearAutoSave } = useCharacterCreationAutoSave(worldId);
+  const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, saveStatus } = useCharacterCreationAutoSave(worldId);
+  const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
+
+  // Show recovery dialog when recovery data is detected
+  React.useEffect(() => {
+    if (hasRecoveryData && !showRecoveryDialog) {
+      setShowRecoveryDialog(true);
+    }
+  }, [hasRecoveryData, showRecoveryDialog]);
   
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
@@ -230,6 +240,14 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   const handleCancel = () => {
     router.push('/characters');
+  };
+
+  // Recovery dialog handlers
+  const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
+    if (choice === 'dismiss') {
+      clearAutoSave();
+    }
+    setShowRecoveryDialog(false);
   };
 
   const handleUpdate = (updates: Partial<CharacterCreationData>) => {
@@ -386,28 +404,47 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const error = hasErrors ? currentValidation.errors.join(', ') : undefined;
 
   return (
-    <WizardContainer title={`Create Character in ${world.name}`}>
-      <div onBlur={handleFieldBlur}>
-        <WizardProgress 
-          steps={steps} 
-          currentStep={wizard.state.currentStep} 
-        />
-        
-        <WizardStep error={error}>
-          {renderStep()}
-        </WizardStep>
-        
-        <WizardNavigation
-          onCancel={handleCancel}
-          onBack={wizard.canGoBack ? handleBack : undefined}
-          onNext={wizard.canGoNext ? handleNext : undefined}
-          onComplete={wizard.isLastStep ? handleCreate : undefined}
-          currentStep={wizard.state.currentStep}
-          totalSteps={steps.length}
-          completeLabel="Create Character"
-          disabled={hasErrors}
-        />
-      </div>
-    </WizardContainer>
+    <>
+      <WizardContainer title={`Create Character in ${world.name}`}>
+        <div onBlur={handleFieldBlur}>
+          {/* Save status indicator */}
+          <div className="mb-4 flex justify-end">
+            <SaveIndicator
+              status={saveStatus}
+              lastSaveTime={data?.lastSaved}
+              compact={true}
+            />
+          </div>
+
+          <WizardProgress 
+            steps={steps} 
+            currentStep={wizard.state.currentStep} 
+          />
+          
+          <WizardStep error={error}>
+            {renderStep()}
+          </WizardStep>
+          
+          <WizardNavigation
+            onCancel={handleCancel}
+            onBack={wizard.canGoBack ? handleBack : undefined}
+            onNext={wizard.canGoNext ? handleNext : undefined}
+            onComplete={wizard.isLastStep ? handleCreate : undefined}
+            currentStep={wizard.state.currentStep}
+            totalSteps={steps.length}
+            completeLabel="Create Character"
+            disabled={hasErrors}
+          />
+        </div>
+      </WizardContainer>
+
+      {/* Recovery dialog */}
+      <RecoveryNotification
+        isVisible={showRecoveryDialog}
+        lastSaved={data?.lastSaved}
+        onRecover={() => handleRecoveryChoice('recover')}
+        onDismiss={() => handleRecoveryChoice('dismiss')}
+      />
+    </>
   );
 };

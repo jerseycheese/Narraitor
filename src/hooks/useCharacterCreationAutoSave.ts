@@ -7,17 +7,22 @@ interface CharacterCreationState {
   characterData: unknown;
   validation: unknown;
   pointPools: unknown;
+  lastSaved?: string;
 }
 
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {
   const [data, setDataInternal] = useState<CharacterCreationState | undefined>();
+  const [hasRecoveryData, setHasRecoveryData] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const saveKey = `character-creation-${worldId}`;
   const hasLoadedRef = useRef(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Debounced auto-save to sessionStorage whenever data changes
+  // Debounced auto-save to localStorage whenever data changes
   useEffect(() => {
     if (data && hasLoadedRef.current) { // Only save after initial load is complete
+      setSaveStatus('saving');
+      
       // Clear any existing timeout
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -25,7 +30,17 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
       
       // Debounce the save operation to prevent excessive writes
       saveTimeoutRef.current = setTimeout(() => {
-        sessionStorage.setItem(saveKey, JSON.stringify(data));
+        try {
+          const dataWithTimestamp = { 
+            ...data, 
+            lastSaved: new Date().toISOString() 
+          };
+          localStorage.setItem(saveKey, JSON.stringify(dataWithTimestamp));
+          setSaveStatus('saved');
+        } catch (error) {
+          console.error('[AutoSave] Failed to save character creation data', error);
+          setSaveStatus('idle');
+        }
       }, 300); // 300ms debounce
     }
   }, [data, saveKey, worldId]);
@@ -49,17 +64,20 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     if (hasLoadedRef.current) return;
     
     const loadData = () => {
-      const saved = sessionStorage.getItem(saveKey);
+      const saved = localStorage.getItem(saveKey);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           setDataInternal(parsed);
+          setHasRecoveryData(true);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
           console.error('[AutoSave] Failed to restore character creation data', e);
+          setHasRecoveryData(false);
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
         }
       } else {
+        setHasRecoveryData(false);
         hasLoadedRef.current = true; // Mark as loaded even if no data found
       }
     };
@@ -88,9 +106,12 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
     }
-    sessionStorage.removeItem(saveKey);
+    localStorage.removeItem(saveKey);
+    setHasRecoveryData(false);
+    setDataInternal(undefined);
     hasLoadedRef.current = false;
+    setSaveStatus('idle');
   }, [saveKey]);
   
-  return { data, setData, handleFieldBlur, clearAutoSave };
+  return { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, saveStatus };
 };
