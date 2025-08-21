@@ -5,42 +5,33 @@ created: 2025-08-20
 updated: 2025-08-21
 ---
 
-# Visual Regression Testing with Playwright
+# Getting visual regression testing working properly
 
-Visual regression testing catches unintended changes to your UI by taking screenshots and comparing them to baseline images. This guide covers how we implement visual testing in Narraitor using Playwright's built-in screenshot comparison capabilities.
+This addresses the visual testing gap in the CI pipeline - turns out there were some interesting challenges with AI-generated content that made this more complex than expected.
 
-## Why Visual Regression Testing?
+## Why this was needed
 
-Traditional testing validates functionality but can miss visual issues like:
-- Layout shifts from CSS changes
-- Font rendering differences
-- Color changes or missing styles  
-- Responsive design breakpoints
-- Cross-browser rendering inconsistencies
+Regular testing catches functional bugs but completely misses when your UI breaks visually. You might have a perfectly working login form that's shifted 200 pixels to the right, or buttons that changed color, or responsive layouts that collapsed unexpectedly. 
 
-Visual tests catch these issues automatically by comparing pixel-perfect screenshots against known-good baselines.
+Visual tests solve this by taking screenshots and comparing them to baseline images. If anything changes beyond acceptable thresholds, the test fails. It's like having a designer review every UI change automatically.
 
-## How It Works
+## How it actually works
 
-Our visual testing setup:
+The basic idea is straightforward: Playwright takes screenshots of your pages, compares them to baseline images, and fails the test if there are too many differences. 
 
-1. **Playwright captures screenshots** of key pages and components
-2. **First run generates baselines** - these become the "source of truth"
-3. **Subsequent runs compare** new screenshots against baselines
-4. **Tests fail if differences exceed thresholds** - protecting against regressions
-5. **CI integration** ensures visual consistency across deployments
+But the reality is more nuanced. The first time you run a test, it generates a baseline screenshot. Every subsequent run compares against that baseline and calculates pixel differences. If the changes exceed your configured thresholds (both absolute pixel count and percentage), the test fails.
 
-## Getting Started
+Where it gets interesting is with dynamic content. AI-generated narratives change every time, timestamps update, session IDs are different - traditional visual testing assumes your content is static, but that's not realistic for most modern apps.
 
-### Prerequisites
+## Getting started
 
-Make sure you have Playwright browsers installed:
+First, make sure you have Playwright browsers installed:
 
 ```bash
 npx playwright install
 ```
 
-### Running Visual Tests
+Then you can run visual tests with these commands:
 
 ```bash
 # Run all visual tests (Chromium only for speed)
@@ -56,9 +47,7 @@ npm run test:visual:headed
 npm run test:visual:debug
 ```
 
-### Your First Visual Test
-
-Here's a simple example testing a component:
+Here's what a basic visual test looks like:
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -76,14 +65,11 @@ test.describe('Component Visual Tests', () => {
 });
 ```
 
-The `toHaveScreenshot()` assertion:
-- Takes a screenshot of the current page or element
-- Compares it to the baseline in `test-name.spec.ts-snapshots/`
-- Fails if differences exceed configured thresholds
+The `toHaveScreenshot()` function does the heavy lifting: takes a screenshot, compares it to the baseline stored in the `test-name.spec.ts-snapshots/` directory, and fails if there are too many differences.
 
-## Configuration
+## The approach that works
 
-Our Playwright configuration is optimized for visual testing consistency:
+Our configuration handles the reality that different types of content need different testing strategies:
 
 ```typescript
 // playwright.config.ts
@@ -100,13 +86,12 @@ export default defineConfig({
 });
 ```
 
-## Split Testing Strategy (2025 Best Practice)
+## Handling AI content vs static UI
 
-We use different tolerance levels depending on content type, following 2025 best practices for AI-driven applications:
+The core insight was that you can't treat AI-generated content the same as static UI components. The solution is a split-tolerance strategy that actually works:
 
-### Dynamic Content Tests (AI/Variable Content)
+**High tolerance for dynamic content** - pages with AI narratives, timestamps, session IDs:
 
-**Configuration**:
 ```typescript
 await expect(page).toHaveScreenshot('game-session-dynamic.png', {
   mask: dynamicContentAreas,        // Hide AI-generated content
@@ -115,14 +100,8 @@ await expect(page).toHaveScreenshot('game-session-dynamic.png', {
 });
 ```
 
-**Use for**:
-- Pages with AI-generated narratives, choices, or content
-- Screens with timestamps, session IDs, or user-specific data
-- Full-page screenshots that include dynamic elements
+**Strict tolerance for static UI** - navigation, forms, buttons, layout components:
 
-### Static UI Tests (Stable Components)
-
-**Configuration**:
 ```typescript
 await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
   maxDiffPixels: 500,              // Low tolerance for static elements  
@@ -130,53 +109,37 @@ await expect(staticComponent).toHaveScreenshot('navigation-header.png', {
 });
 ```
 
-**Use for**:
-- Navigation components, headers, footers
-- Form layouts and input components
-- Button states and UI controls
-- Component-level screenshots
+This also masks specific dynamic areas like narrative paragraphs and choice text, then tests the layout structure rather than content accuracy.
 
-### Threshold Strategy Rationale
+## Why this works better than traditional approaches
 
-**Why split approaches work better**:
-- **AI content varies significantly** between test runs, requiring high tolerance
-- **Static UI should be stable**, allowing strict regression detection
-- **Masking dynamic areas** focuses tests on layout structure, not content accuracy
-- **Environment differences** are handled appropriately for each content type
+Traditional visual testing assumes your content is static and uses uniform thresholds around 20-30%. But when half your UI changes every test run (thanks, AI), you need to be more thoughtful about what you're actually validating.
 
-**Industry context**: Traditional visual testing uses uniform thresholds (20-30%), but AI-driven applications need content-aware strategies to balance stability with meaningful regression detection.
+The split approach gives you layered protection: catch real layout regressions in static components while allowing AI content to vary naturally. You're testing the structure and styling, not whether the AI generated the same story twice.
 
-The combination provides layered protection:
+Both pixel count and percentage thresholds have to be exceeded for a test to fail, which reduces false positives while still catching real issues.
 
-1. **Pixel threshold** catches small, localized changes (misaligned buttons, spacing issues)
-2. **Percentage threshold** catches proportional changes (layout shifts, missing sections)
-3. **Both must be exceeded** for a test to fail, reducing false positives
+## What gets caught vs what doesn't
 
-### Visual Examples
+Acceptable differences that won't fail tests:
+- Font anti-aliasing variations (~50-200 pixels, under 5%)
+- Browser subpixel rendering differences (~100-300 pixels, under 10%) 
+- Minor CSS rendering quirks (~200-400 pixels, under 15%)
 
-**Acceptable differences (below thresholds)**:
-- Font anti-aliasing variations: ~50-200 pixels, <5% change
-- Browser subpixel rendering: ~100-300 pixels, <10% change
-- Minor CSS rendering differences: ~200-400 pixels, <15% change
+Unacceptable differences that will fail tests:
+- Missing navigation bar (~2000+ pixels, over 25%)
+- Layout shifts from CSS changes (~1500+ pixels, over 30%)
+- Major color or styling changes (~3000+ pixels, over 40%)
 
-**Unacceptable differences (above thresholds)**:
-- Missing navigation bar: ~2000+ pixels, >25% change
-- Layout shift from CSS changes: ~1500+ pixels, >30% change
-- Color scheme changes: ~3000+ pixels, >40% change
+## Platform decisions
 
-### Configuration Choices
+All baselines are generated on macOS only. This means you might miss Linux-specific rendering issues, but it gives you consistent, maintainable baselines without the complexity of managing multiple platform versions.
 
-**Darwin-only snapshots**: We generate baselines on macOS only, accepting that we might miss Linux-specific rendering issues in favor of consistent, maintainable baselines.
+Since our entire team develops on macOS and our CI runs on macOS, this keeps the "works on my machine" problems to a minimum. Animations are disabled globally to prevent timing-related differences.
 
-**Stricter thresholds**: Because all development and CI happens on Darwin, we can detect smaller regressions than cross-platform setups.
+## Writing visual tests that actually help
 
-**Animations disabled**: Prevents timing-related visual differences in dynamic content.
-
-## Writing Good Visual Tests
-
-### Test Structure
-
-Organize tests by interface area:
+Organize tests by interface area so they're easy to find and maintain:
 
 ```typescript
 test.describe('Core Interface Visual Tests', () => {
@@ -190,9 +153,9 @@ test.describe('Core Interface Visual Tests', () => {
 });
 ```
 
-### Wait for Content Loading
+### Waiting for content to actually be ready
 
-Always wait for content to fully load before taking screenshots:
+This is crucial - you need to wait for content to fully load before taking screenshots, otherwise you'll get random failures when fonts haven't loaded or content is still shifting around:
 
 ```typescript
 async function waitForAppReady(page) {
@@ -202,10 +165,10 @@ async function waitForAppReady(page) {
   // Wait for main content
   await page.waitForSelector('main', { timeout: 15000 });
   
-  // Wait for fonts to load (critical for consistency)
+  // Wait for fonts to load (this is critical for consistency)
   await page.waitForFunction(() => document.fonts.ready, { timeout: 10000 });
   
-  // Additional stabilization time
+  // Give it a moment to settle
   await page.waitForTimeout(2000);
 }
 
@@ -253,9 +216,7 @@ test('button states', async ({ page }) => {
 });
 ```
 
-## Managing Baselines
-
-### When to Update Baselines
+## Managing baselines (the tricky part)
 
 Update baseline screenshots when you've made intentional visual changes:
 
@@ -267,7 +228,7 @@ npm run test:visual:update
 npx playwright test --update-snapshots tests/visual/specific-test.spec.ts
 ```
 
-**Important**: Only update baselines for intentional changes. If tests fail unexpectedly, investigate the cause rather than blindly updating baselines.
+Here's the important part: only update baselines for intentional changes. If tests fail unexpectedly, investigate why - don't just update the baselines to make them pass. That defeats the entire purpose.
 
 ### Baseline Storage
 
@@ -347,17 +308,11 @@ Visual tests run automatically in CI:
    - If no: fix the code causing the visual regression
 3. **Never update baselines in CI** - always update locally where you can review changes
 
-## Platform Strategy and Trade-offs
+## Why only testing on macOS
 
-### Why Darwin-Only Strategy
+All baseline screenshots are generated on macOS only. This might seem limiting, but it actually makes things much more manageable.
 
-We use a **Darwin-only visual testing strategy**, meaning all baseline screenshots are generated and compared on macOS only. This decision provides several advantages:
-
-**Consistency Benefits**:
-- **Single source of truth**: All baselines generated on the same platform eliminate cross-platform variations
-- **Reduced maintenance**: Only one set of baselines to maintain and review
-- **Faster CI**: No need to manage multiple platform-specific baseline sets
-- **Team alignment**: All developers use macOS, ensuring consistent local testing experience
+The benefits are pretty clear: single source of truth for baselines, no cross-platform variation headaches, faster CI since you're not managing multiple baseline sets, and since development happens on macOS, local testing matches CI behavior.
 
 **Simplified Development Workflow**:
 - **Local testing matches CI**: Same platform means consistent behavior between local and CI visual tests
