@@ -71,7 +71,7 @@ jobs:
 
   e2e:
     name: E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [build]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
