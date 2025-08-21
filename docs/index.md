@@ -12,6 +12,9 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 
 ## Documentation Sections
 
+### Examples
+- [[examples/auto-save-implementation-example|Auto-Save Implementation Example]]
+
 ### Project Overview
 - [[project-overview|Project Overview]]
 - [[development-roadmap|Development Roadmap]]
@@ -35,6 +38,7 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 - [[core-systems/narrative-engine|Narrative Engine]]
 - [[core-systems/journal-system|Journal System]]
 - [[features/narrative-consistency-tracking|Goal Tracking System]]
+- [[storage-resilience-guide|Storage Resilience & Auto-Save System]]
 
 ### Features
 - [[features/ai-systems|AI Systems Overview]]
@@ -45,12 +49,14 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 ### API Documentation
 - [[api/goal-system-api|Goal System API Reference]]
 - [[api/types-reference|Types Reference]]
+- [[api/auto-save-types-reference|Auto-Save Types Reference]]
 
 ### Technical Guides
 - [[technical-guides/goal-tracking-usage|Goal Tracking Usage Guide]]
 - [[technical-guides/goal-system-integration|Goal System Integration]]
 - [[technical-guides/lore-tracking-system|Lore Tracking System]]
 - [[technical-guides/state-management-usage|State Management Usage]]
+- [[technical-guides/auto-save-migration-notes|Auto-Save Migration Notes]]
 
 ### Development
 - [[development/tdd-with-kiss|Test-Driven Development with KISS]]

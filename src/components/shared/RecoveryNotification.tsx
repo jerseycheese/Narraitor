@@ -1,27 +1,66 @@
 /**
- * RecoveryNotification component
- * Displays recovery alert when data recovery is available
+ * RecoveryNotification Component
+ * 
+ * Displays a modal dialog when auto-save recovery data is detected.
+ * Provides users with the choice to recover their previous session data
+ * or dismiss it and start fresh.
+ * 
+ * Features:
+ * - Modal overlay with focus management
+ * - Accessible dialog with ARIA labels
+ * - Formatted last save timestamp
+ * - Auto-focus on primary action (Recover)
+ * - Keyboard navigation support
+ * 
+ * @example
+ * ```tsx
+ * <RecoveryNotification
+ *   isVisible={hasRecoveryData}
+ *   lastSaved="2024-01-15T10:30:00.000Z"
+ *   onRecover={() => {
+ *     // Keep existing data and hide dialog
+ *     setShowRecoveryDialog(false);
+ *   }}
+ *   onDismiss={() => {
+ *     // Clear saved data and hide dialog
+ *     clearAutoSave();
+ *     setShowRecoveryDialog(false);
+ *   }}
+ * />
+ * ```
  */
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '../ui/button';
 import { formatDateTime } from '@/lib/utils';
 
+/**
+ * Props for the RecoveryNotification component
+ */
 interface RecoveryNotificationProps {
+  /** Whether the recovery dialog should be visible */
   isVisible: boolean;
+  /** ISO timestamp of when the data was last saved */
   lastSaved?: string;
+  /** Callback when user chooses to recover the data */
   onRecover: () => void;
+  /** Callback when user chooses to dismiss the recovery data */
   onDismiss: () => void;
 }
 
+/**
+ * RecoveryNotification component implementation
+ */
 export function RecoveryNotification({
   isVisible,
   lastSaved,
   onRecover,
   onDismiss,
 }: RecoveryNotificationProps) {
+  /** Reference to the recover button for focus management */
   const recoverButtonRef = useRef<HTMLButtonElement>(null);
 
+  /** Auto-focus the recover button when dialog becomes visible */
   useEffect(() => {
     if (isVisible && recoverButtonRef.current) {
       recoverButtonRef.current.focus();
@@ -32,7 +71,9 @@ export function RecoveryNotification({
     return null;
   }
 
+  /** Format the last saved timestamp for display */
   const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;
+  /** Only show valid formatted dates */
   const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
 
   return (

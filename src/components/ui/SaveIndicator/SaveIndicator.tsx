@@ -1,5 +1,38 @@
 /**
- * SaveIndicator component - Shows auto-save status and controls
+ * SaveIndicator Component
+ * 
+ * Displays the current auto-save status with visual feedback and optional manual controls.
+ * Shows save state, timestamps, error handling, and provides manual save triggers.
+ * 
+ * Features:
+ * - Status indicator with icons (✓ for saved, ○ for idle)
+ * - Formatted timestamp display
+ * - Error state with retry functionality
+ * - Loading state with spinner
+ * - Manual save button option
+ * - Compact and full display modes
+ * - Save count tracking
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage with auto-save hook
+ * <SaveIndicator
+ *   status={saveStatus}
+ *   lastSaveTime={data?.lastSaved}
+ *   compact={true}
+ * />
+ * 
+ * // With manual save capability
+ * <SaveIndicator
+ *   status={saveStatus}
+ *   lastSaveTime={lastSaveTime}
+ *   errorMessage={error}
+ *   totalSaves={saveCount}
+ *   onManualSave={(reason) => triggerSave(reason)}
+ *   retryable={true}
+ *   onRetryError={() => retrySave()}
+ * />
+ * ```
  */
 
 import React from 'react';
@@ -8,18 +41,33 @@ import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { cn, formatTime } from '@/lib/utils';
 
+/**
+ * Props for the SaveIndicator component
+ */
 export interface SaveIndicatorProps {
+  /** Current save operation status */
   status: 'idle' | 'saving' | 'saved' | 'error';
+  /** ISO timestamp of last successful save */
   lastSaveTime?: string | null;
+  /** Error message to display when status is 'error' */
   errorMessage?: string | null;
+  /** Total number of saves performed (for statistics) */
   totalSaves?: number;
+  /** Callback for manual save trigger */
   onManualSave?: (reason: SaveTriggerReason) => void;
+  /** Callback for retrying failed save operations */
   onRetryError?: () => void;
+  /** Whether the error state allows retry attempts */
   retryable?: boolean;
+  /** Additional CSS classes to apply */
   className?: string;
+  /** Whether to show compact version without detailed info */
   compact?: boolean;
 }
 
+/**
+ * SaveIndicator component implementation
+ */
 export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   status,
   lastSaveTime,
@@ -31,6 +79,9 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
   className = '',
   compact = false,
 }) => {
+  /**
+   * Generates appropriate status text based on current state
+   */
   const getStatusText = () => {
     switch (status) {
       case 'saved':
