@@ -47,6 +47,9 @@ export interface WorldStore {
   setError: (error: string | null) => void;
   clearError: () => void;
   setLoading: (loading: boolean) => void;
+  
+  // Debug method
+  testPersistence: () => void;
 }
 
 // Initial state
@@ -428,9 +431,21 @@ export const useWorldStore = create<WorldStore>()(
 
       // State management actions
       reset: () => set(() => initialState),
-      setError: (error) => set(() => ({ error })),
+      setError: (error) => {
+        console.log('[WorldStore] setError called with:', error);
+        set(() => ({ error }));
+      },
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),
+      
+      // Debug method to test persistence
+      testPersistence: () => {
+        console.log('[WorldStore] testPersistence called - setting error to test persistence');
+        set((state) => ({ 
+          ...state, 
+          error: 'Test persistence: ' + new Date().toISOString() 
+        }));
+      },
 
       // Fetch worlds action - loads from persisted state
       fetchWorlds: async () => {
