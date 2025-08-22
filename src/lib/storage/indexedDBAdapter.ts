@@ -81,14 +81,20 @@ export class IndexedDBAdapter {
 
         request.onsuccess = () => {
           const result = request.result;
+          console.log(`[IndexedDB] getItem result for ${key}:`, result);
+          
           if (result && result.value) {
+            console.log(`[IndexedDB] Found value for ${key}:`, result.value);
             // Handle both JSON and string data
             if (typeof result.value === 'string') {
+              console.log(`[IndexedDB] Returning string value for ${key}`);
               resolve(result.value);
             } else {
+              console.log(`[IndexedDB] Stringifying object value for ${key}`);
               resolve(JSON.stringify(result.value));
             }
           } else {
+            console.log(`[IndexedDB] No result or no value for ${key}:`, { result, hasValue: result?.value });
             resolve(null);
           }
         };
@@ -128,10 +134,13 @@ export class IndexedDBAdapter {
           dataToStore = value;
         }
 
-        const request = store.put({ 
+        const objectToStore = { 
           id: key, 
           value: dataToStore 
-        }, key);
+        };
+        console.log(`[IndexedDB] setItem storing for ${key}:`, objectToStore);
+        
+        const request = store.put(objectToStore, key);
 
         request.onsuccess = () => {
           // Don't wait for oncomplete in the request handler
