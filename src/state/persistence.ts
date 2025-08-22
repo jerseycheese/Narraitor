@@ -74,13 +74,17 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
   
   setItem: async (name: string, value: { state: unknown; version?: number }): Promise<void> => {
     try {
+      console.log(`[Persistence] Setting item: ${name}`, value);
       const storage = await getResilientStorage();
       // Convert the StorageValue object to a JSON string
-      await storage.setItem(name, JSON.stringify(value));
+      const jsonValue = JSON.stringify(value);
+      console.log(`[Persistence] JSON value for ${name}:`, jsonValue.substring(0, 200) + '...');
+      await storage.setItem(name, jsonValue);
+      console.log(`[Persistence] Successfully set item: ${name}`);
     } catch (error) {
       // Resilient storage handles errors internally with retry logic and fallback
       // No need to handle errors here as the storage middleware manages them
-      console.warn('Persistence setItem failed:', error);
+      console.error(`[Persistence] setItem failed for ${name}:`, error);
     }
   },
   
