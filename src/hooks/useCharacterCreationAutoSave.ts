@@ -131,10 +131,12 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     
     const loadData = () => {
       const saved = localStorage.getItem(saveKey);
+      console.log(`[AutoSave] Loading data for key ${saveKey}:`, saved ? 'Found data' : 'No data');
       if (saved) {
         setHasRecoveryData(true);
         try {
           const parsed = JSON.parse(saved);
+          console.log('[AutoSave] Successfully parsed recovery data:', parsed);
           setDataInternal(parsed);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
@@ -143,6 +145,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
         }
       } else {
+        console.log('[AutoSave] No recovery data found');
         setHasRecoveryData(false);
         hasLoadedRef.current = true; // Mark as loaded even if no data found
       }
