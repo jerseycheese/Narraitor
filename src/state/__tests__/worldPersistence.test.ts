@@ -1,6 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { useWorldStore } from '../worldStore';
-import { getResilientStorageInstance } from '../persistence';
 import { IndexedDBAdapter } from '@/lib/storage/indexedDBAdapter';
 import { ResilientStorageMiddleware } from '@/lib/storage/resilientStorage';
 
@@ -8,18 +7,17 @@ import { ResilientStorageMiddleware } from '@/lib/storage/resilientStorage';
 const mockIndexedDB = () => {
   let stores: Record<string, Record<string, string>> = {};
   let initPromise: Promise<void> | null = null;
-  let isInitialized = false;
 
   const mockDB = {
     transaction: jest.fn(() => ({
       objectStore: jest.fn(() => ({
         get: jest.fn((key: string) => ({
           onsuccess: function() {
-            // @ts-ignore
+            // @ts-expect-error - Mock IndexedDB result assignment
             this.result = stores['worlds']?.[key] ? { value: stores['worlds'][key] } : undefined;
           }
         })),
-        put: jest.fn((data: any, key: string) => {
+        put: jest.fn((data: { value: string }, key: string) => {
           if (!stores['worlds']) stores['worlds'] = {};
           stores['worlds'][key] = data.value;
           return {
@@ -35,11 +33,11 @@ const mockIndexedDB = () => {
     value: {
       open: jest.fn(() => ({
         onsuccess: function() {
-          // @ts-ignore
+          // @ts-expect-error - Mock IndexedDB result assignment
           this.result = mockDB;
         },
         onupgradeneeded: function() {
-          // @ts-ignore
+          // @ts-expect-error - Mock IndexedDB result assignment
           this.result = {
             ...mockDB,
             createObjectStore: jest.fn(() => ({}))
@@ -55,12 +53,10 @@ const mockIndexedDB = () => {
     stores,
     reset: () => {
       stores = {};
-      isInitialized = false;
       initPromise = null;
     },
     simulateInitDelay: (ms: number = 100) => {
       initPromise = new Promise(resolve => setTimeout(() => {
-        isInitialized = true;
         resolve();
       }, ms));
       return initPromise;
@@ -112,7 +108,7 @@ describe('World Persistence Infrastructure', () => {
       });
 
       // Verify the world exists in all store instances
-      hooks.forEach((hook, index) => {
+      hooks.forEach((hook) => {
         const worlds = Object.values(hook.result.current.worlds);
         expect(worlds).toHaveLength(1);
         expect(worlds[0].name).toBe('Test Race Condition World');
@@ -125,7 +121,7 @@ describe('World Persistence Infrastructure', () => {
         value: {
           open: jest.fn(() => ({
             onerror: function() {
-              // @ts-ignore
+              // @ts-expect-error - Mock IndexedDB error assignment
               this.error = new Error('IndexedDB initialization failed');
             }
           }))

@@ -120,16 +120,6 @@ export const getResilientStorageInstance = async (): Promise<ResilientStorageMid
  * Debug storage contents (for console debugging)
  */
 export const debugStorage = {
-  async getAllKeys(): Promise<string[]> {
-    const storage = await getResilientStorage();
-    return await storage.debugGetAllKeys();
-  },
-  
-  async getAllData(): Promise<unknown[]> {
-    const storage = await getResilientStorage();
-    return await storage.debugGetAllData();
-  },
-  
   async inspectKey(key: string): Promise<string | null> {
     const storage = await getResilientStorage();
     return await storage.getItem(key);

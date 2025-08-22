@@ -6,7 +6,7 @@
  * even when browser storage fails.
  */
 
-import { IndexedDBAdapter, IIndexedDBAdapter } from './indexedDBAdapter';
+import { IndexedDBAdapter } from './indexedDBAdapter';
 import { handleStorageError } from '../../utils/storageHelpers';
 
 /**
@@ -61,7 +61,7 @@ export interface ResilientStorageConfig {
  * - Storage health monitoring
  */
 export class ResilientStorageMiddleware {
-  private adapter: IIndexedDBAdapter | null = null;
+  private adapter: IndexedDBAdapter | null = null;
   private memoryStorage: Map<string, string> = new Map();
   private status: StorageStatus = StorageStatus.HEALTHY;
   private lastError: StorageError | null = null;
@@ -414,25 +414,6 @@ export class ResilientStorageMiddleware {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  /**
-   * Debug method to inspect all keys in IndexedDB
-   */
-  async debugGetAllKeys(): Promise<string[]> {
-    if (!this.adapter) {
-      await this.initializeAdapter();
-    }
-    return this.adapter?.debugGetAllKeys?.() ?? [];
-  }
-
-  /**
-   * Debug method to inspect all data in IndexedDB
-   */
-  async debugGetAllData(): Promise<unknown[]> {
-    if (!this.adapter) {
-      await this.initializeAdapter();
-    }
-    return this.adapter?.debugGetAllData?.() ?? [];
-  }
 
   /**
    * Cleanup resources
