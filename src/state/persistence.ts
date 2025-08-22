@@ -13,6 +13,7 @@ import { isStorageAvailable } from '../utils/storageHelpers';
  * retry logic, fallback mechanisms, and recovery detection.
  */
 let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
+let resilientStorageInstance: ResilientStorageMiddleware | null = null;
 
 /**
  * Get ResilientStorageMiddleware instance with lazy initialization.
@@ -20,24 +21,32 @@ let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
  * Handles initialization failures gracefully with memory fallback.
  */
 const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
+  if (resilientStorageInstance) {
+    console.log('[Persistence] Reusing existing storage instance');
+    return resilientStorageInstance;
+  }
+  
   if (!resilientStoragePromise) {
-    resilientStoragePromise = Promise.resolve(
-      new ResilientStorageMiddleware({
+    console.log('[Persistence] Creating new storage instance');
+    resilientStoragePromise = (async () => {
+      const storage = new ResilientStorageMiddleware({
         retryAttempts: 3,
         baseDelay: 1000,
         maxDelay: 8000,
         onStatusChange: (status, error) => {
           // Notify user about storage status changes
           if (error?.shouldNotify) {
-            console.warn('Storage status changed:', status, error);
+            console.warn('[Persistence] Storage status changed:', status, error);
           }
         },
-      })
-    );
-    
-    // Start health monitoring
-    const storage = await resilientStoragePromise;
-    storage.startHealthMonitoring(30000); // Check every 30 seconds
+      });
+      
+      // Start health monitoring
+      storage.startHealthMonitoring(30000); // Check every 30 seconds
+      resilientStorageInstance = storage;
+      console.log('[Persistence] Storage instance created and cached');
+      return storage;
+    })();
   }
   
   return resilientStoragePromise;
@@ -105,4 +114,24 @@ export const checkPersistenceAvailable = async (): Promise<boolean> => {
  */
 export const getResilientStorageInstance = async (): Promise<ResilientStorageMiddleware> => {
   return await getResilientStorage();
+};
+
+/**
+ * Debug storage contents (for console debugging)
+ */
+export const debugStorage = {
+  async getAllKeys(): Promise<string[]> {
+    const storage = await getResilientStorage();
+    return await storage.debugGetAllKeys();
+  },
+  
+  async getAllData(): Promise<unknown[]> {
+    const storage = await getResilientStorage();
+    return await storage.debugGetAllData();
+  },
+  
+  async inspectKey(key: string): Promise<string | null> {
+    const storage = await getResilientStorage();
+    return await storage.getItem(key);
+  }
 };
