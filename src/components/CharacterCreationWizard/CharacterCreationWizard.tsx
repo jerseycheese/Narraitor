@@ -271,7 +271,22 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
    */
   const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
     if (choice === 'dismiss') {
+      console.log('[CharacterCreationWizard] User dismissed recovery data, clearing auto-save');
       clearAutoSave();
+    } else if (choice === 'recover') {
+      console.log('[CharacterCreationWizard] User chose to recover data:', data);
+      // Force wizard to use the recovered data
+      if (data?.characterData) {
+        const recoveredData = data.characterData as CharacterCreationData;
+        console.log('[CharacterCreationWizard] Applying recovered character data:', recoveredData);
+        wizard.updateData(recoveredData);
+        
+        // Restore the step position
+        if (data.currentStep !== undefined) {
+          console.log('[CharacterCreationWizard] Restoring step position:', data.currentStep);
+          wizard.goToStep(data.currentStep);
+        }
+      }
     }
     setShowRecoveryDialog(false);
   };

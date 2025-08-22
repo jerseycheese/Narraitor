@@ -8,6 +8,7 @@ import { ToneSettings, DEFAULT_TONE_SETTINGS } from '../types/tone-settings.type
 import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
 import { validateWorld } from '../types/type-guards';
+import { debugStorage } from './persistence';
 
 /**
  * World store interface with state and actions
@@ -542,4 +543,5 @@ export const useWorldStore = create<WorldStore>()(
 // Debug: Add to global scope for console testing
 if (typeof window !== 'undefined') {
   (window as any).debugWorldStore = useWorldStore;
+  (window as any).debugStorage = debugStorage;
 }

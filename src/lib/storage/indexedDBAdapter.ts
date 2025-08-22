@@ -7,7 +7,15 @@
  * Error handling is designed for graceful degradation - operations fail silently 
  * to allow the application to continue functioning when persistence is unavailable.
  */
-export class IndexedDBAdapter {
+export interface IIndexedDBAdapter {
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+  removeItem(key: string): Promise<void>;
+  debugGetAllKeys?(): Promise<string[]>;
+  debugGetAllData?(): Promise<unknown[]>;
+}
+
+export class IndexedDBAdapter implements IIndexedDBAdapter {
   private dbName = 'narraitor-state';
   private version = 1;
   private storeName = 'narraitor-store';
@@ -31,31 +39,71 @@ export class IndexedDBAdapter {
    */
   async initialize(): Promise<void> {
     if (typeof indexedDB === 'undefined') {
+      console.log('[IndexedDB] IndexedDB not available in this environment');
       return; // Gracefully handle environments without IndexedDB
     }
 
-    return new Promise((resolve) => {
-      const request = indexedDB.open(this.dbName, this.version);
+    // If already initialized, don't reinitialize
+    if (this.db) {
+      console.log('[IndexedDB] Database already initialized');
+      return;
+    }
 
-      request.onerror = () => resolve(); // Don't reject, just continue without persistence
-      
-      request.onsuccess = (event: Event) => {
-        this.db = (event.target as IDBOpenDBRequest).result;
-        resolve();
-      };
+    console.log('[IndexedDB] Starting database initialization');
+    return new Promise((resolve, reject) => {
+      try {
+        const request = indexedDB.open(this.dbName, this.version);
 
-      request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
-        const db = (event.target as IDBOpenDBRequest).result;
+        request.onerror = (event) => {
+          console.error('[IndexedDB] Database open failed:', event);
+          resolve(); // Don't reject, just continue without persistence
+        };
         
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName);
-        }
+        request.onsuccess = (event: Event) => {
+          console.log('[IndexedDB] Database opened successfully');
+          this.db = (event.target as IDBOpenDBRequest).result;
+          
+          // Add error handler for the database connection
+          this.db.onerror = (event) => {
+            console.error('[IndexedDB] Database error:', event);
+          };
+          
+          resolve();
+        };
 
-        const transaction = (event.target as IDBOpenDBRequest).transaction;
-        if (transaction) {
-          transaction.oncomplete = () => resolve();
-        }
-      };
+        request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
+          console.log('[IndexedDB] Database upgrade needed');
+          const db = (event.target as IDBOpenDBRequest).result;
+          
+          if (!db.objectStoreNames.contains(this.storeName)) {
+            console.log(`[IndexedDB] Creating object store: ${this.storeName}`);
+            db.createObjectStore(this.storeName);
+          }
+
+          const transaction = (event.target as IDBOpenDBRequest).transaction;
+          if (transaction) {
+            transaction.oncomplete = () => {
+              console.log('[IndexedDB] Database upgrade complete');
+              resolve();
+            };
+            transaction.onerror = (event) => {
+              console.error('[IndexedDB] Database upgrade failed:', event);
+              resolve(); // Don't reject, continue without persistence
+            };
+          } else {
+            resolve();
+          }
+        };
+
+        request.onblocked = (event) => {
+          console.warn('[IndexedDB] Database open blocked:', event);
+          // Still try to continue - resolve after a delay
+          setTimeout(() => resolve(), 100);
+        };
+      } catch (error) {
+        console.error('[IndexedDB] Exception during initialization:', error);
+        resolve(); // Don't reject, continue without persistence
+      }
     });
   }
 
@@ -65,43 +113,70 @@ export class IndexedDBAdapter {
    * @returns Promise resolving to the stored value or null if not found
    */
   async getItem(key: string): Promise<string | null> {
+    console.log(`[IndexedDB] getItem called for key: ${key}`);
+    
     if (!this.db) {
+      console.log(`[IndexedDB] Database not initialized for ${key}, initializing...`);
       await this.initialize();
     }
     
     if (!this.db || typeof indexedDB === 'undefined') {
+      console.log(`[IndexedDB] Database unavailable for ${key}:`, { 
+        hasDB: !!this.db, 
+        hasIndexedDB: typeof indexedDB !== 'undefined' 
+      });
       return null;
     }
 
     try {
-      return new Promise((resolve) => {
-        const transaction = this.db!.transaction([this.storeName], 'readonly');
-        const store = transaction.objectStore(this.storeName);
-        const request = store.get(key);
-
-        request.onsuccess = () => {
-          const result = request.result;
-          console.log(`[IndexedDB] getItem result for ${key}:`, result);
+      console.log(`[IndexedDB] Starting transaction for ${key}`);
+      return new Promise((resolve, reject) => {
+        try {
+          const transaction = this.db!.transaction([this.storeName], 'readonly');
+          console.log(`[IndexedDB] Transaction created for ${key}`);
           
-          if (result && result.value) {
-            console.log(`[IndexedDB] Found value for ${key}:`, result.value);
-            // Handle both JSON and string data
-            if (typeof result.value === 'string') {
-              console.log(`[IndexedDB] Returning string value for ${key}`);
-              resolve(result.value);
-            } else {
-              console.log(`[IndexedDB] Stringifying object value for ${key}`);
-              resolve(JSON.stringify(result.value));
-            }
-          } else {
-            console.log(`[IndexedDB] No result or no value for ${key}:`, { result, hasValue: result?.value });
-            resolve(null);
-          }
-        };
+          const store = transaction.objectStore(this.storeName);
+          console.log(`[IndexedDB] Object store accessed for ${key}`);
+          
+          const request = store.get(key);
+          console.log(`[IndexedDB] Get request initiated for ${key}`);
 
-        request.onerror = () => resolve(null);
+          request.onsuccess = () => {
+            const result = request.result;
+            console.log(`[IndexedDB] getItem result for ${key}:`, result);
+            
+            if (result && result.value) {
+              console.log(`[IndexedDB] Found value for ${key}:`, result.value);
+              // Handle both JSON and string data
+              if (typeof result.value === 'string') {
+                console.log(`[IndexedDB] Returning string value for ${key}`);
+                resolve(result.value);
+              } else {
+                console.log(`[IndexedDB] Stringifying object value for ${key}`);
+                resolve(JSON.stringify(result.value));
+              }
+            } else {
+              console.log(`[IndexedDB] No result or no value for ${key}:`, { result, hasValue: result?.value });
+              resolve(null);
+            }
+          };
+
+          request.onerror = (event) => {
+            console.error(`[IndexedDB] getItem request error for ${key}:`, event);
+            resolve(null);
+          };
+          
+          transaction.onerror = (event) => {
+            console.error(`[IndexedDB] Transaction error for ${key}:`, event);
+            resolve(null);
+          };
+        } catch (error) {
+          console.error(`[IndexedDB] Exception in getItem transaction for ${key}:`, error);
+          resolve(null);
+        }
       });
-    } catch {
+    } catch (error) {
+      console.error(`[IndexedDB] Exception in getItem for ${key}:`, error);
       return null;
     }
   }
@@ -197,6 +272,78 @@ export class IndexedDBAdapter {
         };
       } catch {
         resolve();
+      }
+    });
+  }
+
+  /**
+   * Debug method to inspect all keys in the database
+   * @returns Promise resolving to array of all keys in storage
+   */
+  async debugGetAllKeys(): Promise<string[]> {
+    if (!this.db) {
+      await this.initialize();
+    }
+    
+    if (!this.db || typeof indexedDB === 'undefined') {
+      return [];
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const transaction = this.db!.transaction([this.storeName], 'readonly');
+        const store = transaction.objectStore(this.storeName);
+        const request = store.getAllKeys();
+
+        request.onsuccess = () => {
+          const keys = request.result as string[];
+          console.log('[IndexedDB] All keys in database:', keys);
+          resolve(keys);
+        };
+
+        request.onerror = () => {
+          console.error('[IndexedDB] Failed to get all keys');
+          resolve([]);
+        };
+      } catch (error) {
+        console.error('[IndexedDB] Exception getting all keys:', error);
+        resolve([]);
+      }
+    });
+  }
+
+  /**
+   * Debug method to inspect all data in the database
+   * @returns Promise resolving to array of all stored objects
+   */
+  async debugGetAllData(): Promise<unknown[]> {
+    if (!this.db) {
+      await this.initialize();
+    }
+    
+    if (!this.db || typeof indexedDB === 'undefined') {
+      return [];
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const transaction = this.db!.transaction([this.storeName], 'readonly');
+        const store = transaction.objectStore(this.storeName);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+          const data = request.result;
+          console.log('[IndexedDB] All data in database:', data);
+          resolve(data);
+        };
+
+        request.onerror = () => {
+          console.error('[IndexedDB] Failed to get all data');
+          resolve([]);
+        };
+      } catch (error) {
+        console.error('[IndexedDB] Exception getting all data:', error);
+        resolve([]);
       }
     });
   }
