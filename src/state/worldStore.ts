@@ -65,6 +65,8 @@ export const useWorldStore = create<WorldStore>()(
 
       // Create world
       createWorld: (worldData) => {
+        console.log('[WorldStore] createWorld called with:', worldData);
+        
         if (!worldData.name || safeTrim(worldData.name) === '') {
           throw new Error('World name is required');
         }
@@ -93,13 +95,20 @@ export const useWorldStore = create<WorldStore>()(
           updatedAt: now,
         };
 
-        set((state) => ({
-          worlds: {
-            ...state.worlds,
-            [worldId]: newWorld,
-          },
-        }));
+        console.log('[WorldStore] Creating new world:', newWorld);
 
+        set((state) => {
+          const newState = {
+            worlds: {
+              ...state.worlds,
+              [worldId]: newWorld,
+            },
+          };
+          console.log('[WorldStore] Updated state after createWorld:', newState);
+          return newState;
+        });
+
+        console.log('[WorldStore] createWorld completed, returning ID:', worldId);
         return worldId;
       },
 
@@ -443,6 +452,16 @@ export const useWorldStore = create<WorldStore>()(
       name: 'narraitor-world-store',
       storage: createIndexedDBStorage(),
       version: 1,
+      onRehydrateStorage: (state) => {
+        console.log('[WorldStore] Starting rehydration, current state:', state);
+        return (state, error) => {
+          if (error) {
+            console.error('[WorldStore] Rehydration failed:', error);
+          } else {
+            console.log('[WorldStore] Rehydration successful, final state:', state);
+          }
+        };
+      },
       // Migration strategy for future schema updates
       // Current implementation is minimal for MVP but will need expansion
       // for handling complex migrations in future versions:
