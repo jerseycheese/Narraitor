@@ -50,14 +50,24 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
 export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
   getItem: async (name: string): Promise<{ state: unknown; version?: number } | null> => {
     try {
+      console.log(`[Persistence] Getting item: ${name}`);
       const storage = await getResilientStorage();
       const result = await storage.getItem(name);
       
-      if (!result) return null;
+      console.log(`[Persistence] Raw result for ${name}:`, result);
+      
+      if (!result) {
+        console.log(`[Persistence] No data found for ${name}`);
+        return null;
+      }
+      
       // Parse the JSON string into a StorageValue object
-      return JSON.parse(result) as { state: unknown; version?: number };
-    } catch {
+      const parsed = JSON.parse(result) as { state: unknown; version?: number };
+      console.log(`[Persistence] Parsed result for ${name}:`, parsed);
+      return parsed;
+    } catch (error) {
       // Gracefully handle retrieval errors by returning null
+      console.error(`[Persistence] Error getting item ${name}:`, error);
       return null;
     }
   },

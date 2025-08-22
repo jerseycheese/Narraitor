@@ -451,26 +451,35 @@ export const useWorldStore = create<WorldStore>()(
       // - Add validation of migrated data
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       migrate: (persistedState: unknown, version: number) => {
+        console.log('[WorldStore] Migration started with state:', persistedState);
+        
         // Validate persisted worlds before restoring
         if (persistedState && typeof persistedState === 'object' && 'worlds' in persistedState) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const state = persistedState as any;
+          console.log('[WorldStore] Found state with worlds:', Object.keys(state.worlds || {}));
+          
           if (state.worlds && typeof state.worlds === 'object') {
             // Validate each world in storage
             const invalidWorlds: Record<string, unknown> = {};
             for (const [worldId, world] of Object.entries(state.worlds)) {
+              console.log(`[WorldStore] Validating world ${worldId}:`, world);
               const validation = validateWorld(world);
               if (!validation.valid) {
-                console.warn(`Invalid world data in storage for ${worldId}:`, validation.errors[0]);
+                console.error(`[WorldStore] Invalid world data in storage for ${worldId}:`, validation.errors);
+                console.error(`[WorldStore] World data:`, world);
                 // Backup invalid world before removal
                 invalidWorlds[worldId] = world;
                 // Remove invalid world to prevent crashes
                 delete state.worlds[worldId];
+              } else {
+                console.log(`[WorldStore] World ${worldId} passed validation`);
               }
             }
             
             // If any invalid worlds, backup to localStorage and set error state
             if (Object.keys(invalidWorlds).length > 0) {
+              console.error(`[WorldStore] Removed ${Object.keys(invalidWorlds).length} invalid worlds:`, invalidWorlds);
               try {
                 if (typeof window !== 'undefined' && window.localStorage) {
                   window.localStorage.setItem(
@@ -485,7 +494,11 @@ export const useWorldStore = create<WorldStore>()(
               state.error = `${Object.keys(invalidWorlds).length} invalid world(s) were found and removed to prevent crashes. A backup has been saved. Please check the console for details.`;
             }
           }
+        } else {
+          console.log('[WorldStore] No persisted state or worlds found, starting fresh');
         }
+        
+        console.log('[WorldStore] Migration complete, returning state:', persistedState);
         return persistedState as WorldStore;
       }
     }
