@@ -538,3 +538,8 @@ export const useWorldStore = create<WorldStore>()(
     }
   )
 );
+
+// Debug: Add to global scope for console testing
+if (typeof window !== 'undefined') {
+  (window as any).debugWorldStore = useWorldStore;
+}
