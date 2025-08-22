@@ -47,7 +47,9 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
  * Create resilient IndexedDB storage for Zustand persistence
  * @returns Persistence storage implementation compatible with Zustand
  */
-export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
+export const createIndexedDBStorage = (): PersistStorage<unknown> => {
+  console.log('[Persistence] Creating IndexedDB storage adapter');
+  return {
   getItem: async (name: string): Promise<{ state: unknown; version?: number } | null> => {
     try {
       console.log(`[Persistence] Getting item: ${name}`);
@@ -97,7 +99,8 @@ export const createIndexedDBStorage = (): PersistStorage<unknown> => ({
       console.warn('Persistence removeItem failed:', error);
     }
   }
-});
+  };
+};
 
 /**
  * Persistence configuration for stores
