@@ -79,7 +79,7 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
       ];
       
       // Check for loading text patterns
-      const loadingTextPatterns = ['Loading', 'Thinking up some options', 'Generating', 'Please wait'];
+      const loadingTextPatterns = ['Loading', 'Generating', 'Please wait'];
       const allElements = document.querySelectorAll('*');
       
       for (let elem of allElements) {
