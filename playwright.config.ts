@@ -76,8 +76,8 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        // Standard desktop viewport for consistent screenshots
-        viewport: { width: 1280, height: 720 },
+        // Standard desktop viewport for consistent screenshots (height > 800px for test requirements)
+        viewport: { width: 1280, height: 1024 },
         // Browser launch options for consistent font rendering
         launchOptions: {
           args: [
