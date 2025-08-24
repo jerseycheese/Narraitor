@@ -95,7 +95,7 @@ export const DevToolsPanel = () => {
   return (
     <div 
       data-testid="devtools-panel-container"
-      className={`fixed top-0 left-0 right-0 bg-slate-800 border-b-2 border-slate-600 z-[9999] overflow-hidden ${
+      className={`bg-slate-800 border-t-2 border-slate-600 overflow-hidden ${
         isOpen ? 'max-h-[50vh]' : 'h-12'
       } min-h-[3rem] shadow-lg`}
     >
