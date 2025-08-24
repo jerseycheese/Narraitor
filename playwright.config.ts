@@ -133,6 +133,5 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   
   // Ignore certain files
-  // TEMPORARY: Skip all visual tests due to CI timeout issues
-  testIgnore: ['**/node_modules/**', '**/tests/visual/**'],
+  testIgnore: '**/node_modules/**',
 });
