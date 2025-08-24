@@ -18,9 +18,7 @@ import { test, expect } from '@playwright/test';
  * - Responsive design breakpoints maintain layout integrity
  */
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Homepage Visual Regression', () => {
+test.describe('Homepage Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Ensure consistent state before each test
     await page.goto('/');
@@ -157,9 +155,7 @@ test.describe.skip('Homepage Visual Regression', () => {
   });
 });
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Homepage Responsive Visual Regression', () => {
+test.describe('Homepage Responsive Visual Regression', () => {
   // Test visual consistency across different viewport sizes
   // Critical for responsive design validation
   
@@ -221,9 +217,7 @@ test.describe.skip('Homepage Responsive Visual Regression', () => {
   });
 });
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Homepage Error State Visual Regression', () => {
+test.describe('Homepage Error State Visual Regression', () => {
   test('should handle error states visually consistently', async ({ page }) => {
     // Test error state visual consistency
     // Important for user experience during failures

@@ -14,9 +14,7 @@ import path from 'path';
  * - Visual comparison thresholds are configured to prevent false positives
  */
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Playwright Visual Testing Configuration', () => {
+test.describe('Playwright Visual Testing Configuration', () => {
   test('should have playwright configuration file', async () => {
     // This test will FAIL initially - this is expected for TDD red phase
     const configPath = path.join(process.cwd(), 'playwright.config.ts');
@@ -81,9 +79,7 @@ test.describe.skip('Playwright Visual Testing Configuration', () => {
   });
 });
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Visual Testing Infrastructure Validation', () => {
+test.describe('Visual Testing Infrastructure Validation', () => {
   test('should create screenshot directories automatically', async ({ page }) => {
     // Test that the visual testing infrastructure creates necessary directories
     await page.goto('/');
@@ -124,9 +120,7 @@ test.describe.skip('Visual Testing Infrastructure Validation', () => {
  * These tests ensure that each browser is configured properly for visual regression.
  * They validate that browser-specific settings don't cause inconsistent screenshots.
  */
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Browser-Specific Visual Configuration', () => {
+test.describe('Browser-Specific Visual Configuration', () => {
   // Test will run across all configured browsers
   ['chromium', 'firefox', 'webkit'].forEach(browserName => {
     test(`should have consistent rendering in ${browserName}`, async ({ page, browserName: currentBrowser }) => {

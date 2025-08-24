@@ -18,9 +18,7 @@ import { test, expect } from '@playwright/test';
  * - Character summary and controls are visually stable
  */
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Game Session Interface Visual Regression', () => {
+test.describe('Game Session Interface Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to game session page
     await page.goto('/play');
@@ -141,7 +139,7 @@ test.describe.skip('Game Session Interface Visual Regression', () => {
   });
 });
 
-test.describe.skip('Game Session Interactive Elements Visual Tests', () => {
+test.describe('Game Session Interactive Elements Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/play');
     await page.waitForLoadState('networkidle');
@@ -255,7 +253,7 @@ test.describe.skip('Game Session Interactive Elements Visual Tests', () => {
   });
 });
 
-test.describe.skip('Game Session Loading and Error States Visual Tests', () => {
+test.describe('Game Session Loading and Error States Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/play');
     await page.waitForLoadState('networkidle');
@@ -345,7 +343,7 @@ test.describe.skip('Game Session Loading and Error States Visual Tests', () => {
   });
 });
 
-test.describe.skip('Game Session Responsive Visual Tests', () => {
+test.describe('Game Session Responsive Visual Tests', () => {
   const viewports = [
     { name: 'mobile', width: 375, height: 667 },
     { name: 'tablet', width: 768, height: 1024 },
@@ -391,7 +389,7 @@ test.describe.skip('Game Session Responsive Visual Tests', () => {
   });
 });
 
-test.describe.skip('Game Session Empty and Initial States Visual Tests', () => {
+test.describe('Game Session Empty and Initial States Visual Tests', () => {
   test('should maintain new game session visual layout', async ({ page }) => {
     // Test visual appearance of a fresh game session
     await page.goto('/play');

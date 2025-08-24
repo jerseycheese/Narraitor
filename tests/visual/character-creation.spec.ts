@@ -18,9 +18,7 @@ import { test, expect } from '@playwright/test';
  * - Form validation states are visually stable
  */
 
-// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
-// TODO: Re-enable after fixing CI environment setup - these tests work locally
-test.describe.skip('Character Creation Wizard Visual Regression', () => {
+test.describe('Character Creation Wizard Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to character creation page
     await page.goto('/characters/create');
@@ -111,7 +109,7 @@ test.describe.skip('Character Creation Wizard Visual Regression', () => {
   });
 });
 
-test.describe.skip('Character Attributes/Skills Visual Regression', () => {
+test.describe('Character Attributes/Skills Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
     await page.waitForLoadState('networkidle');
@@ -231,7 +229,7 @@ test.describe.skip('Character Attributes/Skills Visual Regression', () => {
   });
 });
 
-test.describe.skip('Character Portrait Visual Regression', () => {
+test.describe('Character Portrait Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
     await page.waitForLoadState('networkidle');
@@ -343,7 +341,7 @@ test.describe.skip('Character Portrait Visual Regression', () => {
   });
 });
 
-test.describe.skip('Character Creation Validation Visual Tests', () => {
+test.describe('Character Creation Validation Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
     await page.waitForLoadState('networkidle');
@@ -415,7 +413,7 @@ test.describe.skip('Character Creation Validation Visual Tests', () => {
   });
 });
 
-test.describe.skip('Character Creation Multi-Step Flow Visual Tests', () => {
+test.describe('Character Creation Multi-Step Flow Visual Tests', () => {
   test('should maintain visual consistency across character creation steps', async ({ page }) => {
     // Test the complete multi-step character creation flow
     await page.goto('/characters/create');
