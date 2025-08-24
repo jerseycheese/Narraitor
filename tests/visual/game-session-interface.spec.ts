@@ -9,6 +9,8 @@ import { waitForGameSessionReady } from './utils/testHelpers';
  * primary user experience of Narraitor.
  */
 
+// TEMPORARY: Skip visual tests due to CI navigation timeout issues 
+// TODO: Re-enable after fixing CI environment setup - these tests work locally
 test.describe('Game Session Visual Interface Tests', () => {
   test.skip('game session startup and loading states', async ({ page }) => {
     // Navigate to the play page
