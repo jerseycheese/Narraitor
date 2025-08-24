@@ -101,11 +101,33 @@ test.describe('Homepage Visual Regression', () => {
     // Test that interactive elements have consistent visual states
     // Important for user experience and accessibility
     
-    const buttons = page.locator('button, [role="button"], a[href]:visible');
+    // Find proper UI buttons, excluding accessibility skip links and elements outside viewport
+    const buttons = page.locator('button:not(.sr-only), [role="button"]:not(.sr-only), a[href]:not(.sr-only):not([href="#main-content"])').filter({
+      has: page.locator(':visible')
+    });
+    
     const buttonCount = await buttons.count();
     
     if (buttonCount > 0) {
-      const firstButton = buttons.first();
+      // Find the first button that's actually in the viewport and hoverable
+      let firstButton = buttons.first();
+      
+      // Check if the first button is hoverable, if not try the next ones
+      for (let i = 0; i < Math.min(buttonCount, 3); i++) {
+        const testButton = buttons.nth(i);
+        try {
+          // Test if element is in viewport and can be hovered
+          await testButton.scrollIntoViewIfNeeded();
+          const boundingBox = await testButton.boundingBox();
+          if (boundingBox && boundingBox.width > 0 && boundingBox.height > 0) {
+            firstButton = testButton;
+            break;
+          }
+        } catch (error) {
+          console.warn(`Button ${i} not hoverable, trying next one`);
+          continue;
+        }
+      }
       
       // Default state
       await expect(firstButton).toHaveScreenshot('homepage-button-default.png', {
