@@ -8,7 +8,7 @@ import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
 import { isStorageAvailable } from '../utils/storageHelpers';
 
 /**
- * Single resilient storage instance with lazy initialization pattern.
+ * Single resilient storage promise with lazy initialization pattern.
  * This avoids race conditions during initialization and provides
  * retry logic, fallback mechanisms, and recovery detection.
  */
@@ -21,23 +21,27 @@ let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
  */
 const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
   if (!resilientStoragePromise) {
-    resilientStoragePromise = Promise.resolve(
-      new ResilientStorageMiddleware({
+    console.log('[Persistence] Creating new storage instance');
+    resilientStoragePromise = (async () => {
+      const storage = new ResilientStorageMiddleware({
         retryAttempts: 3,
         baseDelay: 1000,
         maxDelay: 8000,
         onStatusChange: (status, error) => {
           // Notify user about storage status changes
           if (error?.shouldNotify) {
-            console.warn('Storage status changed:', status, error);
+            console.warn('[Persistence] Storage status changed:', status, error);
           }
         },
-      })
-    );
-    
-    // Start health monitoring
-    const storage = await resilientStoragePromise;
-    storage.startHealthMonitoring(30000); // Check every 30 seconds
+      });
+      
+      // Start health monitoring
+      storage.startHealthMonitoring(30000); // Check every 30 seconds
+      console.log('[Persistence] Storage instance created and cached');
+      return storage;
+    })();
+  } else {
+    console.log('[Persistence] Reusing existing storage promise');
   }
   
   return resilientStoragePromise;
@@ -105,4 +109,14 @@ export const checkPersistenceAvailable = async (): Promise<boolean> => {
  */
 export const getResilientStorageInstance = async (): Promise<ResilientStorageMiddleware> => {
   return await getResilientStorage();
+};
+
+/**
+ * Debug storage contents (for console debugging)
+ */
+export const debugStorage = {
+  async inspectKey(key: string): Promise<string | null> {
+    const storage = await getResilientStorage();
+    return await storage.getItem(key);
+  }
 };

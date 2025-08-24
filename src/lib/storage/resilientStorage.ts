@@ -67,6 +67,7 @@ export class ResilientStorageMiddleware {
   private lastError: StorageError | null = null;
   private lastSuccessfulSync: string | null = null;
   private healthCheckInterval: NodeJS.Timeout | null = null;
+  private initializationPromise: Promise<void> | null = null;
   
   private readonly config: Required<ResilientStorageConfig>;
 
@@ -78,7 +79,13 @@ export class ResilientStorageMiddleware {
       onStatusChange: config.onStatusChange ?? (() => {}),
     };
     
-    this.initializeAdapter();
+    // Start initialization but don't block constructor
+    // Store the initialization promise for proper error handling
+    this.initializationPromise = this.doInitializeAdapter().catch(error => {
+      console.warn('[ResilientStorage] Background initialization failed:', error);
+      // Don't re-throw here - let getItem handle initialization when needed
+      return Promise.resolve();
+    });
   }
 
   /**
@@ -86,11 +93,32 @@ export class ResilientStorageMiddleware {
    * Attempts to create an IndexedDB adapter and falls back to memory-only mode on failure
    */
   private async initializeAdapter(): Promise<void> {
+    // If already initialized, return immediately
+    if (this.adapter) {
+      return Promise.resolve();
+    }
+    
+    // Return existing promise if initialization is already in progress
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+    
+    // Create and cache the initialization promise
+    this.initializationPromise = this.doInitializeAdapter();
+    return this.initializationPromise;
+  }
+
+  /**
+   * Internal method to perform the actual initialization
+   */
+  private async doInitializeAdapter(): Promise<void> {
     try {
+      console.log('[ResilientStorage] Initializing IndexedDB adapter');
       this.adapter = await IndexedDBAdapter.create();
+      console.log('[ResilientStorage] IndexedDB adapter initialized successfully');
       this.updateStatus(StorageStatus.HEALTHY);
     } catch (error) {
-      console.warn('Failed to initialize IndexedDB adapter:', error);
+      console.warn('[ResilientStorage] Failed to initialize IndexedDB adapter:', error);
       this.handleStorageFailure(error as Error);
     }
   }
@@ -99,6 +127,12 @@ export class ResilientStorageMiddleware {
    * Get an item from storage with retry logic and fallback
    */
   async getItem(key: string): Promise<string | null> {
+    // Ensure adapter is initialized before attempting access
+    if (!this.adapter) {
+      console.log(`[ResilientStorage] Adapter not ready for ${key}, initializing...`);
+      await this.initializeAdapter();
+    }
+
     // Try storage first if available
     if (this.status === StorageStatus.HEALTHY || this.status === StorageStatus.DEGRADED) {
       try {
@@ -110,12 +144,13 @@ export class ResilientStorageMiddleware {
           return result;
         }
       } catch (error) {
-        console.warn(`Storage getItem failed for key ${key}:`, error);
+        console.warn(`[ResilientStorage] Storage getItem failed for key ${key}:`, error);
         this.handleStorageFailure(error as Error);
       }
     }
 
     // Fallback to memory storage
+    console.log(`[ResilientStorage] Using memory fallback for ${key}`);
     return this.memoryStorage.get(key) ?? null;
   }
 
@@ -380,6 +415,7 @@ export class ResilientStorageMiddleware {
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
 
   /**
    * Cleanup resources
