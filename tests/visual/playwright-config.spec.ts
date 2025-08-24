@@ -141,18 +141,49 @@ test.describe('Browser-Specific Visual Configuration', () => {
     // Font rendering can cause visual differences between browsers
     await page.goto('/');
     
-    // Add test content with various font styles
-    await page.setContent(`
-      <div style="font-family: system-ui, sans-serif; padding: 20px;">
+    // Wait for app to be fully built and ready (consistent with other tests)
+    await page.waitForLoadState('domcontentloaded', { timeout: 15000 });
+    
+    // Wait for any loading indicators to disappear
+    try {
+      await page.waitForSelector('main, body', { timeout: 10000 });
+      await page.waitForTimeout(2000); // Allow fonts and styling to load
+    } catch (error) {
+      console.warn('App may still be building, continuing with test');
+    }
+    
+    // Inject test content into the existing page instead of replacing it
+    await page.evaluate(() => {
+      // Remove any existing test content
+      const existingTest = document.getElementById('font-rendering-test');
+      if (existingTest) existingTest.remove();
+      
+      const testDiv = document.createElement('div');
+      testDiv.id = 'font-rendering-test';
+      testDiv.style.cssText = `
+        font-family: system-ui, sans-serif; 
+        padding: 20px; 
+        background: white; 
+        margin: 20px;
+        border: 1px solid #ccc;
+        position: relative;
+        z-index: 1;
+      `;
+      testDiv.innerHTML = `
         <h1>Visual Regression Test</h1>
         <p>This text tests font rendering consistency across browsers.</p>
         <p style="font-weight: bold;">Bold text rendering test</p>
         <p style="font-style: italic;">Italic text rendering test</p>
-      </div>
-    `);
+      `;
+      document.body.appendChild(testDiv);
+    });
     
-    // Should render consistently once proper font loading is configured
-    await expect(page).toHaveScreenshot('font-rendering-test.png', {
+    // Wait for the test element to be rendered
+    const testElement = page.locator('#font-rendering-test');
+    await testElement.waitFor({ state: 'visible' });
+    
+    // Take screenshot of just the test content
+    await expect(testElement).toHaveScreenshot('font-rendering-test.png', {
       threshold: 0.2 // Allow slight font rendering differences
     });
   });
