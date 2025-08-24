@@ -332,11 +332,26 @@ test.describe('World Creation Multi-Step Visual Flow', () => {
     const nextButton = page.locator('button:has-text("Next"), [data-testid="next-button"]').first();
     
     if (await nextButton.count() > 0) {
-      // Fill minimal required data to progress
+      // Check if we're on the template selection step (button shows "Use Selected Template")
+      const useTemplateButton = page.locator('button:has-text("Use Selected Template")');
+      if (await useTemplateButton.count() > 0) {
+        // First select a template to enable the button
+        const templateCards = page.locator('[data-testid^="template-card-"]');
+        if (await templateCards.count() > 0) {
+          console.log('Selecting first available template');
+          await templateCards.first().click();
+          await page.waitForTimeout(500); // Wait for selection to register
+        }
+      }
+      
+      // Fill minimal required data if on basic info step
       const nameInput = page.locator('input[name*="name"], input[placeholder*="name"]').first();
       if (await nameInput.count() > 0) {
         await nameInput.fill('Test World');
       }
+      
+      // Wait for button to become enabled
+      await page.waitForTimeout(1000);
       
       await nextButton.click();
       await page.waitForTimeout(200); // Allow step transition
