@@ -80,9 +80,11 @@ export class ResilientStorageMiddleware {
     };
     
     // Start initialization but don't block constructor
-    // getItem will ensure initialization is complete before access
-    this.initializeAdapter().catch(error => {
+    // Store the initialization promise for proper error handling
+    this.initializationPromise = this.doInitializeAdapter().catch(error => {
       console.warn('[ResilientStorage] Background initialization failed:', error);
+      // Don't re-throw here - let getItem handle initialization when needed
+      return Promise.resolve();
     });
   }
 
@@ -91,14 +93,14 @@ export class ResilientStorageMiddleware {
    * Attempts to create an IndexedDB adapter and falls back to memory-only mode on failure
    */
   private async initializeAdapter(): Promise<void> {
+    // If already initialized, return immediately
+    if (this.adapter) {
+      return Promise.resolve();
+    }
+    
     // Return existing promise if initialization is already in progress
     if (this.initializationPromise) {
       return this.initializationPromise;
-    }
-    
-    // If already initialized, return immediately
-    if (this.adapter) {
-      return;
     }
     
     // Create and cache the initialization promise

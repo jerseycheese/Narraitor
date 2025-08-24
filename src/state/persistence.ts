@@ -8,12 +8,11 @@ import { ResilientStorageMiddleware } from '../lib/storage/resilientStorage';
 import { isStorageAvailable } from '../utils/storageHelpers';
 
 /**
- * Single resilient storage instance with lazy initialization pattern.
+ * Single resilient storage promise with lazy initialization pattern.
  * This avoids race conditions during initialization and provides
  * retry logic, fallback mechanisms, and recovery detection.
  */
 let resilientStoragePromise: Promise<ResilientStorageMiddleware> | null = null;
-let resilientStorageInstance: ResilientStorageMiddleware | null = null;
 
 /**
  * Get ResilientStorageMiddleware instance with lazy initialization.
@@ -21,11 +20,6 @@ let resilientStorageInstance: ResilientStorageMiddleware | null = null;
  * Handles initialization failures gracefully with memory fallback.
  */
 const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
-  if (resilientStorageInstance) {
-    console.log('[Persistence] Reusing existing storage instance');
-    return resilientStorageInstance;
-  }
-  
   if (!resilientStoragePromise) {
     console.log('[Persistence] Creating new storage instance');
     resilientStoragePromise = (async () => {
@@ -43,10 +37,11 @@ const getResilientStorage = async (): Promise<ResilientStorageMiddleware> => {
       
       // Start health monitoring
       storage.startHealthMonitoring(30000); // Check every 30 seconds
-      resilientStorageInstance = storage;
       console.log('[Persistence] Storage instance created and cached');
       return storage;
     })();
+  } else {
+    console.log('[Persistence] Reusing existing storage promise');
   }
   
   return resilientStoragePromise;

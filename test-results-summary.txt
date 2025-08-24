@@ -1,0 +1,1024 @@
+
+> narraitor@0.1.0 test:visual
+> playwright test --project=chromium --timeout=15000
+
+
+Running 113 tests using 6 workers
+
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  4 [chromium] › tests/visual/character-creation.spec.ts:62:3 › Character Creation Wizard Visual Regression › should maintain character name input visual consistency (7.4s)
+  ✓  2 [chromium] › tests/visual/character-creation.spec.ts:141:3 › Character Attributes/Skills Visual Regression › should maintain attribute assignment interface visual consistency (7.5s)
+  ✓  6 [chromium] › tests/visual/character-creation.spec.ts:164:3 › Character Attributes/Skills Visual Regression › should maintain point pool visual consistency (7.4s)
+  ✓  3 [chromium] › tests/visual/character-creation.spec.ts:52:3 › Character Creation Wizard Visual Regression › should maintain character basic info step visual layout (7.5s)
+  ✓  1 [chromium] › tests/visual/character-creation.spec.ts:41:3 › Character Creation Wizard Visual Regression › should maintain character creation wizard layout consistency (7.5s)
+  ✘  5 [chromium] › tests/visual/character-creation.spec.ts:88:3 › Character Creation Wizard Visual Regression › should maintain character description area visual consistency (12.9s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  8 [chromium] › tests/visual/character-creation.spec.ts:211:3 › Character Attributes/Skills Visual Regression › should maintain skill selection visual consistency (5.9s)
+  ✓  10 [chromium] › tests/visual/character-creation.spec.ts:280:3 › Character Portrait Visual Regression › should maintain portrait placeholder visual consistency (5.9s)
+  ✓  11 [chromium] › tests/visual/character-creation.spec.ts:293:3 › Character Portrait Visual Regression › should maintain portrait generation controls visual consistency (5.9s)
+  ✓  7 [chromium] › tests/visual/character-creation.spec.ts:187:3 › Character Attributes/Skills Visual Regression › should maintain attribute slider visual states (5.9s)
+  ✓  9 [chromium] › tests/visual/character-creation.spec.ts:257:3 › Character Portrait Visual Regression › should maintain portrait generation interface visual consistency (6.0s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  13 [chromium] › tests/visual/character-creation.spec.ts:381:3 › Character Creation Validation Visual Tests › should maintain point allocation validation visual feedback (6.1s)
+  ✓  15 [chromium] › tests/visual/character-creation.spec.ts:400:3 › Character Creation Validation Visual Tests › should maintain required field indicators visual consistency (6.2s)
+  -  19 [chromium] › tests/visual/components.spec.ts:17:5 › UI Component Visual Tests › Navigation Components › navigation header component
+  -  20 [chromium] › tests/visual/components.spec.ts:30:5 › UI Component Visual Tests › Page Layout Components › landing page main content
+  -  21 [chromium] › tests/visual/components.spec.ts:41:5 › UI Component Visual Tests › Page Layout Components › characters page layout
+  -  22 [chromium] › tests/visual/components.spec.ts:52:5 › UI Component Visual Tests › Page Layout Components › worlds page layout
+  -  23 [chromium] › tests/visual/core-interface.spec.ts:14:3 › Narraitor Core Interface Visual Tests › landing page layout and navigation
+  -  24 [chromium] › tests/visual/core-interface.spec.ts:32:3 › Narraitor Core Interface Visual Tests › worlds listing and cards layout
+  -  25 [chromium] › tests/visual/core-interface.spec.ts:50:3 › Narraitor Core Interface Visual Tests › characters listing and creation flow
+  -  26 [chromium] › tests/visual/core-interface.spec.ts:68:3 › Narraitor Core Interface Visual Tests › world creation wizard interface
+  -  27 [chromium] › tests/visual/core-interface.spec.ts:86:3 › Narraitor Core Interface Visual Tests › character creation interface
+  -  28 [chromium] › tests/visual/game-session-interface.spec.ts:15:8 › Game Session Visual Interface Tests › game session startup and loading states
+  -  29 [chromium] › tests/visual/game-session-interface.spec.ts:33:8 › Game Session Visual Interface Tests › narrative display and text formatting (with AI content)
+  -  30 [chromium] › tests/visual/game-session-interface.spec.ts:68:8 › Game Session Visual Interface Tests › static UI components (strict visual validation)
+  -  31 [chromium] › tests/visual/game-session-interface.spec.ts:94:8 › Game Session Visual Interface Tests › game controls and interface elements
+  -  32 [chromium] › tests/visual/game-session-interface.spec.ts:112:8 › Game Session Visual Interface Tests › journal and progress tracking interface
+  -  33 [chromium] › tests/visual/game-session-interface.spec.ts:130:8 › Game Session Visual Interface Tests › ending and completion screens
+  ✓  17 [chromium] › tests/visual/character-creation.spec.ts:461:3 › Character Creation Multi-Step Flow Visual Tests › should maintain character creation progress indicator (6.1s)
+  ✓  12 [chromium] › tests/visual/character-creation.spec.ts:316:3 › Character Portrait Visual Regression › should maintain portrait loading state visual consistency (6.1s)
+  ✓  16 [chromium] › tests/visual/character-creation.spec.ts:418:3 › Character Creation Multi-Step Flow Visual Tests › should maintain visual consistency across character creation steps (6.2s)
+  ✓  14 [chromium] › tests/visual/character-creation.spec.ts:351:3 › Character Creation Validation Visual Tests › should maintain validation error visual consistency (6.3s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  18 [chromium] › tests/visual/character-creation.spec.ts:493:3 › Character Creation Multi-Step Flow Visual Tests › should maintain character creation summary/review visual layout (7.3s)
+  ✓  37 [chromium] › tests/visual/game-session.spec.ts:98:3 › Game Session Interface Visual Regression › should maintain character summary visual layout (7.3s)
+  ✓  36 [chromium] › tests/visual/game-session.spec.ts:75:3 › Game Session Interface Visual Regression › should maintain choice selection interface visual consistency (7.3s)
+  ✓  38 [chromium] › tests/visual/game-session.spec.ts:121:3 › Game Session Interface Visual Regression › should maintain game controls visual consistency (7.2s)
+  ✓  35 [chromium] › tests/visual/game-session.spec.ts:52:3 › Game Session Interface Visual Regression › should maintain narrative display visual consistency (7.4s)
+  ✓  34 [chromium] › tests/visual/game-session.spec.ts:41:3 › Game Session Interface Visual Regression › should maintain game session layout consistency (7.4s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  40 [chromium] › tests/visual/game-session.spec.ts:185:3 › Game Session Interactive Elements Visual Tests › should maintain custom action input visual consistency (6.3s)
+  ✓  41 [chromium] › tests/visual/game-session.spec.ts:211:3 › Game Session Interactive Elements Visual Tests › should maintain journal/history interface visual consistency (6.3s)
+  ✓  42 [chromium] › tests/visual/game-session.spec.ts:235:3 › Game Session Interactive Elements Visual Tests › should maintain inventory interface visual consistency (6.3s)
+  ✓  43 [chromium] › tests/visual/game-session.spec.ts:263:3 › Game Session Loading and Error States Visual Tests › should maintain loading state visual consistency (6.2s)
+  ✓  39 [chromium] › tests/visual/game-session.spec.ts:159:3 › Game Session Interactive Elements Visual Tests › should maintain choice button visual states (6.4s)
+  ✓  44 [chromium] › tests/visual/game-session.spec.ts:302:3 › Game Session Loading and Error States Visual Tests › should maintain error state visual consistency (7.7s)
+  ✓  49 [chromium] › tests/visual/game-session.spec.ts:378:3 › Game Session Responsive Visual Tests › should maintain mobile game controls layout (1.6s)
+  ✓  50 [chromium] › tests/visual/game-session.spec.ts:394:3 › Game Session Empty and Initial States Visual Tests › should maintain new game session visual layout (1.1s)
+  ✓  51 [chromium] › tests/visual/game-session.spec.ts:417:3 › Game Session Empty and Initial States Visual Tests › should maintain game session placeholder states (1.0s)
+  ✓  52 [chromium] › tests/visual/game-session.spec.ts:433:3 › Game Session Empty and Initial States Visual Tests › should maintain game session selection interface (1.4s)
+  ✓  53 [chromium] › tests/visual/homepage.spec.ts:43:3 › Homepage Visual Regression › should maintain visual consistency of homepage layout (3.0s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  47 [chromium] › tests/visual/game-session.spec.ts:355:5 › Game Session Responsive Visual Tests › should maintain game session visual consistency on tablet viewport (6.2s)
+  ✓  46 [chromium] › tests/visual/game-session.spec.ts:355:5 › Game Session Responsive Visual Tests › should maintain game session visual consistency on mobile viewport (6.2s)
+  ✓  45 [chromium] › tests/visual/game-session.spec.ts:333:3 › Game Session Loading and Error States Visual Tests › should maintain narrative history visual consistency (6.2s)
+  ✓  48 [chromium] › tests/visual/game-session.spec.ts:355:5 › Game Session Responsive Visual Tests › should maintain game session visual consistency on desktop viewport (6.2s)
+  ✓  54 [chromium] › tests/visual/homepage.spec.ts:54:3 › Homepage Visual Regression › should maintain navigation header visual consistency (2.6s)
+  ✓  55 [chromium] › tests/visual/homepage.spec.ts:66:3 › Homepage Visual Regression › should maintain hero section visual layout (2.6s)
+  -  56 [chromium] › tests/visual/homepage.spec.ts:85:3 › Homepage Visual Regression › should maintain footer visual consistency
+  ✓  59 [chromium] › tests/visual/homepage.spec.ts:171:5 › Homepage Responsive Visual Regression › should maintain visual consistency on mobile viewport (2.6s)
+  ✓  60 [chromium] › tests/visual/homepage.spec.ts:171:5 › Homepage Responsive Visual Regression › should maintain visual consistency on tablet viewport (2.7s)
+  ✓  61 [chromium] › tests/visual/homepage.spec.ts:171:5 › Homepage Responsive Visual Regression › should maintain visual consistency on desktop viewport (2.5s)
+  -  65 [chromium] › tests/visual/homepage.spec.ts:254:3 › Homepage Error State Visual Regression › should handle offline state visual consistency
+  ✓  66 [chromium] › tests/visual/playwright-config.spec.ts:18:3 › Playwright Visual Testing Configuration › should have playwright configuration file (0ms)
+  ✓  67 [chromium] › tests/visual/playwright-config.spec.ts:27:3 › Playwright Visual Testing Configuration › should have visual comparison settings configured (511ms)
+  ✓  62 [chromium] › tests/visual/homepage.spec.ts:171:5 › Homepage Responsive Visual Regression › should maintain visual consistency on wide viewport (2.7s)
+  ✘  68 [chromium] › tests/visual/playwright-config.spec.ts:43:3 › Playwright Visual Testing Configuration › should have consistent browser viewport configuration (129ms)
+  ✓  58 [chromium] › tests/visual/homepage.spec.ts:129:3 › Homepage Visual Regression › should maintain loading state visual consistency (5.3s)
+  ✓  63 [chromium] › tests/visual/homepage.spec.ts:194:3 › Homepage Responsive Visual Regression › should handle mobile navigation menu visual consistency (2.9s)
+  ✓  64 [chromium] › tests/visual/homepage.spec.ts:222:3 › Homepage Error State Visual Regression › should handle error states visually consistently (2.7s)
+  ✓  69 [chromium] › tests/visual/playwright-config.spec.ts:55:3 › Playwright Visual Testing Configuration › should disable animations for consistent screenshots (543ms)
+  -  73 [chromium] › tests/visual/playwright-config.spec.ts:126:5 › Browser-Specific Visual Configuration › should have consistent rendering in firefox
+  ✓  75 [chromium] › tests/visual/playwright-config.spec.ts:68:3 › Playwright Visual Testing Configuration › should have multiple browser configurations for cross-browser testing (5ms)
+  ✓  70 [chromium] › tests/visual/playwright-config.spec.ts:83:3 › Visual Testing Infrastructure Validation › should create screenshot directories automatically (642ms)
+  -  74 [chromium] › tests/visual/playwright-config.spec.ts:126:5 › Browser-Specific Visual Configuration › should have consistent rendering in webkit
+  ✓  71 [chromium] › tests/visual/playwright-config.spec.ts:95:3 › Visual Testing Infrastructure Validation › should handle screenshot comparison failures gracefully (714ms)
+  ✓  72 [chromium] › tests/visual/playwright-config.spec.ts:126:5 › Browser-Specific Visual Configuration › should have consistent rendering in chromium (635ms)
+  ✘  76 [chromium] › tests/visual/playwright-config.spec.ts:140:3 › Browser-Specific Visual Configuration › should handle font rendering consistently across browsers (1.6s)
+  ✓  80 [chromium] › tests/visual/settings.spec.ts:96:3 › Settings Page Visual Regression › should maintain settings save/reset buttons visual consistency (3.1s)
+  ✓  77 [chromium] › tests/visual/settings.spec.ts:41:3 › Settings Page Visual Regression › should maintain settings page layout consistency (3.5s)
+  ✓  79 [chromium] › tests/visual/settings.spec.ts:75:3 › Settings Page Visual Regression › should maintain settings form controls visual consistency (3.2s)
+  ✓  78 [chromium] › tests/visual/settings.spec.ts:52:3 › Settings Page Visual Regression › should maintain settings navigation/sections visual consistency (3.5s)
+  ✓  81 [chromium] › tests/visual/settings.spec.ts:131:3 › Settings Form Input Visual Tests › should maintain text input visual states (2.5s)
+  ✓  82 [chromium] › tests/visual/settings.spec.ts:155:3 › Settings Form Input Visual Tests › should maintain checkbox visual states (2.6s)
+  ✓  83 [chromium] › tests/visual/settings.spec.ts:179:3 › Settings Form Input Visual Tests › should maintain select dropdown visual states (2.6s)
+  ✓  84 [chromium] › tests/visual/settings.spec.ts:205:3 › Settings Form Input Visual Tests › should maintain range slider visual states (2.6s)
+  ✓  85 [chromium] › tests/visual/settings.spec.ts:229:3 › Settings Form Input Visual Tests › should maintain textarea visual states (2.6s)
+  ✓  86 [chromium] › tests/visual/settings.spec.ts:260:3 › Settings Sections Visual Organization › should maintain user profile settings visual layout (2.4s)
+  ✓  89 [chromium] › tests/visual/settings.spec.ts:323:3 › Settings Sections Visual Organization › should maintain notification settings visual layout (2.6s)
+  ✓  87 [chromium] › tests/visual/settings.spec.ts:281:3 › Settings Sections Visual Organization › should maintain game preferences visual layout (2.7s)
+  ✓  88 [chromium] › tests/visual/settings.spec.ts:302:3 › Settings Sections Visual Organization › should maintain accessibility settings visual layout (2.7s)
+  ✓  90 [chromium] › tests/visual/settings.spec.ts:351:3 › Settings Validation and Feedback Visual Tests › should maintain validation error visual consistency (2.7s)
+  ✘  57 [chromium] › tests/visual/homepage.spec.ts:100:3 › Homepage Visual Regression › should handle interactive element hover states consistently (15.3s)
+  ✓  91 [chromium] › tests/visual/settings.spec.ts:370:3 › Settings Validation and Feedback Visual Tests › should maintain save success feedback visual consistency (2.5s)
+  ✓  92 [chromium] › tests/visual/settings.spec.ts:397:3 › Settings Validation and Feedback Visual Tests › should maintain unsaved changes indicator visual consistency (2.7s)
+  ✘  93 [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on mobile viewport (2.9s)
+  ✘  94 [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on tablet viewport (3.1s)
+  ✘  95 [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on desktop viewport (3.1s)
+  ✓  97 [chromium] › tests/visual/settings.spec.ts:447:3 › Settings Responsive Visual Tests › should maintain mobile settings navigation layout (2.5s)
+  ✘  96 [chromium] › tests/visual/settings.spec.ts:463:3 › Settings Empty and Loading States Visual Tests › should maintain settings loading state visual consistency (2.9s)
+  ✘  98 [chromium] › tests/visual/settings.spec.ts:493:3 › Settings Empty and Loading States Visual Tests › should maintain settings error state visual consistency (1.6s)
+  ✘  99 [chromium] › tests/visual/settings.spec.ts:517:3 › Settings Empty and Loading States Visual Tests › should maintain default settings visual layout (3.1s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✘  102 [chromium] › tests/visual/world-creation.spec.ts:52:3 › World Creation Wizard Visual Regression › should maintain step indicator visual consistency (6.1s)
+  ✘  100 [chromium] › tests/visual/world-creation.spec.ts:41:3 › World Creation Wizard Visual Regression › should maintain world creation wizard layout consistency (6.3s)
+  ✘  101 [chromium] › tests/visual/world-creation.spec.ts:75:3 › World Creation Wizard Visual Regression › should maintain basic info step visual layout (6.4s)
+  ✓  103 [chromium] › tests/visual/world-creation.spec.ts:85:3 › World Creation Wizard Visual Regression › should maintain form input visual consistency (5.6s)
+Game session appears to be fully loaded
+  ✓  104 [chromium] › tests/visual/world-creation.spec.ts:111:3 › World Creation Wizard Visual Regression › should maintain wizard navigation buttons visual consistency (5.7s)
+Game session appears to be fully loaded
+  ✓  105 [chromium] › tests/visual/world-creation.spec.ts:131:3 › World Creation Wizard Visual Regression › should maintain template selection visual layout (5.6s)
+Game session appears to be fully loaded
+  ✓  106 [chromium] › tests/visual/world-creation.spec.ts:245:3 › World Creation Image Generation Visual Tests › should maintain image generation interface visual consistency (5.6s)
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+Game session appears to be fully loaded
+  ✓  110 [chromium] › tests/visual/world-creation.spec.ts:269:3 › World Creation Image Generation Visual Tests › should maintain image upload visual states (5.8s)
+  ✓  108 [chromium] › tests/visual/world-creation.spec.ts:199:3 › World Creation Form Validation Visual Tests › should maintain required field indicators visual consistency (5.9s)
+  ✓  109 [chromium] › tests/visual/world-creation.spec.ts:217:3 › World Creation Form Validation Visual Tests › should maintain success state visual consistency (5.9s)
+  ✘  107 [chromium] › tests/visual/world-creation.spec.ts:171:3 › World Creation Form Validation Visual Tests › should maintain validation error visual consistency (6.4s)
+Game session appears to be fully loaded
+  ✓  111 [chromium] › tests/visual/world-creation.spec.ts:287:3 › World Creation Image Generation Visual Tests › should maintain loading state during image generation (5.6s)
+Game session appears to be fully loaded
+  ✘  112 [chromium] › tests/visual/world-creation.spec.ts:318:3 › World Creation Multi-Step Visual Flow › should maintain visual consistency across wizard steps (5.8s)
+Game session appears to be fully loaded
+  ✓  113 [chromium] › tests/visual/world-creation.spec.ts:352:3 › World Creation Multi-Step Visual Flow › should maintain wizard progress indicator throughout flow (5.5s)
+
+
+  1) [chromium] › tests/visual/character-creation.spec.ts:88:3 › Character Creation Wizard Visual Regression › should maintain character description area visual consistency 
+
+    Error: [31mTimed out 5000ms waiting for [39m[2mexpect([22m[31mlocator[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      Timeout 5000ms exceeded.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/character-creation.spec.ts-snapshots/character-creation-description-default-chromium-darwin.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(character-creation-description-default.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - waiting for locator('textarea, [name*="description"], [name*="background"]').first()[22m
+    [2m    - locator resolved to <meta name="description" content="A narrative-driven RPG framework using AI"/>[22m
+    [2m  - taking element screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - attempting scroll into view action[22m
+    [2m    2 × waiting for element to be stable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying scroll into view action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be stable[22m
+    [2m      - element is not visible[22m
+    [2m    - retrying scroll into view action[22m
+    [2m      - waiting 100ms[22m
+    [2m    10 × waiting for element to be stable[22m
+    [2m       - element is not visible[22m
+    [2m     - retrying scroll into view action[22m
+    [2m       - waiting 500ms[22m
+    [2m  - Timeout 5000ms exceeded.[22m
+
+
+      92 |     if (await descriptionArea.count() > 0) {
+      93 |       // Default state
+    > 94 |       await expect(descriptionArea).toHaveScreenshot('character-creation-description-default.png', {
+         |                                     ^
+      95 |         threshold: 0.2
+      96 |       });
+      97 |       
+        at /Users/jackhaas/Projects/narraitor/tests/visual/character-creation.spec.ts:94:37
+
+    attachment #1: character-creation-description-default-expected.png (image/png) ─────────────────
+    tests/visual/character-creation.spec.ts-snapshots/character-creation-description-default-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/character-creation-Charact-55edf-ion-area-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/character-creation-Charact-55edf-ion-area-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/character-creation-Charact-55edf-ion-area-visual-consistency-chromium/error-context.md
+
+  2) [chromium] › tests/visual/homepage.spec.ts:100:3 › Homepage Visual Regression › should handle interactive element hover states consistently 
+
+    [31mTest timeout of 15000ms exceeded.[39m
+
+    Error: locator.hover: Test timeout of 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button, [role="button"], a[href]:visible').first()[22m
+    [2m    - locator resolved to <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-md focus:shadow-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none">Skip to main content</a>[22m
+    [2m  - attempting hover action[22m
+    [2m    2 × waiting for element to be visible and stable[22m
+    [2m      - element is visible and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - element is outside of the viewport[22m
+    [2m    - retrying hover action[22m
+    [2m    - waiting 20ms[22m
+    [2m    2 × waiting for element to be visible and stable[22m
+    [2m      - element is visible and stable[22m
+    [2m      - scrolling into view if needed[22m
+    [2m      - done scrolling[22m
+    [2m      - element is outside of the viewport[22m
+    [2m    - retrying hover action[22m
+    [2m      - waiting 100ms[22m
+    [2m    24 × waiting for element to be visible and stable[22m
+    [2m       - element is visible and stable[22m
+    [2m       - scrolling into view if needed[22m
+    [2m       - done scrolling[22m
+    [2m       - element is outside of the viewport[22m
+    [2m     - retrying hover action[22m
+    [2m       - waiting 500ms[22m
+
+
+      114 |       
+      115 |       // Hover state
+    > 116 |       await firstButton.hover();
+          |                         ^
+      117 |       await expect(firstButton).toHaveScreenshot('homepage-button-hover.png', {
+      118 |         threshold: 0.3 // Allow for hover effect differences
+      119 |       });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/homepage.spec.ts:116:25
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/homepage-Homepage-Visual-R-41a11-t-hover-states-consistently-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/homepage-Homepage-Visual-R-41a11-t-hover-states-consistently-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/homepage-Homepage-Visual-R-41a11-t-hover-states-consistently-chromium/error-context.md
+
+  3) [chromium] › tests/visual/playwright-config.spec.ts:43:3 › Playwright Visual Testing Configuration › should have consistent browser viewport configuration 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThan[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: > [32m800[39m
+    Received:   [31m720[39m
+
+      50 |     expect(viewport).not.toBeNull();
+      51 |     expect(viewport?.width).toBeGreaterThan(1200); // Ensure desktop viewport
+    > 52 |     expect(viewport?.height).toBeGreaterThan(800);
+         |                              ^
+      53 |   });
+      54 |
+      55 |   test('should disable animations for consistent screenshots', async ({ page }) => {
+        at /Users/jackhaas/Projects/narraitor/tests/visual/playwright-config.spec.ts:52:30
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/playwright-config-Playwrig-307b0-wser-viewport-configuration-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/playwright-config-Playwrig-307b0-wser-viewport-configuration-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/visual/playwright-config.spec.ts:140:3 › Browser-Specific Visual Configuration › should handle font rendering consistently across browsers 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      2829 pixels (ratio 0.01 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/playwright-config.spec.ts-snapshots/font-rendering-test-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/font-rendering-test-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/font-rendering-test-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(font-rendering-test.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 2829 pixels (ratio 0.01 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 2829 pixels (ratio 0.01 of all image pixels) are different.[22m
+
+
+      153 |     
+      154 |     // Should render consistently once proper font loading is configured
+    > 155 |     await expect(page).toHaveScreenshot('font-rendering-test.png', {
+          |                        ^
+      156 |       threshold: 0.2 // Allow slight font rendering differences
+      157 |     });
+      158 |   });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/playwright-config.spec.ts:155:24
+
+    attachment #1: font-rendering-test-expected.png (image/png) ────────────────────────────────────
+    tests/visual/playwright-config.spec.ts-snapshots/font-rendering-test-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: font-rendering-test-actual.png (image/png) ──────────────────────────────────────
+    test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/font-rendering-test-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: font-rendering-test-diff.png (image/png) ────────────────────────────────────────
+    test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/font-rendering-test-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/playwright-config-Browser--f17da-onsistently-across-browsers-chromium/error-context.md
+
+  5) [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on mobile viewport 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      35092 pixels (ratio 0.11 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-mobile-viewport-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/settings-mobile-viewport-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/settings-mobile-viewport-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-mobile-viewport.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 35092 pixels (ratio 0.11 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 35092 pixels (ratio 0.11 of all image pixels) are different.[22m
+
+
+      437 |       });
+      438 |       
+    > 439 |       await expect(page).toHaveScreenshot(`settings-${name}-viewport.png`, {
+          |                          ^
+      440 |         fullPage: true,
+      441 |         animations: 'disabled',
+      442 |         threshold: 0.3
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:439:26
+
+    attachment #1: settings-mobile-viewport-expected.png (image/png) ───────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-mobile-viewport-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-mobile-viewport-actual.png (image/png) ─────────────────────────────────
+    test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/settings-mobile-viewport-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-mobile-viewport-diff.png (image/png) ───────────────────────────────────
+    test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/settings-mobile-viewport-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Responsi-f8a36-sistency-on-mobile-viewport-chromium/error-context.md
+
+  6) [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on tablet viewport 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      55011 pixels (ratio 0.06 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-tablet-viewport-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/settings-tablet-viewport-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/settings-tablet-viewport-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-tablet-viewport.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 55011 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 55011 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      437 |       });
+      438 |       
+    > 439 |       await expect(page).toHaveScreenshot(`settings-${name}-viewport.png`, {
+          |                          ^
+      440 |         fullPage: true,
+      441 |         animations: 'disabled',
+      442 |         threshold: 0.3
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:439:26
+
+    attachment #1: settings-tablet-viewport-expected.png (image/png) ───────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-tablet-viewport-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-tablet-viewport-actual.png (image/png) ─────────────────────────────────
+    test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/settings-tablet-viewport-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-tablet-viewport-diff.png (image/png) ───────────────────────────────────
+    test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/settings-tablet-viewport-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Responsi-9947e-sistency-on-tablet-viewport-chromium/error-context.md
+
+  7) [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on desktop viewport 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      75820 pixels (ratio 0.07 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-desktop-viewport-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/settings-desktop-viewport-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/settings-desktop-viewport-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-desktop-viewport.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 75820 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 75820 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      437 |       });
+      438 |       
+    > 439 |       await expect(page).toHaveScreenshot(`settings-${name}-viewport.png`, {
+          |                          ^
+      440 |         fullPage: true,
+      441 |         animations: 'disabled',
+      442 |         threshold: 0.3
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:439:26
+
+    attachment #1: settings-desktop-viewport-expected.png (image/png) ──────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-desktop-viewport-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-desktop-viewport-actual.png (image/png) ────────────────────────────────
+    test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/settings-desktop-viewport-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-desktop-viewport-diff.png (image/png) ──────────────────────────────────
+    test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/settings-desktop-viewport-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Responsi-3e892-istency-on-desktop-viewport-chromium/error-context.md
+
+  8) [chromium] › tests/visual/settings.spec.ts:463:3 › Settings Empty and Loading States Visual Tests › should maintain settings loading state visual consistency 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      79730 pixels (ratio 0.07 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-loaded-state-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/settings-loaded-state-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/settings-loaded-state-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-loaded-state.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      485 |     // Wait for content to load and capture final state
+      486 |     await waitForAppReady(page);
+    > 487 |     await expect(page).toHaveScreenshot('settings-loaded-state.png', {
+          |                        ^
+      488 |       fullPage: true,
+      489 |       threshold: 0.3
+      490 |     });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:487:24
+
+    attachment #1: settings-loaded-state-expected.png (image/png) ──────────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-loaded-state-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-loaded-state-actual.png (image/png) ────────────────────────────────────
+    test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/settings-loaded-state-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-loaded-state-diff.png (image/png) ──────────────────────────────────────
+    test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/settings-loaded-state-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Empty-an-0d886-ng-state-visual-consistency-chromium/error-context.md
+
+  9) [chromium] › tests/visual/settings.spec.ts:493:3 › Settings Empty and Loading States Visual Tests › should maintain settings error state visual consistency 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      79730 pixels (ratio 0.07 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-with-error-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/settings-with-error-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/settings-with-error-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-with-error.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      509 |     
+      510 |     // Capture page with error state
+    > 511 |     await expect(page).toHaveScreenshot('settings-with-error.png', {
+          |                        ^
+      512 |       fullPage: true,
+      513 |       threshold: 0.3
+      514 |     });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:511:24
+
+    attachment #1: settings-with-error-expected.png (image/png) ────────────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-with-error-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-with-error-actual.png (image/png) ──────────────────────────────────────
+    test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/settings-with-error-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-with-error-diff.png (image/png) ────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/settings-with-error-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Empty-an-debc5-or-state-visual-consistency-chromium/error-context.md
+
+  10) [chromium] › tests/visual/settings.spec.ts:517:3 › Settings Empty and Loading States Visual Tests › should maintain default settings visual layout 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      79730 pixels (ratio 0.07 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts-snapshots/settings-default-state-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/settings-default-state-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/settings-default-state-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(settings-default-state.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 79730 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      521 |     
+      522 |     // Capture the default state of settings
+    > 523 |     await expect(page).toHaveScreenshot('settings-default-state.png', {
+          |                        ^
+      524 |       fullPage: true,
+      525 |       threshold: 0.3
+      526 |     });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/settings.spec.ts:523:24
+
+    attachment #1: settings-default-state-expected.png (image/png) ─────────────────────────────────
+    tests/visual/settings.spec.ts-snapshots/settings-default-state-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: settings-default-state-actual.png (image/png) ───────────────────────────────────
+    test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/settings-default-state-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: settings-default-state-diff.png (image/png) ─────────────────────────────────────
+    test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/settings-default-state-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/settings-Settings-Empty-an-c1046-ault-settings-visual-layout-chromium/error-context.md
+
+  11) [chromium] › tests/visual/world-creation.spec.ts:41:3 › World Creation Wizard Visual Regression › should maintain world creation wizard layout consistency 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      101497 pixels (ratio 0.09 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-wizard-layout-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/world-creation-wizard-layout-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/world-creation-wizard-layout-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(world-creation-wizard-layout.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 101497 pixels (ratio 0.09 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 101497 pixels (ratio 0.09 of all image pixels) are different.[22m
+
+
+      43 |     // Tests the overall wizard layout that users interact with
+      44 |     
+    > 45 |     await expect(page).toHaveScreenshot('world-creation-wizard-layout.png', {
+         |                        ^
+      46 |       fullPage: true,
+      47 |       animations: 'disabled',
+      48 |       threshold: 0.3
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:45:24
+
+    attachment #1: world-creation-wizard-layout-expected.png (image/png) ───────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-wizard-layout-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: world-creation-wizard-layout-actual.png (image/png) ─────────────────────────────
+    test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/world-creation-wizard-layout-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: world-creation-wizard-layout-diff.png (image/png) ───────────────────────────────
+    test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/world-creation-wizard-layout-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-creation-World-Creat-797b8-n-wizard-layout-consistency-chromium/error-context.md
+
+  12) [chromium] › tests/visual/world-creation.spec.ts:52:3 › World Creation Wizard Visual Regression › should maintain step indicator visual consistency 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      10231 pixels (ratio 0.13 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-navigation-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/world-creation-navigation-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/world-creation-navigation-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(world-creation-navigation.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - waiting for locator('header, nav, .wizard-header').first()[22m
+    [2m    - locator resolved to <nav role="banner" class="bg-gray-900 text-white shadow-lg">…</nav>[22m
+    [2m  - taking element screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - attempting scroll into view action[22m
+    [2m    - waiting for element to be stable[22m
+    [2m  - 10231 pixels (ratio 0.13 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - waiting for locator('header, nav, .wizard-header').first()[22m
+    [2m    - locator resolved to <nav role="banner" class="bg-gray-900 text-white shadow-lg">…</nav>[22m
+    [2m  - taking element screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - attempting scroll into view action[22m
+    [2m    - waiting for element to be stable[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 10231 pixels (ratio 0.13 of all image pixels) are different.[22m
+
+
+      66 |       const headerArea = page.locator('header, nav, .wizard-header').first();
+      67 |       if (await headerArea.count() > 0) {
+    > 68 |         await expect(headerArea).toHaveScreenshot('world-creation-navigation.png', {
+         |                                  ^
+      69 |           threshold: 0.2
+      70 |         });
+      71 |       }
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:68:34
+
+    attachment #1: world-creation-navigation-expected.png (image/png) ──────────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-navigation-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: world-creation-navigation-actual.png (image/png) ────────────────────────────────
+    test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/world-creation-navigation-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: world-creation-navigation-diff.png (image/png) ──────────────────────────────────
+    test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/world-creation-navigation-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-creation-World-Creat-0a7a4-ndicator-visual-consistency-chromium/error-context.md
+
+  13) [chromium] › tests/visual/world-creation.spec.ts:75:3 › World Creation Wizard Visual Regression › should maintain basic info step visual layout 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      Expected an image 1280px by 824px, received 1280px by 776px. 98686 pixels (ratio 0.10 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-basic-info-step-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/world-creation-basic-info-step-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/world-creation-basic-info-step-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(world-creation-basic-info-step.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - waiting for locator('form, main, .wizard-step').first()[22m
+    [2m    - locator resolved to <main tabindex="-1" id="main-content" class="min-h-screen pb-12 md:pb-14">…</main>[22m
+    [2m  - taking element screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - attempting scroll into view action[22m
+    [2m    - waiting for element to be stable[22m
+    [2m  - Expected an image 1280px by 824px, received 1280px by 776px. 98686 pixels (ratio 0.10 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - waiting for locator('form, main, .wizard-step').first()[22m
+    [2m    - locator resolved to <main tabindex="-1" id="main-content" class="min-h-screen pb-12 md:pb-14">…</main>[22m
+    [2m  - taking element screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - attempting scroll into view action[22m
+    [2m    - waiting for element to be stable[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - Expected an image 1280px by 824px, received 1280px by 776px. 98686 pixels (ratio 0.10 of all image pixels) are different.[22m
+
+
+      78 |     
+      79 |     const mainForm = page.locator('form, main, .wizard-step').first();
+    > 80 |     await expect(mainForm).toHaveScreenshot('world-creation-basic-info-step.png', {
+         |                            ^
+      81 |       threshold: 0.25
+      82 |     });
+      83 |   });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:80:28
+
+    attachment #1: world-creation-basic-info-step-expected.png (image/png) ─────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-basic-info-step-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: world-creation-basic-info-step-actual.png (image/png) ───────────────────────────
+    test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/world-creation-basic-info-step-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: world-creation-basic-info-step-diff.png (image/png) ─────────────────────────────
+    test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/world-creation-basic-info-step-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-creation-World-Creat-addbf-sic-info-step-visual-layout-chromium/error-context.md
+
+  14) [chromium] › tests/visual/world-creation.spec.ts:171:3 › World Creation Form Validation Visual Tests › should maintain validation error visual consistency 
+
+    Error: A snapshot doesn't exist at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-validation-error-chromium-darwin.png, writing actual.
+
+      184 |       
+      185 |       if (await errorMessages.count() > 0) {
+    > 186 |         await expect(errorMessages.first()).toHaveScreenshot('world-creation-validation-error.png', {
+          |         ^
+      187 |           threshold: 0.25
+      188 |         });
+      189 |       }
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:186:9
+
+    Error: A snapshot doesn't exist at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-form-with-errors-chromium-darwin.png, writing actual.
+
+      190 |       
+      191 |       // Capture the form with validation errors
+    > 192 |       await expect(page).toHaveScreenshot('world-creation-form-with-errors.png', {
+          |       ^
+      193 |         fullPage: true,
+      194 |         threshold: 0.3
+      195 |       });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:192:7
+
+    attachment #1: world-creation-validation-error-expected.png (image/png) ────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-validation-error-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: world-creation-validation-error-actual.png (image/png) ──────────────────────────
+    test-results/world-creation-World-Creat-46be1-on-error-visual-consistency-chromium/world-creation-validation-error-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: world-creation-form-with-errors-expected.png (image/png) ────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-form-with-errors-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: world-creation-form-with-errors-actual.png (image/png) ──────────────────────────
+    test-results/world-creation-World-Creat-46be1-on-error-visual-consistency-chromium/world-creation-form-with-errors-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-46be1-on-error-visual-consistency-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-46be1-on-error-visual-consistency-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-creation-World-Creat-46be1-on-error-visual-consistency-chromium/error-context.md
+
+  15) [chromium] › tests/visual/world-creation.spec.ts:318:3 › World Creation Multi-Step Visual Flow › should maintain visual consistency across wizard steps 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m
+
+      101497 pixels (ratio 0.09 of all image pixels) are different.
+
+    Expected: [33m/Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts-snapshots/world-creation-step-1-chromium-darwin.png[39m
+    Received: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/world-creation-step-1-actual.png[39m
+        Diff: [33m/Users/jackhaas/Projects/narraitor/test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/world-creation-step-1-diff.png[39m
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(world-creation-step-1.png)" with timeout 5000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 101497 pixels (ratio 0.09 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 101497 pixels (ratio 0.09 of all image pixels) are different.[22m
+
+
+      324 |     
+      325 |     // Capture initial step
+    > 326 |     await expect(page).toHaveScreenshot('world-creation-step-1.png', {
+          |                        ^
+      327 |       fullPage: true,
+      328 |       threshold: 0.3
+      329 |     });
+        at /Users/jackhaas/Projects/narraitor/tests/visual/world-creation.spec.ts:326:24
+
+    attachment #1: world-creation-step-1-expected.png (image/png) ──────────────────────────────────
+    tests/visual/world-creation.spec.ts-snapshots/world-creation-step-1-chromium-darwin.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: world-creation-step-1-actual.png (image/png) ────────────────────────────────────
+    test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/world-creation-step-1-actual.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: world-creation-step-1-diff.png (image/png) ──────────────────────────────────────
+    test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/world-creation-step-1-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/world-creation-World-Creat-0ef4d-istency-across-wizard-steps-chromium/error-context.md
+
+  15 failed
+    [chromium] › tests/visual/character-creation.spec.ts:88:3 › Character Creation Wizard Visual Regression › should maintain character description area visual consistency 
+    [chromium] › tests/visual/homepage.spec.ts:100:3 › Homepage Visual Regression › should handle interactive element hover states consistently 
+    [chromium] › tests/visual/playwright-config.spec.ts:43:3 › Playwright Visual Testing Configuration › should have consistent browser viewport configuration 
+    [chromium] › tests/visual/playwright-config.spec.ts:140:3 › Browser-Specific Visual Configuration › should handle font rendering consistently across browsers 
+    [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on mobile viewport 
+    [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on tablet viewport 
+    [chromium] › tests/visual/settings.spec.ts:424:5 › Settings Responsive Visual Tests › should maintain settings visual consistency on desktop viewport 
+    [chromium] › tests/visual/settings.spec.ts:463:3 › Settings Empty and Loading States Visual Tests › should maintain settings loading state visual consistency 
+    [chromium] › tests/visual/settings.spec.ts:493:3 › Settings Empty and Loading States Visual Tests › should maintain settings error state visual consistency 
+    [chromium] › tests/visual/settings.spec.ts:517:3 › Settings Empty and Loading States Visual Tests › should maintain default settings visual layout 
+    [chromium] › tests/visual/world-creation.spec.ts:41:3 › World Creation Wizard Visual Regression › should maintain world creation wizard layout consistency 
+    [chromium] › tests/visual/world-creation.spec.ts:52:3 › World Creation Wizard Visual Regression › should maintain step indicator visual consistency 
+    [chromium] › tests/visual/world-creation.spec.ts:75:3 › World Creation Wizard Visual Regression › should maintain basic info step visual layout 
+    [chromium] › tests/visual/world-creation.spec.ts:171:3 › World Creation Form Validation Visual Tests › should maintain validation error visual consistency 
+    [chromium] › tests/visual/world-creation.spec.ts:318:3 › World Creation Multi-Step Visual Flow › should maintain visual consistency across wizard steps 
+  19 skipped
+  79 passed (1.3m)
+
+[36m  Serving HTML report at http://localhost:9323. Press Ctrl+C to quit.[39m
