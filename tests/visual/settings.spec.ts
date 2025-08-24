@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForAppReady } from './utils/testHelpers';
 
 /**
  * Settings Page Layout Visual Regression Tests
@@ -22,7 +23,7 @@ test.describe('Settings Page Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to settings page
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Disable animations for consistent screenshots
     await page.addStyleTag({
@@ -114,7 +115,7 @@ test.describe('Settings Page Visual Regression', () => {
 test.describe('Settings Form Input Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Disable animations
     await page.addStyleTag({
@@ -253,7 +254,7 @@ test.describe('Settings Form Input Visual Tests', () => {
 test.describe('Settings Sections Visual Organization', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
   });
 
   test('should maintain user profile settings visual layout', async ({ page }) => {
@@ -344,7 +345,7 @@ test.describe('Settings Sections Visual Organization', () => {
 test.describe('Settings Validation and Feedback Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
   });
 
   test('should maintain validation error visual consistency', async ({ page }) => {
@@ -423,7 +424,7 @@ test.describe('Settings Responsive Visual Tests', () => {
     test(`should maintain settings visual consistency on ${name} viewport`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto('/settings');
-      await page.waitForLoadState('networkidle');
+      await waitForAppReady(page);
       
       // Disable animations
       await page.addStyleTag({
@@ -447,7 +448,7 @@ test.describe('Settings Responsive Visual Tests', () => {
     // Test mobile-specific settings navigation
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     const mobileNav = page.locator('.mobile-nav, .settings-mobile-menu, .collapsed-nav').first();
     if (await mobileNav.count() > 0) {
@@ -482,7 +483,7 @@ test.describe('Settings Empty and Loading States Visual Tests', () => {
     }
     
     // Wait for content to load and capture final state
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     await expect(page).toHaveScreenshot('settings-loaded-state.png', {
       fullPage: true,
       threshold: 0.3
@@ -516,7 +517,7 @@ test.describe('Settings Empty and Loading States Visual Tests', () => {
   test('should maintain default settings visual layout', async ({ page }) => {
     // Test visual appearance with default/empty settings
     await page.goto('/settings');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Capture the default state of settings
     await expect(page).toHaveScreenshot('settings-default-state.png', {

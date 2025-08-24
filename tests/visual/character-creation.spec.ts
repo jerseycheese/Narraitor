@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForGameSessionReady } from './utils/testHelpers';
 
 /**
  * Character Creation Flow Visual Regression Tests
@@ -22,7 +23,7 @@ test.describe('Character Creation Wizard Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to character creation page
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Disable animations for consistent screenshots
     await page.addStyleTag({
@@ -112,7 +113,7 @@ test.describe('Character Creation Wizard Visual Regression', () => {
 test.describe('Character Attributes/Skills Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Try to navigate to attributes step if wizard exists
     const nextButton = page.locator('button:has-text("Next"), [data-testid="next-button"]').first();
@@ -232,7 +233,7 @@ test.describe('Character Attributes/Skills Visual Regression', () => {
 test.describe('Character Portrait Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Navigate to portrait step if possible
     const nextButton = page.locator('button:has-text("Next")').first();
@@ -344,7 +345,7 @@ test.describe('Character Portrait Visual Regression', () => {
 test.describe('Character Creation Validation Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
   });
 
   test('should maintain validation error visual consistency', async ({ page }) => {
@@ -417,7 +418,7 @@ test.describe('Character Creation Multi-Step Flow Visual Tests', () => {
   test('should maintain visual consistency across character creation steps', async ({ page }) => {
     // Test the complete multi-step character creation flow
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Capture initial step
     await expect(page).toHaveScreenshot('character-creation-step-1.png', {
@@ -460,7 +461,7 @@ test.describe('Character Creation Multi-Step Flow Visual Tests', () => {
   test('should maintain character creation progress indicator', async ({ page }) => {
     // Test progress indicator throughout character creation
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     const progressElement = page.locator(
       '[role="progressbar"], .progress, .step-indicator, .wizard-steps'
@@ -492,7 +493,7 @@ test.describe('Character Creation Multi-Step Flow Visual Tests', () => {
   test('should maintain character creation summary/review visual layout', async ({ page }) => {
     // Test final review/summary step if it exists
     await page.goto('/characters/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Try to navigate to final step by filling minimal data and progressing
     const nextButton = page.locator('button:has-text("Next")');

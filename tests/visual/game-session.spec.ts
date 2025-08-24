@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForGameSessionReady } from './utils/testHelpers';
 
 /**
  * Game Session Interface Visual Regression Tests
@@ -22,7 +23,7 @@ test.describe('Game Session Interface Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to game session page
     await page.goto('/play');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Disable animations for consistent screenshots
     await page.addStyleTag({
@@ -142,7 +143,7 @@ test.describe('Game Session Interface Visual Regression', () => {
 test.describe('Game Session Interactive Elements Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/play');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Disable animations
     await page.addStyleTag({
@@ -256,7 +257,7 @@ test.describe('Game Session Interactive Elements Visual Tests', () => {
 test.describe('Game Session Loading and Error States Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/play');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
   });
 
   test('should maintain loading state visual consistency', async ({ page }) => {
@@ -354,7 +355,7 @@ test.describe('Game Session Responsive Visual Tests', () => {
     test(`should maintain game session visual consistency on ${name} viewport`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto('/play');
-      await page.waitForLoadState('networkidle');
+      await waitForGameSessionReady(page);
       
       // Disable animations
       await page.addStyleTag({

@@ -24,8 +24,36 @@ export async function waitForAppReady(page: Page): Promise<void> {
     // Wait for initial page load
     await page.waitForLoadState('networkidle', { timeout: 30000 });
     
-    // Wait for React hydration - look for interactive content
-    await page.waitForSelector('main', { timeout: 15000 });
+    // Wait for React hydration - specifically wait for loading state to disappear
+    await page.waitForFunction(() => {
+      // Check if still showing loading state
+      const body = document.body;
+      if (!body) return false;
+      
+      // Look for loading text that indicates app hasn't hydrated yet
+      const text = body.textContent || '';
+      if (text.includes('Loading...')) {
+        return false;
+      }
+      
+      // Check if we have meaningful content (more than just "Skip to main content")
+      const meaningfulElements = document.querySelectorAll('h1, h2, p, button, nav, main, form, input');
+      return meaningfulElements.length > 0;
+    }, { timeout: 30000 }).catch(() => {
+      console.warn('App did not fully hydrate within 30s - continuing anyway');
+    });
+    
+    // Wait for specific interactive elements that indicate the app has loaded
+    try {
+      await page.waitForSelector('main', { timeout: 5000 });
+    } catch {
+      // If no main, wait for any navigation or interactive content
+      try {
+        await page.waitForSelector('nav, header, [role="navigation"], h1, h2', { timeout: 5000 });
+      } catch {
+        console.warn('No main navigation or heading elements found - continuing anyway');
+      }
+    }
     
     // Wait for fonts to load - critical for consistent screenshots
     await page.waitForFunction(() => {
@@ -34,8 +62,8 @@ export async function waitForAppReady(page: Page): Promise<void> {
       console.warn('Font loading timeout - continuing anyway');
     });
     
-    // Additional wait for font rendering to stabilize
-    await page.waitForTimeout(2000);
+    // Additional wait for rendering to stabilize
+    await page.waitForTimeout(3000);
   } catch (error) {
     console.warn('waitForAppReady encountered an error:', error instanceof Error ? error.message : 'Unknown error');
     // Continue anyway - CI might have different timing

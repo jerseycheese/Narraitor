@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForGameSessionReady } from './utils/testHelpers';
 
 /**
  * World Creation Interface Visual Regression Tests
@@ -22,7 +23,7 @@ test.describe('World Creation Wizard Visual Regression', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to world creation page
     await page.goto('/world/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Disable animations for consistent screenshots
     await page.addStyleTag({
@@ -154,7 +155,7 @@ test.describe('World Creation Wizard Visual Regression', () => {
 test.describe('World Creation Form Validation Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/world/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Disable animations
     await page.addStyleTag({
@@ -238,7 +239,7 @@ test.describe('World Creation Form Validation Visual Tests', () => {
 test.describe('World Creation Image Generation Visual Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/world/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
   });
 
   test('should maintain image generation interface visual consistency', async ({ page }) => {
@@ -319,7 +320,7 @@ test.describe('World Creation Multi-Step Visual Flow', () => {
     // Critical for overall user experience
     
     await page.goto('/world/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     // Capture initial step
     await expect(page).toHaveScreenshot('world-creation-step-1.png', {
@@ -351,7 +352,7 @@ test.describe('World Creation Multi-Step Visual Flow', () => {
   test('should maintain wizard progress indicator throughout flow', async ({ page }) => {
     // Test that progress indicators update correctly across steps
     await page.goto('/world/create');
-    await page.waitForLoadState('networkidle');
+    await waitForGameSessionReady(page);
     
     const progressElement = page.locator(
       '[role="progressbar"], .progress, .step-indicator, .wizard-steps'

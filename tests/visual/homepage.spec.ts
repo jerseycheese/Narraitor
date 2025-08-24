@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { waitForAppReady } from './utils/testHelpers';
 
 /**
  * Homepage Visual Regression Tests
@@ -24,7 +25,7 @@ test.describe('Homepage Visual Regression', () => {
     await page.goto('/');
     
     // Wait for any initial loading to complete
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Disable animations for consistent screenshots
     await page.addStyleTag({
@@ -147,7 +148,7 @@ test.describe('Homepage Visual Regression', () => {
     }
     
     // Ensure final loaded state is consistent
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     await expect(page).toHaveScreenshot('homepage-loaded-state.png', {
       fullPage: true,
       threshold: 0.3
@@ -170,7 +171,7 @@ test.describe('Homepage Responsive Visual Regression', () => {
     test(`should maintain visual consistency on ${name} viewport`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto('/');
-      await page.waitForLoadState('networkidle');
+      await waitForAppReady(page);
       
       // Disable animations for consistent screenshots
       await page.addStyleTag({
@@ -194,7 +195,7 @@ test.describe('Homepage Responsive Visual Regression', () => {
     // Test mobile-specific navigation if it exists
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Look for mobile menu toggle
     const menuToggle = page.locator('[aria-label*="menu"], .menu-toggle, .hamburger, [data-testid="mobile-menu-toggle"]').first();
@@ -232,7 +233,7 @@ test.describe('Homepage Error State Visual Regression', () => {
     });
     
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await waitForAppReady(page);
     
     // Look for error messages or fallback content
     const errorElement = page.locator('[data-testid="error"], .error, [role="alert"]').first();
@@ -256,7 +257,7 @@ test.describe('Homepage Error State Visual Regression', () => {
     
     try {
       await page.goto('/');
-      await page.waitForLoadState('networkidle', { timeout: 5000 });
+      await waitForAppReady(page);
       
       // Capture offline state
       await expect(page).toHaveScreenshot('homepage-offline-state.png', {
