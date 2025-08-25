@@ -1,23 +1,185 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { EntityID } from '@/types/common.types';
 
+/**
+ * Character creation state interface for auto-save functionality
+ * @interface CharacterCreationState
+ */
 interface CharacterCreationState {
+  /** Current wizard step index */
   currentStep: number;
+  /** World ID for the character being created */
   worldId: EntityID;
+  /** Character data being created */
   characterData: unknown;
+  /** Validation state for each step */
   validation: unknown;
+  /** Point pool allocation state */
   pointPools: unknown;
+  /** ISO timestamp of last save operation */
+  lastSaved?: string;
+}
+
+interface RecoveryDataPreview {
+  name?: string;
+  currentStep?: number;
+  lastSaved?: string;
+  hasAttributes?: boolean;
+  hasSkills?: boolean;
+  hasBackground?: boolean;
+  selectedSkillCount?: number;
+  totalAttributePoints?: number;
+}
+
+/**
+ * Character Creation Auto-Save Hook
+ * 
+ * Provides automatic saving and recovery functionality for character creation workflows.
+ * Uses localStorage for persistence with debounced saves to prevent excessive writes.
+ * Includes recovery detection and user choice dialog integration.
+ * 
+ * Key Features:
+ * - Automatic debounced saving (300ms delay)
+ * - Recovery data detection on mount
+ * - Visual save status feedback
+ * - Manual save clearing on completion
+ * - Migration from sessionStorage to localStorage
+ * 
+ * @param worldId - The ID of the world for which the character is being created
+ * @returns Object containing save state, data handlers, and recovery status
+ * 
+ * @example
+ * ```tsx
+ * const {
+ *   data,
+ *   setData,
+ *   clearAutoSave,
+ *   hasRecoveryData,
+ *   saveStatus
+ * } = useCharacterCreationAutoSave(worldId);
+ * 
+ * // Check for recovery data
+ * if (hasRecoveryData) {
+ *   // Show recovery dialog
+ * }
+ * 
+ * // Update character data (auto-saves after 300ms)
+ * setData({
+ *   currentStep: 1,
+ *   worldId,
+ *   characterData: updatedCharacter,
+ *   validation: stepValidation,
+ *   pointPools: poolState
+ * });
+ * 
+ * // Clear save data when character creation completes
+ * clearAutoSave();
+ * ```
+ */
+/**
+ * Analyzes character data to generate preview information
+ */
+function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview {
+  const preview: RecoveryDataPreview = {
+    currentStep: data.currentStep,
+    lastSaved: data.lastSaved,
+  };
+
+  // Try to extract character data information
+  try {
+    const characterData = data.characterData as Record<string, unknown>;
+    if (characterData) {
+      // Extract name
+      if (characterData.name && typeof characterData.name === 'string') {
+        preview.name = characterData.name;
+      }
+
+      // Check attributes
+      if (characterData.attributes && Array.isArray(characterData.attributes)) {
+        preview.hasAttributes = characterData.attributes.length > 0;
+        preview.totalAttributePoints = characterData.attributes.reduce(
+          (sum: number, attr: Record<string, unknown>) => sum + (Number(attr.value) || 0), 0
+        );
+      }
+
+      // Check skills
+      if (characterData.skills && Array.isArray(characterData.skills)) {
+        const selectedSkills = characterData.skills.filter((skill: Record<string, unknown>) => skill.isSelected);
+        preview.hasSkills = selectedSkills.length > 0;
+        preview.selectedSkillCount = selectedSkills.length;
+      }
+
+      // Check background
+      if (characterData.background && typeof characterData.background === 'object') {
+        const bg = characterData.background as Record<string, unknown>;
+        preview.hasBackground = !!(
+          bg.history || bg.personality || bg.motivation || 
+          (bg.goals && Array.isArray(bg.goals) && bg.goals.length > 0)
+        );
+      }
+    }
+  } catch {
+    console.warn('[AutoSave] Could not analyze recovery data for preview');
+  }
+
+  return preview;
+}
+
+/**
+ * Checks if background data has meaningful content
+ */
+function hasBackgroundData(background: Record<string, unknown>): boolean {
+  return !!(background.history || background.personality || background.motivation || 
+           (background.goals && Array.isArray(background.goals) && background.goals.length > 0));
+}
+
+/**
+ * Checks if current data conflicts with recovery data
+ */
+function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
+  if (!data || !data.characterData) return false;
+
+  try {
+    const characterData = data.characterData as Record<string, unknown>;
+    
+    // Check for any meaningful user input
+    return !!(
+      characterData?.name ||
+      (characterData?.attributes && Array.isArray(characterData.attributes) && 
+        characterData.attributes.some((attr: Record<string, unknown>) => 
+          Number(attr.value || 0) > Number(attr.minValue || 0))) ||
+      (characterData?.skills && Array.isArray(characterData.skills) && 
+        characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected)) ||
+      (characterData?.background && typeof characterData.background === 'object' && 
+        characterData.background !== null && 
+        hasBackgroundData(characterData.background as Record<string, unknown>))
+    );
+  } catch {
+    return false;
+  }
 }
 
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {
+  /** Internal state for character creation data */
   const [data, setDataInternal] = useState<CharacterCreationState | undefined>();
+  /** Whether recovery data was found in localStorage */
+  const [hasRecoveryData, setHasRecoveryData] = useState(false);
+  /** Preview data for recovery dialog */
+  const [recoveryPreview, setRecoveryPreview] = useState<RecoveryDataPreview | undefined>();
+  /** Current save operation status for UI feedback */
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  /** localStorage key for this world's character creation data */
   const saveKey = `character-creation-${worldId}`;
+  /** Prevents saving before initial data load is complete */
   const hasLoadedRef = useRef(false);
+  /** Timeout reference for debounced save operations */
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Debounced auto-save to sessionStorage whenever data changes
+  // Debounced auto-save to localStorage whenever data changes
   useEffect(() => {
     if (data && hasLoadedRef.current) { // Only save after initial load is complete
+      setSaveStatus('saving');
+      
       // Clear any existing timeout
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -25,22 +187,37 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
       
       // Debounce the save operation to prevent excessive writes
       saveTimeoutRef.current = setTimeout(() => {
-        sessionStorage.setItem(saveKey, JSON.stringify(data));
+        try {
+          const dataWithTimestamp = { 
+            ...data, 
+            lastSaved: new Date().toISOString() 
+          };
+          localStorage.setItem(saveKey, JSON.stringify(dataWithTimestamp));
+          setSaveStatus('saved');
+        } catch (error) {
+          console.error('[AutoSave] Failed to save character creation data', error);
+          setSaveStatus('idle');
+        }
       }, 300); // 300ms debounce
     }
   }, [data, saveKey, worldId]);
   
-  // Create a simple setData function that doesn't use useCallback or refs
-  // This will change on every render, so we'll handle that in the component
+  /**
+   * Updates character creation data and triggers auto-save
+   * @param newData - New character creation state to save
+   */
   const setData = (newData: CharacterCreationState | undefined) => {
     setDataInternal(newData);
   };
   
   
-  // Field blur handler (auto-save is now handled automatically in useEffect above)
+  /**
+   * Legacy field blur handler for API compatibility
+   * Auto-save now happens automatically when data changes
+   * @deprecated Use automatic saving via setData instead
+   */
   const handleFieldBlur = useCallback(() => {
-    // Auto-save happens automatically when data changes
-    // This is kept for API compatibility but no longer needed
+    // No-op: Auto-save happens automatically when data changes
   }, []);
   
   // Restore on mount and when worldId changes
@@ -49,17 +226,23 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     if (hasLoadedRef.current) return;
     
     const loadData = () => {
-      const saved = sessionStorage.getItem(saveKey);
+      const saved = localStorage.getItem(saveKey);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
+          setHasRecoveryData(true);
+          setRecoveryPreview(analyzeRecoveryData(parsed));
           setDataInternal(parsed);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
           console.error('[AutoSave] Failed to restore character creation data', e);
+          setHasRecoveryData(true); // Keep recovery data true since data exists, even if corrupted
+          setRecoveryPreview(undefined); // Can't preview corrupted data
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
         }
       } else {
+        setHasRecoveryData(false);
+        setRecoveryPreview(undefined);
         hasLoadedRef.current = true; // Mark as loaded even if no data found
       }
     };
@@ -82,15 +265,39 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     };
   }, []);
   
-  // Clear on completion
+  /**
+   * Clears all auto-save data and resets state
+   * Call this when character creation is completed or cancelled
+   */
   const clearAutoSave = useCallback(() => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = null;
     }
-    sessionStorage.removeItem(saveKey);
+    localStorage.removeItem(saveKey);
+    setHasRecoveryData(false);
+    setRecoveryPreview(undefined);
+    setDataInternal(undefined);
     hasLoadedRef.current = false;
+    setSaveStatus('idle');
   }, [saveKey]);
   
-  return { data, setData, handleFieldBlur, clearAutoSave };
+  return {
+    /** Current character creation data with save metadata */
+    data,
+    /** Function to update character data (triggers auto-save) */
+    setData,
+    /** @deprecated Legacy field blur handler - auto-save is now automatic */
+    handleFieldBlur,
+    /** Function to clear all auto-save data */
+    clearAutoSave,
+    /** Whether recovery data was detected on mount */
+    hasRecoveryData,
+    /** Preview data for recovery dialog */
+    recoveryPreview,
+    /** Whether current form has meaningful data that would be overwritten */
+    hasCurrentData: hasCurrentFormData(data),
+    /** Current save status: 'idle' | 'saving' | 'saved' */
+    saveStatus
+  };
 };

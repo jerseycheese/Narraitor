@@ -44,6 +44,7 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 
 ### API Documentation
 - [[api/goal-system-api|Goal System API Reference]]
+- [[api/character-creation-auto-save-api|Character Creation Auto-Save API Reference]]
 - [[api/types-reference|Types Reference]]
 
 ### Technical Guides
@@ -51,6 +52,10 @@ This is the documentation hub for Narraitor: an AI-powered storytelling app that
 - [[technical-guides/goal-system-integration|Goal System Integration]]
 - [[technical-guides/lore-tracking-system|Lore Tracking System]]
 - [[technical-guides/state-management-usage|State Management Usage]]
+- [[technical-guides/character-creation-auto-save|Character Creation Auto-Save System]]
+
+### Components
+- [[components/recovery-notification|RecoveryNotification Component]]
 
 ### Development
 - [[development/tdd-with-kiss|Test-Driven Development with KISS]]

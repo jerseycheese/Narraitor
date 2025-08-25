@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -14,6 +14,8 @@ import {
   WizardNavigation, 
   WizardStep
 } from '@/components/shared/wizard';
+import { RecoveryNotification } from '@/components/shared/RecoveryNotification';
+import { SaveIndicator } from '@/components/ui/SaveIndicator';
 import { BasicInfoStep } from './steps/BasicInfoStep';
 import { AttributesStep } from './steps/AttributesStep';
 import { SkillsStep } from './steps/SkillsStep';
@@ -21,22 +23,36 @@ import { BackgroundStep } from './steps/BackgroundStep';
 import { PortraitStep } from './steps/PortraitStep';
 import { validateCharacterName, validateAttributes, validateSkills, validateBackground } from './utils/validation';
 
+/**
+ * Props for the CharacterCreationWizard component
+ */
 interface CharacterCreationWizardProps {
+  /** The ID of the world for which to create a character */
   worldId: EntityID;
+  /** Initial step index (0-based) to start the wizard on */
   initialStep?: number;
 }
 
+/**
+ * Complete character data structure for creation wizard
+ */
 interface CharacterCreationData {
+  /** World ID for the character being created */
   worldId: EntityID;
+  /** Character's display name */
   name: string;
+  /** Character description (legacy field) */
   description: string;
+  /** Placeholder text for portrait selection */
   portraitPlaceholder: string;
+  /** Character portrait configuration */
   portrait?: {
     type: 'ai-generated' | 'placeholder';
     url: string | null;
     generatedAt?: string;
     prompt?: string;
   };
+  /** Character attributes with allocated point values */
   attributes: Array<{
     attributeId: EntityID;
     name: string;
@@ -45,15 +61,19 @@ interface CharacterCreationData {
     minValue: number;
     maxValue: number;
   }>;
+  /** Character skills with selection and level data */
   skills: Array<{
     skillId: EntityID;
     name: string;
     description?: string;
     level: number;
-    attributeIds?: EntityID[]; // Multi-attribute support
-    linkedAttributeId?: EntityID; // Legacy support
+    /** Multi-attribute support */
+    attributeIds?: EntityID[];
+    /** Legacy support */
+    linkedAttributeId?: EntityID;
     isSelected: boolean;
   }>;
+  /** Character background and roleplay information */
   background: {
     history: string;
     personality: string;
@@ -79,7 +99,20 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const { createCharacter } = useCharacterStore();
   const world = worlds[worldId];
   
-  const { data, setData, handleFieldBlur, clearAutoSave } = useCharacterCreationAutoSave(worldId);
+  // Auto-save integration
+  const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
+  /** Controls visibility of the recovery data dialog */
+  const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
+
+  /**
+   * Show recovery dialog when recovery data is detected
+   * Only shows once per detection to avoid repeated prompts
+   */
+  React.useEffect(() => {
+    if (hasRecoveryData) {
+      setShowRecoveryDialog(true);
+    }
+  }, [hasRecoveryData]);
   
   // Initialize character data from auto-save or defaults
   const initialCharacterData: CharacterCreationData = useMemo(() => {
@@ -230,6 +263,17 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
 
   const handleCancel = () => {
     router.push('/characters');
+  };
+
+  /**
+   * Handles user choice in the recovery dialog
+   * @param choice - 'recover' to keep data, 'dismiss' to clear it
+   */
+  const handleRecoveryChoice = (choice: 'recover' | 'dismiss') => {
+    if (choice === 'dismiss') {
+      clearAutoSave();
+    }
+    setShowRecoveryDialog(false);
   };
 
   const handleUpdate = (updates: Partial<CharacterCreationData>) => {
@@ -386,28 +430,49 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const error = hasErrors ? currentValidation.errors.join(', ') : undefined;
 
   return (
-    <WizardContainer title={`Create Character in ${world.name}`}>
-      <div onBlur={handleFieldBlur}>
-        <WizardProgress 
-          steps={steps} 
-          currentStep={wizard.state.currentStep} 
-        />
-        
-        <WizardStep error={error}>
-          {renderStep()}
-        </WizardStep>
-        
-        <WizardNavigation
-          onCancel={handleCancel}
-          onBack={wizard.canGoBack ? handleBack : undefined}
-          onNext={wizard.canGoNext ? handleNext : undefined}
-          onComplete={wizard.isLastStep ? handleCreate : undefined}
-          currentStep={wizard.state.currentStep}
-          totalSteps={steps.length}
-          completeLabel="Create Character"
-          disabled={hasErrors}
-        />
-      </div>
-    </WizardContainer>
+    <>
+      <WizardContainer title={`Create Character in ${world.name}`}>
+        <div onBlur={handleFieldBlur}>
+          {/* Auto-save status indicator */}
+          <div className="mb-4 flex justify-end">
+            <SaveIndicator
+              status={saveStatus}
+              lastSaveTime={data?.lastSaved}
+              compact={true}
+            />
+          </div>
+
+          <WizardProgress 
+            steps={steps} 
+            currentStep={wizard.state.currentStep} 
+          />
+          
+          <WizardStep error={error}>
+            {renderStep()}
+          </WizardStep>
+          
+          <WizardNavigation
+            onCancel={handleCancel}
+            onBack={wizard.canGoBack ? handleBack : undefined}
+            onNext={wizard.canGoNext ? handleNext : undefined}
+            onComplete={wizard.isLastStep ? handleCreate : undefined}
+            currentStep={wizard.state.currentStep}
+            totalSteps={steps.length}
+            completeLabel="Create Character"
+            disabled={hasErrors}
+          />
+        </div>
+      </WizardContainer>
+
+      {/* Auto-save recovery dialog */}
+      <RecoveryNotification
+        isVisible={showRecoveryDialog}
+        lastSaved={data?.lastSaved}
+        recoveryData={recoveryPreview}
+        hasCurrentData={hasCurrentData}
+        onRecover={() => handleRecoveryChoice('recover')}
+        onDismiss={() => handleRecoveryChoice('dismiss')}
+      />
+    </>
   );
 };
