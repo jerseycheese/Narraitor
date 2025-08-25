@@ -1,22 +1,25 @@
 # Character Creation Auto-Save System
 
-The auto-save system provides seamless data persistence for character creation workflows, ensuring users never lose progress when creating characters. The implementation focuses on user experience and data reliability across browser sessions.
+So you're working on character creation and wondering how the auto-save works - this guide covers the implementation that keeps users from losing their progress when they accidentally close their browser or navigate away mid-creation.
 
-## Overview
+## The Problem This Solves
 
-Character creation involves multiple steps and complex form data. Users often spend significant time crafting their characters, so losing progress due to browser crashes, accidental tab closures, or navigation errors creates a frustrating experience. The auto-save system solves this by automatically persisting character data and providing recovery options when needed.
+Character creation can take a while. Users fill out multiple steps with attributes, skills, background info - the whole deal. Before this was added, if someone's browser crashed or they accidentally hit the back button, all that work disappeared. Pretty frustrating, especially when you've just spent 10 minutes getting your character's backstory just right.
 
-**Key Features:**
-- Automatic debounced saving (300ms delay) 
-- Cross-session persistence using localStorage
-- Recovery notification with data preview
-- Conflict detection when current form data exists
-- Visual save status feedback
-- Migration from sessionStorage to localStorage
+The auto-save implementation handles this by quietly saving progress in the background and offering to restore it when users return. Nothing fancy - just saves the headache of starting over.
 
-## Architecture
+Here's what it does:
 
-The system consists of two main components working together:
+- Saves character data automatically every 300ms when something changes (debounced so it doesn't spam localStorage)
+- Works across browser sessions - close the browser, open it tomorrow, data's still there
+- Shows a recovery dialog when saved data is found, with a preview of what was saved
+- Warns users if they've already started entering new data that would get overwritten
+- Little save indicator shows when data is being saved
+- Upgraded from sessionStorage to localStorage so it survives browser restarts
+
+## How It's Built
+
+There are basically two pieces that work together:
 
 ### useCharacterCreationAutoSave Hook
 
