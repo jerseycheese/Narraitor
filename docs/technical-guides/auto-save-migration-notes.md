@@ -1,6 +1,6 @@
 # Auto-Save Storage Migration Notes
 
-I switched the character creation auto-save from sessionStorage to localStorage so it actually survives browser restarts. Turns out users were frustrated when they'd lose all their character work just because they closed a tab.
+The character creation auto-save switched from sessionStorage to localStorage so it actually survives browser restarts. Users were getting frustrated when they'd lose all their character work just because they closed a tab.
 
 ## What Changed
 
@@ -25,8 +25,8 @@ The only difference is `hasRecoveryData` can now be true even after browser rest
 
 ## Storage Cleanup
 
-Since localStorage sticks around longer than sessionStorage, I made sure to clean up after ourselves:
-- Auto-save data gets cleared when you finish creating the character
+Since localStorage sticks around longer than sessionStorage, the system cleans up after itself:
+- Auto-save data gets cleared when character creation finishes
 - Old data for deleted worlds gets cleaned up too
 
 That's basically it. The change is invisible to users except that their progress actually persists now.

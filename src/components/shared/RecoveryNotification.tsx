@@ -1,15 +1,28 @@
 /**
  * RecoveryNotification component
- * Displays recovery alert when data recovery is available
+ * Displays recovery alert when data recovery is available with data preview
  */
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '../ui/button';
 import { formatDateTime } from '@/lib/utils';
 
+interface RecoveryData {
+  name?: string;
+  currentStep?: number;
+  lastSaved?: string;
+  hasAttributes?: boolean;
+  hasSkills?: boolean;
+  hasBackground?: boolean;
+  selectedSkillCount?: number;
+  totalAttributePoints?: number;
+}
+
 interface RecoveryNotificationProps {
   isVisible: boolean;
   lastSaved?: string;
+  recoveryData?: RecoveryData;
+  hasCurrentData?: boolean;
   onRecover: () => void;
   onDismiss: () => void;
 }
@@ -17,6 +30,8 @@ interface RecoveryNotificationProps {
 export function RecoveryNotification({
   isVisible,
   lastSaved,
+  recoveryData,
+  hasCurrentData = false,
   onRecover,
   onDismiss,
 }: RecoveryNotificationProps) {
@@ -35,6 +50,15 @@ export function RecoveryNotification({
   const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;
   const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
 
+  // Generate step description
+  const getStepDescription = (step?: number) => {
+    const stepNames = ['Basic Info', 'Attributes', 'Skills', 'Background', 'Portrait'];
+    if (step !== undefined && step >= 0 && step < stepNames.length) {
+      return `${stepNames[step]} step`;
+    }
+    return 'Unknown step';
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
@@ -42,7 +66,7 @@ export function RecoveryNotification({
       aria-labelledby="recovery-title"
       aria-describedby="recovery-description"
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -61,7 +85,7 @@ export function RecoveryNotification({
               </svg>
             </div>
             <h3 id="recovery-title" className="ml-3 text-lg font-medium text-gray-900">
-              Data Recovery Available
+              Character Creation Progress Found
             </h3>
           </div>
           <button
@@ -81,17 +105,44 @@ export function RecoveryNotification({
         </div>
 
         <div id="recovery-description" className="mb-6">
-          <p className="text-sm text-gray-600 mb-3">
-            We detected that your game data may have been cleared, but we found a backup of your progress.
+          <p className="text-sm text-gray-600 mb-4">
+            Found saved character creation progress from a previous session.
+            {hasCurrentData && (
+              <span className="block mt-2 text-amber-600 font-medium">
+                ⚠️ Recovering will replace any current form data you&apos;ve entered.
+              </span>
+            )}
           </p>
+
+          {/* Recovery Data Preview */}
+          {recoveryData && (
+            <div className="bg-gray-50 rounded-md p-4 mb-4">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">Saved Progress Preview:</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                {recoveryData.name && (
+                  <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
+                )}
+                {recoveryData.currentStep !== undefined && (
+                  <div>Progress: <span className="font-medium">{getStepDescription(recoveryData.currentStep)}</span></div>
+                )}
+                {recoveryData.hasAttributes && recoveryData.totalAttributePoints !== undefined && (
+                  <div>Attribute points allocated: <span className="font-medium">{recoveryData.totalAttributePoints}</span></div>
+                )}
+                {recoveryData.hasSkills && recoveryData.selectedSkillCount !== undefined && (
+                  <div>Skills selected: <span className="font-medium">{recoveryData.selectedSkillCount}</span></div>
+                )}
+                {recoveryData.hasBackground && (
+                  <div>Background: <span className="font-medium">Completed</span></div>
+                )}
+              </div>
+            </div>
+          )}
+
           {validDate && (
-            <p className="text-sm text-gray-500">
-              <strong>Last saved:</strong> {validDate}
+            <p className="text-xs text-gray-500 mb-3">
+              Last saved: {validDate}
             </p>
           )}
-          <p className="text-sm text-gray-600 mt-3">
-            Would you like to recover your previous game state? You can also manually import a backup file if you have one.
-          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -100,14 +151,14 @@ export function RecoveryNotification({
             onClick={onRecover}
             className="flex-1"
           >
-            Recover Data
+            Recover Progress
           </Button>
           <Button
             onClick={onDismiss}
             variant="outline"
             className="flex-1"
           >
-            Dismiss
+            Start Fresh
           </Button>
         </div>
       </div>

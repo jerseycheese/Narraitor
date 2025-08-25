@@ -20,6 +20,17 @@ interface CharacterCreationState {
   lastSaved?: string;
 }
 
+interface RecoveryDataPreview {
+  name?: string;
+  currentStep?: number;
+  lastSaved?: string;
+  hasAttributes?: boolean;
+  hasSkills?: boolean;
+  hasBackground?: boolean;
+  selectedSkillCount?: number;
+  totalAttributePoints?: number;
+}
+
 /**
  * Character Creation Auto-Save Hook
  * 
@@ -65,11 +76,91 @@ interface CharacterCreationState {
  * clearAutoSave();
  * ```
  */
+/**
+ * Analyzes character data to generate preview information
+ */
+function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview {
+  const preview: RecoveryDataPreview = {
+    currentStep: data.currentStep,
+    lastSaved: data.lastSaved,
+  };
+
+  // Try to extract character data information
+  try {
+    const characterData = data.characterData as Record<string, unknown>;
+    if (characterData) {
+      // Extract name
+      if (characterData.name && typeof characterData.name === 'string') {
+        preview.name = characterData.name;
+      }
+
+      // Check attributes
+      if (characterData.attributes && Array.isArray(characterData.attributes)) {
+        preview.hasAttributes = characterData.attributes.length > 0;
+        preview.totalAttributePoints = characterData.attributes.reduce(
+          (sum: number, attr: Record<string, unknown>) => sum + (Number(attr.value) || 0), 0
+        );
+      }
+
+      // Check skills
+      if (characterData.skills && Array.isArray(characterData.skills)) {
+        const selectedSkills = characterData.skills.filter((skill: Record<string, unknown>) => skill.isSelected);
+        preview.hasSkills = selectedSkills.length > 0;
+        preview.selectedSkillCount = selectedSkills.length;
+      }
+
+      // Check background
+      if (characterData.background && typeof characterData.background === 'object') {
+        const bg = characterData.background as Record<string, unknown>;
+        preview.hasBackground = !!(
+          bg.history || bg.personality || bg.motivation || 
+          (bg.goals && Array.isArray(bg.goals) && bg.goals.length > 0)
+        );
+      }
+    }
+  } catch {
+    console.warn('[AutoSave] Could not analyze recovery data for preview');
+  }
+
+  return preview;
+}
+
+/**
+ * Checks if current data conflicts with recovery data
+ */
+function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
+  if (!data || !data.characterData) return false;
+
+  try {
+    const characterData = data.characterData as Record<string, unknown>;
+    
+    // Check for any meaningful user input
+    return !!(
+      characterData?.name ||
+      (characterData?.attributes && Array.isArray(characterData.attributes) && 
+        characterData.attributes.some((attr: Record<string, unknown>) => 
+          Number(attr.value || 0) > Number(attr.minValue || 0))) ||
+      (characterData?.skills && Array.isArray(characterData.skills) && 
+        characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected)) ||
+      (characterData?.background && typeof characterData.background === 'object' && 
+        characterData.background !== null) && (() => {
+          const bg = characterData.background as Record<string, unknown>;
+          return bg.history || bg.personality || bg.motivation || 
+                 (bg.goals && Array.isArray(bg.goals) && bg.goals.length > 0);
+        })()
+    );
+  } catch {
+    return false;
+  }
+}
+
 export const useCharacterCreationAutoSave = (worldId: EntityID) => {
   /** Internal state for character creation data */
   const [data, setDataInternal] = useState<CharacterCreationState | undefined>();
   /** Whether recovery data was found in localStorage */
   const [hasRecoveryData, setHasRecoveryData] = useState(false);
+  /** Preview data for recovery dialog */
+  const [recoveryPreview, setRecoveryPreview] = useState<RecoveryDataPreview | undefined>();
   /** Current save operation status for UI feedback */
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   /** localStorage key for this world's character creation data */
@@ -132,18 +223,21 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     const loadData = () => {
       const saved = localStorage.getItem(saveKey);
       if (saved) {
-        setHasRecoveryData(true);
         try {
           const parsed = JSON.parse(saved);
+          setHasRecoveryData(true);
+          setRecoveryPreview(analyzeRecoveryData(parsed));
           setDataInternal(parsed);
           hasLoadedRef.current = true; // Mark as loaded after setting data
         } catch (e) {
           console.error('[AutoSave] Failed to restore character creation data', e);
-          // Keep hasRecoveryData true since data exists, even if corrupted
+          setHasRecoveryData(true); // Keep recovery data true since data exists, even if corrupted
+          setRecoveryPreview(undefined); // Can't preview corrupted data
           hasLoadedRef.current = true; // Still mark as loaded to prevent retries
         }
       } else {
         setHasRecoveryData(false);
+        setRecoveryPreview(undefined);
         hasLoadedRef.current = true; // Mark as loaded even if no data found
       }
     };
@@ -177,6 +271,7 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     }
     localStorage.removeItem(saveKey);
     setHasRecoveryData(false);
+    setRecoveryPreview(undefined);
     setDataInternal(undefined);
     hasLoadedRef.current = false;
     setSaveStatus('idle');
@@ -193,6 +288,10 @@ export const useCharacterCreationAutoSave = (worldId: EntityID) => {
     clearAutoSave,
     /** Whether recovery data was detected on mount */
     hasRecoveryData,
+    /** Preview data for recovery dialog */
+    recoveryPreview,
+    /** Whether current form has meaningful data that would be overwritten */
+    hasCurrentData: hasCurrentFormData(data),
     /** Current save status: 'idle' | 'saving' | 'saved' */
     saveStatus
   };

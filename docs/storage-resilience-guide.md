@@ -1,6 +1,6 @@
 # Storage Resilience Guide
 
-I built this system because browser storage is unreliable - users would hit storage quota limits, run into private browsing restrictions, or just have IndexedDB randomly fail. The game needs to keep working even when persistence breaks.
+This system exists because browser storage is unreliable - users would hit storage quota limits, run into private browsing restrictions, or just have IndexedDB randomly fail. The game needs to keep working even when persistence breaks.
 
 ## What It Does
 
@@ -10,7 +10,7 @@ When storage fails, the system automatically:
 - Detects when storage recovers and switches back
 - Provides clear status so users know what's happening
 
-The key insight: keep the game playable even if we can't save progress.
+The key insight: keep the game playable even if saving progress fails.
 
 ## How It Works
 
@@ -37,6 +37,6 @@ const status = storage.getStorageStatus(); // 'healthy' | 'degraded' | 'unavaila
 
 ## For Developers
 
-The Zustand stores already use this through `createIndexedDBStorage()`. You don't need to do anything special - just handle the storage status if you want to show user feedback about persistence issues.
+The Zustand stores already use this through `createIndexedDBStorage()`. No special setup needed - just handle the storage status if user feedback about persistence issues is needed.
 
-Check `src/lib/storage/resilientStorage.ts` for implementation details.
+The implementation details are in `src/lib/storage/resilientStorage.ts`.

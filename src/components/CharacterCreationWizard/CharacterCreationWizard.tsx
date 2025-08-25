@@ -100,7 +100,7 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
   const world = worlds[worldId];
   
   // Auto-save integration
-  const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, saveStatus } = useCharacterCreationAutoSave(worldId);
+  const { data, setData, handleFieldBlur, clearAutoSave, hasRecoveryData, recoveryPreview, hasCurrentData, saveStatus } = useCharacterCreationAutoSave(worldId);
   /** Controls visibility of the recovery data dialog */
   const [showRecoveryDialog, setShowRecoveryDialog] = useState(false);
 
@@ -468,6 +468,8 @@ export const CharacterCreationWizard: React.FC<CharacterCreationWizardProps> = (
       <RecoveryNotification
         isVisible={showRecoveryDialog}
         lastSaved={data?.lastSaved}
+        recoveryData={recoveryPreview}
+        hasCurrentData={hasCurrentData}
         onRecover={() => handleRecoveryChoice('recover')}
         onDismiss={() => handleRecoveryChoice('dismiss')}
       />
