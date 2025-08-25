@@ -1,6 +1,6 @@
 # Character Creation Auto-Save API Reference
 
-If you're working with the auto-save system, this covers the main hook and component APIs. The implementation from Issue #119 is pretty straightforward - here's how to use it.
+If you're working with the auto-save system, this covers the main hook and component APIs. The implementation is pretty straightforward - here's how to use it.
 
 ## Hook: `useCharacterCreationAutoSave`
 
