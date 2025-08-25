@@ -36,7 +36,7 @@ describe('RecoveryNotification', () => {
     test('calls onRecover when recover button clicked', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      const recoverButton = screen.getByRole('button', { name: /recover data/i });
+      const recoverButton = screen.getByRole('button', { name: /recover progress/i });
       fireEvent.click(recoverButton);
 
       expect(mockOnRecover).toHaveBeenCalledTimes(1);
@@ -45,7 +45,7 @@ describe('RecoveryNotification', () => {
     test('calls onDismiss when dismiss button clicked', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      const dismissButton = screen.getByRole('button', { name: /dismiss/i });
+      const dismissButton = screen.getByRole('button', { name: /start fresh/i });
       fireEvent.click(dismissButton);
 
       expect(mockOnDismiss).toHaveBeenCalledTimes(1);
@@ -73,7 +73,7 @@ describe('RecoveryNotification', () => {
     test('focuses on first button when shown', () => {
       render(<RecoveryNotification {...defaultProps} />);
 
-      const recoverButton = screen.getByRole('button', { name: /recover data/i });
+      const recoverButton = screen.getByRole('button', { name: /recover progress/i });
       expect(recoverButton).toHaveFocus();
     });
   });
@@ -82,14 +82,14 @@ describe('RecoveryNotification', () => {
     test('handles missing lastSaved date', () => {
       render(<RecoveryNotification {...defaultProps} lastSaved={undefined} />);
 
-      expect(screen.getByText(/data recovery available/i)).toBeInTheDocument();
+      expect(screen.getByText(/Character Creation Progress Found/i)).toBeInTheDocument();
       expect(screen.queryByText(/last saved/i)).not.toBeInTheDocument();
     });
 
     test('handles invalid lastSaved date', () => {
       render(<RecoveryNotification {...defaultProps} lastSaved="invalid-date" />);
 
-      expect(screen.getByText(/data recovery available/i)).toBeInTheDocument();
+      expect(screen.getByText(/Character Creation Progress Found/i)).toBeInTheDocument();
       expect(screen.queryByText(/last saved/i)).not.toBeInTheDocument();
     });
   });

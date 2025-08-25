@@ -1,32 +1,95 @@
 /**
- * RecoveryNotification component
- * Displays recovery alert when data recovery is available with data preview
+ * RecoveryNotification Component
+ * 
+ * A modal dialog that presents recovery options when saved character creation data is detected.
+ * Provides clear user choice between recovering previous progress or starting fresh with 
+ * comprehensive data preview and conflict detection.
+ * 
+ * Key Features:
+ * - Data preview with character name, progress step, and completion status
+ * - Conflict warnings when current form data would be overwritten
+ * - Accessible modal dialog with proper ARIA attributes and focus management
+ * - Formatted timestamp display with graceful error handling
+ * - Auto-focus on primary action for optimal keyboard navigation
+ * 
+ * @example
+ * ```tsx
+ * function CharacterCreationWizard() {
+ *   const { hasRecoveryData, recoveryPreview, hasCurrentData, clearAutoSave } = 
+ *     useCharacterCreationAutoSave(worldId);
+ *   const [showDialog, setShowDialog] = useState(false);
+ * 
+ *   useEffect(() => {
+ *     if (hasRecoveryData) setShowDialog(true);
+ *   }, [hasRecoveryData]);
+ * 
+ *   return (
+ *     <RecoveryNotification
+ *       isVisible={showDialog}
+ *       lastSaved={recoveryPreview?.lastSaved}
+ *       recoveryData={recoveryPreview}
+ *       hasCurrentData={hasCurrentData}
+ *       onRecover={() => setShowDialog(false)}
+ *       onDismiss={() => { clearAutoSave(); setShowDialog(false); }}
+ *     />
+ *   );
+ * }
+ * ```
  */
 
 import React, { useEffect, useRef } from 'react';
 import { Button } from '../ui/button';
 import { formatDateTime } from '@/lib/utils';
 
+/**
+ * Recovery data structure containing analyzed save information for preview display
+ */
 interface RecoveryData {
+  /** Character name from saved data */
   name?: string;
+  /** Current wizard step index (0-based) */
   currentStep?: number;
+  /** ISO timestamp of when data was last saved */
   lastSaved?: string;
+  /** Whether character has allocated attribute points */
   hasAttributes?: boolean;
+  /** Whether character has selected skills */
   hasSkills?: boolean;
+  /** Whether character has completed background information */
   hasBackground?: boolean;
+  /** Number of skills selected by the character */
   selectedSkillCount?: number;
+  /** Total attribute points allocated across all attributes */
   totalAttributePoints?: number;
 }
 
+/**
+ * Props interface for RecoveryNotification component
+ */
 interface RecoveryNotificationProps {
+  /** Controls modal dialog visibility */
   isVisible: boolean;
+  /** ISO timestamp of when data was last saved (for display purposes) */
   lastSaved?: string;
+  /** Analyzed recovery data for generating user-friendly preview */
   recoveryData?: RecoveryData;
+  /** Whether current form has meaningful data that would be overwritten by recovery */
   hasCurrentData?: boolean;
+  /** Callback fired when user chooses to recover saved data */
   onRecover: () => void;
+  /** Callback fired when user chooses to dismiss recovery and start fresh */
   onDismiss: () => void;
 }
 
+/**
+ * RecoveryNotification Component
+ * 
+ * Renders a modal dialog allowing users to choose between recovering saved character data
+ * or starting fresh. Includes comprehensive data preview and conflict warnings.
+ * 
+ * @param props - Component props
+ * @returns JSX element or null if not visible
+ */
 export function RecoveryNotification({
   isVisible,
   lastSaved,
@@ -35,8 +98,13 @@ export function RecoveryNotification({
   onRecover,
   onDismiss,
 }: RecoveryNotificationProps) {
+  /** Reference to the recover button for focus management */
   const recoverButtonRef = useRef<HTMLButtonElement>(null);
 
+  /**
+   * Auto-focus the primary action button when dialog becomes visible
+   * Ensures keyboard accessibility and proper focus flow
+   */
   useEffect(() => {
     if (isVisible && recoverButtonRef.current) {
       recoverButtonRef.current.focus();
@@ -47,11 +115,16 @@ export function RecoveryNotification({
     return null;
   }
 
+  // Format timestamp with error handling
   const formattedDate = lastSaved ? formatDateTime(lastSaved) : null;
   const validDate = formattedDate && formattedDate !== 'Invalid date' ? formattedDate : null;
 
-  // Generate step description
-  const getStepDescription = (step?: number) => {
+  /**
+   * Maps step index to user-friendly step name
+   * @param step - Zero-based step index
+   * @returns Human-readable step description
+   */
+  const getStepDescription = (step?: number): string => {
     const stepNames = ['Basic Info', 'Attributes', 'Skills', 'Background', 'Portrait'];
     if (step !== undefined && step >= 0 && step < stepNames.length) {
       return `${stepNames[step]} step`;
