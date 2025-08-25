@@ -182,7 +182,9 @@ export function RecoveryNotification({
             Found saved character creation progress from a previous session.
             {hasCurrentData && (
               <span className="block mt-2 text-amber-600 font-medium">
-                ⚠️ Recovering will replace any current form data you&apos;ve entered.
+                <span aria-hidden="true">⚠️</span>
+                <span className="sr-only">Warning:</span>
+                {' '}Recovering will replace any current form data you&apos;ve entered.
               </span>
             )}
           </p>

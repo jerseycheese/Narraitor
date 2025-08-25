@@ -126,6 +126,14 @@ function analyzeRecoveryData(data: CharacterCreationState): RecoveryDataPreview 
 }
 
 /**
+ * Checks if background data has meaningful content
+ */
+function hasBackgroundData(background: Record<string, unknown>): boolean {
+  return !!(background.history || background.personality || background.motivation || 
+           (background.goals && Array.isArray(background.goals) && background.goals.length > 0));
+}
+
+/**
  * Checks if current data conflicts with recovery data
  */
 function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
@@ -143,11 +151,8 @@ function hasCurrentFormData(data: CharacterCreationState | undefined): boolean {
       (characterData?.skills && Array.isArray(characterData.skills) && 
         characterData.skills.some((skill: Record<string, unknown>) => skill.isSelected)) ||
       (characterData?.background && typeof characterData.background === 'object' && 
-        characterData.background !== null) && (() => {
-          const bg = characterData.background as Record<string, unknown>;
-          return bg.history || bg.personality || bg.motivation || 
-                 (bg.goals && Array.isArray(bg.goals) && bg.goals.length > 0);
-        })()
+        characterData.background !== null && 
+        hasBackgroundData(characterData.background as Record<string, unknown>))
     );
   } catch {
     return false;
