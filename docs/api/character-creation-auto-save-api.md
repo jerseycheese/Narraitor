@@ -1,6 +1,6 @@
 # Character Creation Auto-Save API Reference
 
-Complete API documentation for the character creation auto-save and recovery system implemented in Issue #119.
+If you're working with the auto-save system, this covers the main hook and component APIs. The implementation from Issue #119 is pretty straightforward - here's how to use it.
 
 ## Hook: `useCharacterCreationAutoSave`
 
@@ -8,13 +8,9 @@ Complete API documentation for the character creation auto-save and recovery sys
 function useCharacterCreationAutoSave(worldId: EntityID): UseCharacterCreationAutoSaveReturn
 ```
 
-### Parameters
+Just pass it the `worldId` for the world where the character is being created. The hook uses this to namespace the localStorage key so characters for different worlds don't interfere with each other.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `worldId` | `EntityID` | The ID of the world for which the character is being created |
-
-### Return Value
+What you get back:
 
 ```typescript
 interface UseCharacterCreationAutoSaveReturn {

@@ -1,17 +1,20 @@
 # RecoveryNotification Component
 
-A modal dialog component that presents recovery options when saved character creation data is detected. Provides clear user choice between recovering previous progress or starting fresh with data preview and conflict detection.
+This is the modal dialog that pops up when someone returns to character creation and we find saved data from a previous session. Basically gives users the choice to pick up where they left off or start fresh.
 
-## Overview
+## What It's For
 
-The RecoveryNotification component appears when the auto-save system detects previously saved character creation data. It helps users make informed decisions about whether to continue their previous work or start over, especially when there might be conflicts with current form data.
+So you've got the auto-save system quietly saving character data in the background. When users come back to character creation later - maybe they closed their browser yesterday, or accidentally navigated away - this component shows up to let them know we found their previous work.
 
-**Key Features:**
-- Data preview with character name, progress step, and completion status
-- Conflict warnings when current form data would be overwritten
-- Accessible modal dialog with proper ARIA attributes
-- Auto-focus management for keyboard navigation
-- Formatted timestamp display with error handling
+The tricky part is handling conflicts. If they've already started entering new data in the current session, we need to warn them that recovering will overwrite what they've typed. That's where the conflict detection comes in.
+
+What it handles:
+
+- Shows a preview of what was saved (character name, which step they were on, what they'd completed)
+- Warns users if they've already started typing new stuff that would get overwritten
+- Proper accessibility - ARIA attributes, focus management, all that
+- Auto-focuses on the main button so keyboard navigation works
+- Formats the "last saved" timestamp nicely (and handles cases where the date is corrupted)
 
 ## Props Interface
 
