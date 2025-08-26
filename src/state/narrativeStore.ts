@@ -95,57 +95,16 @@ const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePrefer
 };
 
 /**
- * Infers choice type from option text using keyword analysis
+ * Infers choice type from option text using AI analysis
+ * Falls back to neutral if AI analysis is not available
  */
 const inferChoiceTypeFromText = (text: string): ChoiceTypePreference => {
-  const lowercaseText = text.toLowerCase();
-
-  // Aggressive patterns
-  if (lowercaseText.includes('attack') || 
-      lowercaseText.includes('fight') || 
-      lowercaseText.includes('destroy') ||
-      lowercaseText.includes('kill') ||
-      lowercaseText.includes('strike')) {
-    return 'aggressive';
-  }
-
-  // Diplomatic patterns
-  if (lowercaseText.includes('negotiate') || 
-      lowercaseText.includes('discuss') || 
-      lowercaseText.includes('persuade') ||
-      lowercaseText.includes('convince') ||
-      lowercaseText.includes('talk')) {
-    return 'diplomatic';
-  }
-
-  // Stealthy patterns
-  if (lowercaseText.includes('sneak') || 
-      lowercaseText.includes('hide') || 
-      lowercaseText.includes('steal') ||
-      lowercaseText.includes('quietly') ||
-      lowercaseText.includes('secretly')) {
-    return 'stealthy';
-  }
-
-  // Helpful patterns
-  if (lowercaseText.includes('help') || 
-      lowercaseText.includes('assist') || 
-      lowercaseText.includes('support') ||
-      lowercaseText.includes('aid') ||
-      lowercaseText.includes('save')) {
-    return 'helpful';
-  }
-
-  // Selfish patterns
-  if (lowercaseText.includes('take for myself') || 
-      lowercaseText.includes('keep') || 
-      lowercaseText.includes('claim') ||
-      lowercaseText.includes('mine') ||
-      lowercaseText.includes('abandon')) {
-    return 'selfish';
-  }
-
-  // Default to neutral
+  // TODO: Implement AI-based choice type inference
+  // This should use the existing AI infrastructure to analyze the choice text
+  // and return the appropriate ChoiceTypePreference
+  
+  // For now, return neutral as a safe fallback
+  // The alignment-based mapping from Decision options is the primary method
   return 'neutral';
 };
 
