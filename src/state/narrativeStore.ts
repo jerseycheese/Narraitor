@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
+import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
+import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 
 
 /**
@@ -78,6 +80,115 @@ const initialState = {
   endingError: null,
   error: null,
   loading: false,
+};
+
+/**
+ * Maps choice alignment to appropriate choice type preference
+ */
+const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePreference => {
+  switch (alignment) {
+    case 'lawful': return 'diplomatic';
+    case 'chaotic': return 'aggressive';
+    case 'neutral':
+    default: return 'neutral';
+  }
+};
+
+/**
+ * Infers choice type from option text using keyword analysis
+ */
+const inferChoiceTypeFromText = (text: string): ChoiceTypePreference => {
+  const lowercaseText = text.toLowerCase();
+
+  // Aggressive patterns
+  if (lowercaseText.includes('attack') || 
+      lowercaseText.includes('fight') || 
+      lowercaseText.includes('destroy') ||
+      lowercaseText.includes('kill') ||
+      lowercaseText.includes('strike')) {
+    return 'aggressive';
+  }
+
+  // Diplomatic patterns
+  if (lowercaseText.includes('negotiate') || 
+      lowercaseText.includes('discuss') || 
+      lowercaseText.includes('persuade') ||
+      lowercaseText.includes('convince') ||
+      lowercaseText.includes('talk')) {
+    return 'diplomatic';
+  }
+
+  // Stealthy patterns
+  if (lowercaseText.includes('sneak') || 
+      lowercaseText.includes('hide') || 
+      lowercaseText.includes('steal') ||
+      lowercaseText.includes('quietly') ||
+      lowercaseText.includes('secretly')) {
+    return 'stealthy';
+  }
+
+  // Helpful patterns
+  if (lowercaseText.includes('help') || 
+      lowercaseText.includes('assist') || 
+      lowercaseText.includes('support') ||
+      lowercaseText.includes('aid') ||
+      lowercaseText.includes('save')) {
+    return 'helpful';
+  }
+
+  // Selfish patterns
+  if (lowercaseText.includes('take for myself') || 
+      lowercaseText.includes('keep') || 
+      lowercaseText.includes('claim') ||
+      lowercaseText.includes('mine') ||
+      lowercaseText.includes('abandon')) {
+    return 'selfish';
+  }
+
+  // Default to neutral
+  return 'neutral';
+};
+
+/**
+ * Extracts narrative context from decision prompt and segments
+ */
+const extractDecisionContext = (
+  prompt: string, 
+  segments: NarrativeSegment[]
+): {
+  location?: string;
+  situation?: string;
+  charactersPresent?: string[];
+} => {
+  const context: {
+    location?: string;
+    situation?: string;
+    charactersPresent?: string[];
+  } = {};
+
+  // Extract location from prompt
+  const locationRegex = /\b(?:in|at|on|inside|outside|near|by|within)\s+(the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
+  const locationMatch = locationRegex.exec(prompt);
+  if (locationMatch) {
+    context.location = locationMatch[2];
+  }
+
+  // Extract characters from prompt and recent segments
+  const characterRegex = /\b([A-Z][a-z]{2,})\b/g;
+  const characterMatches = prompt.match(characterRegex) || [];
+  
+  // Filter out common words that aren't character names
+  const commonWords = ['What', 'You', 'Your', 'The', 'This', 'That', 'When', 'Where', 'How', 'Why', 'Who', 'Which'];
+  const potentialCharacters = characterMatches.filter(word => !commonWords.includes(word));
+  
+  if (potentialCharacters.length > 0) {
+    context.charactersPresent = potentialCharacters;
+  }
+
+  // Use prompt as situation context
+  context.situation = prompt;
+
+  return context;
 };
 
 // Narrative Store implementation with persistence
@@ -285,12 +396,74 @@ export const useNarrativeStore = create<NarrativeStore>()(
       return { error: 'Decision not found' };
     }
 
+    const decision = state.decisions[decisionId];
+    const selectedOption = decision.options.find(opt => opt.id === optionId);
+    
+    if (!selectedOption) {
+      return { error: 'Selected option not found' };
+    }
+
     const updatedDecision: Decision = {
-      ...state.decisions[decisionId],
+      ...decision,
       selectedOptionId: optionId,
       selectedAt: new Date(),
       characterId,
     };
+
+    // Track decision in PlayerDecisionTracker for narrative personalization
+    try {
+      // Find session and world IDs
+      let sessionId: EntityID | null = null;
+      let worldId: EntityID | null = null;
+
+      // Find which session contains this decision
+      for (const [sId, decisionIds] of Object.entries(state.sessionDecisions)) {
+        if (decisionIds.includes(decisionId)) {
+          sessionId = sId;
+          break;
+        }
+      }
+
+      // Find worldId from narrative segments in the same session
+      if (sessionId) {
+        const segmentIds = state.sessionSegments[sessionId] || [];
+        for (const segmentId of segmentIds) {
+          const segment = state.segments[segmentId];
+          if (segment?.worldId) {
+            worldId = segment.worldId;
+            break;
+          }
+        }
+      }
+
+      if (sessionId && characterId) {
+        // Determine choice type from alignment or text analysis
+        let choiceType: ChoiceTypePreference = 'neutral';
+        if (selectedOption.alignment) {
+          choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
+        } else {
+          choiceType = inferChoiceTypeFromText(selectedOption.text);
+        }
+
+        // Extract context from decision and recent segments
+        const sessionSegmentIds = state.sessionSegments[sessionId] || [];
+        const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);
+        const context = extractDecisionContext(decision.prompt, sessionSegments);
+
+        // Record decision in PlayerDecisionTracker
+        playerDecisionTracker.recordDecision(
+          decision.prompt,
+          selectedOption.text,
+          choiceType,
+          sessionId,
+          worldId || 'unknown-world',
+          context
+        );
+      }
+    } catch (error) {
+      // Log error but don't break the game flow
+      console.warn('Failed to track player decision:', error);
+    }
 
     return {
       decisions: {
