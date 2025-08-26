@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone } from '../types/narrative.types';
+import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
+import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
 import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
+import { playerDecisionTracker } from '../lib/ai/playerDecisionTracker';
 
 
 /**
@@ -78,6 +80,83 @@ const initialState = {
   endingError: null,
   error: null,
   loading: false,
+};
+
+/**
+ * Maps choice alignment to appropriate choice type preference
+ */
+const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePreference => {
+  switch (alignment) {
+    case 'lawful': return 'diplomatic';
+    case 'chaotic': return 'aggressive';
+    case 'neutral':
+    default: return 'neutral';
+  }
+};
+
+/**
+ * AI-based choice type inference (placeholder for future enhancement)
+ * TODO: Implement AI-based choice analysis for choices without explicit alignment
+ * See follow-up issue for enhanced choice categorization using AI
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const inferChoiceTypeFromText = (_text: string): ChoiceTypePreference => {
+  // For choices without explicit alignment, return neutral
+  // The alignment-based mapping handles the majority of cases effectively
+  // AI-based inference will be implemented in a follow-up enhancement
+  return 'neutral';
+};
+
+/**
+ * Extracts narrative context from decision prompt and segments
+ */
+const extractDecisionContext = (
+  prompt: string, 
+  segments: NarrativeSegment[]
+): {
+  location?: string;
+  situation?: string;
+  charactersPresent?: string[];
+} => {
+  const context: {
+    location?: string;
+    situation?: string;
+    charactersPresent?: string[];
+  } = {};
+
+  // Extract location from segments (most recent with location)
+  for (let i = segments.length - 1; i >= 0; i--) {
+    const segment = segments[i];
+    if (segment?.metadata?.location) {
+      context.location = segment.metadata.location;
+      break;
+    }
+  }
+
+  // Extract characters from segments (collect all mentioned characters)
+  const allCharacterIds = new Set<string>();
+  segments.forEach(segment => {
+    if (segment?.characterIds) {
+      segment.characterIds.forEach(id => allCharacterIds.add(id));
+    }
+    if (segment?.metadata?.characterIds) {
+      segment.metadata.characterIds.forEach(id => allCharacterIds.add(id));
+    }
+  });
+
+  // Also extract characters from prompt text
+  const characterRegex = /\b([a-z]+-[a-z]+|merchant|guard|bandit|villager|traveler)/gi;
+  const promptCharacterMatches = prompt.match(characterRegex) || [];
+  promptCharacterMatches.forEach(char => allCharacterIds.add(char));
+
+  if (allCharacterIds.size > 0) {
+    context.charactersPresent = Array.from(allCharacterIds);
+  }
+
+  // Use prompt as situation context
+  context.situation = prompt;
+
+  return context;
 };
 
 // Narrative Store implementation with persistence
@@ -285,12 +364,74 @@ export const useNarrativeStore = create<NarrativeStore>()(
       return { error: 'Decision not found' };
     }
 
+    const decision = state.decisions[decisionId];
+    const selectedOption = decision.options.find(opt => opt.id === optionId);
+    
+    if (!selectedOption) {
+      return { error: 'Selected option not found' };
+    }
+
     const updatedDecision: Decision = {
-      ...state.decisions[decisionId],
+      ...decision,
       selectedOptionId: optionId,
       selectedAt: new Date(),
       characterId,
     };
+
+    // Track decision in PlayerDecisionTracker for narrative personalization
+    try {
+      // Find session and world IDs
+      let sessionId: EntityID | null = null;
+      let worldId: EntityID | null = null;
+
+      // Find which session contains this decision
+      for (const [sId, decisionIds] of Object.entries(state.sessionDecisions)) {
+        if (decisionIds.includes(decisionId)) {
+          sessionId = sId;
+          break;
+        }
+      }
+
+      // Find worldId from narrative segments in the same session
+      if (sessionId) {
+        const segmentIds = state.sessionSegments[sessionId] || [];
+        for (const segmentId of segmentIds) {
+          const segment = state.segments[segmentId];
+          if (segment?.worldId) {
+            worldId = segment.worldId;
+            break;
+          }
+        }
+      }
+
+      if (sessionId && characterId) {
+        // Determine choice type from alignment or text analysis
+        let choiceType: ChoiceTypePreference = 'neutral';
+        if (selectedOption.alignment) {
+          choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
+        } else {
+          choiceType = inferChoiceTypeFromText(selectedOption.text);
+        }
+
+        // Extract context from decision and recent segments
+        const sessionSegmentIds = state.sessionSegments[sessionId] || [];
+        const sessionSegments = sessionSegmentIds.map(id => state.segments[id]).filter(Boolean);
+        const context = extractDecisionContext(decision.prompt, sessionSegments);
+
+        // Record decision in PlayerDecisionTracker
+        playerDecisionTracker.recordDecision(
+          decision.prompt,
+          selectedOption.text,
+          choiceType,
+          sessionId,
+          worldId || 'unknown-world',
+          context
+        );
+      }
+    } catch (error) {
+      // Log error but don't break the game flow
+      console.warn('Failed to track player decision:', error);
+    }
 
     return {
       decisions: {
