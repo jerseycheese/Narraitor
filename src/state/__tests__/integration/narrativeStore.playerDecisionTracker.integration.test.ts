@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * End-to-End Integration Tests for Issue #142
  * 
@@ -57,7 +56,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       const worldId = 'fantasy-world';
 
       // Step 1: Establish narrative context with multiple segments
-      const segment1Id = store.addSegment(sessionId, {
+      store.addSegment(sessionId, {
         worldId,
         content: 'You enter the bustling marketplace of Rivertown, filled with merchants and travelers.',
         type: 'scene',
@@ -68,7 +67,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         }
       });
 
-      const segment2Id = store.addSegment(sessionId, {
+      store.addSegment(sessionId, {
         worldId,
         content: 'A distressed merchant approaches you, wringing his hands nervously.',
         type: 'dialogue',
@@ -79,7 +78,7 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         }
       });
 
-      const segment3Id = store.addSegment(sessionId, {
+      store.addSegment(sessionId, {
         worldId,
         content: '"Please, adventurer! Bandits stole my entire shipment on the road from Millhaven!"',
         type: 'dialogue',
@@ -131,7 +130,6 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       // Step 4: Get fresh state after selection
       currentState = useNarrativeStore.getState();
       const decision = currentState.decisions[decisionId];
-      const sessionSegments = store.getSessionSegments(sessionId);
 
       // Simulate context extraction
       const context = {

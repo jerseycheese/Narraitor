@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Integration tests for Issue #142: PlayerDecisionTracker integration with narrativeStore.selectDecisionOption()
  * 
@@ -167,7 +166,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       const characterId = 'char-456';
 
       // Add some narrative segments to establish context
-      const segmentId1 = store.addSegment(sessionId, {
+      store.addSegment(sessionId, {
         content: 'You arrive at the bustling marketplace of Rivertown.',
         type: 'scene',
         metadata: {
@@ -177,7 +176,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         }
       });
 
-      const segmentId2 = store.addSegment(sessionId, {
+      store.addSegment(sessionId, {
         content: 'A merchant approaches you with a worried expression.',
         type: 'dialogue',
         characterIds: [characterId, 'merchant-npc'],
@@ -306,7 +305,7 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       expect(mockPlayerDecisionTracker.recordDecision).toHaveBeenCalledTimes(1);
       
       // Verify it was called with some fallback world ID or appropriate handling
-      const [prompt, choiceText, choiceType, calledSessionId, calledWorldId, context] = 
+      const [, , , calledSessionId, calledWorldId] = 
         mockPlayerDecisionTracker.recordDecision.mock.calls[0];
       
       expect(calledSessionId).toBe(sessionId);

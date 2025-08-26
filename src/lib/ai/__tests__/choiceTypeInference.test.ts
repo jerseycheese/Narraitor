@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Tests for choice type inference logic used in Issue #142 integration
  * 
@@ -28,7 +27,7 @@ function mapAlignmentToChoiceType(alignment?: ChoiceAlignment): ChoiceTypePrefer
  * Simple AI-based choice inference (placeholder)
  * In production, this would use AI to analyze choice text
  */
-function inferChoiceTypeFromText(_text: string): ChoiceTypePreference {
+function inferChoiceTypeFromText(): ChoiceTypePreference {
   // AI-based inference would go here
   // For now, return neutral as the fallback
   return 'neutral';

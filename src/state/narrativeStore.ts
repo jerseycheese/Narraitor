@@ -99,8 +99,7 @@ const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePrefer
  * TODO: Implement AI-based choice analysis for choices without explicit alignment
  * See follow-up issue for enhanced choice categorization using AI
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const inferChoiceTypeFromText = (_text: string): ChoiceTypePreference => {
+const inferChoiceTypeFromText = (): ChoiceTypePreference => {
   // For choices without explicit alignment, return neutral
   // The alignment-based mapping handles the majority of cases effectively
   // AI-based inference will be implemented in a follow-up enhancement
@@ -144,8 +143,8 @@ const extractDecisionContext = (
     }
   });
 
-  // Also extract characters from prompt text
-  const characterRegex = /\b([a-z]+-[a-z]+|merchant|guard|bandit|villager|traveler)/gi;
+  // Extract characters from prompt text (capitalized names, possibly with hyphens/apostrophes)
+  const characterRegex = /\b([A-Z][a-z]+(?:[-' ][A-Z][a-z]+)*)\b/g;
   const promptCharacterMatches = prompt.match(characterRegex) || [];
   promptCharacterMatches.forEach(char => allCharacterIds.add(char));
 
@@ -410,7 +409,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
         if (selectedOption.alignment) {
           choiceType = mapAlignmentToChoiceType(selectedOption.alignment);
         } else {
-          choiceType = inferChoiceTypeFromText(selectedOption.text);
+          choiceType = inferChoiceTypeFromText();
         }
 
         // Extract context from decision and recent segments
@@ -430,7 +429,7 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     } catch (error) {
       // Log error but don't break the game flow
-      console.warn('Failed to track player decision:', error);
+      logger.warn('Failed to track player decision:', error);
     }
 
     return {
