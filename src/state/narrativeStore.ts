@@ -95,17 +95,15 @@ const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePrefer
 };
 
 /**
- * AI-based choice type inference (placeholder implementation)
- * TODO: Implement actual AI analysis when AI infrastructure is available
+ * AI-based choice type inference (placeholder for future enhancement)
+ * TODO: Implement AI-based choice analysis for choices without explicit alignment
+ * See follow-up issue for enhanced choice categorization using AI
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const inferChoiceTypeFromText = (_text: string): ChoiceTypePreference => {
-  // TODO: Replace with actual AI-based inference
-  // This should analyze the choice text using the existing AI infrastructure
-  // and return the appropriate ChoiceTypePreference based on semantic understanding
-  
-  // For now, return neutral as a safe fallback
-  // The alignment-based mapping is the primary method until AI is implemented
+  // For choices without explicit alignment, return neutral
+  // The alignment-based mapping handles the majority of cases effectively
+  // AI-based inference will be implemented in a follow-up enhancement
   return 'neutral';
 };
 
