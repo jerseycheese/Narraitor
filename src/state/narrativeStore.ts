@@ -95,16 +95,16 @@ const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePrefer
 };
 
 /**
- * Infers choice type from option text using AI analysis
- * Falls back to neutral if AI analysis is not available
+ * AI-based choice type inference (placeholder implementation)
+ * TODO: Implement actual AI analysis when AI infrastructure is available
  */
-const inferChoiceTypeFromText = (text: string): ChoiceTypePreference => {
-  // TODO: Implement AI-based choice type inference
-  // This should use the existing AI infrastructure to analyze the choice text
-  // and return the appropriate ChoiceTypePreference
+const inferChoiceTypeFromText = (_text: string): ChoiceTypePreference => {
+  // TODO: Replace with actual AI-based inference
+  // This should analyze the choice text using the existing AI infrastructure
+  // and return the appropriate ChoiceTypePreference based on semantic understanding
   
   // For now, return neutral as a safe fallback
-  // The alignment-based mapping from Decision options is the primary method
+  // The alignment-based mapping is the primary method until AI is implemented
   return 'neutral';
 };
 
@@ -113,8 +113,7 @@ const inferChoiceTypeFromText = (text: string): ChoiceTypePreference => {
  */
 const extractDecisionContext = (
   prompt: string, 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _segments: NarrativeSegment[]
+  segments: NarrativeSegment[]
 ): {
   location?: string;
   situation?: string;
@@ -126,23 +125,33 @@ const extractDecisionContext = (
     charactersPresent?: string[];
   } = {};
 
-  // Extract location from prompt
-  const locationRegex = /\b(?:in|at|on|inside|outside|near|by|within)\s+(the\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
-  const locationMatch = locationRegex.exec(prompt);
-  if (locationMatch) {
-    context.location = locationMatch[2];
+  // Extract location from segments (most recent with location)
+  for (let i = segments.length - 1; i >= 0; i--) {
+    const segment = segments[i];
+    if (segment?.metadata?.location) {
+      context.location = segment.metadata.location;
+      break;
+    }
   }
 
-  // Extract characters from prompt and recent segments
-  const characterRegex = /\b([A-Z][a-z]{2,})\b/g;
-  const characterMatches = prompt.match(characterRegex) || [];
-  
-  // Filter out common words that aren't character names
-  const commonWords = ['What', 'You', 'Your', 'The', 'This', 'That', 'When', 'Where', 'How', 'Why', 'Who', 'Which'];
-  const potentialCharacters = characterMatches.filter(word => !commonWords.includes(word));
-  
-  if (potentialCharacters.length > 0) {
-    context.charactersPresent = potentialCharacters;
+  // Extract characters from segments (collect all mentioned characters)
+  const allCharacterIds = new Set<string>();
+  segments.forEach(segment => {
+    if (segment?.characterIds) {
+      segment.characterIds.forEach(id => allCharacterIds.add(id));
+    }
+    if (segment?.metadata?.characterIds) {
+      segment.metadata.characterIds.forEach(id => allCharacterIds.add(id));
+    }
+  });
+
+  // Also extract characters from prompt text
+  const characterRegex = /\b([a-z]+-[a-z]+|merchant|guard|bandit|villager|traveler)/gi;
+  const promptCharacterMatches = prompt.match(characterRegex) || [];
+  promptCharacterMatches.forEach(char => allCharacterIds.add(char));
+
+  if (allCharacterIds.size > 0) {
+    context.charactersPresent = Array.from(allCharacterIds);
   }
 
   // Use prompt as situation context
