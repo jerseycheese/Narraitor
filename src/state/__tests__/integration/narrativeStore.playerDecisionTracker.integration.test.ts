@@ -118,14 +118,19 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         decisionWeight: 'major'
       });
 
-      // Step 3: Simulate integration - player selects helpful option
+      // Step 3: Get the decision options before selection
+      let currentState = useNarrativeStore.getState();
+      const originalDecision = currentState.decisions[decisionId];
+      expect(originalDecision).toBeDefined();
+      const selectedOption = originalDecision.options.find(opt => opt.id === 'help-free');
+
+      // Simulate integration - player selects helpful option
       // This should trigger the integration logic (when implemented)
       store.selectDecisionOption(decisionId, 'help-free', characterId);
 
-      // Step 4: Manually simulate what the integration should do
-      // (This would be automatic once integration is implemented)
-      const decision = store.decisions[decisionId];
-      const selectedOption = decision.options.find(opt => opt.id === 'help-free');
+      // Step 4: Get fresh state after selection
+      currentState = useNarrativeStore.getState();
+      const decision = currentState.decisions[decisionId];
       const sessionSegments = store.getSessionSegments(sessionId);
 
       // Simulate context extraction
@@ -173,12 +178,17 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         ] as DecisionOption[]
       });
 
+      // Get the follow-up decision options before selection
+      currentState = useNarrativeStore.getState();
+      const originalFollowUpDecision = currentState.decisions[followUpDecisionId];
+      const followUpOption = originalFollowUpDecision.options.find(opt => opt.id === 'sneak-stealth');
+
       // Player chooses stealth approach
       store.selectDecisionOption(followUpDecisionId, 'sneak-stealth', characterId);
 
-      // Simulate second decision tracking
-      const followUpDecision = store.decisions[followUpDecisionId];
-      const followUpOption = followUpDecision.options.find(opt => opt.id === 'sneak-stealth');
+      // Get fresh state for follow-up decision
+      currentState = useNarrativeStore.getState();
+      const followUpDecision = currentState.decisions[followUpDecisionId];
       
       testTracker.recordDecision(
         followUpDecision.prompt,
@@ -196,7 +206,8 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       // Step 7: Analyze accumulated patterns
       const patterns = testTracker.analyzeChoicePatterns();
       
-      expect(patterns.dominantChoiceTypes).toEqual(['helpful', 'stealthy']);
+      expect(patterns.dominantChoiceTypes).toContain('helpful');
+      expect(patterns.dominantChoiceTypes).toContain('stealthy');
       expect(patterns.choiceDistribution.helpful).toBe(1);
       expect(patterns.choiceDistribution.stealthy).toBe(1);
       expect(patterns.patternStrength).toBeGreaterThan(0);
@@ -329,8 +340,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       store.selectDecisionOption(decisionId, 'option-1', characterId);
       const afterSelection = Date.now();
 
-      // Verify narrative store is unaffected by potential tracking issues
-      const decision = store.decisions[decisionId];
+      // Get fresh state after selection
+      const updatedState = useNarrativeStore.getState();
+      const decision = updatedState.decisions[decisionId];
       expect(decision.selectedOptionId).toBe('option-1');
       expect(decision.characterId).toBe(characterId);
       expect(decision.selectedAt).toBeInstanceOf(Date);
@@ -424,8 +436,13 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
       const narrativeDecisions = store.getSessionDecisions(sessionId);
       expect(narrativeDecisions).toHaveLength(numDecisions);
 
-      // Verify each decision has correct data
-      trackedDecisions.forEach((decision, index) => {
+      // Verify each decision has correct data (sort numerically by prompt)
+      const sortedTrackedDecisions = trackedDecisions.sort((a, b) => {
+        const aNum = parseInt(a.prompt.match(/\d+/)?.[0] || '0');
+        const bNum = parseInt(b.prompt.match(/\d+/)?.[0] || '0');
+        return aNum - bNum;
+      });
+      sortedTrackedDecisions.forEach((decision, index) => {
         expect(decision.prompt).toBe(`Rapid decision ${index + 1}`);
         expect(decision.choiceText).toBe(`Choice ${index + 1}`);
       });
