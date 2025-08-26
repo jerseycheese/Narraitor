@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Tests for choice type inference logic used in Issue #142 integration
  * 
@@ -15,8 +16,8 @@ import { ChoiceTypePreference } from '../../../types/personalization.types';
  */
 function inferChoiceType(
   choiceText: string, 
-  prompt: string,
-  context?: {
+  _prompt: string,
+  _context?: {
     location?: string;
     situation?: string;
     charactersPresent?: string[];

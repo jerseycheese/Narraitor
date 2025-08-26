@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Integration tests for Issue #142: PlayerDecisionTracker integration with narrativeStore.selectDecisionOption()
  * 

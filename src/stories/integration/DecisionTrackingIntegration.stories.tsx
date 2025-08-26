@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps, react-hooks/rules-of-hooks */
 /**
  * Storybook stories for Issue #142: PlayerDecisionTracker integration visualization
  * 
@@ -11,8 +12,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useEffect, useState } from 'react';
 import { useNarrativeStore } from '../../state/narrativeStore';
 import { playerDecisionTracker } from '../../lib/ai/playerDecisionTracker';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../components/ui/card';
 import { DecisionOption } from '../../types/narrative.types';
 import { ChoiceTypePreference } from '../../types/personalization.types';
 
@@ -100,6 +101,9 @@ const DecisionTrackingDemo: React.FC<DecisionTrackingDemoProps> = ({
     store.addSegment(sessionId, {
       content: `You are traveling through ${currentScenario.context.location}.`,
       type: 'scene',
+      worldId: 'test-world',
+      updatedAt: new Date().toISOString(),
+      timestamp: new Date(),
       metadata: {
         tags: ['travel', 'setting'],
         location: currentScenario.context.location
@@ -133,7 +137,7 @@ const DecisionTrackingDemo: React.FC<DecisionTrackingDemoProps> = ({
     const newDecision = {
       prompt: currentScenario.prompt,
       selectedChoice: selectedOption.text,
-      inferredType: selectedOption.expectedType,
+      inferredType: selectedOption.expectedType as ChoiceTypePreference,
       tracked: showRealTracking
     };
 

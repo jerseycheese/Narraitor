@@ -154,7 +154,8 @@ const inferChoiceTypeFromText = (text: string): ChoiceTypePreference => {
  */
 const extractDecisionContext = (
   prompt: string, 
-  segments: NarrativeSegment[]
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _segments: NarrativeSegment[]
 ): {
   location?: string;
   situation?: string;
