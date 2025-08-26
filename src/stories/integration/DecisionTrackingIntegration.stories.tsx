@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/exhaustive-deps, react-hooks/rules-of-hooks */
 /**
  * Storybook stories for Issue #142: PlayerDecisionTracker integration visualization
  * 
@@ -120,7 +119,7 @@ const DecisionTrackingDemo: React.FC<DecisionTrackingDemoProps> = ({
     });
     
     setCurrentDecisionId(decisionId);
-  }, [initialScenario]);
+  }, [initialScenario, currentScenario.context.location, currentScenario.options, currentScenario.prompt]);
 
   const handleChoiceSelection = (optionId: string) => {
     if (!currentDecisionId) return;
@@ -179,21 +178,32 @@ const DecisionTrackingDemo: React.FC<DecisionTrackingDemoProps> = ({
     // Reset narrative store
     useNarrativeStore.getState().reset();
     
-    // Recreate decision
-    useEffect(() => {
-      const store = useNarrativeStore.getState();
-      const sessionId = 'demo-session';
-      
-      const decisionId = store.addDecision(sessionId, {
-        prompt: currentScenario.prompt,
-        options: currentScenario.options.map(opt => ({
-          id: opt.id,
-          text: opt.text
-        })) as DecisionOption[]
-      });
-      
-      setCurrentDecisionId(decisionId);
-    }, []);
+    // Recreate decision directly (not in useEffect)
+    const store = useNarrativeStore.getState();
+    const sessionId = 'demo-session';
+    
+    // Add context segment
+    store.addSegment(sessionId, {
+      content: `You are traveling through ${currentScenario.context.location}.`,
+      type: 'scene',
+      worldId: 'test-world',
+      updatedAt: new Date().toISOString(),
+      timestamp: new Date(),
+      metadata: {
+        tags: ['travel', 'setting'],
+        location: currentScenario.context.location
+      }
+    });
+    
+    const decisionId = store.addDecision(sessionId, {
+      prompt: currentScenario.prompt,
+      options: currentScenario.options.map(opt => ({
+        id: opt.id,
+        text: opt.text
+      })) as DecisionOption[]
+    });
+    
+    setCurrentDecisionId(decisionId);
   };
 
   return (
@@ -458,7 +468,7 @@ export const PatternBuilding: Story = {
       }
     }
   },
-  play: async ({ canvasElement }) => {
+  play: async () => {
     // This could include automated interactions for testing
     // For now, it's a manual testing story
   }
