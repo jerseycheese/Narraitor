@@ -98,6 +98,7 @@ const mapAlignmentToChoiceType = (alignment?: ChoiceAlignment): ChoiceTypePrefer
  * AI-based choice type inference (placeholder implementation)
  * TODO: Implement actual AI analysis when AI infrastructure is available
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const inferChoiceTypeFromText = (_text: string): ChoiceTypePreference => {
   // TODO: Replace with actual AI-based inference
   // This should analyze the choice text using the existing AI infrastructure
