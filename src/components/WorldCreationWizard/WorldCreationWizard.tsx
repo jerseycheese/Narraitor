@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -13,6 +13,7 @@ import {
   WizardNavigation, 
   WizardStep 
 } from '@/components/shared/wizard';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 import TemplateStep from './steps/TemplateStep';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
@@ -140,6 +141,24 @@ export default function WorldCreationWizard({
     },
   });
 
+  // Cancel confirmation dialog state
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+
+  // Dirty state detection - check if user has made meaningful changes
+  const isDirty = useMemo(() => {
+    const currentData = wizard.state.data;
+    const initialData = initialWorldData;
+    
+    return (
+      currentData.name !== initialData.name ||
+      currentData.description !== initialData.description ||
+      currentData.genre !== initialData.genre ||
+      JSON.stringify(currentData.attributes) !== JSON.stringify(initialData.attributes) ||
+      JSON.stringify(currentData.skills) !== JSON.stringify(initialData.skills) ||
+      currentData.aiSuggestionsGenerated !== initialData.aiSuggestionsGenerated
+    );
+  }, [wizard.state.data, initialWorldData]);
+
   const canProceedToNext = useCallback((): boolean => {
     const currentValidation = wizard.state.validation[wizard.state.currentStep];
     return !currentValidation || currentValidation.valid;
@@ -216,12 +235,32 @@ export default function WorldCreationWizard({
   }, [wizard]);
 
   const handleCancel = useCallback(() => {
+    // Check if user has made meaningful changes
+    if (isDirty) {
+      // Show confirmation dialog
+      setShowCancelConfirmation(true);
+    } else {
+      // Direct cancel for clean state
+      if (onCancel) {
+        onCancel();
+      } else {
+        router.push('/worlds');
+      }
+    }
+  }, [isDirty, onCancel, router]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setShowCancelConfirmation(false);
     if (onCancel) {
       onCancel();
     } else {
       router.push('/worlds');
     }
   }, [onCancel, router]);
+
+  const handleRejectCancel = useCallback(() => {
+    setShowCancelConfirmation(false);
+  }, []);
 
   const handleComplete = useCallback(async () => {
     const data = wizard.state.data;
@@ -465,6 +504,18 @@ export default function WorldCreationWizard({
           />
         )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showCancelConfirmation}
+        onClose={handleRejectCancel}
+        onConfirm={handleConfirmCancel}
+        title="Cancel World Creation?"
+        message="Your progress will be lost. Are you sure you want to cancel?"
+        variant="warning"
+        confirmText="Yes, Cancel"
+        cancelText="Continue Editing"
+      />
     </WizardContainer>
   );
 }
