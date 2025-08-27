@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/button';
 import { truncate } from '@/lib/utils';
 
 // Efficient deep comparison for arrays of objects
-const areArraysEqual = <T extends Record<string, unknown>>(a: T[] = [], b: T[] = []): boolean => {
+const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
   if (a.length !== b.length) return false;
   
   for (let i = 0; i < a.length; i++) {
@@ -37,8 +37,8 @@ const areArraysEqual = <T extends Record<string, unknown>>(a: T[] = [], b: T[] =
     const objB = b[i];
     
     // Compare object keys
-    const keysA = Object.keys(objA);
-    const keysB = Object.keys(objB);
+    const keysA = Object.keys(objA) as (keyof T)[];
+    const keysB = Object.keys(objB) as (keyof T)[];
     
     if (keysA.length !== keysB.length) return false;
     
