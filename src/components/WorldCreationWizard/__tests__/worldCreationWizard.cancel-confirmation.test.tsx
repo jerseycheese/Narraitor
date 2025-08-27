@@ -26,6 +26,19 @@ jest.mock('@/lib/ai/worldAnalyzerClient', () => ({
   analyzeWorldDescriptionClient: jest.fn(),
 }));
 
+// Test data constants
+const TEST_WORLD_DATA = {
+  name: 'Test World Name',
+  description: 'A test world description',
+  genre: 'Sci-Fi',
+  attributes: [
+    { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical' }
+  ],
+  skills: [
+    { name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as const, category: 'Combat' }
+  ]
+};
+
 describe('WorldCreationWizard Cancel Confirmation', () => {
   const mockPush = jest.fn();
   const mockCreateWorld = jest.fn();
@@ -68,7 +81,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World Name');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       // Click cancel - should show confirmation due to dirty state
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -89,7 +102,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World Name');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       // Click cancel to show confirmation
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -108,7 +121,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World Name');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       // Click cancel to show confirmation
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -128,7 +141,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter data to make the wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World Name');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       // Click cancel to show confirmation
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
@@ -149,7 +162,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter name to make wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -162,7 +175,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter description to make wizard dirty
       const descriptionInput = screen.getByTestId('world-description-textarea');
-      await user.type(descriptionInput, 'A test world description');
+      await user.type(descriptionInput, TEST_WORLD_DATA.description);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -175,7 +188,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Change genre to make wizard dirty  
       const genreSelect = screen.getByTestId('world-genre-select');
-      await user.selectOptions(genreSelect, 'Sci-Fi');
+      await user.selectOptions(genreSelect, TEST_WORLD_DATA.genre);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -186,15 +199,13 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when attributes are modified', async () => {
       // Start with some initial attributes and test modification
       const initialData = {
-        attributes: [
-          { name: 'Strength', description: 'Physical power', minValue: 1, maxValue: 10, baseValue: 5, category: 'Physical' }
-        ]
+        attributes: TEST_WORLD_DATA.attributes
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       
       // Modify the name field to trigger dirty state
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Modified World');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -205,15 +216,13 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when skills are modified', async () => {
       // Start with some initial skills and test modification
       const initialData = {
-        skills: [
-          { name: 'Combat', description: 'Fighting ability', difficulty: 'medium' as const, category: 'Combat' }
-        ]
+        skills: TEST_WORLD_DATA.skills
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       
       // Modify the name field to trigger dirty state
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Modified World');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -226,7 +235,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter name to make wizard dirty and simulate AI suggestions generated
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'AI Generated World');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);
@@ -241,7 +250,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Enter name to make wizard dirty
       const nameInput = screen.getByTestId('world-name-input');
-      await user.type(nameInput, 'Test World');
+      await user.type(nameInput, TEST_WORLD_DATA.name);
       
       const cancelButton = screen.getByRole('button', { name: /cancel/i });
       await user.click(cancelButton);

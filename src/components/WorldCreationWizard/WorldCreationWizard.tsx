@@ -28,6 +28,29 @@ import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { truncate } from '@/lib/utils';
 
+// Efficient deep comparison for arrays of objects
+const areArraysEqual = <T extends Record<string, any>>(a: T[] = [], b: T[] = []): boolean => {
+  if (a.length !== b.length) return false;
+  
+  for (let i = 0; i < a.length; i++) {
+    const objA = a[i];
+    const objB = b[i];
+    
+    // Compare object keys
+    const keysA = Object.keys(objA);
+    const keysB = Object.keys(objB);
+    
+    if (keysA.length !== keysB.length) return false;
+    
+    // Compare each property
+    for (const key of keysA) {
+      if (objA[key] !== objB[key]) return false;
+    }
+  }
+  
+  return true;
+};
+
 export type { AttributeSuggestion, SkillSuggestion };
 
 interface WorldCreationData extends Partial<World> {
@@ -153,8 +176,8 @@ export default function WorldCreationWizard({
       currentData.name !== initialData.name ||
       currentData.description !== initialData.description ||
       currentData.genre !== initialData.genre ||
-      JSON.stringify(currentData.attributes) !== JSON.stringify(initialData.attributes) ||
-      JSON.stringify(currentData.skills) !== JSON.stringify(initialData.skills) ||
+      !areArraysEqual(currentData.attributes, initialData.attributes) ||
+      !areArraysEqual(currentData.skills, initialData.skills) ||
       currentData.aiSuggestionsGenerated !== initialData.aiSuggestionsGenerated
     );
   }, [wizard.state.data, initialWorldData]);
