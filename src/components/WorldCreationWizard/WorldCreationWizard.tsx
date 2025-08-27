@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
@@ -13,6 +13,7 @@ import {
   WizardNavigation, 
   WizardStep 
 } from '@/components/shared/wizard';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog/ConfirmationDialog';
 import TemplateStep from './steps/TemplateStep';
 import BasicInfoStep from './steps/BasicInfoStep';
 import DescriptionStep from './steps/DescriptionStep';
@@ -26,6 +27,29 @@ import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { analyzeWorldDescriptionClient } from '@/lib/ai/worldAnalyzerClient';
 import { Button } from '@/components/ui/button';
 import { truncate } from '@/lib/utils';
+
+// Efficient deep comparison for arrays of objects
+const areArraysEqual = <T extends object>(a: T[] = [], b: T[] = []): boolean => {
+  if (a.length !== b.length) return false;
+  
+  for (let i = 0; i < a.length; i++) {
+    const objA = a[i];
+    const objB = b[i];
+    
+    // Compare object keys
+    const keysA = Object.keys(objA) as (keyof T)[];
+    const keysB = Object.keys(objB) as (keyof T)[];
+    
+    if (keysA.length !== keysB.length) return false;
+    
+    // Compare each property
+    for (const key of keysA) {
+      if (objA[key] !== objB[key]) return false;
+    }
+  }
+  
+  return true;
+};
 
 export type { AttributeSuggestion, SkillSuggestion };
 
@@ -140,6 +164,24 @@ export default function WorldCreationWizard({
     },
   });
 
+  // Cancel confirmation dialog state
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+
+  // Dirty state detection - check if user has made meaningful changes
+  const isDirty = useMemo(() => {
+    const currentData = wizard.state.data;
+    const initialData = initialWorldData;
+    
+    return (
+      currentData.name !== initialData.name ||
+      currentData.description !== initialData.description ||
+      currentData.genre !== initialData.genre ||
+      !areArraysEqual(currentData.attributes, initialData.attributes) ||
+      !areArraysEqual(currentData.skills, initialData.skills) ||
+      currentData.aiSuggestionsGenerated !== initialData.aiSuggestionsGenerated
+    );
+  }, [wizard.state.data, initialWorldData]);
+
   const canProceedToNext = useCallback((): boolean => {
     const currentValidation = wizard.state.validation[wizard.state.currentStep];
     return !currentValidation || currentValidation.valid;
@@ -216,12 +258,32 @@ export default function WorldCreationWizard({
   }, [wizard]);
 
   const handleCancel = useCallback(() => {
+    // Check if user has made meaningful changes
+    if (isDirty) {
+      // Show confirmation dialog
+      setShowCancelConfirmation(true);
+    } else {
+      // Direct cancel for clean state
+      if (onCancel) {
+        onCancel();
+      } else {
+        router.push('/worlds');
+      }
+    }
+  }, [isDirty, onCancel, router]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setShowCancelConfirmation(false);
     if (onCancel) {
       onCancel();
     } else {
       router.push('/worlds');
     }
   }, [onCancel, router]);
+
+  const handleRejectCancel = useCallback(() => {
+    setShowCancelConfirmation(false);
+  }, []);
 
   const handleComplete = useCallback(async () => {
     const data = wizard.state.data;
@@ -465,6 +527,18 @@ export default function WorldCreationWizard({
           />
         )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showCancelConfirmation}
+        onClose={handleRejectCancel}
+        onConfirm={handleConfirmCancel}
+        title="Cancel World Creation?"
+        message="Your progress will be lost. Are you sure you want to cancel?"
+        variant="warning"
+        confirmText="Yes, Cancel"
+        cancelText="Continue Editing"
+      />
     </WizardContainer>
   );
 }
