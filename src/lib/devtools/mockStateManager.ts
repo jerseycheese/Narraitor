@@ -39,11 +39,22 @@ const STORAGE_KEY = 'narraitor-devtools-mock-config';
  * Mock state manager for DevTools integration
  */
 export class MockStateManager {
+  private static instance: MockStateManager | undefined;
   private config: MockConfiguration;
   private listeners: Set<(config: MockConfiguration) => void> = new Set();
 
   constructor() {
     this.config = this.loadConfiguration();
+  }
+
+  /**
+   * Get singleton instance
+   */
+  static getInstance(): MockStateManager {
+    if (!MockStateManager.instance) {
+      MockStateManager.instance = new MockStateManager();
+    }
+    return MockStateManager.instance;
   }
 
   /**
@@ -262,4 +273,4 @@ export class MockStateManager {
 /**
  * Global mock state manager instance
  */
-export const mockStateManager = new MockStateManager();
+export const mockStateManager = MockStateManager.getInstance();
