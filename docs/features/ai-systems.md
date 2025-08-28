@@ -245,50 +245,15 @@ await checkForEndingIndicators(newSegment);
 
 ## AI Mocking System
 
-### Overview
-Complete AI response mocking system for testing edge cases and debugging without making real API calls.
+This solves a pretty common development problem: you want to test how your code handles different AI response scenarios, but you don't want to burn through your API quota or deal with network issues while you're trying to debug something.
 
-### Key Features
-- **Live/Mock Toggle**: Seamlessly switch between real API calls and mock responses
-- **Predefined Scenarios**: 5 built-in scenarios covering common use cases
-- **Custom Scenarios**: Create and save custom mock scenarios with specific responses
-- **Realistic Delays**: Configurable response delays with variation (±20%)
-- **Success Rate Control**: Mixed success/failure testing for robustness
-- **Persistent Configuration**: Settings saved across browser sessions
+The mocking system basically intercepts AI requests when enabled and returns predefined responses instead of hitting the real API. This means you can test timeout scenarios, rate limit errors, or specific response patterns without depending on external services.
 
-### Available Mock Scenarios
-1. **Success**: Standard successful AI response
-2. **Timeout**: Simulates API timeout conditions (2000ms delay)
-3. **Rate Limit**: Tests rate limiting error handling
-4. **API Key Error**: Tests authentication failure scenarios
-5. **Network Error**: Simulates network connectivity issues
+There are five built-in scenarios that cover the most common testing situations. The success scenario returns a standard AI response, while the others simulate various failure modes: timeouts (which happen more often than you'd think), rate limiting, API key issues, and network errors. The timeout scenario has a 2-second delay to simulate real network conditions.
 
-### Integration
-Mock system integrates seamlessly with existing AI service calls:
+You can also create custom scenarios if you need to test specific response patterns. So if you're working on horror-themed narrative generation, you could set up a mock response that returns appropriately dark content:
 
 ```typescript
-// AI service automatically uses mock responses when enabled
-import { createDefaultGeminiClient } from '@/lib/ai/gemini-client';
-
-const client = createDefaultGeminiClient();
-// Returns mock response if mocking enabled, otherwise calls real API
-const response = await client.generateContent(prompt);
-```
-
-### DevTools Integration
-Access AI mocking through the DevTools panel:
-
-```typescript
-import { AIMockingSection } from '@/components/devtools/AIMockingSection';
-
-<CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
-  <AIMockingSection />
-</CollapsibleSection>
-```
-
-### Custom Scenario Creation
-```typescript
-// Example custom scenario configuration
 {
   id: 'custom-horror-response',
   name: 'Horror Narrative Test',
@@ -308,27 +273,30 @@ import { AIMockingSection } from '@/components/devtools/AIMockingSection';
 }
 ```
 
-### Development Benefits
-- **Cost Efficiency**: Test without consuming API quota
-- **Faster Iteration**: No network delays during development
-- **Edge Case Testing**: Easily reproduce error conditions
-- **Offline Development**: Work without internet connectivity
-- **Team Collaboration**: Shared mock scenarios for consistent testing
+The nice thing about the integration is that existing AI service calls don't need to change. When mocking is enabled, the system automatically returns mock responses instead of making real API calls:
+
+```typescript
+import { createDefaultGeminiClient } from '@/lib/ai/gemini-client';
+
+const client = createDefaultGeminiClient();
+// Returns mock response if mocking enabled, otherwise calls real API
+const response = await client.generateContent(prompt);
+```
+
+All the mock configuration persists across browser sessions, so you can set up your testing scenarios once and they stick around. The responses include realistic delays with some variation (about ±20%), which helps catch timing-related bugs that only show up with actual network conditions.
 
 ## Testing & Development
 
 ### Manual Testing
+There are several dev routes set up for testing different AI features:
+
 - `/dev/ai-ending-detection` - Test ending detection scenarios
-- `/dev/world-creation-wizard` - Test AI world suggestions
+- `/dev/world-creation-wizard` - Test AI world suggestions  
 - `/dev/game-session` - Test narrative and choice generation
 - `/dev/devtools-test` - Test AI mocking functionality
 
 ### Test Scenarios
-1. **Narrative Generation**: Various world themes and contexts
-2. **Choice Generation**: Different narrative situations
-3. **World Suggestions**: Multiple genre combinations
-4. **Ending Detection**: Conclusive vs ongoing stories
-5. **AI Mocking**: Error scenarios, timeouts, and edge cases
+The testing harnesses let you try out different scenarios without having to set up complete game sessions. You can test narrative generation with various world themes, try different choice generation situations, experiment with genre combinations for world suggestions, and compare conclusive vs ongoing stories for ending detection. The AI mocking section is particularly useful for testing error scenarios and edge cases that are hard to reproduce with the real API.
 
 ## Error Handling
 

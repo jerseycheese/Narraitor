@@ -166,7 +166,7 @@ function replacer(key, value) {
 ## Available DevTools Sections
 
 ### AI Mocking & Simulation
-Mock AI responses for testing edge cases and debugging without making real API calls:
+So this is pretty handy when you need to test how your code handles various AI response scenarios without actually hitting the real API. Whether you're debugging locally or just want to see how error handling works, mocking saves you from burning through API quota.
 
 ```typescript
 import { AIMockingSection } from '../AIMockingSection';
@@ -176,21 +176,11 @@ import { AIMockingSection } from '../AIMockingSection';
 </CollapsibleSection>
 ```
 
-**Features:**
-- Toggle between Live API and Mock modes
-- 5 predefined scenarios: success, timeout, rate-limit, API key error, network error
-- Custom scenario creation with configurable responses and delays
-- Success rate-based random execution for mixed testing
-- Delay variation controls for realistic testing
-- Import/Export/Reset configuration functionality
-- Persistent settings across browser sessions
+The system comes with five built-in scenarios that cover the most common testing situations: standard success responses, timeouts (which happen more than you'd think), rate limiting errors, API key failures, and network issues. You can also create custom scenarios if you need to test specific response patterns.
 
-**Use Cases:**
-- Test edge cases without consuming API quota
-- Debug error handling and timeout scenarios
-- Develop offline without internet connectivity
-- Create reproducible test scenarios for debugging
-- Simulate various API response conditions
+What makes this useful is that everything persists across browser sessions, so you can set up your testing scenarios once and they stick around. The mock responses include realistic delays with some variation, which helps catch timing-related bugs that only show up with actual network conditions.
+
+This is particularly useful when you're working offline or when the AI service is having issues. Instead of your development workflow grinding to a halt, you can flip the toggle and keep working with predictable mock responses.
 
 ### AI Consistency Validation
 Real-time debugging for the AI consistency validation system:
