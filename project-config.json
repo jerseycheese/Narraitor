@@ -1,0 +1,116 @@
+{
+  "github": {
+    "repository": "jerseycheese/narraitor",
+    "defaultBranch": "main",
+    "token": "$GITHUB_TOKEN"
+  },
+  "domain": {
+    "labelPrefix": "domain:",
+    "default": "frontend"
+  },
+  "labels": {
+    "complexityPrefix": "complexity:",
+    "priorityPrefix": "priority:"
+  },
+  "domains": {
+    "frontend": {
+      "keywords": [
+        "component", "ui", "interface", "view", "page", "layout", 
+        "styling", "css", "responsive", "animation", "react", "nextjs"
+      ],
+      "paths": [
+        "src/components/",
+        "src/pages/",
+        "src/app/",
+        "src/hooks/",
+        "src/styles/",
+        "components/",
+        "pages/",
+        "styles/"
+      ]
+    },
+    "backend": {
+      "keywords": [
+        "api", "route", "handler", "middleware", "server", 
+        "database", "auth", "validation", "prisma", "trpc"
+      ],
+      "paths": [
+        "src/api/",
+        "src/lib/",
+        "src/utils/",
+        "src/server/",
+        "pages/api/",
+        "app/api/",
+        "lib/",
+        "utils/"
+      ]
+    },
+    "testing": {
+      "keywords": [
+        "test", "spec", "cypress", "jest", "testing-library", 
+        "e2e", "unit", "integration", "mock"
+      ],
+      "paths": [
+        "src/__tests__/",
+        "__tests__/",
+        "cypress/",
+        "tests/",
+        "src/**/*.test.{js,jsx,ts,tsx}",
+        "src/**/*.spec.{js,jsx,ts,tsx}"
+      ]
+    },
+    "documentation": {
+      "keywords": [
+        "docs", "readme", "documentation", "guide", "storybook", 
+        "comments", "jsdoc", "changelog"
+      ],
+      "paths": [
+        "docs/",
+        "README.md",
+        "CHANGELOG.md",
+        "stories/",
+        ".storybook/"
+      ]
+    },
+    "infrastructure": {
+      "keywords": [
+        "build", "deploy", "ci", "cd", "docker", "config", 
+        "webpack", "vite", "eslint", "prettier", "github-actions"
+      ],
+      "paths": [
+        ".github/",
+        "scripts/",
+        "config/",
+        "Dockerfile",
+        ".eslintrc.js",
+        "prettier.config.js",
+        "next.config.js",
+        "vite.config.js"
+      ]
+    }
+  },
+  "commands": {
+    "build": "npm run build",
+    "test": "npm test",
+    "lint": "npm run lint",
+    "typecheck": "npx tsc --noEmit",
+    "dev": "npm run dev",
+    "e2e": "npm run test:e2e"
+  },
+  "testing": {
+    "framework": "jest",
+    "coverage": 80,
+    "patterns": [
+      "__tests__/",
+      "*.test.{js,jsx,ts,tsx}",
+      "*.spec.{js,jsx,ts,tsx}"
+    ],
+    "testDir": "__tests__",
+    "e2eFramework": "cypress"
+  },
+  "conflicts": {
+    "sameDomainRisk": "MEDIUM",
+    "differentDomainRisk": "LOW",
+    "sharedPathRisk": "HIGH"
+  }
+}

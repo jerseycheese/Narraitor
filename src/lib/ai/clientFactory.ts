@@ -2,6 +2,7 @@
 
 import { AIClient, AIServiceConfig } from './types';
 import { PortraitGenerationClient } from './portraitGenerationClient';
+import { DeveloperMockClient } from './developerMockClient';
 import { getDefaultConfig } from './config';
 
 /**
@@ -18,6 +19,27 @@ class BrowserMockClient implements AIClient {
 }
 
 /**
+ * Get developer mock configuration if available
+ */
+function getDeveloperMockConfig() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const stored = localStorage.getItem('mock-configuration-storage');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.state?.configuration || null;
+    }
+  } catch {
+    // Ignore localStorage errors
+  }
+
+  return null;
+}
+
+/**
  * Creates an AI client with image generation support
  */
 export function createAIClient(config?: Partial<AIServiceConfig>): AIClient {
@@ -25,6 +47,14 @@ export function createAIClient(config?: Partial<AIServiceConfig>): AIClient {
     ...getDefaultConfig(),
     ...config
   };
+
+  // Check for developer mock mode (development environment only)
+  if (process.env.NODE_ENV === 'development') {
+    const mockConfig = getDeveloperMockConfig();
+    if (mockConfig && mockConfig.enabled) {
+      return new DeveloperMockClient(mockConfig);
+    }
+  }
 
   // In test environment, use the proper mock
   if (process.env.NODE_ENV === 'test') {

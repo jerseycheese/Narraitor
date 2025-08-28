@@ -97,3 +97,27 @@ export interface AIClient {
   generateStructuredContent?<T = unknown>(prompt: string, schema: unknown): Promise<T>;
   isAvailable?(): Promise<boolean>;
 }
+
+/**
+ * Mock scenario for testing AI responses
+ */
+export interface MockScenario {
+  id: string;
+  name: string;
+  type: 'success' | 'error' | 'timeout' | 'custom';
+  response?: Partial<AIResponse>;
+  error?: AIServiceError;
+  delay?: number;
+  description?: string;
+}
+
+/**
+ * Configuration for mock AI client
+ */
+export interface MockConfiguration {
+  enabled: boolean;
+  activeScenario: string;
+  scenarios: MockScenario[];
+  globalDelay: number;
+  enableDelayVariation: boolean;
+}

@@ -5,6 +5,8 @@ import type { AITestConfig, AIResponse } from '../../../types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '../../../lib/ai/contextOverride';
 import { requestLogger } from '../../../lib/ai/requestLogger';
+import { useMockConfiguration, useMockControls } from '@/state/mockConfigurationStore';
+import { MockStatusIndicator } from '../MockControlsSection';
 
 interface AITestingPanelProps {
   className?: string;
@@ -15,6 +17,10 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<AIResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Mock configuration hooks
+  const mockConfiguration = useMockConfiguration();
+  const { enableMock, setActiveScenario, getActiveScenario } = useMockControls();
 
   // Mock base data for testing
   const mockWorld = {
@@ -127,23 +133,12 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       const startTime = Date.now();
 
-      // Add realistic delay to show loading state (1.5-3 seconds)
-      const delay = 1500 + Math.random() * 1500;
-      await new Promise(resolve => setTimeout(resolve, delay));
-
-      // Generate context-aware narrative text
-      const worldName = testContext.world.name;
-      const worldTheme = testContext.world.genre;
-      const characterName = testContext.character.name;
-      
-      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
-
       // Generate context-aware choices based on genre
       const generateChoices = (genre: string = 'Fantasy'): string[] => {
         const baseChoices = [
           `Explore the ${genre.toLowerCase()} landscape ahead`,
-          `Study the ${worldName} surroundings more carefully`,
-          `Call upon ${characterName}'s inner strength`
+          `Study the ${worldName || 'unknown world'} surroundings more carefully`,
+          `Call upon ${characterName || 'the character'}'s inner strength`
         ];
 
         if (genre.toLowerCase().includes('fantasy')) {
@@ -169,6 +164,57 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
         }
       };
 
+      // Use developer mock system if enabled, otherwise use legacy mock
+      if (mockConfiguration.enabled) {
+        const activeScenario = getActiveScenario();
+        if (activeScenario) {
+          // Apply scenario-specific delay
+          let delay = activeScenario.delay || mockConfiguration.globalDelay;
+          if (mockConfiguration.enableDelayVariation && delay > 0) {
+            const variation = delay * 0.25;
+            delay = delay + (Math.random() - 0.5) * 2 * variation;
+          }
+          await new Promise(resolve => setTimeout(resolve, Math.max(0, delay)));
+
+          // Handle scenario type
+          if (activeScenario.type === 'error' && activeScenario.error) {
+            throw new Error(activeScenario.error.message);
+          } else if (activeScenario.type === 'timeout') {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            throw new Error('Request timeout');
+          }
+
+          // Use custom response if available
+          if (activeScenario.response?.content) {
+            const response: AIResponse = {
+              text: activeScenario.response.content,
+              choices: generateChoices(testContext.world.genre),
+              metadata: { 
+                tokens: activeScenario.response.promptTokens || 150,
+                scenario: activeScenario.name
+              }
+            };
+            
+            const responseTime = Date.now() - startTime;
+            requestLogger.completeRequest(logId, response, responseTime);
+            setResult(response);
+            return;
+          }
+        }
+      }
+
+      // Legacy mock delay for backward compatibility
+      const delay = 1500 + Math.random() * 1500;
+      await new Promise(resolve => setTimeout(resolve, delay));
+
+      // Generate context-aware narrative text
+      const worldName = testContext.world.name;
+      const worldTheme = testContext.world.genre;
+      const characterName = testContext.character.name;
+      
+      const narrativeText = `In the ${worldTheme?.toLowerCase() || 'mysterious'} realm of ${worldName}, ${characterName} stands at a crossroads. The air thrums with potential as ancient forces stir around you. Your journey has led you to this pivotal moment where every decision will shape the path ahead.`;
+
+
       // Mock narrative generation for testing purposes
       const response: AIResponse = {
         text: narrativeText,
@@ -192,7 +238,38 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
   return (
     <div className={`flex flex-col space-y-3 ${className}`}>
-      <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="devtools-panel text-sm font-medium !my-0">AI Testing Panel</h3>
+        <MockStatusIndicator />
+      </div>
+
+      {/* Mock Quick Controls */}
+      {mockConfiguration.enabled && (
+        <div className="bg-slate-700 p-2 rounded border border-slate-600">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-300">Mock Mode Active</span>
+            <div className="flex gap-2">
+              <select
+                value={mockConfiguration.activeScenario}
+                onChange={(e) => setActiveScenario(e.target.value)}
+                className="text-xs bg-slate-600 border-slate-500 text-slate-200 rounded px-2 py-1"
+              >
+                {mockConfiguration.scenarios.map(scenario => (
+                  <option key={scenario.id} value={scenario.id}>
+                    {scenario.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => enableMock(false)}
+                className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+              >
+                Disable
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* World Override Section */}
       <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
