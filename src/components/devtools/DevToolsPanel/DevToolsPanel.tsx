@@ -12,6 +12,7 @@ import { EndingImageDebugSection } from '../EndingImageDebugSection';
 import { ConsistencyValidationSection } from '../ConsistencyValidationSection';
 import { TextNormalizationSection } from '../TextNormalizationSection';
 import { LoreManagementSection } from '../LoreManagementSection';
+import { AIMockingSection } from '../AIMockingSection';
 import { ErrorSection } from '../ErrorSection';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import { SectionVisibilityControls } from '../SectionVisibilityControls';
@@ -167,6 +168,7 @@ export const DevToolsPanel = () => {
               {/* AI Tools Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.AI_TESTING) || 
                 isSectionVisible(SectionId.AI_MONITORING) ||
+                isSectionVisible(SectionId.AI_MOCKING) ||
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) || 
                 isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
@@ -184,6 +186,12 @@ export const DevToolsPanel = () => {
                     {isSectionVisible(SectionId.AI_MONITORING) && (
                       <CollapsibleSection title="AI Service Monitoring" initialCollapsed={true}>
                         <AIMonitoringSection />
+                      </CollapsibleSection>
+                    )}
+                    
+                    {isSectionVisible(SectionId.AI_MOCKING) && (
+                      <CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
+                        <AIMockingSection />
                       </CollapsibleSection>
                     )}
                     
