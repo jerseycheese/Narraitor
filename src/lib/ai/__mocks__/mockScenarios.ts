@@ -224,7 +224,7 @@ export class MockScenarios {
   /**
    * Execute scenario with realistic delay simulation
    */
-  async executeScenario(scenarioId: string, _prompt?: string): Promise<AIResponse> {
+  async executeScenario(scenarioId: string): Promise<AIResponse> {
     const scenario = this.getScenario(scenarioId);
     if (!scenario) {
       throw new Error(`Unknown mock scenario: ${scenarioId}`);
@@ -240,6 +240,7 @@ export class MockScenarios {
 
     if (shouldSucceedThisTime) {
       // Use stored successResponse if available, otherwise use default response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scenarioWithExtras = scenario as any;
       if (scenarioWithExtras.successResponse) {
         return scenarioWithExtras.successResponse;
@@ -247,6 +248,7 @@ export class MockScenarios {
       return scenario.response as AIResponse;
     } else {
       // Use stored errorResponse if available, otherwise use default response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scenarioWithExtras = scenario as any;
       if (scenarioWithExtras.errorResponse) {
         throw scenarioWithExtras.errorResponse;
@@ -277,6 +279,7 @@ export class MockScenarios {
 
     if (shouldSucceedThisTime) {
       // Use stored successResponse if available, otherwise use default response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scenarioWithExtras = scenario as any;
       if (scenarioWithExtras.successResponse) {
         return scenarioWithExtras.successResponse;
@@ -284,6 +287,7 @@ export class MockScenarios {
       return scenario.response as AIResponse;
     } else {
       // Use stored errorResponse if available, otherwise use default response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scenarioWithExtras = scenario as any;
       if (scenarioWithExtras.errorResponse) {
         throw scenarioWithExtras.errorResponse;
