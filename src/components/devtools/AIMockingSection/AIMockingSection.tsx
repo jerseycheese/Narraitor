@@ -125,7 +125,7 @@ export const AIMockingSection: React.FC = () => {
             ? "bg-yellow-600 hover:bg-yellow-700 text-white" 
             : "border-slate-600 text-slate-300 hover:bg-slate-700"
           }
-          data-testid="mode-toggle"
+          data-testid="mock-mode-toggle"
         >
           {config.isEnabled ? 'Disable Mock' : 'Enable Mock'}
         </Button>
