@@ -225,40 +225,11 @@ export class MockScenarios {
    * Execute scenario with realistic delay simulation
    */
   async executeScenario(scenarioId: string): Promise<AIResponse> {
-    const scenario = this.getScenario(scenarioId);
-    if (!scenario) {
-      throw new Error(`Unknown mock scenario: ${scenarioId}`);
-    }
-
-    // Simulate realistic delay
-    await new Promise(resolve => setTimeout(resolve, scenario.delay));
-
-    // Determine success based on successRate if specified, otherwise use shouldSucceed
-    const shouldSucceedThisTime = scenario.successRate !== undefined 
-      ? Math.random() < scenario.successRate
-      : scenario.shouldSucceed;
-
-    if (shouldSucceedThisTime) {
-      // Use stored successResponse if available, otherwise use default response
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const scenarioWithExtras = scenario as any;
-      if (scenarioWithExtras.successResponse) {
-        return scenarioWithExtras.successResponse;
-      }
-      return scenario.response as AIResponse;
-    } else {
-      // Use stored errorResponse if available, otherwise use default response
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const scenarioWithExtras = scenario as any;
-      if (scenarioWithExtras.errorResponse) {
-        throw scenarioWithExtras.errorResponse;
-      }
-      throw scenario.response as AIServiceError;
-    }
+    return this.executeScenarioWithVariation(scenarioId, 0);
   }
 
   /**
-   * Get scenario with delay variation for more realistic testing
+   * Execute scenario with delay variation for more realistic testing
    */
   async executeScenarioWithVariation(scenarioId: string, variationPercent: number = 20): Promise<AIResponse> {
     const scenario = this.getScenario(scenarioId);
@@ -266,12 +237,31 @@ export class MockScenarios {
       throw new Error(`Unknown mock scenario: ${scenarioId}`);
     }
 
-    // Add delay variation (±variationPercent)
-    const variation = scenario.delay * (variationPercent / 100);
-    const actualDelay = scenario.delay + (Math.random() - 0.5) * 2 * variation;
+    // Calculate delay with optional variation
+    const baseDelay = scenario.delay;
+    const actualDelay = variationPercent > 0
+      ? this.calculateDelayWithVariation(baseDelay, variationPercent)
+      : baseDelay;
     
+    // Simulate realistic delay
     await new Promise(resolve => setTimeout(resolve, Math.max(0, actualDelay)));
 
+    // Determine success and return appropriate response
+    return this.determineScenarioOutcome(scenario);
+  }
+
+  /**
+   * Calculate delay with variation
+   */
+  private calculateDelayWithVariation(baseDelay: number, variationPercent: number): number {
+    const variation = baseDelay * (variationPercent / 100);
+    return baseDelay + (Math.random() - 0.5) * 2 * variation;
+  }
+
+  /**
+   * Determine scenario outcome and return appropriate response
+   */
+  private determineScenarioOutcome(scenario: MockScenario): AIResponse {
     // Determine success based on successRate if specified, otherwise use shouldSucceed
     const shouldSucceedThisTime = scenario.successRate !== undefined 
       ? Math.random() < scenario.successRate

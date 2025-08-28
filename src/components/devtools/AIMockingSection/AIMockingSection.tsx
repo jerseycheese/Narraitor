@@ -31,10 +31,12 @@ export const AIMockingSection: React.FC = () => {
     return unsubscribe;
   }, []);
 
-  // Get all available scenarios (predefined + custom)
+  // Get all available scenarios (predefined + custom, deduplicated)
   const allScenarios = [
     ...scenarios.getAllScenarios(),
-    ...config.customScenarios
+    ...config.customScenarios.filter(custom => 
+      !scenarios.getAllScenarios().some(predefined => predefined.id === custom.id)
+    )
   ];
 
   const handleModeToggle = () => {
@@ -50,22 +52,27 @@ export const AIMockingSection: React.FC = () => {
       return;
     }
 
+    const shouldSucceed = customScenario.shouldSucceed || true;
+    const response = shouldSucceed 
+      ? {
+          content: `Custom mock response: ${customScenario.name}`,
+          finishReason: 'STOP' as const,
+          promptTokens: 20,
+          completionTokens: 15
+        }
+      : {
+          code: 'CUSTOM_ERROR',
+          message: `Custom error: ${customScenario.name}`,
+          retryable: true
+        };
+
     const newScenario: MockScenario = {
       id: customScenario.id,
       name: customScenario.name,
       description: customScenario.description || '',
       delay: customScenario.delay || 1000,
-      shouldSucceed: customScenario.shouldSucceed || true,
-      response: customScenario.shouldSucceed ? {
-        content: `Custom mock response: ${customScenario.name}`,
-        finishReason: 'STOP',
-        promptTokens: 20,
-        completionTokens: 15
-      } : {
-        code: 'CUSTOM_ERROR',
-        message: `Custom error: ${customScenario.name}`,
-        retryable: true
-      }
+      shouldSucceed,
+      response
     };
 
     mockStateManager.addCustomScenario(newScenario);

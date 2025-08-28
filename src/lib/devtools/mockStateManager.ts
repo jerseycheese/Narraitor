@@ -6,12 +6,18 @@ import { MockScenario } from '../ai/__mocks__/mockScenarios';
  * Mock configuration for DevTools
  */
 export interface MockConfiguration {
+  /** Whether AI mocking is currently enabled (true = mock mode, false = live API) */
   isEnabled: boolean;
+  /** ID of the currently active mock scenario */
   activeScenarioId: string;
+  /** User-defined custom mock scenarios */
   customScenarios: MockScenario[];
   settings: {
+    /** Whether to add random delay variation to mock responses */
     delayVariation: boolean;
+    /** Percentage of delay variation to apply (±percentage of base delay) */
     variationPercent: number;
+    /** Whether to persist mock configuration to localStorage */
     persistSettings: boolean;
   };
 }
