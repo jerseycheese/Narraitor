@@ -165,7 +165,7 @@ function replacer(key, value) {
 
 ## Available DevTools Sections
 
-### AI Mocking & Simulation (Issue #156)
+### AI Mocking & Simulation
 Mock AI responses for testing edge cases and debugging without making real API calls:
 
 ```typescript
@@ -192,7 +192,7 @@ import { AIMockingSection } from '../AIMockingSection';
 - Create reproducible test scenarios for debugging
 - Simulate various API response conditions
 
-### AI Consistency Validation (Issue #184)
+### AI Consistency Validation
 Real-time debugging for the AI consistency validation system:
 
 ```typescript
