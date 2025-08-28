@@ -40,7 +40,9 @@ jest.mock('../../../../lib/ai/clientFactory', () => ({
 }));
 
 describe('AIMockingSection - User Behavior Tests', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockStateManager: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let user: any;
 
   beforeEach(() => {

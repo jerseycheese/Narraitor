@@ -57,6 +57,7 @@ jest.mock('@/lib/ai/clientFactory', () => ({
 }));
 
 describe('DevTools AI Mocking Integration', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let user: any;
 
   beforeEach(() => {
@@ -105,7 +106,6 @@ describe('DevTools AI Mocking Integration', () => {
       expect(screen.getByTestId('ai-mocking-section')).toBeInTheDocument();
       
       // Find and click the visibility toggle for AI Mocking
-      const visibilityControls = screen.getByTestId('section-visibility-controls');
       const aiMockingToggle = screen.getByTestId('toggle-ai-mocking-section');
       
       await user.click(aiMockingToggle);
@@ -246,7 +246,9 @@ describe('DevTools AI Mocking Integration', () => {
       process.env.NODE_ENV = 'production';
       
       // Mock test page location
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).location;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).location = { pathname: '/dev/devtools-test' };
       
       renderDevToolsPanel();

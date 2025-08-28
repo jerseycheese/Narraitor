@@ -224,16 +224,21 @@ export class MockStateManager {
   /**
    * Validate configuration structure
    */
-  private isValidConfiguration(config: any): config is MockConfiguration {
+  private isValidConfiguration(config: unknown): config is MockConfiguration {
     return (
-      config &&
-      typeof config.isEnabled === 'boolean' &&
-      typeof config.activeScenarioId === 'string' &&
-      Array.isArray(config.customScenarios) &&
-      config.settings &&
-      typeof config.settings.delayVariation === 'boolean' &&
-      typeof config.settings.variationPercent === 'number' &&
-      typeof config.settings.persistSettings === 'boolean'
+      config !== null &&
+      typeof config === 'object' &&
+      'isEnabled' in config &&
+      'activeScenarioId' in config &&
+      'customScenarios' in config &&
+      'settings' in config &&
+      typeof (config as MockConfiguration).isEnabled === 'boolean' &&
+      typeof (config as MockConfiguration).activeScenarioId === 'string' &&
+      Array.isArray((config as MockConfiguration).customScenarios) &&
+      (config as MockConfiguration).settings &&
+      typeof (config as MockConfiguration).settings.delayVariation === 'boolean' &&
+      typeof (config as MockConfiguration).settings.variationPercent === 'number' &&
+      typeof (config as MockConfiguration).settings.persistSettings === 'boolean'
     );
   }
 

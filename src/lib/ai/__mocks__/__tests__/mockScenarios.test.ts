@@ -4,7 +4,6 @@
  */
 
 import { MockScenarios, MockScenarioConfig } from '../mockScenarios';
-import { AIResponse, AIServiceError } from '../../types';
 
 describe('Mock Scenarios System - API Contract Tests', () => {
   let mockScenarios: MockScenarios;

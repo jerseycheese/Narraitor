@@ -5,7 +5,6 @@
 
 import { createAIClient } from '../clientFactory';
 import { MockStateManager } from '../../devtools/mockStateManager';
-import { AIClient, AIResponse, AIServiceError } from '../types';
 
 // Mock the mock state manager
 jest.mock('../../devtools/mockStateManager', () => ({
@@ -35,6 +34,7 @@ jest.mock('../portraitGenerationClient', () => ({
 }));
 
 describe('Client Factory Mock Integration', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockStateManager: any;
   
   beforeEach(() => {
@@ -283,6 +283,7 @@ describe('Client Factory Mock Integration', () => {
   describe('Browser vs Server Environment', () => {
     test('uses browser-safe mock in browser without API key', () => {
       const originalWindow = global.window;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.window = {} as any; // Simulate browser environment
 
       const client = createAIClient({ apiKey: undefined });
@@ -296,6 +297,7 @@ describe('Client Factory Mock Integration', () => {
 
     test('uses real client in server environment with API key', () => {
       const originalWindow = global.window;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (global as any).window; // Simulate server environment
 
       const client = createAIClient({ apiKey: 'server-api-key' });

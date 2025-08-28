@@ -297,6 +297,7 @@ describe('MockStateManager - Persistence Tests', () => {
     test('rejects invalid mode values', () => {
       // Should handle invalid mode gracefully
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (stateManager as any).setMode('invalid-mode');
       }).not.toThrow();
       
