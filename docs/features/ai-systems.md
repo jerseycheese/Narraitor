@@ -243,18 +243,92 @@ await checkForEndingIndicators(newSegment);
 - **Broader Context**: Earlier story summary for overall understanding
 - **Minimum Requirements**: At least 3 narrative segments before analysis
 
+## AI Mocking System
+
+### Overview
+Complete AI response mocking system for testing edge cases and debugging without making real API calls.
+
+### Key Features
+- **Live/Mock Toggle**: Seamlessly switch between real API calls and mock responses
+- **Predefined Scenarios**: 5 built-in scenarios covering common use cases
+- **Custom Scenarios**: Create and save custom mock scenarios with specific responses
+- **Realistic Delays**: Configurable response delays with variation (±20%)
+- **Success Rate Control**: Mixed success/failure testing for robustness
+- **Persistent Configuration**: Settings saved across browser sessions
+
+### Available Mock Scenarios
+1. **Success**: Standard successful AI response
+2. **Timeout**: Simulates API timeout conditions (2000ms delay)
+3. **Rate Limit**: Tests rate limiting error handling
+4. **API Key Error**: Tests authentication failure scenarios
+5. **Network Error**: Simulates network connectivity issues
+
+### Integration
+Mock system integrates seamlessly with existing AI service calls:
+
+```typescript
+// AI service automatically uses mock responses when enabled
+import { createDefaultGeminiClient } from '@/lib/ai/gemini-client';
+
+const client = createDefaultGeminiClient();
+// Returns mock response if mocking enabled, otherwise calls real API
+const response = await client.generateContent(prompt);
+```
+
+### DevTools Integration
+Access AI mocking through the DevTools panel:
+
+```typescript
+import { AIMockingSection } from '@/components/devtools/AIMockingSection';
+
+<CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
+  <AIMockingSection />
+</CollapsibleSection>
+```
+
+### Custom Scenario Creation
+```typescript
+// Example custom scenario configuration
+{
+  id: 'custom-horror-response',
+  name: 'Horror Narrative Test',
+  description: 'Tests dark/horror themed narrative generation',
+  delay: 1500,
+  shouldSucceed: true,
+  response: {
+    segments: [{
+      content: 'The shadows whispered ancient secrets...',
+      choices: [
+        'Investigate the whispers',
+        'Flee immediately',
+        'Light a torch'
+      ]
+    }]
+  }
+}
+```
+
+### Development Benefits
+- **Cost Efficiency**: Test without consuming API quota
+- **Faster Iteration**: No network delays during development
+- **Edge Case Testing**: Easily reproduce error conditions
+- **Offline Development**: Work without internet connectivity
+- **Team Collaboration**: Shared mock scenarios for consistent testing
+
 ## Testing & Development
 
 ### Manual Testing
 - `/dev/ai-ending-detection` - Test ending detection scenarios
 - `/dev/world-creation-wizard` - Test AI world suggestions
 - `/dev/game-session` - Test narrative and choice generation
+- `/dev/devtools-test` - Test AI mocking functionality
 
 ### Test Scenarios
 1. **Narrative Generation**: Various world themes and contexts
 2. **Choice Generation**: Different narrative situations
 3. **World Suggestions**: Multiple genre combinations
 4. **Ending Detection**: Conclusive vs ongoing stories
+5. **AI Mocking**: Error scenarios, timeouts, and edge cases
 
 ## Error Handling
 

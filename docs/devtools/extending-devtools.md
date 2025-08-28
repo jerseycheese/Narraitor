@@ -165,6 +165,33 @@ function replacer(key, value) {
 
 ## Available DevTools Sections
 
+### AI Mocking & Simulation (Issue #156)
+Mock AI responses for testing edge cases and debugging without making real API calls:
+
+```typescript
+import { AIMockingSection } from '../AIMockingSection';
+
+<CollapsibleSection title="AI Mocking & Simulation" initialCollapsed={true}>
+  <AIMockingSection />
+</CollapsibleSection>
+```
+
+**Features:**
+- Toggle between Live API and Mock modes
+- 5 predefined scenarios: success, timeout, rate-limit, API key error, network error
+- Custom scenario creation with configurable responses and delays
+- Success rate-based random execution for mixed testing
+- Delay variation controls for realistic testing
+- Import/Export/Reset configuration functionality
+- Persistent settings across browser sessions
+
+**Use Cases:**
+- Test edge cases without consuming API quota
+- Debug error handling and timeout scenarios
+- Develop offline without internet connectivity
+- Create reproducible test scenarios for debugging
+- Simulate various API response conditions
+
 ### AI Consistency Validation (Issue #184)
 Real-time debugging for the AI consistency validation system:
 
