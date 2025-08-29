@@ -1,11 +1,11 @@
 // Use the store's Character type since it's more complete
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type CharacterAttribute, type CharacterSkill } from '@/state/characterStore';
 import { World } from '@/types/world.types';
 
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
 
 export function enrichCharacterAttributes(character: StoreCharacter, world: World) {
-  return character.attributes.map((charAttr) => {
+  return character.attributes.map((charAttr: CharacterAttribute) => {
     // Find matching world attribute by ID first (safer), then fallback to name
     const worldAttr = charAttr.worldAttributeId 
       ? world.attributes.find(wa => wa.id === charAttr.worldAttributeId)
@@ -23,7 +23,7 @@ export function enrichCharacterAttributes(character: StoreCharacter, world: Worl
 }
 
 export function enrichCharacterSkills(character: StoreCharacter, world: World) {
-  return character.skills.map((charSkill) => {
+  return character.skills.map((charSkill: CharacterSkill) => {
     // Find matching world skill by ID first (safer), then fallback to name
     const worldSkill = charSkill.worldSkillId 
       ? world.skills.find(ws => ws.id === charSkill.worldSkillId)

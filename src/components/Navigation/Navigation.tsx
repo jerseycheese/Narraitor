@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -44,7 +44,7 @@ export function Navigation() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
-  const worldCharacterCount = Object.values(characters).filter(
+  const worldCharacterCount = (Object.values(characters) as Character[]).filter(
     char => char.worldId === currentWorldId
   ).length;
   
@@ -192,7 +192,7 @@ export function Navigation() {
                   {showWorldSwitcher && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto">
                       {Object.values(worlds).map(world => {
-                        const worldCharacters = Object.values(characters).filter(
+                        const worldCharacters = (Object.values(characters) as Character[]).filter(
                           char => char.worldId === world.id
                         ).length;
                         

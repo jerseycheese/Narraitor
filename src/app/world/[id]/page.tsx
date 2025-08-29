@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 // import Link from 'next/link';
 import Image from 'next/image';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
@@ -16,10 +16,11 @@ export default function WorldViewPage() {
   const router = useRouter();
   const worldId = params.id as string;
   const world = useWorldStore((state) => state.worlds[worldId]);
-  const characters = useCharacterStore((state) => state.characters);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const characters = useCharacterStore((state: any) => state.characters);
   
   // Check if this world has any characters
-  const worldCharacters = Object.values(characters).filter(char => char.worldId === worldId);
+  const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === worldId);
 
   if (!world) {
     return (

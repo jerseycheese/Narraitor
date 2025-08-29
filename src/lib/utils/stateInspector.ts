@@ -74,6 +74,8 @@ export interface StateMetadata {
   totalPaths: number;
   /** Performance warnings generated during snapshot creation */
   performanceWarnings: string[];
+  /** Path count breakdown by store for optimization insights */
+  storePathCounts?: Record<string, number>;
 }
 
 /**
@@ -139,6 +141,10 @@ export class StateInspector {
   private readonly maxWatchers = 50;
   /** Debounce interval for change detection to prevent excessive notifications */
   private readonly debounceMs = 100;
+  /** Performance-aware path counting threshold for warnings */
+  private readonly pathCountWarningThreshold = 800;
+  /** Maximum paths to count before stopping (prevents excessive computation) */
+  private readonly maxPathCountLimit = 2000;
 
   /**
    * Creates a new StateInspector instance
@@ -201,6 +207,7 @@ export class StateInspector {
 
     const timestamp = Date.now();
     const storeStates: Record<string, unknown> = {};
+    const storePathCounts: Record<string, number> = {};
     const performanceWarnings: string[] = [];
     let totalPaths = 0;
 
@@ -210,17 +217,43 @@ export class StateInspector {
         if (isZustandStore(store)) {
           const state = store.getState();
           storeStates[storeName] = this.sanitizeForSerialization(state);
-          totalPaths += this.countPaths(state);
+          const pathCount = this.countPaths(state);
+          storePathCounts[storeName] = pathCount;
+          totalPaths += pathCount;
         }
       } catch (error) {
         logger.error(`Error accessing state for store ${storeName}:`, error);
         storeStates[storeName] = { error: `Error accessing store state: ${error instanceof Error ? error.message : 'Unknown error'}` };
+        storePathCounts[storeName] = 0;
       }
     });
 
-    // Performance warnings
-    if (totalPaths > 1000) {
-      performanceWarnings.push(`High path count (${totalPaths}) may impact performance`);
+    // Performance warnings with detailed guidance
+    if (totalPaths > this.pathCountWarningThreshold) {
+      performanceWarnings.push(`High path count (${totalPaths}) detected after game session activity`);
+      
+      if (totalPaths > 1500) {
+        performanceWarnings.push('Performance impact: DevTools may become sluggish. Consider clearing session data.');
+      }
+      
+      if (totalPaths > this.maxPathCountLimit) {
+        performanceWarnings.push(`Path count capped at ${this.maxPathCountLimit} to prevent excessive computation. Actual count may be higher.`);
+      }
+
+      // Add store-specific recommendations if path count is high
+      if (totalPaths > 1500) {
+        const sortedStores = Object.entries(storePathCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 3); // Top 3 highest path stores
+
+        if (sortedStores.length > 0) {
+          performanceWarnings.push('Largest Stores by Path Count:');
+          sortedStores.forEach(([storeName, pathCount]) => {
+            performanceWarnings.push(`• **${storeName}**: ${pathCount} paths`);
+          });
+          performanceWarnings.push('Consider clearing data from stores with high path counts if DevTools becomes slow.');
+        }
+      }
     }
 
     if (this.watchers.size > this.maxWatchers * 0.8) {
@@ -233,7 +266,8 @@ export class StateInspector {
       metadata: {
         totalStores: Object.keys(this.stores).length,
         totalPaths,
-        performanceWarnings
+        performanceWarnings,
+        storePathCounts
       }
     };
   }
@@ -530,6 +564,135 @@ export class StateInspector {
     logger.debug('Cleared all watchers');
   }
 
+  /**
+   * Analyzes path counts per store to identify performance bottlenecks
+   * @returns Object mapping store names to their path counts
+   */
+  getStorePathCounts(): Record<string, number> {
+    if (process.env.NODE_ENV !== 'development') {
+      return {};
+    }
+
+    const pathCounts: Record<string, number> = {};
+    
+    Object.entries(this.stores).forEach(([storeName, store]) => {
+      try {
+        if (isZustandStore(store)) {
+          const state = store.getState();
+          pathCounts[storeName] = this.countPaths(state);
+        }
+      } catch (error) {
+        logger.error(`Error counting paths for store ${storeName}:`, error);
+        pathCounts[storeName] = 0;
+      }
+    });
+
+    return pathCounts;
+  }
+
+  /**
+   * Provides suggestions for optimizing state performance based on current state
+   * @returns Array of actionable performance suggestions
+   */
+  getPerformanceSuggestions(): string[] {
+    if (process.env.NODE_ENV !== 'development') {
+      return [];
+    }
+
+    const suggestions: string[] = [];
+    const pathCounts = this.getStorePathCounts();
+    const totalPaths = Object.values(pathCounts).reduce((sum, count) => sum + count, 0);
+
+    if (totalPaths > 800) {
+      const topStore = Object.entries(pathCounts).reduce((max, current) => 
+        current[1] > max[1] ? current : max, ['', 0]
+      );
+
+      if (topStore[1] > 400) {
+        suggestions.push(`Store "${topStore[0]}" has ${topStore[1]} paths from complex nested data structures.`);
+      }
+
+      if (pathCounts.narrativeStore > 300) {
+        suggestions.push('narrativeStore: Each narrative segment creates ~300+ paths due to nested decisions/options. Consider simplifying data structures or clearing sessions more frequently.');
+      }
+
+      if (pathCounts.journalStore > 200) {
+        suggestions.push('journalStore: Consider clearing old journal entries to reduce path count.');
+      }
+
+      if (pathCounts.sessionStore > 150) {
+        suggestions.push('sessionStore: Active session data accumulating. Clear old session data regularly.');
+      }
+
+      if (this.watchers.size > 5) {
+        suggestions.push(`${this.watchers.size} active watchers detected. Each watcher adds monitoring overhead.`);
+      }
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Configures lazy loading settings for performance optimization
+   * @param config Partial configuration to merge with defaults
+   */
+  configureLazyLoading(config: Partial<typeof this.lazyLoadingConfig>): void {
+    this.lazyLoadingConfig = { ...this.lazyLoadingConfig, ...config };
+    logger.debug('Updated lazy loading configuration:', this.lazyLoadingConfig);
+  }
+
+  /**
+   * Gets the current lazy loading configuration
+   * @returns Current lazy loading settings
+   */
+  getLazyLoadingConfig(): typeof this.lazyLoadingConfig {
+    return { ...this.lazyLoadingConfig };
+  }
+
+  /**
+   * Creates a performance-optimized state snapshot using lazy loading
+   * @returns Optimized state snapshot with reduced path count
+   */
+  getOptimizedStateSnapshot(): StateSnapshot {
+    if (process.env.NODE_ENV !== 'development') {
+      return {
+        timestamp: Date.now(),
+        storeStates: {},
+        metadata: {
+          totalStores: 0,
+          totalPaths: 0,
+          performanceWarnings: ['State inspection disabled in production'],
+          storePathCounts: {}
+        }
+      };
+    }
+
+    // Temporarily enable more aggressive lazy loading
+    const originalConfig = { ...this.lazyLoadingConfig };
+    this.configureLazyLoading({
+      maxImmediateDepth: 2,
+      maxImmediateItems: 5,
+      thresholdPathCount: 50
+    });
+
+    try {
+      const snapshot = this.getStateSnapshot();
+      return {
+        ...snapshot,
+        metadata: {
+          ...snapshot.metadata,
+          performanceWarnings: [
+            ...snapshot.metadata.performanceWarnings,
+            'Using optimized lazy loading mode for reduced path count'
+          ]
+        }
+      };
+    } finally {
+      // Restore original configuration
+      this.lazyLoadingConfig = originalConfig;
+    }
+  }
+
   // Private helper methods
 
   /**
@@ -577,12 +740,48 @@ export class StateInspector {
   }
 
   /**
+   * Lazy loading configuration for large nested structures
+   */
+  private lazyLoadingConfig = {
+    enabled: true,
+    maxImmediateDepth: 3,
+    maxImmediateItems: 10,
+    thresholdPathCount: 100
+  };
+
+  /**
+   * Checks if a nested structure should be lazy loaded
+   * @param obj Object to check
+   * @param depth Current recursion depth
+   * @returns True if should be lazy loaded
+   */
+  private shouldLazyLoad(obj: unknown, depth: number): boolean {
+    if (!this.lazyLoadingConfig.enabled || depth <= this.lazyLoadingConfig.maxImmediateDepth) {
+      return false;
+    }
+
+    if (obj && typeof obj === 'object') {
+      const keys = Object.keys(obj as Record<string, unknown>);
+      return keys.length > this.lazyLoadingConfig.maxImmediateItems;
+    }
+
+    return false;
+  }
+
+  /**
    * Recursively counts the total number of paths in a state object
    * @param obj Object to count paths in
    * @param depth Current recursion depth
-   * @returns Total number of navigable paths
+   * @param currentTotal Current total count (for early termination)
+   * @param lazyMode Whether to use lazy loading estimation
+   * @returns Total number of navigable paths (capped at maxPathCountLimit)
    */
-  private countPaths(obj: unknown, depth = 0): number {
+  private countPaths(obj: unknown, depth = 0, currentTotal = 0, lazyMode = false): number {
+    // Early termination if we hit limits
+    if (currentTotal >= this.maxPathCountLimit) {
+      return this.maxPathCountLimit;
+    }
+
     if (depth > this.maxDepth || obj === null || obj === undefined || typeof obj !== 'object') {
       return 1;
     }
@@ -595,9 +794,26 @@ export class StateInspector {
 
     try {
       let count = 1;
-      Object.values(obj as Record<string, unknown>).forEach(value => {
-        count += this.countPaths(value, depth + 1);
-      });
+      const objRecord = obj as Record<string, unknown>;
+      const values = Object.values(objRecord);
+      
+      // Check if we should use lazy loading for this level
+      if (this.shouldLazyLoad(obj, depth) && !lazyMode) {
+        // For lazy loaded structures, estimate path count based on immediate children
+        const estimatedChildrenPaths = Math.min(values.length * 5, this.lazyLoadingConfig.thresholdPathCount);
+        return count + estimatedChildrenPaths;
+      }
+      
+      for (const value of values) {
+        const pathCount = this.countPaths(value, depth + 1, currentTotal + count, lazyMode);
+        count += pathCount;
+        
+        // Early termination to prevent excessive computation
+        if (count >= this.maxPathCountLimit) {
+          return this.maxPathCountLimit;
+        }
+      }
+      
       return count;
     } finally {
       this.circularRefs.delete(obj as object);

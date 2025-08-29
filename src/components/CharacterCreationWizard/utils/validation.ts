@@ -1,4 +1,4 @@
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { EntityID } from '@/types/common.types';
 import { 
   validateName, 
@@ -18,7 +18,7 @@ export const validateCharacterName = (name: string, worldId: EntityID): Validati
   // Check uniqueness within world
   const state = useCharacterStore.getState();
   const characters = state.characters || {};
-  const existingCharacters = Object.values(characters).filter(c => c.worldId === worldId);
+  const existingCharacters = (Object.values(characters) as Character[]).filter(c => c.worldId === worldId);
   if (existingCharacters.some(c => c.name === name)) {
     return {
       valid: false,

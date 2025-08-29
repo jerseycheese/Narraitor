@@ -6,7 +6,7 @@ import { Globe, Sparkles, Zap } from 'lucide-react';
 import { World } from '../../types/world.types';
 import { useWorldStore } from '../../state/worldStore';
 import { useSessionStore } from '../../state/sessionStore';
-import { useCharacterStore } from '../../state/characterStore';
+import { useCharacterStore, type Character } from '../../state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { 
   ActiveStateCard, 
@@ -104,7 +104,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       
       // Check for characters in this world
       const characterState = useCharacterStore.getState();
-      const worldCharacters = Object.values(characterState.characters)
+      const worldCharacters = (Object.values(characterState.characters) as Character[])
         .filter(char => char.worldId === world.id);
       
       if (worldCharacters.length === 0) {

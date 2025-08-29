@@ -73,7 +73,8 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   const characterId = useSessionStore(state => state.characterId);
   
   // Get character details
-  const character = useCharacterStore(state => 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const character = useCharacterStore((state: any) => 
     state.characters[characterId || '']
   );
   

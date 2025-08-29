@@ -5,7 +5,7 @@ import { QuickPlay } from '@/components/QuickPlay';
 import { GameStartWizard } from '@/components/GameStartWizard';
 import { Breadcrumbs } from '@/components/Navigation/Breadcrumbs';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useNavigationFlow } from '@/hooks/useNavigationFlow';
 import { formatDateTime } from '@/lib/utils';
@@ -21,7 +21,7 @@ export default function NavigationFlowTestPage() {
   const { getNextStep, canQuickStart, getQuickStartInfo, getCurrentFlowStep } = useNavigationFlow();
 
   const worldList = Object.values(worlds);
-  const characterList = Object.values(characters);
+  const characterList = (Object.values(characters) as Character[]) as Character[];
   const sessionList = Object.values(savedSessions);
 
   return (

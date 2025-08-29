@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -7,7 +8,7 @@ import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
 
 // Simplified character types for MVP implementation
-interface CharacterAttribute {
+export interface CharacterAttribute {
   id: EntityID;
   characterId: EntityID;
   worldAttributeId?: EntityID; // Reference to world attribute for safer matching
@@ -17,7 +18,7 @@ interface CharacterAttribute {
   category?: string;
 }
 
-interface CharacterSkill {
+export interface CharacterSkill {
   id: EntityID;
   characterId: EntityID;
   worldSkillId?: EntityID; // Reference to world skill for safer matching
@@ -44,7 +45,7 @@ interface CharacterStatus {
   location?: string;
 }
 
-interface Character {
+export interface Character {
   id: EntityID;
   name: string;
   description: string;
@@ -95,6 +96,11 @@ interface CharacterStore {
   // Skill management
   addSkill: (characterId: EntityID, skill: Omit<CharacterSkill, 'id' | 'characterId'>) => void;
   
+  // Path Count Optimization
+  cleanupCharacterHistory: (worldId?: EntityID, keepRecentCount?: number) => void;
+  compactCharacterData: () => void;
+  getCharactersCount: (worldId?: EntityID) => number;
+  
   // State management
   reset: () => void;
   setError: (error: string | null) => void;
@@ -111,7 +117,7 @@ const initialState = {
 };
 
 // Character Store implementation with persistence
-export const useCharacterStore = create<CharacterStore>()(
+export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
   persist(
     (set) => ({
       ...initialState,
@@ -358,6 +364,63 @@ export const useCharacterStore = create<CharacterStore>()(
           error: null,
         };
       }),
+
+      // Path Count Optimization Methods
+      cleanupCharacterHistory: (worldId, keepRecentCount = 10) => {
+        set((state) => {
+          let charactersToProcess = Object.values(state.characters);
+          
+          if (worldId) {
+            charactersToProcess = charactersToProcess.filter(char => char.worldId === worldId);
+          }
+
+          if (charactersToProcess.length <= keepRecentCount) {
+            return state;
+          }
+
+          const sortedCharacters = charactersToProcess
+            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          
+          const charactersToRemove = sortedCharacters.slice(keepRecentCount);
+          
+          const newCharacters = { ...state.characters };
+          charactersToRemove.forEach(char => {
+            delete newCharacters[char.id];
+          });
+
+          return { characters: newCharacters };
+        });
+      },
+
+      compactCharacterData: () => {
+        set((state) => {
+          const compactedCharacters: Record<EntityID, Character> = {};
+          
+          Object.entries(state.characters).forEach(([id, character]) => {
+            compactedCharacters[id] = {
+              ...character,
+              attributes: character.attributes?.slice(0, 6) || [],
+              skills: character.skills?.slice(0, 5) || [],
+              background: {
+                ...character.background,
+                goals: character.background.goals?.slice(0, 3) || [],
+                fears: character.background.fears?.slice(0, 3) || [],
+                relationships: []
+              }
+            };
+          });
+
+          return { characters: compactedCharacters };
+        });
+      },
+
+      getCharactersCount: (worldId) => {
+        const { characters } = useCharacterStore.getState();
+        if (worldId) {
+          return Object.values(characters).filter(char => char.worldId === worldId).length;
+        }
+        return Object.keys(characters).length;
+      },
 
       // State management actions
       reset: () => set(() => initialState),

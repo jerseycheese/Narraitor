@@ -1,7 +1,7 @@
 import { AIClient } from './types';
 import { narrativeTemplateManager } from '../promptTemplates/narrativeTemplateManager';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type CharacterSkill } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import {
   Decision,
@@ -439,7 +439,7 @@ export class NarrativeGenerator {
       characterSkillContext = `
 CHARACTER ABILITIES:
 ${playerCharacter.skills
-  .map((skill) => {
+  .map((skill: CharacterSkill) => {
     const worldSkill = world.skills?.find((ws) => ws.id === skill.worldSkillId);
     return `- ${worldSkill?.name || skill.name}: Level ${skill.level}`;
   })

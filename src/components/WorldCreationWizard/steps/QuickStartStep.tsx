@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { World } from '@/types/world.types';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -26,8 +26,10 @@ export default function QuickStartStep({
   onCustomizeCharacter
 }: QuickStartStepProps) {
   const router = useRouter();
-  const createCharacter = useCharacterStore((state) => state.createCharacter);
-  const setCurrentCharacter = useCharacterStore((state) => state.setCurrentCharacter);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const createCharacter = useCharacterStore((state: any) => state.createCharacter);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setCurrentCharacter = useCharacterStore((state: any) => state.setCurrentCharacter);
   const initializeSession = useSessionStore((state) => state.initializeSession);
 
   const handleCharacterSelect = async (archetype: CharacterArchetype) => {
@@ -101,7 +103,7 @@ export default function QuickStartStep({
   // Fix infinite loop with memoized selector
   const existingCharacterNames = useMemo(() => {
     const characters = useCharacterStore.getState().characters;
-    return Object.values(characters)
+    return (Object.values(characters) as Character[])
       .filter(char => char.worldId === world.id)
       .map(char => char.name);
   }, [world.id]);
