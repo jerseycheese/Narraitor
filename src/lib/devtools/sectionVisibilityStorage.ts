@@ -15,6 +15,7 @@ export enum DevToolsSection {
   STATE_INSPECTOR = 'stateInspectorSection',
   AI_TESTING = 'aiTestingPanel',
   AI_MONITORING = 'aiMonitoring',
+  AI_MOCKING = 'aiMocking',
   TEST_DATA_GENERATOR = 'testDataGenerator',
   PORTRAIT_DEBUG = 'portraitDebug',
   ENDING_IMAGE_DEBUG = 'endingImageDebug',
