@@ -6,9 +6,9 @@ const path = require('path');
 
 const config = {
   stories: [
-    // Include all stories from the project
-    '../src/**/*.stories.@(js|jsx|ts|tsx)',
-    '../src/**/*.mdx'
+    // Include all stories from the atomic design structure
+    '../src/stories/**/*.stories.@(js|jsx|ts|tsx)',
+    '../src/stories/**/*.mdx'
   ],
   addons: [
     '@storybook/addon-essentials',
