@@ -60,6 +60,11 @@ export interface LoreStore {
   getFacts: (options?: LoreSearchOptions) => LoreFact[];
   clearFacts: (worldId: EntityID) => void;
   
+  // Path Count Optimization
+  cleanupOldFacts: (worldId: EntityID, keepRecentCount?: number) => void;
+  compactFactHistory: (maxVersionsPerFact?: number) => void;
+  getFactsCount: (worldId?: EntityID) => number;
+  
   // Enhanced Developer Operations
   updateFact: (id: EntityID, updates: Partial<LoreFact>) => void;
   deleteFact: (id: EntityID) => void;
@@ -437,6 +442,57 @@ export const useLoreStore = create<LoreStore>()(
         // Key should be alphanumeric with underscores, not starting with a number
         const keyPattern = /^[a-zA-Z][a-zA-Z0-9_]*$/;
         return keyPattern.test(key);
+      },
+
+      // Path Count Optimization Methods
+      cleanupOldFacts: (worldId, keepRecentCount = 50) => {
+        const { facts, factHistory } = get();
+        const worldFacts = Object.entries(facts)
+          .filter(([, fact]) => fact.worldId === worldId)
+          .sort(([, a], [, b]) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        if (worldFacts.length <= keepRecentCount) {
+          return; // No cleanup needed
+        }
+
+        const factsToRemove = worldFacts.slice(keepRecentCount);
+        
+        const newFacts = { ...facts };
+        const newHistory = { ...factHistory };
+
+        factsToRemove.forEach(([factId]) => {
+          delete newFacts[factId];
+          delete newHistory[factId];
+        });
+
+        set({ facts: newFacts, factHistory: newHistory });
+      },
+
+      compactFactHistory: (maxVersionsPerFact = 3) => {
+        const { factHistory } = get();
+        const compactedHistory: Record<EntityID, FactHistory> = {};
+
+        Object.entries(factHistory).forEach(([factId, history]) => {
+          // Keep only the most recent versions
+          const recentVersions = history.versions
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            .slice(0, maxVersionsPerFact);
+
+          compactedHistory[factId] = {
+            factId: history.factId,
+            versions: recentVersions
+          };
+        });
+
+        set({ factHistory: compactedHistory });
+      },
+
+      getFactsCount: (worldId) => {
+        const { facts } = get();
+        if (worldId) {
+          return Object.values(facts).filter(fact => fact.worldId === worldId).length;
+        }
+        return Object.keys(facts).length;
       },
     }),
     {

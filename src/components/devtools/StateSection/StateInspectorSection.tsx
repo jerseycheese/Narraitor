@@ -87,6 +87,94 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
   }, [isInitialized]);
 
   /**
+   * Manually refreshes the state snapshot to show current data
+   */
+  const refreshSnapshot = useCallback(() => {
+    if (isInitialized) {
+      const newSnapshot = stateInspector.getStateSnapshot();
+      setSnapshot(newSnapshot);
+    }
+  }, [isInitialized]);
+
+  /**
+   * Gets an optimized snapshot with lazy loading to reduce path count
+   */
+  const getOptimizedSnapshot = useCallback(() => {
+    if (isInitialized) {
+      const optimizedSnapshot = stateInspector.getOptimizedStateSnapshot();
+      setSnapshot(optimizedSnapshot);
+    }
+  }, [isInitialized]);
+
+  /**
+   * Cleans up lore store data to reduce path count
+   */
+  const cleanupLoreStore = useCallback(() => {
+    try {
+      const loreStore = stores.useLoreStore.getState();
+      const worldStore = stores.useWorldStore.getState();
+      const currentWorldId = worldStore.currentWorldId;
+      
+      if (currentWorldId) {
+        loreStore.cleanupOldFacts(currentWorldId, 30); // Keep only 30 most recent facts
+        loreStore.compactFactHistory(2); // Keep only 2 versions per fact
+        refreshSnapshot();
+      }
+    } catch (error) {
+      console.error('Failed to cleanup lore store:', error);
+    }
+  }, [refreshSnapshot]);
+
+  /**
+   * Cleans up character store data to reduce path count
+   */
+  const cleanupCharacterStore = useCallback(() => {
+    try {
+      const characterStore = stores.useCharacterStore.getState();
+      const worldStore = stores.useWorldStore.getState();
+      const currentWorldId = worldStore.currentWorldId;
+      
+      characterStore.compactCharacterData();
+      if (currentWorldId) {
+        characterStore.cleanupCharacterHistory(currentWorldId, 5);
+      }
+      refreshSnapshot();
+    } catch (error) {
+      console.error('Failed to cleanup character store:', error);
+    }
+  }, [refreshSnapshot]);
+
+  /**
+   * Gets cleanup recommendations based on current path counts
+   */
+  const getCleanupRecommendations = useCallback(() => {
+    if (!snapshot?.metadata.storePathCounts) return [];
+    
+    const recommendations = [];
+    const pathCounts = snapshot.metadata.storePathCounts;
+    
+    if (pathCounts.useLoreStore > 300) {
+      recommendations.push({
+        store: 'useLoreStore',
+        pathCount: pathCounts.useLoreStore,
+        action: 'Cleanup old facts',
+        handler: cleanupLoreStore
+      });
+    }
+    
+    if (pathCounts.useCharacterStore > 250) {
+      recommendations.push({
+        store: 'useCharacterStore',
+        pathCount: pathCounts.useCharacterStore,
+        action: 'Compact character data',
+        handler: cleanupCharacterStore
+      });
+    }
+    
+    return recommendations.sort((a, b) => b.pathCount - a.pathCount);
+  }, [snapshot, cleanupLoreStore, cleanupCharacterStore]);
+
+  /**
    * Handles navigation to a specific path in the state tree
    * Updates the selected path, retrieves its value and metadata
    */
@@ -263,14 +351,43 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       
       {/* Performance Warnings */}
       {snapshot && snapshot.metadata && snapshot.metadata.performanceWarnings && snapshot.metadata.performanceWarnings.length > 0 && (
-        <div className="text-xs text-yellow-400 mb-2">
-          <strong>Performance Warnings:</strong>
-          <ul className="list-disc list-inside">
+        <CollapsibleSection 
+          title="⚠️ Performance Warnings" 
+          initialCollapsed={false}
+          data-testid="performance-warnings-section"
+        >
+          <div className="text-xs text-yellow-400 space-y-2">
             {snapshot.metadata.performanceWarnings.map((warning, index) => (
-              <li key={index}>{warning}</li>
+              <div key={index} className="bg-yellow-900 bg-opacity-30 p-2 rounded border border-yellow-600">
+                {warning}
+              </div>
             ))}
-          </ul>
-        </div>
+            
+            {/* Store Path Analysis */}
+            {(() => {
+              const storePathCounts = stateInspector.getStorePathCounts();
+              const sortedStores = Object.entries(storePathCounts).sort((a, b) => b[1] - a[1]);
+              const topStores = sortedStores.slice(0, 3);
+              
+              if (topStores.length > 0 && topStores[0][1] > 500) {
+                return (
+                  <div className="bg-slate-800 p-2 rounded border border-slate-600">
+                    <div className="font-medium text-yellow-300 mb-1">Largest Stores by Path Count:</div>
+                    {topStores.map(([storeName, count]) => (
+                      <div key={storeName} className="text-xs text-slate-100">
+                        • <strong>{storeName}</strong>: {count} paths
+                      </div>
+                    ))}
+                    <div className="text-xs text-slate-300 mt-1">
+                      Consider clearing data from stores with high path counts if DevTools becomes slow.
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
+        </CollapsibleSection>
       )}
 
       {/* Path Navigation */}
@@ -536,11 +653,49 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       >
         {snapshot && (
           <div className="space-y-2">
-            <div className="text-xs text-slate-100">
-              <div>Total Stores: {snapshot.metadata.totalStores}</div>
-              <div>Total Paths: {snapshot.metadata.totalPaths}</div>
-              <div>Snapshot Time: {new Date(snapshot.timestamp).toLocaleTimeString()}</div>
-              <div>Active Watchers: {stateInspector.getWatchCount()}</div>
+            <div className="flex justify-between items-center mb-2">
+              <div className="text-xs text-slate-100">
+                <div>Total Stores: {snapshot.metadata.totalStores}</div>
+                <div>Total Paths: {snapshot.metadata.totalPaths}</div>
+                <div>Snapshot Time: {new Date(snapshot.timestamp).toLocaleTimeString()}</div>
+                <div>Active Watchers: {stateInspector.getWatchCount()}</div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={refreshSnapshot}
+                  className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
+                  data-testid="refresh-snapshot-button"
+                  title="Refresh snapshot to show current state data"
+                >
+                  🔄 Refresh
+                </button>
+                
+                <button
+                  onClick={getOptimizedSnapshot}
+                  className="px-2 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded"
+                  data-testid="optimized-snapshot-button"
+                  title="Get optimized snapshot with lazy loading to reduce path count"
+                >
+                  ⚡ Optimize
+                </button>
+                
+                {/* Cleanup Actions */}
+                {getCleanupRecommendations().length > 0 && (
+                  <div className="flex gap-1">
+                    {getCleanupRecommendations().map((rec, index) => (
+                      <button
+                        key={index}
+                        onClick={rec.handler}
+                        className="px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded"
+                        title={`${rec.action} (${rec.pathCount} paths)`}
+                        data-testid={`cleanup-${rec.store.toLowerCase()}-button`}
+                      >
+                        🧹 Clean {rec.store.replace('use', '').replace('Store', '')}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             
             {Object.entries(snapshot.storeStates).map(([storeName, storeState]) => (
