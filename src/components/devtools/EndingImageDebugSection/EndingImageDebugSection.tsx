@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { useNarrativeStore } from '../../../state/narrativeStore';
-import { useCharacterStore } from '../../../state/characterStore';
+import { useCharacterStore, type Character } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import type { StoryEnding, EndingTone, EndingType } from '../../../types/narrative.types';
 import { capitalize } from '@/lib/utils';
@@ -28,14 +28,15 @@ export function EndingImageDebugSection() {
   
   // Get data from stores
   const { currentEnding, getSessionSegments } = useNarrativeStore();
-  const characters = useCharacterStore((state) => state.characters);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const characters = useCharacterStore((state: any) => state.characters);
   const worlds = useWorldStore((state) => state.worlds);
   
   const toneOptions: EndingTone[] = ['triumphant', 'bittersweet', 'mysterious', 'tragic', 'hopeful'];
   
   // Create a mock ending for testing
   const createMockEnding = (): StoryEnding => {
-    const mockCharacter = Object.values(characters)[0];
+    const mockCharacter = (Object.values(characters) as Character[])[0];
     const mockWorld = Object.values(worlds)[0];
     
     return {
@@ -64,7 +65,7 @@ export function EndingImageDebugSection() {
     
     try {
       const mockEnding = currentEnding || createMockEnding();
-      const character = characters[mockEnding.characterId] || Object.values(characters)[0];
+      const character = characters[mockEnding.characterId] || (Object.values(characters) as Character[])[0];
       const world = worlds[mockEnding.worldId] || Object.values(worlds)[0];
       
       // Get recent narrative segments for context
@@ -130,7 +131,7 @@ export function EndingImageDebugSection() {
     
     try {
       const mockEnding = currentEnding || createMockEnding();
-      const character = characters[mockEnding.characterId] || Object.values(characters)[0];
+      const character = characters[mockEnding.characterId] || (Object.values(characters) as Character[])[0];
       const world = worlds[mockEnding.worldId] || Object.values(worlds)[0];
       
       // Get recent narrative segments for context
@@ -229,7 +230,7 @@ export function EndingImageDebugSection() {
     }
   };
 
-  const currentCharacter = currentEnding ? characters[currentEnding.characterId] : Object.values(characters)[0];
+  const currentCharacter = currentEnding ? characters[currentEnding.characterId] : (Object.values(characters) as Character[])[0];
   const currentWorld = currentEnding ? worlds[currentEnding.worldId] : Object.values(worlds)[0];
 
   return (

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { CollapsibleSection } from '../CollapsibleSection';
 import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
 import { createAIClient } from '../../../lib/ai';
-import { useCharacterStore } from '../../../state/characterStore';
+import { useCharacterStore, type Character as StoreCharacter } from '../../../state/characterStore';
 import { useWorldStore } from '../../../state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
 import { Character } from '../../../types/character.types';
@@ -25,8 +25,9 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
   const [showBreakdown, setShowBreakdown] = useState(false);
   
   // Get characters from store
-  const characters = useCharacterStore((state) => state.characters);
-  const charactersArray = Object.values(characters);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const characters = useCharacterStore((state: any) => state.characters);
+  const charactersArray = (Object.values(characters) as StoreCharacter[]);
   const selectedCharacter = selectedCharacterId ? characters[selectedCharacterId] : null;
   
   // Get worlds from store
@@ -80,11 +81,13 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         isActive: skill.isActive !== undefined ? skill.isActive : true
       })) || [];
       
-      const mockCharacter: Character = {
+      const mockCharacter: StoreCharacter = {
         id: 'preview',
         name: effectiveCharacterData.name || 'Test Character',
         description: '',
         worldId: effectiveCharacterData.worldId || 'world-1',
+        level: effectiveCharacterData.level || 1,
+        isPlayer: effectiveCharacterData.isPlayer || false,
         attributes: mockAttributes,
         skills: mockSkills,
         background: {
@@ -172,11 +175,13 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         isActive: skill.isActive !== undefined ? skill.isActive : true
       })) || [];
       
-      const mockCharacter: Character = {
+      const mockCharacter: StoreCharacter = {
         id: 'test',
         name: effectiveCharacterData.name || 'Test Character',
         description: '',
         worldId: effectiveCharacterData.worldId || 'world-1',
+        level: effectiveCharacterData.level || 1,
+        isPlayer: effectiveCharacterData.isPlayer || false,
         attributes: mockAttributes,
         skills: mockSkills,
         background: {
@@ -201,7 +206,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         updatedAt: new Date().toISOString()
       };
 
-      const result = await generator.generatePortrait(mockCharacter, {
+      const result = await generator.generatePortrait(mockCharacter as unknown as Character, {
         worldGenre: effectiveWorldConfig?.genre
       });
 
@@ -251,7 +256,8 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
               <div><strong>World Genre:</strong> {effectiveWorldConfig?.genre || 'Not set'}</div>
               <div><strong>Attributes:</strong> {effectiveCharacterData.attributes?.length || 0}</div>
               <div><strong>Skills:</strong> {
-                effectiveCharacterData.skills?.filter((s) => 'isSelected' in s ? s.isSelected : true)?.length || 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                effectiveCharacterData.skills?.filter((s: any) => 'isSelected' in s ? s.isSelected : true)?.length || 
                 effectiveCharacterData.skills?.length || 0
               }</div>
               <div><strong>Background:</strong> {effectiveCharacterData.background?.personality ? 'Set' : 'Not set'}</div>

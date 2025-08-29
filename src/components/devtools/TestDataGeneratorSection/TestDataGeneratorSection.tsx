@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 // Using API routes for secure AI operations - combines both approaches
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -362,7 +362,7 @@ export const TestDataGeneratorSection: React.FC = () => {
 
     const createdCharacters = [];
     const { characters } = useCharacterStore.getState();
-    const existingCharacterNames = Object.values(characters)
+    const existingCharacterNames = (Object.values(characters) as Character[])
       .filter(char => char.worldId === currentWorld.id)
       .map(char => char.name);
 
@@ -485,7 +485,8 @@ export const TestDataGeneratorSection: React.FC = () => {
                     attributeId: currentWorld.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
                     value: attr.baseValue
                   })),
-                  skills: storeCharacter.skills.map(skill => ({
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  skills: storeCharacter.skills.map((skill: any) => ({
                     skillId: currentWorld.skills.find(ws => ws.name === skill.name)?.id || skill.id,
                     level: skill.level,
                     experience: 0,
@@ -585,7 +586,7 @@ export const TestDataGeneratorSection: React.FC = () => {
     }
 
     const { characters } = useCharacterStore.getState();
-    const worldCharacters = Object.values(characters).filter(char => char.worldId === currentWorld.id);
+    const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === currentWorld.id);
     
     if (worldCharacters.length === 0) {
       alert(`No characters found in world "${currentWorld.name}"`);

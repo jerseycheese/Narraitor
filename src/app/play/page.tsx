@@ -19,7 +19,8 @@ export default function PlayPage() {
   
   const currentWorldId = useWorldStore(state => state.currentWorldId);
   const currentWorld = useWorldStore(state => state.worlds[currentWorldId || '']);
-  const currentCharacterId = useCharacterStore(state => state.currentCharacterId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentCharacterId = useCharacterStore((state: any) => state.currentCharacterId);
   const initializeSession = useSessionStore(state => state.initializeSession);
   const currentSessionId = useSessionStore(state => state.id);
   

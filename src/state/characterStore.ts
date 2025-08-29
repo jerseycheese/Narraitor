@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { UseBoundStore, StoreApi } from 'zustand';
 import { EntityID } from '../types/common.types';
 import { generateUniqueId } from '../lib/utils/generateId';
 import { createIndexedDBStorage } from './persistence';
@@ -7,7 +8,7 @@ import { safeTrim } from '@/lib/utils';
 import { normalizeText } from '../lib/utils/textNormalization';
 
 // Simplified character types for MVP implementation
-interface CharacterAttribute {
+export interface CharacterAttribute {
   id: EntityID;
   characterId: EntityID;
   worldAttributeId?: EntityID; // Reference to world attribute for safer matching
@@ -17,7 +18,7 @@ interface CharacterAttribute {
   category?: string;
 }
 
-interface CharacterSkill {
+export interface CharacterSkill {
   id: EntityID;
   characterId: EntityID;
   worldSkillId?: EntityID; // Reference to world skill for safer matching
@@ -44,7 +45,7 @@ interface CharacterStatus {
   location?: string;
 }
 
-interface Character {
+export interface Character {
   id: EntityID;
   name: string;
   description: string;
@@ -116,7 +117,7 @@ const initialState = {
 };
 
 // Character Store implementation with persistence
-export const useCharacterStore = create<CharacterStore>()(
+export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
   persist(
     (set) => ({
       ...initialState,

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 
@@ -173,7 +173,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
             </h3>
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {Object.values(worlds).map(world => {
-                const worldCharacters = Object.values(characters).filter(
+                const worldCharacters = (Object.values(characters) as Character[]).filter(
                   char => char.worldId === world.id
                 ).length;
                 

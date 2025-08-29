@@ -656,8 +656,8 @@ export class StateInspector {
   getOptimizedStateSnapshot(): StateSnapshot {
     if (process.env.NODE_ENV !== 'development') {
       return {
-        timestamp: new Date().toISOString(),
-        stores: {},
+        timestamp: Date.now(),
+        storeStates: {},
         metadata: {
           totalStores: 0,
           totalPaths: 0,

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Home, Globe, User } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { buildBreadcrumbSegments, type BreadcrumbSegment } from '@/utils/routeUtils';
 import { cn } from '@/lib/utils/classNames';
@@ -155,14 +155,14 @@ export function Breadcrumbs({
       );
     }
 
-    if (nextStep.action === 'select-character' && Object.values(characters).filter(c => c.worldId === currentWorldId).length > 0) {
+    if (nextStep.action === 'select-character' && (Object.values(characters) as Character[]).filter(c => c.worldId === currentWorldId).length > 0) {
       return (
         <div className="ml-4 flex items-center">
           <span className="text-gray-400 mr-2">{separator}</span>
           <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
           <Button
             onClick={() => {
-              const firstCharacter = Object.values(characters).find(c => c.worldId === currentWorldId);
+              const firstCharacter = (Object.values(characters) as Character[]).find(c => c.worldId === currentWorldId);
               if (currentWorldId && firstCharacter) {
                 initializeSession(currentWorldId, firstCharacter.id, () => {
                   router.push('/play');

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
@@ -139,8 +139,8 @@ export default function CharactersPage() {
   const effectiveWorldId = worldIdFromUrl || currentWorldId;
   
   const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-  const worldCharacters = Object.values(characters).filter(
-    char => char.worldId === effectiveWorldId
+  const worldCharacters = (Object.values(characters) as Character[]).filter(
+    (char) => char.worldId === effectiveWorldId
   );
 
   // Toast management
