@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
+    "dev": "kill-port 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -76,6 +76,7 @@
     "glob": "^11.0.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "kill-port": "^2.0.1",
     "playwright": "^1.52.0",
     "postcss": "^8.5.6",
     "postcss-load-config": "^6.0.1",

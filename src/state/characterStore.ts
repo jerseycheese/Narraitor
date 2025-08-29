@@ -75,7 +75,7 @@ export interface Character {
 /**
  * Character store interface with state and actions
  */
-interface CharacterStore {
+export interface CharacterStore {
   // State
   characters: Record<EntityID, Character>;
   currentCharacterId: EntityID | null;
@@ -100,6 +100,9 @@ interface CharacterStore {
   cleanupCharacterHistory: (worldId?: EntityID, keepRecentCount?: number) => void;
   compactCharacterData: () => void;
   getCharactersCount: (worldId?: EntityID) => number;
+  
+  // Cascading delete helper
+  deleteCharactersInWorld: (worldId: EntityID) => void;
   
   // State management
   reset: () => void;
@@ -421,6 +424,20 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
         }
         return Object.keys(characters).length;
       },
+
+      // Delete all characters in a specific world
+      deleteCharactersInWorld: (worldId) => set((state) => {
+        const charactersToKeep = Object.fromEntries(
+          Object.entries(state.characters).filter(([_, char]) => char.worldId !== worldId)
+        );
+        
+        return {
+          characters: charactersToKeep,
+          currentCharacterId: state.currentCharacterId && state.characters[state.currentCharacterId]?.worldId === worldId 
+            ? null 
+            : state.currentCharacterId
+        };
+      }),
 
       // State management actions
       reset: () => set(() => initialState),

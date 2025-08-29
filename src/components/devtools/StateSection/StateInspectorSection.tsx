@@ -30,6 +30,19 @@ interface StateInspectorSectionProps {
 }
 
 /**
+ * Performance threshold constants for state path warnings
+ */
+const PERFORMANCE_THRESHOLDS = {
+  LORE_STORE_PATH_WARNING: 300,
+  CHARACTER_STORE_PATH_WARNING: 250,
+  SESSION_STORE_PATH_WARNING: 150,
+  NARRATIVE_STORE_PATH_WARNING: 300,
+  JOURNAL_STORE_PATH_WARNING: 200,
+  HIGH_PATH_COUNT_WARNING: 800,
+  CRITICAL_PATH_COUNT_WARNING: 1500,
+} as const;
+
+/**
  * StateInspectorSection Component
  * 
  * Provides a comprehensive UI for inspecting application state with hierarchical
@@ -153,7 +166,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
     const recommendations = [];
     const pathCounts = snapshot.metadata.storePathCounts;
     
-    if (pathCounts.useLoreStore > 300) {
+    if (pathCounts.useLoreStore > PERFORMANCE_THRESHOLDS.LORE_STORE_PATH_WARNING) {
       recommendations.push({
         store: 'useLoreStore',
         pathCount: pathCounts.useLoreStore,
@@ -162,7 +175,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
       });
     }
     
-    if (pathCounts.useCharacterStore > 250) {
+    if (pathCounts.useCharacterStore > PERFORMANCE_THRESHOLDS.CHARACTER_STORE_PATH_WARNING) {
       recommendations.push({
         store: 'useCharacterStore',
         pathCount: pathCounts.useCharacterStore,
