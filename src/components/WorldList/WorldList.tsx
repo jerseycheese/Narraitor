@@ -1,7 +1,7 @@
 import React from 'react';
-import { World } from '../../types/world.types';
-import WorldCard from '../WorldCard/WorldCard';
-import { useCharacterStore, type Character } from '../../state/characterStore';
+import { World } from '@/types/world.types';
+import WorldCard from '@/components/WorldCard/WorldCard';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 
 interface WorldListProps {
   worlds: World[];

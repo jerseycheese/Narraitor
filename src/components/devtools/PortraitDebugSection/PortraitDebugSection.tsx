@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CollapsibleSection } from '../CollapsibleSection';
-import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
-import { createAIClient } from '../../../lib/ai';
-import { useCharacterStore, type Character as StoreCharacter } from '../../../state/characterStore';
-import { useWorldStore } from '../../../state/worldStore';
+import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { createAIClient } from '@/lib/ai';
+import { useCharacterStore, type Character as StoreCharacter } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
-import { Character } from '../../../types/character.types';
-import { World } from '../../../types/world.types';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
 
 
 interface PortraitDebugSectionProps {

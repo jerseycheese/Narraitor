@@ -1,8 +1,8 @@
 // src/components/devtools/PortraitDebugSection/PromptBreakdown.tsx
 
 import React from 'react';
-import { Character } from '../../../types/character.types';
-import { World } from '../../../types/world.types';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
 
 interface PromptBreakdownProps {
   characterData: Partial<Character> | null | undefined;

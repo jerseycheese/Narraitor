@@ -3,16 +3,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Globe, Sparkles, Zap } from 'lucide-react';
-import { World } from '../../types/world.types';
-import { useWorldStore } from '../../state/worldStore';
-import { useSessionStore } from '../../state/sessionStore';
-import { useCharacterStore, type Character } from '../../state/characterStore';
+import { World } from '@/types/world.types';
+import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
 import { getGenreLabel } from '@/lib/constants/genres';
 import { 
   ActiveStateCard, 
   MakeActiveButton, 
   CardActionGroup
-} from '../shared/cards';
+} from '@/components/shared/cards';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 

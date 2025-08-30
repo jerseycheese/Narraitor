@@ -1,6 +1,6 @@
 # Narraitor
 
-I've been building this AI-powered storytelling app that basically lets you play through narrative RPG experiences in any fictional world you can imagine. Whether you want to explore Middle Earth, create adventures in the Star Wars universe, or design something completely original, Narraitor adapts the AI storytelling to match your world's themes and tone.
+AI-powered storytelling app that basically lets you play through narrative RPG experiences in any world you can imagine, foctional or non-fictional Maybe you want to explore Middle Earth? Storm the beach at Normandy? Design something completely original? Narraitor adapts the AI storytelling to match your world's themes and tone.
 
 ## What This Actually Does
 

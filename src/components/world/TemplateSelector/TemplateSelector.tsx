@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { templates, WorldTemplate } from '../../../lib/templates/worldTemplates';
+import { templates, WorldTemplate } from '@/lib/templates/worldTemplates';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
 import { TemplateHistoryEntry } from '@/types/game.types';
 import { convertHistoryEntryToWizardData, storeTemplateDataForWizard } from '@/lib/utils/templateHelpers';

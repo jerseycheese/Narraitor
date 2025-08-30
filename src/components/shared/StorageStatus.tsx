@@ -5,8 +5,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { CheckCircle, AlertTriangle, XCircle, RotateCcw, HelpCircle } from 'lucide-react';
-import { StorageStatus as StorageStatusEnum, StorageError } from '../../lib/storage/resilientStorage';
-import { getResilientStorageInstance } from '../../state/persistence';
+import { StorageStatus as StorageStatusEnum, StorageError } from '@/lib/storage/resilientStorage';
+import { getResilientStorageInstance } from '@/state/persistence';
 import { formatRelativeTime } from '@/lib/utils';
 
 interface StorageStatusProps {

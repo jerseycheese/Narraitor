@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { Button } from '../ui/button';
-import { ErrorDisplay } from '../ui/ErrorDisplay/ErrorDisplay';
-import { ExportService } from '../../lib/storage/exportService';
+import { Button } from '@/components/ui/button';
+import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
+import { ExportService } from '@/lib/storage/exportService';
 
 interface ExportImportControlsProps {
   className?: string;

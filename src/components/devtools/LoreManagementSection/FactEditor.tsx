@@ -4,15 +4,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useLoreStore } from '../../../state/loreStore';
+import { useLoreStore } from '@/state/loreStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { LoreCategory, LoreFact } from '../../../types/lore.types';
-import type { EntityID } from '../../../types/common.types';
+import type { LoreCategory, LoreFact } from '@/types/lore.types';
+import type { EntityID } from '@/types/common.types';
 
 interface FactEditorProps {
   worldId: EntityID;

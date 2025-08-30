@@ -1,13 +1,13 @@
 // src/components/CharacterCreationWizard/steps/PortraitStep.tsx
 
 import React, { useState } from 'react';
-import { CharacterPortrait } from '../../CharacterPortrait';
-import { CharacterPortrait as CharacterPortraitType } from '../../../types/character.types';
+import { CharacterPortrait } from '@/components/CharacterPortrait';
+import { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
 // Removed direct AI client imports - using API routes instead
-import { Character } from '../../../types/character.types';
-import { World } from '../../../types/world.types';
-import { LoadingState } from '../../ui/LoadingState';
-import { PortraitCustomizationSection } from '../../shared';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { PortraitCustomizationSection } from '@/components/shared';
 
 interface CharacterFormData {
   name: string;
