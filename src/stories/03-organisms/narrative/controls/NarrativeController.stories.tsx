@@ -2,7 +2,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeController } from '@/components/Narrative/NarrativeController';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
-import { NarrativeSegment } from '@/components/types/narrative.types';
+import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
   title: '03-Organisms/narrative/controls/NarrativeController',

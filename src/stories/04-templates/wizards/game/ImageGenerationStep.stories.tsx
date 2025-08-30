@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ImageGenerationStep from '@/components/WorldCreationWizard/steps/ImageGenerationStep';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta: Meta<typeof ImageGenerationStep> = {
   title: '04-Templates/wizards/game/ImageGenerationStep',

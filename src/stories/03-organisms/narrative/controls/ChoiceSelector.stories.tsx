@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ChoiceSelector from '@/components/shared/ChoiceSelector/ChoiceSelector';
-import { Decision } from '@/components/types/narrative.types';
+import { Decision } from '@/types/narrative.types';
 
 const meta: Meta<typeof ChoiceSelector> = {
   title: '03-Organisms/narrative/controls/ChoiceSelector',

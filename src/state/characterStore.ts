@@ -428,7 +428,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       // Delete all characters in a specific world
       deleteCharactersInWorld: (worldId) => set((state) => {
         const charactersToKeep = Object.fromEntries(
-          Object.entries(state.characters).filter(([_, char]) => char.worldId !== worldId)
+          Object.entries(state.characters).filter(([, char]) => char.worldId !== worldId)
         );
         
         return {

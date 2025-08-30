@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
-import { NarrativeSegment } from '@/components/types/narrative.types';
+import { NarrativeSegment } from '@/types/narrative.types';
 
 const meta = {
   title: '03-Organisms/narrative/display/NarrativeHistory',

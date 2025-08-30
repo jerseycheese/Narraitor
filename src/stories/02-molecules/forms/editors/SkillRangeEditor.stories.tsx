@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import SkillRangeEditor from '@/components/forms/SkillRangeEditor';
-import { WorldSkill } from '@/components/types/world.types';
+import { WorldSkill } from '@/types/world.types';
 import { MIN_SKILL_VALUE as SKILL_MIN_VALUE, MAX_SKILL_VALUE as SKILL_MAX_VALUE } from '@/lib/constants/skillLevelDescriptions';
 
 const meta: Meta<typeof SkillRangeEditor> = {

@@ -3,7 +3,7 @@ import { Navigation } from '@/components/Navigation/Navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { NavigationLoadingProvider } from '@/components/shared/NavigationLoadingProvider';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 // Use character interface from store for consistency
 
 const meta: Meta<typeof Navigation> = {

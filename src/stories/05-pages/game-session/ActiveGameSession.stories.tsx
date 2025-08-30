@@ -1,8 +1,8 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import ActiveGameSession from '@/components/GameSession/ActiveGameSession';
-import { World } from '@/components/types/world.types';
-import { NarrativeSegment, Decision } from '@/components/types/narrative.types';
+import { World } from '@/types/world.types';
+import { NarrativeSegment, Decision } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { useCharacterStore } from '@/state/characterStore';

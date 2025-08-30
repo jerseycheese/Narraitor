@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldBasicInfoForm from '@/components/forms/WorldBasicInfoForm';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const mockWorld: World = {
   id: 'world-123',

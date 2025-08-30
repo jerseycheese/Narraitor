@@ -1,6 +1,6 @@
 import { Typography } from '@/components/ui/Typography';
 
-export default {
+const meta = {
   title: '01-Atoms/display/Typography',
   component: Typography,
   parameters: {
@@ -12,6 +12,8 @@ export default {
     }
   }
 };
+
+export default meta;
 
 export const Default = {
   render: () => <Typography />

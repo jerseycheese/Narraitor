@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeDisplay } from '@/components/Narrative/NarrativeDisplay';
-import { NarrativeSegment } from '@/components/types/narrative.types';
+import { NarrativeSegment } from '@/types/narrative.types';
 
 // Updated stories aligned with actual app usage patterns
 

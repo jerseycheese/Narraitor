@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
-import { WorldSkill, WorldAttribute } from '@/components/types/world.types';
+import { WorldSkill, WorldAttribute } from '@/types/world.types';
 import { DEFAULT_SKILL_DIFFICULTY } from '@/lib/constants/skillDifficultyLevels';
 
 const mockAttributes: WorldAttribute[] = [

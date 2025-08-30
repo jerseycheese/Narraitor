@@ -1,7 +1,7 @@
 import React from 'react';
 import { Logo, LogoText, LogoIcon } from '@/components/ui/Logo';
 
-export default {
+const meta = {
   title: '01-Atoms/display/Logo',
   component: Logo,
   parameters: {
@@ -13,6 +13,8 @@ export default {
     }
   }
 };
+
+export default meta;
 
 export const Default = {
   render: () => <Logo />

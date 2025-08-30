@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { MobileNavigationMenu } from '@/components/Navigation/MobileNavigationMenu';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta: Meta<typeof MobileNavigationMenu> = {
   title: '03-Organisms/navigation/MobileNavigationMenu',

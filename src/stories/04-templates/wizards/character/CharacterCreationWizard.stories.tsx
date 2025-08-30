@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta: Meta<typeof CharacterCreationWizard> = {
   title: '04-Templates/wizards/character/CharacterCreationWizard',

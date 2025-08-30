@@ -4,7 +4,7 @@ import { CharacterHeader } from '@/components/characters/CharacterHeader';
 import { useCharacterStore } from '@/state/characterStore';
 
 type StoreCharacter = ReturnType<typeof useCharacterStore.getState>['characters'][string];
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta = {
   title: '03-Organisms/character/display/CharacterHeader',

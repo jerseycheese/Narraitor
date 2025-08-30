@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta = {
   title: '03-Organisms/world/display/WorldDetailsDisplay',

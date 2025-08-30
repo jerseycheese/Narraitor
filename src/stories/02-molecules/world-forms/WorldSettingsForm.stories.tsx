@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
-import { WorldSettings } from '@/components/types/world.types';
+import { WorldSettings } from '@/types/world.types';
 
 const mockSettings: WorldSettings = {
   maxAttributes: 10,

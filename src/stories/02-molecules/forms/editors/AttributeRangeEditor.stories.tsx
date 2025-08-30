@@ -2,7 +2,7 @@ import React from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import AttributeRangeEditor from '@/components/forms/AttributeRangeEditor';
-import { WorldAttribute } from '@/components/types/world.types';
+import { WorldAttribute } from '@/types/world.types';
 
 const meta: Meta<typeof AttributeRangeEditor> = {
   title: '02-Molecules/forms/editors/AttributeRangeEditor',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AISuggestions } from '@/components/WorldCreationWizard/AISuggestions';
-import { AttributeSuggestion, SkillSuggestion } from '@/components/WizardState';
+import { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
 import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
 
 const meta: Meta<typeof AISuggestions> = {

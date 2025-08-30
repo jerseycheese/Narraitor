@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorldSkillsList } from '@/components/world/WorldSkillsList';
-import { WorldSkill, WorldAttribute } from '@/components/types/world.types';
+import { WorldSkill, WorldAttribute } from '@/types/world.types';
 
 const meta = {
   title: '03-Organisms/world/lists/WorldSkillsList',

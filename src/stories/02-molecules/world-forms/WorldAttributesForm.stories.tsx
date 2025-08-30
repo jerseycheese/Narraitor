@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
-import { WorldAttribute } from '@/components/types/world.types';
+import { WorldAttribute } from '@/types/world.types';
 
 // Updated to use 1-10 range for MVP
 const mockAttributes: WorldAttribute[] = [

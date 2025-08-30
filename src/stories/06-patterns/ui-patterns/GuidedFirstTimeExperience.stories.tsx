@@ -23,7 +23,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <p className="text-sm text-blue-800">
-            Let's guide you through creating your first world in just 2 steps, then create your character.
+            Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
         <button 

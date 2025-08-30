@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AttributeEditor } from '@/components/world/AttributeEditor/AttributeEditor';
-import { EntityID } from '@/components/types/common.types';
+import { EntityID } from '@/types/common.types';
 import { action } from '@storybook/addon-actions';
 
 const meta = {

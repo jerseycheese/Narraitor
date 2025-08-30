@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { NarrativeHistory } from '@/components/Narrative/NarrativeHistory';
-import { NarrativeSegment } from '@/components/types/narrative.types';
+import { NarrativeSegment } from '@/types/narrative.types';
 // NarrativeController and NarrativeDisplay are imported in docstrings but not directly used in this file
 
 const meta = {

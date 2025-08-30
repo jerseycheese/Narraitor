@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { SkillEditor } from '@/components/world/SkillEditor/SkillEditor';
-import { WorldAttribute, WorldSkill } from '@/components/types/world.types';
+import { WorldAttribute, WorldSkill } from '@/types/world.types';
 // SkillDifficulty type used in WorldSkill interface
 
 const mockAttributes: WorldAttribute[] = [

@@ -2,7 +2,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
-import { World } from '@/components/types/world.types';
+import { World } from '@/types/world.types';
 
 const meta: Meta<typeof QuickStartCharacters> = {
   title: '03-Organisms/game-session/setup/QuickStartCharacters',
