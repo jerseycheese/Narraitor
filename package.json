@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "kill-port 3000 && next dev -p 3000",
+    "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
