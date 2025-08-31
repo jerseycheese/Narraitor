@@ -87,7 +87,7 @@ export function CharacterCard({
               e.stopPropagation();
               onView();
             }}
-            className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1"
+            className="text-xl font-semibold text-link-primary cursor-pointer mb-1"
           >
             {character.name}
           </h3>

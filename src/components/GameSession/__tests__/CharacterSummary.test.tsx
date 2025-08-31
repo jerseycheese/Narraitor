@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import CharacterSummary from '../CharacterSummary';
 
 // Define the Character type as used in characterStore
@@ -50,9 +51,18 @@ describe('CharacterSummary', () => {
       expect(screen.getByText('Aldric the Bold')).toBeInTheDocument();
     });
 
-    it('displays character history', () => {
+    it('displays character history when expanded', async () => {
+      const user = userEvent.setup();
       render(<CharacterSummary character={mockCharacter} />);
       
+      // History should be collapsed by default
+      expect(screen.queryByText('Raised in a noble family, trained in the art of combat since childhood')).not.toBeInTheDocument();
+      
+      // Click to expand
+      const expandButton = screen.getByRole('button');
+      await user.click(expandButton);
+      
+      // Now history should be visible
       expect(screen.getByText('Raised in a noble family, trained in the art of combat since childhood')).toBeInTheDocument();
     });
 

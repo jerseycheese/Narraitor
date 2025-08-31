@@ -125,7 +125,7 @@ export function Navigation() {
               
               <Link 
                 href="/" 
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                className="flex items-center gap-2 hover:opacity-90 transition-opacity"
               >
                 <LogoIcon size="small" className="brightness-0 invert" />
                 <LogoText size="sm" className="text-white" />
@@ -135,24 +135,27 @@ export function Navigation() {
               <div className="hidden md:flex items-center space-x-1 ml-8" data-testid="desktop-navigation">
                 <Link 
                   href="/worlds" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : ''
+                  data-navigation
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Worlds
                 </Link>
                 <Link 
                   href="/characters" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
-                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : ''
+                  data-navigation
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Characters
                 </Link>
                 <Link 
                   href="/settings" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
-                    pathname === '/settings' ? 'text-white' : ''
+                  data-navigation
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/settings' ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Settings
@@ -221,7 +224,7 @@ export function Navigation() {
                       <div className="border-t border-gray-200 mt-1 pt-1">
                         <Link
                           href="/worlds"
-                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav"
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

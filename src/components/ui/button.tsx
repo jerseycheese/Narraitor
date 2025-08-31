@@ -13,7 +13,7 @@ const buttonVariants = {
   outline: "border border-gray-300 bg-white hover:bg-gray-50",
   secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
   ghost: "hover:bg-gray-100",
-  link: "text-blue-600 underline-offset-4 hover:underline",
+  link: "text-blue-600 hover:underline transition-colors underline-offset-4",
 }
 
 const buttonSizes = {

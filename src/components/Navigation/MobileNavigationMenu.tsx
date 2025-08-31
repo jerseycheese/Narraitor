@@ -125,7 +125,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
             pathname === '/worlds' || pathname.startsWith('/world/') 
               ? 'bg-gray-700 text-white' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              : 'text-link-nav-dark hover:bg-gray-800'
           }`}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
             pathname === '/characters' || pathname.startsWith('/characters/') 
               ? 'bg-gray-700 text-white' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              : 'text-link-nav-dark hover:bg-gray-800'
           }`}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
             pathname === '/settings' 
               ? 'bg-gray-700 text-white' 
-              : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              : 'text-link-nav-dark hover:bg-gray-800'
           }`}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                     className={`w-full min-h-11 flex items-center justify-between px-4 py-3 text-left ${
                       world.id === currentWorldId 
                         ? 'bg-green-600 text-white hover:bg-green-700' 
-                        : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                        : 'text-link-nav-dark hover:bg-gray-800'
                     }`}
                   >
                     <div>

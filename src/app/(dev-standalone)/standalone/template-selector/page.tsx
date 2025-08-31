@@ -109,7 +109,7 @@ export default function TemplateSelectorPage() {
       </div>
 
       <div className="mt-4">
-        <Link href="/standalone" className="text-blue-500 hover:underline">
+        <Link href="/standalone" className="text-link-primary no-underline">
           Back to Standalone Home
         </Link>
       </div>

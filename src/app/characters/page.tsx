@@ -423,7 +423,7 @@ export default function CharactersPage() {
         <div className="mb-6 -mt-8">
           <Link
             href={`/world/${worldIdFromUrl}`}
-            className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+            className="text-link-primary flex items-center gap-2 no-underline"
           >
             <span>←</span> Back to {currentWorld.name}
           </Link>

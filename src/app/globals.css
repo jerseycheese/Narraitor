@@ -180,30 +180,38 @@
     text-decoration-color: #2563eb; /* blue-600 - stronger underline */
   }
   
-  /* Button-style text links */
-  .text-link-button {
-    @apply inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors;
+  /* Standardized text link classes */
+  .text-link-primary {
+    @apply text-blue-600 hover:underline transition-colors underline-offset-4;
   }
   
-  .text-link-button:hover {
-    text-decoration: none;
+  .text-link-secondary {
+    @apply text-gray-600 hover:text-blue-600 hover:underline transition-colors underline-offset-4;
   }
   
-  /* Subtle text links */
-  .text-link-subtle {
-    @apply text-gray-600 hover:text-blue-600 transition-colors;
+  .text-link-nav {
+    @apply text-blue-600 hover:text-blue-700 transition-colors;
   }
   
-  /* Links in dark backgrounds should remain light */
-  .bg-gray-900 a,
-  .bg-gray-800 a,
-  .bg-slate-800 a {
+  .text-link-nav-dark {
+    @apply text-gray-300 hover:text-white transition-colors;
+    color: rgb(209 213 219) !important; /* gray-300 with !important to override inheritance */
+  }
+  
+  .text-link-nav-dark:hover {
+    color: rgb(255 255 255) !important; /* white with !important for hover */
+  }
+  
+  /* Links in dark backgrounds should remain light - but not navigation links */
+  .bg-gray-900 a:not([data-navigation]),
+  .bg-gray-800 a:not([data-navigation]),
+  .bg-slate-800 a:not([data-navigation]) {
     color: inherit;
   }
   
-  .bg-gray-900 a:hover,
-  .bg-gray-800 a:hover,
-  .bg-slate-800 a:hover {
+  .bg-gray-900 a:not([data-navigation]):hover,
+  .bg-gray-800 a:not([data-navigation]):hover,
+  .bg-slate-800 a:not([data-navigation]):hover {
     text-decoration: none;
   }
   
