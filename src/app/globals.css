@@ -193,14 +193,8 @@
     @apply text-blue-600 hover:text-blue-700 transition-colors;
   }
   
-  /* Deprecated - use text-link-primary instead */
-  .text-link-button {
-    @apply text-blue-600 hover:underline transition-colors underline-offset-4;
-  }
-  
-  /* Deprecated - use text-link-secondary instead */
-  .text-link-subtle {
-    @apply text-gray-600 hover:text-blue-600 hover:underline transition-colors underline-offset-4;
+  .text-link-nav-dark {
+    @apply text-gray-300 hover:text-white transition-colors;
   }
   
   /* Links in dark backgrounds should remain light */

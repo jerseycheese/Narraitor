@@ -125,7 +125,7 @@ export function Navigation() {
               
               <Link 
                 href="/" 
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                className="flex items-center gap-2 hover:opacity-90 transition-opacity"
               >
                 <LogoIcon size="small" className="brightness-0 invert" />
                 <LogoText size="sm" className="text-white" />
@@ -135,7 +135,7 @@ export function Navigation() {
               <div className="hidden md:flex items-center space-x-1 ml-8" data-testid="desktop-navigation">
                 <Link 
                   href="/worlds" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
                     pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : ''
                   }`}
                 >
@@ -143,7 +143,7 @@ export function Navigation() {
                 </Link>
                 <Link 
                   href="/characters" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
                     pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : ''
                   }`}
                 >
@@ -151,7 +151,7 @@ export function Navigation() {
                 </Link>
                 <Link 
                   href="/settings" 
-                  className={`px-3 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors ${
+                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
                     pathname === '/settings' ? 'text-white' : ''
                   }`}
                 >
