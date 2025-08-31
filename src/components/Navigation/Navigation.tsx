@@ -137,7 +137,7 @@ export function Navigation() {
                   href="/worlds" 
                   data-navigation
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : 'text-link-nav-dark'
+                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Worlds
@@ -146,7 +146,7 @@ export function Navigation() {
                   href="/characters" 
                   data-navigation
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : 'text-link-nav-dark'
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Characters
@@ -155,7 +155,7 @@ export function Navigation() {
                   href="/settings" 
                   data-navigation
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/settings' ? 'text-white' : 'text-link-nav-dark'
+                    pathname === '/settings' ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Settings
