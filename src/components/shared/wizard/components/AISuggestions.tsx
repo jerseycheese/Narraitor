@@ -76,7 +76,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
           <button
             type="button"
             onClick={onToggleAll}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-sm text-link-primary font-medium"
           >
             {allAccepted ? 'Deselect All' : 'Select All'}
           </button>

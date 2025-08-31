@@ -221,7 +221,7 @@ export function Navigation() {
                       <div className="border-t border-gray-200 mt-1 pt-1">
                         <Link
                           href="/worlds"
-                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                          className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav"
                           onClick={() => setShowWorldSwitcher(false)}
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

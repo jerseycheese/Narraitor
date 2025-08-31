@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { useWorldStore } from '@/state/worldStore';
+import { Button } from '@/components/ui/button';
 
 // Use the character type from the store rather than types/character.types
 interface Character {
@@ -41,7 +42,8 @@ interface CharacterSummaryProps {
  * 
  * Features:
  * - Character name, level, background, and portrait
- * - Two-column layout: Attributes (left) and Skills (right) on desktop
+ * - Collapsible design: Shows compact view by default, expands to show details
+ * - Two-column layout: Attributes (left) and Skills (right) on desktop when expanded
  * - Responsive design: Single column stack on mobile
  * - Multi-attribute skill linking: Shows which attributes each skill uses
  * - Real-time attribute values and skill levels
@@ -49,6 +51,7 @@ interface CharacterSummaryProps {
  * Supports multi-attribute skill system with attributeIds array
  */
 const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const worldStore = useWorldStore();
   const world = worldStore.worlds[character.worldId];
 
@@ -59,24 +62,59 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       role="region"
       aria-label="Character information"
     >
-      <div className="flex gap-4">
-        {/* Character Info Section */}
-        <div className="flex-1">
-          <Link href={`/characters/${character.id}`} className="block">
-            <h2 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors mb-1">
-              {character.name}
-            </h2>
-          </Link>
+      {/* Compact Header - Always Visible */}
+      <div className="flex items-center justify-between gap-4 cursor-pointer select-none hover:bg-gray-50 -m-2 p-2 rounded transition-colors"
+           onClick={() => setIsExpanded(!isExpanded)}>
+        <div className="flex items-center gap-4">
+          {/* Portrait Section - show in header when collapsed */}
+          {character.portrait && (
+            <div className="flex-shrink-0">
+              <Link href={`/characters/${character.id}`} onClick={(e) => e.stopPropagation()}>
+                <CharacterPortrait
+                  portrait={character.portrait}
+                  characterName={character.name}
+                  size="medium"
+                />
+              </Link>
+            </div>
+          )}
           
-          <p className="text-sm text-gray-600 mb-2">Level {character.level}</p>
-          
+          <div>
+            <Link href={`/characters/${character.id}`} className="block" onClick={(e) => e.stopPropagation()}>
+              <h2 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
+                {character.name}
+              </h2>
+            </Link>
+            <p className="text-sm text-gray-600">Level {character.level}</p>
+          </div>
+        </div>
+        
+        <Button 
+          type="button" 
+          variant="link"
+          size="sm"
+          className="p-0 h-auto"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          aria-expanded={isExpanded}
+          title={isExpanded ? 'Hide character details' : 'Show character details'}
+        >
+          {isExpanded ? 'Hide details' : 'Show details'}
+        </Button>
+      </div>
+
+      {/* Expanded Details - Only show when expanded */}
+      {isExpanded && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
           {character.background?.history && (
-            <p className="text-gray-700 mb-3">{character.background.history}</p>
+            <p className="text-gray-700 mb-4">{character.background.history}</p>
           )}
 
           {/* Attributes and Skills in two columns */}
           {((character.attributes && character.attributes.length > 0) || (character.skills && character.skills.length > 0)) && world && (
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Attributes Column */}
               {character.attributes && character.attributes.length > 0 && (
                 <div>
@@ -136,20 +174,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
             </div>
           )}
         </div>
-
-        {/* Portrait Section - only show if portrait exists */}
-        {character.portrait && (
-          <div className="flex-shrink-0">
-            <Link href={`/characters/${character.id}`}>
-              <CharacterPortrait
-                portrait={character.portrait}
-                characterName={character.name}
-                size="large"
-              />
-            </Link>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

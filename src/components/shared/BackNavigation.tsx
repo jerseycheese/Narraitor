@@ -27,7 +27,7 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
     return (
       <Link 
         href={href}
-        className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+        className="text-link-primary flex items-center gap-2"
       >
         <span>←</span> {label}
       </Link>
@@ -37,7 +37,7 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
   return (
     <button
       onClick={handleClick}
-      className="text-blue-600 hover:text-blue-800 flex items-center gap-2"
+      className="text-link-primary flex items-center gap-2"
     >
       <span>←</span> {label}
     </button>

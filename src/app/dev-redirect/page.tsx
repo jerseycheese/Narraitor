@@ -25,7 +25,7 @@ export default function DevRedirect() {
       </p>
       <p className="mt-2">
         If you&apos;re not redirected, please click{' '}
-        <Link href="/dev" className="text-blue-500 hover:underline">
+        <Link href="/dev" className="text-link-primary">
           here
         </Link>
         .

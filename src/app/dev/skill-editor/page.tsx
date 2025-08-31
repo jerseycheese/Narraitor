@@ -176,7 +176,7 @@ export default function SkillEditorTestPage() {
                             </div>
                             <button
                               onClick={() => setEditingSkill(skill.id)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                              className="text-link-primary text-sm font-medium"
                             >
                               Edit
                             </button>

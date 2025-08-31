@@ -180,18 +180,27 @@
     text-decoration-color: #2563eb; /* blue-600 - stronger underline */
   }
   
-  /* Button-style text links */
+  /* Standardized text link classes */
+  .text-link-primary {
+    @apply text-blue-600 hover:underline transition-colors underline-offset-4;
+  }
+  
+  .text-link-secondary {
+    @apply text-gray-600 hover:text-blue-600 hover:underline transition-colors underline-offset-4;
+  }
+  
+  .text-link-nav {
+    @apply text-blue-600 hover:text-blue-700 transition-colors;
+  }
+  
+  /* Deprecated - use text-link-primary instead */
   .text-link-button {
-    @apply inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium transition-colors;
+    @apply text-blue-600 hover:underline transition-colors underline-offset-4;
   }
   
-  .text-link-button:hover {
-    text-decoration: none;
-  }
-  
-  /* Subtle text links */
+  /* Deprecated - use text-link-secondary instead */
   .text-link-subtle {
-    @apply text-gray-600 hover:text-blue-600 transition-colors;
+    @apply text-gray-600 hover:text-blue-600 hover:underline transition-colors underline-offset-4;
   }
   
   /* Links in dark backgrounds should remain light */

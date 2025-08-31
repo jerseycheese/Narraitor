@@ -54,7 +54,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
       <div className="flex justify-between items-center pt-4 border-t">
         <Link
           href="/world/create"
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-link-primary font-medium"
         >
           Create New World
         </Link>

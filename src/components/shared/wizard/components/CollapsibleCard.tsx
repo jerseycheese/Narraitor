@@ -34,7 +34,7 @@ export const CollapsibleCard: React.FC<CollapsibleCardProps> = ({
           type="button" 
           variant="link"
           size="sm"
-          className="text-blue-600 hover:underline p-0 h-auto ml-2"
+          className="p-0 h-auto ml-2"
           onClick={(e) => {
             e.stopPropagation();
             onToggleExpand();

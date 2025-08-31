@@ -192,7 +192,7 @@ export function Typography() {
             <p className="text-gray-600 mb-4">
               This is a typical card description using gray-600 for secondary text.
             </p>
-            <a href="#" className="text-blue-600 hover:text-blue-700">Learn more →</a>
+            <a href="#" className="text-link-primary">Learn more →</a>
           </div>
           
           <div className="border-l-4 border-blue-500 pl-4 py-2">

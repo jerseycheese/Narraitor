@@ -470,7 +470,7 @@ export default function WorldCreationWizard({
           return (
             <div className="text-center py-12">
               <p className="text-red-600">Error: World not found. Please try creating the world again.</p>
-              <Button onClick={handleBack} variant="link" className="mt-4 text-blue-600 hover:underline p-0 h-auto">
+              <Button onClick={handleBack} variant="link" className="mt-4 p-0 h-auto">
                 Go Back
               </Button>
             </div>
