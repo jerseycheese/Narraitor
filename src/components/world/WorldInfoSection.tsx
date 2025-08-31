@@ -12,7 +12,7 @@ interface WorldInfoSectionProps {
 export function WorldInfoSection({ world }: WorldInfoSectionProps) {
   return (
     <section className="bg-white rounded-lg p-6 shadow mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Information</h2>
+      <h2 className="text-2xl font-semibold mb-4">World details</h2>
       <div className="grid grid-cols-2 gap-4">
         <DataField 
           label="Created" 
