@@ -28,6 +28,8 @@ export interface GeneratedWorldData {
   name: string;
   genre: string;
   description: string;
+  reference?: string;
+  relationship?: 'inspired_by' | 'set_within';
   attributes: Array<Omit<WorldAttribute, 'id' | 'worldId'>>;
   skills: Array<Omit<WorldSkill, 'id' | 'worldId'>>;
   settings: WorldSettings;
@@ -87,7 +89,7 @@ async function generateWithAI(options: WorldGenerationOptions): Promise<Generate
       ? `REQUIRED GENRE: The world MUST be in the "${options.genre}" genre. All world elements, themes, conflicts, and atmosphere must align with this genre.`
       : `IMPORTANT: Create a world based on the suggested name and setting context. Analyze the suggested name for time period and setting clues:
 
-FOR REALISTIC SETTINGS (anything mentioning years like "1970s", "1980s", "1990s", or real-world jobs like "Diner Cook", "Office Worker", "Taxi Driver"):
+FOR REALISTIC SETTINGS (anything mentioning years like "1960s", "1970s", "1980s", "1990s", or real-world jobs like "Diner Cook", "Office Worker", "Taxi Driver"):
 - ABSOLUTELY NO magical, supernatural, fantasy, or sci-fi elements
 - ABSOLUTELY NO reality-shifting, destiny, nexus points, or metaphysical concepts  
 - ABSOLUTELY NO special powers, mystical properties, or otherworldly elements
@@ -194,7 +196,7 @@ CRITICAL: This is the ${reference} universe itself, not something inspired by it
 Provide a JSON response with this exact structure:
 {
   "name": "A creative, unique name for this world (avoid common fantasy tropes)",
-  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_within' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST use ONLY these exact values: ${genreExamples}. Examples: The Office = "modern", Star Wars = "sci-fi", Lord of the Rings = "fantasy", Breaking Bad = "modern", Horror movies = "horror", Deadwood = "western". Use lowercase values exactly as shown.` : `The appropriate genre based on the world context. You MUST use ONLY these exact values: ${genreExamples}. Use lowercase values exactly as shown. Examples: magical worlds = "fantasy", futuristic = "sci-fi", contemporary = "modern", past eras = "historical", scary/dark = "horror", crime solving = "mystery", frontier = "western", dystopian tech = "cyberpunk", unique themes = "other".`}",
+  "genre": "${options.genre ? `"${options.genre}" (USER SPECIFIED - use this exactly)` : options.relationship === 'set_within' && options.reference ? `The ACTUAL genre of ${options.reference}. CRITICAL: You MUST use ONLY these exact values: ${genreExamples}. Examples: The Office = "modern", Star Wars = "sci-fi", Lord of the Rings = "fantasy", Breaking Bad = "modern", Horror movies = "horror", Deadwood = "western". Use lowercase values exactly as shown.` : `The appropriate genre based on the world context. You MUST use ONLY these exact values: ${genreExamples}. Use lowercase values exactly as shown. TEMPORAL GUIDELINES: Settings in 2000s-present = "modern", settings before 2000 (1990s and earlier) = "historical", futuristic = "sci-fi", magical = "fantasy", scary/dark = "horror", crime solving = "mystery", frontier/cowboys = "western", dystopian tech = "cyberpunk", unique themes = "other".`}",
   "description": "A 2-3 sentence description of the world and its unique features. CRITICAL: For realistic settings (anything with years like '1970s' or real jobs like 'Diner Cook'), use completely mundane, realistic language. Describe real equipment, real people, real challenges. NO magical, supernatural, mystical, or fantastical elements whatsoever. Example for 1970s diner: 'A classic roadside diner serving coffee and comfort food to truckers and locals. The grill sizzles with burgers and the jukebox plays classic rock while waitresses navigate busy lunch rushes and difficult customers.' MUST be completely original with no references to existing media.",
   "attributes": [
     {
@@ -394,6 +396,8 @@ Make the world interesting and playable with concepts appropriate to the setting
           normalizeSpecialChars: true,
           preserveStructure: true
         }),
+        reference: options.reference,
+        relationship: options.relationship,
         attributes,
         skills,
         settings

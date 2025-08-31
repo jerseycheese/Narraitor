@@ -40,6 +40,8 @@ export const worldCreationService = {
       name: customizations.name || generatedData.name,
       description: customizations.description || generatedData.description,
       genre: customizations.genre || generatedData.genre,
+      reference: generatedData.reference,
+      relationship: generatedData.relationship,
       attributes: [], // Will be populated below
       skills: [], // Will be populated below
       settings: generatedData.settings,
