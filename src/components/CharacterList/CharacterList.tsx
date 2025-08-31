@@ -48,11 +48,14 @@ export const CharacterList: React.FC<CharacterListProps> = ({
             <div className="flex gap-3 mb-3">
               {/* Character Info Section */}
               <div className="flex-1">
-                <Link href={`/characters/${character.id}`}>
-                  <h3 className="text-xl font-semibold text-link-primary cursor-pointer mb-1">
+                <h3 className="text-xl font-semibold mb-1">
+                  <Link 
+                    href={`/characters/${character.id}`} 
+                    className="text-link-primary no-underline cursor-pointer"
+                  >
                     {character.name}
-                  </h3>
-                </Link>
+                  </Link>
+                </h3>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm text-gray-500">Level {character.level}</span>
                   {character.background?.isKnownFigure !== undefined && (

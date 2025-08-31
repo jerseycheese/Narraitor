@@ -80,11 +80,15 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           )}
           
           <div>
-            <Link href={`/characters/${character.id}`} className="block" onClick={(e) => e.stopPropagation()}>
-              <h2 className="text-lg font-bold text-link-primary">
+            <h2 className="text-lg font-bold">
+              <Link 
+                href={`/characters/${character.id}`} 
+                className="text-link-primary no-underline" 
+                onClick={(e) => e.stopPropagation()}
+              >
                 {character.name}
-              </h2>
-            </Link>
+              </Link>
+            </h2>
             <p className="text-sm text-gray-600">Level {character.level}</p>
           </div>
         </div>

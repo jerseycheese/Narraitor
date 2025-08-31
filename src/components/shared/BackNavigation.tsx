@@ -27,7 +27,7 @@ export function BackNavigation({ href, label, onClick }: BackNavigationProps) {
     return (
       <Link 
         href={href}
-        className="text-link-primary flex items-center gap-2"
+        className="text-link-primary flex items-center gap-2 no-underline"
       >
         <span>←</span> {label}
       </Link>

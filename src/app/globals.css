@@ -195,18 +195,23 @@
   
   .text-link-nav-dark {
     @apply text-gray-300 hover:text-white transition-colors;
+    color: rgb(209 213 219) !important; /* gray-300 with !important to override inheritance */
   }
   
-  /* Links in dark backgrounds should remain light */
-  .bg-gray-900 a,
-  .bg-gray-800 a,
-  .bg-slate-800 a {
+  .text-link-nav-dark:hover {
+    color: rgb(255 255 255) !important; /* white with !important for hover */
+  }
+  
+  /* Links in dark backgrounds should remain light - but not navigation links */
+  .bg-gray-900 a:not([data-navigation]),
+  .bg-gray-800 a:not([data-navigation]),
+  .bg-slate-800 a:not([data-navigation]) {
     color: inherit;
   }
   
-  .bg-gray-900 a:hover,
-  .bg-gray-800 a:hover,
-  .bg-slate-800 a:hover {
+  .bg-gray-900 a:not([data-navigation]):hover,
+  .bg-gray-800 a:not([data-navigation]):hover,
+  .bg-slate-800 a:not([data-navigation]):hover {
     text-decoration: none;
   }
   
