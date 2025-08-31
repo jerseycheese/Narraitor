@@ -81,7 +81,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
           
           <div>
             <Link href={`/characters/${character.id}`} className="block" onClick={(e) => e.stopPropagation()}>
-              <h2 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors">
+              <h2 className="text-lg font-bold text-link-primary">
                 {character.name}
               </h2>
             </Link>

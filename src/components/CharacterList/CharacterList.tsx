@@ -49,7 +49,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
               {/* Character Info Section */}
               <div className="flex-1">
                 <Link href={`/characters/${character.id}`}>
-                  <h3 className="text-xl font-semibold hover:text-blue-600 transition-colors cursor-pointer mb-1">
+                  <h3 className="text-xl font-semibold text-link-primary cursor-pointer mb-1">
                     {character.name}
                   </h3>
                 </Link>
