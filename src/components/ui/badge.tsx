@@ -20,6 +20,10 @@ const badgeVariants = cva(
         success: "border-transparent bg-green-600 text-white hover:bg-green-700",
         warning: "border-transparent bg-yellow-600 text-white hover:bg-yellow-700",
         info: "border-transparent bg-cyan-600 text-white hover:bg-cyan-700",
+        // Static entity badge variants (no hover states)
+        "success-static": "border-transparent bg-green-600 text-white",
+        "info-static": "border-transparent bg-cyan-600 text-white",
+        "default-static": "border-transparent bg-blue-600 text-white",
         // Skill requirement variants
         available: "border-transparent bg-green-100 text-green-800 hover:bg-green-200",
         unavailable: "border-transparent bg-red-100 text-red-800 hover:bg-red-200",

@@ -30,6 +30,12 @@ export interface CardActionGroupProps {
   layout?: 'horizontal' | 'vertical';
   /** Gap between buttons */
   gap?: 'sm' | 'md' | 'lg';
+  /** Button size - applies to all buttons if primarySize and secondarySize not specified */
+  size?: 'sm' | 'md' | 'lg';
+  /** Primary button size - overrides size for primary actions */
+  primarySize?: 'sm' | 'md' | 'lg';
+  /** Secondary button size - overrides size for secondary actions */
+  secondarySize?: 'sm' | 'md' | 'lg';
   /** Custom CSS classes for the container */
   className?: string;
 }
@@ -55,6 +61,9 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
   secondaryActions = [],
   layout = 'horizontal',
   gap = 'md',
+  size = 'md',
+  primarySize,
+  secondarySize,
   className = ''
 }) => {
   const gapClasses = {
@@ -63,8 +72,22 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
     lg: 'gap-3'
   };
 
-  const getButtonClasses = (action: CardAction) => {
-    const baseClasses = 'px-4 py-2 rounded-md font-medium transition-colors';
+  const sizeClasses = {
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base'
+  };
+
+  const getButtonClasses = (action: CardAction, actionType: 'primary' | 'secondary') => {
+    // Determine which size to use
+    let buttonSize = size;
+    if (actionType === 'primary' && primarySize) {
+      buttonSize = primarySize;
+    } else if (actionType === 'secondary' && secondarySize) {
+      buttonSize = secondarySize;
+    }
+    
+    const baseClasses = `${sizeClasses[buttonSize]} rounded-md font-medium transition-colors`;
     const flexClass = action.flex ? 'flex-1' : '';
     
     let variantClasses = '';
@@ -94,12 +117,12 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
     return `${baseClasses} ${variantClasses} ${flexClass} ${action.className || ''}`;
   };
 
-  const renderActions = (actions: CardAction[]) => {
+  const renderActions = (actions: CardAction[], actionType: 'primary' | 'secondary') => {
     return actions.map(action => (
       <button
         key={action.key}
         onClick={action.onClick}
-        className={`${getButtonClasses(action)} flex items-center justify-center gap-2`}
+        className={`${getButtonClasses(action, actionType)} flex items-center justify-center gap-2`}
         title={action.title}
         data-testid={action.testId}
         type="button"
@@ -118,12 +141,12 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
     <div className={`space-y-2 ${className}`}>
       {primaryActions.length > 0 && (
         <div className={`${containerClasses} ${gapClasses[gap]}`}>
-          {renderActions(primaryActions)}
+          {renderActions(primaryActions, 'primary')}
         </div>
       )}
       {secondaryActions.length > 0 && (
         <div className={`${containerClasses} ${gapClasses[gap]}`}>
-          {renderActions(secondaryActions)}
+          {renderActions(secondaryActions, 'secondary')}
         </div>
       )}
     </div>

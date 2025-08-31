@@ -24,9 +24,8 @@ describe('WorldCard', () => {
     // Verify genre (theme) is displayed
     expect(screen.getByText('Fantasy')).toBeInTheDocument();
     
-    // Verify timestamps are displayed (check for the formatted date strings)
+    // Verify timestamp is displayed (check for the formatted date string)
     expect(screen.getByText(`Created: ${formatDate(mockWorld.createdAt)}`)).toBeInTheDocument();
-    expect(screen.getByText(`Updated: ${formatDate(mockWorld.updatedAt)}`)).toBeInTheDocument();
   });
 
   // Test case for visual presentation
@@ -43,7 +42,6 @@ describe('WorldCard', () => {
     
     // Verify timestamp information is present
     expect(screen.getByText(/Created:/)).toBeInTheDocument();
-    expect(screen.getByText(/Updated:/)).toBeInTheDocument();
   });
   
   // Test case for edge cases in data display
@@ -62,15 +60,13 @@ describe('WorldCard', () => {
     expect(screen.getByText('Fantasy')).toBeInTheDocument(); // Genre should still show
   });
 
-  // Test case for triggering selection
-  test('calls onSelect when card is clicked', () => {
-    const mockOnSelect = jest.fn();
-    render(<WorldCard world={mockWorld} onSelect={mockOnSelect} onDelete={jest.fn()} />);
+  // Test case for world name navigation
+  test('world name links to world detail page', () => {
+    render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
     
-    // Click on the world name (which should be clickable)
-    const worldHeading = screen.getByRole('heading', { name: mockWorld.name });
-    fireEvent.click(worldHeading);
-    expect(mockOnSelect).toHaveBeenCalledWith(mockWorld.id);
+    // World name should be wrapped in a link to the detail page
+    const worldLink = screen.getByRole('link', { name: mockWorld.name });
+    expect(worldLink).toHaveAttribute('href', `/world/${mockWorld.id}`);
   });
 
   // New test for Play functionality (navigates to characters when no characters exist)

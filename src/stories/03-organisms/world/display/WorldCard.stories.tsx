@@ -1,7 +1,89 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { World } from '@/types/world.types';
+import { Character } from '@/state/characterStore';
 import WorldCard from '@/components/WorldCard/WorldCard';
 import React from 'react';
+
+// Mock character data
+const mockCharacters: Character[] = [
+  {
+    id: 'char1',
+    name: 'Eldara the Wise',
+    description: 'A powerful wizard with centuries of knowledge',
+    worldId: '1',
+    level: 15,
+    attributes: [],
+    skills: [],
+    background: {
+      history: 'A master of arcane arts',
+      personality: 'Wise and patient',
+      goals: ['Protect the realm'],
+      fears: ['The return of darkness'],
+      relationships: [],
+    },
+    isPlayer: false,
+    status: { health: 100, maxHealth: 100, conditions: [] },
+    inventory: { characterId: 'char1', items: [], capacity: 20, categories: [] },
+    portrait: {
+      type: 'ai-generated',
+      url: 'https://picsum.photos/64/64?random=201',
+      generatedAt: '2023-01-01T10:00:00Z',
+      prompt: 'Wise elderly wizard with flowing robes'
+    },
+    createdAt: '2023-01-01T10:00:00Z',
+    updatedAt: '2023-01-01T10:00:00Z',
+  },
+  {
+    id: 'char2',
+    name: 'Sir Marcus the Bold',
+    description: 'A brave knight and defender of justice',
+    worldId: '1',
+    level: 12,
+    attributes: [],
+    skills: [],
+    background: {
+      history: 'Champion of the royal guard',
+      personality: 'Courageous and noble',
+      goals: ['Uphold justice'],
+      fears: ['Failing those he protects'],
+      relationships: [],
+    },
+    isPlayer: true,
+    status: { health: 100, maxHealth: 100, conditions: [] },
+    inventory: { characterId: 'char2', items: [], capacity: 15, categories: [] },
+    portrait: {
+      type: 'ai-generated',
+      url: 'https://picsum.photos/64/64?random=202',
+      generatedAt: '2023-01-02T10:00:00Z',
+      prompt: 'Noble knight in shining armor'
+    },
+    createdAt: '2023-01-02T10:00:00Z',
+    updatedAt: '2023-01-02T10:00:00Z',
+  },
+  {
+    id: 'char3',
+    name: 'Luna Shadowstep',
+    description: 'A mysterious rogue with unmatched stealth skills',
+    worldId: '1',
+    level: 10,
+    attributes: [],
+    skills: [],
+    background: {
+      history: 'Former thief turned hero',
+      personality: 'Cunning and independent',
+      goals: ['Uncover ancient secrets'],
+      fears: ['Being trapped or confined'],
+      relationships: [],
+    },
+    isPlayer: false,
+    status: { health: 100, maxHealth: 100, conditions: [] },
+    inventory: { characterId: 'char3', items: [], capacity: 25, categories: [] },
+    // No portrait - will show initials fallback
+    createdAt: '2023-01-03T10:00:00Z',
+    updatedAt: '2023-01-03T10:00:00Z',
+  }
+];
+
 
 // Mock world data
 const mockWorld: World = {
@@ -27,51 +109,6 @@ const mockWorld: World = {
   updatedAt: '2023-12-15T14:30:00Z',
 };
 
-const sciFiWorld: World = {
-  id: '2',
-  name: 'Neo Tokyo 2185',
-  description: 'A cyberpunk dystopia where megacorporations rule and underground hackers fight for freedom in the digital realm.',
-  genre: 'fantasy',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 10,
-    maxSkills: 10,
-    attributePointPool: 100,
-    skillPointPool: 100,
-  },
-  image: {
-    type: 'ai-generated',
-    url: 'https://picsum.photos/800/400?random=100',
-    generatedAt: '2023-06-15T08:00:00Z',
-    prompt: 'A futuristic cyberpunk cityscape with neon lights and towering skyscrapers'
-  },
-  createdAt: '2023-06-15T08:00:00Z',
-  updatedAt: '2023-06-15T08:00:00Z',
-};
-
-const westernWorld: World = {
-  id: '3',
-  name: 'Dustbowl County',
-  description: 'The lawless frontier where outlaws roam and justice comes at the end of a six-shooter.',
-  genre: 'fantasy',
-  attributes: [],
-  skills: [],
-  settings: {
-    maxAttributes: 10,
-    maxSkills: 10,
-    attributePointPool: 100,
-    skillPointPool: 100,
-  },
-  image: {
-    type: 'ai-generated',
-    url: 'https://picsum.photos/400/300?random=101',
-    generatedAt: '2024-01-01T00:00:00Z',
-    prompt: 'A wild west desert landscape with red rocks and tumbleweeds'
-  },
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-12-01T16:45:00Z',
-};
 
 // Create a wrapper component that provides both router and store mocks
 const WorldCardWrapper = (args: Parameters<typeof WorldCard>[0]) => {
@@ -124,42 +161,12 @@ type Story = StoryObj<typeof WorldCard>;
 export const Default: Story = {
   args: {
     world: mockWorld,
+    characters: mockCharacters,
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
 };
 
-// Story with Cyberpunk theme
-export const CyberpunkWorld: Story = {
-  args: {
-    world: sciFiWorld,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
-    onDelete: (id: string) => console.log(`Delete world: ${id}`),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A WorldCard displaying a cyberpunk-themed world'
-      }
-    }
-  },
-};
-
-// Story with Western theme
-export const WesternWorld: Story = {
-  args: {
-    world: westernWorld,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
-    onDelete: (id: string) => console.log(`Delete world: ${id}`),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A WorldCard displaying a western-themed world'
-      }
-    }
-  },
-};
 
 
 // Story showing active world state
@@ -167,75 +174,34 @@ export const ActiveWorld: Story = {
   args: {
     world: mockWorld,
     isActive: true,
-    characterCount: 3,
+    characters: mockCharacters,
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
       description: {
-        story: 'A WorldCard in its active state with green header and action buttons'
+        story: 'A WorldCard in its active state with green header and character list'
       }
     }
   },
 };
 
-// Story showing inactive world with Make Active button
-export const InactiveWorld: Story = {
-  args: {
-    world: sciFiWorld,
-    isActive: false,
-    characterCount: 1,
-    onSelect: (id: string) => console.log(`Selected world: ${id}`),
-    onDelete: (id: string) => console.log(`Delete world: ${id}`),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A WorldCard in inactive state showing the "Make Active" button overlay'
-      }
-    }
-  },
-};
-
-// Story with empty description
-export const MinimalContent: Story = {
+// Story with no image layout
+export const NoImage: Story = {
   args: {
     world: {
       ...mockWorld,
-      name: 'Minimal World',
-      description: '',
-      genre: 'fantasy',
-      image: undefined, // No image to test the fallback layout
+      image: undefined,
     },
-    onSelect: () => console.log('Selected minimal world'),
-    onDelete: () => console.log('Delete minimal world'),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'A WorldCard with minimal content and no image to test edge cases'
-      }
-    }
-  },
-};
-
-// Story without image to show the alternative Make Active button position
-export const NoImageInactive: Story = {
-  args: {
-    world: {
-      ...westernWorld,
-      image: undefined, // Remove image to show alternative button placement
-    },
-    isActive: false,
-    characterCount: 0,
+    characters: mockCharacters,
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
       description: {
-        story: 'A WorldCard without an image showing the Make Active button in content area'
+        story: 'A WorldCard without an image showing alternative layout'
       }
     }
   },
@@ -252,7 +218,7 @@ export const SetInWorld: Story = {
       reference: 'Lord of the Rings',
       relationship: 'set_within'
     },
-    characterCount: 5,
+    characters: mockCharacters.slice(0, 2),
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
@@ -265,48 +231,41 @@ export const SetInWorld: Story = {
   },
 };
 
-// Story showing "Based On" world type
-export const BasedOnWorld: Story = {
+// Story showing "Inspired By" world type
+export const InspiredByWorld: Story = {
   args: {
     world: {
-      ...sciFiWorld,
+      ...mockWorld,
       name: 'Chrome Shadows',
       description: 'A neon-soaked metropolis where corporate espionage and street-level hackers clash in a world inspired by classic cyberpunk themes.',
-      genre: 'fantasy',
       reference: 'Blade Runner',
       relationship: 'inspired_by'
     },
-    characterCount: 2,
+    characters: mockCharacters.slice(0, 2),
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
       description: {
-        story: 'A WorldCard showing a world inspired by Blade Runner with green "Inspired by" badge'
+        story: 'A WorldCard showing a world inspired by another universe with "Inspired by" badge'
       }
     }
   },
 };
 
-// Story showing Original world type
-export const OriginalWorld: Story = {
+// Story with no characters
+export const NoCharacters: Story = {
   args: {
-    world: {
-      ...westernWorld,
-      name: 'Dreamscape Frontier',
-      description: 'A completely original world where reality bends to the will of dreamwalkers and nightmares take physical form in the waking world.',
-      genre: 'fantasy',
-      // No reference or relationship = original world
-    },
-    characterCount: 3,
+    world: mockWorld,
+    characters: [],
     onSelect: (id: string) => console.log(`Selected world: ${id}`),
     onDelete: (id: string) => console.log(`Delete world: ${id}`),
   },
   parameters: {
     docs: {
       description: {
-        story: 'A WorldCard showing a completely original world with blue "Original World" badge'
+        story: 'A WorldCard with no characters'
       }
     }
   },

@@ -2,7 +2,6 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Globe, Sparkles, Zap } from 'lucide-react';
 import { World } from '@/types/world.types';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
@@ -25,8 +24,8 @@ interface WorldCardProps {
   onSelect: (worldId: string) => void;
   /** Callback when user wants to delete this world */
   onDelete: (worldId: string) => void;
-  /** Number of characters in this world */
-  characterCount?: number;
+  /** Characters in this world */
+  characters?: Character[];
   /** Optional store actions for testing */
   _storeActions?: {
     setCurrentWorld: (id: string) => void;
@@ -62,7 +61,6 @@ interface WorldCardProps {
  *   isActive={world.id === currentWorldId}
  *   onSelect={(id) => setCurrentWorld(id)}
  *   onDelete={(id) => deleteWorld(id)}
- *   characterCount={getCharacterCount(world.id)}
  * />
  */
 const WorldCard: React.FC<WorldCardProps> = ({ 
@@ -70,7 +68,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   isActive = false,
   onSelect, 
   onDelete,
-  characterCount = 0,
+  characters = [],
   _storeActions,
   _router
 }) => {
@@ -152,110 +150,156 @@ const WorldCard: React.FC<WorldCardProps> = ({
     <ActiveStateCard
       isActive={isActive}
       activeText="Currently Active World"
-      onClick={() => onSelect?.(world.id)}
       testId="world-card"
       hasImage={!!world.image?.url}
     >
-      {/* World Image */}
+      {/* World Image with overlay */}
       {world.image?.url && (
-        <div className="h-48 overflow-hidden bg-gray-100">
-          <Image 
-            src={world.image.url} 
-            alt={`${world.name} world`}
-            width={400}
-            height={192}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Link href={`/world/${world.id}`}>
+          <div className="h-48 overflow-hidden bg-gray-100 relative cursor-pointer">
+            <Image 
+              src={world.image.url} 
+              alt={`${world.name} world`}
+              width={400}
+              height={192}
+              className="w-full h-full object-cover"
+            />
+            {/* World name overlay */}
+            <div className="absolute bottom-0 left-0 right-0">
+              <div className="bg-gradient-to-t from-black/80 to-transparent px-4 py-4">
+                <h2 
+                  data-testid="world-card-name" 
+                  className="text-xl sm:text-2xl font-bold text-white leading-tight"
+                >
+                  {world.name}
+                </h2>
+                
+                {/* Genre badge on overlay */}
+                {world.genre && (
+                  <div className="mt-2">
+                    <span 
+                      data-testid="world-card-genre" 
+                      className="px-2 py-1 text-xs font-medium text-blue-200 bg-blue-900/70 rounded-full backdrop-blur-sm"
+                    >
+                      {getGenreLabel(world.genre)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Link>
       )}
       
       <div className="p-4 flex-grow flex flex-col">
         {/* Content area that grows to fill space */}
         <div className="flex-grow">
-          <header className="mb-4"> 
-            <Link 
-              href={`/world/${world.id}`}
-              className="inline-block"
-            >
-              <h2 
-                data-testid="world-card-name" 
-                className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight mb-2"
+          {/* For cards without images, show the world name here */}
+          {!world.image?.url && (
+            <header className="mb-4"> 
+              <Link 
+                href={`/world/${world.id}`}
+                className="inline-block"
               >
-                {world.name}
-              </h2>
-            </Link>
-            
-            {/* Genre and world type badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              {world.genre && (
-                <span 
-                  data-testid="world-card-genre" 
-                  className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
+                <h2 
+                  data-testid="world-card-name" 
+                  className="text-xl sm:text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors leading-tight mb-2"
                 >
-                  {getGenreLabel(world.genre)}
-                </span>
-              )}
+                  {world.name}
+                </h2>
+              </Link>
               
-              {/* World type badge */}
-              {world.relationship && world.reference ? (
-                <Badge
-                  icon={world.relationship === 'set_within' ? 
-                    <Globe className="w-3 h-3 text-white" /> : 
-                    <Sparkles className="w-3 h-3 text-white" />
-                  }
-                  variant={world.relationship === 'set_within' ? 'info' : 'success'}
-                  data-testid="world-card-type"
-                >
-                  {world.relationship === 'set_within' ? `Set in ${world.reference}` : `Inspired by ${world.reference}`}
-                </Badge>
-              ) : (
-                <Badge
-                  icon={<Zap className="w-3 h-3 text-white" />}
-                  variant="default"
-                  data-testid="world-card-type"
-                >
-                  Original World
-                </Badge>
+              {/* Genre badge for cards without images */}
+              {world.genre && (
+                <div className="mb-3">
+                  <span 
+                    data-testid="world-card-genre" 
+                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
+                  >
+                    {getGenreLabel(world.genre)}
+                  </span>
+                </div>
               )}
-            </div>
+            </header>
+          )}
           
-          {/* Character count for all worlds */}
-          <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (actualRouter) {
-                  actualRouter.push(`/characters?worldId=${world.id}`);
-                }
-              }}
-              className="text-link-button"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              {characterCount} character{characterCount !== 1 ? 's' : ''}
-            </button>
+          {/* Character badges and manage link */}
+          <div className="mb-8">
+            {characters.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {characters.map((char) => (
+                  <button
+                    key={char.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (actualRouter) {
+                        actualRouter.push(`/characters/${char.id}`);
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 transition-colors rounded-full text-sm font-medium text-blue-700 border border-blue-200 cursor-pointer"
+                    title={`Play as ${char.name} - Level ${char.level}`}
+                  >
+                    {/* Character portrait or placeholder */}
+                    {char.portrait?.url ? (
+                      <Image
+                        src={char.portrait.url}
+                        alt={`${char.name} portrait`}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex-shrink-0 flex items-center justify-center">
+                        <span className="text-white text-sm font-bold leading-none">
+                          {char.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-base">
+                      {char.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          </header>
           
-          <div className="mb-4 space-y-3">
+          <div className="mb-8 space-y-3">
             <p 
               data-testid="world-card-description" 
               className="text-gray-700 leading-relaxed"
             >
               {world.description}
             </p>
+            
+            {/* World type badge */}
+            <div className="flex justify-start">
+              {world.reference ? (
+                <Badge 
+                  variant={world.relationship === 'set_within' ? 'info-static' : 'success-static'}
+                  data-testid="world-card-type"
+                  className="text-xs"
+                >
+                  {world.relationship === 'set_within' ? 'Set in' : 'Inspired by'} {world.reference}
+                </Badge>
+              ) : (
+                <Badge 
+                  variant="default-static"
+                  data-testid="world-card-type"
+                  className="text-xs"
+                >
+                  Original World
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
         
         {/* Footer with buttons - always at bottom */}
         <footer className="mt-auto pt-3 border-t border-gray-200">
-        <div className="flex justify-between text-sm text-gray-600 mb-3">
+        <div className="text-sm text-gray-600 mb-3">
           <time data-testid="world-card-createdAt">
             Created: {formatDate(world.createdAt)}
-          </time>
-          <time data-testid="world-card-updatedAt">
-            Updated: {formatDate(world.updatedAt)}
           </time>
         </div>
         <div className="space-y-2">
@@ -275,12 +319,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 onClick: handleCreateCharacter,
                 variant: 'primary',
                 flex: true,
-                className: 'bg-green-600 hover:bg-green-700',
-                icon: (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                )
+                className: 'bg-green-600 hover:bg-green-700'
               },
               {
                 key: 'play',
@@ -289,13 +328,20 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 variant: 'primary',
                 flex: true,
                 className: 'bg-indigo-600 hover:bg-indigo-700',
-                icon: (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ),
                 testId: 'world-card-actions-play-button'
+              },
+              {
+                key: 'manage-characters',
+                text: 'Manage Characters',
+                onClick: (e) => {
+                  e.stopPropagation();
+                  if (actualRouter) {
+                    actualRouter.push(`/characters?worldId=${world.id}`);
+                  }
+                },
+                variant: 'primary',
+                flex: true,
+                className: 'bg-blue-600 hover:bg-blue-700'
               }
             ]}
             secondaryActions={[
@@ -308,17 +354,13 @@ const WorldCard: React.FC<WorldCardProps> = ({
                     actualRouter.push(`/world/${world.id}`);
                   }
                 },
-                variant: 'primary',
-                className: 'bg-blue-600 hover:bg-blue-700',
-                flex: true
+                variant: 'secondary'
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: handleEditClick,
-                variant: 'primary',
-                className: 'bg-blue-600 hover:bg-blue-700',
-                flex: true,
+                variant: 'secondary',
                 testId: 'world-card-actions-edit-button'
               },
               {
@@ -328,6 +370,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 variant: 'danger'
               }
             ]}
+            primarySize="md"
+            secondarySize="sm"
           />
         </div>
       </footer>

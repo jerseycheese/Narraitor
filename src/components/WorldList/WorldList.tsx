@@ -17,12 +17,14 @@ interface WorldListProps {
 }
 
 const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectWorld, onDeleteWorld, _router, _storeActions }) => {
-  // Get character counts for each world
-  const characters = useCharacterStore.getState().characters;
-  const characterCounts = worlds.reduce((counts, world) => {
-    counts[world.id] = (Object.values(characters) as Character[]).filter(char => char.worldId === world.id).length;
-    return counts;
-  }, {} as Record<string, number>);
+  // Get character counts and character data for each world using proper hook
+  const characters = useCharacterStore((state) => state.characters);
+  const allCharacters = Object.values(characters) as Character[];
+  const charactersByWorld = worlds.reduce((acc, world) => {
+    acc[world.id] = allCharacters.filter(char => char.worldId === world.id);
+    return acc;
+  }, {} as Record<string, Character[]>);
+  
   if (worlds.length === 0) {
     return (
       <section data-testid="world-list-empty-message" className="p-12 text-center bg-gray-50 rounded-lg">
@@ -69,7 +71,7 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
             key={world.id}
             world={world}
             isActive={world.id === currentWorldId}
-            characterCount={characterCounts[world.id] || 0}
+            characters={charactersByWorld[world.id] || []}
             onSelect={onSelectWorld}
             onDelete={onDeleteWorld}
             _router={_router}
