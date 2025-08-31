@@ -11,6 +11,8 @@ import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CharacterHeader } from '@/components/characters/CharacterHeader';
 import { CharacterDetailsDisplay } from '@/components/characters/CharacterDetailsDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { Hero } from '@/components/shared/Hero';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 export default function CharacterViewPage() {
   const params = useParams();
@@ -62,10 +64,29 @@ export default function CharacterViewPage() {
   ];
 
   return (
-    <PageLayout title={character.name} description={`${character.level ? `Level ${character.level} • ` : ''}${world.name}`}>
-      <div className="mb-6 -mt-8">
-        <BackNavigation href="/characters" label="Back to Characters" />
-      </div>
+    <PageLayout>
+      {/* Ultra-thin world hero */}
+      {world.image?.url && (
+        <div className="mb-6">
+          <Hero
+            title={character.name}
+            image={{
+              url: world.image.url,
+              alt: `${world.name} world`
+            }}
+            subtitle={`${character.level ? `Level ${character.level} • ` : ''}${world.name}${world.genre ? ` • ${getGenreLabel(world.genre)}` : ''}`}
+            height="h-20 sm:h-24"
+            titleElement="h1"
+          />
+        </div>
+      )}
+
+      {/* Back navigation for pages without world image */}
+      {!world.image?.url && (
+        <div className="mb-6">
+          <BackNavigation href="/characters" label="Back to Characters" />
+        </div>
+      )}
 
       <ActionButtonGroup actions={actionButtons} className="mb-6" />
 
