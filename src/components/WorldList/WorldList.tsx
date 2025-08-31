@@ -24,7 +24,6 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
     acc[world.id] = allCharacters.filter(char => char.worldId === world.id);
     return acc;
   }, {} as Record<string, Character[]>);
-  
   if (worlds.length === 0) {
     return (
       <section data-testid="world-list-empty-message" className="p-12 text-center bg-gray-50 rounded-lg">
