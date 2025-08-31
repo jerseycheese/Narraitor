@@ -15,7 +15,7 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
 
   return (
     <section className="bg-white rounded-lg p-6 shadow mb-6">
-      <h2 className="text-2xl font-semibold mb-4">Skills</h2>
+      <h2 className="text-2xl font-semibold mb-4">Skills that characters can learn in this world</h2>
       <div className="space-y-3">
         {skills.map((skill) => (
           <div key={skill.id} className="border-l-4 border-blue-500 bg-gray-50 rounded-r-lg p-4">

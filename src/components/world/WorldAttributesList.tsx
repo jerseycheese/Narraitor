@@ -14,7 +14,7 @@ export function WorldAttributesList({ attributes }: WorldAttributesListProps) {
   }
 
   return (
-    <SectionWrapper title="Attributes">
+    <SectionWrapper title="Attributes that apply to characters in this world">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {attributes.map((attr) => (
           <div key={attr.id} className="bg-gray-50 rounded-lg p-4">
