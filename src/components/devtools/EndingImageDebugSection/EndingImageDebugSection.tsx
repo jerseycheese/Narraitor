@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CollapsibleSection } from '../CollapsibleSection';
-import { useNarrativeStore } from '../../../state/narrativeStore';
-import { useCharacterStore, type Character } from '../../../state/characterStore';
-import { useWorldStore } from '../../../state/worldStore';
-import type { StoryEnding, EndingTone, EndingType } from '../../../types/narrative.types';
+import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { useNarrativeStore } from '@/state/narrativeStore';
+import { useCharacterStore, type Character } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
+import type { StoryEnding, EndingTone, EndingType } from '@/types/narrative.types';
 import { capitalize } from '@/lib/utils';
 
 export function EndingImageDebugSection() {

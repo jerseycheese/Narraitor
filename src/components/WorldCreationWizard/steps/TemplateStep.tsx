@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import TemplateSelector from '../../world/TemplateSelector';
-import { SmartTemplates } from '../../world/SmartTemplates';
-import { applyWorldTemplate } from '../../../lib/templates/templateLoader';
+import TemplateSelector from '@/components/world/TemplateSelector';
+import { SmartTemplates } from '@/components/world/SmartTemplates';
+import { applyWorldTemplate } from '@/lib/templates/templateLoader';
 import { wizardStyles, WizardFormSection } from '@/components/shared/wizard';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { WorldTemplate } from '@/lib/ai/templateGenerator';
-import { AttributeSuggestion, SkillSuggestion } from '../WizardState';
+import { AttributeSuggestion, SkillSuggestion } from '@/types/ai-suggestions.types';
 import { World } from '@/types/world.types';
 import { Button } from '@/components/ui/button';
 

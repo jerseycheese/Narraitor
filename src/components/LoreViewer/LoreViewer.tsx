@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { useLoreStore } from '../../state/loreStore';
-import type { LoreCategory } from '../../types';
+import { useLoreStore } from '@/state/loreStore';
+import type { LoreCategory } from '@/types';
 
 interface LoreViewerProps {
   worldId: string;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, type CharacterAttribute, type CharacterSkill } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { World } from '@/types/world.types';
 // Removed direct AI client imports - using API routes instead
@@ -114,13 +114,11 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
               fears: character.background.fears || [],
               relationships: []
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            attributes: character.attributes.map((attr: any) => ({
+            attributes: character.attributes.map((attr: CharacterAttribute) => ({
               attributeId: attr.id,
               value: attr.modifiedValue
             })),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            skills: character.skills.map((skill: any) => ({
+            skills: character.skills.map((skill: CharacterSkill) => ({
               skillId: skill.id,
               level: skill.level,
               experience: 0,
@@ -221,15 +219,13 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Attributes Section */}
       <AttributesForm
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        attributes={character.attributes.map((attr: any) => ({
+        attributes={character.attributes.map((attr: CharacterAttribute) => ({
           attributeId: world.attributes.find(wa => wa.name === attr.name)?.id || attr.id,
           value: attr.baseValue
         }))}
         world={world}
         onAttributesChange={(formAttributes) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const updatedAttributes = character.attributes.map((attr: any) => {
+          const updatedAttributes = character.attributes.map((attr: CharacterAttribute) => {
             const formAttr = formAttributes.find(fa => {
               const worldAttr = world.attributes.find(wa => wa.id === fa.attributeId);
               return worldAttr?.name === attr.name;
@@ -242,8 +238,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       
       {/* Skills Section */}
       <SkillsForm
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        skills={character.skills.map((skill: any) => ({
+        skills={character.skills.map((skill: CharacterSkill) => ({
           skillId: world.skills.find(ws => ws.name === skill.name)?.id || skill.id,
           level: skill.level,
           experience: 0,
@@ -251,8 +246,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         }))}
         world={world}
         onSkillsChange={(formSkills) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const updatedSkills = character.skills.map((skill: any) => {
+          const updatedSkills = character.skills.map((skill: CharacterSkill) => {
             const formSkill = formSkills.find(fs => {
               const worldSkill = world.skills.find(ws => ws.id === fs.skillId);
               return worldSkill?.name === skill.name;

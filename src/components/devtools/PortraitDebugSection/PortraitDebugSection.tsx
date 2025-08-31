@@ -2,14 +2,14 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { CollapsibleSection } from '../CollapsibleSection';
-import { PortraitGenerator } from '../../../lib/ai/portraitGenerator';
-import { createAIClient } from '../../../lib/ai';
-import { useCharacterStore, type Character as StoreCharacter } from '../../../state/characterStore';
-import { useWorldStore } from '../../../state/worldStore';
+import { CollapsibleSection } from '@/components/devtools/CollapsibleSection';
+import { PortraitGenerator } from '@/lib/ai/portraitGenerator';
+import { createAIClient } from '@/lib/ai';
+import { useCharacterStore, type Character as StoreCharacter } from '@/state/characterStore';
+import { useWorldStore } from '@/state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
-import { Character } from '../../../types/character.types';
-import { World } from '../../../types/world.types';
+import { Character } from '@/types/character.types';
+import { World } from '@/types/world.types';
 
 
 interface PortraitDebugSectionProps {
@@ -54,6 +54,63 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
     return status?.[prop];
   };
 
+  /**
+   * Creates a mock character object for API calls, centralizing the logic
+   * to avoid duplication between different generation methods
+   */
+  const createMockCharacter = (id: string): StoreCharacter => {
+    if (!effectiveCharacterData) {
+      throw new Error('No character data available');
+    }
+
+    // Handle the different attribute/skill formats between store and types
+    type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
+    type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
+    
+    const mockAttributes = effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
+      attributeId: attr.attributeId || attr.id || 'attr-1',
+      value: attr.value || attr.baseValue || 10
+    })) || [];
+    
+    const mockSkills = effectiveCharacterData.skills?.map((skill: AnySkill) => ({
+      skillId: skill.skillId || skill.id || 'skill-1',
+      level: skill.level || 1,
+      experience: skill.experience || 0,
+      isActive: skill.isActive !== undefined ? skill.isActive : true
+    })) || [];
+    
+    return {
+      id,
+      name: effectiveCharacterData.name || 'Test Character',
+      description: '',
+      worldId: effectiveCharacterData.worldId || 'world-1',
+      level: effectiveCharacterData.level || 1,
+      isPlayer: effectiveCharacterData.isPlayer || false,
+      attributes: mockAttributes,
+      skills: mockSkills,
+      background: {
+        history: getBackgroundProp('history') || '',
+        personality: getBackgroundProp('personality') || '',
+        goals: getBackgroundProp('goals') || [],
+        fears: getBackgroundProp('fears') || [],
+        relationships: getBackgroundProp('relationships') || []
+      },
+      inventory: { 
+        items: [], 
+        capacity: 100, 
+        categories: [], 
+        characterId: id 
+      },
+      status: { 
+        health: getStatusProp('health') || getStatusProp('hp') || 100, 
+        maxHealth: getStatusProp('maxHealth') || 100, 
+        conditions: getStatusProp('conditions') || [] 
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  };
+
   const generatePromptPreview = async () => {
     console.log('generatePromptPreview called');
     if (!effectiveCharacterData) {
@@ -64,53 +121,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
 
     console.log('Starting prompt generation with API...');
     try {
-      // Create a mock character for prompt generation
-      // Handle the different attribute/skill formats between store and types
-      type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
-      type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
-      
-      const mockAttributes = effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
-        attributeId: attr.attributeId || attr.id || 'attr-1',
-        value: attr.value || attr.baseValue || 10
-      })) || [];
-      
-      const mockSkills = effectiveCharacterData.skills?.map((skill: AnySkill) => ({
-        skillId: skill.skillId || skill.id || 'skill-1',
-        level: skill.level || 1,
-        experience: skill.experience || 0,
-        isActive: skill.isActive !== undefined ? skill.isActive : true
-      })) || [];
-      
-      const mockCharacter: StoreCharacter = {
-        id: 'preview',
-        name: effectiveCharacterData.name || 'Test Character',
-        description: '',
-        worldId: effectiveCharacterData.worldId || 'world-1',
-        level: effectiveCharacterData.level || 1,
-        isPlayer: effectiveCharacterData.isPlayer || false,
-        attributes: mockAttributes,
-        skills: mockSkills,
-        background: {
-          history: getBackgroundProp('history') || '',
-          personality: getBackgroundProp('personality') || '',
-          goals: getBackgroundProp('goals') || [],
-          fears: getBackgroundProp('fears') || [],
-          relationships: getBackgroundProp('relationships') || []
-        },
-        inventory: { 
-          items: [], 
-          capacity: 100, 
-          categories: [], 
-          characterId: 'preview' 
-        },
-        status: { 
-          health: getStatusProp('health') || getStatusProp('hp') || 100, 
-          maxHealth: getStatusProp('maxHealth') || 100, 
-          conditions: getStatusProp('conditions') || [] 
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+      const mockCharacter = createMockCharacter('preview');
 
       // Use the server-side API for portrait generation to include character detection
       const requestBody = {
@@ -159,52 +170,7 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       const aiClient = createAIClient();
       const generator = new PortraitGenerator(aiClient);
       
-      // Handle the different attribute/skill formats between store and types
-      type AnyAttribute = { id?: string; attributeId?: string; value?: number; baseValue?: number };
-      type AnySkill = { id?: string; skillId?: string; level?: number; experience?: number; isActive?: boolean };
-      
-      const mockAttributes = effectiveCharacterData.attributes?.map((attr: AnyAttribute) => ({
-        attributeId: attr.attributeId || attr.id || 'attr-1',
-        value: attr.value || attr.baseValue || 10
-      })) || [];
-      
-      const mockSkills = effectiveCharacterData.skills?.map((skill: AnySkill) => ({
-        skillId: skill.skillId || skill.id || 'skill-1',
-        level: skill.level || 1,
-        experience: skill.experience || 0,
-        isActive: skill.isActive !== undefined ? skill.isActive : true
-      })) || [];
-      
-      const mockCharacter: StoreCharacter = {
-        id: 'test',
-        name: effectiveCharacterData.name || 'Test Character',
-        description: '',
-        worldId: effectiveCharacterData.worldId || 'world-1',
-        level: effectiveCharacterData.level || 1,
-        isPlayer: effectiveCharacterData.isPlayer || false,
-        attributes: mockAttributes,
-        skills: mockSkills,
-        background: {
-          history: getBackgroundProp('history') || '',
-          personality: getBackgroundProp('personality') || '',
-          goals: getBackgroundProp('goals') || [],
-          fears: getBackgroundProp('fears') || [],
-          relationships: getBackgroundProp('relationships') || []
-        },
-        inventory: { 
-          items: [], 
-          capacity: 100, 
-          categories: [], 
-          characterId: 'test' 
-        },
-        status: { 
-          health: getStatusProp('health') || getStatusProp('hp') || 100, 
-          maxHealth: getStatusProp('maxHealth') || 100, 
-          conditions: getStatusProp('conditions') || [] 
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+      const mockCharacter = createMockCharacter('test');
 
       const result = await generator.generatePortrait(mockCharacter as unknown as Character, {
         worldGenre: effectiveWorldConfig?.genre

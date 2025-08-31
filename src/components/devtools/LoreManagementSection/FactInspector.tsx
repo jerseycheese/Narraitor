@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { useLoreStore } from '../../../state/loreStore';
+import { useLoreStore } from '@/state/loreStore';
 import { FactEditor } from './FactEditor';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { EntityID } from '../../../types/common.types';
+import type { EntityID } from '@/types/common.types';
 
 interface FactInspectorProps {
   factId: EntityID;

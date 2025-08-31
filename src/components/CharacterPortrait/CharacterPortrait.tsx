@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { CharacterPortrait as CharacterPortraitType } from '../../types/character.types';
-import { cn } from '../../lib/utils/classNames';
+import { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
+import { cn } from '@/lib/utils/classNames';
 
 interface CharacterPortraitProps {
   portrait: CharacterPortraitType;

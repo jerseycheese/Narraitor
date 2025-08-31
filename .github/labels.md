@@ -14,8 +14,7 @@ This file documents the labels used in the Narraitor repository. You can use a t
 
 - `domain:world-configuration` - Related to the World Configuration system
 - `domain:character-system` - Related to the Character System
-- `domain:decision-tracking` - Related to the Decision Tracking System
-- `domain:decision-relevance` - Related to the Decision Relevance System 
+- `domain:decision-relevance-system` - Related to the Decision Relevance System
 - `domain:narrative-engine` - Related to the Narrative Engine
 - `domain:journal-system` - Related to the Journal System
 - `domain:state-management` - Related to the State Management system

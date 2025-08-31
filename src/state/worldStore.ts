@@ -145,15 +145,27 @@ export const useWorldStore = create<WorldStore>()(
       }),
 
       // Delete world
-      deleteWorld: (id) => set((state) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [id]: _deletedWorld, ...remainingWorlds } = state.worlds;
-        
-        return {
-          worlds: remainingWorlds,
-          currentWorldId: state.currentWorldId === id ? null : state.currentWorldId,
-        };
-      }),
+      deleteWorld: (id) => {
+        // First delete all characters in the world
+        try {
+          const { useCharacterStore } = eval('require("./characterStore")');
+          const characterStore = useCharacterStore.getState();
+          characterStore.deleteCharactersInWorld(id);
+        } catch {
+          // Handle import errors silently (e.g., in test environments)
+        }
+
+        // Then delete the world
+        set((state) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [id]: _deletedWorld, ...remainingWorlds } = state.worlds;
+          
+          return {
+            worlds: remainingWorlds,
+            currentWorldId: state.currentWorldId === id ? null : state.currentWorldId,
+          };
+        });
+      },
 
       // Set current world
       setCurrentWorld: (id) => set((state) => {

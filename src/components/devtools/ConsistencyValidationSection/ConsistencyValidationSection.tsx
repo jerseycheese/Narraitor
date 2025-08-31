@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useLoreStore } from '../../../state/loreStore';
-import { generateConsistencyInstructions } from '../../../lib/ai/consistencyInstructions';
-import { buildLoreContext } from '../../../lib/lore/loreContext';
-import { JsonViewer } from '../JsonViewer';
-import { DevToolsSection } from '../shared/DevToolsSection';
+import { useLoreStore } from '@/state/loreStore';
+import { generateConsistencyInstructions } from '@/lib/ai/consistencyInstructions';
+import { buildLoreContext } from '@/lib/lore/loreContext';
+import { JsonViewer } from '@/components/devtools/JsonViewer';
+import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 
 /**
  * Consistency Validation Debug Section

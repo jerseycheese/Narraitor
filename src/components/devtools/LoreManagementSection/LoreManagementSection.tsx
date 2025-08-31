@@ -6,9 +6,9 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { useLoreStore } from '../../../state/loreStore';
-import { useWorldStore } from '../../../state/worldStore';
-import { DevToolsSection } from '../shared/DevToolsSection';
+import { useLoreStore } from '@/state/loreStore';
+import { useWorldStore } from '@/state/worldStore';
+import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 import { FactEditor } from './FactEditor';
 import { FactInspector } from './FactInspector';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,8 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import type { LoreFact, LoreCategory } from '../../../types/lore.types';
-import type { EntityID } from '../../../types/common.types';
+import type { LoreFact, LoreCategory } from '@/types/lore.types';
+import type { EntityID } from '@/types/common.types';
 
 export const LoreManagementSection: React.FC = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<EntityID>('');

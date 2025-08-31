@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useWorldStore } from '../../state/worldStore';
-import WorldList from '../WorldList/WorldList';
-import DeleteConfirmationDialog from '../DeleteConfirmationDialog/DeleteConfirmationDialog';
-import { LoadingPulse } from '../ui/LoadingState';
-import { SectionError } from '../ui/ErrorDisplay';
-import { World } from '../../types/world.types';
+import { useWorldStore } from '@/state/worldStore';
+import WorldList from '@/components/WorldList/WorldList';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog/DeleteConfirmationDialog';
+import { LoadingPulse } from '@/components/ui/LoadingState';
+import { SectionError } from '@/components/ui/ErrorDisplay';
+import { World } from '@/types/world.types';
 
 interface WorldListScreenProps {
   _router?: {

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { AITestConfig, AIResponse } from '../../../types';
+import type { AITestConfig, AIResponse } from '@/types';
 // Using a mock implementation for testing purposes
-import { createTestContext } from '../../../lib/ai/contextOverride';
-import { requestLogger } from '../../../lib/ai/requestLogger';
+import { createTestContext } from '@/lib/ai/contextOverride';
+import { requestLogger } from '@/lib/ai/requestLogger';
 
 interface AITestingPanelProps {
   className?: string;

@@ -1,0 +1,343 @@
+// src/stories/SmartTemplates.stories.tsx
+
+import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import { TemplatePreview } from '@/components/world/SmartTemplates/TemplatePreview';
+import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
+import { LoadingState } from '@/components/ui/LoadingState';
+import { WorldTemplate } from '@/lib/ai/templateGenerator';
+import { GENRES } from '@/lib/constants/genres';
+import { SkillDifficulty } from '@/lib/constants/skillDifficultyLevels';
+import { formatDate } from '@/lib/utils';
+
+// Mock data for Storybook
+const mockTemplateHistory = [
+  {
+    template: {
+      name: 'Cyber Frontier',
+      genre: 'fantasy',
+      description: 'A world where high-tech meets the wild west',
+      attributes: [
+        { name: 'Tech Savvy', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' },
+        { name: 'Grit', baseValue: 70, minValue: 0, maxValue: 100, category: 'Social' }
+      ],
+      skills: [
+        { name: 'Hacking', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'hard' as SkillDifficulty, category: 'Technical' },
+        { name: 'Quick Draw', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium' as SkillDifficulty, category: 'Combat' }
+      ],
+      explanation: 'This genre mix combines cyberpunk technology with western frontier themes'
+    } as WorldTemplate,
+    generatedAt: '2023-01-01',
+    generationType: 'genre-mix' as 'inspired-by' | 'genre-mix' | 'surprise-me',
+    genres: [GENRES[7].label, GENRES[6].label] // Cyberpunk, Western
+  }
+];
+
+const mockGeneratedTemplate: WorldTemplate = {
+  name: 'Generated World',
+  description: 'An AI-generated world for testing',
+  genre: 'fantasy',
+  attributes: [
+    { name: 'Strength', baseValue: 50, minValue: 0, maxValue: 100, category: 'Physical' },
+    { name: 'Intelligence', baseValue: 60, minValue: 0, maxValue: 100, category: 'Mental' }
+  ],
+  skills: [
+    { name: 'Swordplay', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'medium' as SkillDifficulty, category: 'Combat' },
+    { name: 'Magic', baseValue: 35, minValue: 0, maxValue: 100, difficulty: 'hard' as SkillDifficulty, category: 'Mystical' }
+  ],
+  explanation: 'A classic fantasy world with balanced attributes and skills'
+};
+
+type TemplateMode = 'inspired-by' | 'genre-mix' | 'surprise-me';
+
+// Create a mock version of SmartTemplates for Storybook
+const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTemplate) => void; hasHistory?: boolean }> = ({ 
+  onTemplateGenerated, 
+  hasHistory = false 
+}) => {
+  const [mode, setMode] = React.useState<TemplateMode>('inspired-by');
+  const [userInput, setUserInput] = React.useState('');
+  const [selectedGenres, setSelectedGenres] = React.useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  // Tab navigation options
+  const tabOptions: TabOption<TemplateMode>[] = [
+    { value: 'inspired-by', label: 'I want something like...' },
+    { value: 'genre-mix', label: 'Genre Mixer' },
+    { value: 'surprise-me', label: 'Surprise me!' }
+  ];
+
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    setError(null);
+    
+    // Simulate AI generation
+    setTimeout(() => {
+      setIsGenerating(false);
+      onTemplateGenerated(mockGeneratedTemplate);
+    }, 2000);
+  };
+
+  const mockHistory = hasHistory ? mockTemplateHistory : [];
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900">Smart World Templates</h2>
+        <p className="text-gray-600 mt-2">Get creative starting points for your world with AI assistance</p>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
+      {isGenerating && (
+        <LoadingState message="Generating your world template..." />
+      )}
+
+      {!isGenerating && (
+        <div className="space-y-8">
+          {/* Mode Selection */}
+          <div className="space-y-6">
+            {/* Tab-style Mode Selection */}
+            <div className="mb-6">
+              <TabNavigation
+                options={tabOptions}
+                activeValue={mode}
+                onChange={setMode}
+                className="mb-6"
+              />
+            </div>
+
+            {/* Inspired By Mode */}
+            {mode === 'inspired-by' && (
+              <div className="border rounded-lg p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Describe Your World</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Steampunk Victorian London, Space pirates, etc."
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                    <button
+                      onClick={handleGenerate}
+                      disabled={!userInput.trim()}
+                      className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                    >
+                      Generate World
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Genre Mixer Mode */}
+            {mode === 'genre-mix' && (
+              <div className="border rounded-lg p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
+                    <p className="text-sm text-gray-600 mb-4">Select 2 or more genres to blend together</p>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Fantasy', 'Sci-Fi', 'Horror', 'Western', 'Cyberpunk', 'Mystery', 'Modern', 'Historical'].map(genre => (
+                        <button
+                          key={genre}
+                          onClick={() => setSelectedGenres(prev => 
+                            prev.includes(genre) ? prev.filter(g => g !== genre) : [...prev, genre]
+                          )}
+                          className={`px-3 py-2 rounded text-sm ${
+                            selectedGenres.includes(genre) 
+                              ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+                              : 'bg-gray-100 border border-gray-300'
+                          }`}
+                        >
+                          {genre}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">
+                        {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
+                      </span>
+                      <button
+                        onClick={handleGenerate}
+                        disabled={selectedGenres.length < 2}
+                        className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                      >
+                        Mix Genres
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Surprise Me Mode */}
+            {mode === 'surprise-me' && (
+              <div className="border rounded-lg p-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
+                    <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                  </div>
+                  <div>
+                    <button
+                      onClick={handleGenerate}
+                      className="bg-purple-600 text-white px-6 py-2 rounded"
+                    >
+                      Generate Random World
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Template History */}
+          {mockHistory.length > 0 && (
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-semibold mb-4">Recent Templates</h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {mockHistory.map((entry, index) => (
+                  <div 
+                    key={index}
+                    className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors"
+                    onClick={() => onTemplateGenerated(entry.template)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-medium">{entry.template.name}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {formatDate(entry.generatedAt)}
+                        </p>
+                      </div>
+                      <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                        {(() => {
+                          switch(entry.generationType) {
+                            case 'inspired-by': return 'Inspired';
+                            case 'genre-mix': return 'Mixed';
+                            case 'surprise-me': return 'Surprise';
+                            default: return 'Unknown';
+                          }
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {mockHistory.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>No recent templates</p>
+              <p className="text-sm">Generate your first template to get started!</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const meta: Meta<typeof MockSmartTemplates> = {
+  title: '06-Patterns/ai-integration/SmartTemplates',
+  component: MockSmartTemplates,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: 'Smart world template generation with AI assistance. Supports three modes: inspired-by, genre mixing, and surprise generation.'
+      }
+    }
+  },
+  argTypes: {
+    onTemplateGenerated: { action: 'template-generated' },
+    hasHistory: { 
+      control: 'boolean',
+      description: 'Show template history'
+    }
+  }
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Interactive: Story = {
+  args: {
+    onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
+    hasHistory: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Interactive Smart Templates component showing the new tab-based UI and all three generation modes'
+      }
+    }
+  }
+};
+
+export const WithTemplateHistory: Story = {
+  args: {
+    onTemplateGenerated: (template: WorldTemplate) => console.log('Generated template:', template),
+    hasHistory: true
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Shows the component with existing template history for reuse and the improved UX'
+      }
+    }
+  }
+};
+
+// Template Preview Stories
+const mockTemplate: WorldTemplate = {
+  name: 'Neo-Victorian Skyport',
+  description: 'A steampunk world of floating cities powered by steam and clockwork, where airship pirates rule the skies and Victorian sensibilities clash with mechanical marvels.',
+  genre: 'fantasy',
+  attributes: [
+    { name: 'Ingenuity', baseValue: 65, minValue: 0, maxValue: 100, category: 'Mental' },
+    { name: 'Dexterity', baseValue: 60, minValue: 0, maxValue: 100, category: 'Physical' },
+    { name: 'Social Standing', baseValue: 45, minValue: 0, maxValue: 100, category: 'Social' },
+    { name: 'Steam Affinity', baseValue: 55, minValue: 0, maxValue: 100, category: 'Mystical' }
+  ],
+  skills: [
+    { name: 'Engineering', baseValue: 50, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' },
+    { name: 'Airship Piloting', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Technical' },
+    { name: 'Clockwork Repair', baseValue: 45, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Technical' },
+    { name: 'Etiquette', baseValue: 35, minValue: 0, maxValue: 100, difficulty: 'easy', category: 'Social' },
+    { name: 'Dueling', baseValue: 40, minValue: 0, maxValue: 100, difficulty: 'medium', category: 'Combat' },
+    { name: 'Steam Magic', baseValue: 30, minValue: 0, maxValue: 100, difficulty: 'hard', category: 'Mystical' }
+  ],
+  explanation: 'Steampunk worlds emphasize mechanical ingenuity and Victorian social structures. The Steam Affinity attribute represents connection to the mystical power source, while skills balance technical expertise with social graces and combat readiness.'
+};
+
+export const PreviewScreen: Story = {
+  render: () => (
+    <TemplatePreview
+      template={mockTemplate}
+      isOpen={true}
+      onUse={() => console.log('Using template')}
+      onBack={() => console.log('Going back')}
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Template preview screen showing a generated world template with comprehensive details'
+      }
+    }
+  }
+};
