@@ -42,7 +42,7 @@ export function tokensToCSSVariables(tokens: Record<string, string | Record<stri
     if (typeof value === 'string') {
       variables[getCSSVariable(variableName)] = value
     } else if (typeof value === 'object' && value !== null) {
-      Object.assign(variables, tokensToCSSVariables(value, variableName))
+      Object.assign(variables, tokensToCSSVariables(value as Record<string, string | Record<string, unknown>>, variableName))
     }
   })
   
