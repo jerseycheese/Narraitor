@@ -25,10 +25,6 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
     return acc;
   }, {} as Record<string, Character[]>);
   
-  const characterCounts = worlds.reduce((counts, world) => {
-    counts[world.id] = charactersByWorld[world.id]?.length || 0;
-    return counts;
-  }, {} as Record<string, number>);
   if (worlds.length === 0) {
     return (
       <section data-testid="world-list-empty-message" className="p-12 text-center bg-gray-50 rounded-lg">
@@ -75,7 +71,6 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
             key={world.id}
             world={world}
             isActive={world.id === currentWorldId}
-            characterCount={characterCounts[world.id] || 0}
             characters={charactersByWorld[world.id] || []}
             onSelect={onSelectWorld}
             onDelete={onDeleteWorld}
