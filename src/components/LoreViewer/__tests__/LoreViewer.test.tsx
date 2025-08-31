@@ -145,21 +145,25 @@ describe('LoreViewer Component', () => {
     
     const { container } = render(<LoreViewer worldId="world-1" />);
 
-    // Check that category sections have the right color classes
-    const characterSection = container.querySelector('.bg-blue-50');
+    // Check that category sections have the right design token classes
+    const characterSection = container.querySelector('.bg-lore-characters-bg');
     expect(characterSection).toBeInTheDocument();
-    expect(characterSection).toHaveClass('border-blue-200');
+    expect(characterSection).toHaveClass('border-lore-characters-border');
+    expect(characterSection).toHaveClass('text-lore-characters-text');
 
-    const locationSection = container.querySelector('.bg-green-50');
+    const locationSection = container.querySelector('.bg-lore-locations-bg');
     expect(locationSection).toBeInTheDocument();
-    expect(locationSection).toHaveClass('border-green-200');
+    expect(locationSection).toHaveClass('border-lore-locations-border');
+    expect(locationSection).toHaveClass('text-lore-locations-text');
 
-    const eventSection = container.querySelector('.bg-purple-50');
+    const eventSection = container.querySelector('.bg-lore-events-bg');
     expect(eventSection).toBeInTheDocument();
-    expect(eventSection).toHaveClass('border-purple-200');
+    expect(eventSection).toHaveClass('border-lore-events-border');
+    expect(eventSection).toHaveClass('text-lore-events-text');
 
-    const rulesSection = container.querySelector('.bg-orange-50');
+    const rulesSection = container.querySelector('.bg-lore-rules-bg');
     expect(rulesSection).toBeInTheDocument();
-    expect(rulesSection).toHaveClass('border-orange-200');
+    expect(rulesSection).toHaveClass('border-lore-rules-border');
+    expect(rulesSection).toHaveClass('text-lore-rules-text');
   });
 });

@@ -50,9 +50,10 @@
   white-space: pre-line;
 }
 
-/* shadcn/ui CSS Variables */
+/* Design Token CSS Variables */
 @layer base {
   :root {
+    /* Base shadcn/ui colors */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -73,9 +74,53 @@
     --input: 240 5.9% 90%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+    
+    /* Extended semantic tokens */
+    --success: 142.1 76.2% 36.3%; /* green-600 */
+    --success-foreground: 210 40% 98%;
+    --success-background: 142.1 76.2% 97.3%; /* green-50 */
+    --success-border: 142.1 69.8% 85.7%; /* green-200 */
+    --success-muted: 142.1 76.2% 91.8%; /* green-100 */
+    
+    --warning: 32.1 94.6% 43.7%; /* amber-500 */
+    --warning-foreground: 210 40% 98%;
+    --warning-background: 54.5 91.7% 95.3%; /* amber-50 */
+    --warning-border: 42.7 76.4% 82.5%; /* amber-200 */
+    --warning-muted: 54.5 91.7% 90.4%; /* amber-100 */
+    
+    --info: 217.2 91.2% 59.8%; /* blue-500 */
+    --info-foreground: 210 40% 98%;
+    --info-background: 213.8 100% 96.9%; /* blue-50 */
+    --info-border: 213.3 93.9% 87.8%; /* blue-200 */
+    --info-muted: 214.3 91.8% 91.2%; /* blue-100 */
+    
+    /* Contextual colors for storytelling features */
+    --ending-triumphant: 32.1 94.6% 43.7%; /* amber-500 */
+    --ending-bittersweet: 258.3 89.5% 66.3%; /* violet-500 */
+    --ending-mysterious: 219.2 13.9% 32.2%; /* gray-700 */
+    --ending-tragic: 0 84.2% 30.2%; /* red-800 */
+    --ending-hopeful: 160.1 84.1% 39.4%; /* emerald-500 */
+    
+    /* Lore category colors */
+    --lore-characters-bg: 213.8 100% 96.9%; /* blue-50 */
+    --lore-characters-border: 213.3 93.9% 87.8%; /* blue-200 */
+    --lore-characters-text: 213.1 93.7% 26.1%; /* blue-800 */
+    
+    --lore-locations-bg: 142.1 76.2% 97.3%; /* green-50 */
+    --lore-locations-border: 142.1 69.8% 85.7%; /* green-200 */
+    --lore-locations-text: 158.1 64.4% 28.5%; /* green-800 */
+    
+    --lore-events-bg: 270 100% 98%; /* purple-50 */
+    --lore-events-border: 266.7 87% 89%; /* purple-200 */
+    --lore-events-text: 271.5 81% 35.9%; /* purple-800 */
+    
+    --lore-rules-bg: 54.5 91.7% 95.3%; /* amber-50 */
+    --lore-rules-border: 42.7 76.4% 82.5%; /* amber-200 */
+    --lore-rules-text: 25.5 95% 35.1%; /* amber-800 */
   }
 
   .dark {
+    /* Base shadcn/ui dark colors */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -95,53 +140,73 @@
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 224.3 76.3% 94.1%;
+    
+    /* Extended semantic tokens (dark) */
+    --success: 142.1 70.6% 45.3%; /* green-500 */
+    --success-foreground: 222.2 84% 4.9%;
+    --success-background: 142.1 70.6% 7.3%; /* green-950 */
+    --success-border: 142.1 64.2% 24.1%; /* green-800 */
+    --success-muted: 142.1 69.2% 14.1%; /* green-900 */
+    
+    --warning: 43.3 96.4% 56.3%; /* amber-400 */
+    --warning-foreground: 222.2 84% 4.9%;
+    --warning-background: 25.5 95% 7.1%; /* amber-950 */
+    --warning-border: 32.1 94.6% 23.7%; /* amber-800 */
+    --warning-muted: 25.5 83.3% 14.7%; /* amber-900 */
+    
+    --info: 213.1 93.9% 67.8%; /* blue-400 */
+    --info-foreground: 222.2 84% 4.9%;
+    --info-background: 213.1 100% 6.1%; /* blue-950 */
+    --info-border: 213.1 93.7% 26.1%; /* blue-800 */
+    --info-muted: 212 100% 15.7%; /* blue-900 */
+    
+    /* Contextual colors remain the same in dark mode for consistency */
+    --ending-triumphant: 32.1 94.6% 43.7%; /* amber-500 */
+    --ending-bittersweet: 258.3 89.5% 66.3%; /* violet-500 */
+    --ending-mysterious: 219.2 13.9% 32.2%; /* gray-700 */
+    --ending-tragic: 0 84.2% 30.2%; /* red-800 */
+    --ending-hopeful: 160.1 84.1% 39.4%; /* emerald-500 */
+    
+    /* Lore category colors (adjusted for dark mode) */
+    --lore-characters-bg: 213.1 100% 6.1%; /* blue-950 */
+    --lore-characters-border: 213.1 93.7% 26.1%; /* blue-800 */
+    --lore-characters-text: 213.1 93.9% 67.8%; /* blue-400 */
+    
+    --lore-locations-bg: 142.1 70.6% 7.3%; /* green-950 */
+    --lore-locations-border: 142.1 64.2% 24.1%; /* green-800 */
+    --lore-locations-text: 142.1 76.2% 61.6%; /* green-400 */
+    
+    --lore-events-bg: 271.5 81% 5.9%; /* purple-950 */
+    --lore-events-border: 271.5 81% 25.9%; /* purple-800 */
+    --lore-events-text: 270.7 91% 65.1%; /* purple-400 */
+    
+    --lore-rules-bg: 25.5 95% 7.1%; /* amber-950 */
+    --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */
+    --lore-rules-text: 43.3 96.4% 56.3%; /* amber-400 */
   }
 }
 
 /* Ending Screen Tone Styles */
 .ending-triumphant {
-  background-color: #f59e0b; /* amber-500 */
+  background-color: hsl(var(--ending-triumphant));
 }
 
 .ending-bittersweet {
-  background-color: #8b5cf6; /* violet-500 */
+  background-color: hsl(var(--ending-bittersweet));
 }
 
 .ending-mysterious {
-  background-color: #374151; /* gray-700 */
+  background-color: hsl(var(--ending-mysterious));
 }
 
 .ending-tragic {
-  background-color: #991b1b; /* red-800 */
+  background-color: hsl(var(--ending-tragic));
 }
 
 .ending-hopeful {
-  background-color: #10b981; /* emerald-500 */
+  background-color: hsl(var(--ending-hopeful));
 }
 
-/* CSS variables for shadcn/ui theming */
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222.2 84% 4.9%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222.2 84% 4.9%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
-}
 
 /* Base layer for HTML element styles */
 @layer base {
