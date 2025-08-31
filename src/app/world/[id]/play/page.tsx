@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { Hero } from '@/components/shared/Hero';
 import { useWorldStore } from '@/state/worldStore';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 /**
  * Play page component that initializes a game session with a worldId
@@ -37,10 +39,25 @@ export default function PlayPage() {
   }
 
   const pageTitle = world ? `Playing in ${world.name}` : 'Game Session';
-  const pageDescription = world?.genre;
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription} maxWidth="7xl" className="pb-0">
+    <PageLayout maxWidth="7xl" className="pb-0">
+      {/* Ultra-thin world hero */}
+      {world?.image?.url && (
+        <div className="mb-6">
+          <Hero
+            title={pageTitle}
+            image={{
+              url: world.image.url,
+              alt: `${world.name} world`
+            }}
+            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
+            height="h-20 sm:h-24"
+            titleElement="h1"
+          />
+        </div>
+      )}
+      
       <GameSession worldId={worldId} />
     </PageLayout>
   );

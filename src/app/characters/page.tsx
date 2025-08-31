@@ -8,6 +8,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { Hero } from '@/components/shared/Hero';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 // Using API routes for secure AI operations
@@ -15,6 +16,7 @@ import { GenerateCharacterDialog } from '@/components/GenerateCharacterDialog';
 import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -414,12 +416,35 @@ export default function CharactersPage() {
 
   return (
     <PageLayout
-      title="My Characters"
-      description={`${currentWorld.name} • Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.`}
-      actions={actions}
+      title={currentWorld?.image?.url ? undefined : "My Characters"}
+      description={currentWorld?.image?.url ? undefined : `Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.`}
+      actions={currentWorld?.image?.url ? undefined : actions}
     >
-      {/* Show back link if viewing from a specific world */}
-      {worldIdFromUrl && (
+      {/* Show world hero if there's a current world with image */}
+      {currentWorld?.image?.url && (
+        <div className="mb-6">
+          <Hero
+            title={worldIdFromUrl ? `${currentWorld.name} Characters` : `${currentWorld.name} Characters`}
+            image={{
+              url: currentWorld.image.url,
+              alt: `${currentWorld.name} world`
+            }}
+            subtitle={currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined}
+            height="h-32 sm:h-40"
+            titleElement="h2"
+          />
+        </div>
+      )}
+
+      {/* Action buttons below hero when world has image */}
+      {currentWorld?.image?.url && (
+        <div className="mb-8 flex justify-end gap-2">
+          {actions}
+        </div>
+      )}
+
+      {/* Show back link if viewing from a specific world without image */}
+      {worldIdFromUrl && !currentWorld?.image?.url && (
         <div className="mb-6 -mt-8">
           <Link
             href={`/world/${worldIdFromUrl}`}
