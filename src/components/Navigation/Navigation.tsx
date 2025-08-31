@@ -135,24 +135,24 @@ export function Navigation() {
               <div className="hidden md:flex items-center space-x-1 ml-8" data-testid="desktop-navigation">
                 <Link 
                   href="/worlds" 
-                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : ''
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Worlds
                 </Link>
                 <Link 
                   href="/characters" 
-                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
-                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : ''
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Characters
                 </Link>
                 <Link 
                   href="/settings" 
-                  className={`px-3 py-2 text-sm font-medium text-link-nav-dark ${
-                    pathname === '/settings' ? 'text-white' : ''
+                  className={`px-3 py-2 text-sm font-medium transition-colors ${
+                    pathname === '/settings' ? 'text-white' : 'text-gray-300 hover:text-white'
                   }`}
                 >
                   Settings
