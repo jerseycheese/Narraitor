@@ -2,7 +2,7 @@ name: Deploy Storybook to GitHub Pages
 
 on:
   push:
-    branches: [ main, develop, feat/design-token-system ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ develop ]
 
@@ -34,6 +34,7 @@ jobs:
         path: ./storybook-static
 
   deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
