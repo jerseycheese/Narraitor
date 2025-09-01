@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
-    "build": "next build && npm run build-storybook",
+    "build": "next build && npm run build-storybook && cp -r storybook-static public/",
     "build:app": "next build",
     "start": "next start",
     "lint": "next lint",
