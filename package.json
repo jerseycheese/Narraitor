@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && npm run build-storybook",
+    "build:app": "next build",
     "start": "next start",
     "lint": "next lint",
     "tailwind:build-for-storybook": "npx @tailwindcss/cli -i src/app/globals.css -o .storybook/tailwind-compiled.css",
