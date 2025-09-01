@@ -31,6 +31,8 @@ Built on Tailwind CSS v4, the styles are organized to stay maintainable:
 - `--color-muted`: Subtle text color (#6b7280)
 - `--color-border`: Border color (#e5e7eb)
 
+**Note**: These CSS variables are part of the legacy styling system. The current approach uses [design tokens](./design-tokens.md) with a three-tier architecture for better maintainability and consistency.
+
 ### Typography
 - `--font-sans`: Sans-serif font stack
 - `--font-serif`: Serif font stack
