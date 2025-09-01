@@ -166,31 +166,31 @@ function InteractiveDemo() {
       <div className="flex flex-wrap gap-2">
         <button
           onClick={showSuccess}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
         >
           Show Success
         </button>
         <button
           onClick={showError}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
         >
           Show Error
         </button>
         <button
           onClick={showWarning}
-          className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+          className="px-4 py-2 bg-amber-50000 text-white rounded hover:bg-amber-700"
         >
           Show Warning
         </button>
         <button
           onClick={showInfo}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
         >
           Show Info
         </button>
         <button
           onClick={showMultiple}
-          className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+          className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-700"
         >
           Show Multiple
         </button>

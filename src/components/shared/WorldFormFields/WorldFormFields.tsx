@@ -43,7 +43,7 @@ export function WorldNameInput({
         disabled={disabled}
       />
       {error && (
-        <p className="text-sm text-red-600 mt-1">{error}</p>
+        <p className="text-sm text-red-500 mt-1">{error}</p>
       )}
     </div>
   );
@@ -88,7 +88,7 @@ export function GenreSelect({
         ))}
       </Select>
       {error && (
-        <p className="text-sm text-red-600 mt-1">{error}</p>
+        <p className="text-sm text-red-500 mt-1">{error}</p>
       )}
     </div>
   );
@@ -143,10 +143,10 @@ export function DescriptionTextArea({
         <div className="flex justify-between items-center mt-1">
           <div className="flex-1">
             {error && (
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-red-500">{error}</p>
             )}
           </div>
-          <p className={`text-xs ${isNearLimit ? 'text-amber-600' : 'text-gray-500'}`}>
+          <p className={`text-xs ${isNearLimit ? 'text-amber-500' : 'text-gray-500'}`}>
             {characterCount}/{maxLength}
           </p>
         </div>
@@ -154,7 +154,7 @@ export function DescriptionTextArea({
       
       {/* Error without character count */}
       {!maxLength && error && (
-        <p className="text-sm text-red-600 mt-1">{error}</p>
+        <p className="text-sm text-red-500 mt-1">{error}</p>
       )}
     </div>
   );
@@ -178,10 +178,10 @@ export function LoadingState({
   return (
     <div className={`flex items-center justify-center p-4 ${className}`}>
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700 mx-auto mb-2"></div>
         <p className="text-sm font-medium text-gray-900">{message}</p>
         {details && (
-          <p className="text-xs text-gray-600 mt-1">{details}</p>
+          <p className="text-xs text-gray-700 mt-1">{details}</p>
         )}
       </div>
     </div>
@@ -204,10 +204,10 @@ export function ErrorDisplay({
   if (!error) return null;
 
   return (
-    <div className={`bg-red-50 border border-red-200 rounded-md p-4 ${className}`}>
+    <div className={`bg-red-200 border border-red-500 rounded-md p-4 ${className}`}>
       <div className="flex">
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-red-800">
+          <h3 className="text-sm font-medium text-red-700">
             Error
           </h3>
           <p className="text-sm text-red-700 mt-1">
@@ -221,7 +221,7 @@ export function ErrorDisplay({
               <Button
                 onClick={onRetry}
                 variant="ghost"
-                className="text-sm font-medium text-red-800 hover:text-red-900 underline"
+                className="text-sm font-medium text-red-700 hover:text-red-900 underline"
               >
                 Retry
               </Button>
@@ -230,7 +230,7 @@ export function ErrorDisplay({
               <Button
                 onClick={onDismiss}
                 variant="ghost"
-                className="text-sm font-medium text-red-800 hover:text-red-900"
+                className="text-sm font-medium text-red-700 hover:text-red-900"
               >
                 ×
               </Button>

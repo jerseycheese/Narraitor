@@ -206,9 +206,9 @@ export function AttributeEditor({
         </div>
 
         {errors.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
+          <div className="bg-red-200 border border-red-500 rounded-lg p-3 space-y-1">
             {errors.map((error, index) => (
-              <p key={index} className="text-sm text-red-600">
+              <p key={index} className="text-sm text-red-500">
                 {error}
               </p>
             ))}

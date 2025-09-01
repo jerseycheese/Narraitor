@@ -32,7 +32,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
           </div>
           <div>
             <span className="font-medium text-gray-700 block mb-2">Description:</span>
-            <p className="text-gray-800 leading-relaxed">{template.description}</p>
+            <p className="text-gray-900 leading-relaxed">{template.description}</p>
           </div>
         </div>
       </div>
@@ -50,7 +50,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
         <h4 className="font-semibold mb-4">Attributes ({template.attributes.length})</h4>
         <div className="grid gap-3 md:grid-cols-2">
           {template.attributes.map((attr, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
               <div>
                 <span className="font-medium">{attr.name}</span>
                 {attr.category && (
@@ -59,7 +59,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
                   </span>
                 )}
               </div>
-              <div className="text-right text-sm text-gray-600">
+              <div className="text-right text-sm text-gray-700">
                 <div>Base: {attr.baseValue}</div>
                 <div>Range: {attr.minValue}-{attr.maxValue}</div>
               </div>
@@ -73,7 +73,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
         <h4 className="font-semibold mb-4">Skills ({template.skills.length})</h4>
         <div className="grid gap-3">
           {template.skills.map((skill, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={index} className="flex items-center justify-between p-3 bg-gray-100 rounded-lg">
               <div className="flex items-center space-x-3">
                 <span className="font-medium">{skill.name}</span>
                 <span className={`${wizardStyles.badge.base} ${wizardStyles.badge.primary}`}>
@@ -85,7 +85,7 @@ const TemplatePreview: React.FC<TemplatePreviewProps> = memo(({
                   </span>
                 )}
               </div>
-              <div className="text-right text-sm text-gray-600">
+              <div className="text-right text-sm text-gray-700">
                 <div>Base: {skill.baseValue}</div>
                 <div>Range: {skill.minValue}-{skill.maxValue}</div>
               </div>

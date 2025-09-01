@@ -132,7 +132,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
               Please wait
             </h2>
             <p 
-              className="text-gray-600 dark:text-gray-300"
+              className="text-gray-700 dark:text-gray-300"
               aria-live="polite"
             >
               {message}

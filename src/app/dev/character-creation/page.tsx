@@ -101,7 +101,7 @@ export default function CharacterCreationTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h2 className="text-2xl font-bold mb-6">Character Creation Test Harness</h2>
@@ -123,7 +123,7 @@ export default function CharacterCreationTestPage() {
                   onClick={() => handleWorldChange('fantasy')}
                   className={`px-4 py-2 rounded ${
                     selectedWorld === 'fantasy'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 hover:bg-gray-300'
                   }`}
                 >
@@ -133,7 +133,7 @@ export default function CharacterCreationTestPage() {
                   onClick={() => handleWorldChange('western')}
                   className={`px-4 py-2 rounded ${
                     selectedWorld === 'western'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 hover:bg-gray-300'
                   }`}
                 >
@@ -145,13 +145,13 @@ export default function CharacterCreationTestPage() {
             <div className="flex gap-4">
               <button
                 onClick={handleClearAutoSave}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
               >
                 Clear Auto-Save Data
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
               >
                 Refresh Page
               </button>

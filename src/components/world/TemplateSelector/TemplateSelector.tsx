@@ -73,7 +73,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               </h3>
               
               <p
-                className="text-gray-600 mb-3 text-sm"
+                className="text-gray-700 mb-3 text-sm"
                 data-testid={`template-description-${template.id}`}
               >
                 {template.description}
@@ -99,7 +99,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       {/* Show preview for selected template in a separate section */}
       {selectedTemplate && (
         <div 
-          className="border rounded-lg bg-gray-50 p-6"
+          className="border rounded-lg bg-gray-100 p-6"
           data-testid={`template-preview-${selectedTemplate.id}`}
         >
           <h3 className="text-lg font-bold mb-4">Template Details: {selectedTemplate.name}</h3>
@@ -112,7 +112,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 {selectedTemplate.attributes.map((attr) => (
                   <div key={attr.name} className="bg-white rounded p-2 border border-gray-200">
                     <span className="font-medium text-sm text-gray-900">{attr.name}</span>
-                    <p className="text-xs text-gray-600 mt-0.5">{attr.description}</p>
+                    <p className="text-xs text-gray-700 mt-0.5">{attr.description}</p>
                   </div>
                 ))}
               </div>
@@ -125,7 +125,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                 {selectedTemplate.skills.map((skill) => (
                   <div key={skill.name} className="bg-white rounded p-2 border border-gray-200">
                     <span className="font-medium text-sm text-gray-900">{skill.name}</span>
-                    <p className="text-xs text-gray-600 mt-0.5">{skill.description}</p>
+                    <p className="text-xs text-gray-700 mt-0.5">{skill.description}</p>
                   </div>
                 ))}
               </div>

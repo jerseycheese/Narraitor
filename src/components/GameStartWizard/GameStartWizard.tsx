@@ -135,13 +135,13 @@ export function GameStartWizard({
           )}
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-700">
             Step {wizard.state.currentStep + 1} of {gameStartSteps.length}: {currentStepConfig.label}
           </span>
         </div>
         <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-blue-600 transition-all duration-300"
+            className="h-full bg-blue-500 transition-all duration-300"
             style={{ width: `${((wizard.state.currentStep + 1) / gameStartSteps.length) * 100}%` }}
           />
         </div>

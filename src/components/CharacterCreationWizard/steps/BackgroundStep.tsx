@@ -72,7 +72,7 @@ export const BackgroundStep: React.FC<BackgroundStepProps> = ({
     >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-blue-900">
           A compelling backstory helps bring your character to life and 
           provides context for their actions and decisions in the game.
         </p>

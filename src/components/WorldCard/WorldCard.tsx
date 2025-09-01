@@ -238,7 +238,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                         className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex-shrink-0 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex-shrink-0 flex items-center justify-center">
                         <span className="text-white text-sm font-bold leading-none">
                           {char.name.charAt(0).toUpperCase()}
                         </span>
@@ -291,7 +291,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
 
         {/* Footer with buttons - always at bottom */}
         <footer className="mt-auto pt-3 border-t border-gray-200">
-          <div className="text-sm text-gray-600 mb-3">
+          <div className="text-sm text-gray-700 mb-3">
             <time data-testid="world-card-createdAt">
               Created: {formatDate(world.createdAt)}
             </time>
@@ -310,7 +310,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   onClick: handleCreateCharacter,
                   variant: 'primary',
                   flex: true,
-                  className: 'bg-green-600 hover:bg-green-700',
+                  className: 'bg-green-500 hover:bg-green-700',
                 },
                 {
                   key: 'play',
@@ -318,7 +318,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   onClick: handlePlayClick,
                   variant: 'primary',
                   flex: true,
-                  className: 'bg-blue-600 hover:bg-blue-700',
+                  className: 'bg-blue-500 hover:bg-blue-700',
                   testId: 'world-card-actions-play-button',
                 },
                 {
@@ -332,7 +332,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   },
                   variant: 'primary',
                   flex: true,
-                  className: 'bg-blue-600 hover:bg-blue-700',
+                  className: 'bg-blue-500 hover:bg-blue-700',
                 },
               ]}
               secondaryActions={[

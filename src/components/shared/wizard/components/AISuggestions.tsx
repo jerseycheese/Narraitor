@@ -40,7 +40,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent mb-4" />
-          <p className="text-gray-600">Generating suggestions...</p>
+          <p className="text-gray-700">Generating suggestions...</p>
         </div>
       </div>
     );
@@ -48,16 +48,16 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
 
   if (error) {
     return (
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-yellow-800">{error}</p>
+      <div className="p-4 bg-amber-200 border border-amber-200 rounded-lg">
+        <p className="text-amber-700">{error}</p>
       </div>
     );
   }
 
   if (suggestions.length === 0) {
     return (
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-        <p className="text-gray-600">No suggestions available.</p>
+      <div className="p-4 bg-gray-100 border border-gray-200 rounded-lg">
+        <p className="text-gray-700">No suggestions available.</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
         <div>
           <h3 className="text-lg font-semibold">{title}</h3>
           {description && (
-            <p className="text-sm text-gray-600 mt-1">{description}</p>
+            <p className="text-sm text-gray-700 mt-1">{description}</p>
           )}
         </div>
         {onToggleAll && (
@@ -86,12 +86,12 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
       {/* Progress indicator */}
       {maxSelectable && (
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-gray-600">Selected:</span>
-          <span className={`font-medium ${acceptedCount > maxSelectable ? 'text-red-600' : 'text-gray-900'}`}>
+          <span className="text-gray-700">Selected:</span>
+          <span className={`font-medium ${acceptedCount > maxSelectable ? 'text-red-500' : 'text-gray-900'}`}>
             {acceptedCount} / {maxSelectable}
           </span>
           {acceptedCount > maxSelectable && (
-            <span className="text-red-600">
+            <span className="text-red-500">
               (Please deselect {acceptedCount - maxSelectable} item{acceptedCount - maxSelectable > 1 ? 's' : ''})
             </span>
           )}
@@ -109,7 +109,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                 className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                   suggestion.accepted 
                     ? 'border-blue-500 bg-blue-50' 
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-gray-300 hover:border-gray-500'
                 }`}
                 onClick={() => onToggle(index)}
               >
@@ -121,11 +121,11 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                         checked={suggestion.accepted || false}
                         onChange={() => onToggle(index)}
                         onClick={(e) => e.stopPropagation()}
-                        className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        className="h-4 w-4 text-blue-700 rounded border-gray-300 focus:ring-blue-500"
                       />
                       <h4 className="font-medium">{suggestion.name}</h4>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1 ml-6">
+                    <p className="text-sm text-gray-700 mt-1 ml-6">
                       {suggestion.description}
                     </p>
                     {suggestion.metadata && (

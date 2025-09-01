@@ -119,13 +119,13 @@ export function TextNormalizationSection({
         <div className="flex gap-2 text-sm">
           <button
             onClick={handleExport}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
           >
             Export
           </button>
           <button
             onClick={handleCopyNormalized}
-            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-700"
           >
             Copy Result
           </button>
@@ -140,7 +140,7 @@ export function TextNormalizationSection({
             <button
               key={sample}
               onClick={() => handleLoadSample(sample)}
-              className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+              className="px-3 py-1 bg-gray-700 text-white text-sm rounded hover:bg-gray-700"
             >
               {sample}
             </button>
@@ -149,7 +149,7 @@ export function TextNormalizationSection({
       </div>
 
       {/* Options */}
-      <div className="bg-gray-50 p-4 rounded">
+      <div className="bg-gray-100 p-4 rounded">
         <h4 className="font-medium mb-3">Normalization Options:</h4>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(options).map(([key, value]) => (
@@ -188,7 +188,7 @@ export function TextNormalizationSection({
           id="normalized-text"
           value={normalizationResult.normalized}
           readOnly
-          className="w-full h-32 p-3 border rounded font-mono text-sm bg-gray-50"
+          className="w-full h-32 p-3 border rounded font-mono text-sm bg-gray-100"
           placeholder="Normalized text will appear here..."
         />
         <div className="text-xs text-gray-500 mt-1">
@@ -218,13 +218,13 @@ export function TextNormalizationSection({
           <div className="flex gap-4">
             <button
               onClick={() => setShowAnalysis(!showAnalysis)}
-              className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
             >
               {showAnalysis ? 'Hide' : 'Show'} Text Analysis
             </button>
             <button
               onClick={() => setShowStats(!showStats)}
-              className="px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
             >
               {showStats ? 'Hide' : 'Show'} Whitespace Stats
             </button>
@@ -232,7 +232,7 @@ export function TextNormalizationSection({
 
           {/* Text Analysis */}
           {showAnalysis && (
-            <div className="bg-yellow-50 p-4 rounded">
+            <div className="bg-amber-200 p-4 rounded">
               <h4 className="font-medium mb-3">Text Analysis:</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>

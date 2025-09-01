@@ -93,7 +93,7 @@ export const InteractiveDemo: Story = {
             placeholder="Try typing here..." 
             className="px-3 py-2 border rounded"
           />
-          <p className="mt-4 text-sm text-gray-600">
+          <p className="mt-4 text-sm text-gray-700">
             Toggle overlay visibility with controls. Test keyboard navigation (Tab, Escape).
           </p>
         </div>

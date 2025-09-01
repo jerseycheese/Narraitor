@@ -18,12 +18,12 @@ export function WorldSkillsList({ skills, attributes }: WorldSkillsListProps) {
       <h2 className="text-2xl font-semibold mb-4">Skills that characters can learn in this world</h2>
       <div className="space-y-3">
         {skills.map((skill) => (
-          <div key={skill.id} className="border-l-4 border-blue-500 bg-gray-50 rounded-r-lg p-4">
+          <div key={skill.id} className="border-l-4 border-blue-500 bg-gray-100 rounded-r-lg p-4">
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h3 className="font-semibold text-lg mb-1">{skill.name}</h3>
                 {skill.description && (
-                  <p className="text-gray-600 text-sm mb-2">{skill.description}</p>
+                  <p className="text-gray-700 text-sm mb-2">{skill.description}</p>
                 )}
                 <div className="flex gap-4 text-sm text-gray-500">
                   {skill.attributeIds?.[0] && (

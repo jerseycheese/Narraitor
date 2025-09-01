@@ -280,11 +280,11 @@ Respond with JSON format:
   const currentSegments = getSessionSegments(sessionId);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">AI Ending Detection Test</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Test pure AI-based narrative ending detection. No keywords, no patterns - just AI understanding.
           </p>
         </header>
@@ -301,11 +301,11 @@ Respond with JSON format:
                 className={`p-4 rounded-lg border text-left transition-colors ${
                   currentScenario === key
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-gray-300 hover:border-gray-500'
                 } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <div className="font-medium">{scenario.name}</div>
-                <div className="text-sm text-gray-600 mt-1">
+                <div className="text-sm text-gray-700 mt-1">
                   {scenario.segments.length} segments
                 </div>
               </button>
@@ -316,14 +316,14 @@ Respond with JSON format:
             <button
               onClick={addNextSegment}
               disabled={!currentScenario || segmentIndex >= TEST_SCENARIOS[currentScenario as keyof typeof TEST_SCENARIOS]?.segments.length || isProcessing}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add Next Segment ({segmentIndex + 1}/{currentScenario ? TEST_SCENARIOS[currentScenario as keyof typeof TEST_SCENARIOS].segments.length : 0})
             </button>
             <button
               onClick={resetTest}
               disabled={isProcessing}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 disabled:opacity-50"
             >
               Reset Test
             </button>
@@ -332,8 +332,8 @@ Respond with JSON format:
 
         {/* Ending Suggestion Display */}
         {endingSuggestion && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-amber-800 mb-2">
+          <div className="bg-amber-50 border border-amber-500 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-amber-700 mb-2">
               🤖 AI Ending Suggestion
             </h3>
             <div className="mb-2">
@@ -356,7 +356,7 @@ Respond with JSON format:
                 {currentSegments.map((segment, index) => (
                   <div key={segment.id} className="border-l-4 border-blue-200 pl-4">
                     <div className="text-sm text-gray-500 mb-1">Segment {index + 1}</div>
-                    <div className="text-gray-800">{segment.content}</div>
+                    <div className="text-gray-900">{segment.content}</div>
                   </div>
                 ))}
               </div>
@@ -371,7 +371,7 @@ Respond with JSON format:
                 <p className="text-gray-500 italic">No activity yet.</p>
               ) : (
                 logs.map((log, index) => (
-                  <div key={index} className="text-sm font-mono bg-gray-50 p-2 rounded">
+                  <div key={index} className="text-sm font-mono bg-gray-100 p-2 rounded">
                     {log}
                   </div>
                 ))
@@ -396,7 +396,7 @@ Respond with JSON format:
 
         {/* Instructions */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">How to Test</h3>
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">How to Test</h3>
           <ol className="list-decimal list-inside space-y-2 text-blue-700">
             <li><strong>Choose a scenario</strong> - Each tests different ending detection patterns</li>
             <li><strong>Add segments one by one</strong> - Watch when AI suggests ending</li>
@@ -406,7 +406,7 @@ Respond with JSON format:
           </ol>
           
           <div className="mt-4 p-4 bg-white rounded border">
-            <h4 className="font-medium text-blue-800 mb-2">Expected Results:</h4>
+            <h4 className="font-medium text-blue-900 mb-2">Expected Results:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-blue-700">
               <li><strong>Conclusive Story:</strong> Should suggest ending after segment 4-5</li>
               <li><strong>Ongoing Adventure:</strong> Should NOT suggest ending</li>

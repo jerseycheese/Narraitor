@@ -65,7 +65,7 @@ export function CharacterSkillDisplay({ skills, showCategories = false }: Charac
 function SkillItem({ skill }: { skill: CharacterSkill }) {
   return (
     <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-      <div className="text-sm font-medium text-blue-600 mb-1">
+      <div className="text-sm font-medium text-blue-700 mb-1">
         {skill.name}
       </div>
       <div className="text-2xl font-bold text-blue-900">

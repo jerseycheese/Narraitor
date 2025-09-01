@@ -5,5 +5,5 @@ export function ButtonHarness() {
   // Stage 2: Test Harness – Add controls and variations
   // Stage 3: Integration – Integrate with state or context
 
-  return <Button variant="default" className="bg-blue-500 hover:bg-blue-600">Button Harness</Button>;
+  return <Button variant="default" className="bg-blue-500 hover:bg-blue-500">Button Harness</Button>;
 }

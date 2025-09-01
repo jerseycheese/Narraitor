@@ -63,7 +63,7 @@ export const PrioritizationSettings: React.FC<PrioritizationSettingsProps> = ({
         <h3 className="text-sm font-medium text-gray-700">Priority Weights</h3>
         {contextTypes.map(type => (
           <div key={type} className="flex items-center space-x-3">
-            <label className="flex-1 text-sm text-gray-600">
+            <label className="flex-1 text-sm text-gray-700">
               {type.replace(/\./g, ' > ')}
             </label>
             <input

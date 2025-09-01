@@ -62,8 +62,8 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                     <span 
                       className={`text-xs px-2 py-1 rounded-full font-medium ${
                         character.background.isKnownFigure 
-                          ? 'bg-amber-100 text-amber-800' 
-                          : 'bg-blue-100 text-blue-800'
+                          ? 'bg-amber-100 text-amber-700' 
+                          : 'bg-blue-100 text-blue-900'
                       }`}
                     >
                       {character.background.isKnownFigure ? (
@@ -75,7 +75,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                   )}
                 </div>
                 {character.background?.description && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-700">
                     {character.background.description}
                   </p>
                 )}
@@ -117,7 +117,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                 e.stopPropagation();
                 onEditCharacter(character.id);
               }}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
             >
               Edit
             </button>
@@ -126,7 +126,7 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                 e.stopPropagation();
                 onDeleteCharacter(character.id);
               }}
-              className="px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+              className="px-4 py-3 bg-red-500 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
             >
               Delete
             </button>

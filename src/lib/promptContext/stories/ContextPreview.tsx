@@ -104,7 +104,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
               <span className="font-medium">Final tokens:</span>
               <span className="ml-1">{finalTokenCount} / {tokenLimit}</span>
               {showWarning && finalTokenCount > tokenLimit && (
-                <span className="text-red-600 ml-2 font-bold">
+                <span className="text-red-500 ml-2 font-bold">
                   ⚠️ Limit exceeded
                 </span>
               )}
@@ -115,9 +115,9 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
             <div className="flex items-center justify-between text-sm mb-1">
               <span className="font-medium">Context retention:</span>
               <span className={`font-medium ${
-                retentionStatus === 'high' ? 'text-green-600' :
-                retentionStatus === 'medium' ? 'text-yellow-600' :
-                'text-red-600'
+                retentionStatus === 'high' ? 'text-green-500' :
+                retentionStatus === 'medium' ? 'text-amber-500' :
+                'text-red-500'
               }`}>
                 {formatPercentage(contextRetentionPercentage / 100, 1)}
               </span>
@@ -139,7 +139,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
           </div>
           
           {truncationOccurred && showWarning && (
-            <div className="text-sm bg-yellow-50 border border-yellow-200 p-2 rounded text-yellow-700">
+            <div className="text-sm bg-amber-200 border border-amber-200 p-2 rounded text-amber-700">
               <span className="font-bold">⚠️ Truncation applied:</span> Some content was removed to fit within the token limit.
               {contextRetentionPercentage < 50 && (
                 <span className="block mt-1">Significant content loss detected. Consider increasing token limit or reducing input content.</span>
@@ -150,8 +150,8 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
       )}
 
       {showPrioritizationInfo && (
-        <div className="narraitor-context-prioritization p-3 border rounded-lg bg-gray-50 mb-4">
-          <h3 className="font-medium text-gray-800 mb-2">Prioritization Info</h3>
+        <div className="narraitor-context-prioritization p-3 border rounded-lg bg-gray-100 mb-4">
+          <h3 className="font-medium text-gray-900 mb-2">Prioritization Info</h3>
           <div className="text-sm">
             <p className="mb-1"><span className="font-medium">Prompt Type:</span> {promptType}</p>
             <p className="mb-2">Content is prioritized based on:</p>

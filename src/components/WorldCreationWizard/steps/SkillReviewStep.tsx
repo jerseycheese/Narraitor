@@ -379,7 +379,7 @@ export default function SkillReviewStep({
                   {suggestion.difficulty}
                 </span>
                 {suggestion.isModified && (
-                  <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                  <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
                     Modified
                   </span>
                 )}
@@ -457,7 +457,7 @@ export default function SkillReviewStep({
                   
                   <div className="flex-1">
                     <WizardFormGroup label="Linked Attributes">
-                      <div className="text-sm text-gray-600 mb-3">
+                      <div className="text-sm text-gray-700 mb-3">
                         Select one or more attributes this skill depends on
                       </div>
                       <div className="space-y-2" data-testid={`skill-attributes-${index}`}>
@@ -485,7 +485,7 @@ export default function SkillReviewStep({
                         )}
                       </div>
                       {suggestion.selectedAttributeNames && suggestion.selectedAttributeNames.length > 0 && (
-                        <div className="mt-2 text-xs text-blue-600">
+                        <div className="mt-2 text-xs text-blue-700">
                           Selected: {suggestion.selectedAttributeNames.join(', ')}
                         </div>
                       )}
@@ -539,7 +539,7 @@ export default function SkillReviewStep({
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900">Custom Skills</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 Create your own unique skills for this world ({acceptedCount}/12 slots used)
               </p>
             </div>
@@ -555,8 +555,8 @@ export default function SkillReviewStep({
           </div>
           
           {customSkills.length === 0 && !isCreatingCustomSkill ? (
-            <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-600 mb-2">No custom skills yet</p>
+            <div className="text-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+              <p className="text-sm text-gray-700 mb-2">No custom skills yet</p>
               <p className="text-xs text-gray-500">
                 {acceptedCount < 12 
                   ? `You have ${12 - acceptedCount} skill slot${12 - acceptedCount !== 1 ? 's' : ''} available for custom skills`
@@ -575,7 +575,7 @@ export default function SkillReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{skill.name}</span>
-                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                      <span className="text-xs text-blue-700 bg-blue-100 px-2 py-1 rounded">
                         Custom
                       </span>
                       <span className={`${wizardStyles.badge.base} ${
@@ -614,7 +614,7 @@ export default function SkillReviewStep({
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600">
+                  <div className="mt-2 text-sm text-gray-700">
                     {skill.description}
                   </div>
                 </div>
@@ -624,7 +624,7 @@ export default function SkillReviewStep({
           
           {/* Custom Skill Editor */}
           {isCreatingCustomSkill && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border" data-testid="custom-skill-editor">
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg border" data-testid="custom-skill-editor">
               <SkillEditor
                 worldId={worldData.id || ''}
                 mode={editingCustomSkillId ? 'edit' : 'create'}
@@ -648,7 +648,7 @@ export default function SkillReviewStep({
               Skills Selected: {acceptedCount} / 12
             </span>
             {acceptedCount >= 12 && (
-              <span className="text-xs text-amber-600 ml-2">
+              <span className="text-xs text-amber-500 ml-2">
                 (Maximum reached)
               </span>
             )}
@@ -662,7 +662,7 @@ export default function SkillReviewStep({
         </div>
         <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
           <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
             style={{ width: `${(acceptedCount / 12) * 100}%` }}
           ></div>
         </div>

@@ -53,7 +53,7 @@ const meta: Meta<typeof Navigation> = {
             <div className="p-8">
               <div className="bg-white rounded-lg p-6 shadow">
                 <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-                <p className="text-gray-600">
+                <p className="text-gray-700">
                   This area represents the page content below the navigation.
                   The navigation component adapts based on the current world state and user context.
                 </p>
@@ -311,7 +311,7 @@ export const MobileView: Story = {
             <div className="p-8">
               <div className="bg-white rounded-lg p-6 shadow">
                 <h2 className="text-xl font-semibold mb-4">Mobile Page Content</h2>
-                <p className="text-gray-600">
+                <p className="text-gray-700">
                   This shows the mobile navigation with hamburger menu. 
                   The menu should show when screen width is ≤768px.
                 </p>

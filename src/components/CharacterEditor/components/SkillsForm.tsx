@@ -48,7 +48,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 {worldSkill?.difficulty && (
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     worldSkill.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                    worldSkill.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                    worldSkill.difficulty === 'medium' ? 'bg-amber-100 text-amber-700' :
                     'bg-red-100 text-red-700'
                   }`}>
                     {worldSkill.difficulty}
@@ -66,7 +66,7 @@ export const SkillsForm: React.FC<SkillsFormProps> = ({
                 showLabel={false}
                 testId={`skill-${skill.skillId}`}
               />
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 mt-1">
                 Range: {minValue} - {maxValue}
                 {worldSkill?.attributeIds && worldSkill.attributeIds.length > 0 && (
                   <span className="ml-2">

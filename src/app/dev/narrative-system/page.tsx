@@ -231,28 +231,28 @@ export default function NarrativeSystemHarness() {
         <div className="space-y-4">
           <div className="flex gap-2">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
               onClick={handleGenerateNarrative}
             >
               Generate Initial Narrative
             </button>
             
             <button
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-500"
               onClick={() => setShowController(!showController)}
             >
               {showController ? 'Use Manual History' : 'Use Controller'}
             </button>
             
             <button
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+              className="px-4 py-2 bg-amber-2000 text-white rounded hover:bg-amber-50000"
               onClick={handleNewSession}
             >
               New Session
             </button>
             
             <button
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
               onClick={handleClearSession}
             >
               Clear Session
@@ -260,7 +260,7 @@ export default function NarrativeSystemHarness() {
           </div>
           
           <div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-700">
               Session ID: <code className="bg-gray-200 px-2 py-1 rounded">{sessionId}</code>
             </p>
           </div>
@@ -311,14 +311,14 @@ export default function NarrativeSystemHarness() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h2 className="text-xl font-semibold mb-2">Store State</h2>
-          <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
+          <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
             <pre style={{ background: 'transparent' }}>{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         
         <div>
           <h2 className="text-xl font-semibold mb-2">Current Segments</h2>
-          <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
+          <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
             <pre style={{ background: 'transparent' }}>{JSON.stringify(segments, null, 2)}</pre>
           </div>
         </div>

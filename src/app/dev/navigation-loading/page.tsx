@@ -73,7 +73,7 @@ export default function NavigationLoadingTestPage() {
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="border-b pb-4">
         <h1 className="text-2xl font-bold mb-2">Navigation Loading Test Harness</h1>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-700 mb-4">
           Test and verify navigation loading states, transitions, and user feedback.
         </p>
         <div className="bg-blue-50 p-4 rounded-lg text-sm">
@@ -81,7 +81,7 @@ export default function NavigationLoadingTestPage() {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <p className="font-medium text-green-700 mb-1">✅ Shows LoadingOverlay:</p>
-              <ul className="text-green-600 space-y-1">
+              <ul className="text-green-500 space-y-1">
                 <li>• World switching (loads data)</li>
                 <li>• Starting gameplay (initializes session)</li>
                 <li>• Creation wizards (complex flows)</li>
@@ -89,7 +89,7 @@ export default function NavigationLoadingTestPage() {
             </div>
             <div>
               <p className="font-medium text-gray-700 mb-1">⚡ Fast Navigation (No overlay):</p>
-              <ul className="text-gray-600 space-y-1">
+              <ul className="text-gray-700 space-y-1">
                 <li>• Worlds/Characters links</li>
                 <li>• Home/Logo navigation</li>
                 <li>• Simple page transitions</li>
@@ -100,7 +100,7 @@ export default function NavigationLoadingTestPage() {
       </div>
 
       {/* Current State Display */}
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="bg-gray-100 p-4 rounded-lg">
         <h2 className="text-lg font-semibold mb-3">Current Loading State</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -144,7 +144,7 @@ export default function NavigationLoadingTestPage() {
           {testLoadingScenarios.map((scenario, index) => (
             <div key={index} className="border p-4 rounded-lg">
               <h3 className="font-medium mb-2">{scenario.description}</h3>
-              <p className="text-sm text-gray-600 mb-3">{scenario.message}</p>
+              <p className="text-sm text-gray-700 mb-3">{scenario.message}</p>
               <Button
                 onClick={() => handleTestScenario(scenario)}
                 variant={scenario.type === 'error' ? 'destructive' : 'default'}
@@ -178,7 +178,7 @@ export default function NavigationLoadingTestPage() {
 
         <div className="border p-4 rounded-lg">
           <h3 className="font-medium mb-2">Debouncing Test</h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-gray-700 mb-3">
             Tests that loading states under 150ms don&apos;t flash
           </p>
           <Button
@@ -199,7 +199,7 @@ export default function NavigationLoadingTestPage() {
           {testNavigationRoutes.map((route, index) => (
             <div key={index} className="border p-4 rounded-lg">
               <h3 className="font-medium mb-2">{route.label}</h3>
-              <p className="text-sm text-gray-600 mb-3">{route.message}</p>
+              <p className="text-sm text-gray-700 mb-3">{route.message}</p>
               <Button
                 onClick={() => navigateWithLoading(route.path, route.message)}
                 className="w-full"
@@ -215,14 +215,14 @@ export default function NavigationLoadingTestPage() {
       {/* Fast Navigation Comparison */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Fast Navigation (No Loading Overlay)</h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           These navigation actions use regular Next.js Links for instant transitions without loading overlays.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="border p-4 rounded-lg">
             <h3 className="font-medium mb-2">Simple List Navigation</h3>
-            <p className="text-sm text-gray-600 mb-3">Fast page transitions for list views</p>
+            <p className="text-sm text-gray-700 mb-3">Fast page transitions for list views</p>
             <div className="space-y-2">
               <Link href="/worlds" className="block px-3 py-2 bg-gray-100 rounded text-center hover:bg-gray-200 transition-colors">
                 → Worlds List
@@ -234,7 +234,7 @@ export default function NavigationLoadingTestPage() {
           </div>
           <div className="border p-4 rounded-lg">
             <h3 className="font-medium mb-2">Static Page Navigation</h3>
-            <p className="text-sm text-gray-600 mb-3">Instant navigation to static content</p>
+            <p className="text-sm text-gray-700 mb-3">Instant navigation to static content</p>
             <div className="space-y-2">
               <Link href="/" className="block px-3 py-2 bg-gray-100 rounded text-center hover:bg-gray-200 transition-colors">
                 → Home Page
@@ -246,7 +246,7 @@ export default function NavigationLoadingTestPage() {
           </div>
           <div className="border p-4 rounded-lg">
             <h3 className="font-medium mb-2">Dev Pages</h3>
-            <p className="text-sm text-gray-600 mb-3">Development tools and testing</p>
+            <p className="text-sm text-gray-700 mb-3">Development tools and testing</p>
             <div className="space-y-2">
               <Link href="/dev" className="block px-3 py-2 bg-gray-100 rounded text-center hover:bg-gray-200 transition-colors">
                 → Dev Tools
@@ -342,7 +342,7 @@ export default function NavigationLoadingTestPage() {
       {/* Background Content */}
       <div className="bg-blue-50 p-4 rounded-lg">
         <h3 className="font-medium mb-2">Background Content</h3>
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm text-gray-700 mb-3">
           This content should be blocked when overlays are active.
         </p>
         <Button variant="outline" size="sm">

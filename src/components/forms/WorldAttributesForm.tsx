@@ -185,7 +185,7 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
               </div>
               
               <div className="space-y-2">
-                <p className="text-sm text-gray-600">{attribute.description}</p>
+                <p className="text-sm text-gray-700">{attribute.description}</p>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">Range:</span> {attribute.minValue} - {attribute.maxValue}

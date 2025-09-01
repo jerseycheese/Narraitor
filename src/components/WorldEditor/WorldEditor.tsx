@@ -74,7 +74,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center p-8">
-        <div className="text-lg text-gray-600">Loading world data...</div>
+        <div className="text-lg text-gray-700">Loading world data...</div>
       </div>
     );
   }
@@ -82,7 +82,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   if (error || !world) {
     return (
       <div className="p-4">
-        <div className="text-red-600">{error || 'World not found'}</div>
+        <div className="text-red-500">{error || 'World not found'}</div>
         <Button 
           onClick={() => router.push('/worlds')}
           className="mt-4"

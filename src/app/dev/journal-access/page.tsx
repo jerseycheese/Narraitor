@@ -190,7 +190,7 @@ export default function JournalAccessTestPage() {
   }, [entryCount]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Test Controls */}
       <div className="bg-white shadow-md p-6 border-b">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -237,7 +237,7 @@ export default function JournalAccessTestPage() {
               onChange={(e) => setEntryCount(parseInt(e.target.value))}
               className="w-full"
             />
-            <span className="text-sm text-gray-600">{entryCount} entries</span>
+            <span className="text-sm text-gray-700">{entryCount} entries</span>
           </div>
           
           {/* Journal Controls */}
@@ -251,7 +251,7 @@ export default function JournalAccessTestPage() {
                 setEntryCount(0);
                 setTimeout(() => setEntryCount(3), 100);
               }}
-              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-600"
+              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-500"
             >
               Clear & Regenerate Journal
             </button>
@@ -261,7 +261,7 @@ export default function JournalAccessTestPage() {
         {/* Acceptance Criteria Checklist */}
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
           <h3 className="font-semibold text-blue-900 mb-2">✅ Acceptance Criteria Testing</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <ul className="text-sm text-blue-900 space-y-1">
             <li>🎯 <strong>AC1:</strong> Journal button visible when character present</li>
             <li>🎯 <strong>AC2:</strong> Game state preserved when journal opened</li>
             <li>🎯 <strong>AC3:</strong> Journal available during active/paused status</li>
@@ -290,8 +290,8 @@ export default function JournalAccessTestPage() {
           <h3 className="font-semibold text-gray-900 mb-3">🧪 Testing Instructions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
             <div>
-              <h4 className="font-medium text-gray-800 mb-2">Interactive Tests:</h4>
-              <ul className="space-y-1 text-gray-600">
+              <h4 className="font-medium text-gray-900 mb-2">Interactive Tests:</h4>
+              <ul className="space-y-1 text-gray-700">
                 <li>• Toggle character presence to test AC1</li>
                 <li>• Change game status to test AC3</li>
                 <li>• Adjust entry count to test different journal states</li>
@@ -301,8 +301,8 @@ export default function JournalAccessTestPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-medium text-gray-800 mb-2">Expected Behavior:</h4>
-              <ul className="space-y-1 text-gray-600">
+              <h4 className="font-medium text-gray-900 mb-2">Expected Behavior:</h4>
+              <ul className="space-y-1 text-gray-700">
                 <li>• Journal button appears only with character</li>
                 <li>• Modal opens with role=&quot;dialog&quot; and aria-modal=&quot;true&quot;</li>
                 <li>• Journal entries display correctly</li>

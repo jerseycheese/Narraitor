@@ -176,7 +176,7 @@ export default function CharacterGenerationTestPage() {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !selectedWorldId}
-            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? 'Generating...' : 'Generate Character'}
           </button>
@@ -184,8 +184,8 @@ export default function CharacterGenerationTestPage() {
         
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-red-200 border border-red-500 rounded-lg p-4">
+            <p className="text-red-700">{error}</p>
           </div>
         )}
         
@@ -258,7 +258,7 @@ export default function CharacterGenerationTestPage() {
               <div className="mt-6 pt-6 border-t">
                 <button
                   onClick={handleCreateCharacter}
-                  className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-700"
                 >
                   Create This Character
                 </button>
@@ -275,7 +275,7 @@ export default function CharacterGenerationTestPage() {
               {(Object.values(characters) as Character[])
                 .filter(c => c.worldId === selectedWorldId)
                 .map(character => (
-                  <div key={character.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                  <div key={character.id} className="flex justify-between items-center p-2 bg-gray-100 rounded">
                     <span>{character.name}</span>
                     <span className="text-sm text-gray-500">Level {character.level}</span>
                   </div>

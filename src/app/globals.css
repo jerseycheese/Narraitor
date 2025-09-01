@@ -212,18 +212,18 @@
 @layer base {
   /* Main element background - only for non-ending screens */
   main:not(.ending-screen) {
-    background-color: #f7f3ed;
+    background-color: theme('colors.gray.100'); /* Using design token instead of hardcoded color */
   }
   
   /* Link defaults */
   a {
-    color: #2563eb; /* blue-600 */
+    color: theme('colors.blue.500');
     text-decoration: none;
     transition: color 0.2s ease-in-out;
   }
   
   a:hover {
-    color: #1d4ed8; /* blue-700 */
+    color: theme('colors.blue.700');
     text-decoration: underline;
   }
   
@@ -232,30 +232,30 @@
   p a,
   li a,
   span a {
-    color: #2563eb; /* blue-600 */
+    color: theme('colors.blue.500');
     text-decoration: underline;
-    text-decoration-color: #93c5fd; /* blue-300 - subtle underline */
+    text-decoration-color: theme('colors.blue.300');
   }
   
   .prose a:hover,
   p a:hover,
   li a:hover,
   span a:hover {
-    color: #1d4ed8; /* blue-700 */
-    text-decoration-color: #2563eb; /* blue-600 - stronger underline */
+    color: theme('colors.blue.700');
+    text-decoration-color: theme('colors.blue.500');
   }
   
   /* Standardized text link classes */
   .text-link-primary {
-    @apply text-blue-600 hover:underline transition-colors underline-offset-4;
+    @apply text-blue-500 hover:underline transition-colors underline-offset-4;
   }
   
   .text-link-secondary {
-    @apply text-gray-600 hover:text-blue-600 hover:underline transition-colors underline-offset-4;
+    @apply text-gray-500 hover:text-blue-500 hover:underline transition-colors underline-offset-4;
   }
   
   .text-link-nav {
-    @apply text-blue-600 hover:text-blue-700 transition-colors;
+    @apply text-blue-500 hover:text-blue-700 transition-colors;
   }
   
   .text-link-nav-dark {
@@ -269,14 +269,12 @@
   
   /* Links in dark backgrounds should remain light - but not navigation links */
   .bg-gray-900 a:not([data-navigation]),
-  .bg-gray-800 a:not([data-navigation]),
-  .bg-slate-800 a:not([data-navigation]) {
+  .bg-gray-700 a:not([data-navigation]) {
     color: inherit;
   }
   
   .bg-gray-900 a:not([data-navigation]):hover,
-  .bg-gray-800 a:not([data-navigation]):hover,
-  .bg-slate-800 a:not([data-navigation]):hover {
+  .bg-gray-700 a:not([data-navigation]):hover {
     text-decoration: none;
   }
   
@@ -336,7 +334,7 @@
   }
   
   .btn-primary {
-    background-color: var(--color-blue-600);
+    background-color: var(--color-blue-500);
     color: var(--color-white);
     border: 0;
   }
@@ -349,8 +347,8 @@
 /* DevTools specific styling - not in a layer */
 .devtools-panel {
   font-size: 12px;
-  background-color: var(--color-slate-800);
-  color: var(--color-slate-200);
+  background-color: var(--color-gray-700);
+  color: var(--color-gray-300);
 }
 
 .devtools-panel h1,
@@ -362,27 +360,27 @@
   font-size: 0.75rem;
   font-weight: 500;
   margin: 0.5rem 0;
-  color: var(--color-slate-200);
+  color: var(--color-gray-300);
 }
 
 .devtools-panel p {
   font-size: 0.75rem;
   margin: 0.5rem 0;
-  color: var(--color-slate-300);
+  color: var(--color-gray-500);
 }
 
 .devtools-panel button {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
   border-radius: var(--rounded);
-  border: 1px solid var(--color-slate-500);
+  border: 1px solid var(--color-gray-500);
   cursor: pointer;
-  background-color: var(--color-slate-600);
-  color: var(--color-slate-200);
+  background-color: var(--color-gray-500);
+  color: var(--color-gray-300);
 }
 
 .devtools-panel button:hover {
-  background-color: var(--color-slate-500);
+  background-color: var(--color-gray-700);
 }
 
 /* Utility layer for custom animations and mobile optimizations */

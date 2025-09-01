@@ -99,7 +99,7 @@ test.describe('Visual Testing Infrastructure Validation', () => {
     try {
       // Intentionally create a scenario that might cause visual differences
       await page.locator('body').evaluate(el => {
-        el.style.backgroundColor = 'rgb(255, 0, 0)'; // Red background
+        el.style.backgroundColor = '#ef4444'; // red-500 from design system
       });
       
       // This should either pass with the changed background or fail with useful diff
@@ -165,7 +165,7 @@ test.describe('Browser-Specific Visual Configuration', () => {
         padding: 20px; 
         background: white; 
         margin: 20px;
-        border: 1px solid #ccc;
+        border: 1px solid #d1d5db; /* gray-300 from design system */
         position: relative;
         z-index: 1;
       `;

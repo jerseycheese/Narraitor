@@ -62,7 +62,7 @@ export const WithError: Story = {
         {...args} 
         className="border-red-300 focus-visible:ring-red-500" 
       />
-      <p className="text-red-600 text-sm">Character name is required</p>
+      <p className="text-red-500 text-sm">Character name is required</p>
     </div>
   ),
   args: {

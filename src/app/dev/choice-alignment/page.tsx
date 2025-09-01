@@ -139,7 +139,7 @@ export default function ChoiceAlignmentTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
@@ -170,7 +170,7 @@ export default function ChoiceAlignmentTestPage() {
                 <button
                   onClick={generateChoices}
                   disabled={loading || !worldId}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
                 >
                   {loading ? 'Generating...' : !worldId ? 'Initializing...' : 'Generate Aligned Choices'}
                 </button>
@@ -186,7 +186,7 @@ export default function ChoiceAlignmentTestPage() {
               <p className="text-sm text-gray-700 mb-2">
                 <strong>Situation:</strong> {scenarios[scenario].situation}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 {scenarios[scenario].context}
               </p>
             </div>
@@ -194,7 +194,7 @@ export default function ChoiceAlignmentTestPage() {
 
           {/* Error Display */}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <div className="bg-red-100 border border-red-500 text-red-700 px-4 py-3 rounded mb-6">
               <strong>Error:</strong> {error}
             </div>
           )}
@@ -217,7 +217,7 @@ export default function ChoiceAlignmentTestPage() {
                     <span><strong>Neutral:</strong> Balanced, practical approach</span>
                   </div>
                   <div className="flex items-center">
-                    <div className="w-4 h-4 bg-red-50 border border-red-300 rounded mr-2"></div>
+                    <div className="w-4 h-4 bg-red-200 border border-red-300 rounded mr-2"></div>
                     <span><strong>Chaos:</strong> Unexpected, disruptive action</span>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default function ChoiceAlignmentTestPage() {
                   <summary className="text-sm font-semibold text-gray-900 cursor-pointer">
                     Raw Decision Object
                   </summary>
-                  <pre className="text-xs text-gray-600 mt-2 overflow-auto">
+                  <pre className="text-xs text-gray-700 mt-2 overflow-auto">
                     {JSON.stringify(decision, null, 2)}
                   </pre>
                 </details>
@@ -265,7 +265,7 @@ export default function ChoiceAlignmentTestPage() {
 
           {/* Instructions */}
           <div className="mt-8 bg-amber-50 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-amber-800 mb-2">Testing Instructions</h3>
+            <h3 className="text-lg font-semibold text-amber-700 mb-2">Testing Instructions</h3>
             <ul className="text-sm text-amber-700 space-y-1">
               <li>• Try different scenarios to see how alignment varies with context</li>
               <li>• Notice the color coding: blue for lawful, neutral for white, red for chaos</li>

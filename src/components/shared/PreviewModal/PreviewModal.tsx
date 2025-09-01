@@ -62,7 +62,7 @@ function PreviewModalInner<T>({
     >
       <div className="space-y-6">
         {subtitle && (
-          <p className="text-gray-600 -mt-2">{subtitle}</p>
+          <p className="text-gray-700 -mt-2">{subtitle}</p>
         )}
 
         {renderContent(data)}

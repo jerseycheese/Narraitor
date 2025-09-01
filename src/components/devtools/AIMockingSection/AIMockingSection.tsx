@@ -118,7 +118,7 @@ export const AIMockingSection: React.FC = () => {
       {/* Mode Toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${config.isEnabled ? 'bg-yellow-500' : 'bg-green-500'}`} />
+          <div className={`w-2 h-2 rounded-full ${config.isEnabled ? 'bg-amber-2000' : 'bg-green-500'}`} />
           <span className="text-xs text-gray-200">
             Mode: {config.isEnabled ? 'Mock' : 'Live API'}
           </span>
@@ -129,8 +129,8 @@ export const AIMockingSection: React.FC = () => {
           size="sm"
           variant={config.isEnabled ? "default" : "outline"}
           className={config.isEnabled 
-            ? "bg-yellow-600 hover:bg-yellow-700 text-white" 
-            : "border-gray-600 text-gray-300 hover:bg-gray-700"
+            ? "bg-amber-50000 hover:bg-amber-700 text-white" 
+            : "border-gray-700 text-gray-300 hover:bg-gray-700"
           }
           data-testid="mock-mode-toggle"
         >
@@ -148,7 +148,7 @@ export const AIMockingSection: React.FC = () => {
             <select
               value={config.activeScenarioId}
               onChange={(e) => handleScenarioChange(e.target.value)}
-              className="w-full bg-gray-700 border border-gray-600 text-gray-200 rounded px-3 py-2 text-sm"
+              className="w-full bg-gray-700 border border-gray-700 text-gray-200 rounded px-3 py-2 text-sm"
               data-testid="scenario-selector"
             >
               {allScenarios.map(scenario => (
@@ -159,7 +159,7 @@ export const AIMockingSection: React.FC = () => {
             </select>
             
             {activeScenario && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-500 mt-1">
                 {activeScenario.description}
               </p>
             )}
@@ -188,7 +188,7 @@ export const AIMockingSection: React.FC = () => {
                 type="number"
                 value={config.settings.variationPercent}
                 onChange={(e) => mockStateManager.updateSettings({ variationPercent: parseInt(e.target.value) || 0 })}
-                className="bg-gray-700 border-gray-600 text-gray-200"
+                className="bg-gray-700 border-gray-700 text-gray-200"
                 min="0"
                 max="100"
                 disabled={!config.settings.delayVariation}
@@ -197,33 +197,33 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Custom Scenarios */}
-          <div className="border-t border-gray-600 pt-4">
+          <div className="border-t border-gray-700 pt-4">
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-gray-200">Custom Scenarios</h4>
               <Button
                 onClick={() => setShowCustomScenario(!showCustomScenario)}
                 size="sm"
                 variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-700 text-gray-300 hover:bg-gray-700"
               >
                 Add Custom
               </Button>
             </div>
 
             {showCustomScenario && (
-              <div className="space-y-3 bg-gray-700/50 p-3 rounded border border-gray-600 mb-3">
+              <div className="space-y-3 bg-gray-700/50 p-3 rounded border border-gray-700 mb-3">
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     placeholder="Scenario ID"
                     value={customScenario.id}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, id: e.target.value }))}
-                    className="bg-gray-800 border-gray-600 text-gray-200"
+                    className="bg-gray-900 border-gray-700 text-gray-200"
                   />
                   <Input
                     placeholder="Scenario Name"
                     value={customScenario.name}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, name: e.target.value }))}
-                    className="bg-gray-800 border-gray-600 text-gray-200"
+                    className="bg-gray-900 border-gray-700 text-gray-200"
                   />
                 </div>
                 
@@ -231,7 +231,7 @@ export const AIMockingSection: React.FC = () => {
                   placeholder="Description"
                   value={customScenario.description}
                   onChange={(e) => setCustomScenario(prev => ({ ...prev, description: e.target.value }))}
-                  className="bg-gray-800 border-gray-600 text-gray-200"
+                  className="bg-gray-900 border-gray-700 text-gray-200"
                   rows={2}
                 />
                 
@@ -241,7 +241,7 @@ export const AIMockingSection: React.FC = () => {
                     placeholder="Delay (ms)"
                     value={customScenario.delay}
                     onChange={(e) => setCustomScenario(prev => ({ ...prev, delay: parseInt(e.target.value) || 1000 }))}
-                    className="bg-gray-800 border-gray-600 text-gray-200"
+                    className="bg-gray-900 border-gray-700 text-gray-200"
                     min="0"
                   />
                   
@@ -260,14 +260,14 @@ export const AIMockingSection: React.FC = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button onClick={handleAddCustomScenario} size="sm" className="bg-green-600 hover:bg-green-700">
+                  <Button onClick={handleAddCustomScenario} size="sm" className="bg-green-500 hover:bg-green-700">
                     Add Scenario
                   </Button>
                   <Button 
                     onClick={() => setShowCustomScenario(false)} 
                     size="sm" 
                     variant="ghost"
-                    className="text-gray-300 hover:bg-gray-600"
+                    className="text-gray-300 hover:bg-gray-700"
                   >
                     Cancel
                   </Button>
@@ -279,16 +279,16 @@ export const AIMockingSection: React.FC = () => {
             {config.customScenarios.length > 0 && (
               <div className="space-y-2">
                 {config.customScenarios.map(scenario => (
-                  <div key={scenario.id} className="flex items-center justify-between bg-gray-700 p-2 rounded border border-gray-600">
+                  <div key={scenario.id} className="flex items-center justify-between bg-gray-700 p-2 rounded border border-gray-700">
                     <div>
                       <div className="text-sm text-gray-200">{scenario.name}</div>
-                      <div className="text-xs text-gray-400">{scenario.description}</div>
+                      <div className="text-xs text-gray-500">{scenario.description}</div>
                     </div>
                     <Button
                       onClick={() => handleRemoveCustomScenario(scenario.id)}
                       size="sm"
                       variant="ghost"
-                      className="text-red-400 hover:bg-gray-600"
+                      className="text-red-500 hover:bg-gray-700"
                     >
                       Remove
                     </Button>
@@ -299,20 +299,20 @@ export const AIMockingSection: React.FC = () => {
           </div>
 
           {/* Import/Export */}
-          <div className="border-t border-gray-600 pt-4">
+          <div className="border-t border-gray-700 pt-4">
             <h4 className="text-sm font-semibold text-gray-200 mb-2">Configuration</h4>
             <div className="flex gap-2">
-              <Button onClick={handleExportConfig} size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+              <Button onClick={handleExportConfig} size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-700">
                 Export
               </Button>
-              <Button onClick={handleImportConfig} size="sm" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700">
+              <Button onClick={handleImportConfig} size="sm" variant="outline" className="border-gray-700 text-gray-300 hover:bg-gray-700">
                 Import
               </Button>
               <Button 
                 onClick={() => mockStateManager.reset()} 
                 size="sm" 
                 variant="outline" 
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                className="border-gray-700 text-gray-300 hover:bg-gray-700"
               >
                 Reset
               </Button>

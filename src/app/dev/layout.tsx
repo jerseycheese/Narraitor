@@ -9,9 +9,9 @@ export default function DevLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-gray-100 min-h-screen">
       <div className="container mx-auto p-4">
-        <header className="bg-blue-600 text-white p-4 mb-4 rounded shadow">
+        <header className="bg-blue-500 text-white p-4 mb-4 rounded shadow">
           <Link href="/dev">
             <h1 className="text-2xl font-bold text-white hover:text-gray-200 transition-colors cursor-pointer">Narraitor Development</h1>
           </Link>

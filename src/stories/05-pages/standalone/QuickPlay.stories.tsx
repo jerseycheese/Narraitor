@@ -15,7 +15,7 @@ const meta: Meta<typeof QuickPlay> = {
   },
   decorators: [
     (Story) => (
-      <div className="max-w-2xl mx-auto p-8 bg-gray-50">
+      <div className="max-w-2xl mx-auto p-8 bg-gray-100">
         <Story />
       </div>
     ),

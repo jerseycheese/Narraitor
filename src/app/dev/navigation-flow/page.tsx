@@ -29,7 +29,7 @@ export default function NavigationFlowTestPage() {
       <div className="max-w-6xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Navigation Flow Test Harness</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Test the enhanced navigation components and flow logic
           </p>
         </header>
@@ -42,7 +42,7 @@ export default function NavigationFlowTestPage() {
               onClick={() => setActiveTest('quickplay')}
               className={`px-4 py-2 rounded transition-colors ${
                 activeTest === 'quickplay'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -52,7 +52,7 @@ export default function NavigationFlowTestPage() {
               onClick={() => setActiveTest('wizard')}
               className={`px-4 py-2 rounded transition-colors ${
                 activeTest === 'wizard'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -62,7 +62,7 @@ export default function NavigationFlowTestPage() {
               onClick={() => setActiveTest('breadcrumbs')}
               className={`px-4 py-2 rounded transition-colors ${
                 activeTest === 'breadcrumbs'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -72,7 +72,7 @@ export default function NavigationFlowTestPage() {
               onClick={() => setActiveTest('flow')}
               className={`px-4 py-2 rounded transition-colors ${
                 activeTest === 'flow'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
             >
@@ -92,7 +92,7 @@ export default function NavigationFlowTestPage() {
                   <p className="text-gray-500">No worlds created</p>
                 ) : (
                   worldList.map(world => (
-                    <div key={world.id} className="text-gray-600">
+                    <div key={world.id} className="text-gray-700">
                       {world.name} ({world.genre})
                     </div>
                   ))
@@ -106,7 +106,7 @@ export default function NavigationFlowTestPage() {
                   <p className="text-gray-500">No characters created</p>
                 ) : (
                   characterList.map(character => (
-                    <div key={character.id} className="text-gray-600">
+                    <div key={character.id} className="text-gray-700">
                       {character.name} ({worlds[character.worldId]?.name || 'Unknown World'})
                     </div>
                   ))
@@ -120,7 +120,7 @@ export default function NavigationFlowTestPage() {
                   <p className="text-gray-500">No saved sessions</p>
                 ) : (
                   sessionList.map(session => (
-                    <div key={session.id} className="text-gray-600">
+                    <div key={session.id} className="text-gray-700">
                       {worlds[session.worldId]?.name || 'Unknown'} / {characters[session.characterId]?.name || 'Unknown'}
                     </div>
                   ))
@@ -144,7 +144,7 @@ export default function NavigationFlowTestPage() {
           {activeTest === 'wizard' && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Game Start Wizard</h2>
-              <div className="mb-4 p-4 bg-gray-50 rounded">
+              <div className="mb-4 p-4 bg-gray-100 rounded">
                 <h3 className="font-medium mb-2">Wizard Configuration</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -196,13 +196,13 @@ export default function NavigationFlowTestPage() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-medium mb-2">Standard Breadcrumbs</h3>
-                  <div className="bg-gray-50 p-4 rounded">
+                  <div className="bg-gray-100 p-4 rounded">
                     <Breadcrumbs />
                   </div>
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">With Next Step Guidance</h3>
-                  <div className="bg-gray-50 p-4 rounded">
+                  <div className="bg-gray-100 p-4 rounded">
                     <Breadcrumbs showNextStep />
                   </div>
                 </div>
@@ -217,14 +217,14 @@ export default function NavigationFlowTestPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h3 className="font-medium mb-2">Current Flow State</h3>
-                    <div className="bg-gray-50 p-4 rounded space-y-2">
+                    <div className="bg-gray-100 p-4 rounded space-y-2">
                       <div>
                         <span className="font-medium">Current Step:</span>{' '}
-                        <span className="text-blue-600">{getCurrentFlowStep()}</span>
+                        <span className="text-blue-700">{getCurrentFlowStep()}</span>
                       </div>
                       <div>
                         <span className="font-medium">Can Quick Start:</span>{' '}
-                        <span className={canQuickStart() ? 'text-green-600' : 'text-red-600'}>
+                        <span className={canQuickStart() ? 'text-green-500' : 'text-red-500'}>
                           {canQuickStart() ? 'Yes' : 'No'}
                         </span>
                       </div>
@@ -232,7 +232,7 @@ export default function NavigationFlowTestPage() {
                   </div>
                   <div>
                     <h3 className="font-medium mb-2">Next Step</h3>
-                    <div className="bg-gray-50 p-4 rounded">
+                    <div className="bg-gray-100 p-4 rounded">
                       {(() => {
                         const nextStep = getNextStep();
                         if (!nextStep) {
@@ -253,7 +253,7 @@ export default function NavigationFlowTestPage() {
                 
                 <div>
                   <h3 className="font-medium mb-2">Quick Start Info</h3>
-                  <div className="bg-gray-50 p-4 rounded">
+                  <div className="bg-gray-100 p-4 rounded">
                     {(() => {
                       const quickStartInfo = getQuickStartInfo();
                       if (!quickStartInfo) {

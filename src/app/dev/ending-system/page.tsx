@@ -72,7 +72,7 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
@@ -81,7 +81,7 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
           
           <div className="space-y-6">
             {/* Status Display */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-100 rounded-lg p-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">Current Status</h2>
               <div className="space-y-2">
                 <p><strong>Is Generating:</strong> {isGeneratingEnding ? 'Yes' : 'No'}</p>
@@ -144,14 +144,14 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
               <button
                 onClick={handleGenerateEnding}
                 disabled={isGeneratingEnding}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isGeneratingEnding ? 'Generating...' : 'Generate AI Ending'}
               </button>
 
               <button
                 onClick={handleUseMockData}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 Use Mock Ending Data
               </button>
@@ -159,16 +159,16 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
               <button
                 onClick={clearEnding}
                 disabled={!currentEnding}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Clear Ending
               </button>
             </div>
 
             {/* Test Information */}
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-blue-100 rounded-lg p-4">
               <h3 className="text-lg font-semibold text-blue-900 mb-2">Test Information</h3>
-              <div className="text-sm text-blue-800 space-y-1">
+              <div className="text-sm text-blue-900 space-y-1">
                 <p><strong>Session ID:</strong> {mockSessionId}</p>
                 <p><strong>Character ID:</strong> {mockCharacterId}</p>
                 <p><strong>World ID:</strong> {mockWorldId}</p>
@@ -178,22 +178,22 @@ Trade routes reopened, alliances were strengthened, and the people looked toward
 
             {/* Error Display */}
             {endingError && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-red-200 border border-red-500 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-red-900 mb-2">Error</h3>
-                <p className="text-red-800">{endingError}</p>
+                <p className="text-red-700">{endingError}</p>
               </div>
             )}
 
             {/* Loading State */}
             {isGeneratingEnding && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-yellow-900 mb-2">Generating Ending</h3>
-                <p className="text-yellow-800">Please wait while we create your story ending...</p>
+              <div className="bg-amber-200 border border-amber-500 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Generating Ending</h3>
+                <p className="text-gray-700">Please wait while we create your story ending...</p>
                 <div className="mt-2">
                   <div className="animate-pulse flex space-x-4">
-                    <div className="rounded bg-yellow-200 h-2 w-1/4"></div>
-                    <div className="rounded bg-yellow-200 h-2 w-1/2"></div>
-                    <div className="rounded bg-yellow-200 h-2 w-1/4"></div>
+                    <div className="rounded bg-amber-500 h-2 w-1/4"></div>
+                    <div className="rounded bg-amber-500 h-2 w-1/2"></div>
+                    <div className="rounded bg-amber-500 h-2 w-1/4"></div>
                   </div>
                 </div>
               </div>

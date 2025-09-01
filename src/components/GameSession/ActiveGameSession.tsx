@@ -674,7 +674,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             <Button
               data-testid="game-session-end-story"
               variant="secondary"
-              className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white"
+              className="w-full sm:w-auto bg-blue-700 hover:bg-blue-700 text-white"
               onClick={handleEndStoryClick}
               disabled={isGeneratingEnding || isSessionEnded(sessionId)}
               title="End your story with an AI-generated epilogue"
@@ -703,7 +703,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <div className="space-y-3">
             <p>The AI has detected that your story might be ready to conclude based on natural story progression.</p>
             {endingSuggestionReason && (
-              <p className="text-sm text-gray-600 italic">
+              <p className="text-sm text-gray-700 italic">
                 Reason: {endingSuggestionReason}
               </p>
             )}

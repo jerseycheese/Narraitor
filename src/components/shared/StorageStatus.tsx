@@ -98,30 +98,30 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
     const iconClass = "w-4 h-4";
     switch (storageState.status) {
       case StorageStatusEnum.HEALTHY:
-        return <CheckCircle className={`${iconClass} text-green-600`} />;
+        return <CheckCircle className={`${iconClass} text-green-500`} />;
       case StorageStatusEnum.DEGRADED:
-        return <AlertTriangle className={`${iconClass} text-yellow-600`} />;
+        return <AlertTriangle className={`${iconClass} text-amber-500`} />;
       case StorageStatusEnum.UNAVAILABLE:
-        return <XCircle className={`${iconClass} text-red-600`} />;
+        return <XCircle className={`${iconClass} text-red-500`} />;
       case StorageStatusEnum.RECOVERING:
-        return <RotateCcw className={`${iconClass} text-blue-600 animate-spin`} />;
+        return <RotateCcw className={`${iconClass} text-blue-700 animate-spin`} />;
       default:
-        return <HelpCircle className={`${iconClass} text-gray-600`} />;
+        return <HelpCircle className={`${iconClass} text-gray-700`} />;
     }
   };
 
   const getStatusColor = () => {
     switch (storageState.status) {
       case StorageStatusEnum.HEALTHY:
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-green-500 bg-green-50 border-green-200';
       case StorageStatusEnum.DEGRADED:
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'text-amber-500 bg-amber-200 border-amber-200';
       case StorageStatusEnum.UNAVAILABLE:
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'text-red-500 bg-red-200 border-red-500';
       case StorageStatusEnum.RECOVERING:
-        return 'text-blue-600 bg-blue-50 border-blue-200';
+        return 'text-blue-700 bg-blue-50 border-blue-200';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-gray-700 bg-gray-100 border-gray-200';
     }
   };
 
@@ -155,7 +155,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
           </div>
           <button
             onClick={handleDismiss}
-            className="ml-2 text-gray-400 hover:text-gray-600"
+            className="ml-2 text-gray-500 hover:text-gray-700"
             aria-label="Dismiss notification"
           >
             ×
@@ -167,14 +167,14 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
             {storageState.error?.isRecoverable && (
               <button
                 onClick={handleRetry}
-                className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+                className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-100"
               >
                 Retry
               </button>
             )}
             <button
               onClick={toggleExpanded}
-              className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+              className="px-3 py-1 text-xs bg-white border rounded hover:bg-gray-100"
             >
               {isExpanded ? 'Less' : 'Details'}
             </button>
@@ -193,7 +193,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
                 </div>
               )}
               {storageState.status === StorageStatusEnum.UNAVAILABLE && (
-                <div className="text-xs text-gray-600 mt-2">
+                <div className="text-xs text-gray-700 mt-2">
                   <p>Your progress is preserved in memory but will be lost if you refresh or close the browser.</p>
                 </div>
               )}
@@ -204,7 +204,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
         {storageState.status === StorageStatusEnum.RECOVERING && (
           <div className="mt-3">
             <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar">
-              <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
             </div>
           </div>
         )}
@@ -228,7 +228,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
         {storageState.error?.isRecoverable && storageState.status !== StorageStatusEnum.HEALTHY && (
           <button
             onClick={handleRetry}
-            className="ml-auto px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+            className="ml-auto px-2 py-1 text-xs bg-white border rounded hover:bg-gray-100"
           >
             Retry
           </button>
@@ -236,7 +236,7 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
       </div>
       
       {storageState.error && storageState.status !== StorageStatusEnum.HEALTHY && (
-        <p className="text-xs mt-1 text-gray-600" role="alert">
+        <p className="text-xs mt-1 text-gray-700" role="alert">
           {storageState.error.userMessage}
         </p>
       )}

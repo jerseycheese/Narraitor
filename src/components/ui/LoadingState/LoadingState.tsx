@@ -55,10 +55,10 @@ const sizeClasses = {
 
 const themeClasses = {
   light: {
-    text: 'text-gray-600',
+    text: 'text-gray-700',
     skeleton: 'bg-gray-200',
-    spinner: 'text-gray-400',
-    dots: 'text-gray-400',
+    spinner: 'text-gray-500',
+    dots: 'text-gray-500',
   },
   dark: {
     text: 'text-gray-100',

@@ -64,22 +64,22 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
       <div className={`${wizardStyles.card.base} ${
         remaining === 0 
           ? 'bg-green-50 border-green-300' 
-          : 'bg-gray-50'
+          : 'bg-gray-100'
       } transition-colors duration-300`}>
         <h3 className={wizardStyles.subheading}>
           {poolConfig.label || 'Point Pool'}
         </h3>
         <div className="flex justify-between items-center">
           <div className="flex flex-col gap-1 min-w-[120px]">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-700">
               Total: {poolConfig.total}
             </span>
             <span className={`text-base font-bold ${
               remaining === 0 
-                ? 'text-green-600' 
+                ? 'text-green-500' 
                 : remaining < 0
-                ? 'text-red-600'
-                : 'text-amber-600'
+                ? 'text-red-500'
+                : 'text-amber-500'
             }`}>
               Remaining: {remaining}
             </span>
@@ -106,13 +106,13 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
           >
             <div className="flex items-center justify-between mb-4">
               <span className="font-medium text-lg">{allocation.name}</span>
-              <span className="text-2xl font-bold text-blue-600">
+              <span className="text-2xl font-bold text-blue-700">
                 {allocation.value}
               </span>
             </div>
             
             {allocation.description && (
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-700 mb-4">
                 {allocation.description}
               </p>
             )}
@@ -120,7 +120,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
             <div className="space-y-2">
               {calculateMaxValue(allocation) < allocation.maxValue && (
                 <div className="flex justify-end">
-                  <span className="text-xs text-amber-600 font-medium animate-pulse">
+                  <span className="text-xs text-amber-500 font-medium animate-pulse">
                     Limited by available points
                   </span>
                 </div>
@@ -138,7 +138,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
               />
               {/* Visual indicator when at max due to points */}
               {allocation.value === calculateMaxValue(allocation) && calculateMaxValue(allocation) < allocation.maxValue && (
-                <div className="flex items-center gap-2 text-xs text-amber-600 mt-1">
+                <div className="flex items-center gap-2 text-xs text-amber-500 mt-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>

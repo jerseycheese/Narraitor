@@ -35,7 +35,7 @@ export function CharacterDetailsDisplay({
     <div className="border-t pt-8 space-y-8">
       {showAttributes && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Attributes</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-900">Attributes</h2>
           <CharacterAttributeDisplay 
             attributes={enrichedAttributes} 
             showCategories={showCategories} 
@@ -45,7 +45,7 @@ export function CharacterDetailsDisplay({
 
       {showSkills && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Skills</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-900">Skills</h2>
           <CharacterSkillDisplay 
             skills={enrichedSkills} 
             showCategories={showCategories} 
@@ -55,7 +55,7 @@ export function CharacterDetailsDisplay({
 
       {showBackground && (
         <section>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-800">Background</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-900">Background</h2>
           <CharacterBackgroundDisplay background={character.background} />
         </section>
       )}

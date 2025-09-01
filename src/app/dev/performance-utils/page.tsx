@@ -228,7 +228,7 @@ export default function PerformanceUtilsTestHarness() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Performance Utils Test Harness
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Interactive testing environment for performance measurement utilities (Issue #107)
         </p>
       </div>
@@ -270,7 +270,7 @@ export default function PerformanceUtilsTestHarness() {
         <Button 
           onClick={runAllTests} 
           disabled={isRunning}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-blue-500 hover:bg-blue-700"
         >
           {isRunning ? 'Running Tests...' : 'Run All Tests'}
         </Button>
@@ -293,7 +293,7 @@ export default function PerformanceUtilsTestHarness() {
         </CardHeader>
         <CardContent>
           <div 
-            className="bg-gray-50 rounded-lg p-4 font-mono text-sm max-h-96 overflow-y-auto"
+            className="bg-gray-100 rounded-lg p-4 font-mono text-sm max-h-96 overflow-y-auto"
             data-testid="test-results"
           >
             {results.length === 0 ? (

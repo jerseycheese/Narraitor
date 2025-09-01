@@ -92,11 +92,11 @@ export default function DecisionPointsTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Enhanced Choice Presentation Test Harness</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Test the enhanced choice presentation system with context summaries, 
             decision weight styling, and improved visual clarity.
           </p>
@@ -173,7 +173,7 @@ export default function DecisionPointsTestPage() {
         {/* Mobile Responsiveness Test */}
         <div className="mb-12 bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Mobile Responsiveness</h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-700 mb-4">
             Resize your browser window to test mobile behavior of the enhanced choice selector.
           </p>
           <div className="max-w-sm mx-auto border-2 border-gray-300 rounded-lg p-4">
@@ -212,7 +212,7 @@ export default function DecisionPointsTestPage() {
                 <li>• Focus management for better UX</li>
               </ul>
             </div>
-            <div className="p-4 bg-purple-50 border border-purple-200 rounded">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded">
               <h3 className="font-semibold mb-2">Visual Cues</h3>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>• Decision weight: Border thickness (2px/4px/6px) + color coding</li>

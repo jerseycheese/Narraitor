@@ -51,10 +51,10 @@ type Story = StoryObj<typeof meta>;
 
 const sampleActions = (
   <>
-    <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors">
+    <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-500 transition-colors">
       Primary Action
     </button>
-    <button className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors">
+    <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
       Secondary Action
     </button>
   </>
@@ -65,7 +65,7 @@ const sampleContent = (
     {[1, 2, 3, 4, 5, 6].map(i => (
       <div key={i} className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-2">Card {i}</h3>
-        <p className="text-gray-600">Sample content for card {i}</p>
+        <p className="text-gray-700">Sample content for card {i}</p>
       </div>
     ))}
   </div>
@@ -102,7 +102,7 @@ export const MinimalPage: Story = {
     children: (
       <div className="bg-white rounded-lg shadow p-8 text-center">
         <h2 className="text-xl font-semibold mb-4">Empty State</h2>
-        <p className="text-gray-600">No content to display yet.</p>
+        <p className="text-gray-700">No content to display yet.</p>
       </div>
     )
   }
@@ -114,10 +114,10 @@ export const WorldsPageExample: Story = {
     description: "Use the 'Make Active' button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar.",
     actions: (
       <>
-        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors">
+        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-500 transition-colors">
           Create World
         </button>
-        <button className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors">
+        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
           Generate World
         </button>
       </>
@@ -127,12 +127,12 @@ export const WorldsPageExample: Story = {
         {['Fantasy Realm', 'Cyberpunk City', 'Wild West'].map(world => (
           <div key={world} className="bg-white rounded-lg shadow p-6 border-2 border-transparent hover:border-blue-300 transition-colors">
             <h3 className="text-lg font-semibold mb-2">{world}</h3>
-            <p className="text-gray-600 mb-4">A sample world description...</p>
+            <p className="text-gray-700 mb-4">A sample world description...</p>
             <div className="flex gap-2">
-              <button className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
+              <button className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-500">
                 Make Active
               </button>
-              <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+              <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-700">
                 Edit
               </button>
             </div>
@@ -149,13 +149,13 @@ export const CharactersPageExample: Story = {
     description: 'Fantasy Realm • Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.',
     actions: (
       <>
-        <button className="py-2 px-4 bg-blue-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
+        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
           Start Playing
         </button>
-        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors">
+        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-500 transition-colors">
           Create Character
         </button>
-        <button className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors">
+        <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
           Generate Character
         </button>
       </>
@@ -168,15 +168,15 @@ export const CharactersPageExample: Story = {
               Active
             </div>
             <h3 className="text-lg font-semibold mb-2">{character}</h3>
-            <p className="text-gray-600 mb-4">Level 5 Warrior</p>
+            <p className="text-gray-700 mb-4">Level 5 Warrior</p>
             <div className="flex gap-2 flex-wrap">
-              <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600">
+              <button className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-500">
                 View
               </button>
-              <button className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">
+              <button className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-500">
                 Play
               </button>
-              <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">
+              <button className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-700">
                 Edit
               </button>
             </div>

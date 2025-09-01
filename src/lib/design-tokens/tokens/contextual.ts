@@ -14,9 +14,9 @@ export const endingTones = {
     border: primitiveColors.amber[700],
   },
   bittersweet: {
-    background: '#8b5cf6', // violet-500
+    background: primitiveColors.blue[700], // Using our blue system instead of violet
     foreground: primitiveColors.white,
-    border: '#7c3aed', // violet-600
+    border: primitiveColors.blue[900], // Darker blue for border
   },
   mysterious: {
     background: primitiveColors.gray[700], // #374151
@@ -48,9 +48,9 @@ export const loreCategories = {
     text: primitiveColors.green[700],
   },
   events: {
-    background: '#faf5ff', // purple-50
-    border: '#e9d5ff', // purple-200
-    text: '#6b21a8', // purple-800
+    background: primitiveColors.blue[100], // Using our blue system
+    border: primitiveColors.blue[300], // Blue border
+    text: primitiveColors.blue[900], // Dark blue text
   },
   rules: {
     background: primitiveColors.amber[200],
@@ -79,7 +79,7 @@ export const portraitThemes = {
   vibrant: {
     primary: primitiveColors.red[700], // #b91c1c
     secondary: primitiveColors.amber[500], // #f59e0b
-    accent: '#8b5cf6', // violet-500 (custom purple)
+    accent: primitiveColors.red[500], // Using red instead of violet
   },
 } as const
 

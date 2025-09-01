@@ -82,7 +82,7 @@ export const semanticColors = {
     muted: primitiveColors.gray[100],
     subtle: primitiveColors.gray[100],
     card: primitiveColors.white,
-    overlay: '#00000080', // 50% black opacity
+    overlay: primitiveColors.black + '80', // 50% black opacity using our black token
   },
   
   // Border colors
@@ -179,7 +179,7 @@ export const semanticColorsDark = {
     muted: primitiveColors.gray[900],
     subtle: primitiveColors.gray[700],
     card: primitiveColors.gray[900],
-    overlay: '#00000080',
+    overlay: primitiveColors.black + '80', // Using our black token
   },
   
   border: {

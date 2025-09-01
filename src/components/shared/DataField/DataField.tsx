@@ -18,7 +18,7 @@ export function DataField({
   className = '' 
 }: DataFieldProps) {
   const labelClasses = size === 'sm' 
-    ? 'text-xs text-gray-400 font-bold uppercase tracking-wide'
+    ? 'text-xs text-gray-500 font-bold uppercase tracking-wide'
     : 'text-sm text-gray-500 font-bold uppercase tracking-wide';
     
   const valueClasses = size === 'sm'

@@ -31,7 +31,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
   // Get custom styling for legacy variants not supported by Button
   const getCustomStyling = (variant: string | undefined) => {
     switch (variant) {
-      case 'success': return 'bg-green-600 hover:bg-green-700 text-white';
+      case 'success': return 'bg-green-500 hover:bg-green-700 text-white';
       default: return '';
     }
   };

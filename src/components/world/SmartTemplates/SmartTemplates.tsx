@@ -138,7 +138,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
       <div className={wizardStyles.container}>
         <div className={wizardStyles.header}>
           <h2 className={wizardStyles.title}>Smart World Templates</h2>
-          <p className="text-gray-600">Get creative starting points for your world with AI assistance</p>
+          <p className="text-gray-700">Get creative starting points for your world with AI assistance</p>
         </div>
 
       {aiGeneration.error && (
@@ -200,7 +200,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
-                  <p className="text-sm text-gray-600 mb-4">Select 2 or more genres to blend together</p>
+                  <p className="text-sm text-gray-700 mb-4">Select 2 or more genres to blend together</p>
                 </div>
                 <div className="space-y-4">
                   <GenreSelector
@@ -209,7 +209,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
                     excludeOther={true}
                   />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-700">
                       {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                     </span>
                     <Button
@@ -232,7 +232,7 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
-                  <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                  <p className="text-sm text-gray-700 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
                 </div>
                 <div>
                   <Button

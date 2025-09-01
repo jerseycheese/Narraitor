@@ -120,18 +120,18 @@ export const Usage = {
             <div className="bg-white p-3 rounded border flex justify-between items-center">
               <Logo size="small" />
               <div className="flex gap-3 text-sm">
-                <a href="#" className="hover:text-blue-600">Worlds</a>
-                <a href="#" className="hover:text-blue-600">Characters</a>
-                <a href="#" className="hover:text-blue-600">Play</a>
+                <a href="#" className="hover:text-blue-700">Worlds</a>
+                <a href="#" className="hover:text-blue-700">Characters</a>
+                <a href="#" className="hover:text-blue-700">Play</a>
               </div>
             </div>
           </div>
 
           <div className="border rounded-lg p-4">
             <p className="text-sm text-gray-500 mb-3">Hero Section</p>
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded text-center">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-50 p-8 rounded text-center">
               <Logo size="xl" className="justify-center mb-4" />
-              <p className="text-gray-600">Create immersive narrative experiences</p>
+              <p className="text-gray-700">Create immersive narrative experiences</p>
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export const Usage = {
             <p className="text-sm text-gray-500 mb-3">Footer</p>
             <div className="bg-gray-900 text-white p-4 rounded">
               <Logo size="small" className="mb-3" />
-              <p className="text-gray-400 text-sm">© 2024 Narraitor. All rights reserved.</p>
+              <p className="text-gray-500 text-sm">© 2024 Narraitor. All rights reserved.</p>
             </div>
           </div>
         </div>

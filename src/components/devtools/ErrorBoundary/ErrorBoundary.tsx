@@ -117,12 +117,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Default fallback UI
       return (
-        <div className="flex flex-col items-center justify-center min-h-32 p-6 bg-red-50 border-2 border-red-200 rounded-lg">
+        <div className="flex flex-col items-center justify-center min-h-32 p-6 bg-red-200 border-2 border-red-500 rounded-lg">
           <div className="text-center space-y-4">
-            <h3 className="text-lg font-semibold text-red-800">
+            <h3 className="text-lg font-semibold text-red-700">
               Something went wrong
             </h3>
-            <p className="text-red-600 text-sm max-w-md">
+            <p className="text-red-500 text-sm max-w-md">
               {this.state.error?.message || 'An unexpected error occurred'}
             </p>
             {this.state.errorId && (

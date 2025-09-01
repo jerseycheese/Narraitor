@@ -114,7 +114,7 @@ export default function DevToolsTestPage() {
     <div className="min-h-screen p-6" style={{ paddingBottom: '60vh' }}> {/* Extra padding at bottom to ensure visibility */}
         <h2 className="text-2xl font-bold mb-6">DevTools Test Harness</h2>
         
-        <div className="mb-6 p-4 border rounded bg-gray-50">
+        <div className="mb-6 p-4 border rounded bg-gray-100">
           <h2 className="text-xl font-bold mb-2">State Manipulation</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border p-3 rounded">
@@ -124,13 +124,13 @@ export default function DevToolsTestPage() {
               
               <div className="flex space-x-3 mt-4">
                 <button 
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
                   onClick={incrementCounter}
                 >
                   Increment Counter
                 </button>
                 <button 
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
                   onClick={resetCounter}
                 >
                   Reset Counter
@@ -150,7 +150,7 @@ export default function DevToolsTestPage() {
                   className="border rounded p-2 mr-2"
                 />
                 <button 
-                  className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-500"
                   onClick={handleAddItem}
                 >
                   Add Item
@@ -159,7 +159,7 @@ export default function DevToolsTestPage() {
               
               <div className="mt-2">
                 <button 
-                  className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-500"
                   onClick={clearItems}
                 >
                   Clear All Items

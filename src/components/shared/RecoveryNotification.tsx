@@ -144,7 +144,7 @@ export function RecoveryNotification({
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <svg
-                className="h-6 w-6 text-amber-400"
+                className="h-6 w-6 text-amber-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -163,7 +163,7 @@ export function RecoveryNotification({
           </div>
           <button
             onClick={onDismiss}
-            className="ml-3 flex-shrink-0 rounded-md bg-white text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ml-3 flex-shrink-0 rounded-md bg-white text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Close"
           >
             <span className="sr-only">Close</span>
@@ -178,10 +178,10 @@ export function RecoveryNotification({
         </div>
 
         <div id="recovery-description" className="mb-6">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-700 mb-4">
             Found saved character creation progress from a previous session.
             {hasCurrentData && (
-              <span className="block mt-2 text-amber-600 font-medium">
+              <span className="block mt-2 text-amber-500 font-medium">
                 <span aria-hidden="true">⚠️</span>
                 <span className="sr-only">Warning:</span>
                 {' '}Recovering will replace any current form data you&apos;ve entered.
@@ -191,9 +191,9 @@ export function RecoveryNotification({
 
           {/* Recovery Data Preview */}
           {recoveryData && (
-            <div className="bg-gray-50 rounded-md p-4 mb-4">
+            <div className="bg-gray-100 rounded-md p-4 mb-4">
               <h4 className="text-sm font-medium text-gray-900 mb-2">Saved Progress Preview:</h4>
-              <div className="space-y-1 text-sm text-gray-600">
+              <div className="space-y-1 text-sm text-gray-700">
                 {recoveryData.name && (
                   <div>Character name: <span className="font-medium">{recoveryData.name}</span></div>
                 )}

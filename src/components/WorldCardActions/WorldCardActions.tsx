@@ -37,7 +37,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
             <Button 
               onClick={handleCreateCharacter}
               variant="default"
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium"
+              className="flex-1 bg-green-500 hover:bg-green-700 text-white font-medium"
               data-testid="world-card-actions-create-character-button"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
             <Button 
               onClick={onPlay} 
               variant="default"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+              className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-medium"
               data-testid="world-card-actions-play-button"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +62,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
           <Button 
             onClick={onMakeActive}
             variant="default"
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium"
+            className="w-full bg-green-500 hover:bg-green-700 text-white font-medium"
             data-testid="world-card-actions-make-active-button"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +79,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
           onClick={onEdit} 
           variant="outline"
           size="sm"
-          className="flex-1 text-gray-600 border-gray-300 hover:bg-gray-50"
+          className="flex-1 text-gray-700 border-gray-300 hover:bg-gray-100"
           data-testid="world-card-actions-edit-button"
         >
           Edit
@@ -88,7 +88,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
           onClick={onDelete} 
           variant="outline"
           size="sm"
-          className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
+          className="flex-1 text-red-500 border-red-300 hover:bg-red-200"
           data-testid="world-card-actions-delete-button"
         >
           Delete

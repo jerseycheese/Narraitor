@@ -90,7 +90,7 @@ export default function BasicInfoStep({
                 <Label htmlFor="relationship-none" className="text-sm font-medium text-gray-900">
                   Original World
                 </Label>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-700">
                   Create a completely original world from your imagination
                 </p>
               </div>
@@ -111,7 +111,7 @@ export default function BasicInfoStep({
                 <Label htmlFor="relationship-based-on" className="text-sm font-medium text-gray-900">
                   Inspired By
                 </Label>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-700">
                   Create an original world inspired by an existing fictional universe or real setting
                 </p>
               </div>
@@ -132,7 +132,7 @@ export default function BasicInfoStep({
                 <Label htmlFor="relationship-set-in" className="text-sm font-medium text-gray-900">
                   Set Within
                 </Label>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-700">
                   Place your world directly within an existing fictional universe or real setting
                 </p>
               </div>

@@ -251,7 +251,7 @@ export const LoadingState: Story = {
           <div className="max-w-4xl mx-auto">
             <div className="mb-4">
               <h1 className="text-2xl font-bold">Character Editor - Loading State</h1>
-              <p className="text-gray-600">Demonstrating the LoadingState component</p>
+              <p className="text-gray-700">Demonstrating the LoadingState component</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <LoadingStateComponent message="Loading character data..." />
@@ -279,7 +279,7 @@ export const ErrorWithRetry: Story = {
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <h1 className="text-2xl font-bold">Character Editor - Error State</h1>
-            <p className="text-gray-600">Demonstrating the PageError component</p>
+            <p className="text-gray-700">Demonstrating the PageError component</p>
           </div>
           <PageError
             title="Character Loading Failed"
@@ -348,7 +348,7 @@ export const CustomPromptTesting: Story = {
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h2 className="font-semibold text-blue-800 mb-2">Custom Prompt Testing Instructions</h2>
+              <h2 className="font-semibold text-blue-900 mb-2">Custom Prompt Testing Instructions</h2>
               <ul className="text-blue-700 space-y-1 text-sm">
                 <li>1. Check that &quot;Customize physical description&quot; is <strong>unchecked by default</strong></li>
                 <li>2. Check the checkbox and enter custom text in the textarea</li>
@@ -420,7 +420,7 @@ export const UIComponentShowcase: Story = {
         <div className="min-h-screen bg-gray-100 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4">
-              <h2 className="font-semibold text-green-800 mb-2">shadcn/ui Component Integration</h2>
+              <h2 className="font-semibold text-green-700 mb-2">shadcn/ui Component Integration</h2>
               <ul className="text-green-700 space-y-1 text-sm">
                 <li>✅ <strong>Input</strong> components with proper styling and focus states</li>
                 <li>✅ <strong>Select</strong> components replacing raw select elements</li>

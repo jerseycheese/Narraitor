@@ -35,11 +35,11 @@ type Story = StoryObj<typeof meta>;
 const SampleContent = () => (
   <div className="p-6">
     <h3 className="text-xl font-semibold mb-2">Sample Card Title</h3>
-    <p className="text-gray-600 mb-4">
+    <p className="text-gray-700 mb-4">
       This is a sample card content to demonstrate the ActiveStateCard wrapper component.
     </p>
     <div className="flex gap-2">
-      <button className="px-4 py-2 bg-blue-600 text-white rounded-md">Action 1</button>
+      <button className="px-4 py-2 bg-blue-500 text-white rounded-md">Action 1</button>
       <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Action 2</button>
     </div>
   </div>
@@ -79,7 +79,7 @@ export const ActiveWithoutIndicator: Story = {
 export const WithCustomStyling: Story = {
   args: {
     isActive: true,
-    activeClassName: 'ring-4 ring-blue-500 shadow-2xl border-blue-500 bg-blue-50',
+    activeClassName: 'ring-4 ring-blue-500 shadow-2xl border-blue-500 bg-blue-100',
     inactiveClassName: 'hover:shadow-md border-gray-200',
     activeText: 'Primary Selection',
     children: <SampleContent />,
@@ -92,7 +92,7 @@ export const WithImage: Story = {
     hasImage: true,
     children: (
       <>
-        <div className="h-48 bg-gradient-to-b from-blue-500 to-purple-600 flex items-center justify-center text-white">
+        <div className="h-48 bg-gradient-to-b from-blue-500 to-blue-700 flex items-center justify-center text-white">
           <span className="text-2xl font-bold">Image Placeholder</span>
         </div>
         <SampleContent />
@@ -108,7 +108,7 @@ export const ActiveWithImage: Story = {
     activeText: 'Featured Item',
     children: (
       <>
-        <div className="h-48 bg-gradient-to-b from-green-500 to-teal-600 flex items-center justify-center text-white">
+        <div className="h-48 bg-gradient-to-b from-green-500 to-green-700 flex items-center justify-center text-white">
           <span className="text-2xl font-bold">Featured Image</span>
         </div>
         <SampleContent />
@@ -124,7 +124,7 @@ export const Clickable: Story = {
     children: (
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2">Clickable Card</h3>
-        <p className="text-gray-600">Click anywhere on this card to trigger an action.</p>
+        <p className="text-gray-700">Click anywhere on this card to trigger an action.</p>
       </div>
     ),
   },
@@ -141,19 +141,19 @@ export const Grid: Story = {
       <ActiveStateCard isActive={true} activeText="Active Item">
         <div className="p-4">
           <h4 className="font-semibold">Card 1</h4>
-          <p className="text-sm text-gray-600">This card is active</p>
+          <p className="text-sm text-gray-700">This card is active</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
         <div className="p-4">
           <h4 className="font-semibold">Card 2</h4>
-          <p className="text-sm text-gray-600">This card is inactive</p>
+          <p className="text-sm text-gray-700">This card is inactive</p>
         </div>
       </ActiveStateCard>
       <ActiveStateCard isActive={false}>
         <div className="p-4">
           <h4 className="font-semibold">Card 3</h4>
-          <p className="text-sm text-gray-600">This card is inactive</p>
+          <p className="text-sm text-gray-700">This card is inactive</p>
         </div>
       </ActiveStateCard>
     </div>

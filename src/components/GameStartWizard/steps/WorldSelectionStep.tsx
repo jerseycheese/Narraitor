@@ -19,12 +19,12 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
         <h3 className="text-xl font-semibold text-gray-900 mb-4">
           No Worlds Yet
         </h3>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-700 mb-8">
           Create your first world to begin your adventure
         </p>
         <Link
           href="/world/create"
-          className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
+          className="inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
         >
           Create Your First World
         </Link>
@@ -58,7 +58,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
         >
           Create New World
         </Link>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           Click a world to continue
         </p>
       </div>

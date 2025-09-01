@@ -31,23 +31,23 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
           <span className="sr-only">Loading...</span>
         </div>
-        <p className="mt-2 text-gray-600" aria-live="polite">Analyzing world description...</p>
+        <p className="mt-2 text-gray-700" aria-live="polite">Analyzing world description...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-        <p className="text-red-600">{error}</p>
+      <div className="p-4 bg-red-200 border border-red-500 rounded-md">
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
 
   if (attributes.length === 0 && skills.length === 0) {
     return (
-      <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
-        <p className="text-gray-600">No AI suggestions available</p>
+      <div className="p-4 bg-gray-100 border border-gray-200 rounded-md">
+        <p className="text-gray-700">No AI suggestions available</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <h4 className="font-medium">{attribute.name}</h4>
-                    <p className="text-sm text-gray-600">{attribute.description}</p>
+                    <p className="text-sm text-gray-700">{attribute.description}</p>
                     {attribute.category && (
                       <span className="text-xs text-gray-500">Category: {attribute.category}</span>
                     )}
@@ -78,7 +78,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                     <Button
                       onClick={() => onAcceptAttribute(attribute)}
                       size="sm"
-                      className="bg-green-500 hover:bg-green-600"
+                      className="bg-green-500 hover:bg-green-500"
                       aria-label={`Accept ${attribute.name}`}
                     >
                       Accept
@@ -114,7 +114,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <h4 className="font-medium">{skill.name}</h4>
-                    <p className="text-sm text-gray-600">{skill.description}</p>
+                    <p className="text-sm text-gray-700">{skill.description}</p>
                     <div className="flex gap-3 mt-1">
                       {skill.difficulty && (
                         <span className="text-xs text-gray-500">Difficulty: {skill.difficulty}</span>
@@ -128,7 +128,7 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
                     <Button
                       onClick={() => onAcceptSkill(skill)}
                       size="sm"
-                      className="bg-green-500 hover:bg-green-600"
+                      className="bg-green-500 hover:bg-green-500"
                       aria-label={`Accept ${skill.name}`}
                     >
                       Accept

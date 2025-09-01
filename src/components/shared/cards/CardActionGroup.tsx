@@ -97,11 +97,11 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
         if (action.className?.includes('bg-')) {
           variantClasses = action.className;
         } else {
-          variantClasses = 'bg-blue-600 text-white hover:bg-blue-700';
+          variantClasses = 'bg-blue-500 text-white hover:bg-blue-700';
         }
         break;
       case 'danger':
-        variantClasses = 'bg-gray-100 text-red-600 hover:bg-red-50';
+        variantClasses = 'bg-gray-100 text-red-500 hover:bg-red-200';
         break;
       case 'secondary':
       default:

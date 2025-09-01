@@ -107,14 +107,14 @@ export default function WorldsPage() {
       <button
         onClick={handleCreateWorld}
         data-testid="create-world-button"
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors"
       >
         Create World
       </button>
       <button
         onClick={() => setShowPrompt(true)}
         disabled={isGenerating}
-        className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Generate World
       </button>
@@ -170,8 +170,8 @@ export default function WorldsPage() {
                 </div>
               )}
               {isGenerating && (
-                <p className="text-purple-600 text-sm mt-4 mb-4 flex items-center gap-2">
-                  <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
+                <p className="text-blue-700 text-sm mt-4 mb-4 flex items-center gap-2">
+                  <span className="inline-block w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></span>
                   {generatingStatus}
                 </p>
               )}
@@ -191,7 +191,7 @@ export default function WorldsPage() {
                 <button
                   onClick={handleGenerateWorld}
                   disabled={isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim())}
-                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isGenerating ? 'Generating...' : 'Generate'}
                 </button>

@@ -55,7 +55,7 @@ export default function GameSessionComponentsTestPage() {
             choices={mockChoices}
             onSelect={handleChoiceSelected}
           />
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-700">
             Selected: {selectedChoiceId || 'None'}
           </p>
         </section>

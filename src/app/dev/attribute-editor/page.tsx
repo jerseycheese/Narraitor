@@ -101,7 +101,7 @@ export default function AttributeEditorTestPage() {
       <div className="mb-6">
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
         >
           Create New Attribute
         </button>
@@ -117,16 +117,16 @@ export default function AttributeEditorTestPage() {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold text-lg">{attribute.name}</h3>
-                <p className="text-gray-600">{attribute.description}</p>
+                <p className="text-gray-700">{attribute.description}</p>
                 <div className="mt-2 text-sm text-gray-500">
                   Range: {attribute.minValue} - {attribute.maxValue}
                 </div>
                 {skills.some(skill => skill.attributeIds?.includes(attribute.id)) && (
                   <div className="mt-2">
-                    <span className="text-sm font-medium text-yellow-600">
+                    <span className="text-sm font-medium text-amber-500">
                       Linked Skills: 
                     </span>
-                    <span className="text-sm text-gray-600 ml-1">
+                    <span className="text-sm text-gray-700 ml-1">
                       {skills
                         .filter(skill => skill.attributeIds?.includes(attribute.id))
                         .map(skill => skill.name)
@@ -138,7 +138,7 @@ export default function AttributeEditorTestPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setEditingAttribute(attribute.id)}
-                  className="px-3 py-1 text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+                  className="px-3 py-1 text-blue-700 border border-blue-700 rounded hover:bg-blue-50"
                 >
                   Edit
                 </button>
@@ -148,7 +148,7 @@ export default function AttributeEditorTestPage() {
                       handleDeleteAttribute(attribute.id);
                     }
                   }}
-                  className="px-3 py-1 text-red-600 border border-red-600 rounded hover:bg-red-50"
+                  className="px-3 py-1 text-red-500 border border-red-500 rounded hover:bg-red-200"
                 >
                   Delete
                 </button>

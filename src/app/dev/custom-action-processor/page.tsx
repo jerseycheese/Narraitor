@@ -60,7 +60,7 @@ export default function CustomActionProcessorTestPage() {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Custom Action Processor Test</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Test the custom text action skill detection system. Try actions like:
         </p>
         <ul className="list-disc list-inside mt-2 text-sm text-gray-500">
@@ -75,7 +75,7 @@ export default function CustomActionProcessorTestPage() {
       </div>
 
       {/* Character Selection */}
-      <div className="mb-6 p-4 border rounded-lg bg-gray-50">
+      <div className="mb-6 p-4 border rounded-lg bg-gray-100">
         <h2 className="text-lg font-semibold mb-3">Test Character</h2>
         <div className="flex gap-4 mb-4">
           <label className="flex items-center">
@@ -143,8 +143,8 @@ export default function CustomActionProcessorTestPage() {
                         <span className="font-medium">{check.skillName}</span>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           check.success 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-red-100 text-red-700'
                         }`}>
                           {check.success ? 'SUCCESS' : 'FAILED'}
                         </span>
@@ -153,7 +153,7 @@ export default function CustomActionProcessorTestPage() {
                         </span>
                       </div>
                       {check.reasoning && (
-                        <div className="text-xs text-gray-600 italic">
+                        <div className="text-xs text-gray-700 italic">
                           AI Reasoning: {check.reasoning}
                         </div>
                       )}

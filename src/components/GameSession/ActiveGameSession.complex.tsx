@@ -370,7 +370,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               data-testid="journal-access-button"
               onClick={() => setShowJournalModal(true)}
               variant="default"
-              className="bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="bg-blue-500 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-label="Open journal to view your adventure entries"
               title="View your journal entries"
             >
@@ -441,12 +441,12 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
             </div>
           ) : (
             <div className="player-choices-container">
-              <div className="p-4 border rounded bg-gray-50">
-                <p className="text-sm text-gray-600 mb-2">No choices available.</p>
+              <div className="p-4 border rounded bg-gray-100">
+                <p className="text-sm text-gray-700 mb-2">No choices available.</p>
                 <Button 
                   variant="default"
                   size="sm"
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-blue-500 hover:bg-blue-500"
                   onClick={() => {
                     // Try to get latest decision from narrative store
                     const latestDecision = useNarrativeStore.getState().getLatestDecision(sessionId);
@@ -500,7 +500,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <Button
             data-testid="game-session-new"
             variant="default"
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-500 hover:bg-blue-700"
             onClick={() => {
               // Save current session and clear narrative
               useSessionStore.getState().endSession();
@@ -515,7 +515,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <Button
             data-testid="game-session-end-story"
             variant="default"
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-blue-700 hover:bg-blue-700"
             onClick={handleEndStoryClick}
             disabled={isGeneratingEnding || isSessionEnded(sessionId)}
             title="End your story with an AI-generated epilogue"
@@ -525,7 +525,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           <Button
             data-testid="game-session-end"
             variant="destructive"
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-500 hover:bg-red-700"
             onClick={onEnd}
           >
             End Session

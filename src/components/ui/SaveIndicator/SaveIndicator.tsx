@@ -90,14 +90,14 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
         {status === 'saved' ? (
           <span className="text-green-500 text-sm">✓</span>
         ) : (
-          <span className="text-gray-400 text-sm">○</span>
+          <span className="text-gray-500 text-sm">○</span>
         )}
         
         <div className="flex flex-col">
-          <span className="text-gray-600">{getStatusText()}</span>
+          <span className="text-gray-700">{getStatusText()}</span>
           
           {totalSaves > 0 && !compact && (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-500">
               {totalSaves} saves
             </span>
           )}
@@ -107,7 +107,7 @@ export const SaveIndicator: React.FC<SaveIndicatorProps> = ({
       {onManualSave && (
         <button
           onClick={() => onManualSave('manual')}
-          className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-500 transition-colors"
         >
           Save Now
         </button>

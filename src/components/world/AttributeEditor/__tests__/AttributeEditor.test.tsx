@@ -286,7 +286,7 @@ describe('AttributeEditor', () => {
       });
       
       // Find the confirm button in the dialog and click it
-      const dialogDeleteButton = screen.getByRole('dialog').querySelector('button[class*="bg-red-600"]') as HTMLElement;
+      const dialogDeleteButton = screen.getByRole('dialog').querySelector('button[class*="bg-red-500"]') as HTMLElement;
       fireEvent.click(dialogDeleteButton);
 
       await waitFor(() => {

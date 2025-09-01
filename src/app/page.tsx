@@ -26,7 +26,7 @@ export default function HomePage() {
         </div>
 
         {/* Quick Play Section */}
-        <div className="bg-gray-50 rounded-xl p-4 sm:p-8">
+        <div className="bg-gray-100 rounded-xl p-4 sm:p-8">
           <QuickPlay />
         </div>
 
@@ -37,23 +37,23 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <div className="text-3xl font-bold text-blue-600 mb-2">1</div>
+              <div className="text-3xl font-bold text-blue-700 mb-2">1</div>
               <h3 className="font-medium text-gray-900 mb-1">Build Your World</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 Create or generate unique worlds with custom rules and settings
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <div className="text-3xl font-bold text-blue-600 mb-2">2</div>
+              <div className="text-3xl font-bold text-blue-700 mb-2">2</div>
               <h3 className="font-medium text-gray-900 mb-1">Create Characters</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 Design or generate playable characters that fit your world
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <div className="text-3xl font-bold text-blue-600 mb-2">3</div>
+              <div className="text-3xl font-bold text-blue-700 mb-2">3</div>
               <h3 className="font-medium text-gray-900 mb-1">Start Playing</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 Make choices and shape your story
               </p>
             </div>

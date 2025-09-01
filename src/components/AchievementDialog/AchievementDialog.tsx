@@ -21,10 +21,10 @@ export interface AchievementDialogProps {
 }
 
 const achievementTypeClasses: Record<AchievementType, string> = {
-  quest: 'achievement-quest border-green-200 bg-gradient-to-br from-green-50 to-emerald-50',
+  quest: 'achievement-quest border-green-200 bg-gradient-to-br from-green-50 to-green-50',
   skill: 'achievement-skill border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50',
-  discovery: 'achievement-discovery border-purple-200 bg-gradient-to-br from-purple-50 to-violet-50',
-  milestone: 'achievement-milestone border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50',
+  discovery: 'achievement-discovery border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50',
+  milestone: 'achievement-milestone border-amber-500 bg-gradient-to-br from-amber-50 to-amber-50',
   default: 'achievement-default border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
 };
 
@@ -91,7 +91,7 @@ export function AchievementDialog({
         
         <div className="py-6" role="status" aria-live="polite">
           <div className="bg-white/50 rounded-lg p-4 border border-white/20 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Achievement Unlocked
             </h3>
             <p className="text-xl font-bold text-gray-900 mb-4">
@@ -100,10 +100,10 @@ export function AchievementDialog({
             
             {reward && (
               <div className="border-t border-gray-200 pt-3">
-                <p className="text-sm text-gray-600 mb-1">
+                <p className="text-sm text-gray-700 mb-1">
                   <span className="font-medium">Reward:</span>
                 </p>
-                <p className="text-base font-semibold text-gray-800">
+                <p className="text-base font-semibold text-gray-900">
                   {reward}
                 </p>
               </div>

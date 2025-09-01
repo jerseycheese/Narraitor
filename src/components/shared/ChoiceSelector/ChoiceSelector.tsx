@@ -111,14 +111,14 @@ const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
 const getAlignmentClasses = (alignment?: ChoiceAlignment, isDisabled?: boolean): string => {
   const baseClasses = {
     lawful: 'bg-blue-50 border-blue-300',
-    chaotic: 'bg-red-50 border-red-300',
+    chaotic: 'bg-red-200 border-red-300',
     neutral: 'bg-white border-gray-200'
   };
   
   const hoverClasses = {
     lawful: 'hover:bg-blue-100',
     chaotic: 'hover:bg-red-100', 
-    neutral: 'hover:bg-gray-50'
+    neutral: 'hover:bg-gray-100'
   };
   
   const alignmentKey = alignment || 'neutral';
@@ -136,22 +136,22 @@ const getDecisionWeightStyling = (weight?: DecisionWeight) => {
   switch (weight) {
     case 'critical':
       return {
-        container: 'border-4 border-red-500 bg-red-50/50 shadow-lg shadow-red-200',
-        dot: 'bg-red-600',
-        label: 'text-red-800'
+        container: 'border-4 border-red-500 bg-red-200/50 shadow-lg shadow-red-200',
+        dot: 'bg-red-500',
+        label: 'text-red-700'
       };
     case 'major':
       return {
-        container: 'border-2 border-amber-400 bg-amber-50/60 shadow-md shadow-amber-200',
-        dot: 'bg-amber-600',
-        label: 'text-amber-800'
+        container: 'border-2 border-amber-500 bg-amber-50/60 shadow-md shadow-amber-200',
+        dot: 'bg-amber-500',
+        label: 'text-amber-700'
       };
     case 'minor':
     default:
       return {
-        container: 'border-0 bg-gray-500/5',
-        dot: 'bg-gray-600',
-        label: 'text-gray-800'
+        container: 'border-0 bg-gray-100/5',
+        dot: 'bg-gray-700',
+        label: 'text-gray-900'
       };
   }
 };
@@ -274,9 +274,9 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
   // Calculate character count styling
   const characterCount = customInputText.length;
   const characterCountClass = characterCount >= maxCustomLength 
-    ? 'text-red-600' 
+    ? 'text-red-500' 
     : characterCount >= maxCustomLength * 0.8 
-    ? 'text-amber-600' 
+    ? 'text-amber-500' 
     : 'text-gray-500';
 
   // Don't render if no options and custom input is disabled
@@ -303,7 +303,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
           data-testid="context-summary"
           className="mb-4 p-3 bg-white/50 rounded border border-gray-200"
         >
-          <p className="text-sm text-gray-600 italic">
+          <p className="text-sm text-gray-700 italic">
             {decision.contextSummary}
           </p>
         </div>
@@ -318,7 +318,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       
       {/* Custom input field - shown first when enabled */}
       {enableCustomInput && (
-        <div className="mb-4 bg-gray-50 p-4 rounded border">
+        <div className="mb-4 bg-gray-100 p-4 rounded border">
           <Textarea
             id="custom-input"
             ref={inputRef}
@@ -349,7 +349,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
       {/* Label for suggested actions */}
       {allOptions.length > 0 && (
         <div className="mb-2">
-          <span className="text-sm font-medium text-gray-600">Or try a suggested action:</span>
+          <span className="text-sm font-medium text-gray-700">Or try a suggested action:</span>
         </div>
       )}
       

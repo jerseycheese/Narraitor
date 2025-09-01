@@ -40,7 +40,7 @@ It provides developers with fine-grained control over AI response behavior for c
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div className="bg-gray-800 p-4 text-gray-200">
+        <div className="bg-gray-900 p-4 text-gray-200">
           <div style={{ maxWidth: '700px' }}>
             <Story />
           </div>
@@ -242,7 +242,7 @@ export const CompactLayout: Story = {
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div className="bg-gray-800 p-2 text-gray-200">
+        <div className="bg-gray-900 p-2 text-gray-200">
           <div style={{ maxWidth: '400px' }}>
             <Story />
           </div>
@@ -312,22 +312,22 @@ export const DevToolsIntegration: Story = {
   decorators: [
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
-        <div className="bg-gray-800 p-4 text-gray-200">
+        <div className="bg-gray-900 p-4 text-gray-200">
           {/* Simulated DevTools environment */}
-          <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-            <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
+          <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
+            <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
               AI Tools & Validation
             </h3>
             <div className="space-y-3">
               {/* AI Mocking Section */}
-              <div className="bg-gray-600/30 p-3 rounded border border-gray-500">
+              <div className="bg-gray-700/30 p-3 rounded border border-gray-500">
                 <h4 className="text-sm font-medium mb-2 text-gray-200">AI Response Mocking</h4>
                 <Story />
               </div>
               {/* Simulated other sections */}
-              <div className="bg-gray-600/30 p-3 rounded border border-gray-500 opacity-50">
+              <div className="bg-gray-700/30 p-3 rounded border border-gray-500 opacity-50">
                 <h4 className="text-sm font-medium mb-2 text-gray-200">AI Testing Panel</h4>
-                <div className="text-xs text-gray-400">Other DevTools sections...</div>
+                <div className="text-xs text-gray-500">Other DevTools sections...</div>
               </div>
             </div>
           </div>

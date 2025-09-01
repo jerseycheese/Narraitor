@@ -101,7 +101,7 @@ export const ConsistencyValidationSection = () => {
         <select
           value={selectedWorldId}
           onChange={(e) => setSelectedWorldId(e.target.value)}
-          className="w-full bg-gray-800 text-gray-100 border border-gray-500 rounded px-2 py-1 text-xs"
+          className="w-full bg-gray-900 text-gray-100 border border-gray-500 rounded px-2 py-1 text-xs"
         >
           <option value="">-- Select a World --</option>
           {availableWorldIds.map(worldId => (
@@ -128,7 +128,7 @@ export const ConsistencyValidationSection = () => {
 
           {/* Generated Consistency Instructions */}
           <DevToolsSection title="Generated Consistency Instructions">
-            <div className="bg-gray-800 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-gray-100">
+            <div className="bg-gray-900 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-gray-100">
               {consistencyInstructions || 'No instructions generated'}
             </div>
           </DevToolsSection>
@@ -138,7 +138,7 @@ export const ConsistencyValidationSection = () => {
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={loreContext} 
-                className="bg-gray-800"
+                className="bg-gray-900"
               />
             </div>
           </DevToolsSection>
@@ -148,7 +148,7 @@ export const ConsistencyValidationSection = () => {
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={worldLoreFacts} 
-                className="bg-gray-800"
+                className="bg-gray-900"
               />
             </div>
           </DevToolsSection>

@@ -8,7 +8,7 @@ export default function WorldListScreenTestHarness() {
       <div className="max-w-6xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">World List Screen Test Harness</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Test world deletion functionality with the confirmation dialog
           </p>
         </header>
