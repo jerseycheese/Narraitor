@@ -396,14 +396,14 @@ export default function GameSessionTestHarness() {
             return typeof value === 'function';
           }).join(', ')}
         </p>
-        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+        <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+        <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(mockWorld, null, 2)}
         </div>
       </div>

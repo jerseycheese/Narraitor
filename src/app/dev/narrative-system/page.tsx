@@ -311,14 +311,14 @@ export default function NarrativeSystemHarness() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h2 className="text-xl font-semibold mb-2">Store State</h2>
-          <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
+          <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
             <pre style={{ background: 'transparent' }}>{JSON.stringify(useNarrativeStore.getState(), null, 2)}</pre>
           </div>
         </div>
         
         <div>
           <h2 className="text-xl font-semibold mb-2">Current Segments</h2>
-          <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
+          <div className="bg-gray-800 text-gray-100 p-4 rounded overflow-auto font-mono text-xs max-h-[300px]">
             <pre style={{ background: 'transparent' }}>{JSON.stringify(segments, null, 2)}</pre>
           </div>
         </div>

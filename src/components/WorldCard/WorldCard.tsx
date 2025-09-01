@@ -318,7 +318,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   onClick: handlePlayClick,
                   variant: 'primary',
                   flex: true,
-                  className: 'bg-indigo-600 hover:bg-indigo-700',
+                  className: 'bg-blue-600 hover:bg-blue-700',
                   testId: 'world-card-actions-play-button',
                 },
                 {

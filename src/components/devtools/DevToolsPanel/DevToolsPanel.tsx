@@ -39,10 +39,10 @@ const EnvironmentInfo = () => {
   
   return (
     <DevToolsSection title="Environment Info:" className="mb-4 text-xs">
-      <div className="text-slate-100">NODE_ENV: {nodeEnv}</div>
-      <div className="text-slate-100">Is Client: {String(mounted)}</div>
-      <div className="text-slate-100">Is Development: {String(isDev)}</div>
-      <div className="text-slate-100">Window Location: {location}</div>
+      <div className="text-gray-100">NODE_ENV: {nodeEnv}</div>
+      <div className="text-gray-100">Is Client: {String(mounted)}</div>
+      <div className="text-gray-100">Is Development: {String(isDev)}</div>
+      <div className="text-gray-100">Window Location: {location}</div>
     </DevToolsSection>
   );
 };
@@ -96,16 +96,16 @@ export const DevToolsPanel = () => {
   return (
     <div 
       data-testid="devtools-panel-container"
-      className={`bg-slate-800 border-t-2 border-slate-600 overflow-hidden ${
+      className={`bg-gray-800 border-t-2 border-gray-600 overflow-hidden ${
         isOpen ? 'max-h-[50vh]' : 'h-12'
       } min-h-[3rem] shadow-lg`}
     >
       {/* Header with toggle button */}
       <div 
         data-testid="devtools-panel-header"
-        className="flex justify-between items-center px-4 py-2 border-b border-slate-600 flex-shrink-0 bg-slate-700 h-12"
+        className="flex justify-between items-center px-4 py-2 border-b border-gray-600 flex-shrink-0 bg-gray-700 h-12"
       >
-        <div className="text-sm font-medium text-slate-200">
+        <div className="text-sm font-medium text-gray-200">
           Narraitor DevTools
           {isTestPage && ' (Test Page Mode)'}
         </div>
@@ -116,7 +116,7 @@ export const DevToolsPanel = () => {
             onClick={toggleDevTools}
             variant="ghost"
             size="sm"
-            className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
+            className="text-xs bg-gray-600 text-gray-200 hover:bg-gray-500 border border-gray-500"
           >
             {isOpen ? 'Hide DevTools' : 'Show DevTools'}
           </Button>
@@ -127,7 +127,7 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-slate-800 text-slate-200"
+          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-gray-800 text-gray-200"
         >
           <EnvironmentInfo />
           
@@ -137,8 +137,8 @@ export const DevToolsPanel = () => {
             <div className="space-y-4">
               {/* State Management Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.STATE_SECTION) || isSectionVisible(SectionId.STATE_INSPECTOR)) && (
-                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
                     State Management
                   </h3>
                   {isSectionVisible(SectionId.STATE_SECTION) && (
@@ -152,8 +152,8 @@ export const DevToolsPanel = () => {
 
               {/* Error Tracking Group */}
               {isSectionVisible(SectionId.ERROR_SECTION) && (
-                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
                     Error Tracking
                   </h3>
                   <CollapsibleSection title="Runtime Errors" initialCollapsed={true}>
@@ -172,8 +172,8 @@ export const DevToolsPanel = () => {
                 isSectionVisible(SectionId.CONSISTENCY_VALIDATION) || 
                 isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
-                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
                     AI Tools & Validation
                   </h3>
                   <div className="space-y-3">
@@ -218,8 +218,8 @@ export const DevToolsPanel = () => {
               
               {/* Test Data Group - only show if child section is visible */}
               {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
-                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
                     Test Data & Generators
                   </h3>
                   <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
@@ -230,8 +230,8 @@ export const DevToolsPanel = () => {
               
               {/* Content Generation Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.PORTRAIT_DEBUG) || isSectionVisible(SectionId.ENDING_IMAGE_DEBUG)) && (
-                <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-sm font-semibold mb-3 text-slate-100 border-b border-slate-600 pb-2">
+                <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-600 pb-2">
                     Content Generation
                   </h3>
                   <div className="space-y-3">

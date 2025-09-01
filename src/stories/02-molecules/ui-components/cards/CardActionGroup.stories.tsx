@@ -41,7 +41,7 @@ export const WorldCardActions: Story = {
         text: 'Play',
         onClick: () => console.log('Play clicked'),
         variant: 'primary',
-        className: 'bg-indigo-600 hover:bg-indigo-700',
+        className: 'bg-blue-600 hover:bg-blue-700',
         flex: true,
       },
     ],
@@ -85,7 +85,7 @@ export const CharacterCardActions: Story = {
         text: 'Play',
         onClick: () => console.log('Play as character clicked'),
         variant: 'primary',
-        className: 'bg-indigo-600 hover:bg-indigo-700',
+        className: 'bg-blue-600 hover:bg-blue-700',
       },
       {
         key: 'edit',
@@ -126,7 +126,7 @@ export const InCardContext: Story = {
             text: 'Play',
             onClick: () => console.log('Play'),
             variant: 'primary',
-            className: 'bg-indigo-600 hover:bg-indigo-700',
+            className: 'bg-blue-600 hover:bg-blue-700',
             flex: true,
           },
         ]}

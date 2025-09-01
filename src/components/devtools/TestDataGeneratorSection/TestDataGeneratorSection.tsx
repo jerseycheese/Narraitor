@@ -708,7 +708,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleGenerate5Worlds}
-          className="w-full px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm transition-colors"
           title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
         >
           Generate 5 Diverse AI Worlds
@@ -763,7 +763,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         <div className="space-y-2">
           <button
             onClick={handleDeleteAllCharactersInWorld}
-            className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm transition-colors"
+            className="w-full px-3 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 text-sm transition-colors"
             disabled={!effectiveWorldId}
             title={`Deletes all characters in ${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
           >

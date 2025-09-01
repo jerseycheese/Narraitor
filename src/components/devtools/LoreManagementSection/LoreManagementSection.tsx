@@ -115,7 +115,7 @@ export const LoreManagementSection: React.FC = () => {
     characters: 'text-blue-600',
     locations: 'text-green-600',
     events: 'text-purple-600',
-    rules: 'text-orange-600'
+    rules: 'text-amber-600'
   };
 
   return (

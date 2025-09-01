@@ -242,7 +242,7 @@ export function Navigation() {
                 <Button 
                   type="button"
                   onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
-                  className="hidden sm:inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+                  className="hidden sm:inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
                 >
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />

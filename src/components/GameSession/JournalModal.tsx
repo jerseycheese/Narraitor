@@ -52,11 +52,11 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
     <div className="h-full flex flex-col">
       <div className={`border-b pb-4 mb-4 ${
         isSystemEvent 
-          ? 'border-slate-300 bg-slate-50 rounded-t p-4 -m-4 mb-4' 
+          ? 'border-gray-300 bg-gray-50 rounded-t p-4 -m-4 mb-4' 
           : 'border-amber-200'
       }`}>
         <h3 className={`text-xl font-bold mb-2 ${
-          isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+          isSystemEvent ? 'text-gray-700' : 'text-amber-900'
         }`}>
           {isSystemEvent && (
             <span className="mr-2" role="img" aria-label="System event">
@@ -74,12 +74,12 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           <Badge 
             variant={isSystemEvent ? "secondary" : "info"} 
             size="sm"
-            className={isSystemEvent ? "bg-slate-200 text-slate-700" : ""}
+            className={isSystemEvent ? "bg-gray-200 text-gray-700" : ""}
           >
             {isSystemEvent && "System: "}
             {titleCase(entry.type.replace('_', ' '))}
           </Badge>
-          <span className={isSystemEvent ? "text-slate-600" : "text-amber-600"}>
+          <span className={isSystemEvent ? "text-gray-600" : "text-amber-600"}>
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>
           {!entry.isRead && (
@@ -87,7 +87,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           )}
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
-            <Badge variant="outline" size="sm" className="text-slate-600 border-slate-300">
+            <Badge variant="outline" size="sm" className="text-gray-600 border-gray-300">
               Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
@@ -180,11 +180,11 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       onClick={onClose}
     >
       <Card 
-        className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-amber-200"
+        className="bg-gradient-to-br from-amber-50 to-amber-50 rounded-lg max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-amber-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with book-like styling */}
-        <div className="flex justify-between items-center p-6 border-b border-amber-200 bg-gradient-to-r from-amber-100 to-orange-100">
+        <div className="flex justify-between items-center p-6 border-b border-amber-200 bg-gradient-to-r from-amber-100 to-amber-100">
           <div className="flex items-center">
             <h2 id="journal-modal-title" className="text-2xl font-bold text-amber-900">Journal</h2>
             {entries.length > 0 && (
@@ -246,8 +246,8 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                         className={`p-3 border cursor-pointer transition-all duration-200 ${
                           isSystemEvent
                             ? selectedEntryId === entry.id
-                              ? 'bg-slate-100 border-slate-300 shadow-md'
-                              : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                              ? 'bg-gray-100 border-gray-300 shadow-md'
+                              : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
                             : selectedEntryId === entry.id
                               ? 'bg-amber-100 border-amber-300 shadow-md'
                               : 'bg-white border-amber-200 hover:bg-amber-50 hover:border-amber-300'
@@ -265,7 +265,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h4 className={`font-medium text-sm leading-tight flex items-center ${
-                            isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+                            isSystemEvent ? 'text-gray-700' : 'text-amber-900'
                           }`}>
                             {isSystemEvent && (
                               <span className="mr-1.5 text-xs" role="img" aria-label="System event">
@@ -280,7 +280,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                         </div>
                         
                         <p className={`text-xs leading-relaxed mb-2 ${
-                          isSystemEvent ? 'text-slate-600' : 'text-gray-600'
+                          isSystemEvent ? 'text-gray-600' : 'text-gray-600'
                         }`}>
                           {truncate(entry.content, 60)}
                         </p>
@@ -292,7 +292,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                             label={capitalize(entry.significance)}
                           />
                           <span className={`text-xs ${
-                            isSystemEvent ? 'text-slate-500' : 'text-amber-600'
+                            isSystemEvent ? 'text-gray-500' : 'text-amber-600'
                           }`}>
                             {formatRelativeTime(new Date(entry.createdAt))}
                           </span>

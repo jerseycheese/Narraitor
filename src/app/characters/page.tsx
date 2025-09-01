@@ -389,7 +389,7 @@ export default function CharactersPage() {
               router.push(`/world/${character.worldId}/play`);
             }
           }}
-          className="py-2 px-4 bg-indigo-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+          className="py-2 px-4 bg-blue-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />

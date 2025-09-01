@@ -251,7 +251,7 @@ export default function JournalAccessTestPage() {
                 setEntryCount(0);
                 setTimeout(() => setEntryCount(3), 100);
               }}
-              className="w-full px-3 py-2 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
+              className="w-full px-3 py-2 bg-amber-500 text-white rounded text-sm hover:bg-amber-600"
             >
               Clear & Regenerate Journal
             </button>

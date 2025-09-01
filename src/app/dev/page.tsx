@@ -46,13 +46,13 @@ export default function DevPage() {
     blue: 'bg-blue-100 hover:bg-blue-200',
     green: 'bg-green-100 hover:bg-green-200',
     purple: 'bg-purple-100 hover:bg-purple-200',
-    orange: 'bg-orange-100 hover:bg-orange-200',
+    orange: 'bg-amber-100 hover:bg-amber-200',
     yellow: 'bg-yellow-100 hover:bg-yellow-200',
     gray: 'bg-gray-100 hover:bg-gray-200',
-    indigo: 'bg-indigo-100 hover:bg-indigo-200',
+    indigo: 'bg-blue-100 hover:bg-blue-200',
     teal: 'bg-teal-100 hover:bg-teal-200',
     pink: 'bg-pink-100 hover:bg-pink-200',
-    cyan: 'bg-cyan-100 hover:bg-cyan-200',
+    cyan: 'bg-blue-100 hover:bg-blue-200',
     amber: 'bg-amber-100 hover:bg-amber-200',
   };
 

@@ -15,11 +15,11 @@ export default function AITestingPage() {
         <h2 className="text-2xl font-bold mb-6">AI Testing Panel Test Harness</h2>
 
         {/* AI Testing Panel in a dark container to simulate DevTools */}
-        <div className="bg-slate-800 p-6 rounded-lg border-2 border-slate-600">
-          <h2 className="text-slate-200 text-lg font-medium mb-4">
+        <div className="bg-gray-800 p-6 rounded-lg border-2 border-gray-600">
+          <h2 className="text-gray-200 text-lg font-medium mb-4">
             DevTools - AI Testing Panel
           </h2>
-          <div className="bg-slate-800 text-slate-200">
+          <div className="bg-gray-800 text-gray-200">
             <AITestingPanel />
           </div>
         </div>

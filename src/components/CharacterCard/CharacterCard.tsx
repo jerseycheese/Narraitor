@@ -147,7 +147,7 @@ export function CharacterCard({
                 text: 'Play',
                 onClick: onPlay,
                 variant: 'primary',
-                className: 'bg-indigo-600 hover:bg-indigo-700'
+                className: 'bg-blue-600 hover:bg-blue-700'
               },
               {
                 key: 'edit',

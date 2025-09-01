@@ -604,8 +604,8 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
               </div>
               
               {!enhancement && (
-                <div className="p-3 bg-orange-50 rounded border border-orange-200">
-                  <p className="text-orange-800 text-sm">
+                <div className="p-3 bg-amber-50 rounded border border-amber-200">
+                  <p className="text-amber-800 text-sm">
                     📝 <strong>Record some decisions first</strong> to enable personalized narrative generation.
                   </p>
                 </div>

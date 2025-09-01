@@ -150,7 +150,7 @@ export default function LoreViewerTestPage() {
           
           <button
             onClick={testErrorHandling}
-            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+            className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-600"
           >
             Test Error Handling
           </button>
@@ -225,7 +225,7 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
         
-        <div className="mt-4 p-3 bg-orange-50 rounded">
+        <div className="mt-4 p-3 bg-amber-50 rounded">
           <h3 className="font-semibold text-sm mb-1">Production Behavior:</h3>
           <ul className="text-sm space-y-1">
             <li>• <strong>Primary:</strong> AI-powered structured extraction (production with API key)</li>

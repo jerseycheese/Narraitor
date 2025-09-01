@@ -195,46 +195,46 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">World Override</h4>
+      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-600">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">World Override</h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Name:</label>
+            <label htmlFor="world-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Name:</label>
             <input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+              className="devtools-panel w-full bg-gray-600 text-gray-200 border-gray-500 placeholder-gray-400"
             />
           </div>
           <div>
-            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Genre:</label>
+            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Genre:</label>
             <input
               id="world-genre"
               type="text"
               value={testConfig.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
-              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+              className="devtools-panel w-full bg-gray-600 text-gray-200 border-gray-500 placeholder-gray-400"
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Character Override</h4>
+      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-600">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">Character Name:</label>
+          <label htmlFor="character-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">Character Name:</label>
           <input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+            className="devtools-panel w-full bg-gray-600 text-gray-200 border-gray-500 placeholder-gray-400"
           />
         </div>
       </div>
@@ -246,7 +246,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
           disabled={isGenerating}
           className={`devtools-panel w-full transition-colors ${
             isGenerating 
-              ? '!bg-slate-500 cursor-not-allowed' 
+              ? '!bg-gray-500 cursor-not-allowed' 
               : '!bg-blue-600 hover:!bg-blue-500 cursor-pointer'
           }`}
         >

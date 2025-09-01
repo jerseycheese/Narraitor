@@ -149,7 +149,7 @@ export const CharactersPageExample: Story = {
     description: 'Fantasy Realm • Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.',
     actions: (
       <>
-        <button className="py-2 px-4 bg-indigo-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-indigo-700 transition-colors">
+        <button className="py-2 px-4 bg-blue-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors">
           Start Playing
         </button>
         <button className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors">

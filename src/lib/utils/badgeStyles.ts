@@ -7,39 +7,39 @@ export const getBadgeStyles = (variant: BadgeVariant, state?: BadgeState): strin
   if (variant === 'skill-difficulty') {
     switch (state) {
       case 'easy':
-        return `${baseClasses} bg-green-100 text-green-800 border-green-200`;
+        return `${baseClasses} bg-green-200 text-green-700 border-green-500`;
       case 'medium':
-        return `${baseClasses} bg-blue-100 text-blue-800 border-blue-200`;
+        return `${baseClasses} bg-blue-100 text-blue-700 border-blue-300`;
       case 'hard':
-        return `${baseClasses} bg-red-100 text-red-800 border-red-200`;
+        return `${baseClasses} bg-red-200 text-red-700 border-red-500`;
       default:
-        return `${baseClasses} bg-gray-100 text-gray-800 border-gray-200`;
+        return `${baseClasses} bg-gray-100 text-gray-700 border-gray-300`;
     }
   }
   
   if (variant === 'skill-requirement') {
     switch (state) {
       case 'available':
-        return `${baseClasses} bg-green-100 text-green-800 border-green-200`;
+        return `${baseClasses} bg-green-200 text-green-700 border-green-500`;
       case 'unavailable':
-        return `${baseClasses} bg-gray-100 text-gray-500 border-gray-200`;
+        return `${baseClasses} bg-gray-100 text-gray-500 border-gray-300`;
       default:
-        return `${baseClasses} bg-blue-100 text-blue-800 border-blue-200`;
+        return `${baseClasses} bg-blue-100 text-blue-700 border-blue-300`;
     }
   }
   
   if (variant === 'significance') {
     switch (state) {
       case 'critical':
-        return `${baseClasses} bg-red-50 text-red-600 border-red-200`;
+        return `${baseClasses} bg-red-200 text-red-700 border-red-500`;
       case 'major':
-        return `${baseClasses} bg-orange-50 text-orange-600 border-orange-200`;
+        return `${baseClasses} bg-amber-200 text-amber-700 border-amber-500`;
       case 'minor':
-        return `${baseClasses} bg-blue-50 text-blue-600 border-blue-200`;
+        return `${baseClasses} bg-blue-100 text-blue-700 border-blue-300`;
       default:
-        return `${baseClasses} bg-gray-50 text-gray-600 border-gray-200`;
+        return `${baseClasses} bg-gray-100 text-gray-700 border-gray-300`;
     }
   }
   
-  return `${baseClasses} bg-gray-100 text-gray-800 border-gray-200`;
+  return `${baseClasses} bg-gray-100 text-gray-700 border-gray-300`;
 };

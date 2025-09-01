@@ -209,7 +209,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           {currentWorld ? (
             <Button
               onClick={() => handleNavigation(`/world/${currentWorld.id}/play`)}
-              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-medium"
+              className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />

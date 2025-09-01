@@ -56,9 +56,9 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         };
       case 'action':
         return {
-          container: 'border-2 border-orange-300 bg-orange-50',
+          container: 'border-2 border-amber-300 bg-amber-50',
           text: 'font-medium text-gray-800',
-          label: 'text-xs uppercase text-orange-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-amber-600 font-semibold mb-2'
         };
       case 'decision':
         return {
@@ -80,15 +80,15 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
         };
       case 'resolution':
         return {
-          container: 'border-2 border-indigo-300 bg-indigo-50',
+          container: 'border-2 border-blue-300 bg-blue-50',
           text: 'text-gray-700',
-          label: 'text-xs uppercase text-indigo-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-blue-600 font-semibold mb-2'
         };
       case 'character_interaction':
         return {
-          container: 'border-2 border-cyan-300 bg-cyan-50',
+          container: 'border-2 border-blue-300 bg-blue-50',
           text: 'text-gray-700',
-          label: 'text-xs uppercase text-cyan-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-blue-600 font-semibold mb-2'
         };
       case 'revelation':
         return {

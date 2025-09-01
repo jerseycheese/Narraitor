@@ -58,7 +58,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   return (
     <pre
       data-testid="json-viewer"
-      className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 bg-slate-900 border border-slate-600 text-slate-100 ${className}`}
+      className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 bg-gray-900 border border-gray-600 text-gray-100 ${className}`}
     >
       {!isMounted ? (
         // Simple content for server-side rendering
@@ -92,14 +92,14 @@ function syntaxHighlight(json: string): string {
         let cls = 'color: #60a5fa;'; // number - blue-400
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'color: #f1f5f9; font-weight: bold;'; // key - slate-100
+            cls = 'color: #f1f5f9; font-weight: bold;'; // key - gray-100
           } else {
             cls = 'color: #34d399;'; // string - emerald-400
           }
         } else if (/true|false/.test(match)) {
           cls = 'color: #fbbf24;'; // boolean - amber-400
         } else if (/null|undefined|\[Circular Reference\]|\[Function[^\]]*\]/.test(match)) {
-          cls = 'color: #94a3b8;'; // null, undefined, circular ref, functions - slate-400
+          cls = 'color: #94a3b8;'; // null, undefined, circular ref, functions - gray-400
         }
         return `<span style="${cls}">${match}</span>`;
       }

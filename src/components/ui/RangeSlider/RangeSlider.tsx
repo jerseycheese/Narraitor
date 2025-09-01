@@ -221,13 +221,13 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-full
                 [&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-full
                 ${isConstrained && effectiveMax !== undefined && value === effectiveMax 
-                  ? '[&::-webkit-slider-runnable-track]:bg-orange-300 [&::-moz-range-track]:bg-orange-300' 
+                  ? '[&::-webkit-slider-runnable-track]:bg-amber-300 [&::-moz-range-track]:bg-amber-300' 
                   : '[&::-webkit-slider-runnable-track]:bg-gray-200 [&::-moz-range-track]:bg-gray-200'
                 }
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
                 [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:mt-0
                 ${isConstrained && effectiveMax !== undefined && value === effectiveMax
-                  ? '[&::-webkit-slider-thumb]:bg-orange-500 [&::-moz-range-thumb]:bg-orange-500'
+                  ? '[&::-webkit-slider-thumb]:bg-amber-500 [&::-moz-range-thumb]:bg-amber-500'
                   : '[&::-webkit-slider-thumb]:bg-blue-500 [&::-moz-range-thumb]:bg-blue-500'
                 }`}
               data-testid={`${testId}-slider`}

@@ -146,7 +146,7 @@ export function DescriptionTextArea({
               <p className="text-sm text-red-600">{error}</p>
             )}
           </div>
-          <p className={`text-xs ${isNearLimit ? 'text-orange-600' : 'text-gray-500'}`}>
+          <p className={`text-xs ${isNearLimit ? 'text-amber-600' : 'text-gray-500'}`}>
             {characterCount}/{maxLength}
           </p>
         </div>

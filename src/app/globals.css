@@ -76,47 +76,47 @@
     --radius: 0.5rem;
     
     /* Extended semantic tokens */
-    --success: 142.1 76.2% 36.3%; /* green-600 */
+    --success: 34 84% 44%; /* green-500 */
     --success-foreground: 210 40% 98%;
-    --success-background: 142.1 76.2% 97.3%; /* green-50 */
-    --success-border: 142.1 69.8% 85.7%; /* green-200 */
-    --success-muted: 142.1 76.2% 91.8%; /* green-100 */
+    --success-background: 142 69% 83%; /* green-200 */
+    --success-border: 142 69% 83%; /* green-200 */
+    --success-muted: 142 69% 83%; /* green-200 */
     
-    --warning: 32.1 94.6% 43.7%; /* amber-500 */
+    --warning: 32 95% 44%; /* amber-500 */
     --warning-foreground: 210 40% 98%;
-    --warning-background: 54.5 91.7% 95.3%; /* amber-50 */
-    --warning-border: 42.7 76.4% 82.5%; /* amber-200 */
-    --warning-muted: 54.5 91.7% 90.4%; /* amber-100 */
+    --warning-background: 43 76% 83%; /* amber-200 */
+    --warning-border: 43 76% 83%; /* amber-200 */
+    --warning-muted: 43 76% 83%; /* amber-200 */
     
-    --info: 217.2 91.2% 59.8%; /* blue-500 */
+    --info: 217 91% 60%; /* blue-500 */
     --info-foreground: 210 40% 98%;
-    --info-background: 213.8 100% 96.9%; /* blue-50 */
-    --info-border: 213.3 93.9% 87.8%; /* blue-200 */
-    --info-muted: 214.3 91.8% 91.2%; /* blue-100 */
+    --info-background: 214 92% 91%; /* blue-100 */
+    --info-border: 214 92% 91%; /* blue-100 */
+    --info-muted: 214 92% 91%; /* blue-100 */
     
     /* Contextual colors for storytelling features */
-    --ending-triumphant: 32.1 94.6% 43.7%; /* amber-500 */
-    --ending-bittersweet: 258.3 89.5% 66.3%; /* violet-500 */
-    --ending-mysterious: 219.2 13.9% 32.2%; /* gray-700 */
-    --ending-tragic: 0 84.2% 30.2%; /* red-800 */
-    --ending-hopeful: 160.1 84.1% 39.4%; /* emerald-500 */
+    --ending-triumphant: 32 95% 44%; /* amber-500 */
+    --ending-bittersweet: 258 89% 66%; /* custom violet-500 */
+    --ending-mysterious: 219 14% 32%; /* gray-700 */
+    --ending-tragic: 0 84% 44%; /* red-500 */
+    --ending-hopeful: 34 84% 44%; /* green-500 */
     
     /* Lore category colors */
-    --lore-characters-bg: 213.8 100% 96.9%; /* blue-50 */
-    --lore-characters-border: 213.3 93.9% 87.8%; /* blue-200 */
-    --lore-characters-text: 213.1 93.7% 26.1%; /* blue-800 */
+    --lore-characters-bg: 214 92% 91%; /* blue-100 */
+    --lore-characters-border: 213 84% 73%; /* blue-300 */
+    --lore-characters-text: 224 76% 25%; /* blue-700 */
     
-    --lore-locations-bg: 142.1 76.2% 97.3%; /* green-50 */
-    --lore-locations-border: 142.1 69.8% 85.7%; /* green-200 */
-    --lore-locations-text: 158.1 64.4% 28.5%; /* green-800 */
+    --lore-locations-bg: 142 69% 83%; /* green-200 */
+    --lore-locations-border: 34 84% 44%; /* green-500 */
+    --lore-locations-text: 154 86% 27%; /* green-700 */
     
-    --lore-events-bg: 270 100% 98%; /* purple-50 */
-    --lore-events-border: 266.7 87% 89%; /* purple-200 */
-    --lore-events-text: 271.5 81% 35.9%; /* purple-800 */
+    --lore-events-bg: 270 100% 98%; /* custom purple-50 */
+    --lore-events-border: 267 87% 89%; /* custom purple-200 */
+    --lore-events-text: 272 81% 36%; /* custom purple-800 */
     
-    --lore-rules-bg: 54.5 91.7% 95.3%; /* amber-50 */
-    --lore-rules-border: 42.7 76.4% 82.5%; /* amber-200 */
-    --lore-rules-text: 25.5 95% 35.1%; /* amber-800 */
+    --lore-rules-bg: 43 76% 83%; /* amber-200 */
+    --lore-rules-border: 32 95% 44%; /* amber-500 */
+    --lore-rules-text: 21 90% 31%; /* amber-700 */
   }
 
   .dark {
