@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface PageLayoutProps {
   /** The main page title */
-  title: string;
+  title?: string;
   /** Optional description text below the title */
   description?: string;
   /** Optional action buttons to display in the header */
@@ -58,6 +58,8 @@ export function PageLayout({
   maxWidth = '7xl',
   className = '' 
 }: PageLayoutProps) {
+  // Only render header if there's content for it
+  const hasHeaderContent = title || actions || description;
   const maxWidthClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md', 
@@ -76,23 +78,27 @@ export function PageLayout({
   return (
     <main className={mainClasses}>
       <div className={`${maxWidthClasses[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8`}>
-        <header className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <h1 className="text-4xl font-bold">
-              {title}
-            </h1>
-            {actions && (
-              <div className="flex gap-2">
-                {actions}
-              </div>
+        {hasHeaderContent && (
+          <header className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+              {title && (
+                <h1 className="text-4xl font-bold">
+                  {title}
+                </h1>
+              )}
+              {actions && (
+                <div className="flex gap-2">
+                  {actions}
+                </div>
+              )}
+            </div>
+            {description && (
+              <p className="opacity-90">
+                {description}
+              </p>
             )}
-          </div>
-          {description && (
-            <p className="opacity-90">
-              {description}
-            </p>
-          )}
-        </header>
+          </header>
+        )}
 
         <section>
           {children}

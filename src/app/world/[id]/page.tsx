@@ -3,13 +3,12 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
-// import Link from 'next/link';
-import Image from 'next/image';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
 import { NotFoundState } from '@/components/shared/NotFoundState';
-import { BackNavigation } from '@/components/shared/BackNavigation';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { Hero } from '@/components/shared/Hero';
+import { getGenreLabel } from '@/lib/constants/genres';
 
 export default function WorldViewPage() {
   const params = useParams();
@@ -62,20 +61,18 @@ export default function WorldViewPage() {
   ];
 
   return (
-    <PageLayout title={world.name} description={world.genre}>
-      <div className="mb-6 -mt-8">
-        <BackNavigation href="/worlds" label="Back to Worlds" />
-      </div>
-
-      {/* Hero Image */}
+    <PageLayout>
+      {/* Hero Image with Title Overlay */}
       {world.image?.url && (
-        <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-          <Image 
-            src={world.image.url} 
-            alt={`${world.name} world`}
-            width={800}
-            height={400}
-            className="w-full h-64 md:h-96 object-cover"
+        <div className="mb-8">
+          <Hero
+            title={world.name}
+            image={{
+              url: world.image.url,
+              alt: `${world.name} world`
+            }}
+            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
+            height="h-64 md:h-96"
           />
         </div>
       )}
