@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/storybook",
+      "destination": "/storybook-static/index.html"
+    },
+    {
       "source": "/storybook/(.*)",
       "destination": "/storybook-static/$1"
     }
