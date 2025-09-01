@@ -11,7 +11,7 @@ export const endingTones = {
   triumphant: {
     background: primitiveColors.amber[500], // #f59e0b
     foreground: primitiveColors.white,
-    border: primitiveColors.amber[600],
+    border: primitiveColors.amber[700],
   },
   bittersweet: {
     background: '#8b5cf6', // violet-500
@@ -21,31 +21,31 @@ export const endingTones = {
   mysterious: {
     background: primitiveColors.gray[700], // #374151
     foreground: primitiveColors.white,
-    border: primitiveColors.gray[600],
+    border: primitiveColors.gray[500],
   },
   tragic: {
-    background: primitiveColors.red[800], // #991b1b
+    background: primitiveColors.red[500], // #ef4444
     foreground: primitiveColors.white,
     border: primitiveColors.red[700],
   },
   hopeful: {
-    background: primitiveColors.green[500], // #10b981 -> emerald-500
+    background: primitiveColors.green[500], // #22c55e
     foreground: primitiveColors.white,
-    border: primitiveColors.green[600],
+    border: primitiveColors.green[700],
   },
 } as const
 
 // Lore category colors for content organization
 export const loreCategories = {
   characters: {
-    background: primitiveColors.blue[50],
-    border: primitiveColors.blue[200],
-    text: primitiveColors.blue[800],
+    background: primitiveColors.blue[100],
+    border: primitiveColors.blue[300],
+    text: primitiveColors.blue[900],
   },
   locations: {
-    background: primitiveColors.green[50],
-    border: primitiveColors.green[200],
-    text: primitiveColors.green[800],
+    background: primitiveColors.green[200],
+    border: primitiveColors.green[500],
+    text: primitiveColors.green[700],
   },
   events: {
     background: '#faf5ff', // purple-50
@@ -53,33 +53,33 @@ export const loreCategories = {
     text: '#6b21a8', // purple-800
   },
   rules: {
-    background: primitiveColors.amber[50],
-    border: primitiveColors.amber[200],
-    text: primitiveColors.amber[800],
+    background: primitiveColors.amber[200],
+    border: primitiveColors.amber[500],
+    text: primitiveColors.amber[700],
   },
 } as const
 
 // Portrait generation theme colors (used in AI generation)
 export const portraitThemes = {
   warm: {
-    primary: '#d97706', // amber-600
-    secondary: '#f59e0b', // amber-500
-    accent: '#fbbf24', // amber-400
+    primary: primitiveColors.amber[700], // #b45309
+    secondary: primitiveColors.amber[500], // #f59e0b
+    accent: primitiveColors.amber[200], // #fde68a
   },
   cool: {
-    primary: primitiveColors.blue[600],
+    primary: primitiveColors.blue[700],
     secondary: primitiveColors.blue[500],
-    accent: primitiveColors.blue[400],
+    accent: primitiveColors.blue[300],
   },
   neutral: {
-    primary: primitiveColors.gray[600],
+    primary: primitiveColors.gray[700],
     secondary: primitiveColors.gray[500],
-    accent: primitiveColors.gray[400],
+    accent: primitiveColors.gray[300],
   },
   vibrant: {
-    primary: '#dc2626', // red-600
-    secondary: '#f59e0b', // amber-500
-    accent: '#8b5cf6', // violet-500
+    primary: primitiveColors.red[700], // #b91c1c
+    secondary: primitiveColors.amber[500], // #f59e0b
+    accent: '#8b5cf6', // violet-500 (custom purple)
   },
 } as const
 
