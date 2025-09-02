@@ -22,7 +22,12 @@
     "declaration-property-value-no-unknown": [true, {
       "ignoreProperties": {
         "/color/": ["/^theme\\(/", "/^hsl\\(var\\(/"],
-        "/background/": ["/^theme\\(/", "/^hsl\\(var\\(/"]
+        "/background/": ["/^theme\\(/", "/^hsl\\(var\\(/"],
+        "/border/": ["/^theme\\(/", "/^hsl\\(var\\(/", "/.*theme\\(/"],
+        "/padding/": ["/^theme\\(/"],
+        "/margin/": ["/^theme\\(/"],
+        "/border-radius/": ["/^theme\\(/"],
+        "/box-shadow/": ["/^theme\\(/"]
       }
     }],
     "custom-property-pattern": null,

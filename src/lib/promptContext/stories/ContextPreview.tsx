@@ -86,13 +86,8 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
   return (
     <div className="narraitor-context-preview-container space-y-4">
       {showTokenCount && (
-        <div className="narraitor-context-preview-metrics p-3 border rounded-lg" 
-          style={{ 
-            backgroundColor: 'var(--color-background)',
-            borderColor: 'var(--color-border)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-          <h3 className="font-medium mb-2" style={{ color: 'var(--color-foreground)' }}>Token Metrics</h3>
+        <div className="narraitor-context-preview-metrics p-3 border rounded-lg bg-white border-gray-200">
+          <h3 className="font-medium mb-2 text-gray-900">Token Metrics</h3>
           
           <div className="grid grid-cols-2 gap-2 mb-2">
             <div className="text-sm">
@@ -125,14 +120,15 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
             
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="h-2 rounded-full"
-                style={{ 
-                  width: `${Math.min(contextRetentionPercentage, 100)}%`,
-                  backgroundColor: retentionStatus === 'high' 
-                    ? 'var(--color-primary)' 
+                className={`h-2 rounded-full ${
+                  retentionStatus === 'high' 
+                    ? 'bg-blue-700' 
                     : retentionStatus === 'medium' 
-                      ? 'var(--color-accent)' 
-                      : 'var(--color-muted)' 
+                      ? 'bg-blue-300' 
+                      : 'bg-gray-500'
+                }`}
+                style={{ 
+                  width: `${Math.min(contextRetentionPercentage, 100)}%`
                 }}
               ></div>
             </div>
@@ -185,12 +181,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
         </div>
       )}
 
-      <pre className="narraitor-context-preview-content p-4 rounded-lg overflow-x-auto"
-        style={{ 
-          backgroundColor: 'var(--color-background)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <pre className="narraitor-context-preview-content p-4 rounded-lg overflow-x-auto bg-white shadow-sm">
         <code className="text-sm">{context}</code>
       </pre>
     </div>

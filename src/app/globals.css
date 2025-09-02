@@ -315,17 +315,17 @@
 /* Component layer for reusable classes */
 @layer components {
   .card {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--rounded-lg);
-    padding: var(--spacing-4);
-    box-shadow: var(--shadow-md);
+    background-color: theme('colors.white');
+    border: 1px solid theme('colors.gray.200');
+    border-radius: theme('borderRadius.lg');
+    padding: theme('spacing.4');
+    box-shadow: theme('boxShadow.md');
   }
   
   .btn {
     display: inline-block;
-    padding: var(--spacing-2) var(--spacing-4);
-    border-radius: var(--rounded);
+    padding: theme('spacing.2') theme('spacing.4');
+    border-radius: theme('borderRadius.DEFAULT');
     font-weight: 500;
     text-align: center;
     cursor: pointer;
@@ -334,21 +334,21 @@
   }
   
   .btn-primary {
-    background-color: var(--color-blue-500);
-    color: var(--color-white);
+    background-color: theme('colors.blue.500');
+    color: theme('colors.white');
     border: 0;
   }
   
   .btn-primary:hover {
-    background-color: var(--color-blue-700);
+    background-color: theme('colors.blue.700');
   }
 }
 
 /* DevTools specific styling - not in a layer */
 .devtools-panel {
   font-size: 12px;
-  background-color: var(--color-gray-700);
-  color: var(--color-gray-300);
+  background-color: theme('colors.gray.700');
+  color: theme('colors.gray.300');
 }
 
 .devtools-panel h1,
@@ -360,27 +360,27 @@
   font-size: 0.75rem;
   font-weight: 500;
   margin: 0.5rem 0;
-  color: var(--color-gray-300);
+  color: theme('colors.gray.300');
 }
 
 .devtools-panel p {
   font-size: 0.75rem;
   margin: 0.5rem 0;
-  color: var(--color-gray-500);
+  color: theme('colors.gray.500');
 }
 
 .devtools-panel button {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  border-radius: var(--rounded);
-  border: 1px solid var(--color-gray-500);
+  border-radius: theme('borderRadius.DEFAULT');
+  border: 1px solid theme('colors.gray.500');
   cursor: pointer;
-  background-color: var(--color-gray-500);
-  color: var(--color-gray-300);
+  background-color: theme('colors.gray.500');
+  color: theme('colors.gray.300');
 }
 
 .devtools-panel button:hover {
-  background-color: var(--color-gray-700);
+  background-color: theme('colors.gray.700');
 }
 
 /* Utility layer for custom animations and mobile optimizations */
