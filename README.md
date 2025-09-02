@@ -173,16 +173,12 @@ Making sure things don't break when I change stuff:
 
 ### Working Toward 1.0
 
-Timeline: About 7-11 weeks
-
 What constitutes "done enough" for a 1.0:
 - All user-facing polish complete
 - Developer tools operational for maintainability
 - Comprehensive testing coverage
 - Performance benchmarks met
 - Documentation that actually makes sense
-
-This isn't a commercial launch - just getting to a solid milestone where the project feels complete and stable.
 
 ### Future Ideas (Post-1.0)
 
