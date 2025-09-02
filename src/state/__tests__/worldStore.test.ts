@@ -45,7 +45,8 @@ describe('useWorldStore', () => {
     test('should validate required fields', () => {
       const invalidWorldData = {
         name: '',
-        theme: '',
+        description: '',
+        genre: '',
         attributes: [],
         skills: [],
         settings: {
@@ -66,6 +67,7 @@ describe('useWorldStore', () => {
     test('should update existing world', async () => {
       const worldData = {
         name: 'Original World',
+        description: 'Original fantasy world',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -101,6 +103,7 @@ describe('useWorldStore', () => {
     test('should remove world from store', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'To Delete',
+        description: 'World to be deleted',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -121,6 +124,7 @@ describe('useWorldStore', () => {
     test('should clear currentWorldId if deleted world was current', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'Current World',
+        description: 'Current world test',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -144,6 +148,7 @@ describe('useWorldStore', () => {
     test('should set current world ID', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'Current World',
+        description: 'Set current world test',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -175,6 +180,7 @@ describe('useWorldStore', () => {
     beforeEach(() => {
       worldId = useWorldStore.getState().createWorld({
         name: 'Attribute Test World',
+        description: 'World for attribute tests',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -190,6 +196,7 @@ describe('useWorldStore', () => {
     test('should add attribute to world', () => {
       const attributeData = {
         name: 'Strength',
+        description: 'Physical strength attribute',
         baseValue: 10,
         minValue: 3,
         maxValue: 18,
@@ -303,8 +310,12 @@ describe('useWorldStore', () => {
     test('should add skill to world', () => {
       const skillData = {
         name: 'Swordsmanship',
+        description: 'Skill with sword combat',
         difficulty: 'medium' as const,
-        category: 'Combat'
+        category: 'Combat',
+        baseValue: 5,
+        minValue: 0,
+        maxValue: 10
       };
 
       useWorldStore.getState().addSkill(worldId, skillData);
