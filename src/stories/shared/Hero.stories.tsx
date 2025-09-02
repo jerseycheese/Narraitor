@@ -92,7 +92,7 @@ export const FantasyTheme: Story = {
     subtitle: 'A realm of magic and wonder',
     theme: 'fantasy',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-purple-200 bg-purple-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-blue-100 bg-blue-900/70 rounded-full backdrop-blur-sm">
         Fantasy
       </span>
     ),
@@ -105,7 +105,7 @@ export const SciFiTheme: Story = {
     subtitle: 'Advanced civilization among the stars',
     theme: 'sci-fi',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-cyan-200 bg-cyan-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-blue-100 bg-blue-900/70 rounded-full backdrop-blur-sm">
         Sci-Fi
       </span>
     ),
@@ -118,7 +118,7 @@ export const WesternTheme: Story = {
     subtitle: 'Life on the frontier',
     theme: 'western',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-orange-200 bg-orange-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-amber-200 bg-red-700/70 rounded-full backdrop-blur-sm">
         Western
       </span>
     ),

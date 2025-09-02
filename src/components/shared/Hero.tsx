@@ -66,21 +66,21 @@ export const Hero: React.FC<HeroProps> = ({
   titleElement: TitleElement = 'h1',
   theme = 'default',
 }) => {
-  // Theme-based background gradients
+  // Theme-based background gradients using design system colors only
   const getThemeBackground = (theme: string) => {
     switch (theme) {
       case 'fantasy':
-        return 'bg-gradient-to-br from-purple-700 via-blue-800 to-indigo-900';
+        return 'bg-gradient-to-br from-blue-700 via-blue-900 to-gray-900';
       case 'sci-fi':
-        return 'bg-gradient-to-br from-cyan-600 via-blue-700 to-indigo-900';
+        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
       case 'western':
-        return 'bg-gradient-to-br from-orange-600 via-red-700 to-amber-800';
+        return 'bg-gradient-to-br from-amber-500 via-red-500 to-red-700';
       case 'modern':
-        return 'bg-gradient-to-br from-gray-600 via-slate-700 to-gray-900';
+        return 'bg-gradient-to-br from-gray-500 via-gray-700 to-gray-900';
       case 'horror':
-        return 'bg-gradient-to-br from-red-900 via-gray-900 to-black';
+        return 'bg-gradient-to-br from-red-700 via-gray-900 to-black';
       default:
-        return 'bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800';
+        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
     }
   };
 
