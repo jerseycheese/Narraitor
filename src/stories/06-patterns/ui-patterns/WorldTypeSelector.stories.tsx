@@ -62,7 +62,7 @@ const InteractiveWorldTypeSelector = (args: Record<string, unknown>) => {
       {/* Debug output */}
       <div className="mt-8 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-600">
+        <pre className="text-sm text-gray-700">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -138,7 +138,7 @@ const InspiredByExampleComponent = () => {
       
       <div className="mt-8 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-600">
+        <pre className="text-sm text-gray-700">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>
@@ -174,7 +174,7 @@ const SetWithinExampleComponent = () => {
       
       <div className="mt-8 p-4 bg-gray-100 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-2">Current Data:</h3>
-        <pre className="text-sm text-gray-600">
+        <pre className="text-sm text-gray-700">
           {JSON.stringify(data, null, 2)}
         </pre>
       </div>

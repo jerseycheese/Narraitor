@@ -10,23 +10,23 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-blue-600 text-white hover:bg-blue-700",
+          "border-transparent bg-blue-700 text-white hover:bg-blue-900",
         secondary:
-          "border-transparent bg-gray-100 text-gray-900 hover:bg-gray-200",
+          "border-transparent bg-gray-100 text-gray-900 hover:bg-gray-300",
         destructive:
-          "border-transparent bg-red-600 text-white hover:bg-red-700",
-        outline: "text-gray-900 border border-gray-300 bg-white hover:bg-gray-50",
+          "border-transparent bg-red-700 text-white hover:bg-red-900",
+        outline: "text-gray-900 border border-gray-300 bg-white hover:bg-gray-100",
         // Entity badge variants
-        success: "border-transparent bg-green-600 text-white hover:bg-green-700",
-        warning: "border-transparent bg-yellow-600 text-white hover:bg-yellow-700",
-        info: "border-transparent bg-cyan-600 text-white hover:bg-cyan-700",
+        success: "border-transparent bg-green-500 text-white hover:bg-green-700",
+        warning: "border-transparent bg-amber-500 text-white hover:bg-amber-700",
+        info: "border-transparent bg-blue-700 text-white hover:bg-blue-900",
         // Static entity badge variants (no hover states)
-        "success-static": "border-transparent bg-green-600 text-white",
-        "info-static": "border-transparent bg-cyan-600 text-white",
-        "default-static": "border-transparent bg-blue-600 text-white",
+        "success-static": "border-transparent bg-green-500 text-white",
+        "info-static": "border-transparent bg-blue-700 text-white",
+        "default-static": "border-transparent bg-blue-700 text-white",
         // Skill requirement variants
-        available: "border-transparent bg-green-100 text-green-800 hover:bg-green-200",
-        unavailable: "border-transparent bg-red-100 text-red-800 hover:bg-red-200",
+        available: "border-transparent bg-green-200 text-green-700 hover:bg-green-500",
+        unavailable: "border-transparent bg-red-200 text-red-700 hover:bg-red-500",
       },
       size: {
         sm: "px-2 py-0.5 text-xs",

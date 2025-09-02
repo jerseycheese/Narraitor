@@ -106,29 +106,29 @@ const WorldTypeExampleComponent = (args: React.ComponentProps<typeof RadioGroup>
         onValueChange={setValue}
         name="world-type-radio"
       >
-        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-50 border-gray-300">
+        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-100 border-gray-300">
           <RadioGroupItem value="original" />
           <div className="flex-1 ml-3">
             <div className="font-medium text-gray-900">Original World</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-700">
               Generate a completely original world with unique settings and themes
             </div>
           </div>
         </div>
-        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-50 border-gray-300">
+        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-100 border-gray-300">
           <RadioGroupItem value="inspired_by" />
           <div className="flex-1 ml-3">
             <div className="font-medium text-gray-900">Inspired By</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-700">
               Generate an original world inspired by an existing fictional universe
             </div>
           </div>
         </div>
-        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-50 border-gray-300">
+        <div className="flex items-start p-3 border rounded-lg hover:bg-gray-100 border-gray-300">
           <RadioGroupItem value="set_within" />
           <div className="flex-1 ml-3">
             <div className="font-medium text-gray-900">Set Within</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-700">
               Generate a world directly within an existing fictional universe
             </div>
           </div>

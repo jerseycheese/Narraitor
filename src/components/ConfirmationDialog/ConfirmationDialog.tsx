@@ -29,8 +29,8 @@ export interface ConfirmationDialogProps {
 
 const variantClasses: Record<ConfirmationVariant, string> = {
   default: 'border-gray-200 bg-white',
-  destructive: 'border-red-200 bg-red-50',
-  warning: 'border-yellow-200 bg-yellow-50',
+  destructive: 'border-red-500 bg-red-200',
+  warning: 'border-amber-200 bg-amber-200',
   info: 'border-blue-200 bg-blue-50',
 };
 
@@ -120,7 +120,7 @@ export function ConfirmationDialog({
             disabled={isLoading}
             className={cn(
               'w-full sm:w-auto',
-              variant === 'destructive' && 'bg-red-600 hover:bg-red-700 text-white'
+              variant === 'destructive' && 'bg-red-500 hover:bg-red-700 text-white'
             )}
           >
             {isLoading ? loadingText : confirmText}

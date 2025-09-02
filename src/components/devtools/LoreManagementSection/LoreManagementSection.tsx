@@ -112,10 +112,10 @@ export const LoreManagementSection: React.FC = () => {
   };
 
   const categoryColors: Record<LoreCategory, string> = {
-    characters: 'text-blue-600',
-    locations: 'text-green-600',
-    events: 'text-purple-600',
-    rules: 'text-orange-600'
+    characters: 'text-blue-700',
+    locations: 'text-green-500',
+    events: 'text-blue-700',
+    rules: 'text-amber-500'
   };
 
   return (
@@ -162,7 +162,7 @@ export const LoreManagementSection: React.FC = () => {
                 <option value="events">Events</option>
                 <option value="rules">Rules</option>
               </Select>
-              <div className="ml-auto text-sm text-gray-600">
+              <div className="ml-auto text-sm text-gray-700">
                 Total facts: {facts.length}
               </div>
             </div>
@@ -182,7 +182,7 @@ export const LoreManagementSection: React.FC = () => {
                       {categoryFacts.map(fact => (
                         <div
                           key={fact.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
+                          className="flex items-center justify-between p-2 bg-gray-100 rounded hover:bg-gray-100 cursor-pointer"
                           onClick={() => setSelectedFactId(fact.id)}
                         >
                           <div className="flex-1">
@@ -254,7 +254,7 @@ export const LoreManagementSection: React.FC = () => {
             </div>
 
             {searchQuery && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-700">
                 Found {facts.length} result(s) for &quot;{searchQuery}&quot;
               </div>
             )}
@@ -264,7 +264,7 @@ export const LoreManagementSection: React.FC = () => {
               {facts.map(fact => (
                 <div
                   key={fact.id}
-                  className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  className="p-3 border rounded-lg hover:bg-gray-100 cursor-pointer"
                   onClick={() => setSelectedFactId(fact.id)}
                 >
                   <div className="flex items-center gap-2">
@@ -275,7 +275,7 @@ export const LoreManagementSection: React.FC = () => {
                   </div>
                   <div className="mt-1">{fact.value}</div>
                   {fact.metadata?.description && (
-                    <div className="text-sm text-gray-600 mt-1">{fact.metadata.description}</div>
+                    <div className="text-sm text-gray-700 mt-1">{fact.metadata.description}</div>
                   )}
                 </div>
               ))}
@@ -290,7 +290,7 @@ export const LoreManagementSection: React.FC = () => {
                 <Button onClick={handleExport}>Export to JSON</Button>
                 {exportedData && (
                   <div className="mt-2">
-                    <div className="text-sm text-gray-600 mb-1">Exported data (copied to clipboard):</div>
+                    <div className="text-sm text-gray-700 mb-1">Exported data (copied to clipboard):</div>
                     <pre className="p-2 bg-gray-100 rounded text-xs overflow-auto max-h-48">
                       {exportedData}
                     </pre>

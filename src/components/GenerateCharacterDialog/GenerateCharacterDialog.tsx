@@ -51,25 +51,25 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
               disabled={isGenerating}
               className="space-y-2"
             >
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
                 <RadioGroupItem value="known" id="known" className="mr-3" />
                 <div>
                   <div className="font-medium">Known Figure</div>
-                  <div className="text-sm text-gray-600">Generate a major character from {worldName}</div>
+                  <div className="text-sm text-gray-700">Generate a major character from {worldName}</div>
                 </div>
               </div>
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
                 <RadioGroupItem value="original" id="original" className="mr-3" />
                 <div>
                   <div className="font-medium">Original Character</div>
-                  <div className="text-sm text-gray-600">Create a unique character that fits the world</div>
+                  <div className="text-sm text-gray-700">Create a unique character that fits the world</div>
                 </div>
               </div>
-              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+              <div className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-100">
                 <RadioGroupItem value="specific" id="specific" className="mr-3" />
                 <div>
                   <div className="font-medium">Specific Known Figure</div>
-                  <div className="text-sm text-gray-600">Generate a specific character from {worldName} lore</div>
+                  <div className="text-sm text-gray-700">Generate a specific character from {worldName} lore</div>
                 </div>
               </div>
             </RadioGroup>
@@ -95,11 +95,11 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           )}
         </div>
         {error && (
-          <p className="text-red-600 text-sm mt-4">{error}</p>
+          <p className="text-red-500 text-sm mt-4">{error}</p>
         )}
         {isGenerating && (
-          <p className="text-purple-600 text-sm mt-4 flex items-center gap-2">
-            <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
+          <p className="text-blue-700 text-sm mt-4 flex items-center gap-2">
+            <span className="inline-block w-4 h-4 border-2 border-blue-700 border-t-transparent rounded-full animate-spin"></span>
             {generatingStatus}
           </p>
         )}
@@ -114,7 +114,7 @@ export const GenerateCharacterDialog: React.FC<GenerateCharacterDialogProps> = (
           <Button
             onClick={onGenerate}
             disabled={isGenerating || (generationType === 'specific' && !safeTrim(characterName))}
-            className="bg-purple-600 text-white hover:bg-purple-700"
+            className="bg-blue-700 text-white hover:bg-blue-700"
           >
             {isGenerating ? 'Generating...' : 'Generate'}
           </Button>

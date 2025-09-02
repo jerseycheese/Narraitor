@@ -20,32 +20,9 @@ Built on Tailwind CSS v4, the styles are organized to stay maintainable:
 3. **Component Classes**: A few reusable classes for common patterns
 4. **Utility Classes**: Custom utilities that Tailwind doesn't provide
 
-## CSS Variables
+## Design Token Integration
 
-### Colors
-- `--color-background`: Page background (#ffffff)
-- `--color-foreground`: Text color (#171717)
-- `--color-primary`: Primary action color (#2563eb)
-- `--color-secondary`: Secondary accent color (#4f46e5)
-- `--color-accent`: Highlighting color (#f97316)
-- `--color-muted`: Subtle text color (#6b7280)
-- `--color-border`: Border color (#e5e7eb)
-
-### Typography
-- `--font-sans`: Sans-serif font stack
-- `--font-serif`: Serif font stack
-- `--font-mono`: Monospace font stack
-
-### Spacing
-- `--space-1` through `--space-16`: Consistent spacing scale
-
-### Design Elements
-- `--radius-sm`, `--radius-md`, `--radius-lg`: Border radius values
-- `--shadow-sm`, `--shadow-md`, `--shadow-lg`: Box shadow values
-
-## Using CSS Variables in Components
-
-Our CSS variables can be used directly in JSX component styles or in CSS files. Here are some examples:
+This file works with the [design token system](./design-tokens.md) to provide consistent styling. Colors, spacing, and other design properties should use design tokens through Tailwind's theme() function or utility classes rather than hardcoded values.
 
 ### Style Guidelines
 
@@ -74,17 +51,17 @@ const CustomButton = ({ children }) => {
 ### In CSS/SCSS Files
 
 ```css
-/* Example of using CSS variables in a component CSS file */
+/* Example of using design tokens through theme() function */
 .customCard {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  background-color: theme('colors.white');
+  border: 1px solid theme('colors.gray.200');
+  padding: theme('spacing.4');
+  border-radius: theme('borderRadius.lg');
+  box-shadow: theme('boxShadow.md');
 }
 
 .customCard:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: theme('boxShadow.lg');
 }
 ```
 

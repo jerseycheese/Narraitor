@@ -136,21 +136,21 @@ export default function LoreViewerTestPage() {
         <div className="flex flex-wrap gap-4">
           <button
             onClick={addSampleFacts}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
           >
             Add Sample Facts
           </button>
           
           <button
             onClick={testStructuredExtraction}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
           >
             Test AI Structured Extraction
           </button>
           
           <button
             onClick={testErrorHandling}
-            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+            className="px-4 py-2 bg-amber-500 text-white rounded hover:bg-amber-500"
           >
             Test Error Handling
           </button>
@@ -161,7 +161,7 @@ export default function LoreViewerTestPage() {
               setExtractionResult('All facts cleared from this world');
               setTimeout(() => setExtractionResult(''), 3000);
             }}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-500"
           >
             Clear All Facts
           </button>
@@ -178,7 +178,7 @@ export default function LoreViewerTestPage() {
         </div>
         
         {extractionResult && (
-          <div className="p-3 bg-green-100 border border-green-300 rounded text-green-800">
+          <div className="p-3 bg-green-100 border border-green-300 rounded text-green-700">
             {extractionResult}
           </div>
         )}
@@ -214,7 +214,7 @@ export default function LoreViewerTestPage() {
           <li><strong>Clear All Facts:</strong> Remove all facts to start fresh</li>
         </ol>
         
-        <div className="mt-4 p-3 bg-purple-50 rounded">
+        <div className="mt-4 p-3 bg-blue-50 rounded">
           <h3 className="font-semibold text-sm mb-1">AI Structured Extraction:</h3>
           <ul className="text-sm space-y-1">
             <li>• Extracts characters with roles, descriptions, and importance</li>
@@ -225,7 +225,7 @@ export default function LoreViewerTestPage() {
           </ul>
         </div>
         
-        <div className="mt-4 p-3 bg-orange-50 rounded">
+        <div className="mt-4 p-3 bg-amber-50 rounded">
           <h3 className="font-semibold text-sm mb-1">Production Behavior:</h3>
           <ul className="text-sm space-y-1">
             <li>• <strong>Primary:</strong> AI-powered structured extraction (production with API key)</li>

@@ -165,7 +165,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
       notches.push(
         <div
           key={`notch-${i}`}
-          className="w-0.5 h-2 bg-gray-400"
+          className="w-0.5 h-2 bg-gray-500"
         />
       );
     }
@@ -189,10 +189,10 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   return (
     <div className="py-2" data-testid={testId}>
       {showLabel && (
-        <div className="flex justify-between mb-1 text-sm text-gray-600">
+        <div className="flex justify-between mb-1 text-sm text-gray-700">
           <span>{labelText}</span>
           {showLevelDescription && currentLevelDescription && (
-            <span className="font-medium text-blue-600" data-testid={`${testId}-level-label`}>
+            <span className="font-medium text-blue-700" data-testid={`${testId}-level-label`}>
               {currentLevelDescription.label}
             </span>
           )}
@@ -221,13 +221,13 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
                 [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:rounded-full
                 [&::-moz-range-track]:h-1 [&::-moz-range-track]:rounded-full
                 ${isConstrained && effectiveMax !== undefined && value === effectiveMax 
-                  ? '[&::-webkit-slider-runnable-track]:bg-orange-300 [&::-moz-range-track]:bg-orange-300' 
+                  ? '[&::-webkit-slider-runnable-track]:bg-amber-300 [&::-moz-range-track]:bg-amber-300' 
                   : '[&::-webkit-slider-runnable-track]:bg-gray-200 [&::-moz-range-track]:bg-gray-200'
                 }
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full
                 [&::-webkit-slider-thumb]:mt-[-6px] [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:mt-0
                 ${isConstrained && effectiveMax !== undefined && value === effectiveMax
-                  ? '[&::-webkit-slider-thumb]:bg-orange-500 [&::-moz-range-thumb]:bg-orange-500'
+                  ? '[&::-webkit-slider-thumb]:bg-amber-500 [&::-moz-range-thumb]:bg-amber-500'
                   : '[&::-webkit-slider-thumb]:bg-blue-500 [&::-moz-range-thumb]:bg-blue-500'
                 }`}
               data-testid={`${testId}-slider`}
@@ -242,7 +242,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
         
         {/* Level description */}
         {showLevelDescription && currentLevelDescription && currentLevelDescription.description && (
-          <div className="mt-2 text-sm text-gray-600" data-testid={`${testId}-description`}>
+          <div className="mt-2 text-sm text-gray-700" data-testid={`${testId}-description`}>
             <span className="font-medium">{currentLevelDescription.label}:</span> {currentLevelDescription.description}
           </div>
         )}

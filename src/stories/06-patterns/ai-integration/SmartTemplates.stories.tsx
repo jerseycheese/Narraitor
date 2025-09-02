@@ -85,11 +85,11 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900">Smart World Templates</h2>
-        <p className="text-gray-600 mt-2">Get creative starting points for your world with AI assistance</p>
+        <p className="text-gray-700 mt-2">Get creative starting points for your world with AI assistance</p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-200 border border-red-500 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -130,7 +130,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                     <button
                       onClick={handleGenerate}
                       disabled={!userInput.trim()}
-                      className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                      className="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50"
                     >
                       Generate World
                     </button>
@@ -145,7 +145,7 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Mix Genres Together</h3>
-                    <p className="text-sm text-gray-600 mb-4">Select 2 or more genres to blend together</p>
+                    <p className="text-sm text-gray-700 mb-4">Select 2 or more genres to blend together</p>
                   </div>
                   <div className="space-y-4">
                     <div className="grid grid-cols-3 gap-2">
@@ -166,13 +166,13 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                       ))}
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-700">
                         {selectedGenres.length} genre{selectedGenres.length !== 1 ? 's' : ''} selected
                       </span>
                       <button
                         onClick={handleGenerate}
                         disabled={selectedGenres.length < 2}
-                        className="bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-50"
+                        className="bg-blue-500 text-white px-6 py-2 rounded disabled:opacity-50"
                       >
                         Mix Genres
                       </button>
@@ -188,12 +188,12 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-lg font-semibold mb-4">Random World Generation</h3>
-                    <p className="text-sm text-gray-600 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
+                    <p className="text-sm text-gray-700 mb-6">Generate a completely unexpected world with unique themes, attributes, and gameplay elements.</p>
                   </div>
                   <div>
                     <button
                       onClick={handleGenerate}
-                      className="bg-purple-600 text-white px-6 py-2 rounded"
+                      className="bg-blue-700 text-white px-6 py-2 rounded"
                     >
                       Generate Random World
                     </button>
@@ -211,18 +211,18 @@ const MockSmartTemplates: React.FC<{ onTemplateGenerated: (template: WorldTempla
                 {mockHistory.map((entry, index) => (
                   <div 
                     key={index}
-                    className="border rounded-lg p-4 hover:border-gray-400 cursor-pointer transition-colors"
+                    className="border rounded-lg p-4 hover:border-gray-500 cursor-pointer transition-colors"
                     onClick={() => onTemplateGenerated(entry.template)}
                   >
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-medium">{entry.template.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{entry.template.genre}</p>
+                        <p className="text-sm text-gray-700 mt-1">{entry.template.genre}</p>
                         <p className="text-xs text-gray-500 mt-2">
                           {formatDate(entry.generatedAt)}
                         </p>
                       </div>
-                      <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                      <span className="bg-gray-100 text-gray-900 text-xs px-2 py-1 rounded">
                         {(() => {
                           switch(entry.generationType) {
                             case 'inspired-by': return 'Inspired';

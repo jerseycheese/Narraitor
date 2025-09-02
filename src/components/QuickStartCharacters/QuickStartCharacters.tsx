@@ -83,7 +83,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
-          <p className="text-lg text-gray-600 mb-1">
+          <p className="text-lg text-gray-700 mb-1">
             Jump straight into your adventure with {world.name}
           </p>
         </div>
@@ -122,7 +122,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
-        <p className="text-lg text-gray-600 mb-1">
+        <p className="text-lg text-gray-700 mb-1">
           Jump straight into your adventure with {world.name}
         </p>
         <p className="text-sm text-gray-500">
@@ -141,7 +141,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
             isActive={selectedArchetype === archetype.id}
             activeText="Selected Character"
             onClick={() => handleArchetypeSelect(archetype)}
-            activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400"
+            activeClassName="border-green-500 bg-green-50 shadow-xl ring-2 ring-green-500"
             inactiveClassName="border-gray-300 bg-white hover:shadow-lg"
             testId="archetype-card"
           >
@@ -149,7 +149,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               <CardTitle className="text-xl font-bold text-gray-900">
                 {archetype.name}
               </CardTitle>
-              <CardDescription className="text-sm text-gray-600">
+              <CardDescription className="text-sm text-gray-700">
                 {archetype.description}
               </CardDescription>
             </CardHeader>
@@ -205,7 +205,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               {/* Motivation */}
               <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-1">Motivation</h4>
-                <p className="text-xs text-gray-600 italic">
+                <p className="text-xs text-gray-700 italic">
                   &ldquo;{archetype.background.motivation}&rdquo;
                 </p>
               </div>
@@ -258,10 +258,10 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
       {/* Additional Info */}
       <div className="mt-8 text-center space-y-2">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           <strong>Generate New Random Character:</strong> Creates a completely new random character for this world
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           <strong>Create Custom Character:</strong> Build your own character from scratch with full customization
         </p>
         <p className="text-xs text-gray-500 mt-4">

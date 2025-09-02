@@ -105,7 +105,7 @@ export function CharacterCard({
               </Badge>
             )}
           </div>
-          <p className="text-gray-600 text-sm leading-snug">
+          <p className="text-gray-700 text-sm leading-snug">
             {(() => {
               const text = (getNestedValue(character, 'background.history') || 
                           getNestedValue(character, 'background.personality') || 
@@ -140,21 +140,21 @@ export function CharacterCard({
                 text: 'View',
                 onClick: onView,
                 variant: 'primary',
-                className: 'bg-blue-600 hover:bg-blue-700'
+                className: 'bg-blue-500 hover:bg-blue-700'
               },
               {
                 key: 'play',
                 text: 'Play',
                 onClick: onPlay,
                 variant: 'primary',
-                className: 'bg-indigo-600 hover:bg-indigo-700'
+                className: 'bg-blue-500 hover:bg-blue-700'
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: onEdit,
                 variant: 'primary',
-                className: 'bg-blue-600 hover:bg-blue-700'
+                className: 'bg-blue-500 hover:bg-blue-700'
               },
               {
                 key: 'delete',

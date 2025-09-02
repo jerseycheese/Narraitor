@@ -55,7 +55,7 @@ export const ToneSettingsForm: React.FC<ToneSettingsFormProps> = ({
       {showHeader && (
         <div className="mb-6">
           <h3 className="text-2xl font-semibold leading-none tracking-tight mb-2">Tone Settings</h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-700">
             Configure the narrative style, content rating, and language complexity for generated content.
           </p>
         </div>

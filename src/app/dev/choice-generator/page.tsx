@@ -238,7 +238,7 @@ export default function ChoiceGeneratorTestPage() {
           <h2 className="text-xl font-bold">Narrative Segments</h2>
           <button
             onClick={addSegment}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-500"
           >
             Add Segment
           </button>
@@ -250,7 +250,7 @@ export default function ChoiceGeneratorTestPage() {
               <h3 className="font-semibold">Segment {index + 1}</h3>
               <button
                 onClick={() => removeSegment(index)}
-                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-500 text-sm"
                 disabled={(narrativeContext.recentSegments?.length || 0) <= 1}
               >
                 Remove
@@ -269,14 +269,14 @@ export default function ChoiceGeneratorTestPage() {
         <button
           onClick={generateChoices}
           disabled={isGenerating}
-          className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 w-full"
+          className="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-700 disabled:opacity-50 w-full"
         >
           {isGenerating ? 'Generating Choices...' : 'Generate Player Choices'}
         </button>
       </div>
 
       {error && (
-        <div className="mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-8 p-4 bg-red-100 border border-red-500 text-red-700 rounded">
           <h2 className="font-bold mb-2">Error</h2>
           <p>{error}</p>
         </div>
@@ -288,7 +288,7 @@ export default function ChoiceGeneratorTestPage() {
           
           <div className="mb-4">
             <h3 className="font-semibold mb-2">Decision Object:</h3>
-            <pre className="bg-black text-green-400 p-4 rounded overflow-x-auto">
+            <pre className="bg-black text-green-500 p-4 rounded overflow-x-auto">
               {JSON.stringify(decision, null, 2)}
             </pre>
           </div>

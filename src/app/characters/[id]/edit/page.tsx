@@ -15,16 +15,16 @@ export default function CharacterEditPage() {
 
   if (!character) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <h1 className="text-2xl font-bold mb-4">Character Not Found</h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-700 mb-6">
               The character you&apos;re trying to edit doesn&apos;t exist or has been deleted.
             </p>
             <button
               onClick={() => router.push('/characters')}
-              className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
+              className="px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
             >
               Back to Characters
             </button>
@@ -35,7 +35,7 @@ export default function CharacterEditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header with back button */}
         <div className="mb-6">

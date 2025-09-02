@@ -50,64 +50,64 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     switch (type) {
       case 'dialogue':
         return {
-          container: 'border-l-4 border-blue-400 bg-blue-50',
+          container: 'border-l-4 border-blue-500 bg-blue-50',
           text: 'italic text-gray-700',
-          label: 'text-xs uppercase text-blue-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-blue-700 font-semibold mb-2'
         };
       case 'action':
         return {
-          container: 'border-2 border-orange-300 bg-orange-50',
-          text: 'font-medium text-gray-800',
-          label: 'text-xs uppercase text-orange-600 font-semibold mb-2'
+          container: 'border-2 border-amber-300 bg-amber-50',
+          text: 'font-medium text-gray-900',
+          label: 'text-xs uppercase text-amber-500 font-semibold mb-2'
         };
       case 'decision':
         return {
-          container: 'border-2 border-purple-300 bg-purple-50',
-          text: 'font-medium text-gray-800',
-          label: 'text-xs uppercase text-purple-600 font-semibold mb-2'
+          container: 'border-2 border-blue-300 bg-blue-50',
+          text: 'font-medium text-gray-900',
+          label: 'text-xs uppercase text-blue-700 font-semibold mb-2'
         };
       case 'combat':
         return {
-          container: 'border-2 border-red-300 bg-red-50',
-          text: 'font-bold text-gray-800',
-          label: 'text-xs uppercase text-red-600 font-semibold mb-2'
+          container: 'border-2 border-red-300 bg-red-200',
+          text: 'font-bold text-gray-900',
+          label: 'text-xs uppercase text-red-500 font-semibold mb-2'
         };
       case 'exploration':
         return {
           container: 'border-2 border-green-300 bg-green-50',
           text: 'text-gray-700',
-          label: 'text-xs uppercase text-green-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-green-500 font-semibold mb-2'
         };
       case 'resolution':
         return {
-          container: 'border-2 border-indigo-300 bg-indigo-50',
+          container: 'border-2 border-blue-300 bg-blue-50',
           text: 'text-gray-700',
-          label: 'text-xs uppercase text-indigo-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-blue-700 font-semibold mb-2'
         };
       case 'character_interaction':
         return {
-          container: 'border-2 border-cyan-300 bg-cyan-50',
+          container: 'border-2 border-blue-300 bg-blue-50',
           text: 'text-gray-700',
-          label: 'text-xs uppercase text-cyan-600 font-semibold mb-2'
+          label: 'text-xs uppercase text-blue-700 font-semibold mb-2'
         };
       case 'revelation':
         return {
-          container: 'border-2 border-pink-300 bg-pink-50',
-          text: 'font-medium italic text-gray-800',
-          label: 'text-xs uppercase text-pink-600 font-semibold mb-2'
+          container: 'border-2 border-red-300 bg-red-50',
+          text: 'font-medium italic text-gray-900',
+          label: 'text-xs uppercase text-red-500 font-semibold mb-2'
         };
       case 'transition':
         return {
           container: 'bg-gray-100 border border-gray-300',
-          text: 'text-gray-600 text-sm italic',
+          text: 'text-gray-700 text-sm italic',
           label: 'text-xs uppercase text-gray-500 font-semibold mb-2'
         };
       case 'scene':
       default:
         return {
           container: 'bg-white border border-gray-200',
-          text: 'text-gray-800',
-          label: 'text-xs uppercase text-gray-600 font-semibold mb-2'
+          text: 'text-gray-900',
+          label: 'text-xs uppercase text-gray-700 font-semibold mb-2'
         };
     }
   };

@@ -145,7 +145,7 @@ export default function WorldGenerationTestPage() {
           <button
             onClick={handleGenerate}
             disabled={isGenerating || !safeTrim(worldReference)}
-            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-blue-700 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? 'Generating World...' : 'Generate World'}
           </button>
@@ -153,8 +153,8 @@ export default function WorldGenerationTestPage() {
         
         {/* Error Display */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-red-200 border border-red-500 rounded-lg p-4">
+            <p className="text-red-700">{error}</p>
           </div>
         )}
         
@@ -185,7 +185,7 @@ export default function WorldGenerationTestPage() {
                   {generatedWorld.attributes.map((attr, index: number) => (
                     <div key={index} className="border rounded p-3">
                       <div className="font-medium">{attr.name}</div>
-                      <div className="text-sm text-gray-600 mb-2">{attr.description}</div>
+                      <div className="text-sm text-gray-700 mb-2">{attr.description}</div>
                       <div className="text-sm">
                         Range: {attr.minValue} - {attr.maxValue} (Default: {attr.baseValue})
                       </div>
@@ -200,12 +200,12 @@ export default function WorldGenerationTestPage() {
                   {generatedWorld.skills.map((skill, index: number) => (
                     <div key={index} className="border rounded p-3">
                       <div className="font-medium">{skill.name}</div>
-                      <div className="text-sm text-gray-600 mb-2">{skill.description}</div>
+                      <div className="text-sm text-gray-700 mb-2">{skill.description}</div>
                       <div className="text-sm">
                         <span className={`px-2 py-1 rounded text-xs ${
-                          skill.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                          skill.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                          skill.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                          skill.difficulty === 'medium' ? 'bg-amber-100 text-amber-700' :
+                          'bg-red-100 text-red-700'
                         }`}>
                           {capitalize(skill.difficulty)}
                         </span>
@@ -228,7 +228,7 @@ export default function WorldGenerationTestPage() {
               <div className="mt-6 pt-6 border-t">
                 <button
                   onClick={handleCreateWorld}
-                  className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-700"
                 >
                   Create This World
                 </button>
@@ -242,7 +242,7 @@ export default function WorldGenerationTestPage() {
           <h2 className="text-xl font-semibold mb-4">Existing Worlds</h2>
           <div className="space-y-2">
             {Object.values(worlds).map(world => (
-              <div key={world.id} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+              <div key={world.id} className="flex justify-between items-center p-3 bg-gray-100 rounded">
                 <div>
                   <span className="font-medium">{world.name}</span>
                   <span className="text-sm text-gray-500 ml-2">({world.genre})</span>

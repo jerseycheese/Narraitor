@@ -335,7 +335,7 @@ export default function AttributeReviewStep({
           <div className="flex justify-between items-center mb-4">
             <div>
               <h3 className="text-lg font-medium text-gray-900">Custom Attributes</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-700">
                 Create your own unique attributes for this world ({acceptedCount}/6 slots used)
               </p>
             </div>
@@ -351,8 +351,8 @@ export default function AttributeReviewStep({
           </div>
           
           {customAttributes.length === 0 && !isCreatingCustomAttribute ? (
-            <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-sm text-gray-600 mb-2">No custom attributes yet</p>
+            <div className="text-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+              <p className="text-sm text-gray-700 mb-2">No custom attributes yet</p>
               <p className="text-xs text-gray-500">
                 {acceptedCount < 6 
                   ? `You have ${6 - acceptedCount} attribute slot${6 - acceptedCount !== 1 ? 's' : ''} available for custom attributes`
@@ -371,7 +371,7 @@ export default function AttributeReviewStep({
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">{attribute.name}</span>
-                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">
+                      <span className="text-xs text-green-500 bg-green-100 px-2 py-1 rounded">
                         Custom
                       </span>
                       {attribute.category && (
@@ -401,7 +401,7 @@ export default function AttributeReviewStep({
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600">
+                  <div className="mt-2 text-sm text-gray-700">
                     {attribute.description}
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function AttributeReviewStep({
           
           {/* Custom Attribute Editor */}
           {isCreatingCustomAttribute && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border" data-testid="custom-attribute-editor">
+            <div className="mt-4 p-4 bg-gray-100 rounded-lg border" data-testid="custom-attribute-editor">
               <AttributeEditor
                 worldId={worldData.id || ''}
                 mode={editingCustomAttributeId ? 'edit' : 'create'}
@@ -434,7 +434,7 @@ export default function AttributeReviewStep({
               Attributes Selected: {acceptedCount} / 6
             </span>
             {acceptedCount >= 6 && (
-              <span className="text-xs text-amber-600 ml-2">
+              <span className="text-xs text-amber-500 ml-2">
                 (Maximum reached)
               </span>
             )}
@@ -448,7 +448,7 @@ export default function AttributeReviewStep({
         </div>
         <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
           <div 
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
             style={{ width: `${(acceptedCount / 6) * 100}%` }}
           ></div>
         </div>

@@ -130,7 +130,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-lg font-semibold mb-2">Character Portrait</h3>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           {data.characterData.background?.isKnownFigure
             ? `Generate an AI portrait of ${data.characterData.name} as they are commonly recognized`
             : 'Generate an AI portrait for your character or use a placeholder'
@@ -172,7 +172,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             type="button"
             onClick={handleGeneratePortrait}
             disabled={isGenerating}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Generate Portrait
           </button>
@@ -180,20 +180,20 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
 
         {portrait.type === 'ai-generated' && portrait.url && (
           <div className="text-center space-y-2">
-            <p className="text-sm text-green-600">✓ Portrait generated successfully</p>
+            <p className="text-sm text-green-500">✓ Portrait generated successfully</p>
             <div className="flex gap-2 justify-center">
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
                 disabled={isGenerating}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Regenerate Portrait
               </button>
               <button
                 type="button"
                 onClick={handleRemovePortrait}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
               >
                 Remove Portrait
               </button>

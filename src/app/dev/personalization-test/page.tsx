@@ -280,12 +280,12 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
 
   const getStyleBadgeColor = (style: string) => {
     switch (style) {
-      case 'action-focused': return 'bg-red-100 text-red-800';
-      case 'character-driven': return 'bg-blue-100 text-blue-800';
-      case 'strategic': return 'bg-purple-100 text-purple-800';
-      case 'dialogue-heavy': return 'bg-green-100 text-green-800';
-      case 'exploration': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'action-focused': return 'bg-red-100 text-red-700';
+      case 'character-driven': return 'bg-blue-100 text-blue-900';
+      case 'strategic': return 'bg-blue-100 text-blue-900';
+      case 'dialogue-heavy': return 'bg-green-100 text-green-700';
+      case 'exploration': return 'bg-amber-100 text-amber-700';
+      default: return 'bg-gray-100 text-gray-900';
     }
   };
 
@@ -483,7 +483,7 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
                     <h4 className="font-medium mb-2">Pattern Strength</h4>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-blue-600 h-2 rounded-full" 
+                        className="bg-blue-500 h-2 rounded-full" 
                         style={{ width: `${patterns.patternStrength}%` }}
                       />
                     </div>
@@ -555,7 +555,7 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
             <CardContent className="space-y-4">
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <h4 className="font-medium text-blue-900 mb-2">Sample Scenario</h4>
-                <p className="text-blue-800 text-sm">
+                <p className="text-blue-900 text-sm">
                   &ldquo;You are exploring an ancient temple. The air is thick with dust and mystery. 
                   Ahead, you see two paths: one leads deeper into darkness, while the other shows 
                   faint light filtering through cracks in the stone walls. What do you do?&rdquo;
@@ -574,9 +574,9 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
                   </Button>
                   
                   {baselineNarrative && (
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="p-4 bg-gray-100 rounded-lg border border-gray-200">
                       <h4 className="font-medium text-gray-900 mb-2">🤖 Standard AI Narrative</h4>
-                      <div className="text-gray-800 text-sm whitespace-pre-wrap">
+                      <div className="text-gray-900 text-sm whitespace-pre-wrap">
                         {baselineNarrative}
                       </div>
                     </div>
@@ -595,7 +595,7 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
                   {sampleNarrative && (
                     <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                       <h4 className="font-medium text-green-900 mb-2">✨ Personalized AI Narrative</h4>
-                      <div className="text-green-800 text-sm whitespace-pre-wrap">
+                      <div className="text-green-700 text-sm whitespace-pre-wrap">
                         {sampleNarrative}
                       </div>
                     </div>
@@ -604,15 +604,15 @@ Generate a narrative response (2-3 paragraphs) describing the scene and potentia
               </div>
               
               {!enhancement && (
-                <div className="p-3 bg-orange-50 rounded border border-orange-200">
-                  <p className="text-orange-800 text-sm">
+                <div className="p-3 bg-amber-50 rounded border border-amber-500">
+                  <p className="text-amber-700 text-sm">
                     📝 <strong>Record some decisions first</strong> to enable personalized narrative generation.
                   </p>
                 </div>
               )}
               
-              <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
-                <p className="text-yellow-800 text-xs">
+              <div className="p-3 bg-amber-200 rounded border border-amber-200">
+                <p className="text-amber-700 text-xs">
                   💡 <strong>How it works:</strong> Compare the two narratives to see how personalization context 
                   affects AI storytelling. The personalized version uses your detected personality traits, 
                   decision patterns, and preferences to craft a narrative that matches your play style.

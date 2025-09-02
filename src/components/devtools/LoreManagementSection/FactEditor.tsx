@@ -213,7 +213,7 @@ export const FactEditor: React.FC<FactEditorProps> = ({
       </div>
 
       {isDuplicate && !fact && (
-        <Alert className="border-yellow-500">
+        <Alert className="border-amber-500">
           <AlertDescription>
             Duplicate fact detected. This fact already exists for this world.
           </AlertDescription>

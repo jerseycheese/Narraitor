@@ -86,13 +86,8 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
   return (
     <div className="narraitor-context-preview-container space-y-4">
       {showTokenCount && (
-        <div className="narraitor-context-preview-metrics p-3 border rounded-lg" 
-          style={{ 
-            backgroundColor: 'var(--color-background)',
-            borderColor: 'var(--color-border)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-          <h3 className="font-medium mb-2" style={{ color: 'var(--color-foreground)' }}>Token Metrics</h3>
+        <div className="narraitor-context-preview-metrics p-3 border rounded-lg bg-white border-gray-200">
+          <h3 className="font-medium mb-2 text-gray-900">Token Metrics</h3>
           
           <div className="grid grid-cols-2 gap-2 mb-2">
             <div className="text-sm">
@@ -104,7 +99,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
               <span className="font-medium">Final tokens:</span>
               <span className="ml-1">{finalTokenCount} / {tokenLimit}</span>
               {showWarning && finalTokenCount > tokenLimit && (
-                <span className="text-red-600 ml-2 font-bold">
+                <span className="text-red-500 ml-2 font-bold">
                   ⚠️ Limit exceeded
                 </span>
               )}
@@ -115,9 +110,9 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
             <div className="flex items-center justify-between text-sm mb-1">
               <span className="font-medium">Context retention:</span>
               <span className={`font-medium ${
-                retentionStatus === 'high' ? 'text-green-600' :
-                retentionStatus === 'medium' ? 'text-yellow-600' :
-                'text-red-600'
+                retentionStatus === 'high' ? 'text-green-500' :
+                retentionStatus === 'medium' ? 'text-amber-500' :
+                'text-red-500'
               }`}>
                 {formatPercentage(contextRetentionPercentage / 100, 1)}
               </span>
@@ -125,21 +120,22 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
             
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="h-2 rounded-full"
-                style={{ 
-                  width: `${Math.min(contextRetentionPercentage, 100)}%`,
-                  backgroundColor: retentionStatus === 'high' 
-                    ? 'var(--color-primary)' 
+                className={`h-2 rounded-full ${
+                  retentionStatus === 'high' 
+                    ? 'bg-blue-700' 
                     : retentionStatus === 'medium' 
-                      ? 'var(--color-accent)' 
-                      : 'var(--color-muted)' 
+                      ? 'bg-blue-300' 
+                      : 'bg-gray-500'
+                }`}
+                style={{ 
+                  width: `${Math.min(contextRetentionPercentage, 100)}%`
                 }}
               ></div>
             </div>
           </div>
           
           {truncationOccurred && showWarning && (
-            <div className="text-sm bg-yellow-50 border border-yellow-200 p-2 rounded text-yellow-700">
+            <div className="text-sm bg-amber-200 border border-amber-200 p-2 rounded text-amber-700">
               <span className="font-bold">⚠️ Truncation applied:</span> Some content was removed to fit within the token limit.
               {contextRetentionPercentage < 50 && (
                 <span className="block mt-1">Significant content loss detected. Consider increasing token limit or reducing input content.</span>
@@ -150,8 +146,8 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
       )}
 
       {showPrioritizationInfo && (
-        <div className="narraitor-context-prioritization p-3 border rounded-lg bg-gray-50 mb-4">
-          <h3 className="font-medium text-gray-800 mb-2">Prioritization Info</h3>
+        <div className="narraitor-context-prioritization p-3 border rounded-lg bg-gray-100 mb-4">
+          <h3 className="font-medium text-gray-900 mb-2">Prioritization Info</h3>
           <div className="text-sm">
             <p className="mb-1"><span className="font-medium">Prompt Type:</span> {promptType}</p>
             <p className="mb-2">Content is prioritized based on:</p>
@@ -185,12 +181,7 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
         </div>
       )}
 
-      <pre className="narraitor-context-preview-content p-4 rounded-lg overflow-x-auto"
-        style={{ 
-          backgroundColor: 'var(--color-background)',
-          borderRadius: 'var(--radius-md)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
+      <pre className="narraitor-context-preview-content p-4 rounded-lg overflow-x-auto bg-white shadow-sm">
         <code className="text-sm">{context}</code>
       </pre>
     </div>

@@ -56,7 +56,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
     <div className={`${wizardStyles.divider} ${className}`}>
       <h3 className={wizardStyles.subheading}>{title}</h3>
       {description && (
-        <p className="text-sm text-gray-600 mb-4">{description}</p>
+        <p className="text-sm text-gray-700 mb-4">{description}</p>
       )}
       <div className="grid gap-4 md:grid-cols-2">
         {templateHistoryManager.getRecent().map((entry, index) => (
@@ -74,7 +74,7 @@ export const RecentTemplates: React.FC<RecentTemplatesProps> = ({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h4 className="font-medium text-lg">{entry.template.name}</h4>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{entry.template.description}</p>
+                <p className="text-sm text-gray-700 mt-1 line-clamp-2">{entry.template.description}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-sm font-medium text-gray-700">{entry.template.genre}</span>
                   <span className="text-xs text-gray-500">•</span>

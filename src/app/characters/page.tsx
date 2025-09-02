@@ -349,17 +349,17 @@ export default function CharactersPage() {
       >
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <h2 className="text-xl font-semibold mb-2">Choose Your World</h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-700 mb-6">
             Characters belong to specific worlds. To create characters, you need to select an active world first.
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6 text-sm">
+          <div className="bg-blue-100 border border-blue-500 rounded-md p-4 mb-6 text-sm">
             <h3 className="font-medium text-blue-900 mb-2">How to get started:</h3>
-            <ol className="list-decimal list-inside space-y-1 text-blue-800">
+            <ol className="list-decimal list-inside space-y-1 text-blue-700">
               <li>Go to the Worlds page</li>
               <li>Click &quot;Make Active&quot; on any world you want to play in</li>
               <li>Return here to create characters for that world</li>
@@ -367,7 +367,7 @@ export default function CharactersPage() {
           </div>
           <button
             onClick={() => router.push('/worlds')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-md hover:shadow-lg"
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-md hover:shadow-lg"
           >
             Go to Worlds
           </button>
@@ -389,7 +389,7 @@ export default function CharactersPage() {
               router.push(`/world/${character.worldId}/play`);
             }
           }}
-          className="py-2 px-4 bg-indigo-600 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -400,14 +400,14 @@ export default function CharactersPage() {
       )}
       <button
         onClick={handleCreateCharacter}
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-600 transition-colors"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors"
       >
         Create Character
       </button>
       <button
         onClick={() => setShowGenerateDialog(true)}
         disabled={isGenerating}
-        className="py-2 px-4 bg-purple-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Generate Character
       </button>
@@ -456,7 +456,7 @@ export default function CharactersPage() {
       )}
 
       {generateError && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-4 p-4 bg-red-200 border border-red-500 rounded-lg text-red-700">
           <p className="font-medium">Generation Failed</p>
           <p className="text-sm mt-1">{generateError}</p>
         </div>
@@ -466,7 +466,7 @@ export default function CharactersPage() {
         <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-2">No characters in {currentWorld.name} yet</h2>
-            <p className="text-gray-600 mb-2">
+            <p className="text-gray-700 mb-2">
               Choose how you&apos;d like to add your first character.
             </p>
           </div>
@@ -474,7 +474,7 @@ export default function CharactersPage() {
             <button
               onClick={handleGenerateCharacter}
               disabled={isGenerating}
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
               {isGenerating ? (
                 <>
@@ -492,7 +492,7 @@ export default function CharactersPage() {
             </button>
             <button
               onClick={handleCreateCharacter}
-              className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg cursor-pointer"
+              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg cursor-pointer"
             >
               Create Character
             </button>
@@ -500,12 +500,12 @@ export default function CharactersPage() {
           <div className="mt-6 text-sm text-gray-500">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div>
-                <p className="font-medium text-purple-600 mb-1">Generate Character</p>
+                <p className="font-medium text-blue-700 mb-1">Generate Character</p>
                 <p>AI creates a character {currentWorld.reference ? `from ${currentWorld.reference}` : 'for your world'}</p>
                 <p className="text-xs mt-1">Choose known figures, original characters, or specific names</p>
               </div>
               <div>
-                <p className="font-medium text-green-600 mb-1">Create Character</p>
+                <p className="font-medium text-green-700 mb-1">Create Character</p>
                 <p>Design your own character with custom details</p>
                 <p className="text-xs mt-1">Full control over attributes, skills, and background</p>
               </div>

@@ -54,7 +54,7 @@ export const ActiveStateCard: React.FC<ActiveStateCardProps> = ({
   activeIcon,
   onClick,
   className = '',
-  activeClassName = 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-400',
+  activeClassName = 'border-green-500 bg-green-50 shadow-xl ring-2 ring-green-500',
   inactiveClassName = 'border-gray-300 bg-white hover:shadow-lg',
   showActiveIndicator = true,
   children,

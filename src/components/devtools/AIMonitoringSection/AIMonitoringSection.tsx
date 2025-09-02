@@ -15,10 +15,10 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
 
   const getStatusColor = (status: AIMonitoringEntry['status']) => {
     switch (status) {
-      case 'completed': return 'text-green-400';
-      case 'error': return 'text-red-400';
-      case 'pending': return 'text-yellow-400';
-      default: return 'text-gray-400';
+      case 'completed': return 'text-green-500';
+      case 'error': return 'text-red-500';
+      case 'pending': return 'text-amber-500';
+      default: return 'text-gray-500';
     }
   };
 
@@ -37,26 +37,26 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
   };
 
   return (
-    <div className="border border-slate-600 rounded p-3 mb-2 bg-slate-700/30">
+    <div className="border border-gray-700 rounded p-3 mb-2 bg-gray-700/30">
       {/* Entry Header */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`font-mono text-xs px-2 py-1 rounded ${getStatusColor(entry.status)} bg-slate-800`}>
+            <span className={`font-mono text-xs px-2 py-1 rounded ${getStatusColor(entry.status)} bg-gray-900`}>
               {entry.status.toUpperCase()}
             </span>
-            <span className="text-xs text-slate-300">{formatTimestamp(entry.timestamp)}</span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-gray-300">{formatTimestamp(entry.timestamp)}</span>
+            <span className="text-xs text-gray-500">
               {formatDuration(entry.performance.duration)}
             </span>
           </div>
-          <div className="text-sm text-slate-200">
-            <span className="font-mono text-xs bg-slate-800 px-2 py-1 rounded mr-2">
+          <div className="text-sm text-gray-200">
+            <span className="font-mono text-xs bg-gray-900 px-2 py-1 rounded mr-2">
               {entry.method}
             </span>
             {entry.endpoint}
           </div>
-          <div className="text-xs text-slate-400 mt-1">
+          <div className="text-xs text-gray-500 mt-1">
             {truncateText(entry.request.prompt)}
           </div>
         </div>
@@ -65,7 +65,7 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           onClick={() => setIsExpanded(!isExpanded)}
           variant="ghost"
           size="sm"
-          className="text-xs text-slate-400 hover:text-slate-200"
+          className="text-xs text-gray-500 hover:text-gray-200"
         >
           {isExpanded ? 'Hide' : 'Show'}
         </Button>
@@ -73,21 +73,21 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
 
       {/* Expanded Details */}
       {isExpanded && (
-        <div className="border-t border-slate-600 pt-3 space-y-3">
+        <div className="border-t border-gray-700 pt-3 space-y-3">
           {/* Request Details */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-300 mb-2">Request</h4>
-            <div className="bg-slate-800 p-2 rounded text-xs">
+            <h4 className="text-xs font-semibold text-gray-300 mb-2">Request</h4>
+            <div className="bg-gray-900 p-2 rounded text-xs">
               <div className="mb-2">
-                <span className="text-slate-400">Prompt:</span>
-                <div className="text-slate-200 mt-1 whitespace-pre-wrap font-mono">
+                <span className="text-gray-500">Prompt:</span>
+                <div className="text-gray-200 mt-1 whitespace-pre-wrap font-mono">
                   {entry.request.prompt}
                 </div>
               </div>
               {entry.request.config && (
                 <div>
-                  <span className="text-slate-400">Config:</span>
-                  <pre className="text-slate-200 mt-1 text-xs">
+                  <span className="text-gray-500">Config:</span>
+                  <pre className="text-gray-200 mt-1 text-xs">
                     {JSON.stringify(entry.request.config, null, 2)}
                   </pre>
                 </div>
@@ -98,15 +98,15 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           {/* Response Details */}
           {entry.response && (
             <div>
-              <h4 className="text-xs font-semibold text-slate-300 mb-2">Response</h4>
-              <div className="bg-slate-800 p-2 rounded text-xs">
+              <h4 className="text-xs font-semibold text-gray-300 mb-2">Response</h4>
+              <div className="bg-gray-900 p-2 rounded text-xs">
                 <div className="mb-2">
-                  <span className="text-slate-400">Content:</span>
-                  <div className="text-slate-200 mt-1 whitespace-pre-wrap font-mono">
+                  <span className="text-gray-500">Content:</span>
+                  <div className="text-gray-200 mt-1 whitespace-pre-wrap font-mono">
                     {entry.response.content}
                   </div>
                 </div>
-                <div className="flex gap-4 text-slate-400">
+                <div className="flex gap-4 text-gray-500">
                   <span>Status: {entry.response.statusCode}</span>
                   <span>Finish: {entry.response.finishReason}</span>
                   {entry.response.tokenUsage && (
@@ -120,14 +120,14 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           {/* Error Details */}
           {entry.error && (
             <div>
-              <h4 className="text-xs font-semibold text-red-400 mb-2">Error</h4>
-              <div className="bg-slate-800 p-2 rounded text-xs">
-                <div className="text-red-400 mb-1">{entry.error.message}</div>
-                <div className="text-slate-400 mb-2">
+              <h4 className="text-xs font-semibold text-red-500 mb-2">Error</h4>
+              <div className="bg-gray-900 p-2 rounded text-xs">
+                <div className="text-red-500 mb-1">{entry.error.message}</div>
+                <div className="text-gray-500 mb-2">
                   Type: {entry.error.type} | Retryable: {entry.error.retryable ? 'Yes' : 'No'}
                 </div>
                 {entry.error.details && (
-                  <pre className="text-slate-300 text-xs whitespace-pre-wrap">
+                  <pre className="text-gray-300 text-xs whitespace-pre-wrap">
                     {entry.error.details}
                   </pre>
                 )}
@@ -179,7 +179,7 @@ export const AIMonitoringSection = () => {
       {/* Header Controls */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <label className="flex items-center text-sm text-slate-300">
+          <label className="flex items-center text-sm text-gray-300">
             <input
               type="checkbox"
               checked={isEnabled}
@@ -189,7 +189,7 @@ export const AIMonitoringSection = () => {
             Enable Monitoring
           </label>
           
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-gray-500">
             {stats.total} total | {stats.completed} completed | {stats.errors} errors
             {stats.averageResponseTime > 0 && (
               <span> | {Math.round(stats.averageResponseTime)}ms avg</span>
@@ -222,7 +222,7 @@ export const AIMonitoringSection = () => {
       {/* Filters */}
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div>
-          <label className="block text-xs text-slate-400 mb-1">Search</label>
+          <label className="block text-xs text-gray-500 mb-1">Search</label>
           <Input
             placeholder="Search requests/responses..."
             value={filters.search || ''}
@@ -231,11 +231,11 @@ export const AIMonitoringSection = () => {
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-400 mb-1">Status</label>
+          <label className="block text-xs text-gray-500 mb-1">Status</label>
           <select
             value={filters.status || ''}
             onChange={(e) => setFilters({ status: (e.target.value as AIMonitoringEntry['status']) || undefined })}
-            className="w-full h-8 px-2 text-xs bg-slate-800 border border-slate-600 rounded"
+            className="w-full h-8 px-2 text-xs bg-gray-900 border border-gray-700 rounded"
           >
             <option value="">All Status</option>
             <option value="completed">Completed</option>
@@ -244,7 +244,7 @@ export const AIMonitoringSection = () => {
           </select>
         </div>
         <div>
-          <label className="block text-xs text-slate-400 mb-1">Errors Only</label>
+          <label className="block text-xs text-gray-500 mb-1">Errors Only</label>
           <label className="flex items-center h-8">
             <input
               type="checkbox"
@@ -252,7 +252,7 @@ export const AIMonitoringSection = () => {
               onChange={(e) => setFilters({ errorsOnly: e.target.checked || undefined })}
               className="mr-2"
             />
-            <span className="text-xs text-slate-300">Show only errors</span>
+            <span className="text-xs text-gray-300">Show only errors</span>
           </label>
         </div>
       </div>
@@ -260,14 +260,14 @@ export const AIMonitoringSection = () => {
       {/* Entries List */}
       <div className="max-h-96 overflow-y-auto">
         {!isEnabled && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-gray-500">
             <p className="text-sm mb-2">AI monitoring is disabled</p>
             <p className="text-xs">Enable monitoring to capture AI service requests and responses</p>
           </div>
         )}
 
         {isEnabled && entries.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-gray-500">
             <p className="text-sm mb-2">No AI requests captured yet</p>
             <p className="text-xs">AI requests will appear here when they occur</p>
           </div>

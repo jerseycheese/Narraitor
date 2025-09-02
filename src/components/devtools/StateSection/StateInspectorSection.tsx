@@ -369,9 +369,9 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           initialCollapsed={false}
           data-testid="performance-warnings-section"
         >
-          <div className="text-xs text-yellow-400 space-y-2">
+          <div className="text-xs text-amber-500 space-y-2">
             {snapshot.metadata.performanceWarnings.map((warning, index) => (
-              <div key={index} className="bg-yellow-900 bg-opacity-30 p-2 rounded border border-yellow-600">
+              <div key={index} className="bg-amber-700 bg-opacity-30 p-2 rounded border border-amber-50000">
                 {warning}
               </div>
             ))}
@@ -384,14 +384,14 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               
               if (topStores.length > 0 && topStores[0][1] > 500) {
                 return (
-                  <div className="bg-slate-800 p-2 rounded border border-slate-600">
-                    <div className="font-medium text-yellow-300 mb-1">Largest Stores by Path Count:</div>
+                  <div className="bg-gray-900 p-2 rounded border border-gray-700">
+                    <div className="font-medium text-amber-300 mb-1">Largest Stores by Path Count:</div>
                     {topStores.map(([storeName, count]) => (
-                      <div key={storeName} className="text-xs text-slate-100">
+                      <div key={storeName} className="text-xs text-gray-100">
                         • <strong>{storeName}</strong>: {count} paths
                       </div>
                     ))}
-                    <div className="text-xs text-slate-300 mt-1">
+                    <div className="text-xs text-gray-300 mt-1">
                       Consider clearing data from stores with high path counts if DevTools becomes slow.
                     </div>
                   </div>
@@ -412,7 +412,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         <div className="space-y-2">
           {/* Path Input */}
           <div>
-            <label className="text-xs font-medium text-slate-100 block mb-1">
+            <label className="text-xs font-medium text-gray-100 block mb-1">
               Path:
             </label>
             <input
@@ -420,7 +420,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               value={selectedPath}
               onChange={(e) => handlePathNavigation(e.target.value)}
               placeholder="e.g., worldStore.entities"
-              className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100 placeholder-slate-400"
+              className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-500 rounded text-gray-100 placeholder-gray-500"
               data-testid="path-input"
             />
           </div>
@@ -428,10 +428,10 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Breadcrumbs */}
           {breadcrumbs.length > 0 && (
             <div className="text-xs">
-              <span className="text-slate-200">Breadcrumbs: </span>
+              <span className="text-gray-200">Breadcrumbs: </span>
               {breadcrumbs.map((crumb, index) => (
                 <span key={crumb.path}>
-                  {index > 0 && <span className="text-slate-400"> &gt; </span>}
+                  {index > 0 && <span className="text-gray-500"> &gt; </span>}
                   <button
                     onClick={() => handlePathNavigation(crumb.path)}
                     className="text-blue-300 hover:text-blue-200 underline"
@@ -446,16 +446,16 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
 
           {/* Path Metadata */}
           {pathMetadata && pathValue !== null && (
-            <div className="text-xs bg-slate-800 p-2 rounded border border-slate-600 text-slate-100">
+            <div className="text-xs bg-gray-900 p-2 rounded border border-gray-700 text-gray-100">
               {(() => {
                 const typeInfo = getValueTypeInfo(pathValue);
                 return (
                   <>
-                    <div><strong className="text-slate-50">Type:</strong> {pathMetadata.type} {typeInfo.constructor && `(${typeInfo.constructor})`}</div>
-                    <div><strong className="text-slate-50">Depth:</strong> {pathMetadata.depth}</div>
-                    <div><strong className="text-slate-50">Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
-                    <div><strong className="text-slate-50">Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
-                    {typeInfo.isArray && <div><strong className="text-slate-50">Array Length:</strong> {(pathValue as unknown[]).length}</div>}
+                    <div><strong className="text-gray-50">Type:</strong> {pathMetadata.type} {typeInfo.constructor && `(${typeInfo.constructor})`}</div>
+                    <div><strong className="text-gray-50">Depth:</strong> {pathMetadata.depth}</div>
+                    <div><strong className="text-gray-50">Has Children:</strong> {pathMetadata.hasChildren ? 'Yes' : 'No'}</div>
+                    <div><strong className="text-gray-50">Circular:</strong> {pathMetadata.isCircular ? 'Yes' : 'No'}</div>
+                    {typeInfo.isArray && <div><strong className="text-gray-50">Array Length:</strong> {(pathValue as unknown[]).length}</div>}
                   </>
                 );
               })()}
@@ -464,8 +464,8 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   onClick={() => togglePathWatch(selectedPath)}
                   className={`mt-2 px-2 py-1 text-xs rounded ${
                     watchedPaths.has(selectedPath)
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      ? 'bg-red-500 hover:bg-red-700 text-white'
+                      : 'bg-blue-500 hover:bg-blue-700 text-white'
                   }`}
                   data-testid="toggle-watch-button"
                 >
@@ -478,15 +478,15 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Path Value */}
           {pathValue !== null && (
             <div>
-              <div className="text-xs font-medium text-slate-100 mb-1">Value:</div>
-              <JsonViewer data={pathValue} className="bg-slate-800 border border-slate-600" />
+              <div className="text-xs font-medium text-gray-100 mb-1">Value:</div>
+              <JsonViewer data={pathValue} className="bg-gray-900 border border-gray-700" />
             </div>
           )}
 
           {/* State Modification Controls */}
           {pathValue !== null && selectedPath && canModifyValue(pathValue) && (
             <div className="space-y-2">
-              <div className="text-xs font-medium text-slate-100">Modify Value:</div>
+              <div className="text-xs font-medium text-gray-100">Modify Value:</div>
               
               {typeof pathValue === 'boolean' ? (
                 // Direct toggle for boolean values
@@ -501,7 +501,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                       setModificationError('Failed to toggle boolean value');
                     }
                   }}
-                  className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                  className="px-2 py-1 text-xs bg-green-500 hover:bg-green-700 text-white rounded"
                   data-testid="toggle-boolean-button"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -514,7 +514,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               ) : !isEditing ? (
                 <button
                   onClick={startEditing}
-                  className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
+                  className="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-700 text-white rounded"
                   data-testid="edit-value-button"
                   aria-label={`Edit ${typeof pathValue} value`}
                 >
@@ -523,7 +523,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               ) : (
                 <div className="space-y-2">
                   {/* Edit mode indicator */}
-                  <div className="text-xs text-yellow-300" data-testid="edit-mode-indicator">
+                  <div className="text-xs text-amber-300" data-testid="edit-mode-indicator">
                     Editing {typeof pathValue} value
                   </div>
                   {/* Type-specific input */}
@@ -542,7 +542,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                         }
                       }}
                       placeholder="Enter new value"
-                      className="w-full px-2 py-1 text-xs bg-slate-800 border border-slate-500 rounded text-slate-100 placeholder-slate-400"
+                      className="w-full px-2 py-1 text-xs bg-gray-900 border border-gray-500 rounded text-gray-100 placeholder-gray-500"
                       data-testid="edit-value-input"
                       autoFocus
                     />
@@ -552,7 +552,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   <div className="flex space-x-2">
                     <button
                       onClick={saveEdit}
-                      className="px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                      className="px-2 py-1 text-xs bg-green-500 hover:bg-green-700 text-white rounded"
                       data-testid="save-value-button"
                       aria-label="Save edited value"
                     >
@@ -560,7 +560,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                     </button>
                     <button
                       onClick={cancelEditing}
-                      className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded"
+                      className="px-2 py-1 text-xs bg-gray-700 hover:bg-gray-700 text-white rounded"
                       data-testid="cancel-edit-button"
                       aria-label="Cancel editing"
                     >
@@ -570,7 +570,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                   
                   {/* Error display */}
                   {modificationError && (
-                    <div className="text-xs text-red-400" data-testid="validation-error">
+                    <div className="text-xs text-red-500" data-testid="validation-error">
                       {modificationError}
                     </div>
                   )}
@@ -582,13 +582,13 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
           {/* Child Paths */}
           {childPaths.length > 0 && (
             <div>
-              <div className="text-xs font-medium text-slate-100 mb-1">Child Paths:</div>
+              <div className="text-xs font-medium text-gray-100 mb-1">Child Paths:</div>
               <div className="max-h-32 overflow-y-auto">
                 {childPaths.map((childPath) => (
                   <button
                     key={childPath}
                     onClick={() => handlePathNavigation(childPath)}
-                    className="block w-full text-left text-xs text-blue-300 hover:text-blue-200 hover:bg-slate-700 px-2 py-1 rounded"
+                    className="block w-full text-left text-xs text-blue-300 hover:text-blue-200 hover:bg-gray-700 px-2 py-1 rounded"
                     data-testid={`child-path-${childPath.split('.').pop()}`}
                   >
                     {childPath}
@@ -609,8 +609,8 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         >
           <div className="space-y-1">
             {Array.from(watchedPaths).map((path) => (
-              <div key={path} className="flex justify-between items-center text-xs bg-slate-800 p-2 rounded">
-                <span className="text-slate-100">{path}</span>
+              <div key={path} className="flex justify-between items-center text-xs bg-gray-900 p-2 rounded">
+                <span className="text-gray-100">{path}</span>
                 <button
                   onClick={() => togglePathWatch(path)}
                   className="text-red-300 hover:text-red-200 text-xs"
@@ -633,23 +633,23 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         >
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {changeNotifications.slice().reverse().map((notification) => (
-              <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-slate-800 p-2 rounded border border-slate-600">
-                <div className="font-medium text-yellow-300">{notification.path}</div>
-                <div className="text-slate-100 space-y-1">
+              <div key={`${notification.path}-${notification.timestamp}`} className="text-xs bg-gray-900 p-2 rounded border border-gray-700">
+                <div className="font-medium text-amber-300">{notification.path}</div>
+                <div className="text-gray-100 space-y-1">
                   <div className="flex items-start space-x-2">
                     <span className="text-red-300 font-medium">Old:</span>
-                    <span className="font-mono text-xs bg-slate-900 px-1 rounded text-slate-200">
+                    <span className="font-mono text-xs bg-gray-900 px-1 rounded text-gray-200">
                       {formatForDebug(notification.oldValue, { compact: true, maxStringLength: 50 })}
                     </span>
                   </div>
                   <div className="flex items-start space-x-2">
                     <span className="text-green-300 font-medium">New:</span>
-                    <span className="font-mono text-xs bg-slate-900 px-1 rounded text-slate-200">
+                    <span className="font-mono text-xs bg-gray-900 px-1 rounded text-gray-200">
                       {formatForDebug(notification.newValue, { compact: true, maxStringLength: 50 })}
                     </span>
                   </div>
                 </div>
-                <div className="text-slate-300 text-xs mt-1">
+                <div className="text-gray-300 text-xs mt-1">
                   {new Date(notification.timestamp).toLocaleTimeString()}
                 </div>
               </div>
@@ -667,7 +667,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
         {snapshot && (
           <div className="space-y-2">
             <div className="flex justify-between items-center mb-2">
-              <div className="text-xs text-slate-100">
+              <div className="text-xs text-gray-100">
                 <div>Total Stores: {snapshot.metadata.totalStores}</div>
                 <div>Total Paths: {snapshot.metadata.totalPaths}</div>
                 <div>Snapshot Time: {new Date(snapshot.timestamp).toLocaleTimeString()}</div>
@@ -676,7 +676,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
               <div className="flex gap-2">
                 <button
                   onClick={refreshSnapshot}
-                  className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded"
+                  className="px-2 py-1 text-xs bg-blue-500 hover:bg-blue-700 text-white rounded"
                   data-testid="refresh-snapshot-button"
                   title="Refresh snapshot to show current state data"
                 >
@@ -685,7 +685,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                 
                 <button
                   onClick={getOptimizedSnapshot}
-                  className="px-2 py-1 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded"
+                  className="px-2 py-1 text-xs bg-blue-700 hover:bg-blue-700 text-white rounded"
                   data-testid="optimized-snapshot-button"
                   title="Get optimized snapshot with lazy loading to reduce path count"
                 >
@@ -699,7 +699,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                       <button
                         key={index}
                         onClick={rec.handler}
-                        className="px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded"
+                        className="px-2 py-1 text-xs bg-amber-500 hover:bg-amber-700 text-white rounded"
                         title={`${rec.action} (${rec.pathCount} paths)`}
                         data-testid={`cleanup-${rec.store.toLowerCase()}-button`}
                       >
@@ -721,7 +721,7 @@ export const StateInspectorSection = ({ defaultCollapsed = false }: StateInspect
                 <div className="space-y-2">
                   <button
                     onClick={() => handlePathNavigation(storeName)}
-                    className="text-xs text-blue-400 hover:text-blue-300 underline"
+                    className="text-xs text-blue-500 hover:text-blue-300 underline"
                     data-testid={`navigate-to-${storeName}`}
                   >
                     Navigate to {storeName}

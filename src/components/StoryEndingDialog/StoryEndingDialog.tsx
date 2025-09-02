@@ -29,10 +29,10 @@ export interface StoryEndingDialogProps {
 }
 
 const endingTypeClasses: Record<EndingType, string> = {
-  triumphant: 'ending-triumphant border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50',
-  bittersweet: 'ending-bittersweet border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50',
-  tragic: 'ending-tragic border-red-200 bg-gradient-to-br from-red-50 to-rose-50',
-  default: 'ending-default border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50',
+  triumphant: 'ending-triumphant border-amber-200 bg-gradient-to-br from-amber-50 to-amber-50',
+  bittersweet: 'ending-bittersweet border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50',
+  tragic: 'ending-tragic border-red-500 bg-gradient-to-br from-red-50 to-red-50',
+  default: 'ending-default border-gray-200 bg-gradient-to-br from-gray-50 to-gray-50',
 };
 
 export function StoryEndingDialog({

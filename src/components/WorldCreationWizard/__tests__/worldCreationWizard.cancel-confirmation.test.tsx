@@ -257,7 +257,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       
       // Verify warning styling is applied
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveClass('border-yellow-200', 'bg-yellow-50');
+      expect(dialog).toHaveClass('border-amber-200', 'bg-amber-200');
     });
   });
 });

@@ -76,7 +76,7 @@ export function Typography() {
             <p className="text-sm text-gray-500 mb-2">Default link style</p>
             <p className="text-base">
               This is a paragraph with an <a href="#">inline link</a> that shows the default blue color 
-              and hover effect. Links are styled with blue-600 (#2563eb) and transition to blue-700 (#1d4ed8) on hover.
+              and hover effect. Links are styled with blue-500 (#3b82f6) and transition to blue-700 (#1d4ed8) on hover.
             </p>
           </div>
           <div>
@@ -89,7 +89,7 @@ export function Typography() {
             </div>
           </div>
           <div className="bg-gray-900 text-white p-4 rounded">
-            <p className="text-sm text-gray-400 mb-2">Links on dark background</p>
+            <p className="text-sm text-gray-500 mb-2">Links on dark background</p>
             <p>
               Links in dark contexts like the <a href="#" className="hover:text-gray-300">navigation bar</a> inherit 
               the parent text color to maintain readability.
@@ -118,13 +118,13 @@ export function Typography() {
         <div className="space-y-3">
           <p className="text-gray-900">Gray 900 - Primary text</p>
           <p className="text-gray-700">Gray 700 - Secondary text</p>
-          <p className="text-gray-600">Gray 600 - Tertiary text</p>
+          <p className="text-gray-700">Gray 600 - Tertiary text</p>
           <p className="text-gray-500">Gray 500 - Placeholder/hint text</p>
-          <p className="text-gray-400">Gray 400 - Disabled text</p>
-          <p className="text-blue-600">Blue 600 - Links and primary actions</p>
-          <p className="text-green-600">Green 600 - Success messages</p>
-          <p className="text-red-600">Red 600 - Error messages</p>
-          <p className="text-amber-600">Amber 600 - Warning messages</p>
+          <p className="text-gray-500">Gray 400 - Disabled text</p>
+          <p className="text-blue-700">Blue 600 - Links and primary actions</p>
+          <p className="text-green-500">Green 600 - Success messages</p>
+          <p className="text-red-500">Red 600 - Error messages</p>
+          <p className="text-amber-500">Amber 600 - Warning messages</p>
         </div>
       </section>
 
@@ -189,22 +189,22 @@ export function Typography() {
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-xl font-bold mb-2">Card Title</h3>
-            <p className="text-gray-600 mb-4">
-              This is a typical card description using gray-600 for secondary text.
+            <p className="text-gray-700 mb-4">
+              This is a typical card description using gray-700 for secondary text.
             </p>
             <a href="#" className="text-link-primary">Learn more →</a>
           </div>
           
           <div className="border-l-4 border-blue-500 pl-4 py-2">
             <h4 className="font-semibold">Info Box Title</h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-700">
               Informational text that provides additional context or help.
             </p>
           </div>
           
           <div className="bg-red-50 border border-red-200 rounded p-4">
-            <p className="text-red-800 font-medium">Error Message</p>
-            <p className="text-red-600 text-sm mt-1">
+            <p className="text-red-700 font-medium">Error Message</p>
+            <p className="text-red-500 text-sm mt-1">
               Something went wrong. Please try again later.
             </p>
           </div>

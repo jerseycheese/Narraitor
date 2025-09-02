@@ -108,7 +108,7 @@ export function ConsoleDebugAPIDemo() {
     <Card className="p-6 max-w-2xl">
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-2">
-          <Badge variant="default" className="bg-green-600">
+          <Badge variant="default" className="bg-green-500">
             Active
           </Badge>
           <h3 className="text-lg font-semibold">Console Debug API</h3>

@@ -77,7 +77,7 @@ export const Hero: React.FC<HeroProps> = ({
           </TitleElement>
 
           {subtitle && (
-            <p className="text-gray-200 mt-1 text-sm sm:text-base">
+            <p className="text-gray-300 mt-1 text-sm sm:text-base">
               {subtitle}
             </p>
           )}

@@ -115,7 +115,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     <div className={`relative ${className}`} ref={dropdownRef}>
       <Button
         onClick={() => setShowRecentPages(!showRecentPages)}
-        className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-800 hover:bg-gray-700 rounded-md transition-colors text-gray-300 hover:text-white"
+        className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-900 hover:bg-gray-700 rounded-md transition-colors text-gray-300 hover:text-white"
         aria-label="Recent pages"
         variant="ghost"
       >
@@ -130,7 +130,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
       
       {showRecentPages && (
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50 py-1 max-h-96 overflow-y-auto border">
-          <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
+          <div className="px-4 py-2 border-b border-gray-200 bg-gray-100">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-900">Recent Pages</h3>
               <span className="text-xs text-gray-500">{recentPages.length} pages</span>
@@ -156,7 +156,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                     <div className="text-sm text-gray-500 truncate">
                       {formatPathDisplay(entry.path)}
                     </div>
-                    <div className="text-xs text-gray-400 mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       {formatTimestamp(entry.timestamp)}
                     </div>
                   </div>
@@ -170,7 +170,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                   variant="ghost"
                   size="icon"
                 >
-                  <svg className="w-4 h-4 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </Button>

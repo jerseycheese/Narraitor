@@ -15,11 +15,11 @@ export default function AITestingPage() {
         <h2 className="text-2xl font-bold mb-6">AI Testing Panel Test Harness</h2>
 
         {/* AI Testing Panel in a dark container to simulate DevTools */}
-        <div className="bg-slate-800 p-6 rounded-lg border-2 border-slate-600">
-          <h2 className="text-slate-200 text-lg font-medium mb-4">
+        <div className="bg-gray-900 p-6 rounded-lg border-2 border-gray-700">
+          <h2 className="text-gray-200 text-lg font-medium mb-4">
             DevTools - AI Testing Panel
           </h2>
-          <div className="bg-slate-800 text-slate-200">
+          <div className="bg-gray-900 text-gray-200">
             <AITestingPanel />
           </div>
         </div>
@@ -29,7 +29,7 @@ export default function AITestingPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-3">
             Testing Instructions
           </h3>
-          <div className="prose text-gray-600">
+          <div className="prose text-gray-700">
             <ul className="space-y-2">
               <li>Use the World Override section to test different world contexts</li>
               <li>Use the Character Override section to test different character contexts</li>
@@ -44,7 +44,7 @@ export default function AITestingPage() {
         <div className="mt-8 flex space-x-4">
           <a 
             href="/dev/devtools-test" 
-            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 transition-colors"
           >
             Full DevTools Test →
           </a>

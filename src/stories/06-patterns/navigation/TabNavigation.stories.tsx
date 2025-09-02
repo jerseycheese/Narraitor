@@ -54,7 +54,7 @@ const TabNavigationWrapper = (args: any) => {
         activeValue={activeValue}
         onChange={handleChange}
       />
-      <div className="mt-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-gray-700">
         Active: {activeValue}
       </div>
     </div>

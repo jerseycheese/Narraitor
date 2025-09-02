@@ -190,11 +190,11 @@ export function GuidedFirstTimeExperience() {
   const renderWelcomeStep = useMemo(() => (
     <div className="text-center space-y-6" data-testid="guided-experience-container">
       <div className="max-w-md mx-auto">
-        <p className="text-lg text-gray-600 mb-6">
+        <p className="text-lg text-gray-700 mb-6">
           Create a world and start a story
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-blue-800">
+          <p className="text-sm text-blue-900">
             Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
@@ -208,7 +208,7 @@ export function GuidedFirstTimeExperience() {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
           World Concept
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Create an RPG in any fictional universe or original setting
         </p>
       </div>
@@ -233,7 +233,7 @@ export function GuidedFirstTimeExperience() {
       {wizard.stepValidation?.errors.length > 0 && (
         <div className="space-y-1">
           {wizard.stepValidation.errors.map((error, index) => (
-            <p key={index} className="text-sm text-red-600">{error}</p>
+            <p key={index} className="text-sm text-red-500">{error}</p>
           ))}
         </div>
       )}
@@ -251,7 +251,7 @@ export function GuidedFirstTimeExperience() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             World Details
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             {isGenreOptional 
               ? "Give your world a name and optionally override the genre"
               : "Give your world a name and genre"
@@ -315,7 +315,7 @@ export function GuidedFirstTimeExperience() {
           )}
           
           {wizard.stepValidation?.errors.length > 0 && (
-            <div className="text-sm text-red-600">
+            <div className="text-sm text-red-500">
               {wizard.stepValidation.errors.map((error, index) => (
                 <p key={index}>{error}</p>
               ))}
@@ -349,7 +349,7 @@ export function GuidedFirstTimeExperience() {
     <WizardContainer title={
       <div className="text-center">
         <div>First time?</div>
-        <div className="text-sm font-normal text-gray-600">Quick start:</div>
+        <div className="text-sm font-normal text-gray-700">Quick start:</div>
       </div>
     }>
       <div className="space-y-8">
@@ -367,7 +367,7 @@ export function GuidedFirstTimeExperience() {
         <div className="flex justify-between items-center pt-6">
           <button
             onClick={wizard.handlers.handleCancel}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+            className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
           >
             Skip
           </button>
@@ -376,7 +376,7 @@ export function GuidedFirstTimeExperience() {
             {!wizard.isFirstStep && (
               <button
                 onClick={wizard.handlers.handleBack}
-                className="px-4 py-2 border border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-md transition-colors"
+                className="px-4 py-2 border border-gray-300 hover:border-gray-500 text-gray-700 font-medium rounded-md transition-colors"
               >
                 Back
               </button>
@@ -386,7 +386,7 @@ export function GuidedFirstTimeExperience() {
               <button
                 onClick={wizard.handlers.handleComplete}
                 disabled={!wizard.stepValidation?.valid || wizard.state.isProcessing}
-                className="min-h-12 px-6 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
+                className="min-h-12 px-6 py-2 bg-green-500 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
                 {wizard.state.isProcessing ? 'Creating world...' : 'Create world'}
               </button>
@@ -394,7 +394,7 @@ export function GuidedFirstTimeExperience() {
               <button
                 onClick={wizard.handlers.handleNext}
                 disabled={!wizard.stepValidation?.valid}
-                className="min-h-12 px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
+                className="min-h-12 px-6 py-2 bg-blue-500 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-md transition-colors"
               >
                 Next
               </button>
@@ -403,8 +403,8 @@ export function GuidedFirstTimeExperience() {
         </div>
         
         {wizard.currentError && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-3">
-            <p className="text-sm text-red-600">{wizard.currentError}</p>
+          <div className="bg-red-200 border border-red-500 rounded-md p-3">
+            <p className="text-sm text-red-500">{wizard.currentError}</p>
           </div>
         )}
       </div>

@@ -74,7 +74,7 @@ export default function WorldCreationWizardTestHarness() {
           <button
             type="button"
             onClick={resetWizard}
-            className="py-2 px-4 bg-blue-500 text-white border-none rounded-md cursor-pointer hover:bg-blue-600 transition-colors"
+            className="py-2 px-4 bg-blue-500 text-white border-none rounded-md cursor-pointer hover:bg-blue-500 transition-colors"
           >
             Reset Wizard
           </button>
@@ -101,7 +101,7 @@ export default function WorldCreationWizardTestHarness() {
         <h2 className="text-xl font-bold mb-4">
           Mock Data Reference
         </h2>
-        <div className="bg-gray-50 p-4 rounded-md">
+        <div className="bg-gray-100 p-4 rounded-md">
           <pre className="text-sm">
             {JSON.stringify({ mockAttributes, mockSkills }, null, 2)}
           </pre>

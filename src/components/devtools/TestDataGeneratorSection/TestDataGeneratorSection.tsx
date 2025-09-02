@@ -700,7 +700,7 @@ export const TestDataGeneratorSection: React.FC = () => {
       <div className="space-y-2">
         <button
           onClick={handleGenerateWorld}
-          className="w-full px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm transition-colors"
           title="Creates diverse AI worlds: 33% original, 33% set in existing universes, 34% based on existing universes"
         >
           Generate Diverse AI World
@@ -708,7 +708,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleGenerate5Worlds}
-          className="w-full px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm transition-colors"
           title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
         >
           Generate 5 Diverse AI Worlds
@@ -716,7 +716,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleGenerateCharacter}
-          className="w-full px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm transition-colors"
           disabled={!effectiveWorldId}
           title="Creates test character data and navigates to character creation form"
         >
@@ -725,7 +725,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleGenerate5Characters}
-          className="w-full px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm transition-colors"
           disabled={!effectiveWorldId}
           title="Creates 5 AI-generated characters directly in the selected world using smart character type selection based on world relationship"
         >
@@ -734,7 +734,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleNavigateEmpty}
-          className="w-full px-3 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 text-sm transition-colors"
           disabled={!effectiveWorldId}
           title="Navigate to empty character creation form"
         >
@@ -743,7 +743,7 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleDebugStorage}
-          className="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm transition-colors"
+          className="w-full px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-700 text-sm transition-colors"
           disabled={!effectiveWorldId}
           title="Check if test data exists in sessionStorage"
         >
@@ -751,19 +751,19 @@ export const TestDataGeneratorSection: React.FC = () => {
         </button>
       </div>
       
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-gray-500">
         AI generators create diverse content for testing: original worlds, &quot;set in&quot; universes, and &quot;based on&quot; worlds.
         {!effectiveWorldId && ' Select a world to enable character generation.'}
-        {worldIdFromUrl && <span className="block mt-1 text-blue-400">Using world from current page: {worlds[worldIdFromUrl]?.name}</span>}
+        {worldIdFromUrl && <span className="block mt-1 text-blue-500">Using world from current page: {worlds[worldIdFromUrl]?.name}</span>}
       </p>
 
       {/* Destructive Operations Section */}
-      <div className="border-t border-red-600 pt-4">
-        <h4 className="font-bold text-sm text-red-400 mb-2">Destructive Operations</h4>
+      <div className="border-t border-red-500 pt-4">
+        <h4 className="font-bold text-sm text-red-500 mb-2">Destructive Operations</h4>
         <div className="space-y-2">
           <button
             onClick={handleDeleteAllCharactersInWorld}
-            className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm transition-colors"
+            className="w-full px-3 py-2 bg-amber-500 text-white rounded hover:bg-amber-700 text-sm transition-colors"
             disabled={!effectiveWorldId}
             title={`Deletes all characters in ${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
           >
@@ -772,7 +772,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           
           <button
             onClick={handleDeleteAllWorlds}
-            className="w-full px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm transition-colors"
+            className="w-full px-3 py-2 bg-red-500 text-white rounded hover:bg-red-700 text-sm transition-colors"
             title="Deletes all worlds and their characters"
           >
             Delete All Worlds
@@ -780,7 +780,7 @@ export const TestDataGeneratorSection: React.FC = () => {
           
           <button
             onClick={handleNukeEverything}
-            className="w-full px-3 py-2 bg-red-800 text-white rounded hover:bg-red-900 text-sm transition-colors border-2 border-red-600"
+            className="w-full px-3 py-2 bg-red-700 text-white rounded hover:bg-red-900 text-sm transition-colors border-2 border-red-500"
             title="NUCLEAR OPTION: Deletes absolutely everything"
           >
             NUKE EVERYTHING
@@ -792,14 +792,14 @@ export const TestDataGeneratorSection: React.FC = () => {
         
         <button
           onClick={handleDebugPersistence}
-          className="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm transition-colors mt-2"
+          className="w-full px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-700 text-sm transition-colors mt-2"
           title="Debug current store state and persistence"
         >
           Debug Persistence State
         </button>
       </div>
       
-      <div className="text-xs text-gray-500 bg-gray-800 p-2 rounded">
+      <div className="text-xs text-gray-500 bg-gray-900 p-2 rounded">
         <strong>Troubleshooting:</strong>
         <ul className="list-disc list-inside mt-1 space-y-1">
           <li>If form isn&apos;t pre-filled, try the debug page at <code>/dev/test-character-form</code></li>

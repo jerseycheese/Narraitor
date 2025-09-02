@@ -40,14 +40,14 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
     >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-blue-900">
           Select skills that complement your attribute choices. 
           You&apos;ll be able to improve these skills through gameplay and experience.
         </p>
       </div>
 
       {/* Skill selection info */}
-      <div className={`${wizardStyles.card.base} bg-gray-50 mb-6`}>
+      <div className={`${wizardStyles.card.base} bg-gray-100 mb-6`}>
         <h3 className={wizardStyles.subheading}>Skill Selection</h3>
         <div className="flex gap-4 text-sm">
           <span className={wizardStyles.badge.primary}>
@@ -72,12 +72,12 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
               <div className="flex-1">
                 <span className="font-medium text-lg">{skill.name}</span>
                 {skill.description && (
-                  <p className="text-sm text-gray-600 mt-1">{skill.description}</p>
+                  <p className="text-sm text-gray-700 mt-1">{skill.description}</p>
                 )}
                 {/* Show linked attributes */}
                 {skill.attributeIds && skill.attributeIds.length > 0 && worldConfig?.attributes && (
                   <div className="mt-2">
-                    <span className="text-xs font-medium text-blue-600">
+                    <span className="text-xs font-medium text-blue-700">
                       Linked to: {skill.attributeIds
                         .map((attrId: string) => 
                           worldConfig.attributes?.find((attr: any) => attr.id === attrId)?.name || 'Unknown' // eslint-disable-line @typescript-eslint/no-explicit-any

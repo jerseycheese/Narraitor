@@ -33,7 +33,7 @@ export const WorldCardActions: Story = {
         text: 'Create Character',
         onClick: () => console.log('Create character clicked'),
         variant: 'primary',
-        className: 'bg-green-600 hover:bg-green-700',
+        className: 'bg-green-500 hover:bg-green-700',
         flex: true,
       },
       {
@@ -41,7 +41,7 @@ export const WorldCardActions: Story = {
         text: 'Play',
         onClick: () => console.log('Play clicked'),
         variant: 'primary',
-        className: 'bg-indigo-600 hover:bg-indigo-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
         flex: true,
       },
     ],
@@ -51,14 +51,14 @@ export const WorldCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View clicked'),
         variant: 'primary',
-        className: 'bg-blue-600 hover:bg-blue-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'edit',
         text: 'Edit',
         onClick: () => console.log('Edit clicked'),
         variant: 'primary',
-        className: 'bg-blue-600 hover:bg-blue-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'delete',
@@ -78,21 +78,21 @@ export const CharacterCardActions: Story = {
         text: 'View',
         onClick: () => console.log('View character clicked'),
         variant: 'primary',
-        className: 'bg-blue-600 hover:bg-blue-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'play',
         text: 'Play',
         onClick: () => console.log('Play as character clicked'),
         variant: 'primary',
-        className: 'bg-indigo-600 hover:bg-indigo-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'edit',
         text: 'Edit',
         onClick: () => console.log('Edit character clicked'),
         variant: 'primary',
-        className: 'bg-blue-600 hover:bg-blue-700',
+        className: 'bg-blue-500 hover:bg-blue-700',
       },
       {
         key: 'delete',
@@ -108,7 +108,7 @@ export const InCardContext: Story = {
   render: () => (
     <div className="w-96 border border-gray-300 rounded-lg p-6">
       <h3 className="text-xl font-semibold mb-2">Sample World</h3>
-      <p className="text-gray-600 mb-4">
+      <p className="text-gray-700 mb-4">
         A fantasy medieval world with magic and dragons.
       </p>
       <CardActionGroup
@@ -118,7 +118,7 @@ export const InCardContext: Story = {
             text: 'Create Character',
             onClick: () => console.log('Create character'),
             variant: 'primary',
-            className: 'bg-green-600 hover:bg-green-700',
+            className: 'bg-green-500 hover:bg-green-700',
             flex: true,
           },
           {
@@ -126,7 +126,7 @@ export const InCardContext: Story = {
             text: 'Play',
             onClick: () => console.log('Play'),
             variant: 'primary',
-            className: 'bg-indigo-600 hover:bg-indigo-700',
+            className: 'bg-blue-500 hover:bg-blue-700',
             flex: true,
           },
         ]}
@@ -136,14 +136,14 @@ export const InCardContext: Story = {
             text: 'View',
             onClick: () => console.log('View'),
             variant: 'primary',
-            className: 'bg-blue-600 hover:bg-blue-700',
+            className: 'bg-blue-500 hover:bg-blue-700',
           },
           {
             key: 'edit',
             text: 'Edit',
             onClick: () => console.log('Edit'),
             variant: 'primary',
-            className: 'bg-blue-600 hover:bg-blue-700',
+            className: 'bg-blue-500 hover:bg-blue-700',
           },
           {
             key: 'delete',

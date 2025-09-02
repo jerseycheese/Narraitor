@@ -247,7 +247,7 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     >
       <ScrollArea 
         ref={scrollAreaRef}
-        className={`${heightClass} bg-gray-50 dark:bg-gray-800 rounded-lg shadow-inner`}
+        className={`${heightClass} bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner`}
         style={{
           // Enable smooth momentum scrolling on touch devices
           WebkitOverflowScrolling: 'touch'

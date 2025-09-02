@@ -69,7 +69,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     >
       {/* Helpful tip */}
       <div className="border rounded-lg p-4 bg-blue-50 mb-6">
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-blue-900">
           Choose a unique name for your character. The name should be between 3 and 50 characters 
           and must be unique within this world.
         </p>

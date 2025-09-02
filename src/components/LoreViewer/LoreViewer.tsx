@@ -40,15 +40,15 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
   };
 
   const categoryColors: Record<LoreCategory, string> = {
-    characters: 'bg-blue-50 border-blue-200',
-    locations: 'bg-green-50 border-green-200',
-    events: 'bg-purple-50 border-purple-200',
-    rules: 'bg-orange-50 border-orange-200'
+    characters: 'bg-lore-characters-bg border-lore-characters-border text-lore-characters-text',
+    locations: 'bg-lore-locations-bg border-lore-locations-border text-lore-locations-text',
+    events: 'bg-lore-events-bg border-lore-events-border text-lore-events-text',
+    rules: 'bg-lore-rules-bg border-lore-rules-border text-lore-rules-text'
   };
 
   if (facts.length === 0) {
     return (
-      <div className={`text-center py-8 text-gray-500 ${className}`}>
+      <div className={`text-center py-8 text-muted-foreground ${className}`}>
         <p>No lore facts recorded yet.</p>
         <p className="text-sm mt-2">Facts will appear here as the story unfolds.</p>
       </div>
@@ -57,7 +57,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900">Established Lore</h3>
+      <h3 className="text-lg font-semibold text-foreground">Established Lore</h3>
       
       {(Object.keys(categoryLabels) as LoreCategory[]).map(category => {
         const categoryFacts = factsByCategory[category];
@@ -65,10 +65,10 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
 
         return (
           <div key={category} className={`rounded-lg border p-4 ${categoryColors[category]}`}>
-            <h4 className="font-medium text-gray-900 mb-3">{categoryLabels[category]}</h4>
+            <h4 className="font-medium mb-3">{categoryLabels[category]}</h4>
             <ul className="space-y-2">
               {categoryFacts.map(fact => (
-                <li key={fact.id} className="text-sm text-gray-700">
+                <li key={fact.id} className="text-sm">
                   <span className="font-medium">{fact.key}:</span> {fact.value}
                 </li>
               ))}
@@ -77,7 +77,7 @@ export const LoreViewer: React.FC<LoreViewerProps> = ({
         );
       })}
       
-      <div className="text-xs text-gray-500 mt-4">
+      <div className="text-xs text-muted-foreground mt-4">
         Total facts: {facts.length}
       </div>
     </div>

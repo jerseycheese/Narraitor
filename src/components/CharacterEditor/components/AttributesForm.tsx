@@ -55,7 +55,7 @@ export const AttributesForm: React.FC<AttributesFormProps> = ({
                 showLabel={false}
                 testId={`attribute-${attr.attributeId}`}
               />
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 mt-1">
                 Range: {minValue} - {maxValue}
               </div>
             </div>

@@ -47,7 +47,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <h1 className="text-xl font-semibold text-gray-900 mb-4">
@@ -61,8 +61,8 @@ export default function GuidedFirstTimeExperienceTestHarness() {
               </span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${
                 onboardingCompleted 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-yellow-100 text-yellow-800'
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-amber-100 text-amber-700'
               }`}>
                 {onboardingCompleted ? 'Completed' : 'Not Completed'}
               </span>
@@ -76,21 +76,21 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             
             <button
               onClick={handleReset}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+              className="px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
             >
               Reset (Show Onboarding)
             </button>
             
             <button
               onClick={handleMarkCompleted}
-              className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors"
+              className="px-3 py-1 bg-gray-700 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors"
             >
               Mark Completed (Hide Onboarding)
             </button>
             
             <button
               onClick={handleClearStorage}
-              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
+              className="px-3 py-1 bg-red-500 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
             >
               Clear All Storage & Reload
             </button>
@@ -98,7 +98,7 @@ export default function GuidedFirstTimeExperienceTestHarness() {
           
           <div className="bg-blue-50 rounded-lg p-4">
             <h2 className="font-semibold text-blue-900 mb-2">Test Instructions:</h2>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <ul className="text-sm text-blue-900 space-y-1">
               <li>• Test the complete 3-step onboarding flow</li>
               <li>• Verify skip functionality works correctly</li>
               <li>• Test mobile responsiveness by resizing window</li>
@@ -117,16 +117,16 @@ export default function GuidedFirstTimeExperienceTestHarness() {
             
             {onboardingCompleted && (
               <div className="text-center py-8">
-                <div className="bg-gray-50 rounded-lg p-6">
+                <div className="bg-gray-100 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     Onboarding Completed
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-700 mb-4">
                     The guided experience is hidden for returning users.
                   </p>
                   <button
                     onClick={handleReset}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded transition-colors"
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-medium rounded transition-colors"
                   >
                     Reset to Test Again
                   </button>

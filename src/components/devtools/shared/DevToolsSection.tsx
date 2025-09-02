@@ -23,7 +23,7 @@ interface DevToolsSectionProps {
  * DevTools sections by encapsulating the common UI pattern used throughout the interface.
  * 
  * ## Design Features
- * - **Dark Theme**: `bg-slate-700` background with `border-slate-600` borders
+ * - **Dark Theme**: `bg-gray-700` background with `border-gray-700` borders
  * - **Consistent Spacing**: Standard `p-2` padding and `rounded` corners
  * - **Optional Title**: Styled `h4` title with proper typography hierarchy
  * - **Flexible Content**: Accepts any React nodes as children
@@ -32,8 +32,8 @@ interface DevToolsSectionProps {
  * ## Usage Patterns
  * This component replaces the repeated pattern:
  * ```tsx
- * <div className="bg-slate-700 p-2 rounded border border-slate-600">
- *   <h4 className="text-xs font-medium mb-2 text-slate-200">Title</h4>
+ * <div className="bg-gray-700 p-2 rounded border border-gray-700">
+ *   <h4 className="text-xs font-medium mb-2 text-gray-200">Title</h4>
  *   {content}
  * </div>
  * ```
@@ -65,11 +65,11 @@ export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
 }) => {
   return (
     <div className={cn(
-      'bg-slate-700 p-2 rounded border border-slate-600',
+      'bg-gray-700 p-2 rounded border border-gray-700',
       className
     )}>
       {title && (
-        <h4 className="text-xs font-medium mb-2 text-slate-50">
+        <h4 className="text-xs font-medium mb-2 text-gray-50">
           {title}
         </h4>
       )}

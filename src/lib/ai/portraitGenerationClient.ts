@@ -3,6 +3,7 @@
 import { AIClient, AIImageResponse } from './types';
 import { GeminiClient } from './geminiClient';
 import { truncate } from '../utils';
+import { primitiveColors } from '@/lib/design-tokens';
 
 /**
  * Portrait generation client using Gemini's imagen API
@@ -117,24 +118,27 @@ export class PortraitGenerationClient extends GeminiClient implements AIClient {
     const lowerPrompt = prompt.toLowerCase();
     
     // Color mapping based on description
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values
     if (lowerPrompt.includes('fire') || lowerPrompt.includes('red') || lowerPrompt.includes('warrior')) {
-      return { primary: '#dc2626', secondary: '#ea580c', accent: '#fbbf24' };
+      return { primary: primitiveColors.red[700], secondary: primitiveColors.red[500], accent: primitiveColors.amber[500] };
     }
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values  
     if (lowerPrompt.includes('magic') || lowerPrompt.includes('blue') || lowerPrompt.includes('mage') || lowerPrompt.includes('wizard')) {
-      return { primary: '#2563eb', secondary: '#7c3aed', accent: '#06b6d4' };
+      return { primary: primitiveColors.blue[700], secondary: primitiveColors.blue[500], accent: primitiveColors.blue[300] };
     }
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values
     if (lowerPrompt.includes('nature') || lowerPrompt.includes('green') || lowerPrompt.includes('druid') || lowerPrompt.includes('ranger')) {
-      return { primary: '#059669', secondary: '#10b981', accent: '#84cc16' };
+      return { primary: primitiveColors.green[700], secondary: primitiveColors.green[500], accent: primitiveColors.green[200] };
     }
     if (lowerPrompt.includes('shadow') || lowerPrompt.includes('dark') || lowerPrompt.includes('rogue') || lowerPrompt.includes('assassin')) {
-      return { primary: '#374151', secondary: '#1f2937', accent: '#6b7280' };
+      return { primary: primitiveColors.gray[700], secondary: primitiveColors.gray[900], accent: primitiveColors.gray[500] };
     }
     if (lowerPrompt.includes('holy') || lowerPrompt.includes('light') || lowerPrompt.includes('paladin') || lowerPrompt.includes('cleric')) {
-      return { primary: '#f59e0b', secondary: '#fbbf24', accent: '#ffffff' };
+      return { primary: primitiveColors.amber[500], secondary: primitiveColors.amber[200], accent: primitiveColors.white };
     }
     
-    // Default colors
-    return { primary: '#6366f1', secondary: '#8b5cf6', accent: '#f59e0b' };
+    // Default colors using our design system
+    return { primary: primitiveColors.blue[500], secondary: primitiveColors.blue[700], accent: primitiveColors.amber[500] };
   }
 
   private extractFeaturesFromPrompt(prompt: string): { 

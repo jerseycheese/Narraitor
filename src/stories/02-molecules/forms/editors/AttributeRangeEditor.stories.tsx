@@ -93,7 +93,7 @@ export const InteractiveExample: Story = {
           {attributes.map((attribute, index) => (
             <div key={index} className="p-3 border rounded">
               <h3 className="font-medium mb-2">{attribute.name}</h3>
-              <p className="text-sm text-gray-600 mb-3">{attribute.description}</p>
+              <p className="text-sm text-gray-700 mb-3">{attribute.description}</p>
               <AttributeRangeEditor
                 attribute={attribute}
                 onChange={(updates) => action('updated')(`Attribute: ${attribute.name}`, updates)}

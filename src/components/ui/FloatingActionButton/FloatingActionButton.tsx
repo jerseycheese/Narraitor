@@ -28,9 +28,9 @@ const sizeClasses = {
 };
 
 const variantClasses = {
-  primary: 'bg-blue-600 hover:bg-blue-700 border-blue-500 focus:ring-blue-300',
-  secondary: 'bg-gray-600 hover:bg-gray-700 border-gray-500 focus:ring-gray-300',
-  amber: 'bg-amber-600 hover:bg-amber-700 border-amber-500 focus:ring-amber-300',
+  primary: 'bg-blue-500 hover:bg-blue-700 border-blue-500 focus:ring-blue-300',
+  secondary: 'bg-gray-700 hover:bg-gray-700 border-gray-500 focus:ring-gray-300',
+  amber: 'bg-amber-500 hover:bg-amber-700 border-amber-500 focus:ring-amber-300',
 };
 
 /**

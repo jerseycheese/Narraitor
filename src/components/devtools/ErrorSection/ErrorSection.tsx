@@ -92,11 +92,11 @@ export const ErrorSection = () => {
   // Get severity badge color
   const getSeverityColor = (severity: ErrorSeverity) => {
     switch (severity) {
-      case ErrorSeverity.CRITICAL: return 'bg-red-600';
-      case ErrorSeverity.HIGH: return 'bg-red-400';
-      case ErrorSeverity.MEDIUM: return 'bg-yellow-400';
-      case ErrorSeverity.LOW: return 'bg-blue-400';
-      default: return 'bg-gray-400';
+      case ErrorSeverity.CRITICAL: return 'bg-red-500';
+      case ErrorSeverity.HIGH: return 'bg-red-500';
+      case ErrorSeverity.MEDIUM: return 'bg-amber-50000';
+      case ErrorSeverity.LOW: return 'bg-blue-500';
+      default: return 'bg-gray-500';
     }
   };
 
@@ -108,9 +108,9 @@ export const ErrorSection = () => {
   return (
     <div className="space-y-4">
       {/* Error Statistics */}
-      <div className="bg-slate-700 p-3 rounded border border-slate-600">
+      <div className="bg-gray-700 p-3 rounded border border-gray-700">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-slate-200">Runtime Errors</h4>
+          <h4 className="text-sm font-semibold text-gray-200">Runtime Errors</h4>
           {statistics && statistics.total > 0 && (
             <Button
               onClick={handleClearAll}
@@ -124,7 +124,7 @@ export const ErrorSection = () => {
         </div>
         
         {statistics && (
-          <div className="text-xs text-slate-300 space-y-1">
+          <div className="text-xs text-gray-300 space-y-1">
             <div className="flex gap-4">
               <span>Total: {statistics.total}</span>
               <span>Recent: {statistics.recentCount}</span>
@@ -147,7 +147,7 @@ export const ErrorSection = () => {
         <div className="space-y-3">
           {/* Severity Filter */}
           <div>
-            <h5 className="text-xs font-medium text-slate-300 mb-2">Severity</h5>
+            <h5 className="text-xs font-medium text-gray-300 mb-2">Severity</h5>
             <div className="flex flex-wrap gap-2">
               {Object.values(ErrorSeverity).map(severity => (
                 <label key={severity} className="flex items-center gap-1 text-xs">
@@ -156,7 +156,7 @@ export const ErrorSection = () => {
                     onChange={(e) => handleSeverityFilter(severity, e.target.checked)}
                     aria-label={severity.charAt(0).toUpperCase() + severity.slice(1)}
                   />
-                  <span className="text-slate-300 capitalize">{severity}</span>
+                  <span className="text-gray-300 capitalize">{severity}</span>
                 </label>
               ))}
             </div>
@@ -164,7 +164,7 @@ export const ErrorSection = () => {
 
           {/* Category Filter */}
           <div>
-            <h5 className="text-xs font-medium text-slate-300 mb-2">Category</h5>
+            <h5 className="text-xs font-medium text-gray-300 mb-2">Category</h5>
             <div className="flex flex-wrap gap-2">
               {Object.values(ErrorCategory).map(category => (
                 <label key={category} className="flex items-center gap-1 text-xs">
@@ -173,7 +173,7 @@ export const ErrorSection = () => {
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
                     aria-label={category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
                   />
-                  <span className="text-slate-300 capitalize">{category.replace('_', ' ')}</span>
+                  <span className="text-gray-300 capitalize">{category.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -187,7 +187,7 @@ export const ErrorSection = () => {
                 onChange={(e) => handleShowDismissed(e.target.checked)}
                 aria-label="Show dismissed errors"
               />
-              <span className="text-slate-300">Show dismissed errors</span>
+              <span className="text-gray-300">Show dismissed errors</span>
             </label>
           </div>
 
@@ -204,7 +204,7 @@ export const ErrorSection = () => {
       {/* Error List */}
       <div className="space-y-2">
         {errors.length === 0 ? (
-          <div className="text-center py-8 text-slate-400 text-sm">
+          <div className="text-center py-8 text-gray-500 text-sm">
             No runtime errors captured
           </div>
         ) : (
@@ -213,8 +213,8 @@ export const ErrorSection = () => {
               key={error.id}
               className={`border rounded p-3 ${
                 error.dismissed 
-                  ? 'bg-slate-800 border-slate-600 opacity-60' 
-                  : 'bg-slate-700 border-slate-500'
+                  ? 'bg-gray-900 border-gray-700 opacity-60' 
+                  : 'bg-gray-700 border-gray-500'
               }`}
             >
               {/* Error Header */}
@@ -232,11 +232,11 @@ export const ErrorSection = () => {
                         {error.count}x
                       </Badge>
                     )}
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-gray-500">
                       {formatTimestamp(error.timestamp)}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-200 break-words">
+                  <p className="text-sm text-gray-200 break-words">
                     {error.message}
                   </p>
                 </div>
@@ -246,7 +246,7 @@ export const ErrorSection = () => {
                     onClick={() => toggleErrorExpanded(error.id)}
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
+                    className="h-6 w-6 p-0 text-gray-500 hover:text-gray-200"
                     aria-label="View error details"
                   >
                     {expandedErrors.has(error.id) ? '−' : '+'}
@@ -256,7 +256,7 @@ export const ErrorSection = () => {
                       onClick={() => handleDismissError(error.id)}
                       variant="ghost"
                       size="sm"
-                      className="h-6 w-6 p-0 text-slate-400 hover:text-slate-200"
+                      className="h-6 w-6 p-0 text-gray-500 hover:text-gray-200"
                       aria-label="Dismiss error"
                     >
                       ×
@@ -267,12 +267,12 @@ export const ErrorSection = () => {
 
               {/* Expanded Error Details */}
               {expandedErrors.has(error.id) && (
-                <div className="border-t border-slate-600 pt-2 mt-2 space-y-2">
+                <div className="border-t border-gray-700 pt-2 mt-2 space-y-2">
                   {/* Stack Trace */}
                   {error.stack && (
                     <div>
-                      <h6 className="text-xs font-medium text-slate-300 mb-1">Stack Trace</h6>
-                      <pre className="text-xs text-slate-400 bg-slate-800 p-2 rounded overflow-x-auto">
+                      <h6 className="text-xs font-medium text-gray-300 mb-1">Stack Trace</h6>
+                      <pre className="text-xs text-gray-500 bg-gray-900 p-2 rounded overflow-x-auto">
                         {error.stack}
                       </pre>
                     </div>
@@ -281,10 +281,10 @@ export const ErrorSection = () => {
                   {/* Component Context */}
                   {error.componentContext && (
                     <div>
-                      <h6 className="text-xs font-medium text-slate-300 mb-1">Component Context</h6>
-                      <div className="text-xs text-slate-400 space-y-1">
+                      <h6 className="text-xs font-medium text-gray-300 mb-1">Component Context</h6>
+                      <div className="text-xs text-gray-500 space-y-1">
                         <div>Component: {error.componentContext.componentName}</div>
-                        <pre className="bg-slate-800 p-2 rounded overflow-x-auto">
+                        <pre className="bg-gray-900 p-2 rounded overflow-x-auto">
                           {error.componentContext.componentStack}
                         </pre>
                       </div>
@@ -294,8 +294,8 @@ export const ErrorSection = () => {
                   {/* State Snapshot */}
                   {error.stateSnapshot && (
                     <div>
-                      <h6 className="text-xs font-medium text-slate-300 mb-1">State Snapshot</h6>
-                      <div className="text-xs text-slate-400 space-y-1">
+                      <h6 className="text-xs font-medium text-gray-300 mb-1">State Snapshot</h6>
+                      <div className="text-xs text-gray-500 space-y-1">
                         <div>Route: {error.stateSnapshot.route}</div>
                         <div>URL: {error.stateSnapshot.url}</div>
                         <div>User Agent: {error.stateSnapshot.userAgent}</div>

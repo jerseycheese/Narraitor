@@ -82,7 +82,7 @@ export const ImageGenerationSection: React.FC<ImageGenerationSectionProps> = ({
           {imageComponent}
         </div>
         <div className="flex-1">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-700 mb-4">
             {hasImage ? description : `No ${title.toLowerCase()} has been generated yet.`}
           </p>
           

@@ -65,8 +65,8 @@ export function CharacterAttributeDisplay({ attributes, showCategories = false }
 
 function AttributeItem({ attribute }: { attribute: CharacterAttribute }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-      <div className="text-sm font-medium text-gray-600 mb-1">
+    <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
+      <div className="text-sm font-medium text-gray-700 mb-1">
         {attribute.name}
       </div>
       <div className="text-2xl font-bold text-gray-900">

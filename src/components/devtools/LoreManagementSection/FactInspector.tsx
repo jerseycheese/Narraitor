@@ -70,7 +70,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
 
               <div>
                 <span className="font-semibold">Value:</span> 
-                <div className="mt-1 p-2 bg-gray-50 rounded">{fact.value}</div>
+                <div className="mt-1 p-2 bg-gray-100 rounded">{fact.value}</div>
               </div>
 
               <div>
@@ -93,7 +93,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
               {fact.metadata && (
                 <div>
                   <span className="font-semibold">Metadata:</span>
-                  <div className="mt-1 p-2 bg-gray-50 rounded space-y-1">
+                  <div className="mt-1 p-2 bg-gray-100 rounded space-y-1">
                     {fact.metadata.description && (
                       <div>
                         <span className="text-sm font-medium">Description:</span> {fact.metadata.description}
@@ -114,7 +114,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                         <span className="text-sm font-medium">Tags:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {fact.metadata.tags.map((tag, index) => (
-                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-900 text-xs rounded">
                               {tag}
                             </span>
                           ))}
@@ -126,7 +126,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                         <span className="text-sm font-medium">Related Entities:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {fact.metadata.relatedEntities.map((entity, index) => (
-                            <span key={index} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
+                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-900 text-xs rounded">
                               {entity}
                             </span>
                           ))}
@@ -137,7 +137,7 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+              <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
                 <div>
                   <span className="font-medium">Created:</span> 
                   <span className="ml-2">{new Date(fact.createdAt).toLocaleString()}</span>
@@ -164,14 +164,14 @@ export const FactInspector: React.FC<FactInspectorProps> = ({
           <TabsContent value="history" className="space-y-4">
             {history.length > 0 ? (
               <div className="space-y-3">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-700">
                   Showing {history.length} version(s) of this fact
                 </div>
                 {history.map((version, index) => (
                   <div key={index} className="p-3 border rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <span className="font-semibold">Version {history.length - index}</span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-700">
                         {new Date(version.updatedAt).toLocaleString()}
                       </span>
                     </div>

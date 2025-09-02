@@ -171,7 +171,7 @@ export default function FinalizeStep({
                 worldName={worldData.name || 'Untitled World'}
                 size="medium"
               />
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-700 mt-2">
                 {worldData.image?.url ? 'World image will be generated after creation' : 'No world image will be generated'}
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function FinalizeStep({
         {worldData.attributes && worldData.attributes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {worldData.attributes.map((attr, index) => (
-              <div key={index} className={`${wizardStyles.card.base} bg-gray-50`} data-testid={`review-attribute-${index}`}>
+              <div key={index} className={`${wizardStyles.card.base} bg-gray-100`} data-testid={`review-attribute-${index}`}>
                 <div className="font-semibold">{attr.name}</div>
                 <div className="text-sm">{attr.description}</div>
                 <div className="text-sm text-gray-500">
@@ -202,7 +202,7 @@ export default function FinalizeStep({
         {worldData.skills && worldData.skills.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {worldData.skills.map((skill, index) => (
-              <div key={index} className={`${wizardStyles.card.base} bg-gray-50`} data-testid={`review-skill-${index}`}>
+              <div key={index} className={`${wizardStyles.card.base} bg-gray-100`} data-testid={`review-skill-${index}`}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-semibold">{skill.name}</span>
                   <span className={`${wizardStyles.badge.base} ${
@@ -215,7 +215,7 @@ export default function FinalizeStep({
                 </div>
                 <div className="text-sm">{skill.description}</div>
                 {skill.attributeIds && skill.attributeIds.length > 0 && (
-                  <div className="text-sm text-blue-600 mt-1">
+                  <div className="text-sm text-blue-700 mt-1">
                     Linked to: {skill.attributeIds
                       .map(id => worldData.attributes?.find(a => a.id === id)?.name)
                       .filter(Boolean)

@@ -132,10 +132,10 @@ export function EndingScreen() {
   // Show loading state while generating
   if (isGeneratingEnding) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center space-y-4">
           <LoadingState message="Generating your story ending..." />
-          <p className="text-gray-600">
+          <p className="text-gray-700">
             Please wait while we craft the perfect conclusion to your journey...
           </p>
         </div>
@@ -162,7 +162,7 @@ export function EndingScreen() {
       <PageLayout 
         title="No Ending Available" 
         description="It looks like the story ending wasn't generated properly."
-        className="bg-gray-50"
+        className="bg-gray-100"
       >
         <div className="text-center">
           <CardActionGroup 
@@ -196,15 +196,15 @@ export function EndingScreen() {
   // Determine header text color based on tone for better contrast
   const getHeaderTextColor = (tone: string) => {
     switch (tone) {
-      case 'triumphant': // Amber background (#f59e0b)
+      case 'triumphant': // Amber background (amber-500: #f59e0b)
         return 'text-black'; // Black text for bright amber
-      case 'hopeful': // Emerald background (#10b981)  
-        return 'text-white'; // White text for emerald
-      case 'bittersweet': // Violet background (#8b5cf6)
-        return 'text-white'; // White text for violet
-      case 'mysterious': // Gray background (#374151)
+      case 'hopeful': // Green background (green-500: #22c55e)
+        return 'text-white'; // White text for green
+      case 'bittersweet': // Blue background (blue-700: #1d4ed8)
+        return 'text-white'; // White text for blue
+      case 'mysterious': // Gray background (gray-700: #374151)
         return 'text-white'; // White text for dark gray
-      case 'tragic': // Dark red background (#991b1b)
+      case 'tragic': // Red background (red-700: #b91c1c)
         return 'text-white'; // White text for dark red
       default:
         return 'text-white'; // Default to white text
@@ -261,7 +261,7 @@ export function EndingScreen() {
               <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
                 <div className="text-center">
                   <LoadingState message="Generating ending image..." />
-                  <p className="text-gray-600 mt-2 text-sm">
+                  <p className="text-gray-700 mt-2 text-sm">
                     Creating a visual representation of your story&apos;s conclusion...
                   </p>
                 </div>
@@ -304,7 +304,7 @@ export function EndingScreen() {
           </div>
           {/* Epilogue */}
           <SectionWrapper title="Epilogue" className="bg-white/95 backdrop-blur-sm">
-            <div className="text-lg text-gray-800 leading-relaxed whitespace-pre-wrap">
+            <div className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap">
               {currentEnding.epilogue}
             </div>
           </SectionWrapper>
@@ -313,7 +313,7 @@ export function EndingScreen() {
             {/* Character Legacy */}
             <div>
               <SectionWrapper title="Character Legacy" className="bg-white/90 backdrop-blur-sm h-full">
-                <div className="text-gray-800 leading-relaxed">
+                <div className="text-gray-900 leading-relaxed">
                   {currentEnding.characterLegacy}
                 </div>
               </SectionWrapper>
@@ -335,10 +335,10 @@ export function EndingScreen() {
                           key={index}
                           onClick={() => handleAchievementClick(achievement)}
                           variant="ghost"
-                          className="flex items-start justify-start space-x-2 text-gray-800 w-full text-left p-2 rounded-lg hover:bg-yellow-50 focus:ring-2 focus:ring-yellow-300 h-auto"
+                          className="flex items-start justify-start space-x-2 text-gray-900 w-full text-left p-2 rounded-lg hover:bg-amber-200 focus:ring-2 focus:ring-amber-300 h-auto"
                           aria-label={`View details for achievement: ${title}`}
                         >
-                          <Star className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                          <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                           <div>
                             <span className="font-bold">{title}</span>
                             {description && <span>: {description}</span>}
@@ -354,7 +354,7 @@ export function EndingScreen() {
 
           {/* World Impact */}
           <SectionWrapper title="Impact on the World" className="bg-white/90 backdrop-blur-sm">
-            <div className="text-gray-800 leading-relaxed">
+            <div className="text-gray-900 leading-relaxed">
               {currentEnding.worldImpact}
             </div>
           </SectionWrapper>

@@ -155,7 +155,7 @@ export const Interactive: Story = {
     return (
       <div className="space-y-4">
         <div className="bg-blue-50 p-4 rounded border border-blue-200">
-          <h3 className="font-medium text-blue-800 mb-2">Interactive Demo</h3>
+          <h3 className="font-medium text-blue-900 mb-2">Interactive Demo</h3>
           <p className="text-sm text-blue-700 mb-3">
             This demo shows the ErrorSection with sample errors. You can:
           </p>

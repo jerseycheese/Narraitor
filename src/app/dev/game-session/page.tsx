@@ -302,7 +302,7 @@ export default function GameSessionTestHarness() {
         </button>
         
         <button 
-          className="px-4 py-2 bg-yellow-500 text-white rounded mb-4 ml-2"
+          className="px-4 py-2 bg-amber-2000 text-white rounded mb-4 ml-2"
           onClick={() => {
             // Initialize a new session
             logger.info('Starting new session');
@@ -330,7 +330,7 @@ export default function GameSessionTestHarness() {
         </button>
         
         <button 
-          className="px-4 py-2 bg-purple-500 text-white rounded mb-4 ml-2"
+          className="px-4 py-2 bg-blue-500 text-white rounded mb-4 ml-2"
           onClick={() => {
             // Reset all session state to break infinite loops
             logger.info('🔄 Resetting all session and narrative state');
@@ -373,7 +373,7 @@ export default function GameSessionTestHarness() {
         </button>
       </div>
       
-      <div className="border p-4 rounded bg-gray-50">
+      <div className="border p-4 rounded bg-gray-100">
         {showRealComponent ? (
           <GameSession 
             worldId={mockWorld.id}
@@ -387,23 +387,23 @@ export default function GameSessionTestHarness() {
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Current Session State</h2>
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-700 mb-2">
           Status: <span className="font-bold">{currentState.status || 'unknown'}</span>
         </p>
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-700 mb-2">
           Store methods: {Object.keys(useSessionStore.getState()).filter(key => {
             const value = useSessionStore.getState()[key as keyof typeof useSessionStore.getState];
             return typeof value === 'function';
           }).join(', ')}
         </p>
-        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(currentState, null, 2)}
         </div>
       </div>
       
       <div className="mt-6">
         <h2 className="text-xl font-bold mb-2">Test World Data</h2>
-        <div className="bg-slate-800 text-slate-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
+        <div className="bg-gray-900 text-gray-100 p-4 rounded overflow-auto font-mono text-xs whitespace-pre">
           {JSON.stringify(mockWorld, null, 2)}
         </div>
       </div>

@@ -51,7 +51,7 @@ For buttons, status indicators, and general interface elements:
 </Button>
 
 // Status indicators
-<CheckCircle className="w-4 h-4 text-green-600" />
+<CheckCircle className="w-4 h-4 text-green-500" />
 ```
 
 #### **Prominent UI Icons: `w-5 h-5` (20px)**
@@ -103,10 +103,10 @@ Icons for common user actions and interactions:
 System status and health indicators:
 
 ```tsx
-<CheckCircle className="w-4 h-4 text-green-600" />     // Success/healthy
-<AlertTriangle className="w-4 h-4 text-yellow-600" />  // Warning/degraded
-<XCircle className="w-4 h-4 text-red-600" />           // Error/unavailable
-<RotateCcw className="w-4 h-4 text-blue-600 animate-spin" /> // Loading/recovering
+<CheckCircle className="w-4 h-4 text-green-500" />     // Success/healthy
+<AlertTriangle className="w-4 h-4 text-amber-500" />  // Warning/degraded
+<XCircle className="w-4 h-4 text-red-500" />           // Error/unavailable
+<RotateCcw className="w-4 h-4 text-blue-500 animate-spin" /> // Loading/recovering
 ```
 
 ### Game Mechanics Icons
@@ -149,16 +149,16 @@ Use semantic color classes that align with the status meaning:
 
 ```tsx
 // Success states
-<CheckCircle className="w-4 h-4 text-green-600" />
+<CheckCircle className="w-4 h-4 text-green-500" />
 
 // Warning states  
-<AlertTriangle className="w-4 h-4 text-yellow-600" />
+<AlertTriangle className="w-4 h-4 text-amber-500" />
 
 // Error states
-<XCircle className="w-4 h-4 text-red-600" />
+<XCircle className="w-4 h-4 text-red-500" />
 
 // Loading states
-<RotateCcw className="w-4 h-4 text-blue-600 animate-spin" />
+<RotateCcw className="w-4 h-4 text-blue-500 animate-spin" />
 ```
 
 ### Neutral Icons
@@ -166,7 +166,7 @@ Use default text colors for icons without specific semantic meaning:
 
 ```tsx
 <Settings className="w-4 h-4" />  // Inherits text color
-<Home className="w-4 h-4 text-gray-600" />  // Explicit neutral color
+<Home className="w-4 h-4 text-gray-500" />  // Explicit neutral color
 ```
 
 ## Accessibility Guidelines
@@ -183,7 +183,7 @@ Icons should be properly labeled for assistive technologies:
 
 // For meaningful icons, provide proper labeling
 <span aria-label="Storage status: healthy">
-  <CheckCircle className="w-4 h-4 text-green-600" />
+  <CheckCircle className="w-4 h-4 text-green-500" />
 </span>
 
 // In interactive elements, ensure proper labeling
@@ -209,7 +209,7 @@ Ensure sufficient contrast and don't rely solely on color:
 ```tsx
 // Good: Color + icon shape convey meaning
 <div className="flex items-center gap-2">
-  <CheckCircle className="w-4 h-4 text-green-600" />
+  <CheckCircle className="w-4 h-4 text-green-500" />
   <span>Success</span>
 </div>
 
@@ -330,7 +330,7 @@ When you find an emoji in the code, here's how to fix it:
 // Achievements and success
 '🏆' → <Trophy className="w-8 h-8" />
 '⭐' → <Star className="w-3 h-3 text-white" />
-'✅' → <CheckCircle className="w-4 h-4 text-green-600" />
+'✅' → <CheckCircle className="w-4 h-4 text-green-500" />
 
 // Actions and creation
 '➕' → <Plus className="w-3 h-3 text-white" />
@@ -343,9 +343,9 @@ When you find an emoji in the code, here's how to fix it:
 '⚡' → <Zap className="w-3 h-3 text-white" />
 
 // Status and alerts
-'⚠️' → <AlertTriangle className="w-4 h-4 text-yellow-600" />
-'❌' → <XCircle className="w-4 h-4 text-red-600" />
-'🔄' → <RotateCcw className="w-4 h-4 text-blue-600 animate-spin" />
+'⚠️' → <AlertTriangle className="w-4 h-4 text-amber-500" />
+'❌' → <XCircle className="w-4 h-4 text-red-500" />
+'🔄' → <RotateCcw className="w-4 h-4 text-blue-500 animate-spin" />
 
 // Alignment and choices
 '⚖️' → <Scale className="w-4 h-4" />

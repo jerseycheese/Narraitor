@@ -14,7 +14,7 @@ const meta: Meta<typeof CollapsibleSection> = {
     backgrounds: {
       default: 'dark',
       values: [
-        { name: 'dark', value: '#1e293b' }, // slate-800
+        { name: 'dark', value: '#111827' }, // gray-900 from our design system
       ]
     }
   },
@@ -34,7 +34,7 @@ const meta: Meta<typeof CollapsibleSection> = {
   },
   decorators: [
     (Story) => (
-      <div className="p-8 bg-slate-800 rounded-lg dark min-w-[400px]">
+      <div className="p-8 bg-gray-900 rounded-lg dark min-w-[400px]">
         <Story />
       </div>
     )
@@ -48,7 +48,7 @@ export const Default: Story = {
   args: {
     title: 'Example Section',
     children: (
-      <div className="p-4 bg-slate-700 rounded">
+      <div className="p-4 bg-gray-700 rounded">
         <p className="text-gray-200">Section content goes here.</p>
         <p className="text-gray-200">This can be any React component.</p>
       </div>
@@ -61,7 +61,7 @@ export const InitiallyCollapsed: Story = {
     title: 'Collapsed Section',
     initiallyExpanded: false,
     children: (
-      <div className="p-4 bg-slate-700 rounded">
+      <div className="p-4 bg-gray-700 rounded">
         <p className="text-gray-200">This content is initially hidden.</p>
       </div>
     )
@@ -72,13 +72,13 @@ export const WithNestedContent: Story = {
   args: {
     title: 'Complex Content',
     children: (
-      <div className="p-4 bg-slate-700 rounded">
+      <div className="p-4 bg-gray-700 rounded">
         <h3 className="text-lg font-bold mb-2 text-gray-200">Nested Heading</h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="p-2 bg-slate-600 rounded shadow text-gray-200">Item 1</div>
-          <div className="p-2 bg-slate-600 rounded shadow text-gray-200">Item 2</div>
-          <div className="p-2 bg-slate-600 rounded shadow text-gray-200">Item 3</div>
-          <div className="p-2 bg-slate-600 rounded shadow text-gray-200">Item 4</div>
+          <div className="p-2 bg-gray-700 rounded shadow text-gray-200">Item 1</div>
+          <div className="p-2 bg-gray-700 rounded shadow text-gray-200">Item 2</div>
+          <div className="p-2 bg-gray-700 rounded shadow text-gray-200">Item 3</div>
+          <div className="p-2 bg-gray-700 rounded shadow text-gray-200">Item 4</div>
         </div>
       </div>
     )
@@ -90,14 +90,14 @@ export const WithDevToolsContent: Story = {
     title: 'State Information',
     children: (
       <div className="font-mono text-sm">
-        <div className="p-2 bg-slate-700 rounded mb-2">
-          <span className="text-gray-400">currentWorldId:</span> <span className="text-green-400">&quot;world-123&quot;</span>
+        <div className="p-2 bg-gray-700 rounded mb-2">
+          <span className="text-gray-500">currentWorldId:</span> <span className="text-green-500">&quot;world-123&quot;</span>
         </div>
-        <div className="p-2 bg-slate-700 rounded mb-2">
-          <span className="text-gray-400">loading:</span> <span className="text-blue-400">false</span>
+        <div className="p-2 bg-gray-700 rounded mb-2">
+          <span className="text-gray-500">loading:</span> <span className="text-blue-500">false</span>
         </div>
-        <div className="p-2 bg-slate-700 rounded">
-          <span className="text-gray-400">error:</span> <span className="text-red-400">null</span>
+        <div className="p-2 bg-gray-700 rounded">
+          <span className="text-gray-500">error:</span> <span className="text-red-500">null</span>
         </div>
       </div>
     )

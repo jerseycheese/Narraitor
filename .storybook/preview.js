@@ -16,79 +16,8 @@ const preview = {
     },
     options: {
       storySort: {
-        order: [
-          '01-Atoms', 
-          [
-            '01-Atoms', 
-            [
-              'buttons',
-              'display', 
-              'feedback',
-              'forms',
-              ['forms', ['inputs', 'controls']]
-            ]
-          ],
-          '02-Molecules', 
-          [
-            '02-Molecules', 
-            [
-              'character-display',
-              'devtools',
-              'forms',
-              ['forms', ['editors', 'managers']],
-              'ui-components',
-              ['ui-components', ['cards', 'layout', 'selectors']],
-              'world-forms'
-            ]
-          ],
-          '03-Organisms', 
-          [
-            '03-Organisms', 
-            [
-              'character',
-              ['character', ['display', 'portrait', 'editor']],
-              'world',
-              ['world', ['display', 'lists', 'editor', 'actions']],
-              'narrative',
-              ['narrative', ['display', 'controls', 'core']],
-              'navigation',
-              'journal',
-              'dialogs',
-              'devtools',
-              ['devtools', ['panels', 'sections']],
-              'game-session',
-              ['game-session', ['controls', 'setup']],
-              'editor-components'
-            ]
-          ],
-          '04-Templates', 
-          [
-            '04-Templates', 
-            [
-              'layouts',
-              'wizards',
-              ['wizards', ['character', 'world', 'game']]
-            ]
-          ],
-          '05-Pages',
-          [
-            '05-Pages',
-            [
-              'game-session',
-              'standalone'
-            ]
-          ],
-          '06-Patterns',
-          [
-            '06-Patterns',
-            [
-              'ai-integration',
-              'navigation', 
-              'data-management',
-              'ui-patterns'
-            ]
-          ]
-        ],
+        method: 'alphabetical',
+        order: ['00-Foundation', '*'], // Foundation first, everything else alphabetical
       },
     },
     backgrounds: {

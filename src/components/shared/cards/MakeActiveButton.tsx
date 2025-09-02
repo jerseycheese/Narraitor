@@ -47,8 +47,8 @@ export const MakeActiveButton: React.FC<MakeActiveButtonProps> = ({
     </svg>
   );
 
-  const baseClasses = `px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 hover:text-green-900 
-    rounded-md transition-colors border border-green-300 hover:border-green-400 font-medium 
+  const baseClasses = `px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-900 
+    rounded-md transition-colors border border-green-300 hover:border-green-500 font-medium 
     flex items-center justify-center gap-2`;
 
   const widthClass = fullWidth ? 'w-full' : '';

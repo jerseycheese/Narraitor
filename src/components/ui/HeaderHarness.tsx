@@ -4,7 +4,7 @@ export function HeaderHarness() {
   // Stage 3: Integration – …
 
   return (
-    <header className="bg-gray-800 text-white p-4">
+    <header className="bg-gray-900 text-white p-4">
       <h1 className="text-xl font-bold">Header Harness</h1>
     </header>
   );

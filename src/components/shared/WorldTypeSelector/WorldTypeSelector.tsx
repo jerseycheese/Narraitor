@@ -131,7 +131,7 @@ export function WorldTypeSelector({
         {WORLD_TYPE_OPTIONS.map((option) => (
           <label
             key={option.id}
-            className={`flex items-start ${styles.radio} border rounded-lg cursor-pointer hover:bg-gray-50 ${
+            className={`flex items-start ${styles.radio} border rounded-lg cursor-pointer hover:bg-gray-100 ${
               value.worldType === option.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
@@ -141,7 +141,7 @@ export function WorldTypeSelector({
             />
             <div className="flex-1">
               <div className={`${styles.title} text-gray-900`}>{option.label}</div>
-              <div className={`${styles.description} text-gray-600`}>{option.description}</div>
+              <div className={`${styles.description} text-gray-700`}>{option.description}</div>
             </div>
           </label>
         ))}

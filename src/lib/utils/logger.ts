@@ -15,10 +15,10 @@ interface LogColors {
 }
 
 const LOG_COLORS: LogColors = {
-  [LogLevel.DEBUG]: 'color: #888; font-weight: normal;',
-  [LogLevel.INFO]: 'color: #2196F3; font-weight: normal;',
-  [LogLevel.WARN]: 'color: #FF9800; font-weight: bold;',
-  [LogLevel.ERROR]: 'color: #F44336; font-weight: bold;'
+  [LogLevel.DEBUG]: 'color: #6b7280; font-weight: normal;', // gray-500
+  [LogLevel.INFO]: 'color: #3b82f6; font-weight: normal;',   // blue-500  
+  [LogLevel.WARN]: 'color: #f59e0b; font-weight: bold;',     // amber-500
+  [LogLevel.ERROR]: 'color: #ef4444; font-weight: bold;'     // red-500
 };
 
 export class Logger {

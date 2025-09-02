@@ -114,11 +114,11 @@ export default function SkillEditorTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">SkillEditor Test Harness</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-700 mt-2">
             Test the SkillEditor component with realistic data and interactions.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function SkillEditorTestPage() {
                 {!editingSkill && !showCreateDialog && (
                   <button
                     onClick={() => setShowCreateDialog(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                   >
                     Create New Skill
                   </button>
@@ -163,12 +163,12 @@ export default function SkillEditorTestPage() {
                       {skills.map(skill => (
                         <div
                           key={skill.id}
-                          className="border rounded-lg p-4 hover:bg-gray-50"
+                          className="border rounded-lg p-4 hover:bg-gray-100"
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <h4 className="font-medium text-gray-900">{skill.name}</h4>
-                              <p className="text-sm text-gray-600 mt-1">{skill.description}</p>
+                              <p className="text-sm text-gray-700 mt-1">{skill.description}</p>
                               <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                                 <span>Linked Attributes: {getLinkedAttributeNames(skill.attributeIds) || 'None'}</span>
                                 <span>Difficulty: {skill.difficulty}</span>
@@ -199,7 +199,7 @@ export default function SkillEditorTestPage() {
                 {mockAttributes.map(attr => (
                   <div key={attr.id} className="text-sm">
                     <div className="font-medium">{attr.name}</div>
-                    <div className="text-gray-600 text-xs">{attr.description}</div>
+                    <div className="text-gray-700 text-xs">{attr.description}</div>
                   </div>
                 ))}
               </div>

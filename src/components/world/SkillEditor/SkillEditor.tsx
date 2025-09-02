@@ -204,8 +204,8 @@ export function SkillEditor({
       </div>
 
       {mode === 'create' && isAtMaxSkills && (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <p className="text-sm text-yellow-700">
+        <div className="p-4 bg-amber-200 border border-amber-200 rounded-md">
+          <p className="text-sm text-amber-700">
             Maximum number of skills ({maxSkills}) reached. You cannot create more skills for this world.
           </p>
         </div>
@@ -214,7 +214,7 @@ export function SkillEditor({
       {errors.length > 0 && (
         <div className="space-y-2">
           {errors.map((error, index) => (
-            <div key={index} className="text-sm text-red-600" role="alert">
+            <div key={index} className="text-sm text-red-500" role="alert">
               {error}
             </div>
           ))}
@@ -251,7 +251,7 @@ export function SkillEditor({
 
           <div>
             <Label className="text-base font-medium">Linked Attributes</Label>
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-700 mb-3">
               Select one or more attributes this skill is based on
             </p>
             <div className="space-y-2">

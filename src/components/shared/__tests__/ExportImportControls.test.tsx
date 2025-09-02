@@ -29,7 +29,8 @@ describe('ExportImportControls', () => {
       exportGameState: jest.fn(),
       importGameState: jest.fn(),
       getExportSize: jest.fn(),
-    }) as ExportService);
+      validateGameState: jest.fn(),
+    }) as any); // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   describe('export functionality', () => {

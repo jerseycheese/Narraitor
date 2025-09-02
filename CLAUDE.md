@@ -74,6 +74,21 @@ Core guidelines:
   - Use `Textarea` instead of `<textarea>`
   - Import from `@/components/ui/[component]`
 
+## Design Token Enforcement
+The codebase enforces our 23-color design token system through automated linting:
+
+- **Stylelint**: Catches hardcoded hex colors, rgb/hsl values, and non-token color names in CSS
+- **Tailwind Config**: Restricts available colors to only our design token palette
+- **Automatic Detection**: Violations are caught during development and in CI
+
+To fix color violations:
+```bash
+npm run lint:css        # See what's wrong
+npm run lint:css:fix    # Auto-fix simple issues
+```
+
+The linter will flag things like `color: #ff0000` or `background: rgb(255,0,0)` and point you toward using `theme('colors.red.700')` or Tailwind classes instead.
+
 ## Documentation Standards
 Documentation should sound like explaining something to a colleague, not writing for a corporate wiki.
 
@@ -105,6 +120,8 @@ Documentation should sound like explaining something to a colleague, not writing
 - `npm run test`: Run all Jest tests
 - `npm run storybook`: Launch Storybook for component development
 - `npm run lint`: Run ESLint
+- `npm run lint:css`: Check CSS for design token violations
+- `npm run lint:css:fix`: Auto-fix CSS violations where possible
 
 ## Environment Configuration
 ```bash

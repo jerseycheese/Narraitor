@@ -66,7 +66,7 @@ const meta: Meta<typeof MobileNavigationMenu> = {
           <div className="absolute inset-0 bg-gray-100 p-8">
             <div className="bg-white rounded-lg p-6 shadow">
               <h2 className="text-xl font-semibold mb-4">Page Content</h2>
-              <p className="text-gray-600">
+              <p className="text-gray-700">
                 This content is behind the mobile navigation overlay when open.
                 The overlay should cover the entire screen and prevent interaction with background content.
               </p>

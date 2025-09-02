@@ -36,7 +36,7 @@ export const CustomPromptSection: React.FC<CustomPromptSectionProps> = ({
         rows={rows}
       />
       {helpText && (
-        <p className="text-xs text-gray-600">{helpText}</p>
+        <p className="text-xs text-gray-700">{helpText}</p>
       )}
       {example && (
         <p className="text-xs text-gray-500">
@@ -85,7 +85,7 @@ export const PromptOverrideSection: React.FC<PromptOverrideSectionProps> = ({
       <button
         type="button"
         onClick={() => setShowPromptOverride(!showPromptOverride)}
-        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100"
       >
         {showPromptOverride ? buttonText.hide : buttonText.show}
       </button>

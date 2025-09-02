@@ -84,7 +84,7 @@ export function CharacterPortrait({
   if (error) {
     return (
       <div className={containerClasses} data-testid="character-portrait">
-        <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-600">
+        <div className="absolute inset-0 flex items-center justify-center bg-red-100 text-red-500">
           <span className="text-xs text-center p-2">{error}</span>
         </div>
       </div>
@@ -117,7 +117,7 @@ export function CharacterPortrait({
       data-testid="character-portrait"
       onClick={onClick}
     >
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500 text-white font-semibold">
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-500 text-white font-semibold">
         {getInitials(characterName)}
       </div>
     </div>

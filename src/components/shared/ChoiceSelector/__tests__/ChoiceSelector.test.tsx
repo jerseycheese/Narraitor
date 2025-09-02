@@ -8,11 +8,21 @@ import { Decision } from '@/types/narrative.types';
 interface TestCharacter {
   id: string;
   name: string;
+  description: string;
+  worldId: string;
+  level: number;
+  attributes: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   skills: Array<{
     id: string;
     name: string;
     level: number;
   }>;
+  background: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  inventory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  status: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  createdAt: string;
+  updatedAt: string;
+  isPlayer: boolean;
 }
 
 describe('ChoiceSelector', () => {
@@ -45,12 +55,12 @@ describe('ChoiceSelector', () => {
       { 
         id: 'stealth-opt', 
         text: 'Sneak past', 
-        requirements: [{ type: 'skill', skill: 'Stealth', level: 5 }] 
+        requirements: [{ type: 'skill', targetId: 'stealth-skill', operator: 'gte', value: 5 }] 
       },
       { 
         id: 'intimidate-opt', 
         text: 'Intimidate the guard', 
-        requirements: [{ type: 'skill', skill: 'Intimidation', level: 7 }] 
+        requirements: [{ type: 'skill', targetId: 'intimidation-skill', operator: 'gte', value: 7 }] 
       },
       { id: 'direct-opt', text: 'Walk directly' },
     ],
@@ -59,10 +69,20 @@ describe('ChoiceSelector', () => {
   const mockCharacter: TestCharacter = {
     id: 'char-1',
     name: 'Test Hero',
+    description: 'A test character',
+    worldId: 'world-1',
+    level: 5,
+    attributes: [],
     skills: [
       { id: 'skill-1', name: 'Stealth', level: 3 },
       { id: 'skill-2', name: 'Intimidation', level: 8 },
     ],
+    background: {},
+    inventory: {},
+    status: {},
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    isPlayer: true,
   };
 
   describe('Basic Choice Selection', () => {
@@ -167,7 +187,6 @@ describe('ChoiceSelector', () => {
         <ChoiceSelector 
           choices={simpleChoices} 
           onSelect={mockOnSelect}
-          loading={true}
         />
       );
       
@@ -181,7 +200,6 @@ describe('ChoiceSelector', () => {
         <ChoiceSelector 
           choices={simpleChoices} 
           onSelect={mockOnSelect}
-          loading={true}
         />
       );
       

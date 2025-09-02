@@ -139,7 +139,7 @@ describe('WorldCard', () => {
     // Check badge content and styling
     const setBadge = screen.getByTestId('world-card-type');
     expect(setBadge).toHaveTextContent('Set in Star Wars');
-    expect(setBadge).toHaveClass('bg-cyan-600', 'text-white');
+    expect(setBadge).toHaveClass('bg-blue-700', 'text-white');
 
     // Test "Based On" world
     const basedOnWorld = createMockWorld({
@@ -156,7 +156,7 @@ describe('WorldCard', () => {
     );
     const basedBadge = screen.getByTestId('world-card-type');
     expect(basedBadge).toHaveTextContent('Inspired by Lord of the Rings');
-    expect(basedBadge).toHaveClass('bg-green-600', 'text-white');
+    expect(basedBadge).toHaveClass('bg-green-500', 'text-white');
 
     // Test Original world (no reference/relationship)
     const originalWorld = createMockWorld({
@@ -173,6 +173,6 @@ describe('WorldCard', () => {
     );
     const originalBadge = screen.getByTestId('world-card-type');
     expect(originalBadge).toHaveTextContent('Original World');
-    expect(originalBadge).toHaveClass('bg-blue-600', 'text-white');
+    expect(originalBadge).toHaveClass('bg-blue-700', 'text-white');
   });
 });

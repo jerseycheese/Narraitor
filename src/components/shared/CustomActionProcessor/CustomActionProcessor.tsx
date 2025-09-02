@@ -225,7 +225,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         
         {/* Loading state */}
         {isAnalyzing && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-700">
             <LoadingState variant="dots" size="sm" />
             <span>Analyzing skills...</span>
           </div>
@@ -233,7 +233,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
 
         {/* Analysis error */}
         {analysisError && (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+          <div className="text-sm text-red-500 bg-red-200 p-2 rounded">
             Error: {analysisError}
           </div>
         )}
@@ -242,7 +242,7 @@ const CustomActionProcessor: React.FC<CustomActionProcessorProps> = ({
         {skillCheckResults.length > 0 && !isAnalyzing && (
           <div className="space-y-2">
             <div className="flex flex-wrap gap-2">
-              <span className="text-sm text-gray-600 font-medium">Detected Skills:</span>
+              <span className="text-sm text-gray-700 font-medium">Detected Skills:</span>
               {skillCheckResults.map((result, index) => {
                 const operatorSuffix = result.requirement.operator === 'gte' ? '+' : '';
                 const label = `${result.skillName} ${result.requirement.value}${operatorSuffix}`;

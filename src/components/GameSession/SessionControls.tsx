@@ -30,7 +30,7 @@ const SessionControls: React.FC<SessionControlsProps> = ({
           <Button
             data-testid="game-session-controls-end-story"
             variant="secondary"
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-blue-700 hover:bg-blue-700 text-white"
             onClick={onEndStory}
             title="End your story with an AI-generated epilogue"
           >

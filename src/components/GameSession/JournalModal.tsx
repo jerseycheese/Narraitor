@@ -52,11 +52,11 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
     <div className="h-full flex flex-col">
       <div className={`border-b pb-4 mb-4 ${
         isSystemEvent 
-          ? 'border-slate-300 bg-slate-50 rounded-t p-4 -m-4 mb-4' 
-          : 'border-amber-200'
+          ? 'border-gray-300 bg-gray-100 rounded-t p-4 -m-4 mb-4' 
+          : 'border-amber-500'
       }`}>
         <h3 className={`text-xl font-bold mb-2 ${
-          isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+          isSystemEvent ? 'text-gray-700' : 'text-amber-900'
         }`}>
           {isSystemEvent && (
             <span className="mr-2" role="img" aria-label="System event">
@@ -74,12 +74,12 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           <Badge 
             variant={isSystemEvent ? "secondary" : "info"} 
             size="sm"
-            className={isSystemEvent ? "bg-slate-200 text-slate-700" : ""}
+            className={isSystemEvent ? "bg-gray-200 text-gray-700" : ""}
           >
             {isSystemEvent && "System: "}
             {titleCase(entry.type.replace('_', ' '))}
           </Badge>
-          <span className={isSystemEvent ? "text-slate-600" : "text-amber-600"}>
+          <span className={isSystemEvent ? "text-gray-700" : "text-amber-500"}>
             {formatRelativeTime(new Date(entry.createdAt))}
           </span>
           {!entry.isRead && (
@@ -87,7 +87,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           )}
           {/* Show session duration for session_end events */}
           {entry.type === 'session_end' && entry.metadata.sessionDuration && (
-            <Badge variant="outline" size="sm" className="text-slate-600 border-slate-300">
+            <Badge variant="outline" size="sm" className="text-gray-700 border-gray-300">
               Duration: {formatSessionDuration(entry.metadata.sessionDuration)}
             </Badge>
           )}
@@ -95,7 +95,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
       </div>
     
     <div className="flex-1 overflow-auto">
-      <div className="prose prose-amber max-w-none">
+      <div className="prose pred-amber max-w-none">
         <div className="text-gray-700 leading-relaxed">
           {entry.type === 'discovery' ? (
             <div 
@@ -115,7 +115,7 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
       </div>
       
       {entry.relatedEntities && entry.relatedEntities.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-amber-200">
+        <div className="mt-6 pt-4 border-t border-amber-500">
           <h4 className="font-semibold text-amber-900 mb-2">Related</h4>
           <div className="flex flex-wrap gap-2">
             {entry.relatedEntities.map((entity, index) => (
@@ -180,11 +180,11 @@ export const JournalModal: React.FC<JournalModalProps> = ({
       onClick={onClose}
     >
       <Card 
-        className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-amber-200"
+        className="bg-gradient-to-br from-amber-50 to-amber-50 rounded-lg max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border-2 border-amber-500"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with book-like styling */}
-        <div className="flex justify-between items-center p-6 border-b border-amber-200 bg-gradient-to-r from-amber-100 to-orange-100">
+        <div className="flex justify-between items-center p-6 border-b border-amber-500 bg-gradient-to-r from-amber-100 to-amber-100">
           <div className="flex items-center">
             <h2 id="journal-modal-title" className="text-2xl font-bold text-amber-900">Journal</h2>
             {entries.length > 0 && (
@@ -218,10 +218,10 @@ export const JournalModal: React.FC<JournalModalProps> = ({
           ) : (
             <>
               {/* Entry List - Full width on mobile, sidebar on desktop */}
-              <div className={`w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-200 flex flex-col ${
+              <div className={`w-full md:w-80 border-b md:border-b-0 md:border-r border-amber-500 flex flex-col ${
                 selectedEntry ? 'hidden md:flex' : 'flex'
               }`}>
-                <div className="p-4 border-b border-amber-200 bg-amber-50 flex items-center justify-between">
+                <div className="p-4 border-b border-amber-500 bg-amber-50 flex items-center justify-between">
                   <h3 className="font-semibold text-amber-900">Entries</h3>
                   {selectedEntry && (
                     <Button
@@ -246,11 +246,11 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                         className={`p-3 border cursor-pointer transition-all duration-200 ${
                           isSystemEvent
                             ? selectedEntryId === entry.id
-                              ? 'bg-slate-100 border-slate-300 shadow-md'
-                              : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                              ? 'bg-gray-100 border-gray-300 shadow-md'
+                              : 'bg-gray-100 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
                             : selectedEntryId === entry.id
                               ? 'bg-amber-100 border-amber-300 shadow-md'
-                              : 'bg-white border-amber-200 hover:bg-amber-50 hover:border-amber-300'
+                              : 'bg-white border-amber-500 hover:bg-amber-50 hover:border-amber-300'
                         }`}
                         onClick={() => handleEntrySelect(entry)}
                         role="button"
@@ -265,7 +265,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h4 className={`font-medium text-sm leading-tight flex items-center ${
-                            isSystemEvent ? 'text-slate-700' : 'text-amber-900'
+                            isSystemEvent ? 'text-gray-700' : 'text-amber-900'
                           }`}>
                             {isSystemEvent && (
                               <span className="mr-1.5 text-xs" role="img" aria-label="System event">
@@ -280,7 +280,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                         </div>
                         
                         <p className={`text-xs leading-relaxed mb-2 ${
-                          isSystemEvent ? 'text-slate-600' : 'text-gray-600'
+                          isSystemEvent ? 'text-gray-700' : 'text-gray-700'
                         }`}>
                           {truncate(entry.content, 60)}
                         </p>
@@ -292,7 +292,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                             label={capitalize(entry.significance)}
                           />
                           <span className={`text-xs ${
-                            isSystemEvent ? 'text-slate-500' : 'text-amber-600'
+                            isSystemEvent ? 'text-gray-500' : 'text-amber-500'
                           }`}>
                             {formatRelativeTime(new Date(entry.createdAt))}
                           </span>
@@ -323,7 +323,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                   </div>
                 ) : (
                   <div className="p-6 h-full flex items-center justify-center">
-                    <div className="text-center text-amber-600">
+                    <div className="text-center text-amber-500">
                       <div className="text-4xl mb-4">📖</div>
                       <h3 className="text-lg font-medium mb-2">Select an Entry</h3>
                       <p className="text-sm">

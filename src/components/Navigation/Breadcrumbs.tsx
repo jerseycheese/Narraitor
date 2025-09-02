@@ -68,11 +68,11 @@ export function Breadcrumbs({
         <>
           <span 
             data-testid="breadcrumb-ellipsis"
-            className="text-gray-400"
+            className="text-gray-500"
           >
             ...
           </span>
-          <span className="text-gray-400">{separator}</span>
+          <span className="text-gray-500">{separator}</span>
         </>
       )}
       
@@ -86,13 +86,13 @@ export function Breadcrumbs({
             <React.Fragment key={segment.href}>
               <span
                 data-testid={testId}
-                className="text-gray-400 flex items-center gap-2"
+                className="text-gray-500 flex items-center gap-2"
               >
                 {getSegmentIcon(segment)}
                 {segment.label}
               </span>
               {!isLast && (
-                <span className="text-gray-400">{separator}</span>
+                <span className="text-gray-500">{separator}</span>
               )}
             </React.Fragment>
           );
@@ -109,14 +109,14 @@ export function Breadcrumbs({
                 'hover:text-gray-700 transition-colors flex items-center gap-2',
                 segment.isCurrentPage 
                   ? 'text-gray-900 font-medium cursor-default' 
-                  : 'text-gray-600'
+                  : 'text-gray-700'
               )}
             >
               {getSegmentIcon(segment)}
               {segment.label}
             </Link>
             {!isLast && (
-              <span className="text-gray-400">{separator}</span>
+              <span className="text-gray-500">{separator}</span>
             )}
           </React.Fragment>
         );
@@ -135,8 +135,8 @@ export function Breadcrumbs({
       const character = characters[nextStep.characterId];
       return (
         <div className="ml-4 flex items-center">
-          <span className="text-gray-400 mr-2">{separator}</span>
-          <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
+          <span className="text-gray-500 mr-2">{separator}</span>
+          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
           <Button
             onClick={() => {
               if (currentWorldId && nextStep.characterId) {
@@ -145,7 +145,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            className="text-sm px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+            className="text-sm px-3 py-1 bg-green-500 hover:bg-green-700 text-white rounded-md transition-colors"
             variant="default"
             size="sm"
           >
@@ -158,8 +158,8 @@ export function Breadcrumbs({
     if (nextStep.action === 'select-character' && (Object.values(characters) as Character[]).filter(c => c.worldId === currentWorldId).length > 0) {
       return (
         <div className="ml-4 flex items-center">
-          <span className="text-gray-400 mr-2">{separator}</span>
-          <span className="text-sm text-gray-600 mr-2">Next: Start Playing</span>
+          <span className="text-gray-500 mr-2">{separator}</span>
+          <span className="text-sm text-gray-700 mr-2">Next: Start Playing</span>
           <Button
             onClick={() => {
               const firstCharacter = (Object.values(characters) as Character[]).find(c => c.worldId === currentWorldId);
@@ -169,7 +169,7 @@ export function Breadcrumbs({
                 });
               }
             }}
-            className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            className="text-sm px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white rounded-md transition-colors"
             variant="default"
             size="sm"
           >
@@ -181,8 +181,8 @@ export function Breadcrumbs({
 
     return (
       <div className="ml-4 flex items-center">
-        <span className="text-gray-400 mr-2">{separator}</span>
-        <span className="text-sm text-gray-600 mr-2">Next: {nextStep.label}</span>
+        <span className="text-gray-500 mr-2">{separator}</span>
+        <span className="text-sm text-gray-700 mr-2">Next: {nextStep.label}</span>
         <Link
           href={nextStep.href}
           className="text-sm text-link-primary font-medium no-underline"

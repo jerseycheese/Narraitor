@@ -18,17 +18,17 @@ const GuidedFirstTimeExperienceDemo = () => {
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           Welcome to Narraitor
         </h1>
-        <p className="text-lg text-gray-600 mb-6">
+        <p className="text-lg text-gray-700 mb-6">
           Create your own world and start your story
         </p>
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-blue-800">
+          <p className="text-sm text-blue-900">
             Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
           </p>
         </div>
         <button 
           onClick={() => setCurrentStep(1)}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="w-full bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
         >
           Get Started
         </button>
@@ -42,7 +42,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
           World Concept
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Create an RPG in any fictional universe or original setting
         </p>
       </div>
@@ -71,7 +71,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </button>
         <button 
           onClick={() => setCurrentStep(2)}
-          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium"
         >
           Continue
         </button>
@@ -85,7 +85,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
           World Details
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-700">
           Give your world a name and genre
         </p>
       </div>
@@ -130,7 +130,7 @@ const GuidedFirstTimeExperienceDemo = () => {
         </button>
         <button 
           onClick={() => alert('World creation complete!')}
-          className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
+          className="flex-1 bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
         >
           Create World
         </button>
@@ -139,7 +139,7 @@ const GuidedFirstTimeExperienceDemo = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-100 py-8">
       <div className="container mx-auto px-4">
         {/* Progress indicator */}
         <div className="mb-8">
@@ -149,8 +149,8 @@ const GuidedFirstTimeExperienceDemo = () => {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     index <= currentStep
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-300 text-gray-600'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-300 text-gray-700'
                   }`}
                 >
                   {index + 1}
@@ -158,7 +158,7 @@ const GuidedFirstTimeExperienceDemo = () => {
                 {index < steps.length - 1 && (
                   <div
                     className={`w-12 h-0.5 ${
-                      index < currentStep ? 'bg-blue-600' : 'bg-gray-300'
+                      index < currentStep ? 'bg-blue-500' : 'bg-gray-300'
                     }`}
                   />
                 )}

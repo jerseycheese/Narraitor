@@ -78,7 +78,7 @@ export const SectionVisibilityControls = () => {
         onClick={toggleDropdown}
         variant="ghost"
         size="sm"
-        className="text-xs bg-slate-600 text-slate-200 hover:bg-slate-500 border border-slate-500"
+        className="text-xs bg-gray-700 text-gray-200 hover:bg-gray-100 border border-gray-500"
         aria-expanded={isDropdownOpen}
         aria-haspopup="menu"
         aria-label="Section visibility controls"
@@ -89,18 +89,18 @@ export const SectionVisibilityControls = () => {
 
       {isDropdownOpen && (
         <div 
-          className="absolute top-full right-0 mt-1 bg-slate-700 border border-slate-600 rounded shadow-lg z-50 min-w-48"
+          className="absolute top-full right-0 mt-1 bg-gray-700 border border-gray-700 rounded shadow-lg z-50 min-w-48"
           data-testid="visibility-dropdown"
           role="menu"
         >
           {/* Header with bulk actions */}
-          <div className="p-2 border-b border-slate-600">
+          <div className="p-2 border-b border-gray-700">
             <div className="flex gap-1">
               <Button
                 onClick={handleShowAll}
                 variant="ghost"
                 size="sm"
-                className="text-xs flex-1 bg-slate-600 text-slate-200 hover:bg-slate-500"
+                className="text-xs flex-1 bg-gray-700 text-gray-200 hover:bg-gray-100"
                 data-testid="show-all-sections"
                 role="menuitem"
               >
@@ -110,7 +110,7 @@ export const SectionVisibilityControls = () => {
                 onClick={handleHideAll}
                 variant="ghost"
                 size="sm"
-                className="text-xs flex-1 bg-slate-600 text-slate-200 hover:bg-slate-500"
+                className="text-xs flex-1 bg-gray-700 text-gray-200 hover:bg-gray-100"
                 data-testid="hide-all-sections"
                 role="menuitem"
               >
@@ -130,16 +130,16 @@ export const SectionVisibilityControls = () => {
                   onClick={() => handleSectionToggle(sectionId)}
                   variant="ghost"
                   size="sm"
-                  className="w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-600 flex items-center gap-2 justify-start h-auto"
+                  className="w-full px-3 py-2 text-left text-xs text-gray-200 hover:bg-gray-700 flex items-center gap-2 justify-start h-auto"
                   data-testid={SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]}
                   role="menuitemcheckbox"
                   aria-checked={isVisible}
                   aria-label={`Toggle ${displayName} visibility`}
                 >
-                  <span className={`w-4 h-4 border border-slate-400 rounded flex items-center justify-center ${
-                    isVisible ? 'bg-slate-500' : 'bg-transparent'
+                  <span className={`w-4 h-4 border border-gray-500 rounded flex items-center justify-center ${
+                    isVisible ? 'bg-gray-100' : 'bg-transparent'
                   }`}>
-                    {isVisible && <span className="text-slate-200">✓</span>}
+                    {isVisible && <span className="text-gray-200">✓</span>}
                   </span>
                   <span>{displayName}</span>
                 </Button>
@@ -148,12 +148,12 @@ export const SectionVisibilityControls = () => {
           </div>
 
           {/* Footer */}
-          <div className="p-2 border-t border-slate-600">
+          <div className="p-2 border-t border-gray-700">
             <Button
               onClick={() => setIsDropdownOpen(false)}
               variant="ghost"
               size="sm"
-              className="w-full text-xs text-slate-400 hover:text-slate-200 h-auto"
+              className="w-full text-xs text-gray-500 hover:text-gray-200 h-auto"
               data-testid="close-dropdown"
             >
               Close

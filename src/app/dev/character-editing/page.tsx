@@ -123,7 +123,7 @@ export default function CharacterEditingTestPage() {
 
   if (!testCharacterId) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-4">Character Editing Test Harness</h1>
           <p>Setting up test data...</p>
@@ -133,12 +133,12 @@ export default function CharacterEditingTestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-4">Character Editing Test Harness</h1>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h2 className="font-semibold text-blue-800 mb-2">Acceptance Criteria Testing</h2>
+            <h2 className="font-semibold text-blue-900 mb-2">Acceptance Criteria Testing</h2>
             <ul className="text-blue-700 space-y-1 text-sm">
               <li>✅ An editing interface allows modification of existing character fields</li>
               <li>✅ The editing interface reuses the same validation as character creation</li>

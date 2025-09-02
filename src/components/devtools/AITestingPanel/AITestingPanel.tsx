@@ -195,46 +195,46 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">World Override</h4>
+      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">World Override</h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Name:</label>
+            <label htmlFor="world-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Name:</label>
             <input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+              className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
             />
           </div>
           <div>
-            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">World Genre:</label>
+            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Genre:</label>
             <input
               id="world-genre"
               type="text"
               value={testConfig.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
-              className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+              className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="devtools-panel bg-slate-700 p-2 rounded border border-slate-600">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-slate-200">Character Override</h4>
+      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="devtools-panel block !text-xs text-slate-300 !my-0 mb-0.5">Character Name:</label>
+          <label htmlFor="character-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">Character Name:</label>
           <input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="devtools-panel w-full bg-slate-600 text-slate-200 border-slate-500 placeholder-slate-400"
+            className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
           />
         </div>
       </div>
@@ -246,8 +246,8 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
           disabled={isGenerating}
           className={`devtools-panel w-full transition-colors ${
             isGenerating 
-              ? '!bg-slate-500 cursor-not-allowed' 
-              : '!bg-blue-600 hover:!bg-blue-500 cursor-pointer'
+              ? '!bg-gray-100 cursor-not-allowed' 
+              : '!bg-blue-500 hover:!bg-blue-500 cursor-pointer'
           }`}
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
@@ -256,19 +256,19 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="bg-yellow-900 bg-opacity-30 p-2 rounded border border-yellow-600">
-          <p className="devtools-panel !text-xs text-yellow-200 !my-0">Generating narrative...</p>
+        <div className="bg-amber-700 bg-opacity-30 p-2 rounded border border-amber-50000">
+          <p className="devtools-panel !text-xs text-amber-200 !my-0">Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-600">
+        <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-500">
           <p className="devtools-panel !text-xs text-red-200 !my-0">Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-600">
+        <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-500">
           <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-green-200">Generated Results</h4>
           <div className="mb-2">
             <p className="devtools-panel !text-xs text-green-100 !my-0">{result.text}</p>
@@ -278,7 +278,7 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
               <h5 className="devtools-panel !text-xs !font-medium !my-0 !mb-1 text-green-200">Choices:</h5>
               <ul className="text-xs text-green-100 my-0 p-0 list-none space-y-1">
                 {result.choices.map((choice, index) => (
-                  <li key={index} className="pl-2 border-l-2 border-green-400 text-xs">• {choice}</li>
+                  <li key={index} className="pl-2 border-l-2 border-green-500 text-xs">• {choice}</li>
                 ))}
               </ul>
             </div>

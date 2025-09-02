@@ -63,7 +63,7 @@ export const WithError: Story = {
         {...args} 
         className="border-red-300 focus-visible:ring-red-500" 
       />
-      <p className="text-red-600 text-sm">Background must be at least 50 characters</p>
+      <p className="text-red-500 text-sm">Background must be at least 50 characters</p>
     </div>
   ),
   args: {

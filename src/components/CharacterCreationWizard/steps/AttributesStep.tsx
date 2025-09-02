@@ -67,7 +67,7 @@ export const AttributesStep: React.FC<AttributesStepProps> = ({
 
       {remaining !== 0 && (
         <div className={wizardStyles.card.base}>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-700">
             You must allocate exactly {data.pointPools.attributes.total} points to proceed.
           </p>
         </div>

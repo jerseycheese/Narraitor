@@ -63,7 +63,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
       aria-label="Character information"
     >
       {/* Compact Header - Always Visible */}
-      <div className="flex items-center justify-between gap-4 cursor-pointer select-none hover:bg-gray-50 -m-2 p-2 rounded transition-colors"
+      <div className="flex items-center justify-between gap-4 cursor-pointer select-none hover:bg-gray-100 -m-2 p-2 rounded transition-colors"
            onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-center gap-4">
           {/* Portrait Section - show in header when collapsed */}
@@ -89,7 +89,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
                 {character.name}
               </Link>
             </h2>
-            <p className="text-sm text-gray-600">Level {character.level}</p>
+            <p className="text-sm text-gray-700">Level {character.level}</p>
           </div>
         </div>
         
@@ -122,7 +122,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
               {/* Attributes Column */}
               {character.attributes && character.attributes.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-800 mb-2">Attributes</h3>
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Attributes</h3>
                   <div className="space-y-1">
                     {character.attributes.map(attr => {
                       const worldAttribute = world.attributes.find(wa => wa.id === attr.worldAttributeId);
@@ -142,7 +142,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
               {/* Skills Column */}
               {character.skills && character.skills.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-gray-800 mb-2">Skills</h3>
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Skills</h3>
                   <div className="space-y-1">
                     {character.skills.map(skill => {
                         const worldSkill = world.skills.find(ws => ws.id === skill.worldSkillId);
@@ -165,7 +165,7 @@ const CharacterSummary: React.FC<CharacterSummaryProps> = ({ character }) => {
                             <span className="font-medium text-gray-700">{worldSkill.name}</span>
                             <span className="text-gray-500 ml-1">(Level {skill.level})</span>
                             {linkedAttributes.length > 0 && (
-                              <div className="text-xs text-blue-600">
+                              <div className="text-xs text-blue-700">
                                 Linked to: {linkedAttributes.join(', ')}
                               </div>
                             )}

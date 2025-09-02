@@ -29,21 +29,21 @@ interface ErrorDisplayProps {
 
 const severityStyles = {
   error: {
-    container: 'bg-red-50 border-red-200 text-red-800',
+    container: 'bg-red-200 border-red-500 text-red-700',
     title: 'text-red-700',
-    message: 'text-red-600',
+    message: 'text-red-500',
     button: 'bg-red-100 hover:bg-red-200 text-red-700',
   },
   warning: {
-    container: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    title: 'text-yellow-700',
-    message: 'text-yellow-600',
-    button: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-700',
+    container: 'bg-amber-200 border-amber-200 text-amber-700',
+    title: 'text-amber-700',
+    message: 'text-amber-500',
+    button: 'bg-amber-100 hover:bg-amber-200 text-amber-700',
   },
   info: {
-    container: 'bg-blue-50 border-blue-200 text-blue-800',
+    container: 'bg-blue-50 border-blue-200 text-blue-900',
     title: 'text-blue-700',
-    message: 'text-blue-600',
+    message: 'text-blue-700',
     button: 'bg-blue-100 hover:bg-blue-200 text-blue-700',
   },
 };
@@ -140,7 +140,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
           {showDismiss && onDismiss && (
             <button
               onClick={onDismiss}
-              className="ml-4 text-gray-400 hover:text-gray-600"
+              className="ml-4 text-gray-500 hover:text-gray-700"
               aria-label="Dismiss"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

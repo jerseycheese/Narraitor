@@ -62,7 +62,7 @@ export const Placeholder: Story = {
 export const Generating: Story = {
   decorators: [
     () => (
-      <div className="p-8 bg-gray-50 rounded-lg">
+      <div className="p-8 bg-gray-100 rounded-lg">
         <h3 className="text-lg font-semibold mb-4">Generating Character Portrait</h3>
         <div className="bg-white p-6 rounded-lg shadow">
           <LoadingState message="Generating character portrait..." />

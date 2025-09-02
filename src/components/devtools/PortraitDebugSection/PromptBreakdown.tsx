@@ -51,28 +51,28 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
   return (
     <div className="space-y-4">
       {/* Logic Flow Diagram */}
-      <div className="bg-slate-800 p-4 rounded border border-slate-700">
-        <h4 className="font-medium mb-3 text-slate-200">Prompt Construction Logic Flow</h4>
+      <div className="bg-gray-900 p-4 rounded border border-gray-700">
+        <h4 className="font-medium mb-3 text-gray-200">Prompt Construction Logic Flow</h4>
         
         <div className="space-y-3 text-sm">
           {/* Decision Tree */}
           <div className="border-l-2 border-blue-500 pl-4">
-            <div className="font-medium text-blue-400">1. Automatic Character Detection</div>
-            <div className="text-slate-300 ml-4">
-              <div className="text-slate-400">AI analyzes &quot;{characterData?.name || 'Unknown'}&quot;</div>
+            <div className="font-medium text-blue-500">1. Automatic Character Detection</div>
+            <div className="text-gray-300 ml-4">
+              <div className="text-gray-500">AI analyzes &quot;{characterData?.name || 'Unknown'}&quot;</div>
               {isPhotorealisticPrompt ? (
-                <div className="ml-4 text-green-400">→ Detected as known figure (photorealistic approach)</div>
+                <div className="ml-4 text-green-500">→ Detected as known figure (photorealistic approach)</div>
               ) : isFantasyPrompt ? (
-                <div className="ml-4 text-purple-400">→ Detected as original character (fantasy art approach)</div>
+                <div className="ml-4 text-blue-500">→ Detected as original character (fantasy art approach)</div>
               ) : (
-                <div className="ml-4 text-gray-400">→ Detection pending...</div>
+                <div className="ml-4 text-gray-500">→ Detection pending...</div>
               )}
             </div>
           </div>
           
           <div className="border-l-2 border-green-500 pl-4">
-            <div className="font-medium text-green-400">2. Opening Statement</div>
-            <div className="text-slate-300 ml-4">
+            <div className="font-medium text-green-500">2. Opening Statement</div>
+            <div className="text-gray-300 ml-4">
               {isPhotorealisticPrompt ? 
                 '&quot;A portrait photograph of&quot;' : 
                 '&quot;A fantasy portrait of&quot;'
@@ -80,9 +80,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div className="border-l-2 border-yellow-500 pl-4">
-            <div className="font-medium text-yellow-400">3. Subject Details</div>
-            <div className="text-slate-300 ml-4">
+          <div className="border-l-2 border-amber-500 pl-4">
+            <div className="font-medium text-amber-500">3. Subject Details</div>
+            <div className="text-gray-300 ml-4">
               <div>Name: &quot;{characterData?.name || 'Unknown'}&quot;</div>
               {physicalDescription && (
                 <div>Physical: &quot;{physicalDescription}&quot;</div>
@@ -96,9 +96,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div className="border-l-2 border-purple-500 pl-4">
-            <div className="font-medium text-purple-400">4. Context/Background</div>
-            <div className="text-slate-300 ml-4">
+          <div className="border-l-2 border-blue-500 pl-4">
+            <div className="font-medium text-blue-500">4. Context/Background</div>
+            <div className="text-gray-300 ml-4">
               {isPhotorealisticPrompt ? (
                 <>
                   <div>• professional headshot</div>
@@ -113,9 +113,9 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
             </div>
           </div>
           
-          <div className="border-l-2 border-pink-500 pl-4">
-            <div className="font-medium text-pink-400">5. Style Elements</div>
-            <div className="text-slate-300 ml-4">
+          <div className="border-l-2 border-red-500 pl-4">
+            <div className="font-medium text-red-500">5. Style Elements</div>
+            <div className="text-gray-300 ml-4">
               {isPhotorealisticPrompt ? (
                 <>
                   <div>• 85mm lens</div>
@@ -137,41 +137,41 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
       </div>
       
       {/* Prompt Breakdown */}
-      <div className="bg-slate-800 p-4 rounded border border-slate-700">
-        <h4 className="font-medium mb-3 text-slate-200">Prompt Component Breakdown</h4>
+      <div className="bg-gray-900 p-4 rounded border border-gray-700">
+        <h4 className="font-medium mb-3 text-gray-200">Prompt Component Breakdown</h4>
         <div className="space-y-2">
           {promptParts.map((part, index) => {
             const trimmedPart = part.trim();
             let category = 'other';
-            let color = 'text-slate-400';
+            let color = 'text-gray-500';
             
             // Categorize each part
             if (index === 0) {
               category = 'opening';
-              color = 'text-blue-400';
+              color = 'text-blue-500';
             } else if (trimmedPart === characterData?.name) {
               category = 'name';
-              color = 'text-green-400';
+              color = 'text-green-500';
             } else if (trimmedPart.includes('the ') && isPhotorealisticPrompt) {
               category = 'context';
-              color = 'text-yellow-400';
+              color = 'text-amber-500';
             } else if (trimmedPart.includes('character') || trimmedPart.includes('class')) {
               category = 'description';
-              color = 'text-orange-400';
+              color = 'text-amber-500';
             } else if (trimmedPart.includes('lighting') || trimmedPart.includes('headshot') || trimmedPart.includes('setting') || trimmedPart.includes('background')) {
               category = 'environment';
-              color = 'text-purple-400';
+              color = 'text-blue-500';
             } else if (trimmedPart.includes('lens') || trimmedPart.includes('photorealistic') || trimmedPart.includes('painting') || trimmedPart.includes('style') || trimmedPart.includes('quality')) {
               category = 'style';
-              color = 'text-pink-400';
+              color = 'text-red-500';
             }
             
             return (
               <div key={index} className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-1 rounded ${color} bg-slate-900 font-mono`}>
+                <span className={`text-xs px-2 py-1 rounded ${color} bg-gray-900 font-mono`}>
                   {category}
                 </span>
-                <span className="text-slate-300">{trimmedPart}</span>
+                <span className="text-gray-300">{trimmedPart}</span>
               </div>
             );
           })}
@@ -179,39 +179,39 @@ export function PromptBreakdown({ characterData, worldConfig, prompt }: PromptBr
       </div>
       
       {/* Data Analysis */}
-      <div className="bg-slate-800 p-4 rounded border border-slate-700">
-        <h4 className="font-medium mb-3 text-slate-200">Input Data Analysis</h4>
+      <div className="bg-gray-900 p-4 rounded border border-gray-700">
+        <h4 className="font-medium mb-3 text-gray-200">Input Data Analysis</h4>
         <div className="space-y-2 text-sm">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="text-slate-400">Character Name:</span>
-              <span className="ml-2 text-slate-200">{characterData?.name || 'Not set'}</span>
+              <span className="text-gray-500">Character Name:</span>
+              <span className="ml-2 text-gray-200">{characterData?.name || 'Not set'}</span>
             </div>
             <div>
-              <span className="text-slate-400">Portrait Type:</span>
-              <span className="ml-2 text-slate-200">
+              <span className="text-gray-500">Portrait Type:</span>
+              <span className="ml-2 text-gray-200">
                 {isPhotorealisticPrompt ? 'Photorealistic' : isFantasyPrompt ? 'Fantasy Art' : 'Auto-detected'}
               </span>
             </div>
             <div>
-              <span className="text-slate-400">Physical Description:</span>
-              <span className="ml-2 text-slate-200">{physicalDescription ? `${physicalDescription.length} chars` : 'None'}</span>
+              <span className="text-gray-500">Physical Description:</span>
+              <span className="ml-2 text-gray-200">{physicalDescription ? `${physicalDescription.length} chars` : 'None'}</span>
             </div>
             <div>
-              <span className="text-slate-400">Personality Length:</span>
-              <span className="ml-2 text-slate-200">{characterData?.background?.personality?.length || 0} chars</span>
+              <span className="text-gray-500">Personality Length:</span>
+              <span className="ml-2 text-gray-200">{characterData?.background?.personality?.length || 0} chars</span>
             </div>
             <div>
-              <span className="text-slate-400">Extracted Traits:</span>
-              <span className="ml-2 text-slate-200">{personalityTraits || 'None'}</span>
+              <span className="text-gray-500">Extracted Traits:</span>
+              <span className="ml-2 text-gray-200">{personalityTraits || 'None'}</span>
             </div>
             <div>
-              <span className="text-slate-400">History Contains Class:</span>
-              <span className="ml-2 text-slate-200">{profession || 'No'}</span>
+              <span className="text-gray-500">History Contains Class:</span>
+              <span className="ml-2 text-gray-200">{profession || 'No'}</span>
             </div>
             <div>
-              <span className="text-slate-400">World Genre:</span>
-              <span className="ml-2 text-slate-200">{worldConfig?.genre || 'Not set'}</span>
+              <span className="text-gray-500">World Genre:</span>
+              <span className="ml-2 text-gray-200">{worldConfig?.genre || 'Not set'}</span>
             </div>
           </div>
         </div>

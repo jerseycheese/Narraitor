@@ -26,7 +26,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
         {label}
       </span>
       {description && (
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-500">
           {description}
         </p>
       )}

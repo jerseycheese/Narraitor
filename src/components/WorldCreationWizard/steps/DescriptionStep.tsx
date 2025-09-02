@@ -52,7 +52,7 @@ export default function DescriptionStep({
       </WizardFormSection>
 
       {errors.ai && (
-        <div className="p-4 mb-4 bg-yellow-100 text-yellow-800 rounded" data-testid="ai-warning">
+        <div className="p-4 mb-4 bg-amber-100 text-amber-700 rounded" data-testid="ai-warning">
           {errors.ai}
         </div>
       )}

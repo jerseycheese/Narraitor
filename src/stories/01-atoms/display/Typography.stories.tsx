@@ -74,12 +74,12 @@ export const Links = {
         <div>
           <p className="text-sm text-gray-500 mb-2">Standard Links</p>
           <p className="text-base">
-            Links are styled with <a href="#">blue-600 color</a> by default and 
+            Links are styled with <a href="#">blue-700 color</a> by default and 
             transition to <a href="#">blue-700 on hover</a> with an underline.
           </p>
         </div>
         <div className="bg-gray-900 text-white p-4 rounded">
-          <p className="text-sm text-gray-400 mb-2">Links on Dark Backgrounds</p>
+          <p className="text-sm text-gray-500 mb-2">Links on Dark Backgrounds</p>
           <p>
             In dark contexts, <a href="#" className="hover:text-gray-300">links inherit</a> the 
             parent text color for better readability.
@@ -100,18 +100,18 @@ export const Colors = {
           <div className="space-y-2">
             <p className="text-gray-900">Gray 900 - Primary</p>
             <p className="text-gray-700">Gray 700 - Secondary</p>
-            <p className="text-gray-600">Gray 600 - Tertiary</p>
+            <p className="text-gray-700">Gray 600 - Tertiary</p>
             <p className="text-gray-500">Gray 500 - Muted</p>
-            <p className="text-gray-400">Gray 400 - Disabled</p>
+            <p className="text-gray-500">Gray 400 - Disabled</p>
           </div>
         </div>
         <div>
           <h3 className="font-semibold mb-3">Semantic Colors</h3>
           <div className="space-y-2">
-            <p className="text-blue-600">Blue 600 - Links/Primary</p>
-            <p className="text-green-600">Green 600 - Success</p>
-            <p className="text-amber-600">Amber 600 - Warning</p>
-            <p className="text-red-600">Red 600 - Error</p>
+            <p className="text-blue-700">Blue 600 - Links/Primary</p>
+            <p className="text-green-500">Green 600 - Success</p>
+            <p className="text-amber-500">Amber 600 - Warning</p>
+            <p className="text-red-500">Red 600 - Error</p>
           </div>
         </div>
       </div>

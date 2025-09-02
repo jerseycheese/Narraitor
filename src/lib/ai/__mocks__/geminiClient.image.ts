@@ -14,7 +14,7 @@ export class MockGeminiImageClient extends MockGeminiClient implements AIClient 
     // Generate a simple SVG for testing
     const svg = `
       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100" height="100" fill="#6366f1"/>
+        <rect width="100" height="100" fill="#3b82f6"/>
         <circle cx="50" cy="40" r="15" fill="white" opacity="0.8"/>
         <ellipse cx="50" cy="75" rx="20" ry="15" fill="white" opacity="0.8"/>
         <text x="50" y="90" font-family="Arial" font-size="8" fill="white" text-anchor="middle">Test</text>

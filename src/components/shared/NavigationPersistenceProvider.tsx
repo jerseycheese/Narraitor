@@ -40,7 +40,7 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-700">
           Loading...
         </div>
       </div>

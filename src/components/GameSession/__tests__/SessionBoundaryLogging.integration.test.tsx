@@ -167,7 +167,7 @@ describe('Session Boundary Logging Integration', () => {
 
     it('handles session start callback and journal entry creation workflow', async () => {
       const sessionStartTime = new Date('2024-01-15T10:30:00Z');
-      const mockDate = jest.spyOn(global, 'Date').mockImplementation(() => sessionStartTime as unknown as string);
+      const mockDate = jest.spyOn(global, 'Date').mockImplementation(() => sessionStartTime);
       
       const mockAddEntry = jest.fn().mockReturnValue('session-start-entry');
       
@@ -243,6 +243,8 @@ describe('Session Boundary Logging Integration', () => {
               content: 'A new session has started',
               significance: 'minor',
               relatedEntities: [],
+              updatedAt: sessionStartTime.toISOString(),
+              isRead: false,
               metadata: {
                 tags: ['system', 'session'],
                 automaticEntry: true,
@@ -277,6 +279,8 @@ describe('Session Boundary Logging Integration', () => {
         content: 'A new session has started',
         significance: 'minor',
         relatedEntities: [],
+        updatedAt: sessionStartTime.toISOString(),
+        isRead: false,
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -371,16 +375,13 @@ describe('Session Boundary Logging Integration', () => {
               content: 'Session completed after 45 minutes',
               significance: 'minor',
               relatedEntities: [],
+              updatedAt: sessionEndTime.toISOString(),
+              isRead: false,
               metadata: {
                 tags: ['system', 'session'],
                 automaticEntry: true,
                 sessionStartTime: sessionStartTime.toISOString(),
-                sessionEndTime: sessionEndTime.toISOString(),
-                sessionDuration: expectedDuration,
-                sessionStats: {
-                  decisionsCount: 8,
-                  narrativeSegments: 12
-                }
+                sessionDuration: expectedDuration
               }
             });
           }
@@ -410,16 +411,13 @@ describe('Session Boundary Logging Integration', () => {
         content: 'Session completed after 45 minutes',
         significance: 'minor',
         relatedEntities: [],
+        updatedAt: sessionEndTime.toISOString(),
+        isRead: false,
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
           sessionStartTime: sessionStartTime.toISOString(),
-          sessionEndTime: sessionEndTime.toISOString(),
-          sessionDuration: expectedDuration,
-          sessionStats: {
-            decisionsCount: 8,
-            narrativeSegments: 12
-          }
+          sessionDuration: expectedDuration
         }
       });
 
@@ -482,6 +480,8 @@ describe('Session Boundary Logging Integration', () => {
             content: 'New adventure began',
             significance: 'minor',
             relatedEntities: [],
+            updatedAt: new Date().toISOString(),
+            isRead: false,
             metadata: { tags: ['system'], automaticEntry: true }
           });
 
@@ -494,6 +494,8 @@ describe('Session Boundary Logging Integration', () => {
             content: 'Adventure concluded',
             significance: 'minor',
             relatedEntities: [],
+            updatedAt: new Date().toISOString(),
+            isRead: false,
             metadata: { tags: ['system'], automaticEntry: true }
           });
         };

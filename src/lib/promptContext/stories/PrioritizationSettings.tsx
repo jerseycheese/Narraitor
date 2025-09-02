@@ -47,7 +47,7 @@ export const PrioritizationSettings: React.FC<PrioritizationSettingsProps> = ({
             value={selectedPreset}
             onChange={(e) => handlePresetSelect(e.target.value)}
             disabled={readOnly}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Custom</option>
             {presets.map(preset => (
@@ -63,7 +63,7 @@ export const PrioritizationSettings: React.FC<PrioritizationSettingsProps> = ({
         <h3 className="text-sm font-medium text-gray-700">Priority Weights</h3>
         {contextTypes.map(type => (
           <div key={type} className="flex items-center space-x-3">
-            <label className="flex-1 text-sm text-gray-600">
+            <label className="flex-1 text-sm text-gray-700">
               {type.replace(/\./g, ' > ')}
             </label>
             <input

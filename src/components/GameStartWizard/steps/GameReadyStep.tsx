@@ -32,17 +32,17 @@ export function GameReadyStep({
         Ready to Begin Your Story!
       </h3>
       
-      <div className="bg-gray-50 rounded-lg p-6 mb-8 max-w-md mx-auto">
+      <div className="bg-gray-100 rounded-lg p-6 mb-8 max-w-md mx-auto">
         <div className="space-y-3 text-left">
           <div>
-            <span className="text-sm text-gray-600">World:</span>
+            <span className="text-sm text-gray-700">World:</span>
             <p className="font-medium text-gray-900">{world?.name}</p>
-            <p className="text-sm text-gray-600">{world?.genre}</p>
+            <p className="text-sm text-gray-700">{world?.genre}</p>
           </div>
           <div className="pt-2 border-t">
-            <span className="text-sm text-gray-600">Character:</span>
+            <span className="text-sm text-gray-700">Character:</span>
             <p className="font-medium text-gray-900">{character?.name}</p>
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-gray-700 line-clamp-2">
               {character?.background?.personality || 'No description available'}
             </p>
           </div>
@@ -53,7 +53,7 @@ export function GameReadyStep({
         <Button
           onClick={onStart}
           disabled={isStarting}
-          className="inline-flex items-center px-8 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium rounded-md transition-colors"
+          className="inline-flex items-center px-8 py-3 bg-green-500 hover:bg-green-700 disabled:bg-green-500 text-white font-medium rounded-md transition-colors"
           variant="default"
         >
           {isStarting ? (
@@ -70,7 +70,7 @@ export function GameReadyStep({
           <Button
             onClick={onBack}
             disabled={isStarting}
-            className="text-gray-600 hover:text-gray-800 disabled:text-gray-400"
+            className="text-gray-700 hover:text-gray-900 disabled:text-gray-500"
             variant="ghost"
           >
             ← Change Character

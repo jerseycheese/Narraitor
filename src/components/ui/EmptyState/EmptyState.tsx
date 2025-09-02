@@ -51,7 +51,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           {title}
         </h3>
         {description && (
-          <p className={cn('text-gray-600 mt-2', descriptionClasses)}>
+          <p className={cn('text-gray-700 mt-2', descriptionClasses)}>
             {description}
           </p>
         )}

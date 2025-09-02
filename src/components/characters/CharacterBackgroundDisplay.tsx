@@ -22,7 +22,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
         <h4 className="text-lg font-semibold mb-2 text-gray-700">
           History
         </h4>
-        <p className="text-gray-600 leading-relaxed">
+        <p className="text-gray-700 leading-relaxed">
           {background.history}
         </p>
       </div>
@@ -32,7 +32,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
         <h4 className="text-lg font-semibold mb-2 text-gray-700">
           Personality
         </h4>
-        <p className="text-gray-600 leading-relaxed">
+        <p className="text-gray-700 leading-relaxed">
           {background.personality}
         </p>
       </div>
@@ -44,11 +44,11 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
             Goals & Motivations
           </h4>
           {background.goals.length === 1 ? (
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-gray-700 leading-relaxed">
               {background.goals[0]}
             </p>
           ) : (
-            <ul className="list-disc list-inside text-gray-600 space-y-1">
+            <ul className="list-disc list-inside text-gray-700 space-y-1">
               {background.goals.map((goal, index) => (
                 <li key={index}>{goal}</li>
               ))}
@@ -63,7 +63,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
           <h4 className="text-lg font-semibold mb-2 text-gray-700">
             Fears
           </h4>
-          <ul className="list-disc list-inside text-gray-600 space-y-1">
+          <ul className="list-disc list-inside text-gray-700 space-y-1">
             {background.fears.map((fear, index) => (
               <li key={index}>{fear}</li>
             ))}
@@ -77,7 +77,7 @@ export function CharacterBackgroundDisplay({ background }: CharacterBackgroundDi
           <h4 className="text-lg font-semibold mb-2 text-gray-700">
             Physical Appearance
           </h4>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-gray-700 leading-relaxed">
             {background.physicalDescription}
           </p>
         </div>
