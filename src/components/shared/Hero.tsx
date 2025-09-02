@@ -19,8 +19,10 @@ interface HeroProps {
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-  /** Background color theme when no image is provided */
-  theme?: 'fantasy' | 'sci-fi' | 'western' | 'modern' | 'horror' | 'default';
+  /** Background color theme when no image is provided - uses genre values */
+  theme?: 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other' | 'default';
+  /** Border radius style - 'all' for all corners, 'top' for top only, 'none' for no radius */
+  borderRadius?: 'all' | 'top' | 'none';
 }
 
 /**
@@ -65,28 +67,48 @@ export const Hero: React.FC<HeroProps> = ({
   titleTestId,
   titleElement: TitleElement = 'h1',
   theme = 'default',
+  borderRadius = 'all',
 }) => {
-  // Theme-based background gradients using design system colors only
+  // Genre-based background gradients using design system colors only
   const getThemeBackground = (theme: string) => {
     switch (theme) {
       case 'fantasy':
         return 'bg-gradient-to-br from-blue-700 via-blue-900 to-gray-900';
       case 'sci-fi':
+      case 'cyberpunk':
         return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
       case 'western':
         return 'bg-gradient-to-br from-amber-500 via-red-500 to-red-700';
       case 'modern':
+      case 'historical':
         return 'bg-gradient-to-br from-gray-500 via-gray-700 to-gray-900';
       case 'horror':
         return 'bg-gradient-to-br from-red-700 via-gray-900 to-black';
+      case 'mystery':
+        return 'bg-gradient-to-br from-gray-700 via-gray-900 to-black';
+      case 'other':
+        return 'bg-gradient-to-br from-gray-500 via-blue-500 to-gray-700';
       default:
         return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
     }
   };
 
+  // Get border radius classes based on borderRadius prop
+  const getBorderRadiusClass = (borderRadius: string) => {
+    switch (borderRadius) {
+      case 'top':
+        return 'rounded-t-lg';
+      case 'none':
+        return '';
+      case 'all':
+      default:
+        return 'rounded-lg';
+    }
+  };
+
   return (
     <div
-      className={`${height} overflow-hidden rounded-lg shadow-lg relative ${
+      className={`${height} overflow-hidden ${getBorderRadiusClass(borderRadius)} shadow-lg relative ${
         image ? 'bg-gray-100' : getThemeBackground(theme)
       }`}
     >

@@ -60,22 +60,6 @@ export default function WorldViewPage() {
     }
   ];
 
-  // Map world genre to theme for background
-  const getThemeFromGenre = (genre?: string) => {
-    if (!genre) return 'default';
-    switch (genre.toLowerCase()) {
-      case 'fantasy': return 'fantasy';
-      case 'sci-fi': 
-      case 'science fiction': 
-      case 'cyberpunk': return 'sci-fi';
-      case 'western': return 'western';
-      case 'horror': 
-      case 'thriller': return 'horror';
-      case 'modern':
-      case 'contemporary': return 'modern';
-      default: return 'default';
-    }
-  };
 
   return (
     <PageLayout>
@@ -88,7 +72,7 @@ export default function WorldViewPage() {
             alt: `${world.name} world`
           } : undefined}
           subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-          theme={getThemeFromGenre(world.genre)}
+          theme={world.genre || 'default'}
           height="h-64 md:h-96"
         />
       </div>

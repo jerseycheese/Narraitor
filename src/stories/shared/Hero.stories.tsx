@@ -85,14 +85,14 @@ export const Short: Story = {
   },
 };
 
-// Themed background variants (no image)
+// Genre-based themed background variants (no image)
 export const FantasyTheme: Story = {
   args: {
     title: 'The Mystical Kingdoms',
     subtitle: 'A realm of magic and wonder',
     theme: 'fantasy',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-blue-100 bg-blue-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
         Fantasy
       </span>
     ),
@@ -105,7 +105,7 @@ export const SciFiTheme: Story = {
     subtitle: 'Advanced civilization among the stars',
     theme: 'sci-fi',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-blue-100 bg-blue-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
         Sci-Fi
       </span>
     ),
@@ -118,7 +118,7 @@ export const WesternTheme: Story = {
     subtitle: 'Life on the frontier',
     theme: 'western',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-amber-200 bg-red-700/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
         Western
       </span>
     ),
@@ -131,8 +131,34 @@ export const HorrorTheme: Story = {
     subtitle: 'Where nightmares become reality',
     theme: 'horror',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-red-200 bg-red-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
         Horror
+      </span>
+    ),
+  },
+};
+
+export const ModernTheme: Story = {
+  args: {
+    title: 'Metropolitan Life',
+    subtitle: 'Urban stories and contemporary drama',
+    theme: 'modern',
+    badge: (
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+        Modern
+      </span>
+    ),
+  },
+};
+
+export const MysteryTheme: Story = {
+  args: {
+    title: 'The Noir Investigation',
+    subtitle: 'Unraveling secrets in the shadows',
+    theme: 'mystery',
+    badge: (
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+        Mystery
       </span>
     ),
   },
