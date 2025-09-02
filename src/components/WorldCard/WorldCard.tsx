@@ -163,7 +163,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
             url: world.image.url,
             alt: `${world.name} world`,
           } : undefined}
-          theme={world.genre || 'default'}
+          theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
           badge={
             world.genre && (
               <span

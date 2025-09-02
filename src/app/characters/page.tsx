@@ -430,7 +430,7 @@ export default function CharactersPage() {
               url: currentWorld.image.url,
               alt: `${currentWorld.name} world`
             } : undefined}
-            theme={currentWorld.genre || 'default'}
+            theme={(currentWorld.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined}
             height="h-32 sm:h-40"
             titleElement="h2"

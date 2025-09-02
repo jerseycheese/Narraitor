@@ -52,7 +52,7 @@ export default function PlayPage() {
               url: world.image.url,
               alt: `${world.name} world`
             } : undefined}
-            theme={world.genre || 'default'}
+            theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
             height="h-20 sm:h-24"
             titleElement="h1"
