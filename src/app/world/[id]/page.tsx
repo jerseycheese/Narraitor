@@ -60,22 +60,38 @@ export default function WorldViewPage() {
     }
   ];
 
+  // Map world genre to theme for background
+  const getThemeFromGenre = (genre?: string) => {
+    if (!genre) return 'default';
+    switch (genre.toLowerCase()) {
+      case 'fantasy': return 'fantasy';
+      case 'sci-fi': 
+      case 'science fiction': 
+      case 'cyberpunk': return 'sci-fi';
+      case 'western': return 'western';
+      case 'horror': 
+      case 'thriller': return 'horror';
+      case 'modern':
+      case 'contemporary': return 'modern';
+      default: return 'default';
+    }
+  };
+
   return (
     <PageLayout>
-      {/* Hero Image with Title Overlay */}
-      {world.image?.url && (
-        <div className="mb-8">
-          <Hero
-            title={world.name}
-            image={{
-              url: world.image.url,
-              alt: `${world.name} world`
-            }}
-            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height="h-64 md:h-96"
-          />
-        </div>
-      )}
+      {/* Hero section with image or themed background */}
+      <div className="mb-8">
+        <Hero
+          title={world.name}
+          image={world.image?.url ? {
+            url: world.image.url,
+            alt: `${world.name} world`
+          } : undefined}
+          subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
+          theme={getThemeFromGenre(world.genre)}
+          height="h-64 md:h-96"
+        />
+      </div>
 
       <ActionButtonGroup actions={actionButtons} className="mb-8" />
 
