@@ -30,6 +30,8 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 *AI-generated narrative with choice-based gameplay and skill checks*
 
+> **Note**: Yes, I know the UI is pretty basic right now. I'm focused on building the foundational framework first - the storytelling engine, world system, and character mechanics. Eventually, worlds will support automatic theming/skinning to match their genres (think sleek sci-fi interfaces for space opera, parchment textures for fantasy, etc.).
+
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
 **Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
