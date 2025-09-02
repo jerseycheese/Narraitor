@@ -64,9 +64,13 @@ describe('WorldCard', () => {
   test('world name links to world detail page', () => {
     render(<WorldCard world={mockWorld} onSelect={jest.fn()} onDelete={jest.fn()} />);
     
-    // World name should be wrapped in a link to the detail page
-    const worldLink = screen.getByRole('link', { name: mockWorld.name });
-    expect(worldLink).toHaveAttribute('href', `/world/${mockWorld.id}`);
+    // World name should be accessible as a heading and the hero link should navigate to detail page
+    const worldTitle = screen.getByRole('heading', { name: mockWorld.name });
+    expect(worldTitle).toBeInTheDocument();
+    
+    // The hero link should navigate to the world detail page
+    const heroLink = worldTitle.closest('a');
+    expect(heroLink).toHaveAttribute('href', `/world/${mockWorld.id}`);
   });
 
   // New test for Play functionality (navigates to characters when no characters exist)

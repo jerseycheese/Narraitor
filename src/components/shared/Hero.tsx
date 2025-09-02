@@ -4,8 +4,8 @@ import Image from 'next/image';
 interface HeroProps {
   /** The title to display over the image */
   title: string;
-  /** The image to display */
-  image: {
+  /** The image to display (optional) */
+  image?: {
     url: string;
     alt: string;
   };
@@ -19,17 +19,22 @@ interface HeroProps {
   titleTestId?: string;
   /** Optional title element type (h1, h2, etc.) */
   titleElement?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  /** Background color theme when no image is provided - uses genre values */
+  theme?: 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other' | 'default';
+  /** Border radius style - 'all' for all corners, 'top' for top only, 'none' for no radius */
+  borderRadius?: 'all' | 'top' | 'none';
 }
 
 /**
- * Hero - Display a large image with overlaid title and optional content
+ * Hero - Display a large hero section with image or themed background
  *
- * Creates an image hero section with a gradient overlay containing the title,
- * optional subtitle, and badge content. Uses the same overlay styling as
- * WorldCard for consistency.
+ * Creates a hero section with either an image background or a themed gradient 
+ * background when no image is provided. Includes a gradient overlay containing 
+ * the title, optional subtitle, and badge content.
  *
  * Features:
- * - Responsive image display
+ * - Optional responsive image display
+ * - Themed background colors for different genres
  * - Gradient overlay for text readability
  * - Optional subtitle and badge support
  * - Configurable height
@@ -37,11 +42,19 @@ interface HeroProps {
  * @param props - Hero configuration
  * @returns A hero section with overlaid content
  *
- * @example Basic usage
+ * @example With image
  * <Hero
  *   title="My World"
  *   image={{ url: "/world-image.jpg", alt: "My World" }}
  *   subtitle="Fantasy Adventure"
+ *   height="h-64 md:h-96"
+ * />
+ *
+ * @example With themed background (no image)
+ * <Hero
+ *   title="Fantasy World"
+ *   subtitle="A magical realm"
+ *   theme="fantasy"
  *   height="h-64 md:h-96"
  * />
  */
@@ -53,22 +66,69 @@ export const Hero: React.FC<HeroProps> = ({
   height = 'h-64 md:h-96',
   titleTestId,
   titleElement: TitleElement = 'h1',
+  theme = 'default',
+  borderRadius = 'all',
 }) => {
+  // Genre-based background gradients using design system colors only
+  const getThemeBackground = (theme: string) => {
+    switch (theme) {
+      case 'fantasy':
+        return 'bg-gradient-to-br from-blue-700 via-blue-900 to-gray-900';
+      case 'sci-fi':
+      case 'cyberpunk':
+        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
+      case 'western':
+        return 'bg-gradient-to-br from-amber-500 via-red-500 to-red-700';
+      case 'modern':
+      case 'historical':
+        return 'bg-gradient-to-br from-gray-500 via-gray-700 to-gray-900';
+      case 'horror':
+        return 'bg-gradient-to-br from-red-700 via-gray-900 to-black';
+      case 'mystery':
+        return 'bg-gradient-to-br from-gray-700 via-gray-900 to-black';
+      case 'other':
+        return 'bg-gradient-to-br from-gray-500 via-blue-500 to-gray-700';
+      default:
+        return 'bg-gradient-to-br from-blue-500 via-blue-700 to-blue-900';
+    }
+  };
+
+  // Get border radius classes based on borderRadius prop
+  const getBorderRadiusClass = (borderRadius: string) => {
+    switch (borderRadius) {
+      case 'top':
+        return 'rounded-t-lg';
+      case 'none':
+        return '';
+      case 'all':
+      default:
+        return 'rounded-lg';
+    }
+  };
+
   return (
     <div
-      className={`${height} overflow-hidden rounded-lg shadow-lg bg-gray-100 relative`}
+      className={`${height} overflow-hidden ${getBorderRadiusClass(borderRadius)} shadow-lg relative ${
+        image ? 'bg-gray-100' : getThemeBackground(theme)
+      }`}
     >
-      <Image
-        src={image.url}
-        alt={image.alt}
-        width={800}
-        height={400}
-        className="w-full h-full object-cover"
-      />
+      {image && (
+        <Image
+          src={image.url}
+          alt={image.alt}
+          width={800}
+          height={400}
+          className="w-full h-full object-cover"
+        />
+      )}
 
       {/* Title overlay with gradient background */}
       <div className="absolute bottom-0 left-0 right-0">
-        <div className="bg-gradient-to-t from-black/80 to-transparent px-4 py-4">
+        <div className={`px-4 py-4 ${
+          image 
+            ? 'bg-gradient-to-t from-black/80 to-transparent' 
+            : 'bg-gradient-to-t from-black/40 to-transparent'
+        }`}>
           <TitleElement
             className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight text-white"
             data-testid={titleTestId}

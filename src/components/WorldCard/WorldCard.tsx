@@ -147,70 +147,43 @@ const WorldCard: React.FC<WorldCardProps> = ({
     }
   };
 
+
   return (
     <ActiveStateCard
       isActive={isActive}
       activeText="Currently Active World"
       testId="world-card"
-      hasImage={!!world.image?.url}
+      hasImage={true}
     >
-      {/* World Image with overlay */}
-      {world.image?.url && (
-        <Link href={`/world/${world.id}`} className="block cursor-pointer">
-          <Hero
-            title={world.name}
-            image={{
-              url: world.image.url,
-              alt: `${world.name} world`,
-            }}
-            badge={
-              world.genre && (
-                <span
-                  data-testid="world-card-genre"
-                  className="px-2 py-1 text-xs font-medium text-blue-200 bg-blue-900/70 rounded-full backdrop-blur-sm"
-                >
-                  {getGenreLabel(world.genre)}
-                </span>
-              )
-            }
-            height="h-48"
-            titleTestId="world-card-name"
-            titleElement="h2"
-          />
-        </Link>
-      )}
+      {/* Always show Hero component - with image or themed background */}
+      <Link href={`/world/${world.id}`} className="block cursor-pointer">
+        <Hero
+          title={world.name}
+          image={world.image?.url ? {
+            url: world.image.url,
+            alt: `${world.name} world`,
+          } : undefined}
+          theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+          badge={
+            world.genre && (
+              <span
+                data-testid="world-card-genre"
+                className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm"
+              >
+                {getGenreLabel(world.genre)}
+              </span>
+            )
+          }
+          height="h-48"
+          titleTestId="world-card-name"
+          titleElement="h2"
+          borderRadius="top"
+        />
+      </Link>
 
       <div className="p-4 flex-grow flex flex-col">
         {/* Content area that grows to fill space */}
         <div className="flex-grow">
-          {/* For cards without images, show the world name here */}
-          {!world.image?.url && (
-            <header className="mb-4">
-              <h2
-                data-testid="world-card-name"
-                className="text-xl sm:text-2xl font-bold leading-tight mb-2"
-              >
-                <Link
-                  href={`/world/${world.id}`}
-                  className="text-link-primary no-underline"
-                >
-                  {world.name}
-                </Link>
-              </h2>
-
-              {/* Genre badge for cards without images */}
-              {world.genre && (
-                <div className="mb-3">
-                  <span
-                    data-testid="world-card-genre"
-                    className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full"
-                  >
-                    {getGenreLabel(world.genre)}
-                  </span>
-                </div>
-              )}
-            </header>
-          )}
 
           {/* Character badges and manage link */}
           <div className="mb-8">

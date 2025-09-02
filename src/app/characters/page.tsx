@@ -111,6 +111,7 @@ async function generateCharacterPortrait(
   }
 }
 
+
 export default function CharactersPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -420,15 +421,16 @@ export default function CharactersPage() {
       description={currentWorld?.image?.url ? undefined : `Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.`}
       actions={currentWorld?.image?.url ? undefined : actions}
     >
-      {/* Show world hero if there's a current world with image */}
-      {currentWorld?.image?.url && (
+      {/* Show world hero with image or themed background */}
+      {currentWorld && (
         <div className="mb-6">
           <Hero
             title={worldIdFromUrl ? `${currentWorld.name} Characters` : `${currentWorld.name} Characters`}
-            image={{
+            image={currentWorld.image?.url ? {
               url: currentWorld.image.url,
               alt: `${currentWorld.name} world`
-            }}
+            } : undefined}
+            theme={(currentWorld.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
             subtitle={currentWorld.genre ? getGenreLabel(currentWorld.genre) : undefined}
             height="h-32 sm:h-40"
             titleElement="h2"
@@ -436,8 +438,8 @@ export default function CharactersPage() {
         </div>
       )}
 
-      {/* Action buttons below hero when world has image */}
-      {currentWorld?.image?.url && (
+      {/* Action buttons below hero when world exists */}
+      {currentWorld && (
         <div className="mb-8 flex justify-end gap-2">
           {actions}
         </div>

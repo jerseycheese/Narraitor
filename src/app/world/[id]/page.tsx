@@ -60,22 +60,22 @@ export default function WorldViewPage() {
     }
   ];
 
+
   return (
     <PageLayout>
-      {/* Hero Image with Title Overlay */}
-      {world.image?.url && (
-        <div className="mb-8">
-          <Hero
-            title={world.name}
-            image={{
-              url: world.image.url,
-              alt: `${world.name} world`
-            }}
-            subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
-            height="h-64 md:h-96"
-          />
-        </div>
-      )}
+      {/* Hero section with image or themed background */}
+      <div className="mb-8">
+        <Hero
+          title={world.name}
+          image={world.image?.url ? {
+            url: world.image.url,
+            alt: `${world.name} world`
+          } : undefined}
+          subtitle={world.genre ? getGenreLabel(world.genre) : undefined}
+          theme={(world.genre as 'fantasy' | 'sci-fi' | 'modern' | 'historical' | 'horror' | 'mystery' | 'western' | 'cyberpunk' | 'other') || 'default'}
+          height="h-64 md:h-96"
+        />
+      </div>
 
       <ActionButtonGroup actions={actionButtons} className="mb-8" />
 
