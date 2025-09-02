@@ -67,7 +67,7 @@ export const WithImageAndBadge: Story = {
       alt: 'Cyberpunk cityscape'
     },
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-blue-200 bg-blue-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded-full">
         Sci-Fi
       </span>
     ),
@@ -82,7 +82,7 @@ export const TallHero: Story = {
     image: sampleImage,
     height: 'h-80 md:h-[500px]',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-green-200 bg-green-900/70 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-green-700 rounded-full">
         Set in Tolkien Universe
       </span>
     ),
@@ -113,7 +113,7 @@ export const FantasyTheme: Story = {
     subtitle: 'A realm of magic and wonder',
     theme: 'fantasy',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded-full">
         Fantasy
       </span>
     ),
@@ -126,7 +126,7 @@ export const SciFiTheme: Story = {
     subtitle: 'Advanced civilization among the stars',
     theme: 'sci-fi',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-gray-700 rounded-full">
         Sci-Fi
       </span>
     ),
@@ -139,7 +139,7 @@ export const WesternTheme: Story = {
     subtitle: 'Life on the frontier',
     theme: 'western',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-amber-700 rounded-full">
         Western
       </span>
     ),
@@ -152,7 +152,7 @@ export const HorrorTheme: Story = {
     subtitle: 'Where nightmares become reality',
     theme: 'horror',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-red-700 rounded-full">
         Horror
       </span>
     ),
@@ -165,7 +165,7 @@ export const ModernTheme: Story = {
     subtitle: 'Urban stories and contemporary drama',
     theme: 'modern',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-gray-700 rounded-full">
         Modern
       </span>
     ),
@@ -178,7 +178,7 @@ export const MysteryTheme: Story = {
     subtitle: 'Unraveling secrets in the shadows',
     theme: 'mystery',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-black rounded-full">
         Mystery
       </span>
     ),
@@ -191,7 +191,7 @@ export const HistoricalTheme: Story = {
     subtitle: 'Stories from the past',
     theme: 'historical',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-amber-700 rounded-full">
         Historical
       </span>
     ),
@@ -204,7 +204,7 @@ export const CyberpunkTheme: Story = {
     subtitle: 'High tech, low life',
     theme: 'cyberpunk',
     badge: (
-      <span className="px-2 py-1 text-xs font-medium text-white bg-black/50 rounded-full backdrop-blur-sm">
+      <span className="px-2 py-1 text-xs font-medium text-white bg-blue-700 rounded-full">
         Cyberpunk
       </span>
     ),
