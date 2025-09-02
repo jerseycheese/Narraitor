@@ -32,10 +32,6 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 *AI-generated narrative with choice-based gameplay and skill checks*
 
-![Character Detail with Hero Component](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/character-detail-with-hero.png)
-
-*Character detail page showing the hero component with portrait image overlay*
-
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
 **Session Persistence**: Your games save automatically using IndexedDB, so you can pick up where you left off. No more lost progress when you close the browser.
