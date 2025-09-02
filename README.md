@@ -2,7 +2,7 @@
 
 AI-powered storytelling app that basically lets you play through narrative RPG experiences in any world you can imagine, fictional or non-fictional. Maybe you want to explore Middle Earth? Storm the beach at Normandy? Design something completely original? Narraitor adapts the AI storytelling to match your world's themes and tone.
 
-![Narraitor home page](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/home-page.png)
+![Narraitor home page](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/home-page-clean.png)
 
 *The main landing page showcasing the app's core features*
 
@@ -16,19 +16,19 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 **World Creation**: You can define any fictional universe with custom attributes (like "Force Sensitivity" for Star Wars or "Sanity" for Lovecraft) and skills that make sense for your setting. The AI wizard helps suggest appropriate mechanics based on your world's theme.
 
-![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/world-creation-wizard.png)
+![World Creation Wizard](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/world-creation-wizard-clean.png)
 
 *Multi-step wizard for creating custom worlds with templates and AI generation*
 
 **Character Building**: Multi-step character creation that works with your world's rules. Allocate attribute points, pick relevant skills, write backstories; all tailored to fit your specific fictional universe.
 
-![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/characters-page.png)
+![Character Management](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/characters-page-clean.png)
 
 *Create and manage characters with custom attributes and progression*
 
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
-![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/gameplay-session.png)
+![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/gameplay-session-clean.png)
 
 *AI-generated narrative with choice-based gameplay and skill checks*
 
