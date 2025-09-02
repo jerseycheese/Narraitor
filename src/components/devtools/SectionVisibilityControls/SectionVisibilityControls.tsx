@@ -78,7 +78,7 @@ export const SectionVisibilityControls = () => {
         onClick={toggleDropdown}
         variant="ghost"
         size="sm"
-        className="text-xs bg-gray-700 text-gray-200 hover:bg-gray-100 border border-gray-500"
+        className="text-xs bg-gray-700 text-white hover:bg-gray-100 border border-gray-500"
         aria-expanded={isDropdownOpen}
         aria-haspopup="menu"
         aria-label="Section visibility controls"
@@ -100,7 +100,7 @@ export const SectionVisibilityControls = () => {
                 onClick={handleShowAll}
                 variant="ghost"
                 size="sm"
-                className="text-xs flex-1 bg-gray-700 text-gray-200 hover:bg-gray-100"
+                className="text-xs flex-1 bg-gray-700 text-white hover:bg-gray-100"
                 data-testid="show-all-sections"
                 role="menuitem"
               >
@@ -110,7 +110,7 @@ export const SectionVisibilityControls = () => {
                 onClick={handleHideAll}
                 variant="ghost"
                 size="sm"
-                className="text-xs flex-1 bg-gray-700 text-gray-200 hover:bg-gray-100"
+                className="text-xs flex-1 bg-gray-700 text-white hover:bg-gray-100"
                 data-testid="hide-all-sections"
                 role="menuitem"
               >
@@ -130,7 +130,7 @@ export const SectionVisibilityControls = () => {
                   onClick={() => handleSectionToggle(sectionId)}
                   variant="ghost"
                   size="sm"
-                  className="w-full px-3 py-2 text-left text-xs text-gray-200 hover:bg-gray-700 flex items-center gap-2 justify-start h-auto"
+                  className="w-full px-3 py-2 text-left text-xs text-white hover:bg-gray-700 flex items-center gap-2 justify-start h-auto"
                   data-testid={SECTION_TEST_IDS[sectionId as keyof typeof SECTION_TEST_IDS]}
                   role="menuitemcheckbox"
                   aria-checked={isVisible}
@@ -139,7 +139,7 @@ export const SectionVisibilityControls = () => {
                   <span className={`w-4 h-4 border border-gray-500 rounded flex items-center justify-center ${
                     isVisible ? 'bg-gray-100' : 'bg-transparent'
                   }`}>
-                    {isVisible && <span className="text-gray-200">✓</span>}
+                    {isVisible && <span className="text-black">✓</span>}
                   </span>
                   <span>{displayName}</span>
                 </Button>

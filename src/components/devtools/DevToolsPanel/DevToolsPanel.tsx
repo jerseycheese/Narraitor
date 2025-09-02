@@ -39,10 +39,10 @@ const EnvironmentInfo = () => {
   
   return (
     <DevToolsSection title="Environment Info:" className="mb-4 text-xs">
-      <div className="text-gray-100">NODE_ENV: {nodeEnv}</div>
-      <div className="text-gray-100">Is Client: {String(mounted)}</div>
-      <div className="text-gray-100">Is Development: {String(isDev)}</div>
-      <div className="text-gray-100">Window Location: {location}</div>
+      <div className="text-white">NODE_ENV: {nodeEnv}</div>
+      <div className="text-white">Is Client: {String(mounted)}</div>
+      <div className="text-white">Is Development: {String(isDev)}</div>
+      <div className="text-white">Window Location: {location}</div>
     </DevToolsSection>
   );
 };
@@ -116,7 +116,7 @@ export const DevToolsPanel = () => {
             onClick={toggleDevTools}
             variant="ghost"
             size="sm"
-            className="text-xs bg-gray-700 text-gray-200 hover:bg-gray-100 border border-gray-500"
+            className="text-xs bg-gray-700 text-white hover:bg-gray-100 border border-gray-500"
           >
             {isOpen ? 'Hide DevTools' : 'Show DevTools'}
           </Button>
@@ -127,7 +127,7 @@ export const DevToolsPanel = () => {
       {isOpen && (
         <div 
           data-testid="devtools-panel-content"
-          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-gray-900 text-gray-200"
+          className="p-4 overflow-auto h-[calc(50vh-48px)] max-h-[calc(50vh-48px)] bg-gray-900 text-white"
         >
           <EnvironmentInfo />
           
@@ -138,7 +138,7 @@ export const DevToolsPanel = () => {
               {/* State Management Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.STATE_SECTION) || isSectionVisible(SectionId.STATE_INSPECTOR)) && (
                 <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
+                  <h3 className="text-sm font-semibold mb-3 text-white border-b border-gray-700 pb-2">
                     State Management
                   </h3>
                   {isSectionVisible(SectionId.STATE_SECTION) && (
@@ -153,7 +153,7 @@ export const DevToolsPanel = () => {
               {/* Error Tracking Group */}
               {isSectionVisible(SectionId.ERROR_SECTION) && (
                 <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
+                  <h3 className="text-sm font-semibold mb-3 text-white border-b border-gray-700 pb-2">
                     Error Tracking
                   </h3>
                   <CollapsibleSection title="Runtime Errors" initialCollapsed={true}>
@@ -173,7 +173,7 @@ export const DevToolsPanel = () => {
                 isSectionVisible(SectionId.TEXT_NORMALIZATION) || 
                 isSectionVisible(SectionId.LORE_MANAGEMENT)) && (
                 <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
+                  <h3 className="text-sm font-semibold mb-3 text-white border-b border-gray-700 pb-2">
                     AI Tools & Validation
                   </h3>
                   <div className="space-y-3">
@@ -219,7 +219,7 @@ export const DevToolsPanel = () => {
               {/* Test Data Group - only show if child section is visible */}
               {isSectionVisible(SectionId.TEST_DATA_GENERATOR) && (
                 <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
+                  <h3 className="text-sm font-semibold mb-3 text-white border-b border-gray-700 pb-2">
                     Test Data & Generators
                   </h3>
                   <CollapsibleSection title="Test Data Generators" initialCollapsed={true}>
@@ -231,7 +231,7 @@ export const DevToolsPanel = () => {
               {/* Content Generation Group - only show if any child sections are visible */}
               {(isSectionVisible(SectionId.PORTRAIT_DEBUG) || isSectionVisible(SectionId.ENDING_IMAGE_DEBUG)) && (
                 <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-100 border-b border-gray-700 pb-2">
+                  <h3 className="text-sm font-semibold mb-3 text-white border-b border-gray-700 pb-2">
                     Content Generation
                   </h3>
                   <div className="space-y-3">

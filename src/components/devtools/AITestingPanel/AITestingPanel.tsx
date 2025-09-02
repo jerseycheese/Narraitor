@@ -196,28 +196,28 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       
       {/* World Override Section */}
       <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">World Override</h4>
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-white">World Override</h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Name:</label>
+            <label htmlFor="world-name" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">World Name:</label>
             <input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
+              className="devtools-panel w-full bg-gray-700 text-white border-gray-500 placeholder-gray-400"
             />
           </div>
           <div>
-            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">World Genre:</label>
+            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">World Genre:</label>
             <input
               id="world-genre"
               type="text"
               value={testConfig.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
-              className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
+              className="devtools-panel w-full bg-gray-700 text-white border-gray-500 placeholder-gray-400"
             />
           </div>
         </div>
@@ -225,9 +225,9 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
       {/* Character Override Section */}
       <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-gray-200">Character Override</h4>
+        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-white">Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="devtools-panel block !text-xs text-gray-300 !my-0 mb-0.5">Character Name:</label>
+          <label htmlFor="character-name" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">Character Name:</label>
           <input
             id="character-name"
             type="text"
