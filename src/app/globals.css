@@ -260,11 +260,11 @@
   
   .text-link-nav-dark {
     @apply text-gray-300 hover:text-white transition-colors;
-    color: rgb(209 213 219) !important; /* gray-300 with !important to override inheritance */
+    color: theme('colors.gray.300') !important; /* gray-300 with !important to override inheritance */
   }
   
   .text-link-nav-dark:hover {
-    color: rgb(255 255 255) !important; /* white with !important for hover */
+    color: theme('colors.white') !important; /* white with !important for hover */
   }
   
   /* Links in dark backgrounds should remain light - but not navigation links */

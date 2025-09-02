@@ -118,12 +118,15 @@ export class PortraitGenerationClient extends GeminiClient implements AIClient {
     const lowerPrompt = prompt.toLowerCase();
     
     // Color mapping based on description
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values
     if (lowerPrompt.includes('fire') || lowerPrompt.includes('red') || lowerPrompt.includes('warrior')) {
       return { primary: primitiveColors.red[700], secondary: primitiveColors.red[500], accent: primitiveColors.amber[500] };
     }
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values  
     if (lowerPrompt.includes('magic') || lowerPrompt.includes('blue') || lowerPrompt.includes('mage') || lowerPrompt.includes('wizard')) {
       return { primary: primitiveColors.blue[700], secondary: primitiveColors.blue[500], accent: primitiveColors.blue[300] };
     }
+    // eslint-disable-next-line design-tokens/no-hardcoded-colors -- String matching for AI prompts, not color values
     if (lowerPrompt.includes('nature') || lowerPrompt.includes('green') || lowerPrompt.includes('druid') || lowerPrompt.includes('ranger')) {
       return { primary: primitiveColors.green[700], secondary: primitiveColors.green[500], accent: primitiveColors.green[200] };
     }

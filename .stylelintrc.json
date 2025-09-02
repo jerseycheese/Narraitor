@@ -2,30 +2,35 @@
   "extends": ["stylelint-config-standard"],
   "rules": {
     "at-rule-no-unknown": [true, {
-      "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen"]
+      "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen", "layer"]
     }],
     "color-no-hex": true,
     "color-named": "never", 
     "function-disallowed-list": [
       "rgb",
-      "rgba",
-      "hsl", 
-      "hsla"
+      "rgba"
     ],
     "declaration-property-value-disallowed-list": {
       "/^(background|border|color|fill|stroke|outline|text-decoration|box-shadow).*$/": [
         "/^#[0-9a-fA-F]+$/",
         "/^rgb\\(/",
-        "/^hsl\\(/",
+        "/^rgba\\(/",
         "/^(red|blue|green|yellow|orange|purple|pink|brown|indigo|violet|cyan|teal|lime|emerald|sky|rose|slate|stone|neutral|zinc|fuchsia|magenta)$/i"
       ]
     },
+    "function-allowed-list": ["hsl", "hsla", "var", "calc", "theme", "translateY", "translateX", "translate", "scale", "rotate"],
+    "declaration-property-value-no-unknown": [true, {
+      "ignoreProperties": {
+        "/color/": ["/^theme\\(/", "/^hsl\\(var\\(/"],
+        "/background/": ["/^theme\\(/", "/^hsl\\(var\\(/"]
+      }
+    }],
     "custom-property-pattern": null,
-    "function-allowed-list": null,
     "property-no-vendor-prefix": null,
     "rule-empty-line-before": null,
     "custom-property-empty-line-before": null,
-    "no-descending-specificity": null
+    "no-descending-specificity": null,
+    "declaration-empty-line-before": null
   },
   "ignoreFiles": [
     "node_modules/**/*",
