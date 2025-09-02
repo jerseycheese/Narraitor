@@ -26,6 +26,14 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 
 *Create and manage characters with custom attributes and progression*
 
+![World Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/world-detail-page-clean.png)
+
+*Detailed world view showing attributes, skills, and character creation rules*
+
+![Character Detail View](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/character-detail-page-clean.png)
+
+*Complete character sheet with stats, skills, and background information*
+
 **Adaptive AI Storytelling**: This is where it gets interesting. The AI doesn't just generate generic fantasy stories. It learns your world's tone, themes, and mechanics, then creates narratives that feel authentic to that universe. Playing in a noir detective setting feels completely different from space opera adventures.
 
 ![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/gameplay-session-clean.png)

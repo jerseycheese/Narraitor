@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  devIndicators: false, // Hide development indicators for clean screenshots
   async redirects() {
     return [
       // Redirect old dev paths to new ones
