@@ -51,9 +51,6 @@ export async function waitForGameSessionReady(page: Page): Promise<void> {
   await waitForAppReady(page);
   
   try {
-    // Set consistent viewport for visual tests (height > 800px for test requirements)
-    await page.setViewportSize({ width: 1280, height: 1024 });
-    
     // Brief wait for any dynamic content
     await page.waitForTimeout(3000);
     
