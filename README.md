@@ -6,6 +6,8 @@ AI-powered storytelling app that basically lets you play through narrative RPG e
 
 *The main landing page showcasing the app's core features*
 
+> **A quick note on the UI**: I know it's pretty basic right now. I'm focused on building the foundational systems first - the storytelling engine, world mechanics, character progression. The plan is to eventually have worlds auto-skin their interfaces to match their genres. Think sleek sci-fi panels for space opera, weathered parchment for fantasy, noir shadows for detective stories. Right now it's all about getting the framework solid.
+
 ## What This Actually Does
 
 The core idea came from wanting tabletop RPG experiences that could happen anytime, without coordinating schedules or finding a game master. Narraitor uses Google's Gemini AI to generate dynamic stories that respond to your choices, but here's the key part: it's not just generic fantasy. You define your world's rules, attributes, and tone, and the AI storytelling adapts to match exactly what you're going for.
@@ -29,8 +31,6 @@ The core idea came from wanting tabletop RPG experiences that could happen anyti
 ![Interactive Gameplay](https://raw.githubusercontent.com/jerseycheese/Narraitor/develop/.playwright-mcp/gameplay-session.png)
 
 *AI-generated narrative with choice-based gameplay and skill checks*
-
-> **Note**: Yes, I know the UI is pretty basic right now. I'm focused on building the foundational framework first - the storytelling engine, world system, and character mechanics. Eventually, worlds will support automatic theming/skinning to match their genres (think sleek sci-fi interfaces for space opera, parchment textures for fantasy, etc.).
 
 **Smart Choice Systems**: Decisions get weighted as Minor/Major/Critical so you can see what really matters. Plus there's alignment tracking (Lawful/Neutral/Chaotic) with visual indicators, which helps maintain character consistency.
 
