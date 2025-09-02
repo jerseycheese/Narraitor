@@ -101,6 +101,103 @@ src/
 
 The components are grouped by domain (World, Character, Narrative, etc.) rather than by type. So you'll find `components/world/WorldEditor/` instead of `components/editors/WorldEditor/`. Makes it easier to find related functionality.
 
+## Roadmap
+
+So basically the core MVP functionality is complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
+
+### What's Already Working ✅
+
+The foundation is solid:
+- **World Creation System** with AI assistance and template worlds
+- **Character Building** with point allocation and progression
+- **AI Narrative Engine** with story generation and choice systems
+- **Session Persistence** using IndexedDB with graceful fallbacks
+- **Visual Regression Testing** with Playwright ([#384](https://github.com/jerseycheese/Narraitor/issues/384))
+- **Toast Notification System** for user feedback
+- **Navigation & State Management** with automatic saves
+- **Decision Weight System** (Minor/Major/Critical choices)
+- **Character Alignment Tracking** (Lawful/Neutral/Chaotic)
+
+### Current Focus: Polish & Cleanup
+
+Making what exists work really well:
+
+**Journal System Completeness** 
+- Entry viewing with proper formatting
+- Choice and outcome tracking
+- Session boundary logging
+
+**Character System Improvements**
+- Better attribute point distribution
+- In-game character reference access
+- Post-creation character modifications
+
+**World Configuration Polish**
+- Custom attribute definition capabilities
+- Improved AI suggestion workflows
+
+### Developer Infrastructure
+
+Because debugging production issues without proper tools is a nightmare:
+
+**Error Reporting & Monitoring**
+- Runtime error capture and display
+- Comprehensive error reporting system
+- AI service error monitoring
+
+**Debugging Tools**
+- Application state modification interfaces
+- Component visibility debugging
+- Console access for debugging functions
+
+**AI Service Improvements**
+- Request/response monitoring and logging
+- Decision relevance scoring ([#666](https://github.com/jerseycheese/Narraitor/issues/666))
+- Performance measurement tools
+
+### Testing & Quality
+
+Making sure things don't break when I change stuff:
+
+**Visual Testing Enhancements**
+- [Cross-platform Docker consistency](https://github.com/jerseycheese/Narraitor/issues/653)
+- [Advanced flakiness mitigation](https://github.com/jerseycheese/Narraitor/issues/654)
+- [Visual diff review workflow](https://github.com/jerseycheese/Narraitor/issues/652)
+- [Performance monitoring](https://github.com/jerseycheese/Narraitor/issues/656)
+- [Component library generation](https://github.com/jerseycheese/Narraitor/issues/657)
+
+**Technical Debt**
+- [Fix skipped localStorage tests](https://github.com/jerseycheese/Narraitor/issues/646)
+- Performance optimization
+- Bundle size improvements
+
+### Working Toward 1.0
+
+Timeline: About 7-11 weeks
+
+What constitutes "done enough" for a 1.0:
+- All user-facing polish complete
+- Developer tools operational for maintainability
+- Comprehensive testing coverage
+- Performance benchmarks met
+- Documentation that actually makes sense
+
+This isn't a commercial launch - just getting to a solid milestone where the project feels complete and stable.
+
+### Future Ideas (Post-1.0)
+
+Things that would be cool to explore:
+- **Enhanced Notifications** across all user interactions ([#607](https://github.com/jerseycheese/Narraitor/issues/607))
+- **Multi-Model AI Support** (GPT-4, Claude integration)
+- **Multiplayer Capabilities** (shared worlds and storytelling)
+- **Voice Narration** for enhanced immersion
+- **Mobile App Versions** for on-the-go storytelling
+- **Advanced AI Personalization** based on play patterns
+- **Content Moderation Tools** for public sharing
+- **Economy Systems** for more complex world building
+
+The nice thing about having the foundation solid is that these features can be added incrementally without breaking existing functionality.
+
 ## Technical Architecture
 
 The app separates concerns into clear domains:
