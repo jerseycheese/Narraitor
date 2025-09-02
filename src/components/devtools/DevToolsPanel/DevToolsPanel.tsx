@@ -105,7 +105,7 @@ export const DevToolsPanel = () => {
         data-testid="devtools-panel-header"
         className="flex justify-between items-center px-4 py-2 border-b border-gray-700 flex-shrink-0 bg-gray-700 h-12"
       >
-        <div className="text-sm font-medium text-gray-200">
+        <div className="text-sm font-medium text-white">
           Narraitor DevTools
           {isTestPage && ' (Test Page Mode)'}
         </div>
