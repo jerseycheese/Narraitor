@@ -13,6 +13,7 @@ node_modules
 /test-results/
 /data/
 index.html
+.playwright-mcp
 
 # next.js
 /.next/
