@@ -103,7 +103,7 @@ The components are grouped by domain (World, Character, Narrative, etc.) rather 
 
 ## Roadmap
 
-So basically the core MVP functionality is complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
+The core MVP functionality is basically complete - you can create worlds, build characters, play through AI-generated stories, and everything persists properly. The focus now has shifted to polish and getting things ready for a proper 1.0 release.
 
 ### What's Already Working ✅
 
