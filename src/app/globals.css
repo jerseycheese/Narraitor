@@ -60,6 +60,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
+
     /* Design system aligned tokens - maps to our blue-700/gray-700 */
     --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 */
     --primary-foreground: 0 0% 100%; /* white */
@@ -128,6 +129,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
+
     /* Design system aligned dark mode tokens */
     --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 - same in dark mode */
     --primary-foreground: 0 0% 100%; /* white */

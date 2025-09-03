@@ -1,9 +1,11 @@
+import Image from 'next/image';
+
 export function Logo({ size = 'medium', showText = true, textSize = 'auto', className = '' }) {
   const logoSizes = {
-    small: 'w-8 h-8',
-    medium: 'w-16 h-16',
-    large: 'w-24 h-24',
-    xl: 'w-32 h-32'
+    small: { width: 32, height: 32, className: 'w-8 h-8' },
+    medium: { width: 64, height: 64, className: 'w-16 h-16' },
+    large: { width: 96, height: 96, className: 'w-24 h-24' },
+    xl: { width: 128, height: 128, className: 'w-32 h-32' }
   };
 
   const textSizes = {
@@ -16,13 +18,16 @@ export function Logo({ size = 'medium', showText = true, textSize = 'auto', clas
   };
 
   const actualTextSize = textSize === 'auto' ? textSizes.auto : textSizes[textSize] || textSizes.auto;
+  const logoConfig = logoSizes[size];
 
   return (
     <div className={`flex items-center gap-4 ${className}`}>
-      <img 
+      <Image 
         src="/narraitor-logo.svg" 
         alt="Narraitor Logo" 
-        className={logoSizes[size]}
+        width={logoConfig.width}
+        height={logoConfig.height}
+        className={logoConfig.className}
       />
       {showText && (
         <div className={actualTextSize}>
@@ -55,17 +60,21 @@ export function LogoText({ size = 'lg', className = '' }) {
 
 export function LogoIcon({ size = 'medium', className = '' }) {
   const logoSizes = {
-    small: 'w-8 h-8',
-    medium: 'w-16 h-16',
-    large: 'w-24 h-24',
-    xl: 'w-32 h-32'
+    small: { width: 32, height: 32, className: 'w-8 h-8' },
+    medium: { width: 64, height: 64, className: 'w-16 h-16' },
+    large: { width: 96, height: 96, className: 'w-24 h-24' },
+    xl: { width: 128, height: 128, className: 'w-32 h-32' }
   };
 
+  const logoConfig = logoSizes[size];
+
   return (
-    <img 
+    <Image 
       src="/narraitor-logo.svg" 
       alt="Narraitor Logo" 
-      className={`${logoSizes[size]} ${className}`}
+      width={logoConfig.width}
+      height={logoConfig.height}
+      className={`${logoConfig.className} ${className}`}
     />
   );
 }
