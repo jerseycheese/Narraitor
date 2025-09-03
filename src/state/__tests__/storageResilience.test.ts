@@ -39,7 +39,7 @@ describe('Storage Resilience Core', () => {
 
       // Test basic storage operations don't crash
       expect(() => {
-        mockStorage.setItem('test-key', 'test-value').catch((error: any) => {
+        mockStorage.setItem('test-key', 'test-value').catch((error: unknown) => {
           // Storage failed as expected
           expect(error).toBeInstanceOf(Error);
         });
