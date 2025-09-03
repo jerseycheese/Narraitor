@@ -40,7 +40,7 @@ export const ButtonSizeComparison: Story = {
                 )
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size="sm"</code>
+            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;sm&quot;</code>
           </div>
           <div className="flex items-center gap-4">
             <span className="w-16 text-sm text-gray-600">Default:</span>
@@ -58,7 +58,7 @@ export const ButtonSizeComparison: Story = {
                 )
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size="default"</code>
+            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;default&quot;</code>
           </div>
           <div className="flex items-center gap-4">
             <span className="w-16 text-sm text-gray-600">Large:</span>
@@ -76,7 +76,7 @@ export const ButtonSizeComparison: Story = {
                 )
               }]}
             />
-            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size="lg"</code>
+            <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;lg&quot;</code>
           </div>
         </div>
       </div>

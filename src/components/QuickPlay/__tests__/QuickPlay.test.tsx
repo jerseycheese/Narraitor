@@ -157,7 +157,7 @@ describe('QuickPlay', () => {
       
       await waitFor(() => {
         expect(mockResume).toHaveBeenCalledWith('session-1');
-        expect(mockPush).toHaveBeenCalledWith('/play');
+        expect(mockPush).toHaveBeenCalledWith('/world/world-1/play');
       });
     });
 

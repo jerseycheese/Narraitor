@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
-import { CardActionGroup } from '@/components/shared/cards/CardActionGroup';
 
 /**
  * # Button Styling Guidelines & Patterns
@@ -186,7 +185,7 @@ export const IncorrectHardcodedColors: Story = {
   name: '❌ Wrong: Hardcoded Colors',
   render: () => (
     <div className="space-y-4">
-      <p className="text-sm text-red-600 font-medium mb-4">❌ Don't use hardcoded colors outside the design system:</p>
+      <p className="text-sm text-red-600 font-medium mb-4">❌ Don&apos;t use hardcoded colors outside the design system:</p>
       <div className="flex gap-3">
         <button className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-700">
           Wrong: Orange not in design system
