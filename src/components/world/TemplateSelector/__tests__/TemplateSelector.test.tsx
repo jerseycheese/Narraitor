@@ -22,17 +22,20 @@ jest.mock('../../../../state/worldStore', () => {
     }
     // Otherwise return the mock store
     return mockStore;
-  }) as unknown;
+  });
   
   // Add setState method to the store
-  mockStore.setState = jest.fn();
-  mockStore.getState = jest.fn(() => ({ 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mockStore as any).setState = jest.fn();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mockStore as any).getState = jest.fn(() => ({ 
     worlds: {},
     createWorld: createWorldMock,
     error: null,
     loading: false
   }));
-  mockStore.subscribe = jest.fn(() => jest.fn());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (mockStore as any).subscribe = jest.fn(() => jest.fn());
   
   return {
     worldStore: mockStore
