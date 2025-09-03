@@ -10,6 +10,17 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
+// Create proper mock type for worldStore
+interface MockWorldStore {
+  worlds: Record<string, unknown>;
+  setCurrentWorld: jest.Mock;
+  updateWorld: jest.Mock;
+}
+
+interface MockWorldStoreHook extends jest.Mock {
+  getState: jest.Mock<MockWorldStore>;
+}
+
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: jest.fn(),
 }));
@@ -52,10 +63,11 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       push: mockPush,
     });
 
-    (useWorldStore as unknown as jest.Mock).mockReturnValue(mockCreateWorld);
+    const mockWorldStoreHook = useWorldStore as MockWorldStoreHook;
+    mockWorldStoreHook.mockReturnValue(mockCreateWorld);
     
     // Mock the getState method for accessing worlds
-    (useWorldStore as unknown as { getState: jest.Mock }).getState = jest.fn().mockReturnValue({
+    mockWorldStoreHook.getState = jest.fn().mockReturnValue({
       worlds: {},
       setCurrentWorld: jest.fn(),
       updateWorld: jest.fn(),

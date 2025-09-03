@@ -97,18 +97,18 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       
       if (choicesContainer && narrativeContainer) {
         const choicesHeight = choicesContainer.getBoundingClientRect().height;
-        
-        // If we're in a loading state (very small height), retain the previous height
-        const isLoadingState = choicesHeight < 200; // Assume loading if less than 200px
         let finalHeight: number;
         
-        if (isLoadingState && previousHeightRef.current > 0) {
-          // Retain the previous height during loading
+        // Use actual loading state instead of height heuristic
+        if (isGeneratingChoices && previousHeightRef.current > 0) {
+          // Preserve previous height during loading
           finalHeight = previousHeightRef.current;
         } else {
           // Use the current choices height and remember it
           finalHeight = choicesHeight;
-          previousHeightRef.current = choicesHeight;
+          if (!isGeneratingChoices && choicesHeight > 0) {
+            previousHeightRef.current = choicesHeight;
+          }
         }
         
         // Target the ScrollArea component within the narrative history

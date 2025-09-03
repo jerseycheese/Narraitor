@@ -3,6 +3,22 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TemplateSelector from '../TemplateSelector';
 import { templates } from '../../../../lib/templates/worldTemplates';
 
+// Define proper types for the Zustand mock
+interface MockWorldStoreState {
+  worlds: Record<string, unknown>;
+  createWorld: jest.Mock;
+  error: null;
+  loading: boolean;
+  setCurrentWorld: jest.Mock;
+  fetchWorlds: jest.Mock;
+}
+
+interface MockZustandStore extends jest.Mock {
+  setState: jest.Mock;
+  getState: jest.Mock<MockWorldStoreState>;
+  subscribe: jest.Mock;
+}
+
 // Mock the worldStore
 jest.mock('../../../../state/worldStore', () => {
   const createWorldMock = jest.fn().mockReturnValue('mock-world-id');
@@ -22,20 +38,19 @@ jest.mock('../../../../state/worldStore', () => {
     }
     // Otherwise return the mock store
     return mockStore;
-  });
+  }) as MockZustandStore;
   
-  // Add setState method to the store
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (mockStore as any).setState = jest.fn();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (mockStore as any).getState = jest.fn(() => ({ 
+  // Add Zustand store methods with proper typing
+  mockStore.setState = jest.fn();
+  mockStore.getState = jest.fn(() => ({ 
     worlds: {},
     createWorld: createWorldMock,
     error: null,
-    loading: false
+    loading: false,
+    setCurrentWorld: jest.fn(),
+    fetchWorlds: jest.fn().mockResolvedValue(undefined)
   }));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (mockStore as any).subscribe = jest.fn(() => jest.fn());
+  mockStore.subscribe = jest.fn(() => jest.fn());
   
   return {
     worldStore: mockStore
