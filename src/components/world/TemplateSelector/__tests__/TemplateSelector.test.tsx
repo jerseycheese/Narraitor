@@ -22,7 +22,7 @@ jest.mock('../../../../state/worldStore', () => {
     }
     // Otherwise return the mock store
     return mockStore;
-  });
+  }) as any;
   
   // Add setState method to the store
   mockStore.setState = jest.fn();
