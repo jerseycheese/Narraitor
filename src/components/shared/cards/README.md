@@ -41,7 +41,7 @@ This one's pretty clever - handles the complexity of primary vs secondary action
 <CardActionGroup
   primaryActions={[
     { key: 'create', text: 'Create Character', onClick: handleCreate, variant: 'primary', flex: true },
-    { key: 'play', text: 'Play', onClick: handlePlay, variant: 'primary', flex: true }
+    { key: 'play', text: 'Play', onClick: handlePlay, variant: 'success', flex: true }
   ]}
   secondaryActions={[
     { key: 'view', text: 'View', onClick: handleView },
@@ -90,9 +90,8 @@ const WorldCard = ({ world, isActive, onSelect, onDelete }) => {
       key: 'play',
       text: 'Play',
       onClick: handlePlay,
-      variant: 'primary' as const,
+      variant: 'success' as const,
       flex: true,
-      className: 'bg-indigo-600 text-white hover:bg-indigo-700',
       icon: <PlayIcon className="w-5 h-5" />
     }
   ];

@@ -8,6 +8,7 @@ import { useSessionStore } from '@/state/sessionStore';
 import { CharacterCreationWizard } from '@/components/CharacterCreationWizard';
 import { QuickStartCharacters } from '@/components/QuickStartCharacters/QuickStartCharacters';
 import { Button } from '@/components/ui/button';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { CharacterArchetype } from '@/lib/utils/characterArchetypes';
 
 export default function CharacterCreatePage() {
@@ -51,12 +52,15 @@ export default function CharacterCreatePage() {
             <p className="text-gray-500 text-sm mb-6">
               Each world defines unique attributes, skills, and rules that shape your characters.
             </p>
-            <button
-              onClick={() => router.push('/worlds')}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-md hover:shadow-lg"
-            >
-              Select a World First
-            </button>
+            <ActionButtonGroup
+              actions={[{
+                label: 'Select a World First',
+                onClick: () => router.push('/worlds'),
+                variant: 'primary',
+                size: 'lg'
+              }]}
+              className="justify-center"
+            />
           </div>
         </div>
       </div>

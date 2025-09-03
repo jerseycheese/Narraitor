@@ -4,6 +4,7 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import { CharacterEditor } from '@/components/CharacterEditor';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 
 export default function CharacterEditPage() {
   const params = useParams();
@@ -22,12 +23,14 @@ export default function CharacterEditPage() {
             <p className="text-gray-700 mb-6">
               The character you&apos;re trying to edit doesn&apos;t exist or has been deleted.
             </p>
-            <button
-              onClick={() => router.push('/characters')}
-              className="px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-            >
-              Back to Characters
-            </button>
+            <ActionButtonGroup
+              actions={[{
+                label: 'Back to Characters',
+                onClick: () => router.push('/characters'),
+                variant: 'primary'
+              }]}
+              className="justify-center"
+            />
           </div>
         </div>
       </div>

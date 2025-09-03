@@ -219,8 +219,8 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
     );
   };
 
-  // Always use a fixed height to ensure scrolling works properly
-  const heightClass = 'h-[580px]'; // Fixed height to enable scrolling
+  // Use full height - let the parent container control the height via JavaScript or CSS
+  const heightClass = 'h-full';
   
   // Get the ScrollArea's viewport element for scroll control
   useEffect(() => {

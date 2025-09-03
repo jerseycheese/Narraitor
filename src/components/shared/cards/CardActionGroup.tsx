@@ -8,7 +8,7 @@ export interface CardAction {
   /** Click handler */
   onClick: (e: React.MouseEvent) => void;
   /** Button variant */
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'success' | 'danger';
   /** Optional icon */
   icon?: React.ReactNode;
   /** Optional tooltip */
@@ -47,7 +47,7 @@ export interface CardActionGroupProps {
  * <CardActionGroup
  *   primaryActions={[
  *     { key: 'create', text: 'Create Character', onClick: handleCreate, variant: 'primary', flex: true },
- *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'primary', flex: true }
+ *     { key: 'play', text: 'Play', onClick: handlePlay, variant: 'success', flex: true }
  *   ]}
  *   secondaryActions={[
  *     { key: 'view', text: 'View', onClick: handleView },
@@ -100,12 +100,15 @@ export const CardActionGroup: React.FC<CardActionGroupProps> = ({
           variantClasses = 'bg-blue-500 text-white hover:bg-blue-700';
         }
         break;
+      case 'success':
+        variantClasses = 'bg-green-500 text-white hover:bg-green-700';
+        break;
       case 'danger':
-        variantClasses = 'bg-gray-100 text-red-500 hover:bg-red-200';
+        variantClasses = 'bg-gray-100 text-red-500 hover:bg-red-200 hover:text-red-700';
         break;
       case 'secondary':
       default:
-        variantClasses = 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+        variantClasses = 'bg-gray-100 text-gray-700 hover:bg-gray-300 hover:text-gray-900';
         break;
     }
 

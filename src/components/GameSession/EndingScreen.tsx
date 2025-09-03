@@ -4,16 +4,16 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Trophy } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
+import { useSessionStore } from '@/state/sessionStore';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { SectionWrapper } from '@/components/shared/SectionWrapper';
 import { CardActionGroup, type CardAction } from '@/components/shared/cards/CardActionGroup';
-import { AchievementDialog } from '@/components/AchievementDialog';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
@@ -42,25 +42,7 @@ export function EndingScreen() {
   const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
 
-  // State for achievement dialog
-  const [selectedAchievement, setSelectedAchievement] = useState<{
-    title: string;
-    description: string;
-    originalText: string;
-  } | null>(null);
 
-  // Handle achievement click to show detailed dialog
-  const handleAchievementClick = (achievement: string) => {
-    const colonIndex = achievement.indexOf(':');
-    const title = colonIndex > 0 ? achievement.substring(0, colonIndex) : achievement;
-    const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : 'Achievement unlocked during your adventure.';
-    
-    setSelectedAchievement({
-      title,
-      description,
-      originalText: achievement,
-    });
-  };
 
   const generateEndingImage = useCallback(async () => {
     if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
@@ -214,25 +196,59 @@ export function EndingScreen() {
   // Navigation actions using shared CardAction format
   const navigationActions: CardAction[] = [
     {
-      key: 'new-story',
-      text: 'New Story',
-      onClick: () => router.push(`/world/${currentEnding.worldId}/play`),
+      key: 'back-to-worlds',
+      text: 'Back to Worlds',
+      onClick: () => router.push('/worlds'),
       variant: 'primary',
-      flex: true
+      flex: true,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
     },
     {
       key: 'new-character', 
       text: 'New Character',
       onClick: () => router.push(`/characters/create?worldId=${currentEnding.worldId}`),
       variant: 'primary',
-      flex: true
+      flex: true,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      )
     },
     {
-      key: 'back-to-worlds',
-      text: 'Back to Worlds',
-      onClick: () => router.push('/worlds'),
-      variant: 'primary',
-      flex: true
+      key: 'new-story',
+      text: 'New Story',
+      onClick: async () => {
+        // Set the current character, end the session, clear the ending, then navigate to play
+        const { setCurrentCharacter } = useCharacterStore.getState();
+        const { clearEnding, clearSessionSegments, clearSessionDecisions } = useNarrativeStore.getState();
+        const { endSession } = useSessionStore.getState();
+        
+        // End the current session if it exists
+        if (currentEnding.sessionId) {
+          clearSessionSegments(currentEnding.sessionId);
+          clearSessionDecisions(currentEnding.sessionId);
+        }
+        
+        // End the current session to save it
+        await endSession();
+        
+        setCurrentCharacter(currentEnding.characterId);
+        clearEnding();
+        router.push(`/world/${currentEnding.worldId}/play?fresh=true`);
+      },
+      variant: 'success',
+      flex: true,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
     }
   ];
 
@@ -331,19 +347,16 @@ export function EndingScreen() {
                       const description = colonIndex > 0 ? achievement.substring(colonIndex + 1).trim() : '';
                       
                       return (
-                        <Button
+                        <div
                           key={index}
-                          onClick={() => handleAchievementClick(achievement)}
-                          variant="ghost"
-                          className="flex items-start justify-start space-x-2 text-gray-900 w-full text-left p-2 rounded-lg hover:bg-amber-200 focus:ring-2 focus:ring-amber-300 h-auto"
-                          aria-label={`View details for achievement: ${title}`}
+                          className="flex items-start justify-start space-x-2 text-gray-900 p-2"
                         >
                           <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <span className="font-bold">{title}</span>
-                            {description && <span>: {description}</span>}
+                          <div className="min-w-0 flex-1 break-words">
+                            <span className="font-bold break-words">{title}</span>
+                            {description && <span className="break-words">: {description}</span>}
                           </div>
-                        </Button>
+                        </div>
                       );
                     })}
                   </div>
@@ -370,19 +383,6 @@ export function EndingScreen() {
         </div>
       </PageLayout>
 
-      {/* Achievement Detail Dialog */}
-      {selectedAchievement && (
-        <AchievementDialog
-          isOpen={!!selectedAchievement}
-          onClose={() => setSelectedAchievement(null)}
-          title="Achievement Unlocked!"
-          description={selectedAchievement.description}
-          achievement={selectedAchievement.title}
-          type="milestone"
-          icon={<Trophy className="w-8 h-8" />}
-          buttonText="Continue"
-        />
-      )}
     </>
   );
 }

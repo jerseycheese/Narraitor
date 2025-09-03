@@ -60,10 +60,11 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    /* Design system aligned tokens - maps to our blue-700/gray-700 */
+    --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 */
+    --primary-foreground: 0 0% 100%; /* white */
+    --secondary: 220 13% 25%; /* gray-700: #374151 */
+    --secondary-foreground: 0 0% 100%; /* white */
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 240 4.8% 95.9%;
@@ -127,10 +128,11 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
+    /* Design system aligned dark mode tokens */
+    --primary: 221.2 83.2% 44.3%; /* blue-700: #1d4ed8 - same in dark mode */
+    --primary-foreground: 0 0% 100%; /* white */
+    --secondary: 220 13% 25%; /* gray-700: #374151 - same in dark mode */
+    --secondary-foreground: 0 0% 100%; /* white */
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 240 3.7% 15.9%;

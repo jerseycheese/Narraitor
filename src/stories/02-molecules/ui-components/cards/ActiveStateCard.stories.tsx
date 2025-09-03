@@ -39,7 +39,7 @@ const SampleContent = () => (
       This is a sample card content to demonstrate the ActiveStateCard wrapper component.
     </p>
     <div className="flex gap-2">
-      <button className="px-4 py-2 bg-blue-500 text-white rounded-md">Action 1</button>
+      <button className="px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-blue-900">Action 1</button>
       <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md">Action 2</button>
     </div>
   </div>
