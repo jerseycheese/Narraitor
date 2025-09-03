@@ -14,8 +14,11 @@ interface TestCharacter {
   attributes: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
   skills: Array<{
     id: string;
+    characterId: string;
     name: string;
     level: number;
+    worldSkillId?: string;
+    category?: string;
   }>;
   background: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   inventory: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -74,8 +77,8 @@ describe('ChoiceSelector', () => {
     level: 5,
     attributes: [],
     skills: [
-      { id: 'skill-1', name: 'Stealth', level: 3 },
-      { id: 'skill-2', name: 'Intimidation', level: 8 },
+      { id: 'skill-1', characterId: 'char-1', name: 'Stealth', level: 3 },
+      { id: 'skill-2', characterId: 'char-1', name: 'Intimidation', level: 8 },
     ],
     background: {},
     inventory: {},
@@ -150,7 +153,6 @@ describe('ChoiceSelector', () => {
           decision={decisionWithSkillRequirements} 
           onSelect={mockOnSelect}
           character={mockCharacter}
-          showSkillRequirements
         />
       );
       
@@ -171,7 +173,6 @@ describe('ChoiceSelector', () => {
           decision={decisionWithSkillRequirements} 
           onSelect={mockOnSelect}
           character={mockCharacter}
-          showSkillRequirements
         />
       );
       
@@ -238,7 +239,6 @@ describe('ChoiceSelector', () => {
           decision={decisionWithSkillRequirements} 
           onSelect={mockOnSelect}
           character={mockCharacter}
-          showSkillRequirements
         />
       );
       

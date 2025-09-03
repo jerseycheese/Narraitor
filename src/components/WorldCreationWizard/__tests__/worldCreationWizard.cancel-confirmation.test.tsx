@@ -52,7 +52,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       push: mockPush,
     });
 
-    (useWorldStore as jest.Mock).mockReturnValue(mockCreateWorld);
+    (useWorldStore as unknown as jest.Mock).mockReturnValue(mockCreateWorld);
     
     // Mock the getState method for accessing worlds
     (useWorldStore as unknown as { getState: jest.Mock }).getState = jest.fn().mockReturnValue({
@@ -199,7 +199,12 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when attributes are modified', async () => {
       // Start with some initial attributes and test modification
       const initialData = {
-        attributes: TEST_WORLD_DATA.attributes
+        attributes: TEST_WORLD_DATA.attributes.map(attr => ({
+          ...attr,
+          id: `attr-${Date.now()}`,
+          worldId: 'test-world-id'
+        })),
+        genre: TEST_WORLD_DATA.genre
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       
@@ -216,7 +221,16 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when skills are modified', async () => {
       // Start with some initial skills and test modification
       const initialData = {
-        skills: TEST_WORLD_DATA.skills
+        skills: TEST_WORLD_DATA.skills.map(skill => ({
+          ...skill,
+          id: `skill-${Date.now()}`,
+          worldId: 'test-world-id',
+          attributeIds: [],
+          baseValue: 5,
+          minValue: 1,
+          maxValue: 10
+        })),
+        genre: TEST_WORLD_DATA.genre
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       
