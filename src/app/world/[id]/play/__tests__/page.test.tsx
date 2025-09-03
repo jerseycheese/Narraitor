@@ -9,6 +9,7 @@ jest.mock('next/navigation', () => ({
     push: jest.fn(),
   }),
   useParams: jest.fn().mockReturnValue({ id: 'world-1' }),
+  useSearchParams: jest.fn().mockReturnValue(new URLSearchParams()),
   notFound: jest.fn(),
 }));
 

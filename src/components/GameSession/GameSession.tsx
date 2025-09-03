@@ -54,6 +54,14 @@ const GameSession: React.FC<GameSessionProps> = ({
   const autoResume = searchParams?.get('autoResume') === 'true';
   const [hasAutoResumed, setHasAutoResumed] = useState(false);
   
+  // Create a stable fresh session ID when disableAutoResume is true
+  const freshSessionId = useMemo(() => {
+    if (disableAutoResume) {
+      return generateUniqueId(`fresh-session-${worldId}`);
+    }
+    return null;
+  }, [disableAutoResume, worldId]); // Only depend on these stable values
+  
   // Set isClient to true once component mounts
   useEffect(() => {
     setIsClient(true);
@@ -88,6 +96,11 @@ const GameSession: React.FC<GameSessionProps> = ({
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {
+    // If we're disabling auto-resume (fresh session requested), use the stable fresh session ID
+    if (disableAutoResume && freshSessionId) {
+      return freshSessionId;
+    }
+    
     // First priority: Use session ID from session state (from store)
     if (sessionState.id) {
       return sessionState.id;
@@ -128,7 +141,7 @@ const GameSession: React.FC<GameSessionProps> = ({
     const sessionId = generateUniqueId(`session-${worldId}`);
     
     return sessionId;
-  }, [worldId, sessionState.id, savedSession]);
+  }, [worldId, sessionState.id, savedSession, disableAutoResume, freshSessionId]);
   
   // Update session store when session ID changes
   useEffect(() => {

@@ -177,6 +177,6 @@ describe('WorldCard', () => {
     );
     const originalBadge = screen.getByTestId('world-card-type');
     expect(originalBadge).toHaveTextContent('Original World');
-    expect(originalBadge).toHaveClass('bg-blue-700', 'text-white');
+    expect(originalBadge).toHaveClass('bg-gray-700', 'text-white');
   });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { notFound, useParams } from 'next/navigation';
+import { notFound, useParams, useSearchParams } from 'next/navigation';
 import GameSession from '@/components/GameSession/GameSession';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
@@ -13,9 +13,13 @@ import { getGenreLabel } from '@/lib/constants/genres';
  */
 export default function PlayPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const worldId = params?.id as string;
   const [isClient, setIsClient] = useState(false);
   const world = useWorldStore((state) => state.worlds[worldId]);
+  
+  // Check if this should be a fresh session (from "Start New Session" button)
+  const disableAutoResume = searchParams?.get('fresh') === 'true';
   
   // Set isClient to true once component mounts
   useEffect(() => {
@@ -60,7 +64,7 @@ export default function PlayPage() {
         </div>
       )}
       
-      <GameSession worldId={worldId} />
+      <GameSession worldId={worldId} disableAutoResume={disableAutoResume} />
     </PageLayout>
   );
 }

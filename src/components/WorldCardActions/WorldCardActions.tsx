@@ -48,7 +48,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
             <Button 
               onClick={onPlay} 
               variant="default"
-              className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-medium"
+              className="flex-1 bg-blue-700 hover:bg-blue-900 text-white font-medium"
               data-testid="world-card-actions-play-button"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

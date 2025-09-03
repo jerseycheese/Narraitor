@@ -10,6 +10,7 @@ import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { DataField } from '@/components/shared/DataField';
 import { GuidedFirstTimeExperience } from '@/components/GuidedFirstTimeExperience';
 import { Button } from '@/components/ui/button';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 
@@ -50,7 +51,7 @@ export function QuickPlay() {
     
     const success = resumeSavedSession(mostRecentSession.id);
     if (success) {
-      router.push('/play');
+      router.push(`/world/${mostRecentSession.worldId}/play`);
     }
   };
 
@@ -99,8 +100,8 @@ export function QuickPlay() {
       <div className="text-center">
         <Button
           onClick={handleNewGame}
-          className="px-8 py-4 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium rounded-lg transition-colors"
           variant="default"
+          className="px-8 py-4 text-lg font-medium"
         >
           Start New Game
         </Button>
@@ -146,23 +147,21 @@ export function QuickPlay() {
           </div>
         </div>
         
-        <div className="flex gap-2">
-          <Button
-            onClick={handleContinue}
-            className="flex-1 px-6 py-3 bg-green-500 hover:bg-green-700 text-white font-medium rounded-md transition-colors"
-            variant="default"
-          >
-            Continue Last Game
-          </Button>
-          {/* Campaign deletion button - opens confirmation dialog */}
-          <Button
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="px-4 py-3 bg-red-500 hover:bg-red-700 text-white font-medium rounded-md transition-colors"
-            variant="destructive"
-          >
-            Delete
-          </Button>
-        </div>
+        <ActionButtonGroup
+          actions={[
+            {
+              label: 'Continue Last Game',
+              onClick: handleContinue,
+              variant: 'success'
+            },
+            {
+              label: 'Delete',
+              onClick: () => setIsDeleteDialogOpen(true),
+              variant: 'danger'
+            }
+          ]}
+          className="[&>button:first-child]:flex-1"
+        />
       </div>
 
       {/* Start New Game - Secondary Option */}
@@ -170,8 +169,8 @@ export function QuickPlay() {
         <p className="text-sm text-gray-700 mb-2">Or</p>
         <Button
           onClick={handleNewGame}
-          className="px-6 py-2 border border-gray-300 hover:border-gray-500 text-gray-700 font-medium rounded-md transition-colors"
           variant="outline"
+          className="px-6 py-2 font-medium"
         >
           Start New Game
         </Button>

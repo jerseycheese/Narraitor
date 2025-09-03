@@ -15,11 +15,14 @@ export default function WorldViewPage() {
   const router = useRouter();
   const worldId = params.id as string;
   const world = useWorldStore((state) => state.worlds[worldId]);
+  const currentWorldId = useWorldStore((state) => state.currentWorldId);
+  const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const characters = useCharacterStore((state: any) => state.characters);
   
   // Check if this world has any characters
   const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === worldId);
+  const isActive = currentWorldId === worldId;
 
   if (!world) {
     return (
@@ -42,21 +45,37 @@ export default function WorldViewPage() {
     }
   };
 
+  const handleMakeActive = () => {
+    setCurrentWorld(worldId);
+  };
+
   const actionButtons = [
-    {
-      label: 'Edit World',
-      onClick: () => router.push(`/world/${worldId}/edit`),
-      variant: 'primary' as const
-    },
-    {
-      label: 'Play in World',
-      onClick: handlePlayInWorld,
-      variant: 'success' as const
-    },
+    // Only show Make Active button if world is not currently active
+    ...(!isActive ? [{
+      label: 'Make Active',
+      onClick: handleMakeActive,
+      variant: 'secondary' as const
+    }] : []),
     {
       label: 'View Characters',
       onClick: () => router.push(`/characters?worldId=${worldId}`),
       variant: 'primary' as const
+    },
+    {
+      label: 'Edit World',
+      onClick: () => router.push(`/world/${worldId}/edit`),
+      variant: 'secondary' as const
+    },
+    {
+      label: 'Play in World',
+      onClick: handlePlayInWorld,
+      variant: 'success' as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
     }
   ];
 

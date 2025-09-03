@@ -76,13 +76,13 @@ export function StoryEndingDialog({
         aria-labelledby="story-ending-title"
         aria-describedby="story-ending-content"
       >
-        <DialogTitle
-          id="story-ending-title"
-          className="text-xl font-bold text-center mb-4"
-        >
-          {(title && safeTrim(title)) || "Story Ending"}
-        </DialogTitle>
         <DialogHeader>
+          <DialogTitle
+            id="story-ending-title"
+            className="text-xl font-bold text-center mb-4"
+          >
+            {(title && safeTrim(title)) || "Story Ending"}
+          </DialogTitle>
           <DialogDescription className="sr-only">
             Story ending dialog content
           </DialogDescription>

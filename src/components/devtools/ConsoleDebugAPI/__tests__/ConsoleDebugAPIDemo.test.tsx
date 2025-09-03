@@ -64,9 +64,9 @@ describe('ConsoleDebugAPIDemo', () => {
       // Mock window with debug API
       window.NARRAITOR_DEBUG = {
         clearLogs: jest.fn(),
-        triggerError: jest.fn().mockImplementation((message?: string): never => {
+        triggerError: jest.fn().mockImplementation((message?: string) => {
           throw new Error(message || 'Test error');
-        }),
+        }) as unknown as (message?: string) => never,
         simulateCondition: jest.fn().mockReturnValue('Simulated condition'),
         getStoreState: jest.fn().mockReturnValue('Store state accessed'),
         resetStores: jest.fn().mockReturnValue('Stores reset'),

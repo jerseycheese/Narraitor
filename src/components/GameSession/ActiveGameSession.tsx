@@ -86,6 +86,57 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
+  // Track previous height to retain during loading states
+  const previousHeightRef = React.useRef<number>(0);
+  
+  // Sync narrative height with choices height
+  React.useEffect(() => {
+    const syncHeights = () => {
+      const choicesContainer = document.getElementById('choices-container');
+      const narrativeContainer = document.getElementById('narrative-container');
+      
+      if (choicesContainer && narrativeContainer) {
+        const choicesHeight = choicesContainer.getBoundingClientRect().height;
+        let finalHeight: number;
+        
+        // Use actual loading state instead of height heuristic
+        if (isGeneratingChoices && previousHeightRef.current > 0) {
+          // Preserve previous height during loading
+          finalHeight = previousHeightRef.current;
+        } else {
+          // Use the current choices height and remember it
+          finalHeight = choicesHeight;
+          if (!isGeneratingChoices && choicesHeight > 0) {
+            previousHeightRef.current = choicesHeight;
+          }
+        }
+        
+        // Target the ScrollArea component within the narrative history
+        const scrollArea = narrativeContainer.querySelector('[data-radix-scroll-area-root]');
+        if (scrollArea && scrollArea instanceof HTMLElement) {
+          scrollArea.style.height = `${finalHeight}px`;
+        }
+        
+        // Also target the narrative history container as fallback
+        const narrativeHistory = narrativeContainer.querySelector('.narrative-history-container');
+        if (narrativeHistory && narrativeHistory instanceof HTMLElement) {
+          narrativeHistory.style.height = `${finalHeight}px`;
+        }
+      }
+    };
+    
+    // Initial sync
+    const timeoutId = setTimeout(syncHeights, 100);
+    
+    // Sync on window resize
+    window.addEventListener('resize', syncHeights);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', syncHeights);
+    };
+  }, [currentDecision, choices, isGeneratingChoices]);
+  
   
   // Initialize the narrative only once per session
   // instead of clearing and recreating each time
@@ -576,9 +627,9 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
       )}
       
       {/* Two-column layout for larger screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:min-h-[600px]">
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-start">
         {/* Story Column */}
-        <div className="lg:row-span-1 lg:self-stretch lg:min-h-[600px]">
+        <div className="lg:flex-1" id="narrative-container">
           {/* Use NarrativeHistoryManager to display narrative content without generation logic */}
           <NarrativeHistoryManager
             key={`display-${controllerKey}`}
@@ -605,7 +656,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
         </div>
 
         {/* Choices Column */}
-        <div className="lg:row-span-1 lg:self-stretch">
+        <div className="lg:flex-1" id="choices-container">
           {/* Show AI-generated choices, loading state, or fallback */}
           {currentDecision ? (
             <div className="player-choices-container">
@@ -660,13 +711,35 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               data-testid="game-session-new"
               variant="default"
               className="w-full sm:w-auto"
-              onClick={() => {
-                // Save current session and clear narrative
-                useSessionStore.getState().endSession();
-                useNarrativeStore.getState().clearSessionSegments(sessionId);
+              onClick={async () => {
+                // Force a completely fresh start by clearing everything
+                const sessionStore = useSessionStore.getState();
+                const narrativeStore = useNarrativeStore.getState();
                 
-                // Reload the page to start fresh
-                window.location.reload();
+                // Clear all narrative data for this session
+                narrativeStore.clearSessionSegments(sessionId);
+                narrativeStore.clearSessionDecisions(sessionId);
+                narrativeStore.clearEnding();
+                
+                // End the current session first
+                await sessionStore.endSession();
+                
+                // THEN clear all saved sessions for this world/character combination
+                // This must happen after endSession() to prevent the session from being re-saved
+                Object.keys(sessionStore.savedSessions).forEach(savedSessionId => {
+                  const savedSession = sessionStore.savedSessions[savedSessionId];
+                  if (savedSession.worldId === worldId && savedSession.characterId === characterId) {
+                    sessionStore.deleteSavedSession(savedSessionId);
+                  }
+                });
+                
+                // Wait a moment for the deletion to persist to storage
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Navigate with a fresh parameter to signal a new session
+                const url = new URL(window.location.href);
+                url.searchParams.set('fresh', 'true');
+                window.location.href = url.toString();
               }}
             >
               Start New Session

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import WorldListScreen from '@/components/WorldListScreen/WorldListScreen';
 import { PageLayout } from '@/components/shared/PageLayout';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { useWorldStore } from '@/state/worldStore';
 import { InlineError } from '@/components/shared';
 import { WorldTypeSelector, WorldTypeData, createInitialWorldTypeData } from '@/components/shared/WorldTypeSelector';
@@ -102,30 +103,35 @@ export default function WorldsPage() {
     }
   };
 
-  const actions = (
-    <>
-      <button
-        onClick={handleCreateWorld}
-        data-testid="create-world-button"
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors"
-      >
-        Create World
-      </button>
-      <button
-        onClick={() => setShowPrompt(true)}
-        disabled={isGenerating}
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Generate World
-      </button>
-    </>
-  );
+  const actionButtons = [
+    {
+      label: 'Create World',
+      onClick: handleCreateWorld,
+      variant: 'primary' as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      )
+    },
+    {
+      label: 'Generate World',
+      onClick: () => setShowPrompt(true),
+      variant: 'secondary' as const,
+      disabled: isGenerating,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      )
+    }
+  ];
 
   return (
     <PageLayout
       title="My Worlds"
-      description="Use the 'Make Active' button on a world to set it as your current world, then create characters and start your interactive narrative. You can switch between worlds anytime using the world selector in the navigation bar."
-      actions={actions}
+      description="Create unique story worlds, then manage characters and play through interactive narratives. Your currently active world appears in the navigation bar."
+      actions={<ActionButtonGroup actions={actionButtons} />}
     >
 
       {/* World Generation Prompt */}
@@ -175,26 +181,33 @@ export default function WorldsPage() {
                   {generatingStatus}
                 </p>
               )}
-              <div className="flex justify-end gap-2 mt-6">
-                <button
-                  onClick={() => {
-                    setShowPrompt(false);
-                    setWorldTypeData(createInitialWorldTypeData());
-                    setWorldName('');
-                    setError(null);
-                  }}
-                  disabled={isGenerating}
-                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 cursor-pointer disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleGenerateWorld}
-                  disabled={isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim())}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isGenerating ? 'Generating...' : 'Generate'}
-                </button>
+              <div className="flex justify-end mt-6">
+                <ActionButtonGroup
+                  actions={[
+                    {
+                      label: 'Cancel',
+                      onClick: () => {
+                        setShowPrompt(false);
+                        setWorldTypeData(createInitialWorldTypeData());
+                        setWorldName('');
+                        setError(null);
+                      },
+                      variant: 'secondary',
+                      disabled: isGenerating
+                    },
+                    {
+                      label: isGenerating ? 'Generating...' : 'Generate',
+                      onClick: handleGenerateWorld,
+                      variant: 'primary',
+                      disabled: isGenerating || (worldTypeData.worldType !== 'original' && !worldTypeData.worldReference?.trim()),
+                      icon: (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      )
+                    }
+                  ]}
+                />
               </div>
             </div>
           </div>

@@ -178,7 +178,7 @@ describe('SkillEditor', () => {
         description: `Description ${i}`,
         worldId: mockWorldId,
         attributeIds: ['attr-1'],
-        difficulty: 'easy',
+        difficulty: 'easy' as const,
         baseValue: 5,
         minValue: 1,
         maxValue: 10,

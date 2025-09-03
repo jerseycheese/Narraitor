@@ -9,6 +9,7 @@ import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
+import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
 // Using API routes for secure AI operations
@@ -366,12 +367,15 @@ export default function CharactersPage() {
               <li>Return here to create characters for that world</li>
             </ol>
           </div>
-          <button
-            onClick={() => router.push('/worlds')}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-md hover:shadow-lg"
-          >
-            Go to Worlds
-          </button>
+          <ActionButtonGroup
+            actions={[{
+              label: 'Go to Worlds',
+              onClick: () => router.push('/worlds'),
+              variant: 'primary',
+              size: 'lg'
+            }]}
+            className="justify-center"
+          />
           <p className="text-sm text-gray-500 mt-4">
             Each world has unique attributes, skills, and themes that shape your characters
           </p>
@@ -380,46 +384,50 @@ export default function CharactersPage() {
     );
   }
 
-  const actions = (
-    <>
-      {currentCharacterId && effectiveWorldId && (
-        <button
-          onClick={() => {
-            const character = characters[currentCharacterId];
-            if (character) {
-              router.push(`/world/${character.worldId}/play`);
-            }
-          }}
-          className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Start Playing
-        </button>
-      )}
-      <button
-        onClick={handleCreateCharacter}
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors"
-      >
-        Create Character
-      </button>
-      <button
-        onClick={() => setShowGenerateDialog(true)}
-        disabled={isGenerating}
-        className="py-2 px-4 bg-blue-500 text-white rounded-md border-none cursor-pointer text-base font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Generate Character
-      </button>
-    </>
-  );
+  const actionButtons = [
+    {
+      label: 'Create Character',
+      onClick: handleCreateCharacter,
+      variant: 'primary' as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      )
+    },
+    {
+      label: 'Generate Character',
+      onClick: () => setShowGenerateDialog(true),
+      variant: 'secondary' as const,
+      disabled: isGenerating,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      )
+    },
+    ...(currentCharacterId && effectiveWorldId ? [{
+      label: 'Start Playing',
+      onClick: () => {
+        const character = characters[currentCharacterId];
+        if (character) {
+          router.push(`/world/${character.worldId}/play`);
+        }
+      },
+      variant: 'success' as const,
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    }] : [])
+  ];
 
   return (
     <PageLayout
       title={currentWorld?.image?.url ? undefined : "My Characters"}
       description={currentWorld?.image?.url ? undefined : `Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.`}
-      actions={currentWorld?.image?.url ? undefined : actions}
     >
       {/* Show world hero with image or themed background */}
       {currentWorld && (
@@ -440,8 +448,8 @@ export default function CharactersPage() {
 
       {/* Action buttons below hero when world exists */}
       {currentWorld && (
-        <div className="mb-8 flex justify-end gap-2">
-          {actions}
+        <div className="mb-8 flex justify-end">
+          <ActionButtonGroup actions={actionButtons} />
         </div>
       )}
 
@@ -472,33 +480,36 @@ export default function CharactersPage() {
               Choose how you&apos;d like to add your first character.
             </p>
           </div>
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={handleGenerateCharacter}
-              disabled={isGenerating}
-              className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
-            >
-              {isGenerating ? (
-                <>
+          <ActionButtonGroup
+            actions={[
+              {
+                label: isGenerating ? (generatingStatus || 'Generating...') : 'Generate Character',
+                onClick: handleGenerateCharacter,
+                variant: 'secondary',
+                disabled: isGenerating,
+                size: 'lg',
+                icon: isGenerating ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  {generatingStatus || 'Generating...'}
-                </>
-              ) : (
-                <>
+                ) : (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
-                  Generate Character
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleCreateCharacter}
-              className="px-8 py-3 bg-green-500 text-white rounded-lg hover:bg-green-700 text-lg font-semibold transition-colors shadow-md hover:shadow-lg cursor-pointer"
-            >
-              Create Character
-            </button>
-          </div>
+                )
+              },
+              {
+                label: 'Create Character',
+                onClick: handleCreateCharacter,
+                variant: 'primary',
+                size: 'lg',
+                icon: (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                )
+              }
+            ]}
+            className="justify-center"
+          />
           <div className="mt-6 text-sm text-gray-500">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div>

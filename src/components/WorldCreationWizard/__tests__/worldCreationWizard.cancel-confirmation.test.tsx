@@ -10,6 +10,17 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
+// Create proper mock type for worldStore
+interface MockWorldStore {
+  worlds: Record<string, unknown>;
+  setCurrentWorld: jest.Mock;
+  updateWorld: jest.Mock;
+}
+
+interface MockWorldStoreHook extends jest.Mock {
+  getState: jest.Mock<MockWorldStore>;
+}
+
 jest.mock('@/state/worldStore', () => ({
   useWorldStore: jest.fn(),
 }));
@@ -52,10 +63,11 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       push: mockPush,
     });
 
-    (useWorldStore as jest.Mock).mockReturnValue(mockCreateWorld);
+    const mockWorldStoreHook = useWorldStore as MockWorldStoreHook;
+    mockWorldStoreHook.mockReturnValue(mockCreateWorld);
     
     // Mock the getState method for accessing worlds
-    (useWorldStore as unknown as { getState: jest.Mock }).getState = jest.fn().mockReturnValue({
+    mockWorldStoreHook.getState = jest.fn().mockReturnValue({
       worlds: {},
       setCurrentWorld: jest.fn(),
       updateWorld: jest.fn(),
@@ -199,7 +211,12 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when attributes are modified', async () => {
       // Start with some initial attributes and test modification
       const initialData = {
-        attributes: TEST_WORLD_DATA.attributes
+        attributes: TEST_WORLD_DATA.attributes.map(attr => ({
+          ...attr,
+          id: `attr-${Date.now()}`,
+          worldId: 'test-world-id'
+        })),
+        genre: TEST_WORLD_DATA.genre
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       
@@ -216,7 +233,16 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
     it('should detect dirty state when skills are modified', async () => {
       // Start with some initial skills and test modification
       const initialData = {
-        skills: TEST_WORLD_DATA.skills
+        skills: TEST_WORLD_DATA.skills.map(skill => ({
+          ...skill,
+          id: `skill-${Date.now()}`,
+          worldId: 'test-world-id',
+          attributeIds: [],
+          baseValue: 5,
+          minValue: 1,
+          maxValue: 10
+        })),
+        genre: TEST_WORLD_DATA.genre
       };
       render(<WorldCreationWizard initialData={initialData} initialStep={1} onCancel={mockOnCancel} />);
       

@@ -63,7 +63,6 @@ const WorldList: React.FC<WorldListProps> = ({ worlds, currentWorldId, onSelectW
 
   return (
     <section data-testid="world-list-container" className="mt-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-900">Your Worlds</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
         {sortedWorlds.map((world) => (
           <WorldCard
