@@ -18,6 +18,7 @@ import { World } from '@/types/world.types';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { Toast } from '@/components/ui/toast';
 import { getGenreLabel } from '@/lib/constants/genres';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 // Type for character portrait update
 type CharacterPortraitUpdate = {
@@ -118,9 +119,6 @@ export default function CharactersPage() {
   const searchParams = useSearchParams();
   const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
   const { worlds, currentWorldId } = useWorldStore();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatingStatus, setGeneratingStatus] = useState<string>('');
-  const [generateError, setGenerateError] = useState<string | null>(null);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [characterName, setCharacterName] = useState('');
   const [generationType, setGenerationType] = useState<'known' | 'original' | 'specific'>('known');
@@ -137,50 +135,17 @@ export default function CharactersPage() {
     variant: 'success' | 'error';
     duration?: number;
   }>>([]);
-  
-  // Use worldId from URL if provided, otherwise use the current world
-  const worldIdFromUrl = searchParams.get('worldId');
-  const effectiveWorldId = worldIdFromUrl || currentWorldId;
-  
-  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-  const worldCharacters = (Object.values(characters) as Character[]).filter(
-    (char) => char.worldId === effectiveWorldId
-  );
 
-  // Toast management
-  const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
-    const id = `toast-${Date.now()}-${Math.random()}`;
-    const newToast = { ...toast, id };
-    setToasts(prev => [...prev, newToast]);
-    
-    // Auto-remove toast after duration
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, toast.duration || 3000);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
-  };
-
-  const handleCreateCharacter = () => {
-    router.push('/characters/create');
-  };
-  
-  const handleGenerateCharacter = async () => {
-    if (!currentWorld || !effectiveWorldId) return;
-    
-    // Validate specific character name
-    if (generationType === 'specific' && !characterName.trim()) {
-      setGenerateError('Please enter a character name');
-      return;
-    }
-    
-    setIsGenerating(true);
-    setGenerateError(null);
-    setGeneratingStatus('Creating character...');
-    
-    try {
+  // Async operation hook for character generation
+  const generateOperation = useAsyncOperation(
+    async () => {
+      if (!currentWorld || !effectiveWorldId) throw new Error('No world selected');
+      
+      // Validate specific character name
+      if (generationType === 'specific' && !characterName.trim()) {
+        throw new Error('Please enter a character name');
+      }
+      
       // Get existing character names to avoid duplicates
       const existingNames = worldCharacters.map(char => char.name);
       
@@ -248,7 +213,6 @@ export default function CharactersPage() {
       setCurrentCharacter(characterId);
       
       // Generate portrait for the character
-      setGeneratingStatus('Generating portrait...');
       await generateCharacterPortrait(
         characterId,
         generatedData,
@@ -257,20 +221,93 @@ export default function CharactersPage() {
         updateCharacter
       );
       
-      // Reset dialog state
-      setShowGenerateDialog(false);
-      setCharacterName('');
-      setGenerationType('known');
-      setGenerateError(null);
-      
-      // Navigate to view the character
-      router.push(`/characters/${characterId}`);
-    } catch (error) {
-      setGenerateError(error instanceof Error ? error.message : 'Failed to generate character');
-    } finally {
-      setIsGenerating(false);
-      setGeneratingStatus('');
+      return { characterId, generatedData };
+    },
+    {
+      onSuccess: ({ characterId }) => {
+        // Reset dialog state
+        setShowGenerateDialog(false);
+        setCharacterName('');
+        setGenerationType('known');
+        
+        // Navigate to view the character
+        router.push(`/characters/${characterId}`);
+      }
     }
+  );
+
+  // Async operation hook for character deletion
+  const deleteOperation = useAsyncOperation(
+    async (characterId: string) => {
+      const character = characters[characterId];
+      if (!character) throw new Error('Character not found');
+      
+      // Use service layer for decoupled deletion with journal cleanup
+      await CharacterDeletionService.deleteCharacterWithCleanup(characterId);
+      
+      return character.name;
+    },
+    {
+      onSuccess: (characterName) => {
+        // Success toast
+        addToast({
+          title: 'Character Deleted',
+          description: `${characterName} has been permanently deleted`,
+          variant: 'success'
+        });
+        
+        // Close dialog
+        setDeleteDialog({ 
+          isOpen: false, 
+          characterId: null, 
+          characterName: '', 
+          isDeleting: false 
+        });
+      },
+      onError: () => {
+        // Error toast
+        addToast({
+          title: 'Delete Failed',
+          description: 'Failed to delete character. Please try again.',
+          variant: 'error'
+        });
+        
+        setDeleteDialog(prev => ({ ...prev, isDeleting: false }));
+      }
+    }
+  );
+  
+  // Use worldId from URL if provided, otherwise use the current world
+  const worldIdFromUrl = searchParams.get('worldId');
+  const effectiveWorldId = worldIdFromUrl || currentWorldId;
+  
+  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+  const worldCharacters = (Object.values(characters) as Character[]).filter(
+    (char) => char.worldId === effectiveWorldId
+  );
+
+  // Toast management
+  const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    const newToast = { ...toast, id };
+    setToasts(prev => [...prev, newToast]);
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, toast.duration || 3000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  const handleCreateCharacter = () => {
+    router.push('/characters/create');
+  };
+  
+  const handleGenerateCharacter = () => {
+    generateOperation.execute();
   };
 
   const handleSelectCharacter = (characterId: string) => {
@@ -297,41 +334,11 @@ export default function CharactersPage() {
     });
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (!deleteDialog.characterId) return;
     
     setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
-    
-    try {
-      const characterName = deleteDialog.characterName;
-      
-      // Use service layer for decoupled deletion with journal cleanup
-      await CharacterDeletionService.deleteCharacterWithCleanup(deleteDialog.characterId);
-      
-      // Success toast
-      addToast({
-        title: 'Character Deleted',
-        description: `${characterName} has been permanently deleted`,
-        variant: 'success'
-      });
-      
-      // Close dialog
-      setDeleteDialog({ 
-        isOpen: false, 
-        characterId: null, 
-        characterName: '', 
-        isDeleting: false 
-      });
-    } catch {
-      // Error toast
-      addToast({
-        title: 'Delete Failed',
-        description: 'Failed to delete character. Please try again.',
-        variant: 'error'
-      });
-      
-      setDeleteDialog(prev => ({ ...prev, isDeleting: false }));
-    }
+    deleteOperation.execute(deleteDialog.characterId);
   };
 
   const handleCancelDelete = () => {
@@ -399,7 +406,7 @@ export default function CharactersPage() {
       label: 'Generate Character',
       onClick: () => setShowGenerateDialog(true),
       variant: 'secondary' as const,
-      disabled: isGenerating,
+      disabled: generateOperation.isLoading,
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -465,10 +472,10 @@ export default function CharactersPage() {
         </div>
       )}
 
-      {generateError && (
+      {generateOperation.error && (
         <div className="mb-4 p-4 bg-red-200 border border-red-500 rounded-lg text-red-700">
           <p className="font-medium">Generation Failed</p>
-          <p className="text-sm mt-1">{generateError}</p>
+          <p className="text-sm mt-1">{generateOperation.error}</p>
         </div>
       )}
 
@@ -483,12 +490,12 @@ export default function CharactersPage() {
           <ActionButtonGroup
             actions={[
               {
-                label: isGenerating ? (generatingStatus || 'Generating...') : 'Generate Character',
+                label: generateOperation.isLoading ? 'Generating...' : 'Generate Character',
                 onClick: handleGenerateCharacter,
                 variant: 'secondary',
-                disabled: isGenerating,
+                disabled: generateOperation.isLoading,
                 size: 'lg',
-                icon: isGenerating ? (
+                icon: generateOperation.isLoading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -548,17 +555,17 @@ export default function CharactersPage() {
       {/* Character Generation Dialog */}
       <GenerateCharacterDialog
         isOpen={showGenerateDialog}
-        isGenerating={isGenerating}
-        generatingStatus={generatingStatus}
+        isGenerating={generateOperation.isLoading}
+        generatingStatus={generateOperation.isLoading ? 'Generating character...' : ''}
         characterName={characterName}
         generationType={generationType}
         worldName={currentWorld?.name || ''}
-        error={generateError}
+        error={generateOperation.error}
         onClose={() => {
           setShowGenerateDialog(false);
           setCharacterName('');
           setGenerationType('known');
-          setGenerateError(null);
+          generateOperation.clearError();
         }}
         onGenerate={handleGenerateCharacter}
         onCharacterNameChange={setCharacterName}
@@ -575,7 +582,7 @@ export default function CharactersPage() {
         itemName={deleteDialog.characterName}
         confirmButtonText="Delete Character"
         cancelButtonText="Cancel"
-        isDeleting={deleteDialog.isDeleting}
+        isDeleting={deleteOperation.isLoading}
       />
 
       {/* Toast Notifications */}

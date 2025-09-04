@@ -8,6 +8,7 @@ import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { PortraitCustomizationSection } from '@/components/shared';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface CharacterFormData {
   name: string;
@@ -35,9 +36,6 @@ interface PortraitStepProps {
 }
 
 export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
   // Local state for prompt-affecting fields
   const [localPhysicalDescription, setLocalPhysicalDescription] = useState(
     data.characterData.background?.physicalDescription || ''
@@ -49,11 +47,9 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
     url: null
   };
 
-  const handleGeneratePortrait = async () => {
-    setIsGenerating(true);
-    setError(null);
-
-    try {
+  // Async operation hook for portrait generation
+  const portraitOperation = useAsyncOperation(
+    async () => {
       // Create a character object for the API
       const characterForGeneration: Character = {
         id: 'temp',
@@ -105,15 +101,19 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       }
 
       const { portrait: generatedPortrait } = await response.json();
-
-      onUpdate({
-        portrait: generatedPortrait
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate portrait');
-    } finally {
-      setIsGenerating(false);
+      return generatedPortrait;
+    },
+    {
+      onSuccess: (generatedPortrait) => {
+        onUpdate({
+          portrait: generatedPortrait
+        });
+      }
     }
+  );
+
+  const handleGeneratePortrait = () => {
+    portraitOperation.execute();
   };
 
   const handleRemovePortrait = () => {
@@ -123,7 +123,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
         url: null
       }
     });
-    setError(null);
+    portraitOperation.clearError();
   };
 
   return (
@@ -150,7 +150,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
       )}
 
       <div className="flex flex-col items-center space-y-4">
-        {isGenerating ? (
+        {portraitOperation.isLoading ? (
           <div className="w-32 h-32 flex items-center justify-center">
             <LoadingState 
               variant="spinner" 
@@ -163,7 +163,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
             portrait={portrait}
             characterName={data.characterData.name}
             size="xlarge"
-            error={error}
+            error={portraitOperation.error}
           />
         )}
 
@@ -171,7 +171,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
           <button
             type="button"
             onClick={handleGeneratePortrait}
-            disabled={isGenerating}
+            disabled={portraitOperation.isLoading}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Generate Portrait
@@ -185,7 +185,7 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
               <button
                 type="button"
                 onClick={handleGeneratePortrait}
-                disabled={isGenerating}
+                disabled={portraitOperation.isLoading}
                 className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Regenerate Portrait

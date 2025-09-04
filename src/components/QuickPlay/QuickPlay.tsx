@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 export function QuickPlay() {
   const router = useRouter();
@@ -25,8 +26,7 @@ export function QuickPlay() {
   
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false); // Prevents multiple delete operations
-
+  
   // Find the most recent valid saved session
   const validSessions = Object.values(savedSessions)
     .filter(session => {
@@ -38,6 +38,22 @@ export function QuickPlay() {
 
   const mostRecentSession = validSessions[0];
   const hasValidSession = Boolean(mostRecentSession);
+
+  // Async operation hook for session deletion
+  const deleteSessionOperation = useAsyncOperation(
+    async (sessionId: string) => {
+      await cleanupSessionData(sessionId);
+    },
+    {
+      onSuccess: () => {
+        setIsDeleteDialogOpen(false);
+      },
+      onError: (error) => {
+        console.error('Failed to delete session:', error);
+        setIsDeleteDialogOpen(false); // Close dialog even on error to prevent stuck state
+      }
+    }
+  );
 
   const handleContinue = async () => {
     if (!mostRecentSession) return;
@@ -74,15 +90,7 @@ export function QuickPlay() {
   const handleDeleteSession = async () => {
     if (!mostRecentSession) return;
     
-    setIsDeleting(true);
-    try {
-      await cleanupSessionData(mostRecentSession.id);
-    } catch (error) {
-      console.error('Failed to delete session:', error);
-    } finally {
-      setIsDeleting(false);
-      setIsDeleteDialogOpen(false);
-    }
+    await deleteSessionOperation.execute(mostRecentSession.id);
   };
 
   // Show guided experience for first-time users
@@ -184,7 +192,7 @@ export function QuickPlay() {
         title="Delete Campaign"
         description="This will permanently delete all data for this campaign, including narrative progress and journal entries. This action cannot be undone."
         itemName={mostRecentSession ? `${world.name} - ${character.name}` : ''}
-        isDeleting={isDeleting}
+        isDeleting={deleteSessionOperation.isLoading}
       />
     </div>
   );

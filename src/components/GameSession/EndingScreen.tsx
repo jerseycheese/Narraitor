@@ -9,6 +9,7 @@ import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useSessionStore } from '@/state/sessionStore';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { PageLayout } from '@/components/shared/PageLayout';
@@ -37,28 +38,27 @@ export function EndingScreen() {
   const { worlds } = useWorldStore();
   
   // State for ending image generation
-  const [endingImage, setEndingImage] = useState<string | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
-  const [imageError, setImageError] = useState<string | null>(null);
   const generatedForEndingRef = useRef<string | null>(null);
 
-
-
-  const generateEndingImage = useCallback(async () => {
-    if (!currentEnding || isGeneratingImage || generatedForEndingRef.current === currentEnding.id) {
-      return; // Prevent multiple simultaneous requests or duplicate generation
-    }
-    
-    generatedForEndingRef.current = currentEnding.id; // Mark this ending as being processed
-    setIsGeneratingImage(true);
-    setImageError(null);
-    
-    try {
-      const character = characters[currentEnding.characterId];
-      const world = worlds[currentEnding.worldId];
+  // Use async operation hook for image generation
+  const {
+    execute: generateEndingImageExecute,
+    isLoading: isGeneratingImage,
+    data: endingImage,
+    error: imageError
+  } = useAsyncOperation(
+    async (ending: typeof currentEnding) => {
+      if (!ending || generatedForEndingRef.current === ending.id) {
+        throw new Error('Invalid ending or already generated');
+      }
+      
+      generatedForEndingRef.current = ending.id;
+      
+      const character = characters[ending.characterId];
+      const world = worlds[ending.worldId];
       
       // Get recent narrative segments for context
-      const recentSegments = getSessionSegments(currentEnding.sessionId);
+      const recentSegments = getSessionSegments(ending.sessionId);
       const recentNarrative = recentSegments
         .slice(-5)
         .map(segment => segment.content);
@@ -69,7 +69,7 @@ export function EndingScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ending: currentEnding,
+          ending,
           world,
           character,
           recentNarrative
@@ -81,15 +81,21 @@ export function EndingScreen() {
       }
 
       const data = await response.json();
-      setEndingImage(data.imageUrl);
-    } catch (error) {
-      console.error('Failed to generate ending image:', error);
-      setImageError('Failed to generate ending image');
-      generatedForEndingRef.current = null; // Reset on error so user can retry
-    } finally {
-      setIsGeneratingImage(false);
+      return data.imageUrl;
+    },
+    {
+      onError: (error) => {
+        console.error('Failed to generate ending image:', error);
+        generatedForEndingRef.current = null; // Reset on error so user can retry
+      }
     }
-  }, [currentEnding, isGeneratingImage, characters, worlds, getSessionSegments]);
+  );
+
+  const generateEndingImage = useCallback(() => {
+    if (currentEnding && !isGeneratingImage) {
+      generateEndingImageExecute(currentEnding);
+    }
+  }, [currentEnding, isGeneratingImage, generateEndingImageExecute]);
 
   // Generate ending image when ending is available (but not in Storybook or test environment)
   useEffect(() => {
@@ -296,7 +302,7 @@ export function EndingScreen() {
                   <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-sm">Unable to generate ending image</p>
+                  <p className="text-sm">{imageError.message || 'Unable to generate ending image'}</p>
                   <Button 
                     onClick={generateEndingImage}
                     variant="link"

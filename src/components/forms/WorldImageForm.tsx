@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { World, WorldImage } from '@/types/world.types';
 import { createAIClient } from '@/lib/ai';
 import { WorldImageGenerator } from '@/lib/ai/worldImageGenerator';
 import { ImageGenerationSection } from '@/components/shared';
 import { WorldImage as WorldImageComponent } from '@/components/WorldImage';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface WorldImageFormProps {
   world: World;
@@ -11,23 +12,25 @@ interface WorldImageFormProps {
 }
 
 const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleGenerateImage = async (customPrompt?: string) => {
-    setIsGenerating(true);
-
-    try {
+  // Async operation hook for image generation
+  const imageOperation = useAsyncOperation(
+    async (customPrompt?: string) => {
       const aiClient = createAIClient();
       const imageGenerator = new WorldImageGenerator(aiClient);
       
       const image = await imageGenerator.generateWorldImage(world, customPrompt);
       
-      onChange({ image });
-    } catch (err) {
-      throw err; // Let ImageGenerationSection handle the error display
-    } finally {
-      setIsGenerating(false);
+      return image;
+    },
+    {
+      onSuccess: (image) => {
+        onChange({ image });
+      }
     }
+  );
+
+  const handleGenerateImage = (customPrompt?: string) => {
+    imageOperation.execute(customPrompt);
   };
 
   const handleRemoveImage = () => {
@@ -48,7 +51,7 @@ const WorldImageForm: React.FC<WorldImageFormProps> = ({ world, onChange }) => {
       currentImageType={world.image?.type}
       generatedAt={world.image?.generatedAt}
       currentPrompt={world.image?.prompt}
-      isGenerating={isGenerating}
+      isGenerating={imageOperation.isLoading}
       onGenerate={handleGenerateImage}
       onRemove={handleRemoveImage}
       customPromptLabel="Customize description for world image generation"

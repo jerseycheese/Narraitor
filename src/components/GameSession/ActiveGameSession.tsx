@@ -20,6 +20,7 @@ import { JournalModal } from './JournalModal';
 import { JournalFloatingButton } from './JournalFloatingButton';
 import { useJournalStore } from '@/state/journalStore';
 import { Button } from '@/components/ui/button';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -83,6 +84,58 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   
   // Get journal store for auto-creating entries
   const { addEntry } = useJournalStore();
+  
+  // Async operation hooks
+  const journalSummaryOperation = useAsyncOperation(
+    async ({ content, type, location, decisionWeight }: { content: string; type: string; location?: string; decisionWeight?: 'minor' | 'major' | 'critical' }) => {
+      const response = await fetch('/api/narrative/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content,
+          type,
+          location,
+          decisionWeight,
+          instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate AI summary for journal entry');
+      }
+      
+      const data = await response.json();
+      if (data.summary && data.entryType && data.significance) {
+        return {
+          summary: data.summary,
+          entryType: data.entryType,
+          significance: data.significance
+        };
+      }
+      
+      throw new Error('Invalid response format from AI summary service');
+    },
+    {
+      onError: (error) => {
+        console.warn('Failed to generate AI summary for journal entry:', error);
+      }
+    }
+  );
+  
+  const endingOperation = useAsyncOperation(
+    async ({ endingType, sessionId, characterId, worldId }: { endingType: EndingType; sessionId: string; characterId: string; worldId: string }) => {
+      await generateEnding(endingType, {
+        sessionId,
+        characterId,
+        worldId
+      });
+    },
+    {
+      onError: (error) => {
+        console.error('Failed to generate ending:', error);
+      }
+    }
+  );
   // Use a consistent key that doesn't change on remounts for the same session
   const controllerKey = React.useMemo(() => `controller-fixed-${sessionId}`, [sessionId]);
   
@@ -208,42 +261,14 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   }, [sessionId, worldId, controllerKey]);
 
   // Helper function to generate AI summary for journal entries
-  const generateJournalSummary = async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical'): Promise<{summary: string, entryType: string, significance: string}> => {
-    try {
-      const response = await fetch('/api/narrative/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          type,
-          location,
-          decisionWeight,
-          instructions: 'Create a concise journal entry summary of what happened. Focus on key actions, discoveries, or events only. Avoid sensory details.'
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.summary && data.entryType && data.significance) {
-          return {
-            summary: data.summary,
-            entryType: data.entryType,
-            significance: data.significance
-          };
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to generate AI summary for journal entry:', error);
-    }
-    
-    // Return fallback values using decision weight for significance
-    const fallbackSignificance = decisionWeight || 'minor';
-    return {
-      summary: createFallbackSummary(content),
-      entryType: 'character_event',
-      significance: fallbackSignificance
-    };
-  };
+  const generateJournalSummary = React.useCallback(async (content: string, type: string, location?: string, decisionWeight?: 'minor' | 'major' | 'critical') => {
+    return journalSummaryOperation.execute({
+      content,
+      type,
+      location,
+      decisionWeight
+    });
+  }, [journalSummaryOperation]);
 
   // Fallback summary method when AI fails
   const createFallbackSummary = (content: string): string => {
@@ -347,29 +372,56 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
     
     // Generate AI summary, type, and significance for journal entry (async)
     generateJournalSummary(cleanContent, segment.type, actualLocation, relatedDecisionWeight).then(aiResult => {
-      try {
-        addEntry(sessionId, {
-          worldId: worldId,
-          characterId: characterId,
-          type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event' | 'relationship_change',
-          title: '', // No title for MVP - content is sufficient
-          content: aiResult.summary,
-          significance: aiResult.significance as 'minor' | 'major' | 'critical',
-          isRead: false, // Read status no longer used but kept for type compatibility
-          relatedEntities: [],
-          metadata: {
-            tags: [segment.type],
-            automaticEntry: true,
-            narrativeSegmentId: segment.id
-          },
-          updatedAt: new Date().toISOString()
-        });
-      } catch (error) {
-        console.warn('Failed to create journal entry from narrative segment:', error);
+      if (aiResult) {
+        try {
+          addEntry(sessionId, {
+            worldId: worldId,
+            characterId: characterId,
+            type: aiResult.entryType as 'character_event' | 'discovery' | 'achievement' | 'world_event' | 'relationship_change',
+            title: '', // No title for MVP - content is sufficient
+            content: aiResult.summary,
+            significance: aiResult.significance as 'minor' | 'major' | 'critical',
+            isRead: false, // Read status no longer used but kept for type compatibility
+            relatedEntities: [],
+            metadata: {
+              tags: [segment.type],
+              automaticEntry: true,
+              narrativeSegmentId: segment.id
+            },
+            updatedAt: new Date().toISOString()
+          });
+        } catch (error) {
+          console.warn('Failed to create journal entry from narrative segment:', error);
+        }
+      } else {
+        // Handle case where AI operation failed - use fallback
+        console.warn('AI summary failed, using fallback for journal entry');
+        try {
+          const fallbackSignificance = relatedDecisionWeight || 'minor';
+          const fallbackContent = createFallbackSummary(cleanContent);
+          addEntry(sessionId, {
+            worldId: worldId,
+            characterId: characterId,
+            type: 'character_event',
+            title: '', // No title for MVP - content is sufficient
+            content: fallbackContent,
+            significance: fallbackSignificance,
+            isRead: false, // Read status no longer used but kept for type compatibility
+            relatedEntities: [],
+            metadata: {
+              tags: [segment.type],
+              automaticEntry: true,
+              narrativeSegmentId: segment.id
+            },
+            updatedAt: new Date().toISOString()
+          });
+        } catch (fallbackError) {
+          console.warn('Failed to create fallback journal entry:', fallbackError);
+        }
       }
     }).catch(error => {
-      console.warn('Failed to generate journal summary, using fallback:', error);
-      // Use fallback if AI completely fails
+      console.warn('Journal summary operation failed completely:', error);
+      // Use fallback if operation completely fails
       try {
         const fallbackSignificance = relatedDecisionWeight || 'minor';
         const fallbackContent = createFallbackSummary(cleanContent);
@@ -550,19 +602,16 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
   
   // Handle ending story functionality with confirmation
-  const handleEndStory = async () => {
+  const handleEndStory = React.useCallback(async () => {
     if (!characterId || !world) return;
     
-    try {
-      await generateEnding('player-choice', {
-        sessionId,
-        characterId,
-        worldId: world.id
-      });
-    } catch (error) {
-      console.error('Failed to generate ending:', error);
-    }
-  };
+    await endingOperation.execute({
+      endingType: 'player-choice',
+      sessionId,
+      characterId,
+      worldId: world.id
+    });
+  }, [endingOperation, characterId, world, sessionId]);
   
   // Handle ending suggestion from AI
   const handleEndingSuggested = (reason: string, endingType: EndingType) => {
@@ -572,20 +621,17 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   };
   
   // Accept AI ending suggestion
-  const handleAcceptEndingSuggestion = async () => {
+  const handleAcceptEndingSuggestion = React.useCallback(async () => {
     setShowEndingSuggestion(false);
     if (!characterId || !world) return;
     
-    try {
-      await generateEnding(suggestedEndingType, {
-        sessionId,
-        characterId,
-        worldId: world.id
-      });
-    } catch (error) {
-      console.error('Failed to generate ending:', error);
-    }
-  };
+    await endingOperation.execute({
+      endingType: suggestedEndingType,
+      sessionId,
+      characterId,
+      worldId: world.id
+    });
+  }, [endingOperation, suggestedEndingType, characterId, world, sessionId]);
   
   // Reject AI ending suggestion
   const handleRejectEndingSuggestion = () => {

@@ -13,6 +13,7 @@ import { BasicInfoForm } from './components/BasicInfoForm';
 import { BackgroundForm } from './components/BackgroundForm';
 import { AttributesForm } from './components/AttributesForm';
 import { SkillsForm } from './components/SkillsForm';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 // Use the Character type from the store since it's different from the main types
 type Character = ReturnType<typeof useCharacterStore.getState>['characters'][string];
@@ -27,74 +28,35 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
   const [world, setWorld] = useState<World | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [generatingPortrait, setGeneratingPortrait] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
-  // Load character data on mount
-  useEffect(() => {
-    try {
-      const { characters } = useCharacterStore.getState();
-      const characterData = characters[characterId];
-      
-      if (!characterData) {
-        setError('Character not found');
-        setLoading(false);
-        return;
-      }
-      
-      // Load world data for attribute/skill limits
-      const { worlds } = useWorldStore.getState();
-      const worldData = worlds[characterData.worldId];
-      setWorld(worldData);
-      
-      setCharacter(characterData);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load character data');
-      setLoading(false);
-      console.error('Error loading character:', err);
-    }
-  }, [characterId]);
-  
-  // Handle saving all character changes
-  const handleSave = async () => {
-    if (!character) return;
-    
-    setSaving(true);
-    try {
+
+  // Async operation hook for saving
+  const saveOperation = useAsyncOperation(
+    async (characterData: Character) => {
       const { updateCharacter } = useCharacterStore.getState();
-      updateCharacter(characterId, character);
+      updateCharacter(characterId, characterData);
       
       // Small delay to show save state
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      router.push(`/characters/${characterId}`); // Navigate back to character view
-    } catch (err) {
-      setError('Failed to save character');
-      console.error('Error saving character:', err);
-    } finally {
-      setSaving(false);
+      return characterData;
+    },
+    {
+      onSuccess: () => {
+        router.push(`/characters/${characterId}`); // Navigate back to character view
+      },
+      onError: (err) => {
+        setError('Failed to save character');
+        console.error('Error saving character:', err);
+      }
     }
-  };
-  
-  // Handle canceling edits
-  const handleCancel = () => {
-    router.push(`/characters/${characterId}`);
-  };
-  
-  // Handle character deletion
-  const handleDelete = () => {
-    useCharacterStore.getState().deleteCharacter(characterId);
-    router.push('/characters');
-  };
-  
-  // Handle portrait generation
-  const handleGeneratePortrait = async (customDescription?: string) => {
-    if (!character || !world) return;
-    
-    setGeneratingPortrait(true);
-    try {
+  );
+
+  // Async operation hook for portrait generation  
+  const portraitOperation = useAsyncOperation(
+    async ({ customDescription }: { customDescription?: string }) => {
+      if (!character || !world) throw new Error('Character or world not available');
+
       // Use the portrait generation API route
       const response = await fetch('/api/generate-portrait', {
         method: 'POST',
@@ -149,18 +111,75 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       }
 
       const { portrait } = await response.json();
-      
-      // Update character with new portrait
-      setCharacter({ ...character, portrait });
-      
-      // Also update the character store
-      useCharacterStore.getState().updateCharacter(characterId, { portrait });
-    } catch (error) {
-      console.error('Failed to generate portrait:', error);
-      setError('Failed to generate portrait. Please try again.');
-    } finally {
-      setGeneratingPortrait(false);
+      return portrait;
+    },
+    {
+      onSuccess: (portrait) => {
+        if (!character) return;
+        
+        // Update character with new portrait
+        const updatedCharacter = { ...character, portrait };
+        setCharacter(updatedCharacter);
+        
+        // Also update the character store
+        useCharacterStore.getState().updateCharacter(characterId, { portrait });
+      },
+      onError: (error) => {
+        console.error('Failed to generate portrait:', error);
+        setError('Failed to generate portrait. Please try again.');
+      }
     }
+  );
+  
+  // Load character data on mount
+  useEffect(() => {
+    try {
+      const { characters } = useCharacterStore.getState();
+      const characterData = characters[characterId];
+      
+      if (!characterData) {
+        setError('Character not found');
+        setLoading(false);
+        return;
+      }
+      
+      // Load world data for attribute/skill limits
+      const { worlds } = useWorldStore.getState();
+      const worldData = worlds[characterData.worldId];
+      setWorld(worldData);
+      
+      setCharacter(characterData);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to load character data');
+      setLoading(false);
+      console.error('Error loading character:', err);
+    }
+  }, [characterId]);
+  
+  // Handle saving all character changes
+  const handleSave = async () => {
+    if (!character) return;
+    
+    await saveOperation.execute(character);
+  };
+  
+  // Handle canceling edits
+  const handleCancel = () => {
+    router.push(`/characters/${characterId}`);
+  };
+  
+  // Handle character deletion
+  const handleDelete = () => {
+    useCharacterStore.getState().deleteCharacter(characterId);
+    router.push('/characters');
+  };
+  
+  // Handle portrait generation
+  const handleGeneratePortrait = async (customDescription?: string) => {
+    if (!character || !world) return;
+    
+    await portraitOperation.execute({ customDescription });
   };
   
   if (loading) {
@@ -184,7 +203,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
       <PortraitSection
         portrait={character.portrait}
         characterName={character.name}
-        generatingPortrait={generatingPortrait}
+        generatingPortrait={portraitOperation.isLoading}
         onGeneratePortrait={handleGeneratePortrait}
         onRemovePortrait={() => setCharacter({ ...character, portrait: undefined })}
       />
@@ -262,7 +281,7 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
         <Button 
           variant="destructive"
           onClick={() => setShowDeleteDialog(true)}
-          disabled={saving}
+          disabled={saveOperation.isLoading}
         >
           Delete Character
         </Button>
@@ -270,15 +289,15 @@ const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
           <Button 
             variant="outline"
             onClick={handleCancel}
-            disabled={saving}
+            disabled={saveOperation.isLoading}
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSave}
-            disabled={saving}
+            disabled={saveOperation.isLoading}
           >
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saveOperation.isLoading ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>

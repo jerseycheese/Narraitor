@@ -212,13 +212,40 @@ describe('QuickStartCharacters', () => {
 
   describe('Error Handling', () => {
     test('shows error message when archetype generation fails', async () => {
-      mockGenerateArchetypes.mockRejectedValue(new Error('Generation failed'));
-      render(<QuickStartCharacters {...defaultProps} />);
+      // Suppress expected console error
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       
-      await waitFor(() => {
-        expect(screen.getByText('Character Generation Failed')).toBeInTheDocument();
-        expect(screen.getByText('Try Again')).toBeInTheDocument();
+      // Add Jest error handler for unhandled rejections during the test
+      const originalOnUnhandledRejection = process.listeners('unhandledRejection');
+      process.removeAllListeners('unhandledRejection');
+      process.on('unhandledRejection', () => {
+        // Silently handle the expected rejection
       });
+      
+      try {
+        // Mock the async function to reject
+        mockGenerateArchetypes.mockRejectedValue(new Error('Generation failed'));
+        
+        render(<QuickStartCharacters {...defaultProps} />);
+        
+        // Wait for the async operation to complete and error state to render
+        await waitFor(() => {
+          expect(screen.getByText('Character Generation Failed')).toBeInTheDocument();
+        }, { timeout: 5000 });
+        
+        // Verify retry button is present
+        expect(screen.getByText('Try Again')).toBeInTheDocument();
+        
+        // Verify error was logged
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to generate character archetypes:', expect.any(Error));
+      } finally {
+        // Restore console and error handlers
+        consoleSpy.mockRestore();
+        process.removeAllListeners('unhandledRejection');
+        originalOnUnhandledRejection.forEach(listener => {
+          process.on('unhandledRejection', listener);
+        });
+      }
     });
   });
 });

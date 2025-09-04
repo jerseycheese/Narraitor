@@ -9,6 +9,7 @@ import {
   generateCharacterArchetypes, 
   generateRandomArchetype 
 } from '@/lib/utils/characterArchetypes';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,27 +34,42 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   onCustomizeClick,
   existingCharacterNames = []
 }: QuickStartCharactersProps) {
-  const [archetypes, setArchetypes] = useState<CharacterArchetype[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<string | null>(null);
 
-  const generateArchetypes = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const generated = await generateCharacterArchetypes(world, existingCharacterNames);
-      setArchetypes(generated);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Unable to generate character options: ${errorMessage}`);
-    } finally {
-      setLoading(false);
+  // Use the hook for generating archetypes
+  const {
+    execute: generateArchetypesExecute,
+    isLoading: isGeneratingArchetypes,
+    data: archetypes,
+    error: archetypesError
+  } = useAsyncOperation(
+    (world: World, existingNames: string[]) => generateCharacterArchetypes(world, existingNames),
+    {
+      onError: (error) => {
+        console.error('Failed to generate character archetypes:', error);
+      }
     }
-  };
+  );
+
+  // Use the hook for generating random character
+  const {
+    execute: generateRandomCharacterExecute,
+    isLoading: isGeneratingRandom,
+    error: randomError
+  } = useAsyncOperation(
+    (world: World, existingNames: string[]) => generateRandomArchetype(world, existingNames),
+    {
+      onSuccess: (randomArchetype) => {
+        handleArchetypeSelect(randomArchetype);
+      },
+      onError: (error) => {
+        console.error('Failed to generate random character:', error);
+      }
+    }
+  );
 
   useEffect(() => {
-    generateArchetypes();
+    generateArchetypesExecute(world, existingCharacterNames);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [world.id]); // Only depend on world.id to prevent infinite loops from object reference changes
 
@@ -65,20 +81,21 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
     }, SELECTION_DELAY_MS);
   };
 
-
-  const handleRandomSelect = async () => {
-    try {
-      setLoading(true);
-      const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
-      handleArchetypeSelect(randomArchetype);
-    } catch {
-      setError('Failed to generate random character. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handleRandomSelect = () => {
+    generateRandomCharacterExecute(world, existingCharacterNames);
   };
 
-  if (loading && archetypes.length === 0) {
+  const generateArchetypes = () => {
+    generateArchetypesExecute(world, existingCharacterNames);
+  };
+
+  // Combine loading states and errors for the UI
+  const loading = isGeneratingArchetypes || isGeneratingRandom;
+  const error = archetypesError ? `Unable to generate character options: ${archetypesError.message}` : 
+                randomError ? `Failed to generate random character. Please try again.` : null;
+
+
+  if (loading && (!archetypes || archetypes.length === 0)) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center mb-8">
@@ -135,7 +152,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
         className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
         data-testid="archetypes-grid"
       >
-        {archetypes.map((archetype) => (
+        {(archetypes || []).map((archetype) => (
           <ActiveStateCard
             key={archetype.id}
             isActive={selectedArchetype === archetype.id}

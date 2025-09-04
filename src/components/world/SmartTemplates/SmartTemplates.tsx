@@ -13,7 +13,7 @@ import { GenreSelector } from '@/components/shared/GenreSelector/GenreSelector';
 import { TabNavigation, TabOption } from '@/components/shared/TabNavigation';
 import { TemplatePreview } from './TemplatePreview';
 import { RecentTemplates } from '@/components/shared/RecentTemplates';
-import { useAIGeneration } from '@/lib/hooks/useAIGeneration';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface SmartTemplatesProps {
   onTemplateGenerated: (template: WorldTemplate) => void;
@@ -38,30 +38,40 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
   const addTemplateToHistory = useSessionStore(state => state.addTemplateToHistory);
 
   // AI generation hook with proper error handling and loading states
-  const aiGeneration = useAIGeneration<
-    { type: TemplateMode; userInput?: string; genres?: string[] },
-    WorldTemplate
-  >({
-    endpoint: '/api/ai/generate-template',
-    onSuccess: (template) => {
-      // Add to history
-      const historyEntry: TemplateHistoryEntry = {
-        template,
-        generatedAt: new Date().toISOString(),
-        generationType: mode,
-        userInput: mode === 'inspired-by' ? userInput : undefined,
-        genres: mode === 'genre-mix' ? selectedGenres : undefined
-      };
-      
-      addTemplateToHistory(historyEntry);
-      
-      // Show preview
-      setPreviewTemplate(template);
+  const templateGenerationOperation = useAsyncOperation(
+    async (requestData: { type: TemplateMode; userInput?: string; genres?: string[] }) => {
+      const response = await fetch('/api/ai/generate-template', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Template generation failed');
+      }
+
+      const template = await response.json();
+      return template as WorldTemplate;
     },
-    onError: () => {
-      // Error is already handled by the hook's error state
+    {
+      onSuccess: (template) => {
+        // Add to history
+        const historyEntry: TemplateHistoryEntry = {
+          template,
+          generatedAt: new Date().toISOString(),
+          generationType: mode,
+          userInput: mode === 'inspired-by' ? userInput : undefined,
+          genres: mode === 'genre-mix' ? selectedGenres : undefined
+        };
+        
+        addTemplateToHistory(historyEntry);
+        
+        // Show preview
+        setPreviewTemplate(template);
+      }
     }
-  });
+  );
 
   const toggleGenre = useCallback((genre: string) => {
     setSelectedGenres(prev => 
@@ -71,20 +81,15 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
     );
   }, []);
 
-  const generateTemplate = useCallback(async (generationMode: TemplateMode) => {
+  const generateTemplate = useCallback((generationMode: TemplateMode) => {
     const requestBody = {
       type: generationMode,
       userInput: generationMode === 'inspired-by' ? userInput : undefined,
       genres: generationMode === 'genre-mix' ? selectedGenres : undefined,
     };
 
-    try {
-      await aiGeneration.generate(requestBody);
-    } catch {
-      // Error is already handled by the hook's error state
-      // No need to do anything here - the hook manages the error display
-    }
-  }, [userInput, selectedGenres, aiGeneration]);
+    templateGenerationOperation.execute(requestBody);
+  }, [userInput, selectedGenres, templateGenerationOperation]);
 
   const handleUseTemplate = useCallback(() => {
     if (previewTemplate) {
@@ -141,19 +146,19 @@ export const SmartTemplates: React.FC<SmartTemplatesProps> = ({ onTemplateGenera
           <p className="text-gray-700">Get creative starting points for your world with AI assistance</p>
         </div>
 
-      {aiGeneration.error && (
+      {templateGenerationOperation.error && (
         <ErrorDisplay 
-          message={aiGeneration.error}
-          onDismiss={aiGeneration.clearError}
+          message={templateGenerationOperation.error}
+          onDismiss={templateGenerationOperation.clearError}
           className="mb-6"
         />
       )}
 
-      {aiGeneration.isGenerating && (
+      {templateGenerationOperation.isLoading && (
         <LoadingState message="Generating your world template..." />
       )}
 
-      {!aiGeneration.isGenerating && (
+      {!templateGenerationOperation.isLoading && (
         <div className="space-y-8">
           {/* Mode Selection */}
           <div className="space-y-6">

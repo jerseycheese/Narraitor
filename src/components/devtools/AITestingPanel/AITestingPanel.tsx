@@ -5,6 +5,7 @@ import type { AITestConfig, AIResponse } from '@/types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '@/lib/ai/contextOverride';
 import { requestLogger } from '@/lib/ai/requestLogger';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface AITestingPanelProps {
   className?: string;
@@ -12,9 +13,6 @@ interface AITestingPanelProps {
 
 export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   const [testConfig, setTestConfig] = useState<AITestConfig>({});
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [result, setResult] = useState<AIResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   // Mock base data for testing
   const mockWorld = {
@@ -103,12 +101,14 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
   };
 
 
-  const handleGenerateNarrative = async () => {
-    setIsGenerating(true);
-    setError(null);
-    setResult(null);
-
-    try {
+  // Use async operation hook for narrative generation
+  const {
+    execute: generateNarrative,
+    isLoading: isGenerating,
+    data: result,
+    error
+  } = useAsyncOperation(
+    async (): Promise<AIResponse> => {
       // Create test context with overrides
       const testContext = createTestContext(
         mockWorld,
@@ -181,13 +181,12 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
       // Complete request log
       requestLogger.completeRequest(logId, response, responseTime);
 
-      setResult(response);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-    } finally {
-      setIsGenerating(false);
+      return response;
     }
+  );
+
+  const handleGenerateNarrative = () => {
+    generateNarrative();
   };
 
   return (

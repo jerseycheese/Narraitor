@@ -7,14 +7,13 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ExportService } from '@/lib/storage/exportService';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface ExportImportControlsProps {
   className?: string;
 }
 
 export function ExportImportControls({ className = '' }: ExportImportControlsProps) {
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,47 +29,60 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
     }, 5000);
   };
 
-  const handleExport = async () => {
-    if (isExporting || isImporting) return;
-
-    setIsExporting(true);
-    
-    try {
+  // Async operation hook for export
+  const exportOperation = useAsyncOperation(
+    async () => {
       await exportService.downloadGameState();
-      showMessage('Export completed successfully', 'success');
-    } catch {
-      showMessage('Export failed. Please try again.', 'error');
-    } finally {
-      setIsExporting(false);
+      return 'success';
+    },
+    {
+      onSuccess: () => {
+        showMessage('Export completed successfully', 'success');
+      },
+      onError: () => {
+        showMessage('Export failed. Please try again.', 'error');
+      }
     }
+  );
+
+  // Async operation hook for import
+  const importOperation = useAsyncOperation(
+    async (file: File) => {
+      const result = await exportService.importFromFile(file);
+      return result;
+    },
+    {
+      onSuccess: (result) => {
+        if (result.success) {
+          showMessage(result.message || 'Import successful', 'success');
+        } else {
+          showMessage(result.error || 'Import failed', 'error');
+        }
+      },
+      onError: () => {
+        showMessage('Import failed. Please check the file format.', 'error');
+      },
+      onSettled: () => {
+        // Clear file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    }
+  );
+
+  const handleExport = () => {
+    if (exportOperation.isLoading || importOperation.isLoading) return;
+    exportOperation.execute();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    setIsImporting(true);
-    
-    try {
-      const result = await exportService.importFromFile(file);
-      
-      if (result.success) {
-        showMessage(result.message || 'Import successful', 'success');
-      } else {
-        showMessage(result.error || 'Import failed', 'error');
-      }
-    } catch {
-      showMessage('Import failed. Please check the file format.', 'error');
-    } finally {
-      setIsImporting(false);
-      // Clear file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
+    importOperation.execute(file);
   };
 
-  const isLoading = isExporting || isImporting;
+  const isLoading = exportOperation.isLoading || importOperation.isLoading;
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -81,7 +93,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
           variant="outline"
           className="flex-1"
         >
-          {isExporting ? 'Exporting...' : 'Export Game Data'}
+          {exportOperation.isLoading ? 'Exporting...' : 'Export Game Data'}
         </Button>
 
         <div className="flex-1">
@@ -104,7 +116,7 @@ export function ExportImportControls({ className = '' }: ExportImportControlsPro
             variant="outline"
             className="w-full"
           >
-            {isImporting ? 'Importing...' : 'Import Game Data'}
+            {importOperation.isLoading ? 'Importing...' : 'Import Game Data'}
           </Button>
         </div>
       </div>

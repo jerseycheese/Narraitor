@@ -8,6 +8,7 @@ import WorldAttributesForm from '@/components/forms/WorldAttributesForm';
 import WorldSkillsForm from '@/components/forms/WorldSkillsForm';
 import WorldSettingsForm from '@/components/forms/WorldSettingsForm';
 import WorldImageForm from '@/components/forms/WorldImageForm';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 
 interface WorldEditorProps {
   worldId: string;
@@ -18,7 +19,27 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const [world, setWorld] = useState<World | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  
+  // Async operation hook for saving
+  const saveOperation = useAsyncOperation(
+    async (worldData: World) => {
+      const { updateWorld } = useWorldStore.getState();
+      updateWorld(worldId, worldData);
+      
+      // Small delay to show save state
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      return worldData;
+    },
+    {
+      onSuccess: () => {
+        router.push('/worlds'); // Navigate back to worlds list
+      },
+      onError: () => {
+        setError('Failed to save world');
+      }
+    }
+  );
   
   // Load world data on mount
   useEffect(() => {
@@ -44,20 +65,7 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
   const handleSave = async () => {
     if (!world) return;
     
-    setSaving(true);
-    try {
-      const { updateWorld } = useWorldStore.getState();
-      updateWorld(worldId, world);
-      
-      // Small delay to show save state
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      router.push('/worlds'); // Navigate back to worlds list
-    } catch {
-      setError('Failed to save world');
-    } finally {
-      setSaving(false);
-    }
+    await saveOperation.execute(world);
   };
   
   // Handle canceling edits
@@ -131,15 +139,15 @@ const WorldEditor: React.FC<WorldEditorProps> = ({ worldId }) => {
         <Button 
           variant="outline"
           onClick={handleCancel}
-          disabled={saving}
+          disabled={saveOperation.isLoading}
         >
           Cancel
         </Button>
         <Button 
           onClick={handleSave}
-          disabled={saving}
+          disabled={saveOperation.isLoading}
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saveOperation.isLoading ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
     </div>
