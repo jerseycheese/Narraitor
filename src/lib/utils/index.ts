@@ -159,6 +159,14 @@ export {
  */
 export { ResponseExtractor } from './responseExtractor';
 
+/** 
+ * Narrative parsing utilities for AI response content processing
+ * Handles JSON code blocks, malformed JSON, and multiple fallback strategies
+ * @see narrativeParser.ts for detailed usage examples
+ */
+export { parseNarrativeContent, parseNarrativeContentWithMetadata } from './narrativeParser';
+export type { NarrativeParseResult } from './narrativeParser';
+
 /** Type definitions for performance measurement */
 export type {
   PerformanceMeasurement,
