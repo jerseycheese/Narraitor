@@ -57,7 +57,7 @@ export default function CharacterViewPage() {
       label: 'Play with Character',
       onClick: () => {
         setCurrentCharacter(characterId);
-        router.push(`/world/${character.worldId}/play`);
+        router.push(`/worlds/${character.worldId}/play`);
       },
       variant: 'success' as const,
       icon: (

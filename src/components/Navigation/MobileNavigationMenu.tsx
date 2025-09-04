@@ -80,7 +80,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
 
   const handleWorldSwitch = useCallback((worldId: string) => {
     setCurrentWorld(worldId);
-    onNavigate(`/world/${worldId}`);
+    onNavigate(`/worlds/${worldId}`);
     onClose();
   }, [setCurrentWorld, onNavigate, onClose]);
 
@@ -123,7 +123,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           onClick={() => handleNavigation('/worlds')}
           variant="ghost"
           className={`w-full min-h-11 flex items-center gap-3 px-4 py-3 text-left text-lg font-medium justify-start ${
-            pathname === '/worlds' || pathname.startsWith('/world/') 
+            pathname === '/worlds' || pathname.startsWith('/worlds/') 
               ? 'bg-gray-700 text-white' 
               : 'text-link-nav-dark hover:bg-gray-900'
           }`}
@@ -208,7 +208,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
         <div className="pt-4 mt-4 border-t border-gray-700">
           {currentWorld ? (
             <Button
-              onClick={() => handleNavigation(`/world/${currentWorld.id}/play`)}
+              onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,7 +219,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
             </Button>
           ) : Object.keys(worlds).length === 0 ? (
             <Button
-              onClick={() => handleNavigation('/world/create')}
+              onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +229,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
             </Button>
           ) : (
             <Button
-              onClick={() => handleNavigation('/world/create')}
+              onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

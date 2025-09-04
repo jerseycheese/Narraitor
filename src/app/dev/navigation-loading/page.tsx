@@ -31,7 +31,7 @@ export default function NavigationLoadingTestPage() {
   const testNavigationRoutes = [
     { path: '/worlds', label: 'Worlds Page', message: 'Loading worlds...' },
     { path: '/characters', label: 'Characters Page', message: 'Loading characters...' },
-    { path: '/world/create', label: 'Create World', message: 'Setting up world creation...' },
+    { path: '/worlds/create', label: 'Create World', message: 'Setting up world creation...' },
     { path: '/characters/create', label: 'Create Character', message: 'Preparing character creation...' },
   ];
 

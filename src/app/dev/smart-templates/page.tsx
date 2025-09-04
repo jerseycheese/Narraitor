@@ -62,7 +62,7 @@ export default function SmartTemplatesTestPage() {
     // Add a small delay to ensure storage is complete before navigation
     setTimeout(() => {
       console.log('Navigating to wizard...');
-      router.push('/world/create?step=1');
+      router.push('/worlds/create?step=1');
     }, 100);
   };
 

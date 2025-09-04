@@ -239,7 +239,7 @@ export function EndingScreen() {
         
         setCurrentCharacter(currentEnding.characterId);
         clearEnding();
-        router.push(`/world/${currentEnding.worldId}/play?fresh=true`);
+        router.push(`/worlds/${currentEnding.worldId}/play?fresh=true`);
       },
       variant: 'success',
       flex: true,

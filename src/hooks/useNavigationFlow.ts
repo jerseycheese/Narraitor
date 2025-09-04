@@ -38,7 +38,7 @@ export function useNavigationFlow() {
       if (Object.keys(worlds).length === 0) {
         return {
           label: 'Create Your First World',
-          href: '/world/create',
+          href: '/worlds/create',
           action: 'create-world',
           isEnabled: true,
         };
@@ -132,7 +132,7 @@ export function useNavigationFlow() {
       return 'playing';
     }
 
-    if (!currentWorldId || pathname === '/worlds' || pathname === '/world/create') {
+    if (!currentWorldId || pathname === '/worlds' || pathname === '/worlds/create') {
       return 'world';
     }
 

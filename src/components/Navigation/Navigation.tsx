@@ -86,7 +86,7 @@ export function Navigation() {
     setShowWorldSwitcher(false);
     // Navigate to the selected world's view page with loading state
     const worldName = worlds[worldId]?.name || 'world';
-    navigateWithLoading(`/world/${worldId}`, `Loading ${worldName}...`);
+    navigateWithLoading(`/worlds/${worldId}`, `Loading ${worldName}...`);
   };
   
   // Don't show navigation on dev pages
@@ -137,7 +137,7 @@ export function Navigation() {
                   href="/worlds" 
                   data-navigation
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
-                    pathname === '/worlds' || pathname.startsWith('/world/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
+                    pathname === '/worlds' || pathname.startsWith('/worlds/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
                   }`}
                 >
                   Worlds
@@ -241,7 +241,7 @@ export function Navigation() {
               {currentWorld && (
                 <Button 
                   type="button"
-                  onClick={() => navigateWithLoading(`/world/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
+                  onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
                   className="hidden sm:inline-flex items-center bg-green-500 hover:bg-green-700 text-white text-sm font-medium"
                 >
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ export function Navigation() {
               {!currentWorld && Object.keys(worlds).length === 0 && (
                 <Button 
                   type="button"
-                  onClick={() => navigateWithLoading('/world/create', 'Setting up world creation...')}
+                  onClick={() => navigateWithLoading('/worlds/create', 'Setting up world creation...')}
                   className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium"
                 >
                   Create Your First World

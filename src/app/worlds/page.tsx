@@ -45,7 +45,7 @@ export default function WorldsPage() {
   }, [showPrompt, isGenerating]);
 
   const handleCreateWorld = () => {
-    router.push('/world/create');
+    router.push('/worlds/create');
   };
 
   const handleGenerateWorld = async () => {

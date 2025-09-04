@@ -411,7 +411,7 @@ export default function CharactersPage() {
       onClick: () => {
         const character = characters[currentCharacterId];
         if (character) {
-          router.push(`/world/${character.worldId}/play`);
+          router.push(`/worlds/${character.worldId}/play`);
         }
       },
       variant: 'success' as const,
@@ -457,7 +457,7 @@ export default function CharactersPage() {
       {worldIdFromUrl && !currentWorld?.image?.url && (
         <div className="mb-6 -mt-8">
           <Link
-            href={`/world/${worldIdFromUrl}`}
+            href={`/worlds/${worldIdFromUrl}`}
             className="text-link-primary flex items-center gap-2 no-underline"
           >
             <span>←</span> Back to {currentWorld.name}
@@ -536,7 +536,7 @@ export default function CharactersPage() {
               onView={() => handleViewCharacter(character.id)}
               onPlay={() => {
                 setCurrentCharacter(character.id);
-                router.push(`/world/${character.worldId}/play`);
+                router.push(`/worlds/${character.worldId}/play`);
               }}
               onEdit={() => handleEditCharacter(character.id)}
               onDelete={() => handleDeleteCharacter(character.id)}

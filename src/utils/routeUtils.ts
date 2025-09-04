@@ -39,8 +39,28 @@ export function parseRoute(pathname: string): ParsedRoute {
   const segments: RouteSegment[] = [];
   
   // Special handling for known patterns
-  if (parts[0] === 'world' && parts[1]) {
-    // /world/123 pattern
+  if (parts[0] === 'worlds' && parts[1] && parts[1] !== 'create') {
+    // /worlds/123 pattern (consolidated route)
+    segments.push({
+      path: 'worlds',
+      param: undefined,
+      value: undefined
+    });
+    segments.push({
+      path: parts[1],
+      param: 'id',
+      value: parts[1]
+    });
+    // Continue processing remaining parts
+    for (let i = 2; i < parts.length; i++) {
+      segments.push({
+        path: parts[i],
+        param: undefined,
+        value: undefined
+      });
+    }
+  } else if (parts[0] === 'world' && parts[1]) {
+    // Legacy /world/123 pattern (maintain backward compatibility during transition)
     segments.push({
       path: 'world',
       param: 'id',
@@ -127,15 +147,54 @@ export function buildBreadcrumbSegments(
     isCurrentPage: false
   });
   
-  // Handle world routes
-  if (pathname.startsWith('/world/')) {
+  // Handle consolidated world routes
+  if (pathname.startsWith('/worlds/')) {
+    const worldIdMatch = pathname.match(/\/worlds\/([^\/]+)/);
+    if (worldIdMatch) {
+      const worldId = worldIdMatch[1];
+      
+      // Skip adding breadcrumb for create page
+      if (worldId === 'create') {
+        segments.push({
+          label: 'Create World',
+          href: '/worlds/create',
+          isCurrentPage: pathname === '/worlds/create'
+        });
+      } else {
+        // Individual world
+        const world = worlds[worldId];
+        segments.push({
+          label: world?.name || 'Loading...',
+          href: `/worlds/${worldId}`,
+          isCurrentPage: pathname === `/worlds/${worldId}`
+        });
+        
+        // Handle sub-routes (edit, play)
+        if (pathname.includes('/edit')) {
+          segments.push({
+            label: 'Edit',
+            href: `/worlds/${worldId}/edit`,
+            isCurrentPage: pathname === `/worlds/${worldId}/edit`
+          });
+        } else if (pathname.includes('/play')) {
+          segments.push({
+            label: 'Play',
+            href: `/worlds/${worldId}/play`,
+            isCurrentPage: pathname === `/worlds/${worldId}/play`
+          });
+        }
+      }
+    }
+  } 
+  // Handle legacy world routes (during transition)
+  else if (pathname.startsWith('/world/')) {
     const worldIdMatch = pathname.match(/\/world\/([^\/]+)/);
     if (worldIdMatch) {
       const worldId = worldIdMatch[1];
       const world = worlds[worldId];
       segments.push({
         label: world?.name || 'Loading...',
-        href: `/world/${worldId}`,
+        href: `/worlds/${worldId}`, // Redirect to new route
         isCurrentPage: pathname === `/world/${worldId}`
       });
     }
@@ -147,7 +206,7 @@ export function buildBreadcrumbSegments(
     if (currentWorldId && worlds[currentWorldId]) {
       segments.push({
         label: worlds[currentWorldId].name,
-        href: `/world/${currentWorldId}`,
+        href: `/worlds/${currentWorldId}`,
         isCurrentPage: false
       });
     }

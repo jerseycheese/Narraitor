@@ -41,7 +41,7 @@ export default function WorldViewPage() {
       router.push(`/characters?worldId=${worldId}`);
     } else {
       // Has characters, go to play page
-      router.push(`/world/${worldId}/play`);
+      router.push(`/worlds/${worldId}/play`);
     }
   };
 
@@ -63,7 +63,7 @@ export default function WorldViewPage() {
     },
     {
       label: 'Edit World',
-      onClick: () => router.push(`/world/${worldId}/edit`),
+      onClick: () => router.push(`/worlds/${worldId}/edit`),
       variant: 'secondary' as const
     },
     {

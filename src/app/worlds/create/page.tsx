@@ -64,7 +64,7 @@ export default function CreateWorldPage() {
   }, [searchParams]);
 
   const handleComplete = (worldId: string) => {
-    router.push(`/world/${worldId}`);
+    router.push(`/worlds/${worldId}`);
   };
 
   const handleCancel = () => {
