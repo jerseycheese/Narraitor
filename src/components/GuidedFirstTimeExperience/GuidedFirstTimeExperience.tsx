@@ -8,6 +8,7 @@ import { WizardContainer } from '@/components/shared/wizard/WizardContainer';
 import { WizardProgress } from '@/components/shared/wizard/WizardProgress';
 import { useWizardState } from '@/components/shared/wizard/hooks/useWizardState';
 import { validators, validateField } from '@/components/shared/wizard/utils/validation';
+import { useAsyncOperation } from '@/lib/hooks/useAsyncOperation';
 import { GENRES } from '@/lib/constants/genres';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
@@ -32,39 +33,9 @@ export function GuidedFirstTimeExperience() {
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const { createWorld, setCurrentWorld } = useWorldStore();
 
-  // Validation function for wizard steps
-  const validateStep = useCallback((step: number, data: OnboardingData) => {
-    switch (step) {
-      case 0: // Welcome step - always valid
-        return { valid: true, errors: [], touched: true };
-      case 1: // Concept step
-        const conceptErrors = validateWorldTypeData(data.worldTypeData);
-        return {
-          valid: conceptErrors.length === 0,
-          errors: conceptErrors,
-          touched: true,
-        };
-      case 2: // Details step
-        // For "Set Within" and "Inspired By" worlds, genre is optional since it can be inferred from the universe
-        const isSetWithin = data.worldTypeData.worldType === 'set_within';
-        const isInspiredBy = data.worldTypeData.worldType === 'inspired_by';
-        const isGenreOptional = isSetWithin || isInspiredBy;
-        const genreValidators = isGenreOptional ? [] : [(value: string) => validators.required(value, 'Genre')];
-        const genreError = validateField(data.genre, genreValidators);
-        const errors = [genreError].filter(Boolean) as string[];
-        return {
-          valid: errors.length === 0,
-          errors,
-          touched: true,
-        };
-      default:
-        return { valid: true, errors: [], touched: true };
-    }
-  }, []);
-
-  // Complete onboarding and create world
-  const handleComplete = useCallback(async (data: OnboardingData) => {
-    try {
+  // World creation async operation
+  const worldCreationOperation = useAsyncOperation(
+    async (data: OnboardingData) => {
       // Get existing world names to avoid duplicates
       const { worlds } = useWorldStore.getState();
       const existingNames = Object.values(worlds).map(world => world.name);
@@ -148,19 +119,59 @@ export function GuidedFirstTimeExperience() {
         // Don't fail the onboarding if image generation fails
       }
 
-      // Set as current world
-      setCurrentWorld(worldId);
-      
-      // Mark onboarding as completed
-      setOnboardingCompleted(true);
-      
-      // Navigate to character creation to continue the flow
-      router.push(`/characters/create?worldId=${worldId}`);
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      throw error; // Re-throw to let wizard handle it
+      return worldId;
+    },
+    {
+      onSuccess: (worldId) => {
+        // Set as current world
+        setCurrentWorld(worldId);
+        
+        // Mark onboarding as completed
+        setOnboardingCompleted(true);
+        
+        // Navigate to character creation to continue the flow
+        router.push(`/characters/create?worldId=${worldId}`);
+      },
+      onError: (error) => {
+        console.error('Error completing onboarding:', error);
+      }
     }
-  }, [createWorld, setCurrentWorld, setOnboardingCompleted, router]);
+  );
+
+  // Validation function for wizard steps
+  const validateStep = useCallback((step: number, data: OnboardingData) => {
+    switch (step) {
+      case 0: // Welcome step - always valid
+        return { valid: true, errors: [], touched: true };
+      case 1: // Concept step
+        const conceptErrors = validateWorldTypeData(data.worldTypeData);
+        return {
+          valid: conceptErrors.length === 0,
+          errors: conceptErrors,
+          touched: true,
+        };
+      case 2: // Details step
+        // For "Set Within" and "Inspired By" worlds, genre is optional since it can be inferred from the universe
+        const isSetWithin = data.worldTypeData.worldType === 'set_within';
+        const isInspiredBy = data.worldTypeData.worldType === 'inspired_by';
+        const isGenreOptional = isSetWithin || isInspiredBy;
+        const genreValidators = isGenreOptional ? [] : [(value: string) => validators.required(value, 'Genre')];
+        const genreError = validateField(data.genre, genreValidators);
+        const errors = [genreError].filter(Boolean) as string[];
+        return {
+          valid: errors.length === 0,
+          errors,
+          touched: true,
+        };
+      default:
+        return { valid: true, errors: [], touched: true };
+    }
+  }, []);
+
+  // Complete onboarding and create world
+  const handleComplete = useCallback(async (data: OnboardingData) => {
+    await worldCreationOperation.execute(data);
+  }, [worldCreationOperation]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
@@ -184,6 +195,8 @@ export function GuidedFirstTimeExperience() {
     onCancel: handleSkip,
     validateStep,
     persistKey: 'narraitor-onboarding',
+    isProcessing: worldCreationOperation.isLoading,
+    currentError: worldCreationOperation.error,
   });
 
   // Memoized render functions for performance
