@@ -3,7 +3,7 @@ import { NarrativeSegment } from '@/types/narrative.types';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { formatAIResponse, FormattingOptions } from '@/lib/utils/textFormatter';
-import { safeTrim, getNestedValue } from '@/lib/utils';
+import { parseNarrativeContent, getNestedValue } from '@/lib/utils';
 
 
 interface NarrativeDisplayProps {
@@ -112,94 +112,6 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
     }
   };
 
-  // Parse content if it's in JSON format
-  const parseContent = (content: string): string => {
-    // Skip parsing if content is empty or not a string
-    if (!content || typeof content !== 'string') {
-      return content || '';
-    }
-    
-    // If content is suspiciously short and looks like metadata, return a fallback message
-    if (safeTrim(content).length < 20 && (content.includes('scene') || content.includes('Starting Location'))) {
-      return 'The story is beginning... (Content generation in progress)';
-    }
-    
-    // Check if content starts with ```json
-    if (safeTrim(content).startsWith('```json')) {
-      try {
-        // Extract JSON string between backticks
-        const jsonStr = safeTrim(content).replace(/^```json\s*/, '').replace(/\s*```$/, '');
-        
-        // Pre-process JSON string to handle bad control characters
-        // Replace control characters that would cause JSON.parse to fail
-        const sanitizedJson = jsonStr.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ');
-        
-        try {
-          const parsed = JSON.parse(sanitizedJson);
-          
-          // If parsed successfully and has content property, return that
-          if (parsed && typeof parsed.content === 'string') {
-            return parsed.content;
-          } else if (parsed && typeof parsed.text === 'string') {
-            // Some models return 'text' instead of 'content'
-            return parsed.text;
-          } else if (parsed && typeof parsed === 'object') {
-            // If we have an object but no direct content field, check for nested structure
-            // Common for some AI response formats
-            if (parsed.response?.content) return parsed.response.content as string;
-            if (parsed.narrative?.content) return parsed.narrative.content as string;
-            if (parsed.scene?.description) return parsed.scene.description as string;
-            
-            // If it's just a string property, return the first one we find
-            for (const key in parsed) {
-              if (typeof parsed[key] === 'string' && parsed[key].length > 20) {
-                return parsed[key];
-              }
-            }
-          }
-        } catch {
-          // If proper JSON parsing fails, try more lenient approaches
-          console.warn('Strict JSON parsing failed, trying regex extraction');
-          
-          // First look for content field
-          const contentMatch = jsonStr.match(/"content"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
-          if (contentMatch && contentMatch[1]) {
-            return contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
-          }
-          
-          // Then try text field
-          const textMatch = jsonStr.match(/"text"\s*:\s*"([^"]*(?:\\.[^"]*)*)"/);
-          if (textMatch && textMatch[1]) {
-            return textMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
-          }
-          
-          // As a last resort, try to extract any large string
-          const anyStringMatch = jsonStr.match(/"[^"]+"\s*:\s*"([^"]{20,}(?:\\.[^"]*)*)"/);
-          if (anyStringMatch && anyStringMatch[1]) {
-            return anyStringMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n');
-          }
-        }
-      } catch (error) {
-        console.error('Failed to parse code block content:', error);
-      }
-    }
-    
-    // Final check for raw JSON without code markers
-    if (safeTrim(content).startsWith('{') && safeTrim(content).endsWith('}')) {
-      try {
-        const parsed = JSON.parse(content);
-        if (parsed && typeof parsed.content === 'string') {
-          return parsed.content;
-        } else if (parsed && typeof parsed.text === 'string') {
-          return parsed.text;
-        }
-      } catch {
-        // Ignore error, just return the content as-is
-      }
-    }
-    
-    return content;
-  };
 
   const getFormattingOptions = (type: string): FormattingOptions => {
     switch (type) {
@@ -248,7 +160,7 @@ export const NarrativeDisplay: React.FC<NarrativeDisplayProps> = ({
 
   const styles = getSegmentStyles(segment.type);
   const formattingOptions = getFormattingOptions(segment.type);
-  const parsedContent = parseContent(segment.content);
+  const parsedContent = parseNarrativeContent(segment.content);
   const formattedContent = formatAIResponse(parsedContent, formattingOptions);
 
   return (
