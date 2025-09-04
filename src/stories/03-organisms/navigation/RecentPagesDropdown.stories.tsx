@@ -110,7 +110,7 @@ export const Default: Story = {
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
         {
-          path: '/world/fantasy-realm',
+          path: '/worlds/fantasy-realm',
           timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
@@ -184,7 +184,7 @@ export const LongTitlesAndPaths: Story = {
     navigationState: {
       history: [
         {
-          path: '/world/very-long-world-name-that-should-be-truncated',
+          path: '/worlds/very-long-world-name-that-should-be-truncated',
           timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
@@ -304,7 +304,7 @@ export const PagesWithoutTitles: Story = {
           timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
         },
         {
-          path: '/world/fantasy-realm',
+          path: '/worlds/fantasy-realm',
           timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
         },
       ],
@@ -368,7 +368,7 @@ export const InteractiveDemo: Story = {
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },
         {
-          path: '/world/fantasy-realm',
+          path: '/worlds/fantasy-realm',
           timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
           title: '03-Organisms/navigation/RecentPagesDropdown',
         },

@@ -69,7 +69,7 @@ Sometimes you create a world and then realize you want to tweak things. Maybe yo
 
 ### Architecture
 ```
-/world/[id]/edit (page)
+/worlds/[id]/edit (page)
   └── WorldEditor (component)
       ├── WorldBasicInfoForm
       ├── WorldAttributesForm
@@ -98,7 +98,7 @@ const handleSave = (worldData: Partial<World>) => {
 
 ### Navigation Flow
 1. Access via "Edit" button on world cards
-2. Navigate to `/world/[id]/edit` route
+2. Navigate to `/worlds/[id]/edit` route
 3. Load existing world data into forms
 4. Make modifications with live validation
 5. Save changes with optimistic updates

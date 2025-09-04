@@ -10,7 +10,7 @@ The main application has these routes:
 - `/` - Home page (redirects to /worlds)
 - `/worlds` - World list page with "Create World" button
 - `/worlds/[id]` - Individual world page (404 until implemented)
-- `/world/create` - World creation page
+- `/worlds/create` - World creation page
 
 **Development Routes:**
 - `/dev` - Development test harness index

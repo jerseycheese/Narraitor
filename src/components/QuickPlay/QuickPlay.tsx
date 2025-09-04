@@ -51,7 +51,7 @@ export function QuickPlay() {
     
     const success = resumeSavedSession(mostRecentSession.id);
     if (success) {
-      router.push(`/world/${mostRecentSession.worldId}/play`);
+      router.push(`/worlds/${mostRecentSession.worldId}/play`);
     }
   };
 

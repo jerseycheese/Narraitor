@@ -70,7 +70,7 @@ describe('WorldCard', () => {
     
     // The hero link should navigate to the world detail page
     const heroLink = worldTitle.closest('a');
-    expect(heroLink).toHaveAttribute('href', `/world/${mockWorld.id}`);
+    expect(heroLink).toHaveAttribute('href', `/worlds/${mockWorld.id}`);
   });
 
   // New test for Play functionality (navigates to characters when no characters exist)
@@ -119,7 +119,7 @@ describe('WorldCard', () => {
     fireEvent.click(screen.getByTestId('world-card-actions-edit-button'));
     
     // Verify navigation to edit page
-    expect(mockRouterPush).toHaveBeenCalledWith(`/world/${mockWorld.id}/edit`);
+    expect(mockRouterPush).toHaveBeenCalledWith(`/worlds/${mockWorld.id}/edit`);
   });
 
   // Test for world type badges

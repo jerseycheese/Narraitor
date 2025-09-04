@@ -66,10 +66,10 @@ There's **automatic cleanup** with a 30-second safety timeout in case something 
 const { navigateWithLoading } = useNavigationLoading();
 
 // Basic navigation
-navigateWithLoading('/world/123');
+navigateWithLoading('/worlds/123');
 
 // With custom message
-navigateWithLoading('/world/123', 'Loading world details...');
+navigateWithLoading('/worlds/123', 'Loading world details...');
 ```
 
 ### Form Submissions

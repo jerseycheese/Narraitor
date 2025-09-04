@@ -15,9 +15,10 @@ describe('routeUtils', () => {
     });
 
     it('should parse path with ID parameter', () => {
-      const result = parseRoute('/world/123');
+      const result = parseRoute('/worlds/123');
       expect(result.segments).toEqual([
-        { path: 'world', param: 'id', value: '123' }
+        { path: 'worlds', param: undefined, value: undefined },
+        { path: '123', param: 'id', value: '123' }
       ]);
     });
 
@@ -46,7 +47,7 @@ describe('routeUtils', () => {
 
     it('should build breadcrumbs for world detail page', () => {
       const segments = buildBreadcrumbSegments(
-        '/world/123',
+        '/worlds/123',
         mockWorlds,
         mockCharacters,
         '123'
@@ -59,7 +60,7 @@ describe('routeUtils', () => {
         },
         {
           label: 'Fantasy Realm',
-          href: '/world/123',
+          href: '/worlds/123',
           isCurrentPage: true
         }
       ]);
@@ -80,7 +81,7 @@ describe('routeUtils', () => {
         },
         {
           label: 'Fantasy Realm',
-          href: '/world/123',
+          href: '/worlds/123',
           isCurrentPage: false
         },
         {
@@ -93,7 +94,7 @@ describe('routeUtils', () => {
 
     it('should handle missing entity names', () => {
       const segments = buildBreadcrumbSegments(
-        '/world/999',
+        '/worlds/999',
         {},  // No worlds
         {},
         '999'

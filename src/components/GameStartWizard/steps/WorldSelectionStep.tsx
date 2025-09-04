@@ -23,7 +23,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
           Create your first world to begin your adventure
         </p>
         <Link
-          href="/world/create"
+          href="/worlds/create"
           className="inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-medium rounded-md transition-colors"
         >
           Create Your First World
@@ -53,7 +53,7 @@ export function WorldSelectionStep({ onNext }: WorldSelectionStepProps) {
 
       <div className="flex justify-between items-center pt-4 border-t">
         <Link
-          href="/world/create"
+          href="/worlds/create"
           className="text-link-primary font-medium no-underline"
         >
           Create New World

@@ -15,7 +15,7 @@
     "world": {
       "keywords": ["world", "template", "genre", "creation", "configuration"],
       "paths": [
-        "src/app/world/",
+        "src/app/worlds/",
         "src/components/World/",
         "src/state/worldStore.ts"
       ]

@@ -55,7 +55,7 @@ npm run dev
 
 ### 4. Verify Secure Implementation
 
-1. **Navigate to a game session page**: `/world/[worldId]/play`
+1. **Navigate to a game session page**: `/worlds/[worldId]/play`
 2. **Trigger narrative generation** (start a game or make a choice)
 3. **Check Network tab** - you should see:
    ```
