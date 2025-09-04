@@ -59,21 +59,6 @@ export function parseRoute(pathname: string): ParsedRoute {
         value: undefined
       });
     }
-  } else if (parts[0] === 'world' && parts[1]) {
-    // Legacy /world/123 pattern (maintain backward compatibility during transition)
-    segments.push({
-      path: 'world',
-      param: 'id',
-      value: parts[1]
-    });
-    // Continue processing remaining parts
-    for (let i = 2; i < parts.length; i++) {
-      segments.push({
-        path: parts[i],
-        param: undefined,
-        value: undefined
-      });
-    }
   } else if (parts[0] === 'characters' && parts[1] && parts[1] !== 'create') {
     // /characters/char-456 pattern
     segments.push({
@@ -184,19 +169,6 @@ export function buildBreadcrumbSegments(
           });
         }
       }
-    }
-  } 
-  // Handle legacy world routes (during transition)
-  else if (pathname.startsWith('/world/')) {
-    const worldIdMatch = pathname.match(/\/world\/([^\/]+)/);
-    if (worldIdMatch) {
-      const worldId = worldIdMatch[1];
-      const world = worlds[worldId];
-      segments.push({
-        label: world?.name || 'Loading...',
-        href: `/worlds/${worldId}`, // Redirect to new route
-        isCurrentPage: pathname === `/world/${worldId}`
-      });
     }
   }
   

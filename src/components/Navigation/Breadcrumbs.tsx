@@ -203,7 +203,7 @@ export function Breadcrumbs({
 function getTestId(segment: BreadcrumbSegment): string {
   // Check for loading states
   if (segment.label === 'Loading...') {
-    if (segment.href.includes('/worlds/') || segment.href.includes('/world/')) {
+    if (segment.href.includes('/worlds/') ) {
       return 'breadcrumb-world-loading';
     }
     if (segment.href.includes('/characters/')) {
@@ -215,7 +215,7 @@ function getTestId(segment: BreadcrumbSegment): string {
   if (segment.label === 'Worlds') {
     return 'breadcrumb-home';
   }
-  if (segment.href.startsWith('/worlds/') || segment.href.startsWith('/world/')) {
+  if (segment.href.startsWith('/worlds/') ) {
     return 'breadcrumb-world';
   }
   if (segment.href === '/characters') {
@@ -240,7 +240,7 @@ function getSegmentIcon(segment: BreadcrumbSegment): React.ReactNode {
   }
   
   // World segments
-  if (segment.href.startsWith('/worlds/') || segment.href.startsWith('/world/')) {
+  if (segment.href.startsWith('/worlds/') ) {
     return <Globe className="w-4 h-4" data-testid="icon-globe" aria-hidden="true" />;
   }
   
