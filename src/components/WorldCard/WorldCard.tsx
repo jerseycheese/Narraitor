@@ -119,8 +119,8 @@ const WorldCard: React.FC<WorldCardProps> = ({
       if (actualRouter) {
         // Add query parameter to auto-resume if there's a saved session
         const url = hasSession
-          ? `/world/${world.id}/play?autoResume=true`
-          : `/world/${world.id}/play`;
+          ? `/worlds/${world.id}/play?autoResume=true`
+          : `/worlds/${world.id}/play`;
         actualRouter.push(url);
       }
     } catch {
@@ -131,7 +131,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   const handleEditClick = () => {
     try {
       if (actualRouter) {
-        actualRouter.push(`/world/${world.id}/edit`);
+        actualRouter.push(`/worlds/${world.id}/edit`);
       }
     } catch {
       // Handle navigation errors gracefully
@@ -147,7 +147,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
       hasImage={true}
     >
       {/* Always show Hero component - with image or themed background */}
-      <Link href={`/world/${world.id}`} className="block cursor-pointer">
+      <Link href={`/worlds/${world.id}`} className="block cursor-pointer">
         <Hero
           title={world.name}
           image={world.image?.url ? {
@@ -310,7 +310,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
                   onClick: (e) => {
                     e.stopPropagation();
                     if (actualRouter) {
-                      actualRouter.push(`/world/${world.id}`);
+                      actualRouter.push(`/worlds/${world.id}`);
                     }
                   },
                   variant: 'secondary',
