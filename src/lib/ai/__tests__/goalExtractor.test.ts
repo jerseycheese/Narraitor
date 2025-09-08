@@ -136,13 +136,13 @@ describe('goalExtractor', () => {
 
       expect(result.newGoals).toHaveLength(3);
       
-      const goalTitles = result.newGoals.map((g: NarrativeGoal) => g.title.toLowerCase());
+      const goalTitles = result.newGoals.map((g) => g.title.toLowerCase());
       expect(goalTitles.some((title: string) => title.includes('artifact'))).toBe(true);
       expect(goalTitles.some((title: string) => title.includes('daughter') || title.includes('rescue'))).toBe(true);
       expect(goalTitles.some((title: string) => title.includes('message') || title.includes('deliver'))).toBe(true);
       
       // All should be quest type since they're explicit tasks
-      expect(result.newGoals.every((g: NarrativeGoal) => g.type === 'quest')).toBe(true);
+      expect(result.newGoals.every((g) => g.type === 'quest')).toBe(true);
     });
 
     test('should prioritize goals based on narrative urgency', async () => {
@@ -158,8 +158,8 @@ describe('goalExtractor', () => {
 
       expect(result.newGoals).toHaveLength(2);
       
-      const urgentGoal = result.newGoals.find((g: NarrativeGoal) => g.title.toLowerCase().includes('sarah') || g.title.toLowerCase().includes('find'));
-      const routineGoal = result.newGoals.find((g: NarrativeGoal) => g.title.toLowerCase().includes('book') || g.title.toLowerCase().includes('library'));
+      const urgentGoal = result.newGoals.find((g) => g.title.toLowerCase().includes('sarah') || g.title.toLowerCase().includes('find'));
+      const routineGoal = result.newGoals.find((g) => g.title.toLowerCase().includes('book') || g.title.toLowerCase().includes('library'));
       
       expect(urgentGoal?.priority).toBe('critical');
       expect(urgentGoal?.type).toBe('survival');

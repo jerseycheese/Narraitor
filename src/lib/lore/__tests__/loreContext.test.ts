@@ -16,7 +16,7 @@ describe('buildLoreContext', () => {
 
     it('handles invalid facts gracefully', () => {
       const invalidFacts = [
-        { id: 'invalid1', category: 'unknown' as 'characters', value: 'Invalid fact', source: 'manual', worldId: 'world1', sessionId: 'session1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        { id: 'invalid1', key: 'unknown_fact', category: 'unknown' as 'characters', value: 'Invalid fact', source: 'manual' as const, worldId: 'world1', sessionId: 'session1', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
       ];
       
       const result = buildLoreContext(invalidFacts);

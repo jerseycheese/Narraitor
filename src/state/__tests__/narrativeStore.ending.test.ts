@@ -19,7 +19,6 @@ describe('narrativeStore - Ending functionality', () => {
       decisions: {},
       sessionDecisions: {},
       endedSessions: {}, // Add session locking state
-      currentSegmentId: null,
       currentEnding: null,
       isGeneratingEnding: false,
       endingError: null,
@@ -197,8 +196,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       useNarrativeStore.setState({
@@ -228,8 +227,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       useNarrativeStore.setState({
@@ -265,8 +264,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       useNarrativeStore.setState({
@@ -296,8 +295,8 @@ describe('narrativeStore - Ending functionality', () => {
         characterLegacy: 'A hero...',
         worldImpact: 'Peace...',
         timestamp: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
       useNarrativeStore.setState({
@@ -313,8 +312,8 @@ describe('narrativeStore - Ending functionality', () => {
               endingData: mockEnding
             },
             timestamp: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date()
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           }
         }
       });
@@ -378,7 +377,11 @@ describe('narrativeStore - Ending functionality', () => {
         store.addSegment(sessionId, {
           type: 'scene',
           content: 'New content',
-          metadata: {}
+          timestamp: new Date(),
+          updatedAt: new Date().toISOString(),
+          metadata: {
+            tags: []
+          }
         });
       }).toThrow('Cannot add segments to an ended session');
     });

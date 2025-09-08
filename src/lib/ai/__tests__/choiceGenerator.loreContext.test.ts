@@ -69,6 +69,12 @@ rules: magic_rule = Magic requires concentration
     const params = {
       worldId: 'world-123',
       narrativeContext: {
+        worldId: 'world-123',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
         currentLocation: 'Ancient Forest',
         recentSegments: []
       },
@@ -99,6 +105,12 @@ rules: magic_rule = Magic requires concentration
     const params = {
       worldId: 'world-123',
       narrativeContext: {
+        worldId: 'world-123',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
         currentLocation: 'Empty Room',
         recentSegments: []
       },
@@ -133,6 +145,12 @@ rules: travel_rule = The marshlands cannot be crossed at night
     const params = {
       worldId: 'world-123',
       narrativeContext: {
+        worldId: 'world-123',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
         currentLocation: 'Edge of Cursed Marshlands',
         currentSituation: 'Approaching dangerous territory at dusk',
         recentSegments: []
@@ -163,6 +181,12 @@ rules: combat_rule = Magic users become exhausted after casting spells
     const params = {
       worldId: 'world-123',
       narrativeContext: {
+        worldId: 'world-123',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: [],
+        sessionId: 'session-1',
         currentSituation: 'Just finished casting a powerful spell',
         recentSegments: []
       },

@@ -44,7 +44,7 @@ export function ActionButtonGroup({ actions, className = '' }: ActionButtonGroup
     <div className={`flex gap-3 ${className}`}>
       {actions.map((action, index) => (
         <Button
-          key={index}
+          key={`action-${action.label}-${index}`}
           onClick={action.onClick}
           variant={mapVariant(action.variant)}
           size={action.size || 'default'}

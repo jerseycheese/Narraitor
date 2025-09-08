@@ -111,13 +111,32 @@ export interface CharacterStore {
   setLoading: (loading: boolean) => void;
 }
 
-// Initial state
-const initialState = {
-  characters: {},
-  currentCharacterId: null,
-  error: null,
-  loading: false,
+// Initial state with test mode detection
+const getInitialState = () => {
+  // Check for test data (used in visual regression tests)
+  if (typeof window !== 'undefined') {
+    const testCharacters = (window as typeof window & { __TEST_CHARACTERS__?: Record<string, Character> }).__TEST_CHARACTERS__;
+    
+    if (testCharacters && Object.keys(testCharacters).length > 0) {
+      console.log('🧪 CharacterStore using test data');
+      return {
+        characters: testCharacters,
+        currentCharacterId: Object.keys(testCharacters)[0] || null,
+        error: null,
+        loading: false,
+      };
+    }
+  }
+
+  return {
+    characters: {},
+    currentCharacterId: null,
+    error: null,
+    loading: false,
+  };
 };
+
+const initialState = getInitialState();
 
 // Character Store implementation with persistence
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
@@ -440,7 +459,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       }),
 
       // State management actions
-      reset: () => set(() => initialState),
+      reset: () => set(() => getInitialState()),
       setError: (error) => set(() => ({ error })),
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),

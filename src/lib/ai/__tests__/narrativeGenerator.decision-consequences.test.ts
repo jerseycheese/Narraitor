@@ -11,7 +11,8 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useAiContextStore } from '@/state/aiContextStore';
 import { MockAIClient } from '../../__mocks__/mockAiClient';
-import { PlayerDecision, NarrativeGenerationRequest } from '@/types/narrative.types';
+import { NarrativeGenerationRequest } from '@/types/narrative.types';
+import { PlayerDecision } from '@/types/personalization.types';
 import { narrativeTemplateManager } from '../../promptTemplates/narrativeTemplateManager';
 import { getLoreContextForPrompt } from '../loreContextHelper';
 import { getDetailedToneInstructions } from '../toneSettingsGuidance';
@@ -83,20 +84,22 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
   const pastDecisions: PlayerDecision[] = [
     {
       id: 'decision-1',
+      prompt: 'An injured merchant lies on the ground. What do you do?',
       sessionId: 'session-1',
       worldId: 'world-1',
       choiceText: 'Help the injured merchant',
-      choiceType: 'compassionate',
-      timestamp: new Date(Date.now() - 86400000), // 1 day ago
+      choiceType: 'helpful',
+      timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
       context: { situation: 'moral dilemma', charactersPresent: ['merchant'] }
     },
     {
       id: 'decision-2', 
+      prompt: 'Bandits block your path. How do you handle this?',
       sessionId: 'session-1',
       worldId: 'world-1',
       choiceText: 'Negotiate instead of fighting',
       choiceType: 'diplomatic',
-      timestamp: new Date(Date.now() - 43200000), // 12 hours ago
+      timestamp: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
       context: { situation: 'conflict resolution', charactersPresent: ['bandit leader'] }
     }
   ];
@@ -122,7 +125,7 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
     });
 
     // Mock aiContext store for goal context
-    (useAiContextStore as { getState: jest.Mock }).getState.mockReturnValue({
+    (useAiContextStore as unknown as { getState: jest.Mock }).getState.mockReturnValue({
       buildContextForSession: jest.fn().mockReturnValue({
         goalContext: null,
         activeGoals: []
@@ -149,7 +152,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'Continue the story',
         sessionId: 'session-1'
       };
 
@@ -178,7 +180,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'A new challenge appears',
         sessionId: 'session-1'
       };
 
@@ -202,7 +203,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1', 
         characterIds: ['char-1'],
-        prompt: 'You encounter the merchant again',
         sessionId: 'session-1'
       };
 
@@ -231,7 +231,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'], 
-        prompt: 'You enter the town square',
         sessionId: 'session-1'
       };
 
@@ -259,7 +258,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'A conflict breaks out nearby',
         sessionId: 'session-1'
       };
 
@@ -289,7 +287,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'The kingdom faces a new threat',
         sessionId: 'session-1'
       };
 
@@ -315,7 +312,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'The kingdom faces a new threat',
         sessionId: 'session-1'
       };
 
@@ -347,7 +343,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'Begin your adventure',
         sessionId: 'session-1'
       };
 
@@ -358,11 +353,12 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       // Create many past decisions
       const manyDecisions = Array.from({ length: 20 }, (_, i) => ({
         id: `decision-${i}`,
+        prompt: `What will you do next? (Decision ${i})`,
         sessionId: 'session-1',
         worldId: 'world-1',
         choiceText: `Choice ${i}`,
-        choiceType: 'action' as const,
-        timestamp: new Date(Date.now() - (i * 1000)),
+        choiceType: 'neutral' as const,
+        timestamp: new Date(Date.now() - (i * 1000)).toISOString(),
         context: { situation: 'generic' }
       }));
 
@@ -371,7 +367,6 @@ describe('NarrativeGenerator - Decision Consequences (Issue #210)', () => {
       const request: NarrativeGenerationRequest = {
         worldId: 'world-1',
         characterIds: ['char-1'],
-        prompt: 'Continue the story',
         sessionId: 'session-1'
       };
 

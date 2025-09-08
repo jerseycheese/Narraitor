@@ -1,10 +1,8 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
-import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
@@ -68,19 +66,67 @@ interface NarrativeStore {
   markSessionEnded: (sessionId: EntityID) => void;
 }
 
-// Initial state
-const initialState = {
-  segments: {},
-  sessionSegments: {},
-  decisions: {},
-  sessionDecisions: {},
-  endedSessions: {},
-  currentEnding: null,
-  isGeneratingEnding: false,
-  endingError: null,
-  error: null,
-  loading: false,
+// Initial state with test mode detection
+const getInitialState = () => {
+  // Check for test data (only in browser environment)
+  if (typeof window === 'undefined') {
+    return {
+      segments: {},
+      decisions: {},
+      sessionSegments: {},
+      sessionDecisions: {},
+      endedSessions: {},
+      currentEnding: null,
+      isGeneratingEnding: false,
+      endingError: null,
+      error: null,
+      loading: false,
+    };
+  }
+  
+  const testWindow = window as typeof window & {
+    __TEST_SEGMENTS__?: Record<string, NarrativeSegment>;
+    __TEST_DECISIONS__?: Record<string, Decision>;
+    __TEST_SESSION_SEGMENTS__?: Record<string, string[]>;
+    __TEST_SESSION_DECISIONS__?: Record<string, string[]>;
+  };
+  
+  const testSegments = testWindow.__TEST_SEGMENTS__;
+  const testDecisions = testWindow.__TEST_DECISIONS__;
+  const testSessionSegments = testWindow.__TEST_SESSION_SEGMENTS__;
+  const testSessionDecisions = testWindow.__TEST_SESSION_DECISIONS__;
+  
+  if (testSegments && testDecisions && testSessionSegments && testSessionDecisions) {
+    return {
+      segments: testSegments,
+      sessionSegments: testSessionSegments,
+      decisions: testDecisions,
+      sessionDecisions: testSessionDecisions,
+      endedSessions: {},
+      currentEnding: null,
+      isGeneratingEnding: false,
+      endingError: null,
+      error: null,
+      loading: false,
+    };
+  }
+  
+  // Regular initial state
+  return {
+    segments: {},
+    sessionSegments: {},
+    decisions: {},
+    sessionDecisions: {},
+    endedSessions: {},
+    currentEnding: null,
+    isGeneratingEnding: false,
+    endingError: null,
+    error: null,
+    loading: false,
+  };
 };
+
+const initialState = getInitialState();
 
 /**
  * Maps choice alignment to appropriate choice type preference
@@ -158,10 +204,8 @@ const extractDecisionContext = (
   return context;
 };
 
-// Narrative Store implementation with persistence
-export const useNarrativeStore = create<NarrativeStore>()(
-  persist(
-    (set, get) => ({
+// Narrative Store implementation without persistence for now
+export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
   ...initialState,
 
   // Add segment
@@ -623,10 +667,4 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }));
   },
-}),
-{
-  name: 'narraitor-narrative-store',
-  storage: createIndexedDBStorage(),
-  version: 1,
-}
-));
+}));

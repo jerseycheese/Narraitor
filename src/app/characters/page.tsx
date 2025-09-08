@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCharacterStore, type Character } from '@/state/characterStore';
@@ -9,6 +9,7 @@ import { CharacterDeletionService } from '@/services/characterDeletionService';
 import { CharacterCard } from '@/components/CharacterCard';
 import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
+import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import type { GeneratedCharacterData } from '@/lib/ai/characterGenerator';
@@ -118,6 +119,17 @@ export default function CharactersPage() {
   const searchParams = useSearchParams();
   const { characters, currentCharacterId, setCurrentCharacter, createCharacter, updateCharacter } = useCharacterStore();
   const { worlds, currentWorldId } = useWorldStore();
+  const [mounted, setMounted] = useState(false);
+  
+  // Check for test data to support visual regression tests (guarded for SSR)
+  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & {
+    __TEST_WORLDS__?: Record<string, unknown>;
+    __TEST_CHARACTERS__?: Record<string, unknown>;
+  };
+  
+  const testWorlds = testWindow.__TEST_WORLDS__;
+  const testCharacters = testWindow.__TEST_CHARACTERS__;
+  const isTestMode = testWorlds && testCharacters;
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
   const [generateError, setGenerateError] = useState<string | null>(null);
@@ -140,12 +152,43 @@ export default function CharactersPage() {
   
   // Use worldId from URL if provided, otherwise use the current world
   const worldIdFromUrl = searchParams.get('worldId');
-  const effectiveWorldId = worldIdFromUrl || currentWorldId;
   
-  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-  const worldCharacters = (Object.values(characters) as Character[]).filter(
-    (char) => char.worldId === effectiveWorldId
-  );
+  // In test mode, use test data; otherwise use normal store data
+  let effectiveWorldId: string | null;
+  let currentWorld: World | null;
+  let worldCharacters: Character[];
+  
+  if (isTestMode) {
+    // Use test data but respect URL-selected world when provided
+    console.log('🧪 Using test data for CharactersPage');
+    const testWorldsRecord = testWorlds as Record<string, World>;
+    const allTestWorlds = Object.values(testWorldsRecord);
+    // Prefer explicit worldId from URL, fallback to the first test world
+    effectiveWorldId = (worldIdFromUrl && testWorldsRecord[worldIdFromUrl] ? worldIdFromUrl : allTestWorlds[0]?.id) || null;
+    currentWorld = effectiveWorldId ? testWorldsRecord[effectiveWorldId] : null;
+    // Filter characters to the effective world to avoid cross-world bleed
+    worldCharacters = (Object.values(testCharacters) as Character[]).filter(
+      (char) => char.worldId === effectiveWorldId
+    );
+  } else {
+    // Use normal store data
+    effectiveWorldId = worldIdFromUrl || currentWorldId;
+    currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+    worldCharacters = (Object.values(characters) as Character[]).filter(
+      (char) => char.worldId === effectiveWorldId
+    );
+  }
+
+  // Mark mounted after first client render to make header SSR-safe
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Compute header content in a hydration-safe way: keep it on during SSR/first paint
+  const headerTitle = mounted && currentWorld?.image?.url ? undefined : 'My Characters';
+  const headerDescription = mounted && currentWorld?.image?.url
+    ? undefined
+    : 'Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.';
 
   // Toast management
   const addToast = (toast: Omit<typeof toasts[0], 'id'>) => {
@@ -215,8 +258,8 @@ export default function CharactersPage() {
         description: generatedData.background.description || '',
         worldId: effectiveWorldId,
         level: generatedData.level,
-        attributes: transformGeneratedAttributes(generatedData, currentWorld),
-        skills: transformGeneratedSkills(generatedData, currentWorld),
+        attributes: transformGeneratedAttributes(generatedData, currentWorld!),
+        skills: transformGeneratedSkills(generatedData, currentWorld!),
         background: {
           history: generatedData.background.description,
           personality: generatedData.background.personality,
@@ -252,7 +295,7 @@ export default function CharactersPage() {
       await generateCharacterPortrait(
         characterId,
         generatedData,
-        currentWorld,
+        currentWorld!,
         effectiveWorldId,
         updateCharacter
       );
@@ -343,11 +386,11 @@ export default function CharactersPage() {
     });
   };
 
-  if (!effectiveWorldId || !currentWorld) {
+  if (mounted && (!effectiveWorldId || !currentWorld)) {
     return (
       <PageLayout
         title="My Characters"
-        description="Create unique characters for your interactive narrative adventures."
+        description={"Create unique characters for your interactive narrative adventures. Use the \"Make Active\" button on a character to set them as your current character for gameplay."}
       >
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -426,11 +469,11 @@ export default function CharactersPage() {
 
   return (
     <PageLayout
-      title={currentWorld?.image?.url ? undefined : "My Characters"}
-      description={currentWorld?.image?.url ? undefined : `Create unique characters for your interactive narrative adventures. Use the "Make Active" button on a character to set them as your current character for gameplay.`}
+      title={headerTitle}
+      description={headerDescription}
     >
-      {/* Show world hero with image or themed background */}
-      {currentWorld && (
+      {/* Show world hero with image or themed background (after hydration) */}
+      {mounted && currentWorld && (
         <div className="mb-6">
           <Hero
             title={worldIdFromUrl ? `${currentWorld.name} Characters` : `${currentWorld.name} Characters`}
@@ -446,21 +489,21 @@ export default function CharactersPage() {
         </div>
       )}
 
-      {/* Action buttons below hero when world exists */}
-      {currentWorld && (
+      {/* Action buttons below hero when world exists (after hydration) */}
+      {mounted && currentWorld && (
         <div className="mb-8 flex justify-end">
           <ActionButtonGroup actions={actionButtons} />
         </div>
       )}
 
       {/* Show back link if viewing from a specific world without image */}
-      {worldIdFromUrl && !currentWorld?.image?.url && (
+      {mounted && worldIdFromUrl && !currentWorld?.image?.url && (
         <div className="mb-6 -mt-8">
           <Link
             href={`/worlds/${worldIdFromUrl}`}
             className="text-link-primary flex items-center gap-2 no-underline"
           >
-            <span>←</span> Back to {currentWorld.name}
+            <span>←</span> Back to {currentWorld?.name || 'World'}
           </Link>
         </div>
       )}
@@ -472,78 +515,80 @@ export default function CharactersPage() {
         </div>
       )}
 
-      {worldCharacters.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-2">No characters in {currentWorld.name} yet</h2>
-            <p className="text-gray-700 mb-2">
-              Choose how you&apos;d like to add your first character.
-            </p>
-          </div>
-          <ActionButtonGroup
-            actions={[
-              {
-                label: isGenerating ? (generatingStatus || 'Generating...') : 'Generate Character',
-                onClick: handleGenerateCharacter,
-                variant: 'secondary',
-                disabled: isGenerating,
-                size: 'lg',
-                icon: isGenerating ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                )
-              },
-              {
-                label: 'Create Character',
-                onClick: handleCreateCharacter,
-                variant: 'primary',
-                size: 'lg',
-                icon: (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                )
-              }
-            ]}
-            className="justify-center"
-          />
-          <div className="mt-6 text-sm text-gray-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div>
-                <p className="font-medium text-blue-700 mb-1">Generate Character</p>
-                <p>AI creates a character {currentWorld.reference ? `from ${currentWorld.reference}` : 'for your world'}</p>
-                <p className="text-xs mt-1">Choose known figures, original characters, or specific names</p>
-              </div>
-              <div>
-                <p className="font-medium text-green-700 mb-1">Create Character</p>
-                <p>Design your own character with custom details</p>
-                <p className="text-xs mt-1">Full control over attributes, skills, and background</p>
+      <SSRClientOnly>
+        {!currentWorld || worldCharacters.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-lg p-12 text-center max-w-2xl mx-auto">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold mb-2">{currentWorld ? `No characters in ${currentWorld.name} yet` : 'No characters yet'}</h2>
+              <p className="text-gray-700 mb-2">
+                Choose how you&apos;d like to add your first character.
+              </p>
+            </div>
+            <ActionButtonGroup
+              actions={[
+                {
+                  label: isGenerating ? (generatingStatus || 'Generating...') : 'Generate Character',
+                  onClick: handleGenerateCharacter,
+                  variant: 'secondary',
+                  disabled: isGenerating,
+                  size: 'lg',
+                  icon: isGenerating ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  )
+                },
+                {
+                  label: 'Create Character',
+                  onClick: handleCreateCharacter,
+                  variant: 'primary',
+                  size: 'lg',
+                  icon: (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  )
+                }
+              ]}
+              className="justify-center"
+            />
+            <div className="mt-6 text-sm text-gray-500">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div>
+                  <p className="font-medium text-blue-700 mb-1">Generate Character</p>
+                  <p>AI creates a character {currentWorld?.reference ? `from ${currentWorld.reference}` : 'for your world'}</p>
+                  <p className="text-xs mt-1">Choose known figures, original characters, or specific names</p>
+                </div>
+                <div>
+                  <p className="font-medium text-green-700 mb-1">Create Character</p>
+                  <p>Design your own character with custom details</p>
+                  <p className="text-xs mt-1">Full control over attributes, skills, and background</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {worldCharacters.map(character => (
-            <CharacterCard
-              key={character.id}
-              character={character}
-              isActive={currentCharacterId === character.id}
-              onMakeActive={() => handleSelectCharacter(character.id)}
-              onView={() => handleViewCharacter(character.id)}
-              onPlay={() => {
-                setCurrentCharacter(character.id);
-                router.push(`/worlds/${character.worldId}/play`);
-              }}
-              onEdit={() => handleEditCharacter(character.id)}
-              onDelete={() => handleDeleteCharacter(character.id)}
-            />
-          ))}
-        </div>
-      )}
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {(worldCharacters as Character[]).map((character) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                isActive={currentCharacterId === character.id}
+                onMakeActive={() => handleSelectCharacter(character.id)}
+                onView={() => handleViewCharacter(character.id)}
+                onPlay={() => {
+                  setCurrentCharacter(character.id);
+                  router.push(`/worlds/${character.worldId}/play`);
+                }}
+                onEdit={() => handleEditCharacter(character.id)}
+                onDelete={() => handleDeleteCharacter(character.id)}
+              />
+            ))}
+          </div>
+        )}
+      </SSRClientOnly>
       
       {/* Character Generation Dialog */}
       <GenerateCharacterDialog

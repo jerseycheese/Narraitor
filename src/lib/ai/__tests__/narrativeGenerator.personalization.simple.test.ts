@@ -14,6 +14,17 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
   let mockCharacter: Character;
   let mockWorld: World;
 
+  // Helper to convert Character to PersonalizationCharacter format
+  const convertToPersonalizationCharacter = (character: Character) => ({
+    id: character.id,
+    name: character.name,
+    background: typeof character.background === 'object' ? character.background.history || '' : character.background,
+    attributes: character.attributes,
+    skills: character.skills,
+    createdAt: character.createdAt,
+    updatedAt: character.updatedAt
+  });
+
   beforeEach(() => {
     personalizationEngine = new PersonalizationEngine();
     tracker = new PlayerDecisionTracker({ storageKey: 'test_personalization_decisions' });
@@ -22,12 +33,34 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     mockCharacter = {
       id: 'char-1',
       name: 'Alex Archer',
-      background: 'Experienced archaeologist with a mysterious past',
-      attributes: { Intelligence: 8, Dexterity: 6 },
-      skills: [
-        { name: 'Investigation', level: 8, worldSkillId: 'skill-1' },
-        { name: 'Athletics', level: 5, worldSkillId: 'skill-2' }
+      worldId: 'world-1',
+      description: 'A skilled archaeologist seeking ancient mysteries',
+      background: {
+        history: 'Experienced archaeologist with a mysterious past',
+        personality: 'Curious and determined',
+        goals: ['Discover ancient secrets'],
+        fears: ['Failure'],
+        relationships: []
+      },
+      attributes: [
+        { attributeId: 'attr-intelligence', value: 8 },
+        { attributeId: 'attr-dexterity', value: 6 }
       ],
+      skills: [
+        { skillId: 'skill-1', level: 8, experience: 100, isActive: true },
+        { skillId: 'skill-2', level: 5, experience: 50, isActive: true }
+      ],
+      inventory: {
+        characterId: 'char-1',
+        items: [],
+        capacity: 100,
+        categories: []
+      },
+      status: {
+        health: 100,
+        maxHealth: 100,
+        conditions: []
+      },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01'
     };
@@ -37,6 +70,12 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
       name: 'Ancient Mysteries',
       description: 'A world of archaeological discoveries',
       genre: 'mystery',
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 12,
+        attributePointPool: 27,
+        skillPointPool: 40
+      },
       createdAt: '2023-01-01',
       updatedAt: '2023-01-01',
       attributes: [],
@@ -68,7 +107,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     
     // Create personalized context
     const context = personalizationEngine.createPersonalizedContext(
-      mockCharacter,
+      convertToPersonalizationCharacter(mockCharacter),
       mockWorld,
       decisions,
       [],
@@ -106,7 +145,7 @@ describe('NarrativeGenerator Personalization - Core Tests', () => {
     
     // Use in personalization
     const behaviorAnalysis = personalizationEngine.analyzePlayerBehavior(
-      mockCharacter,
+      convertToPersonalizationCharacter(mockCharacter),
       mockWorld,
       decisions,
       [],

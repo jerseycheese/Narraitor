@@ -7,7 +7,7 @@ import { NarrativeHistoryManager } from '@/components/Narrative/NarrativeHistory
 import { Decision, NarrativeSegment } from '@/types/narrative.types';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useSessionStore } from '@/state/sessionStore';
-import { useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore, Character } from '@/state/characterStore';
 import { ChoiceSelector } from '@/components/shared/ChoiceSelector';
 import { generateUniqueId, truncate, safeTrim, getNestedValue } from '@/lib/utils';
 import CharacterSummary from './CharacterSummary';
@@ -69,13 +69,23 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
   // Journal modal state (Issue #278)
   const [showJournalModal, setShowJournalModal] = React.useState(false);
   
+  // Check for test data to support visual regression tests (guarded for SSR)
+  const testCharacters =
+    typeof window !== 'undefined'
+      ? (window as typeof window & { __TEST_CHARACTERS__?: Record<string, Character> }).__TEST_CHARACTERS__
+      : undefined;
+  const isTestMode = !!testCharacters;
+  
   // Get character ID from session store
   const characterId = useSessionStore(state => state.characterId);
   
-  // Get character details
-  const character = useCharacterStore((state) => 
-    state.characters[characterId || '']
-  );
+  // Always call hooks - handle test mode logic after
+  const storeCharacter = useCharacterStore((state) => state.characters[characterId || '']);
+  
+  // Get character details - use test data in test mode or store data in normal mode
+  const character = isTestMode 
+    ? Object.values(testCharacters || {}).find((char: Character) => char.worldId === worldId)
+    : storeCharacter;
   
   // Get narrative store for ending functionality
   const { currentEnding, isGeneratingEnding, generateEnding, isSessionEnded } = useNarrativeStore();

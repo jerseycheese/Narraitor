@@ -1,4 +1,4 @@
-import { worldStore, WorldStore } from '../../worldStore';
+import { useWorldStore, WorldStore } from '../../worldStore';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -18,7 +18,7 @@ const mockAdapter = {
 // Mock the IndexedDBAdapter module
 jest.mock('../../../lib/storage/indexedDBAdapter', () => {
   const MockAdapter = jest.fn().mockImplementation(() => mockAdapter);
-  MockAdapter.create = jest.fn().mockResolvedValue(mockAdapter);
+  (MockAdapter as jest.MockedFunction<typeof MockAdapter> & { create: jest.MockedFunction<() => Promise<typeof mockAdapter>> }).create = jest.fn().mockResolvedValue(mockAdapter);
   
   return {
     IndexedDBAdapter: MockAdapter
@@ -27,7 +27,7 @@ jest.mock('../../../lib/storage/indexedDBAdapter', () => {
 
 // Mock zustand persist middleware
 jest.mock('zustand/middleware', () => ({
-  persist: jest.fn((config: unknown) => 
+  persist: jest.fn((config: (...args: unknown[]) => unknown) => 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (set: any, get: any, api: any) => {
       // Return the original store config with mock persist behavior
@@ -39,6 +39,7 @@ jest.mock('zustand/middleware', () => ({
 const createTestWorld = (overrides = {}) => ({
   id: 'test-world-1',
   name: 'Test World',
+  description: 'A test world for persistence testing',
   genre: 'fantasy',
   attributes: [],
   skills: [],
@@ -59,7 +60,7 @@ describe('worldStore persistence', () => {
     jest.clearAllMocks();
     
     // Reset the store
-    worldStore.getState().reset();
+    useWorldStore.getState().reset();
   });
 
   describe('state persistence', () => {
@@ -68,7 +69,7 @@ describe('worldStore persistence', () => {
       const worldData = createTestWorld();
       
       // Create a world to trigger persistence
-      worldStore.getState().createWorld(worldData);
+      useWorldStore.getState().createWorld(worldData);
       
       // Manually call the mock setItem with expected data
       mockSetItem('narraitor-world-store', JSON.stringify({
@@ -128,7 +129,7 @@ describe('worldStore persistence', () => {
       const persistedStore = create<WorldStore>()(
         persist(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          (_set, _get, _api) => worldStore.getState(),
+          (_set, _get, _api) => useWorldStore.getState(),
           {
             name: 'narraitor-world-store',
             storage: {
@@ -165,7 +166,7 @@ describe('worldStore persistence', () => {
       });
 
       // Create world to trigger persistence
-      worldStore.getState().createWorld(worldWithDates);
+      useWorldStore.getState().createWorld(worldWithDates);
       
       // Manually simulate persistence
       mockSetItem('narraitor-world-store', JSON.stringify({

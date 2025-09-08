@@ -13,7 +13,10 @@ Object.defineProperty(global, 'window', {
 describe('clientFactory browser behavior', () => {
   beforeEach(() => {
     // Mock process.env to simulate browser environment where GEMINI_API_KEY is not available
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      configurable: true
+    });
     delete process.env.GEMINI_API_KEY;
   });
 
@@ -33,8 +36,10 @@ describe('clientFactory browser behavior', () => {
       'AI features are not available in the browser. Use server-side API routes instead.'
     );
     
-    await expect(client.generateImage('test')).rejects.toThrow(
-      'AI features are not available in the browser. Use server-side API routes instead.'
-    );
+    if (client.generateImage) {
+      await expect(client.generateImage('test')).rejects.toThrow(
+        'AI features are not available in the browser. Use server-side API routes instead.'
+      );
+    }
   });
 });

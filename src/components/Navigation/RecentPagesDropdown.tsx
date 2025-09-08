@@ -26,6 +26,7 @@ interface RecentPagesDropdownProps {
  */
 export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps) {
   const [showRecentPages, setShowRecentPages] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { navigateWithLoading } = useNavigationLoadingContext();
   
@@ -35,6 +36,11 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
     preferences,
     removeFromHistory 
   } = useNavigationStore();
+
+  // Mark mounted to avoid SSR/client markup differences on first paint
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -49,6 +55,11 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showRecentPages]);
+
+  // During SSR/first client render, avoid rendering to keep markup stable
+  if (!mounted) {
+    return null;
+  }
 
   // Don't show if recent pages are disabled in preferences
   if (!preferences.showRecentPages) {

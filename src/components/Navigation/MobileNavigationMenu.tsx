@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
@@ -32,10 +32,13 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
   const { currentWorldId, worlds, setCurrentWorld } = useWorldStore();
   const { characters } = useCharacterStore();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const startX = useRef<number>(0);
   const startY = useRef<number>(0);
 
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
+  const hasWorldsStore = Object.keys(worlds).length > 0;
+  const hasWorlds = mounted && hasWorldsStore;
 
   // Focus management - focus first element when opened
   useEffect(() => {
@@ -46,6 +49,11 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
       }
     }
   }, [isOpen]);
+
+  // Mark mounted to keep SSR/client markup consistent
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Touch gesture handling for swipe to close (memoized)
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -134,6 +142,8 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           Worlds
         </Button>
 
+        {/* Only show Characters nav when worlds exist */}
+        {/* Always render Characters nav item to keep markup consistent between SSR and client */}
         <Button
           onClick={() => handleNavigation('/characters')}
           variant="ghost"
@@ -141,7 +151,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
             pathname === '/characters' || pathname.startsWith('/characters/') 
               ? 'bg-gray-700 text-white' 
               : 'text-link-nav-dark hover:bg-gray-900'
-          }`}
+          } ${!hasWorlds ? 'hidden' : ''}`}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

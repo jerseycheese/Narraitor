@@ -31,20 +31,20 @@ describe('consoleDebugAPI', () => {
     // Reset mock window
     mockWindow.NARRAITOR_DEBUG = undefined;
     // Set development environment
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
     // Clear any existing console methods
     delete (global as unknown as { window?: unknown }).window;
     (global as unknown as { window: typeof window }).window = mockWindow as typeof window;
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
     delete (global as unknown as { window?: unknown }).window;
   });
 
   describe('initializeConsoleDebugAPI', () => {
     it('should initialize debug API in development environment', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
       
       consoleDebugAPI.initialize();
       
@@ -55,7 +55,7 @@ describe('consoleDebugAPI', () => {
     });
 
     it('should not initialize debug API in production environment', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true });
       
       consoleDebugAPI.initialize();
       
@@ -63,7 +63,7 @@ describe('consoleDebugAPI', () => {
     });
 
     it('should not initialize debug API in test environment', () => {
-      process.env.NODE_ENV = 'test';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'test', writable: true });
       
       consoleDebugAPI.initialize();
       
@@ -73,7 +73,7 @@ describe('consoleDebugAPI', () => {
 
   describe('debug functions', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
       consoleDebugAPI.initialize();
     });
 
@@ -195,7 +195,7 @@ describe('consoleDebugAPI', () => {
 
   describe('automation support', () => {
     beforeEach(() => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
       consoleDebugAPI.initialize();
     });
 

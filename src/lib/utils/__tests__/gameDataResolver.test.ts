@@ -9,7 +9,10 @@ describe('gameDataResolver', () => {
       description: 'Ability to frighten or coerce others',
       category: 'Social',
       baseValue: 0,
-      maxValue: 10
+      minValue: 0,
+      maxValue: 10,
+      worldId: 'test-world',
+      difficulty: 'medium' as const
     },
     {
       id: 'stealth',
@@ -17,7 +20,10 @@ describe('gameDataResolver', () => {
       description: 'Ability to move unseen and unheard',
       category: 'Physical',
       baseValue: 0,
-      maxValue: 10
+      minValue: 0,
+      maxValue: 10,
+      worldId: 'test-world',
+      difficulty: 'medium' as const
     },
     {
       id: 'magic',
@@ -25,7 +31,10 @@ describe('gameDataResolver', () => {
       description: 'Ability to cast spells and use magical items',
       category: 'Mental',
       baseValue: 0,
-      maxValue: 10
+      minValue: 0,
+      maxValue: 10,
+      worldId: 'test-world',
+      difficulty: 'hard' as const
     }
   ];
 
@@ -96,7 +105,10 @@ describe('gameDataResolver', () => {
           description: 'Real magic skill',
           category: 'Mental',
           baseValue: 0,
-          maxValue: 10
+          minValue: 0,
+          maxValue: 10,
+          worldId: 'test-world',
+          difficulty: 'hard' as const
         },
         {
           id: 'other',
@@ -104,7 +116,10 @@ describe('gameDataResolver', () => {
           description: 'Different skill with same name',
           category: 'Other',
           baseValue: 0,
-          maxValue: 10
+          minValue: 0,
+          maxValue: 10,
+          worldId: 'test-world',
+          difficulty: 'medium' as const
         }
       ];
 
@@ -123,7 +138,10 @@ describe('gameDataResolver', () => {
           description: 'Ability to pick locks',
           category: 'Physical',
           baseValue: 0,
-          maxValue: 10
+          minValue: 0,
+          maxValue: 10,
+          worldId: 'test-world',
+          difficulty: 'medium' as const
         }
       ];
 
@@ -150,7 +168,10 @@ describe('gameDataResolver', () => {
           description: 'Basic sword combat',
           category: 'Combat',
           baseValue: 0,
-          maxValue: 10
+          minValue: 0,
+          maxValue: 10,
+          worldId: 'test-world',
+          difficulty: 'medium' as const
         },
         {
           id: 'advanced-sword-fighting',
@@ -158,7 +179,10 @@ describe('gameDataResolver', () => {
           description: 'Advanced sword techniques',
           category: 'Combat',
           baseValue: 0,
-          maxValue: 10
+          minValue: 0,
+          maxValue: 10,
+          worldId: 'test-world',
+          difficulty: 'hard' as const
         }
       ];
 

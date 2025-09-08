@@ -15,26 +15,45 @@ describe('contextOverride', () => {
       attributePointPool: 27,
       skillPointPool: 40
     },
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const mockCharacter: Character = {
     id: 'char-1',
     name: 'Test Character',
     worldId: 'world-1',
-    level: 1,
-    attributes: {},
-    skills: {},
-    createdAt: new Date(),
-    updatedAt: new Date()
+    description: 'A test character for context override tests',
+    background: {
+      history: 'Test character background',
+      personality: 'Test personality',
+      goals: [],
+      fears: [],
+      relationships: []
+    },
+    attributes: [],
+    skills: [],
+    inventory: {
+      characterId: 'char-1',
+      items: [],
+      capacity: 100,
+      categories: []
+    },
+    status: {
+      health: 100,
+      maxHealth: 100,
+      conditions: [],
+      location: 'Test Location'
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const mockNarrativeContext: NarrativeContext = {
-    recentSegments: [],
+    recentSegments: ['segment-1', 'segment-2'],
     activeCharacters: ['char-1'],
     currentLocation: 'Starting area',
-    activeQuests: [],
+    activeQuests: ['Quest: Find the artifact'],
     mood: 'neutral'
   };
 
@@ -99,8 +118,8 @@ describe('contextOverride', () => {
 
     // Verify the narrative context is defined and structure is preserved
     expect(result.narrativeContext).toBeDefined();
-    expect(result.narrativeContext.currentScene).toBe(mockNarrativeContext.currentScene);
-    expect(result.narrativeContext.previousChoices).toBe(mockNarrativeContext.previousChoices);
+    expect(result.narrativeContext.currentLocation).toBe(mockNarrativeContext.currentLocation);
+    expect(result.narrativeContext.mood).toBe(mockNarrativeContext.mood);
     
     // Verify that the test config was properly passed through
     // Note: Custom variables integration would be implemented when real AI integration is added

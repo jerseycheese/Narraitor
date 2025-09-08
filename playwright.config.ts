@@ -112,7 +112,7 @@ export default defineConfig({
   webServer: process.env.CI ? {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     // Increased timeout for server to start (especially in CI and app build)
     timeout: 240 * 1000,
     // Ensure server is fully ready before tests start
@@ -129,8 +129,8 @@ export default defineConfig({
   globalSetup: undefined,
   globalTeardown: undefined,
   
-  // Test match patterns
-  testMatch: '**/*.spec.ts',
+  // Test match patterns (include setup hooks files)
+  testMatch: ['**/*.spec.ts', '**/*.setup.ts'],
   
   // Ignore certain files
   testIgnore: '**/node_modules/**',

@@ -23,12 +23,14 @@ describe('Journal Store - Session Boundary Logging', () => {
         title: 'Session Started',
         content: 'New gameplay session began',
         significance: 'minor',
+        isRead: false,
         relatedEntities: [],
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
           sessionStartTime: new Date().toISOString()
-        }
+        },
+        updatedAt: new Date().toISOString()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -55,6 +57,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'Started new session in the Kingdom of Eldara',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session', 'new-adventure'],
           automaticEntry: true,
@@ -93,6 +97,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'New gameplay session began',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -109,6 +115,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'Gameplay session completed after 45 minutes',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -148,6 +156,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'Session ended (duration unknown)',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -180,6 +190,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'System: New session began',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true
@@ -195,6 +207,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'You discovered an ancient artifact',
         significance: 'major',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['discovery', 'artifact'],
           automaticEntry: false
@@ -233,6 +247,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'A new story unfolds',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -248,6 +264,8 @@ describe('Journal Store - Session Boundary Logging', () => {
         content: 'The adventure concludes for now',
         significance: 'minor',
         relatedEntities: [],
+        isRead: false,
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['system', 'session'],
           automaticEntry: true,
@@ -285,10 +303,12 @@ describe('Journal Store - Session Boundary Logging', () => {
           content: '', // Empty content should be rejected
           significance: 'minor',
           relatedEntities: [],
+          isRead: false,
           metadata: {
             tags: ['system'],
             automaticEntry: true
-          }
+          },
+          updatedAt: new Date().toISOString()
         });
       }).toThrow('Entry content is required');
     });

@@ -61,6 +61,7 @@ describe('PortraitGenerator', () => {
       id: 'char-1',
       name: 'Elara Moonshadow',
       worldId: 'world-1',
+      description: 'A mysterious elven mage with silver hair and piercing blue eyes',
       attributes: [
         { attributeId: 'strength', value: 8 },
         { attributeId: 'intelligence', value: 15 }
@@ -133,12 +134,13 @@ describe('PortraitGenerator', () => {
 
     it('should include world theme in portrait generation', async () => {
       const worldTheme = 'dark fantasy';
+      void worldTheme; // Mark as used for potential future enhancement
       (mockAIClient.generateImage as jest.Mock).mockResolvedValue({
         image: 'data:image/png;base64,abc123',
         prompt: ''
       });
 
-      await generator.generatePortrait(mockCharacter, { worldTheme });
+      await generator.generatePortrait(mockCharacter, {});
 
       const callArgs = (mockAIClient.generateImage as jest.Mock).mock.calls[0][0];
       // Current implementation uses consistent realistic portrait approach

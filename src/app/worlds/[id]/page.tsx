@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
@@ -14,6 +15,7 @@ export default function WorldViewPage() {
   const params = useParams();
   const router = useRouter();
   const worldId = params.id as string;
+  const [mounted, setMounted] = useState(false);
   const world = useWorldStore((state) => state.worlds[worldId]);
   const currentWorldId = useWorldStore((state) => state.currentWorldId);
   const setCurrentWorld = useWorldStore((state) => state.setCurrentWorld);
@@ -23,6 +25,17 @@ export default function WorldViewPage() {
   // Check if this world has any characters
   const worldCharacters = (Object.values(characters) as Character[]).filter(char => char.worldId === worldId);
   const isActive = currentWorldId === worldId;
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    // Keep SSR/client markup stable; decide after hydration
+    return (
+      <PageLayout>
+        <div />
+      </PageLayout>
+    );
+  }
 
   if (!world) {
     return (

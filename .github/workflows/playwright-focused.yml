@@ -1,0 +1,52 @@
+name: Playwright Testing
+
+on:
+  push:
+    branches: [ feature/playwright-* ]
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/visual/**'
+      - 'playwright.config.ts'
+      - '.github/workflows/playwright-focused.yml'
+
+jobs:
+  playwright:
+    name: Visual Regression Tests
+    runs-on: macos-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        
+      - name: Run Playwright tests
+        run: npm run test:e2e:critical
+        
+      - name: Upload test results on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 7
+          
+      - name: Upload HTML report on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          retention-days: 7

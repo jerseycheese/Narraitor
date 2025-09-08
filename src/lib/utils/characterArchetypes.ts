@@ -709,7 +709,7 @@ export function getArchetypeTemplatesForGenre(genre: GenreValue): ArchetypeTempl
  * Generate character name based on template and ensure uniqueness
  */
 function generateCharacterName(template: ArchetypeTemplate, existingNames: string[] = []): string {
-  const baseName = template.nameTemplates[Math.floor(Math.random() * template.nameTemplates.length)];
+  const baseName = template.nameTemplates[Math.floor(globalRandom() * template.nameTemplates.length)];
   
   // Add descriptive suffix based on archetype
   const suffixes = [
@@ -726,7 +726,7 @@ function generateCharacterName(template: ArchetypeTemplate, existingNames: strin
   
   // If base name exists, try with suffix
   if (existingNames.includes(finalName)) {
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const suffix = suffixes[Math.floor(globalRandom() * suffixes.length)];
     finalName = `${baseName} ${suffix}`;
   }
   
@@ -765,13 +765,13 @@ function distributeAttributes(
     
     if (isPrimary) {
       // Primary attributes: 70-100% of range
-      value = Math.floor(attr.minValue + range * 0.7 + Math.random() * range * 0.3);
+      value = Math.floor(attr.minValue + range * 0.7 + globalRandom() * range * 0.3);
     } else if (isSecondary) {
       // Secondary attributes: 50-80% of range
-      value = Math.floor(attr.minValue + range * 0.5 + Math.random() * range * 0.3);
+      value = Math.floor(attr.minValue + range * 0.5 + globalRandom() * range * 0.3);
     } else {
       // Other attributes: 20-60% of range
-      value = Math.floor(attr.minValue + range * 0.2 + Math.random() * range * 0.4);
+      value = Math.floor(attr.minValue + range * 0.2 + globalRandom() * range * 0.4);
     }
     
     // Ensure within bounds
@@ -802,10 +802,10 @@ function distributeSkills(
     
     if (isPreferred) {
       // Preferred skills: 6-9 (competent to expert)
-      level = Math.floor(Math.random() * 4) + 6;
+      level = Math.floor(globalRandom() * 4) + 6;
     } else {
       // Other skills: 1-6 (beginner to competent)
-      level = Math.floor(Math.random() * 6) + 1;
+      level = Math.floor(globalRandom() * 6) + 1;
     }
     
     // Ensure within bounds
@@ -822,6 +822,36 @@ function distributeSkills(
 /**
  * Generate character archetypes for quick start
  */
+/**
+ * Simple seeded random number generator for consistent test results
+ */
+function createSeededRandom(seed: number = 12345) {
+  let state = seed;
+  return function() {
+    state = (state * 9301 + 49297) % 233280;
+    return state / 233280;
+  };
+}
+
+/**
+ * Global random function that can be overridden for testing
+ */
+let globalRandom = Math.random;
+
+/**
+ * Set random function for testing
+ */
+function setRandomFunction(randomFn: () => number) {
+  globalRandom = randomFn;
+}
+
+/**
+ * Reset random function to Math.random
+ */
+function resetRandomFunction() {
+  globalRandom = Math.random;
+}
+
 export async function generateCharacterArchetypes(
   world: World, 
   existingNames: string[] = []
@@ -846,12 +876,20 @@ export async function generateCharacterArchetypes(
   const templates = getArchetypeTemplatesForGenre(world.genre);
   const archetypes: CharacterArchetype[] = [];
   
+  // Use seeded random for consistent results in test environments
+  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & { __TEST_SEEDED__?: boolean };
+  const isTestEnv = typeof window !== 'undefined' && !!testWindow.__TEST_SEEDED__;
+  
+  if (isTestEnv) {
+    setRandomFunction(createSeededRandom(42));
+  }
+  
   for (const template of templates) {
     try {
       const name = generateCharacterName(template, [...existingNames, ...archetypes.map(a => a.name)]);
-      const personality = template.personalities[Math.floor(Math.random() * template.personalities.length)];
-      const motivation = template.motivations[Math.floor(Math.random() * template.motivations.length)];
-      const fears = template.fears[Math.floor(Math.random() * template.fears.length)];
+      const personality = template.personalities[Math.floor(globalRandom() * template.personalities.length)];
+      const motivation = template.motivations[Math.floor(globalRandom() * template.motivations.length)];
+      const fears = template.fears[Math.floor(globalRandom() * template.fears.length)];
       
       const archetype: CharacterArchetype = {
         id: generateUniqueId('archetype'),
@@ -876,6 +914,11 @@ export async function generateCharacterArchetypes(
     }
   }
   
+  // Reset random function after generation
+  if (isTestEnv) {
+    resetRandomFunction();
+  }
+  
   return archetypes;
 }
 
@@ -883,7 +926,7 @@ export async function generateCharacterArchetypes(
  * Generate physical description based on archetype and genre
  */
 function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreValue, worldName?: string): string {
-  const ageRange = Math.floor(Math.random() * 20) + 20; // 20-40 years old
+  const ageRange = Math.floor(globalRandom() * 20) + 20; // 20-40 years old
   
   const builds = {
     'Warrior': ['muscular', 'athletic', 'sturdy', 'imposing'],
@@ -915,7 +958,7 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
   };
   
   const build = builds[template.name as keyof typeof builds] || builds['Balanced'];
-  const selectedBuild = build[Math.floor(Math.random() * build.length)];
+  const selectedBuild = build[Math.floor(globalRandom() * build.length)];
   
   const features = genre === 'fantasy' 
     ? ['piercing eyes', 'weathered hands', 'distinctive scars', 'noble bearing']
@@ -933,7 +976,7 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
     ? ['neural interfaces', 'chrome augmentations', 'neon-lit tattoos', 'corporate modifications']
     : ['expressive eyes', 'confident posture', 'street-smart appearance', 'modern style'];
   
-  const selectedFeature = features[Math.floor(Math.random() * features.length)];
+  const selectedFeature = features[Math.floor(globalRandom() * features.length)];
   
   return `${ageRange}-year-old human with a ${selectedBuild} build and ${selectedFeature}, perfectly suited for the ${genre} setting of ${worldName || 'this world'}.`;
 }
@@ -942,8 +985,16 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
  * Generate a random archetype from the available options
  */
 export async function generateRandomArchetype(world: World, existingNames: string[] = []): Promise<CharacterArchetype> {
+  // Use seeded random for consistent results in test environments
+  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & { __TEST_SEEDED__?: boolean };
+  const isTestEnv = typeof window !== 'undefined' && !!testWindow.__TEST_SEEDED__;
+  
+  if (isTestEnv) {
+    setRandomFunction(createSeededRandom(84)); // Different seed than main generation
+  }
+  
   const archetypes = await generateCharacterArchetypes(world, existingNames);
-  const randomIndex = Math.floor(Math.random() * archetypes.length);
+  const randomIndex = Math.floor(globalRandom() * archetypes.length);
   
   // Modify the selected archetype to be more randomized
   const selectedArchetype = archetypes[randomIndex];
@@ -951,7 +1002,7 @@ export async function generateRandomArchetype(world: World, existingNames: strin
   // Randomize the name further
   const templates = getArchetypeTemplatesForGenre(world.genre);
   const allNameTemplates = templates.flatMap(t => t.nameTemplates);
-  const randomBaseName = allNameTemplates[Math.floor(Math.random() * allNameTemplates.length)];
+  const randomBaseName = allNameTemplates[Math.floor(globalRandom() * allNameTemplates.length)];
   
   selectedArchetype.name = generateCharacterName(
     { ...templates[0], nameTemplates: [randomBaseName] }, 
@@ -965,10 +1016,15 @@ export async function generateRandomArchetype(world: World, existingNames: strin
       world.attributes.find(wa => wa.id === attr.id)?.minValue || 1,
       Math.min(
         world.attributes.find(wa => wa.id === attr.id)?.maxValue || 10,
-        attr.value + (Math.random() > 0.5 ? 1 : -1)
+        attr.value + (globalRandom() > 0.5 ? 1 : -1)
       )
     )
   }));
+  
+  // Reset random function after generation
+  if (isTestEnv) {
+    resetRandomFunction();
+  }
   
   return selectedArchetype;
 }

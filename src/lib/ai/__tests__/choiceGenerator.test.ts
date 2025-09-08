@@ -54,11 +54,18 @@ const createMockNarrativeContext = (): NarrativeContext => {
   });
 
   return {
+    worldId: 'world-1',
+    currentSceneId: 'scene-1',
+    characterIds: ['char-1'],
+    previousSegments: [],
+    currentTags: [],
+    sessionId: 'session-1',
     recentSegments: [
       createSegment('segment-1', 'The hero enters the forest.'),
       createSegment('segment-2', 'A strange noise echoes through the trees.')
     ],
-    currentLocation: 'Forest'
+    currentLocation: 'Forest',
+    currentSituation: 'Exploring the forest'
   };
 };
 

@@ -12,6 +12,7 @@ describe('Store Integration', () => {
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
+        description: 'A test world for integration testing',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -26,15 +27,30 @@ describe('Store Integration', () => {
       // Create a character in that world
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
+        description: 'A character in the test world',
         worldId: worldId,
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'A character in the test world',
+          history: 'A character in the test world',
           personality: 'Brave',
-          motivation: 'Adventure'
+          goals: ['Adventure'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       // Create inventory for the character
@@ -211,6 +227,7 @@ describe('Store Integration', () => {
     test('should handle character deletion with inventory', () => {
       const worldId = useWorldStore.getState().createWorld({
         name: 'Test World',
+        description: 'A test world for integration testing',
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -224,15 +241,30 @@ describe('Store Integration', () => {
 
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Character with Items',
+        description: 'Character with inventory items',
         worldId: worldId,
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'Has inventory',
+          history: 'Has inventory',
           personality: 'Collector',
-          motivation: 'Gathering'
+          goals: ['Gathering'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       // Add items to character
@@ -275,11 +307,13 @@ describe('Store Integration', () => {
       // Create a fantasy world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Fantasy Realm',
+        description: 'A complete fantasy world for testing',
         genre: 'fantasy',
         attributes: [
           {
             id: 'str-1',
             name: 'Strength',
+            description: 'Physical strength attribute',
             worldId: 'placeholder',
             baseValue: 10,
             minValue: 3,
@@ -289,6 +323,7 @@ describe('Store Integration', () => {
           {
             id: 'dex-1',
             name: 'Dexterity',
+            description: 'Agility and dexterity attribute',
             worldId: 'placeholder',
             baseValue: 10,
             minValue: 3,
@@ -300,10 +335,14 @@ describe('Store Integration', () => {
           {
             id: 'sword-1',
             name: 'Swordsmanship',
+            description: 'Skill in using swords effectively',
             worldId: 'placeholder',
             attributeIds: ['str-1'],
             difficulty: 'medium',
-            category: 'Combat'
+            category: 'Combat',
+            baseValue: 0,
+            minValue: 0,
+            maxValue: 10
           }
         ],
         settings: {
@@ -317,7 +356,9 @@ describe('Store Integration', () => {
       // Create a character in that world
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Hero',
+        description: 'A brave hero ready for adventure',
         worldId: worldId,
+        level: 1,
         attributes: [
           {
             id: 'char-str-1',
@@ -336,11 +377,24 @@ describe('Store Integration', () => {
           }
         ],
         background: {
-          description: 'A brave adventurer',
+          history: 'A brave adventurer',
           personality: 'Courageous',
-          motivation: 'Save the realm'
+          goals: ['Save the realm'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       // Give the character some equipment

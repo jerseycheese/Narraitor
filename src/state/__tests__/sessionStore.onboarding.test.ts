@@ -128,7 +128,7 @@ describe('SessionStore - Onboarding Functionality', () => {
       const state = useSessionStore.getState();
       
       existingFunctionality.forEach(funcName => {
-        expect(typeof state[funcName]).toBe('function');
+        expect(typeof (state as Record<string, unknown>)[funcName]).toBe('function');
       });
     });
 

@@ -1,0 +1,46 @@
+import { test, expect } from '@playwright/test';
+import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
+
+/**
+ * Game Session Visual Regression Tests
+ * 
+ * Tests the active gameplay interface including session management,
+ * narrative display, and player choice interactions.
+ */
+
+test.describe('Game Session Visual Tests', () => {
+  test('Game session page should render consistently', async ({ page }) => {
+    await seedTestData(page);
+    await mockApiEndpoints(page);
+    
+    // Navigate to the cyberpunk world's play page
+    await page.goto('/worlds/world-cyberpunk-2077/play');
+    await waitForContentStable(page);
+    
+    // Click Start Session to show active gameplay
+    const startButton = page.locator('button:has-text("Start Session")');
+    if (await startButton.count() > 0) {
+      console.log('Found Start Session button, clicking...');
+      await startButton.click();
+      await page.waitForTimeout(2000); // Give time for session to start and narrative to load
+      await waitForContentStable(page);
+      
+      // Wait for active session content to appear
+      await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+      
+      // Wait for narrative content and player choices
+      await Promise.race([
+        page.waitForSelector('.narrative-content, .player-choices-container', { timeout: 8000 }),
+        page.waitForTimeout(8000) // Fallback if selectors don't match
+      ]);
+      
+      await waitForContentStable(page);
+    }
+    
+    await hideDynamicContent(page);
+    
+    // Take screenshot of game session page - should show active session with narrative and choices
+    await expect(page).toHaveScreenshot('game-session.png', { fullPage: true });
+  });
+});

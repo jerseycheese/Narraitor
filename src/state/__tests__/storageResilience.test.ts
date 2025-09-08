@@ -7,9 +7,9 @@ import { describe, test, expect, jest, beforeEach } from '@jest/globals';
 
 // Mock storage interface for testing
 const mockStorage = {
-  getItem: jest.fn().mockResolvedValue(null),
-  setItem: jest.fn().mockResolvedValue(undefined),
-  removeItem: jest.fn().mockResolvedValue(undefined),
+  getItem: jest.fn<(key: string) => Promise<string | null>>().mockResolvedValue(null),
+  setItem: jest.fn<(key: string, value: string) => Promise<void>>().mockResolvedValue(undefined),
+  removeItem: jest.fn<(key: string) => Promise<void>>().mockResolvedValue(undefined),
 };
 
 // Simple mock for resilient storage

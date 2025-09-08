@@ -162,8 +162,8 @@ const WorldAttributesForm: React.FC<WorldAttributesFormProps> = ({
         <p className="text-gray-500 italic">No attributes defined yet.</p>
       ) : (
         <div className="space-y-6">
-          {attributes.map((attribute) => (
-            <div key={attribute.id} className="p-3 border border-gray-200 rounded">
+          {attributes.map((attribute, index) => (
+            <div key={`${attribute.id ?? attribute.name ?? index}`} className="p-3 border border-gray-200 rounded">
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">{attribute.name}</h3>
                 <div className="flex gap-2">

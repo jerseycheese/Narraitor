@@ -29,21 +29,43 @@ const mockWorldWithSkills: World = {
       id: 'athletics',
       name: 'Athletics',
       description: 'Physical prowess and endurance',
-      attributeIds: ['strength']
+      attributeIds: ['strength'],
+      worldId: 'skill-world',
+      difficulty: 'medium' as const,
+      baseValue: 0,
+      minValue: 0,
+      maxValue: 10
     },
     {
       id: 'magic',
       name: 'Magic',
       description: 'Arcane knowledge and spellcasting',
-      attributeIds: ['intelligence']
+      attributeIds: ['intelligence'],
+      worldId: 'skill-world',
+      difficulty: 'hard' as const,
+      baseValue: 0,
+      minValue: 0,
+      maxValue: 10
     },
     {
       id: 'stealth',
       name: 'Stealth',
       description: 'Moving unseen and unheard',
-      attributeIds: ['dexterity']
+      attributeIds: ['dexterity'],
+      worldId: 'skill-world',
+      difficulty: 'easy' as const,
+      baseValue: 0,
+      minValue: 0,
+      maxValue: 10
     }
   ],
+  attributes: [],
+  settings: {
+    maxAttributes: 6,
+    maxSkills: 12,
+    attributePointPool: 27,
+    skillPointPool: 40
+  },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
 };
@@ -53,17 +75,35 @@ const mockCharacterWithSkills: Character = {
   id: 'char-1',
   worldId: 'skill-world',
   name: 'Test Hero',
-  background: 'Skilled adventurer',
+  description: 'A skilled adventurer ready for any challenge',
+  background: {
+    history: 'Skilled adventurer with years of experience',
+    personality: 'Brave and resourceful',
+    goals: ['Master all skills'],
+    fears: ['Failure'],
+    relationships: []
+  },
   attributes: [
     { attributeId: 'strength', value: 16 },
     { attributeId: 'intelligence', value: 14 },
     { attributeId: 'dexterity', value: 12 }
   ],
   skills: [
-    { skillId: 'athletics', level: 6, isActive: true },
-    { skillId: 'magic', level: 4, isActive: true },
-    { skillId: 'stealth', level: 3, isActive: true }
+    { skillId: 'athletics', level: 6, experience: 100, isActive: true },
+    { skillId: 'magic', level: 4, experience: 80, isActive: true },
+    { skillId: 'stealth', level: 3, experience: 60, isActive: true }
   ],
+  inventory: {
+    characterId: 'char-1',
+    items: [],
+    capacity: 100,
+    categories: []
+  },
+  status: {
+    health: 100,
+    maxHealth: 100,
+    conditions: []
+  },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
 };
@@ -128,7 +168,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
             characterIds: ["char-1"]
           }
         }),
-        tokenUsage: 150
+        finishReason: 'stop' as const,
+        promptTokens: 75,
+        completionTokens: 75
       };
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
@@ -168,7 +210,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
             characterIds: ["char-1"]
           }
         }),
-        tokenUsage: 140
+        finishReason: 'stop' as const,
+        promptTokens: 70,
+        completionTokens: 70
       };
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
@@ -265,7 +309,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
     it('should include character skill information in narrative context', async () => {
       const mockResponse = {
         content: "You assess your options, drawing on your athletic prowess and magical knowledge.",
-        tokenUsage: 100
+        finishReason: 'stop' as const,
+        promptTokens: 50,
+        completionTokens: 50
       };
       mockAIClient.generateContent.mockResolvedValue(mockResponse);
 
@@ -298,7 +344,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       // Test successful skill usage narrative
       const successResponse = {
         content: "Your expertise shines through as you execute the maneuver perfectly.",
-        tokenUsage: 90
+        finishReason: 'stop' as const,
+        promptTokens: 45,
+        completionTokens: 45
       };
       mockAIClient.generateContent.mockResolvedValueOnce(successResponse);
 
@@ -324,7 +372,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       // Test failed skill usage narrative
       const failureResponse = {
         content: "You struggle with the technique, clearly needing more practice.",
-        tokenUsage: 85
+        finishReason: 'stop' as const,
+        promptTokens: 42,
+        completionTokens: 43
       };
       mockAIClient.generateContent.mockResolvedValueOnce(failureResponse);
 
@@ -352,7 +402,9 @@ describe('NarrativeGenerator - Skill-Based Choices', () => {
       // Reset mocks and use a simple successful response
       mockAIClient.generateContent.mockResolvedValue({
         content: "You proceed with your adventure in this simple world.",
-        tokenUsage: 70
+        finishReason: 'stop' as const,
+        promptTokens: 35,
+        completionTokens: 35
       });
 
       // Use the existing mock world from setup but don't override skills

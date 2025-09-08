@@ -220,7 +220,7 @@ const mockUpdateSettings = jest.fn((worldId: string, settings: Partial<WorldSett
   };
 });
 
-const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<typeof import('@/types/tone-settings.types').ToneSettings>) => {
+const mockUpdateToneSettings = jest.fn((worldId: string, toneSettings: Partial<import('@/types/tone-settings.types').ToneSettings>) => {
   console.log('[__mocks__/worldStore.ts] updateToneSettings called:', worldId, toneSettings);
   if (!mockState.worlds[worldId]) {
     mockState.error = 'World not found';

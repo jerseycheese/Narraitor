@@ -21,7 +21,7 @@ jest.mock('../../lib/services/autoSaveService', () => ({
 const mockSessionStore = {
   autoSave: {
     enabled: true,
-    lastSaveTime: null,
+    lastSaveTime: null as string | null,
     status: 'idle',
     errorMessage: null,
     totalSaves: 0,

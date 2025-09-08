@@ -10,7 +10,7 @@ describe('PromptTemplateManager', () => {
         id: 'test-template',
         type: PromptType.CHARACTER,
         content: 'Template with {{variable}}',
-        variables: [{ name: 'variable', description: 'Test variable' }]
+        variables: [{ name: 'variable', description: 'Test variable', type: 'string' }]
       };
       
       manager.addTemplate(template);
@@ -82,8 +82,8 @@ describe('PromptTemplateManager', () => {
         type: PromptType.CHARACTER,
         content: 'Create a character named {{name}} who is {{age}} years old.',
         variables: [
-          { name: 'name', description: 'Character name' },
-          { name: 'age', description: 'Character age' }
+          { name: 'name', description: 'Character name', type: 'string' },
+          { name: 'age', description: 'Character age', type: 'string' }
         ]
       };
       
@@ -104,8 +104,8 @@ describe('PromptTemplateManager', () => {
         type: PromptType.CHARACTER,
         content: 'Character {{name}} with {{attribute}}',
         variables: [
-          { name: 'name', description: 'Character name' },
-          { name: 'attribute', description: 'Character attribute' }
+          { name: 'name', description: 'Character name', type: 'string' },
+          { name: 'attribute', description: 'Character attribute', type: 'string' }
         ]
       };
       
@@ -126,7 +126,7 @@ describe('PromptTemplateManager', () => {
         type: PromptType.CHARACTER,
         content: 'Character with {{trait.special+}} trait',
         variables: [
-          { name: 'trait.special+', description: 'Special trait with regex chars' }
+          { name: 'trait.special+', description: 'Special trait with regex chars', type: 'string' }
         ]
       };
       
@@ -234,7 +234,7 @@ describe('PromptTemplateManager', () => {
         id: 'valid-template',
         type: PromptType.CHARACTER,
         content: 'Content with {{var}}',
-        variables: [{ name: 'var', description: 'Test variable' }]
+        variables: [{ name: 'var', description: 'Test variable', type: 'string' }]
       };
       
       expect(() => {
@@ -262,7 +262,7 @@ describe('PromptTemplateManager', () => {
         type: PromptType.CHARACTER,
         content: 'Template with {{name}} and {{age}}',
         variables: [
-          { name: 'name', description: 'Character name' }
+          { name: 'name', description: 'Character name', type: 'string' }
           // 'age' variable is used but not defined
         ]
       };

@@ -13,16 +13,15 @@ jest.mock('../../utils/generateId', () => ({
 }));
 
 // Mock the useWorldStore
-jest.mock('../../../state/worldStore', () => {
-  const mockSetState = jest.fn();
-  
-  return {
-    useWorldStore: {
-      setState: mockSetState,
-      getState: jest.fn(() => ({ worlds: {} }))
-    }
-  };
-});
+const mockSetState = jest.fn();
+const mockGetState = jest.fn(() => ({ worlds: {} }));
+
+jest.mock('../../../state/worldStore', () => ({
+  useWorldStore: {
+    setState: mockSetState,
+    getState: mockGetState
+  }
+}));
 
 describe('Template Loader', () => {
   beforeEach(() => {
@@ -51,7 +50,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the first setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -70,7 +69,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -107,7 +106,7 @@ describe('Template Loader', () => {
     expect(worldId).toBe('world-123');
     
     // Extract the updater function from the setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };

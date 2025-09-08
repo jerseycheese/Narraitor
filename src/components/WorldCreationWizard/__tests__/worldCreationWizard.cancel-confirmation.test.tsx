@@ -63,7 +63,7 @@ describe('WorldCreationWizard Cancel Confirmation', () => {
       push: mockPush,
     });
 
-    const mockWorldStoreHook = useWorldStore as MockWorldStoreHook;
+    const mockWorldStoreHook = useWorldStore as unknown as MockWorldStoreHook;
     mockWorldStoreHook.mockReturnValue(mockCreateWorld);
     
     // Mock the getState method for accessing worlds

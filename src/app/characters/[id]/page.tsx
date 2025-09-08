@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -22,14 +22,26 @@ export default function CharacterViewPage() {
   const { worlds } = useWorldStore();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
+  const [mounted, setMounted] = useState(false);
   const character = characters[characterId];
   const world = character ? worlds[character.worldId] : null;
+
+  useEffect(() => setMounted(true), []);
 
   const handleDelete = () => {
     deleteCharacter(characterId);
     router.push('/characters');
   };
 
+
+  if (!mounted) {
+    // Preserve SSR/client markup; decide what to show after hydration
+    return (
+      <PageLayout>
+        <div />
+      </PageLayout>
+    );
+  }
 
   if (!character || !world) {
     return (

@@ -7,15 +7,29 @@ describe('journalStore - deleteSessionEntries', () => {
   });
 
   const mockEntry1: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> = {
+    worldId: 'world-1',
+    characterId: 'char-1',
+    type: 'character_event',
+    title: 'Test Entry 1',
     content: 'Test entry 1',
-    type: 'manual',
+    significance: 'minor',
     isRead: false,
+    relatedEntities: [],
+    metadata: { tags: [], automaticEntry: false },
+    updatedAt: new Date().toISOString()
   };
 
   const mockEntry2: Omit<JournalEntry, 'id' | 'sessionId' | 'createdAt'> = {
+    worldId: 'world-1',
+    characterId: 'char-2',
+    type: 'world_event',
+    title: 'Test Entry 2',
     content: 'Test entry 2', 
-    type: 'auto',
+    significance: 'major',
     isRead: true,
+    relatedEntities: [],
+    metadata: { tags: [], automaticEntry: true },
+    updatedAt: new Date().toISOString()
   };
 
   it('should delete all entries for a specific session', () => {
@@ -96,9 +110,9 @@ describe('journalStore - deleteSessionEntries', () => {
     const { addEntry, deleteSessionEntries, getSessionEntries } = useJournalStore.getState();
     
     // Add different types of entries
-    addEntry('session-1', { ...mockEntry1, type: 'manual' });
-    addEntry('session-1', { ...mockEntry2, type: 'auto' });
-    addEntry('session-1', { ...mockEntry1, type: 'system' });
+    addEntry('session-1', { ...mockEntry1, type: 'character_event' });
+    addEntry('session-1', { ...mockEntry2, type: 'world_event' });
+    addEntry('session-1', { ...mockEntry1, type: 'discovery' });
     
     // Verify all entries exist
     expect(getSessionEntries('session-1')).toHaveLength(3);

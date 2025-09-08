@@ -58,6 +58,12 @@ describe('NarrativeGenerator - Player Choices', () => {
     it('should generate player choices successfully', async () => {
       // Create a mock narrative context
       const mockNarrativeContext: NarrativeContext = {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: ['forest'],
+        sessionId: 'session-1',
         recentSegments: [{
           id: 'segment-1',
           content: 'You are in a forest clearing.',
@@ -68,7 +74,8 @@ describe('NarrativeGenerator - Player Choices', () => {
           timestamp: new Date(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
-        }]
+        }],
+        currentLocation: 'Forest clearing'
       };
       
       const result = await narrativeGenerator.generatePlayerChoices(
@@ -102,6 +109,12 @@ describe('NarrativeGenerator - Player Choices', () => {
       mockGenerateChoices.mockRejectedValueOnce(new Error('Choice generation failed'));
       
       const mockNarrativeContext: NarrativeContext = {
+        worldId: 'world-1',
+        currentSceneId: 'scene-1',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: ['forest'],
+        sessionId: 'session-1',
         recentSegments: [{
           id: 'segment-1',
           content: 'You are in a forest clearing.',
@@ -112,7 +125,8 @@ describe('NarrativeGenerator - Player Choices', () => {
           timestamp: new Date(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
-        }]
+        }],
+        currentLocation: 'Forest clearing'
       };
       
       // The generatePlayerChoices method should return fallback choices instead of throwing

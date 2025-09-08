@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "bash scripts/kill-port.sh 3000 && next dev -p 3000",
     "dev:turbo": "next dev --turbopack",
+    "kill": "pkill -f 'next dev' || true",
     "build": "next build && npm run build-storybook && cp -r storybook-static public/",
     "build:app": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:layout-usage": "node scripts/verify-page-layout-usage.cjs",
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css:fix": "stylelint \"**/*.css\" --fix",
     "tailwind:build-for-storybook": "npx @tailwindcss/cli -i src/app/globals.css -o .storybook/tailwind-compiled.css",
@@ -22,10 +24,13 @@
     "test:prompt-templates": "jest --config=jest.config.cjs src/lib/promptTemplates/promptTemplateManager.test.ts",
     "test:coverage": "jest --config=jest.config.cjs --coverage",
     "test:e2e:critical": "playwright test",
-    "test:visual": "playwright test --project=chromium",
-    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual": "npm run test:visual:seed && playwright test --project=chromium",
+    "test:visual:seed": "node scripts/seed-visual-test-data.cjs",
+    "test:visual:update": "npm run test:visual:seed && playwright test --update-snapshots",
+    "test:visual:prune": "node scripts/clean-visual-snapshots.cjs",
     "test:visual:headed": "playwright test --headed",
-    "test:visual:debug": "playwright test --debug"
+    "test:visual:debug": "playwright test --debug",
+    "test:visual:report": "./scripts/download-playwright-report.sh"
   },
   "dependencies": {
     "@google/genai": "^0.13.0",
@@ -113,7 +118,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jerseycheese/narraitor/issues"
+    "url": "https://github.com/jerseycheese/Narraitor/issues"
   },
-  "homepage": "https://github.com/jerseycheese/narraitor#readme"
+  "homepage": "https://github.com/jerseycheese/Narraitor#readme"
 }

@@ -64,7 +64,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           tags: ['marketplace', 'social', 'entry'],
           location: 'Rivertown Marketplace',
           mood: 'neutral'
-        }
+        },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date()
       });
 
       store.addSegment(sessionId, {
@@ -75,7 +77,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         metadata: {
           tags: ['encounter', 'merchant', 'distress'],
           location: 'Rivertown Marketplace'
-        }
+        },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date()
       });
 
       store.addSegment(sessionId, {
@@ -85,7 +89,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         characterIds: [characterId, 'merchant-desperate'],
         metadata: {
           tags: ['plea', 'backstory', 'quest-hook']
-        }
+        },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date()
       });
 
       // Step 2: Create decision with contextually appropriate options
@@ -236,7 +242,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
           tags: ['temple', 'party', 'ancient', 'mystery'],
           location: 'Temple of Forgotten Wisdom',
           mood: 'mysterious'
-        }
+        },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date()
       });
 
       store.addSegment(sessionId, {
@@ -246,7 +254,9 @@ describe('NarrativeStore ↔ PlayerDecisionTracker End-to-End Integration (Issue
         characterIds: [playerCharacterId, companionCharacterId, 'temple-guardian'],
         metadata: {
           tags: ['warning', 'choice', 'consequence']
-        }
+        },
+        updatedAt: new Date().toISOString(),
+        timestamp: new Date()
       });
 
       // Player decision

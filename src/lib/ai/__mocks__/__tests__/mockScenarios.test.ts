@@ -17,7 +17,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       const scenarios = ['success-fast', 'success-slow', 'success-detailed'];
       
       for (const scenarioId of scenarios) {
-        const response = await mockScenarios.executeScenario(scenarioId, 'test prompt');
+        const response = await mockScenarios.executeScenario(scenarioId);
         
         // Must return proper AIResponse structure
         expect(response).toMatchObject({
@@ -40,7 +40,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       const errorScenarios = ['error-timeout', 'error-rate-limit', 'error-api-key'];
       
       for (const scenarioId of errorScenarios) {
-        await expect(mockScenarios.executeScenario(scenarioId, 'test prompt'))
+        await expect(mockScenarios.executeScenario(scenarioId))
           .rejects.toMatchObject({
             code: expect.any(String),
             message: expect.any(String),
@@ -74,7 +74,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       // Run multiple times to test success rate behavior
       const results = await Promise.allSettled(
         Array(20).fill(null).map(() => 
-          mockScenarios.executeScenario('mixed-test', 'test prompt')
+          mockScenarios.executeScenario('mixed-test')
         )
       );
       
@@ -119,7 +119,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       
       // Test fast response
       const fastStart = Date.now();
-      await mockScenarios.executeScenario('delay-test-fast', 'test');
+      await mockScenarios.executeScenario('delay-test-fast');
       const fastDuration = Date.now() - fastStart;
       
       // Fast should complete within reasonable time (allowing for test overhead)
@@ -127,7 +127,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       
       // Test slow response
       const slowStart = Date.now();
-      await mockScenarios.executeScenario('delay-test-slow', 'test');
+      await mockScenarios.executeScenario('delay-test-slow');
       const slowDuration = Date.now() - slowStart;
       
       // Slow should take at least the configured delay
@@ -150,7 +150,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       mockScenarios.addCustomScenario(immediateConfig);
       
       const start = Date.now();
-      await mockScenarios.executeScenario('immediate-test', 'test');
+      await mockScenarios.executeScenario('immediate-test');
       const duration = Date.now() - start;
       
       // Should complete very quickly (under 50ms including test overhead)
@@ -182,7 +182,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       // Run multiple times - should never fail
       const results = await Promise.allSettled(
         Array(10).fill(null).map(() => 
-          mockScenarios.executeScenario('always-success', 'test')
+          mockScenarios.executeScenario('always-success')
         )
       );
       
@@ -215,7 +215,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       // Run multiple times - should always fail
       const results = await Promise.allSettled(
         Array(10).fill(null).map(() => 
-          mockScenarios.executeScenario('always-fail', 'test')
+          mockScenarios.executeScenario('always-fail')
         )
       );
       
@@ -251,7 +251,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       
       mockScenarios.addCustomScenario(customConfig);
       
-      const response = await mockScenarios.executeScenario('custom-narrative', 'Generate story');
+      const response = await mockScenarios.executeScenario('custom-narrative');
       
       expect(response).toMatchObject({
         content: 'The hero ventured into the mysterious forest...',
@@ -277,21 +277,21 @@ describe('Mock Scenarios System - API Contract Tests', () => {
       
       mockScenarios.addCustomScenario(overrideConfig);
       
-      const response = await mockScenarios.executeScenario('success-fast', 'test');
+      const response = await mockScenarios.executeScenario('success-fast');
       
       // Should get the custom response, not the built-in one
       expect(response.content).toBe('Custom override response');
     });
 
     test('throws error for unknown scenarios', async () => {
-      await expect(mockScenarios.executeScenario('unknown-scenario', 'test'))
+      await expect(mockScenarios.executeScenario('unknown-scenario'))
         .rejects.toThrow(/unknown.*scenario.*unknown-scenario/i);
     });
   });
 
   describe('Response Content Validation', () => {
     test('narrative responses contain story-like content', async () => {
-      const response = await mockScenarios.executeScenario('success-detailed', 'Generate narrative');
+      const response = await mockScenarios.executeScenario('success-detailed');
       
       // Should contain narrative elements
       expect(response.content).toMatch(/\b(you|your|the|a|an)\b/i); // Common story words
@@ -300,7 +300,7 @@ describe('Mock Scenarios System - API Contract Tests', () => {
     });
 
     test('token counts are realistic for response length', async () => {
-      const response = await mockScenarios.executeScenario('success-detailed', 'test');
+      const response = await mockScenarios.executeScenario('success-detailed');
       
       // Token counts should be reasonable relative to content length
       const wordCount = response.content.split(/\s+/).length;

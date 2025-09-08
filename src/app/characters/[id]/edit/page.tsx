@@ -1,39 +1,41 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCharacterStore } from '@/state/characterStore';
 import { CharacterEditor } from '@/components/CharacterEditor';
-import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+//
+import { NotFoundState } from '@/components/shared/NotFoundState';
 
 export default function CharacterEditPage() {
   const params = useParams();
   const router = useRouter();
   const characterId = params.id as string;
   const { characters } = useCharacterStore();
-  
+  const [mounted, setMounted] = useState(false);
   const character = characters[characterId];
 
-  if (!character) {
+  useEffect(() => setMounted(true), []);
+
+  // Keep SSR and first client paint identical; decide after hydration
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-100 p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <h1 className="text-2xl font-bold mb-4">Character Not Found</h1>
-            <p className="text-gray-700 mb-6">
-              The character you&apos;re trying to edit doesn&apos;t exist or has been deleted.
-            </p>
-            <ActionButtonGroup
-              actions={[{
-                label: 'Back to Characters',
-                onClick: () => router.push('/characters'),
-                variant: 'primary'
-              }]}
-              className="justify-center"
-            />
-          </div>
+          <div className="mb-6" />
         </div>
       </div>
+    );
+  }
+
+  if (!character) {
+    return (
+      <NotFoundState
+        title="Character Not Found"
+        message="The character you're trying to edit doesn't exist or has been deleted."
+        backUrl="/characters"
+        backLabel="Back to Characters"
+      />
     );
   }
 

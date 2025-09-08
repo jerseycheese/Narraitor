@@ -17,7 +17,9 @@ const createMockDB = () => ({
     oncomplete: null,
     onerror: null
   })),
-  close: jest.fn()
+  close: jest.fn(),
+  objectStoreNames: { contains: jest.fn(() => true) },
+  createObjectStore: jest.fn(() => ({ name: 'narraitor-store' }))
 });
 
 describe('IndexedDBAdapter', () => {
@@ -68,11 +70,10 @@ describe('IndexedDBAdapter', () => {
 
     test('should create object store if not exists', async () => {
       const mockDB = createMockDB();
-      mockDB.objectStoreNames = { contains: jest.fn(() => false) };
-      mockDB.createObjectStore = jest.fn(() => ({ name: 'narraitor-store' }));
+      mockDB.objectStoreNames.contains = jest.fn(() => false);
       
       const mockTransaction = { 
-        oncomplete: null as (() => void) | null 
+        oncomplete: jest.fn() 
       };
       
       const mockRequest = {
@@ -113,7 +114,7 @@ describe('IndexedDBAdapter', () => {
       };
       
       const mockTransaction = { 
-        oncomplete: null as (() => void) | null 
+        oncomplete: jest.fn() 
       };
       
       const mockRequest = {
@@ -178,10 +179,14 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        get: jest.fn(() => mockRequest)
+        get: jest.fn(() => mockRequest),
+        put: jest.fn(),
+        delete: jest.fn()
       };
       mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
+        objectStore: jest.fn(() => mockStore),
+        oncomplete: null,
+        onerror: null
       });
 
       // Now test getItem
@@ -229,10 +234,14 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        get: jest.fn(() => mockRequest)
+        get: jest.fn(() => mockRequest),
+        put: jest.fn(),
+        delete: jest.fn()
       };
       mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
+        objectStore: jest.fn(() => mockStore),
+        oncomplete: null,
+        onerror: null
       });
 
       const getPromise = adapter.getItem('non-existent-key');
@@ -299,11 +308,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        put: jest.fn(() => mockRequest)
+        get: jest.fn(),
+        put: jest.fn(() => mockRequest),
+        delete: jest.fn()
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -354,11 +365,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        put: jest.fn(() => mockRequest)
+        get: jest.fn(),
+        put: jest.fn(() => mockRequest),
+        delete: jest.fn()
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -409,11 +422,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        put: jest.fn(() => mockRequest)
+        get: jest.fn(),
+        put: jest.fn(() => mockRequest),
+        delete: jest.fn()
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -460,11 +475,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        put: jest.fn(() => mockRequest)
+        get: jest.fn(),
+        put: jest.fn(() => mockRequest),
+        delete: jest.fn()
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -513,11 +530,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
+        get: jest.fn(),
+        put: jest.fn(),
         delete: jest.fn(() => mockRequest)
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -564,11 +583,13 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
+        get: jest.fn(),
+        put: jest.fn(),
         delete: jest.fn(() => mockRequest)
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -626,15 +647,17 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
+        get: jest.fn(),
         put: jest.fn(() => {
           const request = { onsuccess: null, onerror: null };
           mockRequests.push(request);
           return request;
-        })
+        }),
+        delete: jest.fn()
       };
       const mockTransaction = {
         objectStore: jest.fn(() => mockStore),
-        oncomplete: null as (() => void) | null,
+        oncomplete: null,
         onerror: null
       };
       mockDB.transaction.mockReturnValue(mockTransaction);
@@ -685,10 +708,14 @@ describe('IndexedDBAdapter', () => {
       await adapter.initialize();
 
       const mockStore = {
-        get: jest.fn(() => mockRequest)
+        get: jest.fn(() => mockRequest),
+        put: jest.fn(),
+        delete: jest.fn()
       };
       mockDB.transaction.mockReturnValue({
-        objectStore: jest.fn(() => mockStore)
+        objectStore: jest.fn(() => mockStore),
+        oncomplete: null,
+        onerror: null
       });
 
       const getPromise = adapter.getItem('corrupt-key');
