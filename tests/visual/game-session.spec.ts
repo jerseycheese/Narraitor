@@ -169,17 +169,25 @@ test.describe('Game Session Visual Tests', () => {
       // Clear any existing content
       narrativeManager.innerHTML = '';
       
-      // Manually inject the seeded narrative content for visual testing
+      // Manually inject the seeded narrative content with proper production styling
       const narrativeHTML = `
-        <div class="narrative-history">
-          <div class="narrative-segment p-6 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-            <div class="text-lg narrative-content readable">
-              Rain pelts the neon-soaked streets of Neo-Tokyo as you navigate through the maze of towering corporate arcologies. Your neural interface crackles with encrypted data streams, each one a potential gateway to the information you desperately need. The job seemed simple enough when your fixer contacted you through the usual dark channels - infiltrate Arasaka Tower, extract the personnel files, get out clean. But standing here in the perpetual twilight of the corporate district, watching security drones patrol overhead like digital vultures, you realize this might be more than you bargained for.
+        <div class="space-y-4 px-4 py-4" style="scroll-snap-type: y mandatory; scroll-behavior: smooth;">
+          <div class="space-y-3 snap-center">
+            <div class="narrative-segment p-6 rounded-lg bg-white border border-gray-200">
+              <p class="text-xs uppercase text-gray-700 font-semibold mb-2">scene</p>
+              <div class="text-lg narrative-content readable scene-spacing text-gray-900">
+                <p>Rain pelts the neon-soaked streets of Neo-Tokyo as you navigate through the maze of towering corporate arcologies. Your neural interface crackles with encrypted data streams, each one a potential gateway to the information you desperately need. The job seemed simple enough when your fixer contacted you through the usual dark channels - infiltrate Arasaka Tower, extract the personnel files, get out clean. But standing here in the perpetual twilight of the corporate district, watching security drones patrol overhead like digital vultures, you realize this might be more than you bargained for.</p>
+              </div>
+              <p class="text-xs text-gray-600 mt-4 italic">Corporate District</p>
             </div>
           </div>
-          <div class="narrative-segment p-6 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mt-4">
-            <div class="text-lg narrative-content readable">
-              You slip through the service entrance, your hacking rig interfacing seamlessly with the building's antiquated security system. The corridors are sterile and gleaming, a stark contrast to the grimy streets outside. As you make your way toward the data vaults, your cybernetic eye detects movement ahead - corporate security is tighter than your intelligence suggested.
+          <div class="space-y-3 snap-center">
+            <div class="narrative-segment p-6 rounded-lg bg-white border border-gray-200">
+              <p class="text-xs uppercase text-gray-700 font-semibold mb-2">scene</p>
+              <div class="text-lg narrative-content readable scene-spacing text-gray-900">
+                <p>You slip through the service entrance, your hacking rig interfacing seamlessly with the building's antiquated security system. The corridors are sterile and gleaming, a stark contrast to the grimy streets outside. As you make your way toward the data vaults, your cybernetic eye detects movement ahead - corporate security is tighter than your intelligence suggested.</p>
+              </div>
+              <p class="text-xs text-gray-600 mt-4 italic">Inside Arasaka Tower</p>
             </div>
           </div>
         </div>
@@ -189,23 +197,66 @@ test.describe('Game Session Visual Tests', () => {
       
       console.log('✅ Manually injected narrative content for visual testing');
       
-      // Also inject suggested choice buttons in the player choice area
+      // Also inject suggested choice buttons matching the Storybook Active Gameplay example
       // Find the textarea and inject choices above it
       const textArea = document.querySelector('textarea');
       if (textArea && textArea.parentElement) {
         console.log('Found textarea, injecting choices above it...');
         const choicesHTML = `
-          <div class="suggested-choices mb-4">
-            <h4 class="text-md font-medium mb-3 text-gray-700">Suggested actions:</h4>
-            <div class="space-y-2">
-              <button class="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer">
-                <span class="text-blue-800">🔧 Use your hacking skills to disable the security cameras</span>
+          <div data-testid="choice-selector" class="choice-selector p-4 rounded-lg border-0 bg-gray-100/5" role="group" aria-labelledby="choices-heading">
+            <div data-testid="context-summary" class="mb-4 p-3 bg-white/50 rounded border border-gray-200">
+              <p class="text-sm text-gray-700 italic">You stand at the entrance to the corporate district, ready to infiltrate Arasaka Tower, with security drones patrolling overhead.</p>
+            </div>
+            <h3 class="text-lg font-bold mb-4 text-gray-900" id="choices-heading">What will you do?</h3>
+            <div class="mb-4 bg-gray-100 p-4 rounded border">
+              <textarea class="flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full resize-none" id="custom-input" placeholder="Type your custom response..." aria-label="Custom response input" rows="3"></textarea>
+              <div class="flex justify-between items-center mt-2">
+                <span class="text-sm text-gray-500">0/250</span>
+                <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3" disabled>Submit</button>
+              </div>
+            </div>
+            <div class="mb-2">
+              <span class="text-sm font-medium text-gray-700">Or try a suggested action:</span>
+            </div>
+            <div class="space-y-2" role="radiogroup" aria-labelledby="choices-heading">
+              <button class="block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal bg-white border-gray-300 hover:bg-gray-100 cursor-pointer" role="radio" aria-checked="false">
+                <div class="flex items-start gap-2">
+                  <span class="flex-1">Hack into the security system directly</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Use your neural interface to bypass the building's defenses</div>
               </button>
-              <button class="w-full p-3 text-left bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors cursor-pointer">
-                <span class="text-green-800">🚇 Find an alternate route through the ventilation system</span>  
+              <button class="block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal bg-white border-gray-300 hover:bg-gray-100 cursor-pointer" role="radio" aria-checked="false">
+                <div class="flex items-start gap-2">
+                  <span class="flex-1">Scout the perimeter for alternative entrances</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Look for service entrances or maintenance access points</div>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-100 border-blue-500 text-blue-800">
+                    Investigation 3+
+                  </div>
+                </div>
               </button>
-              <button class="w-full p-3 text-left bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer">
-                <span class="text-red-800">⚡ Confront the security directly with your enhanced reflexes</span>
+              <button class="block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal bg-white border-gray-300 hover:bg-gray-100 cursor-pointer" role="radio" aria-checked="false">
+                <div class="flex items-start gap-2">
+                  <span class="flex-1">Create a distraction to draw security away</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Use street chaos to mask your infiltration approach</div>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-red-100 border-red-500 text-red-800">
+                    Hacking 5+
+                  </div>
+                </div>
+              </button>
+              <button class="block w-full text-left p-3 border rounded transition-colors h-auto whitespace-normal bg-white border-gray-300 hover:bg-gray-100 cursor-pointer" role="radio" aria-checked="false">
+                <div class="flex items-start gap-2">
+                  <span class="flex-1">Contact your fixer for updated intelligence</span>
+                </div>
+                <div class="text-sm text-gray-500 mt-1">Get real-time information about tower security changes</div>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-green-100 border-green-500 text-green-800">
+                    Streetwise 4+
+                  </div>
+                </div>
               </button>
             </div>
           </div>
