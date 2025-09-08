@@ -183,25 +183,37 @@ test.describe('Game Session Visual Tests', () => {
             </div>
           </div>
         </div>
-        <div class="player-choices mt-6">
-          <h3 class="text-lg font-semibold mb-3">What will you do?</h3>
-          <div class="choice-grid">
-            <button class="choice-button p-4 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Use your hacking skills to disable the security cameras
-            </button>
-            <button class="choice-button p-4 bg-green-600 text-white rounded hover:bg-green-700 mt-2">
-              Find an alternate route through the ventilation system  
-            </button>
-            <button class="choice-button p-4 bg-red-600 text-white rounded hover:bg-red-700 mt-2">
-              Confront the security directly with your enhanced reflexes
-            </button>
-          </div>
-        </div>
       `;
       
       narrativeManager.innerHTML = narrativeHTML;
       
       console.log('✅ Manually injected narrative content for visual testing');
+      
+      // Also inject suggested choice buttons in the player choice area
+      // Find the textarea and inject choices above it
+      const textArea = document.querySelector('textarea');
+      if (textArea && textArea.parentElement) {
+        console.log('Found textarea, injecting choices above it...');
+        const choicesHTML = `
+          <div class="suggested-choices mb-4">
+            <h4 class="text-md font-medium mb-3 text-gray-700">Suggested actions:</h4>
+            <div class="space-y-2">
+              <button class="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer">
+                <span class="text-blue-800">🔧 Use your hacking skills to disable the security cameras</span>
+              </button>
+              <button class="w-full p-3 text-left bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-colors cursor-pointer">
+                <span class="text-green-800">🚇 Find an alternate route through the ventilation system</span>  
+              </button>
+              <button class="w-full p-3 text-left bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors cursor-pointer">
+                <span class="text-red-800">⚡ Confront the security directly with your enhanced reflexes</span>
+              </button>
+            </div>
+          </div>
+        `;
+        textArea.insertAdjacentHTML('beforebegin', choicesHTML);
+      } else {
+        console.log('Could not find textarea to inject choices');
+      }
     });
     
     await hideDynamicContent(page);
