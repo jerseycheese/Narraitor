@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
-import { seedTestData } from './utils/data-seeder';
+import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
+import { seedTestData, seedBaseData } from './utils/data-seeder';
 
 /**
  * Main Pages Visual Regression Tests
@@ -11,28 +11,8 @@ import { seedTestData } from './utils/data-seeder';
 
 test.describe('Main Pages Visual Tests', () => {
   test('Home page should render consistently (empty state)', async ({ page }) => {
-    // Ensure truly empty state by clearing any test data
-    await page.addInitScript(() => {
-      // Clear window globals
-      delete (window as any).__TEST_WORLDS__;
-      delete (window as any).__TEST_CHARACTERS__;
-      delete (window as any).__TEST_SESSIONS__;
-      delete (window as any).__TEST_CURRENT_WORLD_ID__;
-      delete (window as any).__TEST_SEEDED__;
-      
-      // Clear localStorage to ensure no persisted data
-      localStorage.clear();
-      
-      // Also clear any specific store keys
-      try {
-        localStorage.removeItem('narraitor-world-store');
-        localStorage.removeItem('narraitor-character-store');
-        localStorage.removeItem('narraitor-session-store');
-        localStorage.removeItem('narraitor-narrative-store');
-      } catch (e) {
-        // Ignore errors
-      }
-    });
+    // Use base seeding for empty state - much faster than clearing everything manually
+    await seedBaseData(page);
     
     await page.goto('/');
     await waitForContentStable(page);
@@ -71,28 +51,8 @@ test.describe('Main Pages Visual Tests', () => {
   });
 
   test('Worlds list page should render consistently (empty state)', async ({ page }) => {
-    // Ensure truly empty state by clearing any test data
-    await page.addInitScript(() => {
-      // Clear window globals
-      delete (window as any).__TEST_WORLDS__;
-      delete (window as any).__TEST_CHARACTERS__;
-      delete (window as any).__TEST_SESSIONS__;
-      delete (window as any).__TEST_CURRENT_WORLD_ID__;
-      delete (window as any).__TEST_SEEDED__;
-      
-      // Clear localStorage to ensure no persisted data
-      localStorage.clear();
-      
-      // Also clear any specific store keys
-      try {
-        localStorage.removeItem('narraitor-world-store');
-        localStorage.removeItem('narraitor-character-store');
-        localStorage.removeItem('narraitor-session-store');
-        localStorage.removeItem('narraitor-narrative-store');
-      } catch (e) {
-        // Ignore errors
-      }
-    });
+    // Use base seeding for empty state - much faster and more reliable
+    await seedBaseData(page);
     
     await page.goto('/worlds');
     await waitForContentStable(page);

@@ -10,24 +10,25 @@ export default defineConfig({
   // Test directory for visual regression tests
   testDir: './tests/visual',
   
-  // Global timeout for each test (increased for app loading)
-  timeout: 60 * 1000,
+  // Reduced timeout for faster failure detection
+  timeout: 30 * 1000,
   
   // Expect timeout for assertions
   expect: {
     // Visual comparison settings
     toHaveScreenshot: {
-      // Increased tolerance for content height variations between environments
-      maxDiffPixels: 2000,
-      // More permissive threshold for CI/local environment differences
-      threshold: 0.3,
+      // Reduced tolerance for faster comparison
+      maxDiffPixels: 1000,
+      // Slightly tighter threshold for better accuracy
+      threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
-      // Remove global clip to allow per-test flexibility
+      // Optimize screenshot mode for faster execution
+      mode: 'mask-diff',
     },
   },
   
-  // Fulfill missing origin before running tests
+  // Enable full parallelism for faster execution
   fullyParallel: true,
   
   // Fail the build on CI if accidentally left test.only in source code
@@ -52,9 +53,9 @@ export default defineConfig({
     // Base URL for all tests
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
     
-    // Browser settings for consistent screenshots (increased for app loading)
-    actionTimeout: 15 * 1000,
-    navigationTimeout: 45 * 1000,
+    // Reduced timeouts for faster execution
+    actionTimeout: 10 * 1000,
+    navigationTimeout: 20 * 1000,
     
     // Visual consistency settings
     trace: 'on-first-retry',
@@ -129,8 +130,8 @@ export default defineConfig({
   globalSetup: undefined,
   globalTeardown: undefined,
   
-  // Test match patterns (include setup hooks files)
-  testMatch: ['**/*.spec.ts', '**/*.setup.ts'],
+  // Test match patterns (exclude setup files from being run as tests)
+  testMatch: ['**/*.spec.ts'],
   
   // Ignore certain files
   testIgnore: '**/node_modules/**',

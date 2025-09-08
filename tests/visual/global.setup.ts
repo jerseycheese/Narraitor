@@ -1,0 +1,176 @@
+import { chromium, FullConfig } from '@playwright/test';
+import { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } from './utils/data-seeder';
+
+const authFile = 'tests/visual/.auth/seeded-state.json';
+
+/**
+ * Global Setup for Playwright Tests
+ * 
+ * Seeds test data once and saves the browser state for reuse across all tests.
+ * This eliminates redundant seeding operations and significantly improves test performance.
+ */
+async function globalSetup(config: FullConfig) {
+  console.log('🌍 Global setup: Seeding test data once for all tests...');
+  
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  
+  try {
+    // Navigate to the app first to initialize stores
+    await page.goto(config.projects[1]?.use.baseURL || 'http://localhost:3000');
+    
+    // Seed data using a more efficient approach
+    await page.evaluate(async (testData) => {
+      const { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS } = testData;
+      
+      // Convert arrays to Record format that Zustand expects
+      const worldsRecord = SAMPLE_WORLDS.reduce((acc: Record<string, unknown>, world) => {
+        acc[world.id] = world;
+        return acc;
+      }, {});
+      
+      const charactersRecord = SAMPLE_CHARACTERS.reduce((acc: Record<string, unknown>, char) => {
+        acc[char.id] = char;
+        return acc;
+      }, {});
+      
+      const sessionsRecord = SAMPLE_GAME_SESSIONS.reduce((acc: Record<string, unknown>, session) => {
+        acc[session.id] = session;
+        return acc;
+      }, {});
+      
+      const segmentsRecord = SAMPLE_NARRATIVE_SEGMENTS.reduce((acc: Record<string, unknown>, segment) => {
+        acc[segment.id] = segment;
+        return acc;
+      }, {});
+      
+      const decisionsRecord = SAMPLE_DECISIONS.reduce((acc: Record<string, unknown>, decision) => {
+        acc[decision.id] = decision;
+        return acc;
+      }, {});
+
+      // Efficient seeding via localStorage (most reliable approach)
+      const worldStoreData = {
+        state: {
+          worlds: worldsRecord,
+          currentWorldId: SAMPLE_WORLDS[0]?.id || null,
+          error: null,
+          loading: false
+        },
+        version: 1
+      };
+      
+      const characterStoreData = {
+        state: {
+          characters: charactersRecord,
+          currentCharacterId: SAMPLE_CHARACTERS[0]?.id || null,
+          error: null,
+          loading: false
+        },
+        version: 1
+      };
+      
+      const sessionStoreData = {
+        state: {
+          sessions: sessionsRecord,
+          currentSessionId: SAMPLE_GAME_SESSIONS[0]?.id || null,
+          savedSessions: {
+            'session-cyberpunk-ghost': {
+              id: 'session-cyberpunk-ghost',
+              worldId: 'world-cyberpunk-2077',
+              characterId: 'char-cyberpunk-hacker',
+              lastPlayed: '2024-01-01T02:00:00.000Z',
+              narrativeCount: 3
+            },
+            'session-fantasy-mage': {
+              id: 'session-fantasy-mage',
+              worldId: 'world-fantasy-realm',
+              characterId: 'char-fantasy-mage',
+              lastPlayed: '2024-01-02T02:00:00.000Z',
+              narrativeCount: 2
+            }
+          },
+          onboardingCompleted: true,
+          error: null,
+          loading: false
+        },
+        version: 1
+      };
+      
+      const narrativeStoreData = {
+        state: {
+          segments: segmentsRecord,
+          sessionSegments: {
+            [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(segmentsRecord).filter(id => {
+              const segment = segmentsRecord[id] as Record<string, unknown>;
+              return segment?.sessionId === SAMPLE_GAME_SESSIONS[0]?.id;
+            }),
+            [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(segmentsRecord).filter(id => {
+              const segment = segmentsRecord[id] as Record<string, unknown>;
+              return segment?.sessionId === SAMPLE_GAME_SESSIONS[1]?.id;
+            })
+          },
+          decisions: decisionsRecord,
+          sessionDecisions: {
+            [SAMPLE_GAME_SESSIONS[0]?.id]: Object.keys(decisionsRecord).filter(id => {
+              const decision = decisionsRecord[id] as Record<string, unknown>;
+              return decision?.narrativeSegmentId && String(decision.narrativeSegmentId).startsWith('segment-cyberpunk');
+            }),
+            [SAMPLE_GAME_SESSIONS[1]?.id]: Object.keys(decisionsRecord).filter(id => {
+              const decision = decisionsRecord[id] as Record<string, unknown>;
+              return decision?.narrativeSegmentId && String(decision.narrativeSegmentId).startsWith('segment-fantasy');
+            })
+          },
+          endedSessions: {},
+          currentEnding: null,
+          isGeneratingEnding: false,
+          endingError: null,
+          error: null,
+          loading: false
+        },
+        version: 1
+      };
+      
+      // Seed localStorage
+      localStorage.setItem('narraitor-world-store', JSON.stringify(worldStoreData));
+      localStorage.setItem('narraitor-character-store', JSON.stringify(characterStoreData));
+      localStorage.setItem('narraitor-session-store', JSON.stringify(sessionStoreData));
+      localStorage.setItem('narraitor-narrative-store', JSON.stringify(narrativeStoreData));
+      
+      // Store test data globally for later access
+      const testWindow = window as typeof window & {
+        __TEST_WORLDS__?: Record<string, unknown>;
+        __TEST_CHARACTERS__?: Record<string, unknown>;
+        __TEST_SESSIONS__?: Record<string, unknown>;
+        __TEST_SEGMENTS__?: Record<string, unknown>;
+        __TEST_DECISIONS__?: Record<string, unknown>;
+        __TEST_CURRENT_WORLD_ID__?: string | null;
+        __TEST_SEEDED__?: boolean;
+      };
+      
+      testWindow.__TEST_WORLDS__ = worldsRecord;
+      testWindow.__TEST_CHARACTERS__ = charactersRecord;
+      testWindow.__TEST_SESSIONS__ = sessionsRecord;
+      testWindow.__TEST_SEGMENTS__ = segmentsRecord;
+      testWindow.__TEST_DECISIONS__ = decisionsRecord;
+      testWindow.__TEST_CURRENT_WORLD_ID__ = SAMPLE_WORLDS[0]?.id || null;
+      testWindow.__TEST_SEEDED__ = true;
+      
+      console.log('✅ Global setup: Test data seeded successfully');
+      
+    }, { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS });
+    
+    // Wait for stores to initialize with seeded data
+    await page.waitForTimeout(500);
+    
+    // Save authentication state (includes localStorage, sessionStorage, cookies, etc.)
+    await page.context().storageState({ path: authFile });
+    
+    console.log('✅ Global setup: Browser state saved for test reuse');
+    
+  } finally {
+    await browser.close();
+  }
+}
+
+export default globalSetup;

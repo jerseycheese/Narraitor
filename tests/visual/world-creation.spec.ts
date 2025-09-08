@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { waitForContentStable, hideDynamicContent } from './utils/wait-helpers';
+import { waitForContentStable, hideDynamicContent, waitForInteraction } from './utils/wait-helpers';
 import { seedTestData } from './utils/data-seeder';
 
 /**
@@ -10,6 +10,7 @@ import { seedTestData } from './utils/data-seeder';
  */
 
 test('World creation wizard visual sequence (Steps 1–6)', async ({ page }) => {
+  test.setTimeout(45000); // Extended timeout for complex wizard
   await seedTestData(page);
   await page.goto('/worlds');
   await waitForContentStable(page);

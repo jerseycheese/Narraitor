@@ -532,10 +532,82 @@ export const SAMPLE_DECISIONS = [
 ];
 
 /**
- * Simple data seeding by using addInitScript before page loads
+ * Base seeding for empty state tests - minimal data needed for app initialization
+ */
+export async function seedBaseData(page: Page): Promise<void> {
+  console.log('Seeding base data for empty state tests...');
+  
+  await page.addInitScript(async () => {
+    // Clear any existing data to ensure true empty state
+    localStorage.clear();
+    
+    // Set minimal required configuration
+    const emptyWorldStoreData = {
+      state: {
+        worlds: {},
+        currentWorldId: null,
+        error: null,
+        loading: false
+      },
+      version: 1
+    };
+    
+    const emptyCharacterStoreData = {
+      state: {
+        characters: {},
+        currentCharacterId: null,
+        error: null,
+        loading: false
+      },
+      version: 1
+    };
+    
+    const emptySessionStoreData = {
+      state: {
+        sessions: {},
+        currentSessionId: null,
+        savedSessions: {},
+        onboardingCompleted: false, // Important: empty state shows onboarding
+        error: null,
+        loading: false
+      },
+      version: 1
+    };
+    
+    const emptyNarrativeStoreData = {
+      state: {
+        segments: {},
+        sessionSegments: {},
+        decisions: {},
+        sessionDecisions: {},
+        endedSessions: {},
+        currentEnding: null,
+        isGeneratingEnding: false,
+        endingError: null,
+        error: null,
+        loading: false
+      },
+      version: 1
+    };
+    
+    // Seed localStorage with empty stores
+    localStorage.setItem('narraitor-world-store', JSON.stringify(emptyWorldStoreData));
+    localStorage.setItem('narraitor-character-store', JSON.stringify(emptyCharacterStoreData));
+    localStorage.setItem('narraitor-session-store', JSON.stringify(emptySessionStoreData));
+    localStorage.setItem('narraitor-narrative-store', JSON.stringify(emptyNarrativeStoreData));
+    
+    // Mark as seeded for debugging
+    (window as any).__TEST_SEEDED__ = 'base';
+    
+    console.log('✅ Base data seeded for empty state');
+  });
+}
+
+/**
+ * Full data seeding for populated state tests
  */
 export async function seedTestData(page: Page): Promise<void> {
-  console.log('Seeding test data via addInitScript...');
+  console.log('Seeding full test data for populated state tests...');
   
   // Use addInitScript to set data BEFORE the app loads
   await page.addInitScript(async (testData) => {
@@ -738,7 +810,7 @@ export async function seedTestData(page: Page): Promise<void> {
     
     // Also set current world context for proper navigation/breadcrumbs
     testWindow.__TEST_CURRENT_WORLD_ID__ = SAMPLE_WORLDS[0]?.id || null;
-    testWindow.__TEST_SEEDED__ = true;
+    testWindow.__TEST_SEEDED__ = 'full';
     
     // Add additional session/narrative data for active session testing
     const sessionWindow = window as typeof window & {
@@ -785,7 +857,7 @@ export async function seedTestData(page: Page): Promise<void> {
     
   }, { SAMPLE_WORLDS, SAMPLE_CHARACTERS, SAMPLE_GAME_SESSIONS, SAMPLE_NARRATIVE_SEGMENTS, SAMPLE_DECISIONS });
   
-  console.log('✅ Test data seeded via addInitScript');
+  console.log('✅ Full test data seeded via addInitScript');
 }
 
 /**

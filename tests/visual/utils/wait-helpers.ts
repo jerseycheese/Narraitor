@@ -9,41 +9,48 @@ import { Page } from '@playwright/test';
 
 /**
  * Wait for content to be fully stable before taking screenshots.
- * Combines multiple wait strategies to ensure reliable visual testing.
+ * Balanced approach - faster than original but reliable for data seeding.
  */
 export async function waitForContentStable(page: Page): Promise<void> {
-  // Wait for network activity to settle
-  await page.waitForLoadState('networkidle');
+  // Wait for network activity to settle - increased timeout for data seeding
+  try {
+    await page.waitForLoadState('networkidle', { timeout: 8000 });
+  } catch (error) {
+    // If networkidle times out, continue - common with dynamic content
+    console.log('Network idle timeout, continuing...');
+  }
   
-  // Wait for any loading indicators to disappear
+  // Wait for any loading indicators to disappear with reasonable timeouts
   const loadingSelectors = [
     '.loading',
     '[data-testid="loading"]',
     '[aria-label="Loading"]',
-    '.spinner'
+    '.spinner',
+    'text=Loading...',
+    'text=Creating archetypes...'
   ];
   
-  for (const selector of loadingSelectors) {
-    try {
-      // If loading element exists, wait for it to be gone
-      await page.waitForSelector(selector, { state: 'detached', timeout: 5000 });
-    } catch (error) {
-      // Loading element not found or already gone - continue
-    }
-  }
+  // Check all loading selectors concurrently
+  await Promise.allSettled(
+    loadingSelectors.map(selector => 
+      page.waitForSelector(selector, { state: 'detached', timeout: 5000 })
+        .catch(() => {}) // Ignore if not found
+    )
+  );
   
-  // Wait for "Loading..." text to disappear (common in React hydration)
+  // Wait for "Loading..." text to disappear with adequate timeout for seeding
   try {
     await page.waitForFunction(
-      () => !document.body.textContent?.includes('Loading...'),
+      () => !document.body.textContent?.includes('Loading') && 
+            !document.body.textContent?.includes('Creating archetypes'),
       { timeout: 8000 }
     );
   } catch (error) {
-    // "Loading..." text not found or already gone - continue
+    // Loading text not found or already gone - continue
   }
   
-  // Final stabilization wait to ensure animations complete
-  await page.waitForTimeout(300);
+  // Final stabilization wait - enough time for data seeding to complete
+  await page.waitForTimeout(500);
 }
 
 /**
@@ -96,6 +103,46 @@ export async function hideDynamicContent(page: Page): Promise<void> {
 }
 
 /**
+ * Smart wait for element interactions that replaces fixed timeouts.
+ */
+export async function waitForInteraction(
+  page: Page,
+  action: () => Promise<void>,
+  options: {
+    waitFor?: 'navigation' | 'response' | 'networkidle' | 'custom';
+    customWait?: () => Promise<void>;
+    timeout?: number;
+  } = {}
+): Promise<void> {
+  const { waitFor = 'networkidle', timeout = 5000 } = options;
+
+  if (waitFor === 'navigation') {
+    await Promise.all([
+      page.waitForLoadState('networkidle', { timeout }),
+      action()
+    ]);
+  } else if (waitFor === 'response') {
+    await Promise.all([
+      page.waitForResponse(response => response.status() === 200, { timeout }),
+      action()
+    ]);
+  } else if (waitFor === 'custom' && options.customWait) {
+    await Promise.all([
+      options.customWait(),
+      action()
+    ]);
+  } else {
+    // Default: wait for network idle
+    await action();
+    try {
+      await page.waitForLoadState('networkidle', { timeout: timeout / 2 });
+    } catch (e) {
+      // Continue if network idle times out
+    }
+  }
+}
+
+/**
  * Enhanced screenshot helper that combines stability waiting and dynamic content hiding.
  * Use this instead of direct toHaveScreenshot() calls for better reliability.
  */
@@ -108,7 +155,7 @@ export async function takeStableScreenshot(
   await hideDynamicContent(page);
   
   // Small additional wait after hiding content to ensure styles apply
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(50); // Reduced from 100ms
   
   // Take the screenshot with enhanced options
   await page.screenshot({
