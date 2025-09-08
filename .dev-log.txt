@@ -1511,3 +1511,23 @@ Using real Gemini client with server-side API key
  ✓ Compiled in 482ms (808 modules)
  ✓ Compiled in 127ms (808 modules)
  ✓ Compiled in 107ms (808 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 522ms (1029 modules)
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/jackhaas/Projects/narraitor/.next/server/vendor-chunks/next.js'
+    at __webpack_require__.f.require (.next/server/webpack-runtime.js:203:28)
+    at <unknown> (.next/server/webpack-runtime.js:111:40)
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (.next/server/webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (.next/server/webpack-runtime.js:162:22)
+    at <unknown> (.next/server/app/page.js:3134:47)
+    at Object.<anonymous> (.next/server/app/page.js:3137:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/jackhaas/Projects/narraitor/.next/server/vendor-chunks/next.js',
+  page: '/'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 570ms (2156 modules)
+ GET / 500 in 1590ms

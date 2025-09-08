@@ -10,45 +10,42 @@ import { seedTestData, mockApiEndpoints } from './utils/data-seeder';
  */
 
 test.describe('Game Session Visual Tests', () => {
-  // TODO: Re-enable once complete flakiness mitigation is implemented (PR #686)
-  // This test is currently skipped due to dynamic AI-generated narrative content causing
-  // height variations that make visual regression testing unreliable
+  // TODO: This test demonstrates the exact flakiness issue that PR #686 aims to solve
+  // The test times out due to dynamic AI-generated narrative content not stabilizing properly
+  // Will be re-enabled once complete flakiness mitigation with ignore zones is implemented
   test.skip('Game session page should render consistently', async ({ page }) => {
     await seedTestData(page);
     await mockApiEndpoints(page);
     
     // Navigate to the cyberpunk world's play page
+    // The pre-seeded data should include an active session (session-cyberpunk-ghost) 
+    // with stable narrative segments, so we should see active gameplay immediately
     await page.goto('/worlds/world-cyberpunk-2077/play');
     await waitForContentStable(page);
     
-    // Click Start Session to show active gameplay
-    const startButton = page.locator('button:has-text("Start Session")');
-    if (await startButton.count() > 0) {
-      console.log('Found Start Session button, clicking...');
-      await startButton.click();
-      await page.waitForTimeout(2000); // Give time for session to start and narrative to load
-      await waitForContentStable(page);
-      
-      // Wait for active session content to appear
-      await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
-      
-      // Wait for narrative content and player choices
-      await Promise.race([
-        page.waitForSelector('.narrative-content, .player-choices-container', { timeout: 8000 }),
-        page.waitForTimeout(8000) // Fallback if selectors don't match
-      ]);
-      
-      await waitForContentStable(page);
-    }
+    // Wait for active session content to appear (should be immediate with seeded data)
+    await page.waitForSelector('[data-testid="game-session-active"]', { timeout: 10000 });
+    
+    // Wait for narrative content and player choices to be stable
+    await Promise.race([
+      page.waitForSelector('.narrative-content, .player-choices-container', { timeout: 8000 }),
+      page.waitForTimeout(8000) // Fallback if selectors don't match
+    ]);
+    
+    await waitForContentStable(page);
     
     await hideDynamicContent(page);
     
-    // Take screenshot of game session page - should show active session with narrative and choices
-    // Note: Using higher threshold due to dynamic AI-generated narrative content causing pixel variations
-    // This is part of the flakiness mitigation work in PR #686
+    // Take screenshot of game session page - should show active session with stable narrative and choices
+    // Mask dynamic narrative content areas to prevent height variations from affecting test
     await expect(page).toHaveScreenshot('game-session.png', { 
       fullPage: true,
-      threshold: 0.35  // More lenient threshold for dynamic content areas
+      mask: [
+        page.locator('.narrative-content').first(),
+        page.locator('[data-testid="narrative-segment"]').first(),
+        page.locator('.player-choices-container').first(),
+        page.locator('[data-testid="player-choices"]').first()
+      ]
     });
   });
 });
