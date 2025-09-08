@@ -23,6 +23,8 @@ jobs:
         run: npm run lint
       - name: Run Stylelint (CSS Design Token Enforcement)
         run: npm run lint:css
+      - name: Enforce non-self-closing PageLayout usage
+        run: npm run lint:layout-usage
 
   test:
     name: Unit & Integration Tests
@@ -71,30 +73,29 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
 
-# Playwright E2E tests temporarily disabled
-  # e2e:
-  #   name: E2E Tests
-  #   runs-on: macos-latest
-  #   needs: [build]
-  #   env:
-  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '20'
-  #         cache: 'npm'
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Install Playwright browsers
-  #       run: npx playwright install --with-deps
-  #     - name: Run E2E tests (fail on visual diffs)
-  #       run: npm run test:e2e:critical
-  #     - name: Upload test results
-  #       uses: actions/upload-artifact@v4
-  #       if: failure()
-  #       with:
-  #         name: e2e-test-failures
-  #         path: test-results/
-  #         retention-days: 7
+  e2e:
+    name: E2E Tests
+    runs-on: macos-latest
+    needs: [build]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run E2E tests (fail on visual diffs)
+        run: npm run test:e2e:critical
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-test-failures
+          path: test-results/
+          retention-days: 7

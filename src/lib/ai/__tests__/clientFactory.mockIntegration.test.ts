@@ -65,7 +65,10 @@ describe('Client Factory Mock Integration', () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      configurable: true
+    });
     global.window = originalWindow;
   });
 

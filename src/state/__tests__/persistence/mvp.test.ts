@@ -43,7 +43,7 @@ interface MockFunctions {
   create: jest.Mock;
 }
 // Cast to properly typed mock functions
-const mockFunctions = (IndexedDBAdapter as { mockFunctions: MockFunctions }).mockFunctions;
+const mockFunctions = (IndexedDBAdapter as unknown as { mockFunctions: MockFunctions }).mockFunctions;
 
 // Import after mock setup
 import { createIndexedDBStorage } from '../../persistence';

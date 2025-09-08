@@ -27,7 +27,8 @@ function mapAlignmentToChoiceType(alignment?: ChoiceAlignment): ChoiceTypePrefer
  * Simple AI-based choice inference (placeholder)
  * In production, this would use AI to analyze choice text
  */
-function inferChoiceTypeFromText(): ChoiceTypePreference {
+function inferChoiceTypeFromText(choiceText?: string): ChoiceTypePreference {
+  void choiceText; // Mark as used
   // AI-based inference would go here
   // For now, return neutral as the fallback
   return 'neutral';

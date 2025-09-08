@@ -163,6 +163,12 @@ events: prophecy = The chosen one will bring balance
       sessionId: 'session-789',
       characterIds: ['char-1'],
       narrativeContext: {
+        worldId: 'world-123',
+        currentSceneId: 'scene-final',
+        characterIds: ['char-1'],
+        previousSegments: [],
+        currentTags: ['final-battle'],
+        sessionId: 'session-789',
         currentLocation: 'Tower of Shadows',
         currentSituation: 'Final confrontation with the Shadow King',
         recentSegments: []
@@ -199,6 +205,7 @@ events: ritual = Monthly blessing ceremony
 
     const request = {
       worldId: 'world-123',
+      sessionId: 'session-1',
       characterIds: ['char-1'],
       generationParameters: {
         segmentType: 'scene' as const

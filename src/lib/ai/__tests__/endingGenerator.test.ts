@@ -37,6 +37,7 @@ import type {
 import type { Character } from '../../../types/character.types';
 import type { World } from '../../../types/world.types';
 import type { JournalEntry } from '../../../types/journal.types';
+import { PromptType } from '../../promptTemplates/types';
 
 // Mock logger first - need to handle both named and default exports
 jest.mock('../../utils/logger', () => {
@@ -103,23 +104,22 @@ describe('endingGenerator', () => {
     description: 'A land of magic and adventure',
     genre: 'fantasy',
     settings: {
-      magicLevel: 'high',
-      technologyLevel: 'medieval',
-      dangerLevel: 'moderate'
+      maxAttributes: 6,
+      maxSkills: 12,
+      attributePointPool: 27,
+      skillPointPool: 40
     },
-    atmosphere: 'Epic and adventurous',
-    imageUrl: '',
-    isActive: false,
     attributes: [],
     skills: [],
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const mockCharacter: Character = {
     id: 'char-456',
     name: 'Aria Stormblade',
     worldId: 'world-123',
+    description: 'A seasoned warrior with a noble heart',
     attributes: [
       { attributeId: 'attr-strength', value: 18 },
       { attributeId: 'attr-dexterity', value: 14 },
@@ -137,9 +137,10 @@ describe('endingGenerator', () => {
       relationships: []
     },
     inventory: {
+      characterId: 'char-456',
       items: [],
-      maxWeight: 100,
-      currentWeight: 0
+      capacity: 100,
+      categories: []
     },
     status: {
       health: 100,
@@ -147,8 +148,8 @@ describe('endingGenerator', () => {
       conditions: [],
       location: 'Dark Castle'
     },
-    createdAt: new Date(),
-    updatedAt: new Date()
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   };
 
   const mockNarrativeSegments: NarrativeSegment[] = [
@@ -160,8 +161,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'castle'], mood: 'tense' },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
       id: 'seg-2',
@@ -171,8 +172,8 @@ describe('endingGenerator', () => {
       worldId: 'world-123',
       metadata: { tags: ['combat', 'boss-fight'], mood: 'action' },
       timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ];
 
@@ -182,13 +183,18 @@ describe('endingGenerator', () => {
       sessionId: 'session-789',
       characterId: 'char-456',
       worldId: 'world-123',
+      type: 'achievement',
+      title: 'Dragon Defeated',
       content: 'Defeated the dragon and saved the village',
-      category: 'quest',
-      tags: ['achievement', 'dragon'],
-      metadata: { importance: 'high' },
-      timestamp: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
+      significance: 'major',
+      isRead: false,
+      relatedEntities: [],
+      metadata: { 
+        tags: ['achievement', 'dragon'], 
+        automaticEntry: false 
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ];
 
@@ -226,7 +232,12 @@ describe('endingGenerator', () => {
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({ content: mockPrompt });
+      mockPromptTemplateManager.getTemplate.mockReturnValue({ 
+        id: 'test-template',
+        type: PromptType.NARRATIVE,
+        content: mockPrompt,
+        variables: []
+      });
       mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
       const result = await endingGenerator.generateEnding(mockRequest);
@@ -272,7 +283,12 @@ describe('endingGenerator', () => {
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate bittersweet ending...' });
+      mockPromptTemplateManager.getTemplate.mockReturnValue({
+        id: 'test-template',
+        type: PromptType.NARRATIVE,
+        content: 'Generate bittersweet ending...',
+        variables: []
+      });
       mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
       const result = await endingGenerator.generateEnding(mockRequest);
@@ -327,7 +343,12 @@ describe('endingGenerator', () => {
       const mockContextManager = contextManager as jest.Mocked<typeof contextManager>;
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate ending...' });
+      mockPromptTemplateManager.getTemplate.mockReturnValue({
+        id: 'test-template',
+        type: PromptType.NARRATIVE,
+        content: 'Generate ending...',
+        variables: []
+      });
       mockGeminiClient.generateContent.mockResolvedValue({ content: mockResponse });
 
       const result = await endingGenerator.generateEnding(mockRequest);
@@ -356,7 +377,12 @@ describe('endingGenerator', () => {
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Base prompt' });
+      mockPromptTemplateManager.getTemplate.mockReturnValue({
+        id: 'test-template',
+        type: PromptType.NARRATIVE,
+        content: 'Base prompt',
+        variables: []
+      });
       mockGeminiClient.generateContent.mockImplementation((prompt) => {
         expect(prompt).toContain('cottage');
         return Promise.resolve({ content: `{
@@ -400,7 +426,12 @@ describe('endingGenerator', () => {
         const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
         
         mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-        mockPromptTemplateManager.getTemplate.mockReturnValue({ content: `Generate ${type} ending...` });
+        mockPromptTemplateManager.getTemplate.mockReturnValue({
+          id: 'test-template',
+          type: PromptType.NARRATIVE,
+          content: `Generate ${type} ending...`,
+          variables: []
+        });
         mockGeminiClient.generateContent.mockResolvedValue({ content: `{
           "epilogue": "The hero ${expectedContent}...",
           "characterLegacy": "Remembered well...",
@@ -436,7 +467,12 @@ describe('endingGenerator', () => {
       const mockPromptTemplateManager = promptTemplateManager as jest.Mocked<typeof promptTemplateManager>;
       
       mockContextManager.buildEndingContext.mockResolvedValue(mockContext);
-      mockPromptTemplateManager.getTemplate.mockReturnValue({ content: 'Generate ending...' });
+      mockPromptTemplateManager.getTemplate.mockReturnValue({
+        id: 'test-template',
+        type: PromptType.NARRATIVE,
+        content: 'Generate ending...',
+        variables: []
+      });
       
       // First attempt fails, second succeeds
       mockGeminiClient.generateContent

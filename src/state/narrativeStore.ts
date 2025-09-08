@@ -1,10 +1,8 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { Decision, NarrativeSegment, StoryEnding, EndingType, EndingTone, ChoiceAlignment } from '../types/narrative.types';
 import { EntityID } from '../types/common.types';
 import { ChoiceTypePreference } from '../types/personalization.types';
 import { generateUniqueId } from '../lib/utils';
-import { createIndexedDBStorage } from './persistence';
 import { endingGenerator } from '../lib/ai/endingGenerator';
 import { logger } from '../lib/utils/logger';
 import { normalizeText } from '../lib/utils/textNormalization';
@@ -69,7 +67,7 @@ interface NarrativeStore {
 }
 
 // Initial state
-const initialState = {
+const getInitialState = () => ({
   segments: {},
   sessionSegments: {},
   decisions: {},
@@ -80,7 +78,9 @@ const initialState = {
   endingError: null,
   error: null,
   loading: false,
-};
+});
+
+const initialState = getInitialState();
 
 /**
  * Maps choice alignment to appropriate choice type preference
@@ -158,10 +158,8 @@ const extractDecisionContext = (
   return context;
 };
 
-// Narrative Store implementation with persistence
-export const useNarrativeStore = create<NarrativeStore>()(
-  persist(
-    (set, get) => ({
+// Narrative Store implementation without persistence for now
+export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
   ...initialState,
 
   // Add segment
@@ -623,10 +621,4 @@ export const useNarrativeStore = create<NarrativeStore>()(
       }
     }));
   },
-}),
-{
-  name: 'narraitor-narrative-store',
-  storage: createIndexedDBStorage(),
-  version: 1,
-}
-));
+}));

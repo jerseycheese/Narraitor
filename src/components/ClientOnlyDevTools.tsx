@@ -14,11 +14,14 @@ export function ClientOnlyDevTools() {
   useEffect(() => {
     setIsClient(true);
     
-    // Initialize console debug API
-    consoleDebugAPI.initialize();
+    // Initialize console debug API only in development
+    if (process.env.NODE_ENV === 'development') {
+      consoleDebugAPI.initialize();
+    }
   }, []);
 
-  if (!isClient) {
+  // Only render in development and on client
+  if (!isClient || process.env.NODE_ENV !== 'development') {
     return null;
   }
 

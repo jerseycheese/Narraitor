@@ -59,7 +59,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     });
 
     // Mock getState for store access
-    (useJournalStore as unknown as jest.Mock).getState = jest.fn(() => mockJournalStore);
+    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
   });
 
   beforeEach(() => {
@@ -157,7 +157,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     test('clears currentCharacterId when active character is deleted', () => {
       const { result } = renderHook(() => useCharacterStore());
 
-      let characterId: string;
+      let characterId: string = '';
 
       act(() => {
         characterId = result.current.createCharacter({
@@ -206,7 +206,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     test('preserves currentCharacterId when non-active character is deleted', () => {
       const { result } = renderHook(() => useCharacterStore());
 
-      let activeCharacterId: string;
+      let activeCharacterId: string = '';
       let otherCharacterId: string;
 
       act(() => {
@@ -301,7 +301,7 @@ describe('CharacterStore - Related Data Cleanup', () => {
     test('handles deletion gracefully and reliably', () => {
       const { result } = renderHook(() => useCharacterStore());
 
-      let characterId: string;
+      let characterId: string = '';
 
       act(() => {
         characterId = result.current.createCharacter({

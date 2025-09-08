@@ -16,22 +16,28 @@ import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 
 export function QuickPlay() {
   const router = useRouter();
+  
+  // Use persisted store data
   const { worlds } = useWorldStore();
   const { characters } = useCharacterStore();
   const savedSessions = useSessionStore(state => state.savedSessions);
   const resumeSavedSession = useSessionStore(state => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const onboardingCompleted = useSessionStore(state => state.onboardingCompleted);
+  const actualWorlds = worlds;
+  const actualCharacters = characters;
+  const actualSavedSessions = savedSessions;
+  const actualOnboardingCompleted = onboardingCompleted;
   
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false); // Prevents multiple delete operations
 
   // Find the most recent valid saved session
-  const validSessions = Object.values(savedSessions)
+  const validSessions = Object.values(actualSavedSessions)
     .filter(session => {
-      const world = worlds[session.worldId];
-      const character = characters[session.characterId];
+      const world = actualWorlds[session.worldId];
+      const character = actualCharacters[session.characterId];
       return world && character;
     })
     .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime());
@@ -85,11 +91,10 @@ export function QuickPlay() {
     }
   };
 
-  // Show guided experience for first-time users
-  // If shouldShowOnboarding method exists, use it; otherwise fallback to checking conditions directly
-  const showOnboarding = shouldShowOnboarding 
-    ? shouldShowOnboarding() 
-    : (Object.keys(savedSessions).length === 0 && !onboardingCompleted);
+  // Show guided experience for first-time users using store methods
+  const showOnboarding = shouldShowOnboarding
+    ? shouldShowOnboarding()
+    : (Object.keys(actualSavedSessions).length === 0 && !actualOnboardingCompleted);
     
   if (showOnboarding) {
     return <GuidedFirstTimeExperience />;
@@ -109,8 +114,8 @@ export function QuickPlay() {
     );
   }
 
-  const world = worlds[mostRecentSession.worldId];
-  const character = characters[mostRecentSession.characterId];
+  const world = actualWorlds[mostRecentSession.worldId];
+  const character = actualCharacters[mostRecentSession.characterId];
   const lastPlayedText = formatRelativeTime(mostRecentSession.lastPlayed);
 
   return (

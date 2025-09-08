@@ -26,11 +26,12 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
   const pastDecisions: PlayerDecision[] = [
     {
       id: 'decision-1',
+      prompt: 'Bandits are threatening the village. What do you do?',
       sessionId: 'session-1',
       worldId: 'world-1',
       choiceText: 'Save the village from bandits',
-      choiceType: 'heroic',
-      timestamp: new Date(Date.now() - 86400000),
+      choiceType: 'helpful',
+      timestamp: new Date(Date.now() - 86400000).toISOString(),
       context: { 
         situation: 'moral challenge',
         charactersPresent: ['village elder', 'scared farmers'],
@@ -38,12 +39,13 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       }
     },
     {
-      id: 'decision-2', 
+      id: 'decision-2',
+      prompt: 'The defeated bandit leader begs for mercy. What do you decide?',
       sessionId: 'session-1',
       worldId: 'world-1',
       choiceText: 'Spare the bandit leader\'s life',
-      choiceType: 'merciful',
-      timestamp: new Date(Date.now() - 43200000),
+      choiceType: 'diplomatic',
+      timestamp: new Date(Date.now() - 43200000).toISOString(),
       context: {
         situation: 'justice decision', 
         charactersPresent: ['bandit leader', 'villagers'],
@@ -62,15 +64,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic', 'merciful'],
+          personality: ['empathetic', 'diplomatic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic', 'merciful'],
-          narrativeStyle: 'action',
+          preferredChoiceTypes: ['helpful', 'diplomatic'],
+          narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'character'
+          contentFocus: 'dialogue',
+          confidenceLevel: 90,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -95,15 +100,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic'],
+          personality: ['empathetic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic'],
+          preferredChoiceTypes: ['helpful'],
           narrativeStyle: 'exploration',
-          detailLevel: 'high',
-          contentFocus: 'story'
+          detailLevel: 'detailed',
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -126,15 +134,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['merciful'],
+          personality: ['diplomatic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['merciful'],
-          narrativeStyle: 'character',
-          detailLevel: 'high',
-          contentFocus: 'relationships'
+          preferredChoiceTypes: ['diplomatic'],
+          narrativeStyle: 'character-driven',
+          detailLevel: 'detailed',
+          contentFocus: 'dialogue',
+          confidenceLevel: 90,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -163,15 +174,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic'],
+          personality: ['empathetic'],
           goals: [],
+          relationships: [],
           recentDecisions: [pastDecisions[0]] // Just the village-saving decision
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic'],
-          narrativeStyle: 'action',
+          preferredChoiceTypes: ['helpful'],
+          narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'story'
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -194,15 +208,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['merciful'],
+          personality: ['diplomatic'],
           goals: [],
+          relationships: [],
           recentDecisions: [pastDecisions[1]] // Just the mercy decision
         },
         playerPreferences: {
-          preferredChoiceTypes: ['merciful'],
-          narrativeStyle: 'character',
-          detailLevel: 'high',
-          contentFocus: 'relationships'
+          preferredChoiceTypes: ['diplomatic'],
+          narrativeStyle: 'character-driven',
+          detailLevel: 'detailed',
+          contentFocus: 'dialogue',
+          confidenceLevel: 90,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -225,15 +242,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic', 'merciful'],
+          personality: ['empathetic', 'diplomatic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions // Both decisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic', 'merciful'],
+          preferredChoiceTypes: ['helpful', 'diplomatic'],
           narrativeStyle: 'exploration',
-          detailLevel: 'high',
-          contentFocus: 'balanced'
+          detailLevel: 'detailed',
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -258,15 +278,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic'],
+          personality: ['empathetic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic'],
+          preferredChoiceTypes: ['helpful'],
           narrativeStyle: 'exploration',
-          detailLevel: 'high',
-          contentFocus: 'story'
+          detailLevel: 'detailed',
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -288,15 +311,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic', 'merciful'],
+          personality: ['empathetic', 'diplomatic'],
           goals: [],
+          relationships: [],
           recentDecisions: pastDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic', 'merciful'],
-          narrativeStyle: 'character',
-          detailLevel: 'high',
-          contentFocus: 'story'
+          preferredChoiceTypes: ['helpful', 'diplomatic'],
+          narrativeStyle: 'character-driven',
+          detailLevel: 'detailed',
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],
@@ -322,22 +348,24 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       // Create many decisions to test prioritization
       const manyDecisions: PlayerDecision[] = Array.from({ length: 15 }, (_, i) => ({
         id: `decision-${i}`,
+        prompt: `What do you do in situation ${i}?`,
         sessionId: 'session-1',
         worldId: 'world-1',
         choiceText: `Minor choice ${i}`,
-        choiceType: 'action' as const,
-        timestamp: new Date(Date.now() - (i * 1000)),
+        choiceType: 'neutral' as const,
+        timestamp: new Date(Date.now() - (i * 1000)).toISOString(),
         context: { situation: 'minor' }
       }));
 
       // Add one significant decision at the end
       manyDecisions.push({
         id: 'significant-decision',
+        prompt: 'A terrible disaster threatens everyone. What do you do?',
         sessionId: 'session-1',
         worldId: 'world-1',
         choiceText: 'Saved all the people from the disaster',
-        choiceType: 'heroic',
-        timestamp: new Date(),
+        choiceType: 'helpful',
+        timestamp: new Date().toISOString(),
         context: { 
           situation: 'world-changing',
           charactersPresent: ['leader', 'deputy', 'all citizens'],
@@ -348,15 +376,18 @@ describe('PersonalizationEngine - Decision Enhancement (Issue #210)', () => {
       const context: PersonalizedNarrativeContext = {
         character: {
           ...mockCharacter,
-          personality: ['heroic'],
+          personality: ['empathetic'],
           goals: [],
+          relationships: [],
           recentDecisions: manyDecisions
         },
         playerPreferences: {
-          preferredChoiceTypes: ['heroic'],
-          narrativeStyle: 'action',
+          preferredChoiceTypes: ['helpful'],
+          narrativeStyle: 'action-focused',
           detailLevel: 'moderate',
-          contentFocus: 'story'
+          contentFocus: 'balanced',
+          confidenceLevel: 85,
+          lastUpdated: new Date().toISOString()
         },
         narrativeHistory: {
           keyEvents: [],

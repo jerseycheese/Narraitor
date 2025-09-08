@@ -22,26 +22,47 @@ describe('journalStore', () => {
 
       // Add entries with delays to ensure different timestamps
       const firstEntryId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'First entry',
         type: 'character_event',
-        title: 'Entry 1'
+        title: 'Entry 1',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       // Wait 5ms to ensure different timestamp
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const secondEntryId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Second entry',
         type: 'world_event',
-        title: 'Entry 2'
+        title: 'Entry 2',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const thirdEntryId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Third entry',
         type: 'discovery',
-        title: 'Entry 3'
+        title: 'Entry 3',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -74,15 +95,29 @@ describe('journalStore', () => {
       } as DateConstructor;
 
       const firstId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Entry 1',
         type: 'achievement',
-        title: 'Entry 1'
+        title: 'Entry 1',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       const secondId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Entry 2',
         type: 'combat',
-        title: 'Entry 2'
+        title: 'Entry 2',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       const entries = getSessionEntries(sessionId);
@@ -106,25 +141,46 @@ describe('journalStore', () => {
 
       // Add entries to different sessions
       const entry1 = addEntry(session1, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Session 1 first',
         type: 'dialogue',
-        title: 'S1-1'
+        title: 'S1-1',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const entry2 = addEntry(session2, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Session 2 first',
         type: 'relationship_change',
-        title: 'S2-1'
+        title: 'S2-1',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const entry3 = addEntry(session1, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Session 1 second',
         type: 'character_event',
-        title: 'S1-2'
+        title: 'S1-2',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       const session1Entries = getSessionEntries(session1);
@@ -145,25 +201,46 @@ describe('journalStore', () => {
       const sessionId = 'test-session';
 
       const firstId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'First',
         type: 'world_event',
-        title: 'First'
+        title: 'First',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const secondId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Second',
         type: 'achievement',
-        title: 'Second'
+        title: 'Second',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       await new Promise(resolve => setTimeout(resolve, 5));
 
       const thirdId = addEntry(sessionId, {
+        worldId: "test-world",
+        characterId: "test-character",
         content: 'Third',
         type: 'discovery',
-        title: 'Third'
+        title: 'Third',
+        significance: "minor",
+        isRead: false,
+        relatedEntities: [],
+        metadata: { tags: [], automaticEntry: false },
+        updatedAt: new Date().toISOString()
       });
 
       // Delete middle entry

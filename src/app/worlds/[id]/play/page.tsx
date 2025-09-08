@@ -16,6 +16,9 @@ export default function PlayPage() {
   const searchParams = useSearchParams();
   const worldId = params?.id as string;
   const [isClient, setIsClient] = useState(false);
+  
+  // Check for test data to support visual regression tests (guarded for SSR)
+  // Always call hooks and use persisted store data
   const world = useWorldStore((state) => state.worlds[worldId]);
   
   // Check if this should be a fresh session (from "Start New Session" button)

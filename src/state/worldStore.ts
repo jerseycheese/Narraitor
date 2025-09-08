@@ -49,19 +49,19 @@ export interface WorldStore {
   setLoading: (loading: boolean) => void;
 }
 
-// Initial state
-const initialState = {
+// Function to get initial state
+const getInitialState = () => ({
   worlds: {},
   currentWorldId: null,
   error: null,
   loading: false,
-};
+});
 
 // World Store implementation with persistence
 export const useWorldStore = create<WorldStore>()(
   persist(
     (set) => ({
-      ...initialState,
+      ...getInitialState(),
 
       // Create world
       createWorld: (worldData) => {
@@ -430,7 +430,7 @@ export const useWorldStore = create<WorldStore>()(
       }),
 
       // State management actions
-      reset: () => set(() => initialState),
+      reset: () => set(() => getInitialState()),
       setError: (error) => set(() => ({ error })),
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),

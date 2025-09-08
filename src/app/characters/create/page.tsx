@@ -18,6 +18,7 @@ export default function CharacterCreatePage() {
   const { createCharacter, setCurrentCharacter } = useCharacterStore();
   const { initializeSession } = useSessionStore();
   const [showQuickStart, setShowQuickStart] = useState(true);
+  const [mounted, setMounted] = useState(false);
   
   // Get worldId from URL parameter or use current world
   const worldIdFromUrl = searchParams.get('worldId');
@@ -30,6 +31,11 @@ export default function CharacterCreatePage() {
       setCurrentWorld(worldIdFromUrl);
     }
   }, [worldIdFromUrl, currentWorldId, setCurrentWorld]);
+  
+  // Mark mounted to make initial render independent of client-only store hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Note: Auto-save data clearing is now handled by the CharacterCreationWizard
   // to allow for recovery dialog functionality
@@ -144,23 +150,34 @@ export default function CharacterCreatePage() {
     setShowQuickStart(true);
   };
 
+  // Determine which branch to show on initial render in a hydration-safe way
+  const shouldShowQuickStart = showQuickStart && (mounted ? !!currentWorld : !!effectiveWorldId);
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
-        {showQuickStart && currentWorld ? (
+        {shouldShowQuickStart ? (
           <>
             <div className="mb-8">
               <h1 className="text-3xl font-bold mb-2">Create New Character</h1>
               <p className="text-gray-700">
-                Choose a quick start character for <strong>{currentWorld.name}</strong> or create your own
+                <span suppressHydrationWarning>
+                  {currentWorld
+                    ? `Choose a quick start character for ${currentWorld.name} or create your own`
+                    : 'Choose a quick start character or create your own'}
+                </span>
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-8">
-              <QuickStartCharacters
-                world={currentWorld}
-                onCharacterSelect={handleQuickStartSelect}
-                onCustomizeClick={handleCustomizeClick}
-              />
+              {mounted && currentWorld ? (
+                <QuickStartCharacters
+                  world={currentWorld}
+                  onCharacterSelect={handleQuickStartSelect}
+                  onCustomizeClick={handleCustomizeClick}
+                />
+              ) : (
+                <div className="text-center py-12 text-gray-500">Preparing quick start options...</div>
+              )}
             </div>
           </>
         ) : (

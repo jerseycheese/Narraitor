@@ -9,7 +9,10 @@ import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadi
 import { useMobileNavigation } from '@/hooks/useMobileNavigation';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Breadcrumbs } from './Breadcrumbs';
-import { RecentPagesDropdown } from './RecentPagesDropdown';
+import dynamic from 'next/dynamic';
+import { SSRClientOnly } from '@/components/shared/SSRClientOnly';
+// Render RecentPagesDropdown only on the client to avoid SSR/client mismatches
+const RecentPagesDropdown = dynamic(() => import('./RecentPagesDropdown').then(m => ({ default: m.RecentPagesDropdown })), { ssr: false });
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
@@ -42,11 +45,15 @@ export function Navigation() {
   const { isMenuOpen, isMobile, closeMenu, toggleMenu } = useMobileNavigation();
   const [showWorldSwitcher, setShowWorldSwitcher] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   
   const currentWorld = currentWorldId ? worlds[currentWorldId] : null;
+  const hasWorldsStore = Object.keys(worlds).length > 0;
   const worldCharacterCount = (Object.values(characters) as Character[]).filter(
     char => char.worldId === currentWorldId
   ).length;
+  // Ensure first client render matches server by deferring store-driven visibility until after mount
+  const hasWorlds = mounted && hasWorldsStore;
   
   // Check if we should show breadcrumbs
   const shouldShowBreadcrumbs = pathname !== '/' && pathname !== '/worlds';
@@ -80,6 +87,11 @@ export function Navigation() {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showWorldSwitcher]);
+  
+  // Mark mounted after first client render
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const handleWorldSwitch = (worldId: string) => {
     setCurrentWorld(worldId);
@@ -142,12 +154,14 @@ export function Navigation() {
                 >
                   Worlds
                 </Link>
+                {/* Always render Characters link to keep server/client markup consistent */}
                 <Link 
                   href="/characters" 
                   data-navigation
+                  aria-disabled={!hasWorlds}
                   className={`px-3 py-2 text-sm font-medium transition-colors ${
                     pathname === '/characters' || pathname.startsWith('/characters/') ? 'text-white hover:text-gray-300' : 'text-link-nav-dark'
-                  }`}
+                  } ${!hasWorlds ? 'hidden' : ''}`}
                 >
                   Characters
                 </Link>
@@ -165,11 +179,8 @@ export function Navigation() {
             
             {/* Right side - Quick actions and current context (hidden on mobile) */}
             <div className="hidden md:flex items-center gap-2 sm:gap-4">
-              {/* Recent Pages Dropdown */}
-              <RecentPagesDropdown />
-              
               {/* World Switcher Dropdown */}
-              {Object.keys(worlds).length > 0 && (
+              {hasWorlds && (
                 <div className="relative" ref={dropdownRef}>
                   <Button
                     onClick={() => setShowWorldSwitcher(!showWorldSwitcher)}
@@ -237,29 +248,36 @@ export function Navigation() {
                   )}
                 </div>
               )}
+
+              {/* Recent Pages Dropdown - mount after SSR-matched elements to avoid hydration diff */}
+              <SSRClientOnly>
+                <RecentPagesDropdown />
+              </SSRClientOnly>
               
-              {currentWorld && (
-                <Button 
-                  type="button"
-                  onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
-                  className="hidden sm:inline-flex items-center bg-green-500 hover:bg-green-700 text-white text-sm font-medium"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Play
-                </Button>
-              )}
-              {!currentWorld && Object.keys(worlds).length === 0 && (
-                <Button 
-                  type="button"
-                  onClick={() => navigateWithLoading('/worlds/create', 'Setting up world creation...')}
-                  className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium"
-                >
-                  Create Your First World
-                </Button>
-              )}
+              {/* Quick actions - render after hydration to keep SSR stable */}
+              <SSRClientOnly>
+                {currentWorld ? (
+                  <Button 
+                    type="button"
+                    onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
+                    className="hidden sm:inline-flex items-center bg-green-500 hover:bg-green-700 text-white text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Play
+                  </Button>
+                ) : (!hasWorldsStore ? (
+                  <Button 
+                    type="button"
+                    onClick={() => navigateWithLoading('/worlds/create', 'Setting up world creation...')}
+                    className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium"
+                  >
+                    Create Your First World
+                  </Button>
+                ) : null)}
+              </SSRClientOnly>
             </div>
           </div>
         </div>
@@ -272,12 +290,16 @@ export function Navigation() {
         onNavigate={navigateWithLoading}
       />
       
-      {/* Breadcrumbs */}
+      {/* Breadcrumbs - render after hydration to keep SSR/client markup identical */}
       {shouldShowBreadcrumbs && (
         <div className="bg-gray-100 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <Breadcrumbs className="sm:hidden" maxItems={2} />
-            <Breadcrumbs className="hidden sm:flex" />
+            <SSRClientOnly>
+              <Breadcrumbs className="sm:hidden" maxItems={2} />
+            </SSRClientOnly>
+            <SSRClientOnly>
+              <Breadcrumbs className="hidden sm:flex" />
+            </SSRClientOnly>
           </div>
         </div>
       )}

@@ -58,8 +58,9 @@ describe('NarrativeGenerator', () => {
     it('generates a narrative segment with appropriate world context', async () => {
       const mockAIResponse = {
         content: 'The ancient trees whispered secrets in the moonlight...',
-        type: 'scene',
-        metadata: { mood: 'mysterious', location: 'Deep Forest' }
+        finishReason: 'stop',
+        promptTokens: 50,
+        completionTokens: 30
       };
 
       mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
@@ -85,8 +86,9 @@ describe('NarrativeGenerator', () => {
     it('includes narrative context when provided', async () => {
       const mockAIResponse = {
         content: 'Continuing deeper into the forest...',
-        type: 'transition', 
-        metadata: { mood: 'tense' }
+        finishReason: 'stop',
+        promptTokens: 45,
+        completionTokens: 25
       };
 
       mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);
@@ -96,11 +98,25 @@ describe('NarrativeGenerator', () => {
         sessionId: 'session-123',
         characterIds: ['char-1'],
         narrativeContext: {
+          worldId: 'world-123',
+          currentSceneId: 'scene-1',
+          characterIds: ['char-1'],
+          sessionId: 'session-123',
+          previousSegments: [],
+          currentTags: [],
           recentSegments: [
             {
               id: 'seg-1',
               content: 'Previous narrative content...',
-              type: 'scene'
+              type: 'scene' as const,
+              metadata: {
+                mood: 'mysterious' as const,
+                location: 'Forest Entrance',
+                tags: ['forest', 'mysterious']
+              },
+              timestamp: new Date(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
             }
           ],
           currentLocation: 'Forest Entrance'
@@ -133,8 +149,9 @@ describe('NarrativeGenerator', () => {
     it('generates an appropriate opening scene for the world', async () => {
       const mockAIResponse = {
         content: 'You awaken in the heart of the Mystical Forest...',
-        type: 'scene',
-        metadata: { mood: 'mysterious', location: 'Forest Heart' }
+        finishReason: 'stop',
+        promptTokens: 40,
+        completionTokens: 35
       };
 
       mockGeminiClient.generateContent.mockResolvedValue(mockAIResponse);

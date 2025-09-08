@@ -15,11 +15,16 @@ export const resolveSkillData = (
   
   // If no exact match, try case-insensitive name match
   if (!skill) {
-    const normalizedSkillId = skillId.toLowerCase();
-    skill = worldSkills.find(skill => 
-      skill.name.toLowerCase() === normalizedSkillId ||
-      skill.id.toLowerCase() === normalizedSkillId
-    );
+    const normalizedSkillId = String(skillId).toLowerCase();
+    skill = worldSkills.find(skill => {
+      const nameMatches = typeof (skill as Partial<WorldSkill>).name === 'string' 
+        ? (skill as Partial<WorldSkill>).name!.toLowerCase() === normalizedSkillId 
+        : false;
+      const idMatches = typeof (skill as Partial<WorldSkill>).id === 'string' 
+        ? (skill as Partial<WorldSkill>).id!.toLowerCase() === normalizedSkillId 
+        : false;
+      return nameMatches || idMatches;
+    });
   }
   
   return skill;

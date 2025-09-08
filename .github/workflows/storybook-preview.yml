@@ -2,7 +2,7 @@ name: Storybook Preview Build
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ main, develop ]
 
 permissions:
   contents: read

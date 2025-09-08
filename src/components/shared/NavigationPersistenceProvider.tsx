@@ -24,6 +24,7 @@ interface NavigationPersistenceProviderProps {
  */
 export function NavigationPersistenceProvider({ children }: NavigationPersistenceProviderProps) {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   /**
    * Immediate initialization
@@ -32,11 +33,18 @@ export function NavigationPersistenceProvider({ children }: NavigationPersistenc
    * to prevent the app from being blocked by navigation persistence issues.
    */
   useEffect(() => {
+    setIsClient(true);
     logger.debug('Forcing immediate navigation initialization');
     setIsInitialized(true);
   }, []);
 
-  // Minimal loading state - only show very briefly
+  // Prevent hydration mismatch by always rendering children on server
+  // and only showing loading state briefly on client side
+  if (!isClient) {
+    return <>{children}</>;
+  }
+
+  // Minimal loading state - only show very briefly on client
   if (!isInitialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">

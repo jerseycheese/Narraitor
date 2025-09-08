@@ -61,9 +61,9 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
 
       {/* Skills list */}
       <div className="space-y-4">
-        {data.characterData.skills.map((skill: any) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
+        {data.characterData.skills.map((skill: any, index: number) => ( // eslint-disable-line @typescript-eslint/no-explicit-any
           <div 
-            key={skill.skillId} 
+            key={skill.skillId || skill.name || index} 
             className={`${wizardStyles.card.base} ${
               skill.isSelected ? wizardStyles.card.selected : ''
             }`}
@@ -93,7 +93,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
                 activeLabel="Selected ✓"
                 inactiveLabel="Not Selected"
                 onClick={() => handleSkillToggle(skill.skillId)}
-                testId={`skill-toggle-${skill.skillId}`}
+                testId={`skill-toggle-${skill.skillId || skill.name || index}`}
               />
             </div>
           </div>

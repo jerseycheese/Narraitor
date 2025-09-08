@@ -1,6 +1,6 @@
 import { ChoiceGenerator } from '../choiceGenerator';
 import { MockGeminiClient } from '../__mocks__/geminiClient.mock';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { NarrativeContext } from '@/types/narrative.types';
 import { World } from '@/types/world.types';
 
@@ -21,11 +21,16 @@ describe('ChoiceGenerator - Alignment System', () => {
       name: 'Test World',
       description: 'A test world for alignment testing',
       genre: 'fantasy',
-      customAttributes: [],
-      customSkills: [],
-      imageUrl: '',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      attributes: [],
+      skills: [],
+      settings: {
+        maxAttributes: 6,
+        maxSkills: 12,
+        attributePointPool: 27,
+        skillPointPool: 40
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     mockNarrativeContext = {
@@ -40,7 +45,7 @@ describe('ChoiceGenerator - Alignment System', () => {
     };
 
     // Mock the store to return our test world
-    (worldStore.getState as jest.Mock).mockReturnValue({
+    (useWorldStore.getState as jest.Mock).mockReturnValue({
       worlds: { 'test-world': mockWorld }
     });
   });
@@ -59,7 +64,7 @@ Options:
 3. [NEUTRAL] Look for an alternative approach
 4. [CHAOS] Create a distraction and act unpredictably`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -85,7 +90,7 @@ Options:
 2. [NEUTRAL] Consider options
 3. [CHAOTIC] Act unpredictably`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -107,7 +112,7 @@ Options:
 2. [NEUTRAL] Look around
 3. [CHAOTIC] Act wildly`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -130,7 +135,7 @@ Options:
 1. [LAWFUL] Follow rules
 2. [NEUTRAL] Be practical`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -157,7 +162,7 @@ Options:
 1. Look around
 2. Move forward`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -182,7 +187,7 @@ Options:
   describe('Fallback Choice Alignment', () => {
     it('should assign appropriate alignments to fallback choices', async () => {
       // Force an error to trigger fallback
-      mockGeminiClient.generateContent.mockRejectedValueOnce(new Error('AI Error'));
+      (mockGeminiClient.generateContent as jest.Mock).mockRejectedValueOnce(new Error('AI Error'));
 
       const result = await choiceGenerator.generateChoices({
         worldId: 'test-world',
@@ -199,7 +204,7 @@ Options:
     it('should create default options with neutral alignment', async () => {
       const mockResponse = 'Invalid response format';
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -224,7 +229,7 @@ Options:
 1. Follow protocol
 2. Consider options`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -251,7 +256,7 @@ Options:
 3. [CHAOS] Act chaotically
 4. [] Empty tag`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 
@@ -276,7 +281,7 @@ Options:
 2. [LAWFUL] Second option with tag
 3. Third option without tag`;
 
-      mockGeminiClient.generateContent.mockResolvedValueOnce({
+      (mockGeminiClient.generateContent as jest.Mock).mockResolvedValueOnce({
         content: mockResponse
       });
 

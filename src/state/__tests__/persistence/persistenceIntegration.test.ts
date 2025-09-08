@@ -74,11 +74,11 @@ describe('Persistence Integration - MVP', () => {
     useCharacterStore.getState().reset();
     
     // Mock global indexedDB
-    (global as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
+    (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB = mockIndexedDB;
   });
 
   afterEach(() => {
-    delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+    delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
   });
 
   describe('basic persistence functionality', () => {
@@ -92,17 +92,30 @@ describe('Persistence Integration - MVP', () => {
       // Create a character using the actual store
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Test Character',
+        description: 'A test character for persistence testing',
         worldId: 'test-world-1',
         level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'A test character',
+          history: 'A test character',
           personality: 'Bold',
-          motivation: 'Adventure'
+          goals: ['Adventure'],
+          fears: [],
+          relationships: []
         },
         isPlayer: true,
-        status: { hp: 100, mp: 50, stamina: 100 }
+        inventory: {
+          characterId: "",
+          items: [],
+          capacity: 20,
+          categories: []
+        },
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        }
       });
 
       // Advance timers and flush promises
@@ -130,6 +143,7 @@ describe('Persistence Integration - MVP', () => {
       // Create a world
       const worldId = useWorldStore.getState().createWorld({
         name: 'Reference World',
+        description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -144,17 +158,30 @@ describe('Persistence Integration - MVP', () => {
       // Create a character referencing the world
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Reference Character',
+        description: 'A test character for persistence testing',
         worldId: worldId,
         level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'A test character',
+          history: 'A test character',
           personality: 'Bold',
-          motivation: 'Adventure'
+          goals: ['Adventure'],
+          fears: [],
+          relationships: []
         },
         isPlayer: true,
-        status: { hp: 100, mp: 50, stamina: 100 }
+        inventory: {
+          characterId: "",
+          items: [],
+          capacity: 20,
+          categories: []
+        },
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        }
       });
 
       // Advance timers and flush promises
@@ -183,11 +210,12 @@ describe('Persistence Integration - MVP', () => {
   describe('error handling and fallback', () => {
     test('should work without IndexedDB', async () => {
       // Remove IndexedDB
-      delete (global as { indexedDB?: typeof mockIndexedDB }).indexedDB;
+      delete (global as unknown as { indexedDB?: typeof mockIndexedDB }).indexedDB;
 
       // Stores should still function without persistence
       const worldId = useWorldStore.getState().createWorld({
         name: 'Fallback World',
+        description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
         skills: [],
@@ -218,6 +246,7 @@ describe('Persistence Integration - MVP', () => {
       // Store should still function despite errors
       const worldId = useWorldStore.getState().createWorld({
         name: 'Error Test World',
+        description: "A test world for persistence testing",
         genre: 'fantasy',
         attributes: [],
         skills: [],

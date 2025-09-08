@@ -62,6 +62,8 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
         content: 'You are traveling on a forest road.',
         type: 'scene',
         worldId: worldId,
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['travel', 'road'],
           location: 'Forest Road'
@@ -169,6 +171,8 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       store.addSegment(sessionId, {
         content: 'You arrive at the bustling marketplace of Rivertown.',
         type: 'scene',
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
         metadata: {
           tags: ['marketplace', 'town'],
           location: 'Rivertown Marketplace',
@@ -179,6 +183,8 @@ describe('NarrativeStore - PlayerDecisionTracker Integration (Issue #142)', () =
       store.addSegment(sessionId, {
         content: 'A merchant approaches you with a worried expression.',
         type: 'dialogue',
+        timestamp: new Date(),
+        updatedAt: new Date().toISOString(),
         characterIds: [characterId, 'merchant-npc'],
         metadata: {
           tags: ['interaction', 'merchant'],

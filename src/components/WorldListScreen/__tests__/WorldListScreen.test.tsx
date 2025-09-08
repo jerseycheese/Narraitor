@@ -92,7 +92,7 @@ jest.mock('../../../state/worldStore', () => {
   });
   
   // Add proper store methods
-  mockStore.setState = jest.fn((updater) => {
+  mockStore.setState = jest.fn((updater: ((state: MockWorldStore) => Partial<MockWorldStore>) | Partial<MockWorldStore>) => {
     if (typeof updater === 'function') {
       const newState = updater(mockState);
       mockState = { ...mockState, ...newState };
@@ -100,12 +100,12 @@ jest.mock('../../../state/worldStore', () => {
       mockState = { ...mockState, ...updater };
     }
     // Call any subscribed listeners
-    mockStore.listeners.forEach(listener => listener());
+    mockStore.listeners.forEach((listener: () => void) => listener());
   });
 
   mockStore.getState = mockGetState;
-  mockStore.listeners = [];
-  mockStore.subscribe = jest.fn((listener) => {
+  mockStore.listeners = [] as (() => void)[];
+  mockStore.subscribe = jest.fn((listener: () => void) => {
     mockStore.listeners.push(listener);
     // Return unsubscribe function
     return () => {
@@ -123,6 +123,9 @@ jest.mock('../../../state/worldStore', () => {
 type WorldStoreFunction = {
   (selector: (state: MockWorldStore) => unknown): unknown;
   getState: () => MockWorldStore;
+  setState: jest.Mock;
+  listeners: (() => void)[];
+  subscribe: jest.Mock;
 };
 
 // Mock getState for the store
@@ -270,7 +273,8 @@ describe('WorldListScreen', () => {
     await user.click(selectButton);
     
     // Check setState was called
-    expect(jest.requireMock('../../../state/worldStore').useWorldStore.setState).toHaveBeenCalled();
+    const mockStore = jest.requireMock('../../../state/worldStore').useWorldStore as WorldStoreFunction;
+    expect(mockStore.setState).toHaveBeenCalled();
 
     // Simulate deleting a world
     const deleteButton = screen.getByRole('button', { name: /Delete/i });
@@ -289,6 +293,6 @@ describe('WorldListScreen', () => {
     await user.click(confirmButton);
     
     // Check setState was called for deletion
-    expect(jest.requireMock('../../../state/worldStore').useWorldStore.setState).toHaveBeenCalledTimes(2);
+    expect(mockStore.setState).toHaveBeenCalledTimes(2);
   });
 });

@@ -39,8 +39,8 @@ describe('CharacterDeletionService', () => {
     jest.clearAllMocks();
     
     // Mock getState methods
-    (useJournalStore as unknown as jest.Mock).getState = jest.fn(() => mockJournalStore);
-    (useCharacterStore as unknown as jest.Mock).getState = jest.fn(() => mockCharacterStore);
+    (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => mockJournalStore);
+    (useCharacterStore as jest.MockedFunction<typeof useCharacterStore>).getState = jest.fn(() => mockCharacterStore);
   });
 
   describe('deleteCharacterWithCleanup', () => {
@@ -80,7 +80,7 @@ describe('CharacterDeletionService', () => {
     });
 
     test('handles errors during journal store access', async () => {
-      (useJournalStore as unknown as jest.Mock).getState = jest.fn(() => {
+      (useJournalStore as jest.MockedFunction<typeof useJournalStore>).getState = jest.fn(() => {
         throw new Error('Store access failed');
       });
 

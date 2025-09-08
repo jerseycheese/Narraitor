@@ -99,9 +99,11 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
 
       {/* Allocations */}
       <div className="space-y-6">
-        {allocations.map((allocation) => (
+        {allocations.map((allocation, index) => {
+          const safeKey = allocation.id || allocation.name || String(index);
+          return (
           <div 
-            key={allocation.id}
+            key={safeKey}
             className={wizardStyles.card.base}
           >
             <div className="flex items-center justify-between mb-4">
@@ -126,7 +128,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
                 </div>
               )}
               <RangeSlider
-                key={`slider-${allocation.id}`}
+                key={`slider-${allocation.id || allocation.name || index}`}
                 value={allocation.value}
                 onChange={(value) => handleSliderChange(allocation, value)}
                 min={allocation.minValue}
@@ -147,7 +149,8 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Validation Message */}

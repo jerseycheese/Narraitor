@@ -34,6 +34,7 @@ export const mockTemplate: WorldTemplate = {
       name: 'Skill 1',
       description: 'First test skill',
       relatedAttributes: ['Attribute 1'],
+      linkedAttributes: ['Attribute 1'],
       minValue: 1,
       maxValue: 10,
       defaultValue: 3
@@ -42,6 +43,7 @@ export const mockTemplate: WorldTemplate = {
       name: 'Skill 2',
       description: 'Second test skill',
       relatedAttributes: ['Attribute 1', 'Attribute 2'],
+      linkedAttributes: ['Attribute 1', 'Attribute 2'],
       minValue: 1,
       maxValue: 10,
       defaultValue: 3

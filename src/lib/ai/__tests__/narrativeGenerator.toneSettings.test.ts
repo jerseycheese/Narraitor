@@ -1,7 +1,8 @@
 import { NarrativeGenerator } from '../narrativeGenerator';
-import { worldStore } from '@/state/worldStore';
+import { useWorldStore } from '@/state/worldStore';
 import { ToneSettings } from '@/types/tone-settings.types';
 import { EntityID } from '@/types/common.types';
+import { AIClient } from '../types';
 
 // Mock AI client
 const mockAIClient = {
@@ -13,7 +14,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
   let worldId: EntityID;
 
   beforeEach(() => {
-    worldStore.getState().reset();
+    useWorldStore.getState().reset();
     mockAIClient.generateContent.mockClear();
     generator = new NarrativeGenerator(mockAIClient as unknown as AIClient);
 
@@ -25,7 +26,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
       customInstructions: 'Focus on character development and emotional depth'
     };
 
-    worldId = worldStore.getState().createWorld({
+    worldId = useWorldStore.getState().createWorld({
       name: 'Test World',
       description: 'A dramatic fantasy world',
       genre: 'fantasy',
@@ -117,7 +118,7 @@ describe('NarrativeGenerator Tone Settings Integration', () => {
 
   test('should handle missing tone settings gracefully', async () => {
     // Create world without tone settings
-    const worldWithoutTone = worldStore.getState().createWorld({
+    const worldWithoutTone = useWorldStore.getState().createWorld({
       name: 'Default World',
       description: 'A world without tone settings',
       genre: 'fantasy',

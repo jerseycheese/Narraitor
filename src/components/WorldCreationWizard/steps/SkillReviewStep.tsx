@@ -350,7 +350,7 @@ export default function SkillReviewStep({
     <div data-testid="skill-review-step">
       <WizardFormSection
         title="Review Skills"
-        description="We've suggested skills for your world. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
+        description="We've suggested skills for your world. At least one skill is required to proceed. Click 'Customize' to modify any skill, or 'Selected/Excluded' to include/exclude it. You can have up to 12 skills total."
       >
 
       <div className="space-y-4 my-4">

@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
+  // Enable development indicators to help catch errors during testing
+  // devIndicators: false, // Disabled to allow error visibility during tests
+  
   // Configure external image domains
   images: {
     remotePatterns: [

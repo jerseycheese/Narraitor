@@ -132,7 +132,7 @@ describe('Performance Utilities', () => {
 
     it('should preserve function arguments and return value', () => {
       const testFn = (a: number, b: string) => `${a}-${b}`;
-      const measuredFn = measureTime(testFn, 'test-with-args');
+      const measuredFn = measureTime(testFn as (...args: unknown[]) => unknown, 'test-with-args');
       
       const result = measuredFn(42, 'test');
       
@@ -396,11 +396,11 @@ describe('Performance Utilities', () => {
     const originalEnv = process.env.NODE_ENV;
 
     afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
+      Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
     });
 
     it('should skip measurement in production environment', () => {
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true });
       
       const testFn = createDelayedFunction(10);
       const measuredFn = measureTime(testFn, 'production-test');
@@ -415,7 +415,7 @@ describe('Performance Utilities', () => {
     });
 
     it('should track measurements in development environment', () => {
-      process.env.NODE_ENV = 'development';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
       
       const testFn = createDelayedFunction(5);
       const measuredFn = measureTime(testFn, 'development-test');

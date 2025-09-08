@@ -112,12 +112,14 @@ export interface CharacterStore {
 }
 
 // Initial state
-const initialState = {
-  characters: {},
-  currentCharacterId: null,
-  error: null,
-  loading: false,
-};
+const getInitialState = () => ({
+    characters: {},
+    currentCharacterId: null,
+    error: null,
+    loading: false,
+});
+
+const initialState = getInitialState();
 
 // Character Store implementation with persistence
 export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create<CharacterStore>()(
@@ -440,7 +442,7 @@ export const useCharacterStore: UseBoundStore<StoreApi<CharacterStore>> = create
       }),
 
       // State management actions
-      reset: () => set(() => initialState),
+      reset: () => set(() => getInitialState()),
       setError: (error) => set(() => ({ error })),
       clearError: () => set(() => ({ error: null })),
       setLoading: (loading) => set(() => ({ loading })),

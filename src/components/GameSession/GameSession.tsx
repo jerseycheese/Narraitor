@@ -6,6 +6,7 @@ import { GameSessionState } from '@/types/game.types';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';
@@ -25,6 +26,7 @@ interface GameSessionProps {
   _stores?: {
     worldStore: Partial<ReturnType<typeof useWorldStore.getState>> | (() => Partial<ReturnType<typeof useWorldStore.getState>>);
     sessionStore: Partial<ReturnType<typeof useSessionStore.getState>> | (() => Partial<ReturnType<typeof useSessionStore.getState>>);
+    characterStore?: Partial<ReturnType<typeof useCharacterStore.getState>> | (() => Partial<ReturnType<typeof useCharacterStore.getState>>);
   };
   _router?: {
     push: (url: string) => void;
@@ -67,9 +69,24 @@ const GameSession: React.FC<GameSessionProps> = ({
     setIsClient(true);
   }, []);
   
+  // No test globals; use real persisted state only
+  const testSessionState = null;
+
   // Use the custom hook for state management
+  const hookResult = useGameSessionState({
+    worldId,
+    isClient,
+    onSessionStart,
+    onSessionEnd,
+    initialState: testSessionState || initialState,
+    disableAutoResume,
+    router: actualRouter,
+    _stores,
+  });
+
+  // Override session state for test mode
   const {
-    sessionState,
+    sessionState: hookSessionState,
     error,
     worldExists,
     world,
@@ -83,16 +100,9 @@ const GameSession: React.FC<GameSessionProps> = ({
     savedSession,
     handleResumeSession,
     handleNewSession,
-  } = useGameSessionState({
-    worldId,
-    isClient,
-    onSessionStart,
-    onSessionEnd,
-    initialState,
-    disableAutoResume,
-    router: actualRouter,
-    _stores,
-  });
+  } = hookResult;
+
+  const sessionState = testSessionState || hookSessionState;
   
   // Create a stable session ID that won't change on re-renders
   const stableSessionId = useMemo(() => {

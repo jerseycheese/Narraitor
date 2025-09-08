@@ -2,6 +2,9 @@ import { applyWorldTemplate } from '../templateLoader';
 import { templates } from '../worldTemplates';
 import { useWorldStore } from '../../../state/worldStore';
 
+// Get the mocked functions
+const mockSetState = useWorldStore.setState as jest.MockedFunction<typeof useWorldStore.setState>;
+
 // Mock the generateUniqueId function
 jest.mock('../../utils/generateId', () => ({
   generateUniqueId: jest.fn().mockImplementation((prefix) => {
@@ -12,17 +15,12 @@ jest.mock('../../utils/generateId', () => ({
   }),
 }));
 
-// Mock the useWorldStore
-jest.mock('../../../state/worldStore', () => {
-  const mockSetState = jest.fn();
-  
-  return {
-    useWorldStore: {
-      setState: mockSetState,
-      getState: jest.fn(() => ({ worlds: {} }))
-    }
-  };
-});
+jest.mock('../../../state/worldStore', () => ({
+  useWorldStore: {
+    setState: jest.fn(),
+    getState: jest.fn(() => ({ worlds: {} }))
+  }
+}));
 
 describe('Template Loader', () => {
   beforeEach(() => {
@@ -51,7 +49,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the first setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -70,7 +68,7 @@ describe('Template Loader', () => {
     applyWorldTemplate(template);
     
     // Extract the updater function from the setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };
@@ -107,7 +105,7 @@ describe('Template Loader', () => {
     expect(worldId).toBe('world-123');
     
     // Extract the updater function from the setState call
-    const setStateCall = useWorldStore.setState.mock.calls[0][0];
+    const setStateCall = mockSetState.mock.calls[0][0];
     
     // Call the updater function with an empty state
     const testState = { worlds: {} };

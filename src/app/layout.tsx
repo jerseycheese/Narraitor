@@ -43,7 +43,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   {children}
                 </main>
                 {/* DevTools at the very bottom of the page in normal flow */}
-                {process.env.NODE_ENV === 'development' && <ClientOnlyDevTools />}
+                <ClientOnlyDevTools />
                 {/* Toast container - renders all active toasts */}
                 <Toaster />
               </ToastProvider>

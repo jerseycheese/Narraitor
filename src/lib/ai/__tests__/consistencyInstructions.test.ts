@@ -30,11 +30,13 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'Aragorn',
             traits: ['skilled ranger', 'rightful king', 'brave'],
+            background: 'Ranger of the North who becomes king',
             importance: 'high'
           },
           {
             name: 'Tom',
             traits: ['innkeeper'],
+            background: 'Local innkeeper at the Prancing Pony',
             importance: 'low'
           }
         ],
@@ -56,6 +58,7 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'Gandalf',
             traits: ['wizard', 'wise'],
+            background: 'Gray Wizard of Middle-earth',
             importance: 'high'
           }
         ],
@@ -76,6 +79,7 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'Villager',
             traits: ['farmer'],
+            background: 'A simple farmer who works the fields',
             importance: 'medium'
           }
         ],
@@ -129,10 +133,12 @@ describe('generateConsistencyInstructions', () => {
         worldRules: [
           {
             rule: 'Magic requires great concentration and drains energy',
+            description: 'Fundamental rule about how magic works in this world',
             importance: 'high'
           },
           {
             rule: 'Shops close at sunset',
+            description: 'Basic commerce timing rule for settlements',
             importance: 'low'
           }
         ],
@@ -182,6 +188,7 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'Hero',
             traits: ['brave', 'determined'],
+            background: 'The chosen champion destined to save the realm',
             importance: 'high'
           }
         ],
@@ -196,6 +203,7 @@ describe('generateConsistencyInstructions', () => {
         worldRules: [
           {
             rule: 'Magic is forbidden in the city',
+            description: 'Strict law prohibiting magical practice within city limits',
             importance: 'high'
           }
         ],
@@ -226,6 +234,7 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'TestChar',
             traits: ['trait1'],
+            background: 'Test character background',
             importance: 'high'
           }
         ],
@@ -250,6 +259,7 @@ describe('generateConsistencyInstructions', () => {
           {
             name: 'NoTraits',
             traits: [],
+            background: 'A mysterious character with no defined traits',
             importance: 'medium'
           }
         ],

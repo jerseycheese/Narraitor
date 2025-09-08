@@ -46,6 +46,13 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       setArchetypes(generated);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      console.error('QuickStartCharacters archetype generation failed:', {
+        error: err,
+        world: world.name,
+        genre: world.genre,
+        attributes: world.attributes?.length || 0,
+        skills: world.skills?.length || 0
+      });
       setError(`Unable to generate character options: ${errorMessage}`);
     } finally {
       setLoading(false);
@@ -71,7 +78,12 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
       setLoading(true);
       const randomArchetype = await generateRandomArchetype(world, existingCharacterNames);
       handleArchetypeSelect(randomArchetype);
-    } catch {
+    } catch (err) {
+      console.error('QuickStartCharacters random archetype generation failed:', {
+        error: err,
+        world: world.name,
+        genre: world.genre
+      });
       setError('Failed to generate random character. Please try again.');
     } finally {
       setLoading(false);
@@ -169,9 +181,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                   {archetype.attributes
                     .sort((a, b) => (b.value || 0) - (a.value || 0))
                     .slice(0, 3)
-                    .map((attr) => (
+                    .map((attr, idx) => (
                       <Badge 
-                        key={attr.id} 
+                        key={`${archetype.id}-attr-${attr.id ?? attr.name}-${idx}`}
                         variant="secondary" 
                         count={attr.value}
                         className="text-xs"
@@ -189,9 +201,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
                   {archetype.skills
                     .sort((a, b) => (b.level || 0) - (a.level || 0))
                     .slice(0, 3)
-                    .map((skill) => (
+                    .map((skill, idx) => (
                       <Badge 
-                        key={skill.id} 
+                        key={`${archetype.id}-skill-${skill.id ?? skill.name}-${idx}`} 
                         variant="outline" 
                         count={skill.level}
                         className="text-xs"

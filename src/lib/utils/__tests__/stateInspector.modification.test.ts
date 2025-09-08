@@ -45,7 +45,7 @@ interface ReadOnlyTestStore {
 /**
  * Create a test store with modification capabilities
  */
-function createTestStore(): TestStore & { getState: () => TestStore; setState: (partial: Partial<TestStore>) => void } {
+function createTestStore() {
   return create<TestStore>()((set) => ({
     stringValue: 'initial string',
     numberValue: 42,
@@ -106,7 +106,7 @@ describe('StateInspector.setValueAtPath', () => {
   beforeEach(() => {
     // Set NODE_ENV to development for tests
     originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true });
     
     // Create fresh instances for each test
     stateInspector = new StateInspector();
@@ -124,9 +124,9 @@ describe('StateInspector.setValueAtPath', () => {
     stateInspector.clearAllWatchers();
     // Restore original NODE_ENV
     if (originalNodeEnv !== undefined) {
-      process.env.NODE_ENV = originalNodeEnv;
+      Object.defineProperty(process.env, 'NODE_ENV', { value: originalNodeEnv, writable: true });
     } else {
-      delete process.env.NODE_ENV;
+      Object.defineProperty(process.env, 'NODE_ENV', { value: undefined, writable: true });
     }
   });
 
@@ -405,7 +405,7 @@ describe('StateInspector.setValueAtPath', () => {
     it('should disable modifications in non-development environments', () => {
       // Mock production environment
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'production';
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true });
       
       // Create new inspector in production mode
       const prodInspector = new StateInspector();
@@ -419,7 +419,7 @@ describe('StateInspector.setValueAtPath', () => {
       expect(testStore.getState().stringValue).toBe('initial string');
       
       // Restore environment
-      process.env.NODE_ENV = originalEnv;
+      Object.defineProperty(process.env, 'NODE_ENV', { value: originalEnv, writable: true });
     });
   });
 });

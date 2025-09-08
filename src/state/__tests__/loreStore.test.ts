@@ -4,6 +4,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useLoreStore } from '../loreStore';
+import type { LoreFact } from '@/types/lore.types';
 
 describe('LoreStore', () => {
   beforeEach(() => {
@@ -295,7 +296,7 @@ describe('LoreStore', () => {
       expect(parsed.facts).toHaveLength(2);
       
       // Sort facts by key to avoid order dependency
-      const sortedFacts = parsed.facts.sort((a, b) => a.key.localeCompare(b.key));
+      const sortedFacts = parsed.facts.sort((a: LoreFact, b: LoreFact) => a.key.localeCompare(b.key));
       expect(sortedFacts[0].key).toBe('fact1');
       expect(sortedFacts[1].key).toBe('fact2');
     });
@@ -390,9 +391,8 @@ describe('LoreStore', () => {
       const invalidValue = { ...validFact, value: '' };
       expect(result.current.validateFact(invalidValue)).toBe(false);
 
-      // @ts-expect-error Testing invalid category
-      const invalidCategory = { ...validFact, category: 'invalid' };
-      expect(result.current.validateFact(invalidCategory)).toBe(false);
+      const invalidCategory = { ...validFact, category: 'invalid' as string };
+      expect(result.current.validateFact(invalidCategory as LoreFact)).toBe(false);
     });
 
     test('should validate key format', () => {

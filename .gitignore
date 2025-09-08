@@ -9,15 +9,37 @@ node_modules
 /coverage
 
 # playwright
+# Ignore generated reports and test results
 /playwright-report/
+/playwright-html-report/
+/playwright-test-results/
 /test-results/
 /data/
 index.html
 .playwright-mcp
 
+# Playwright downloaded artifacts (from CI failures)
+playwright-html-report/
+playwright-test-results/
+
+# Playwright trace files (generated during debugging)
+/trace/
+trace/
+
+# Playwright browser binaries and cache
+.playwright/
+
+# Note: Keep these Playwright files in repo:
+# - playwright.config.ts (configuration)
+# - tests/**/*.spec.ts (test files)
+# - tests/**/*-snapshots/*.png (baseline screenshots - Darwin only)
+
 # next.js
 /.next/
 /out/
+# Next.js build artifacts in worktrees
+worktrees/**/.next/
+**/.next/trace
 
 # production
 /build
@@ -80,6 +102,12 @@ docs/voice-writing-profile.md
 .claude/*
 .claude-workflow/
 .clauderc
+
+# MCP local config (do not commit)
+.mcp.json
+
+# Agent guidelines (local developer docs)
+AGENTS.md
 
 # Personal paths (security)
 **/Users/*/

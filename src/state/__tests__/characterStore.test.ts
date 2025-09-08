@@ -25,15 +25,30 @@ describe('useCharacterStore', () => {
     test('should create a new character', () => {
       const characterData = {
         name: 'Test Character',
+        description: 'A test character',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'A test character',
+          history: 'A test character',
           personality: 'Friendly',
-          motivation: 'Testing'
+          goals: ['Testing'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       };
 
       const characterId = useCharacterStore.getState().createCharacter(characterData);
@@ -50,15 +65,30 @@ describe('useCharacterStore', () => {
     test('should validate required fields', () => {
       const invalidCharacterData = {
         name: '',
+        description: '',
         worldId: '',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: '',
+          history: '',
           personality: '',
-          motivation: ''
+          goals: [],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       };
 
       expect(() => {
@@ -71,15 +101,30 @@ describe('useCharacterStore', () => {
     test('should update existing character', () => {
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Original Character',
+        description: 'Original character description',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'Original description',
+          history: 'Original description',
           personality: 'Original personality',
-          motivation: 'Original motivation'
+          goals: ['Original motivation'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       const originalUpdatedAt = useCharacterStore.getState().characters[characterId].updatedAt;
@@ -90,15 +135,17 @@ describe('useCharacterStore', () => {
       useCharacterStore.getState().updateCharacter(characterId, {
         name: 'Updated Character',
         background: {
-          description: 'Updated description',
+          history: 'Updated description',
           personality: 'Updated personality',
-          motivation: 'Updated motivation'
+          goals: ['Updated goals'],
+          fears: [],
+          relationships: []
         }
       });
 
       const state = useCharacterStore.getState();
       expect(state.characters[characterId].name).toBe('Updated Character');
-      expect(state.characters[characterId].background.description).toBe('Updated description');
+      expect(state.characters[characterId].background.history).toBe('Updated description');
       expect(state.characters[characterId].updatedAt).not.toBe(originalUpdatedAt);
     });
 
@@ -113,15 +160,30 @@ describe('useCharacterStore', () => {
     test('should remove character from store', () => {
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'To Delete',
+        description: 'Character to be deleted',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'Will be deleted',
+          history: 'Will be deleted',
           personality: 'N/A',
-          motivation: 'N/A'
+          goals: [],
+          fears: [],
+          relationships: []
         },
-        isPlayer: false
+        isPlayer: false,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       useCharacterStore.getState().deleteCharacter(characterId);
@@ -133,15 +195,30 @@ describe('useCharacterStore', () => {
     test('should clear currentCharacterId if deleted character was current', () => {
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Current Character',
+        description: 'Currently selected character',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'Currently selected',
+          history: 'Currently selected',
           personality: 'Active',
-          motivation: 'Playing'
+          goals: ['Playing'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       useCharacterStore.getState().setCurrentCharacter(characterId);
@@ -156,15 +233,30 @@ describe('useCharacterStore', () => {
     test('should set current character ID', () => {
       const characterId = useCharacterStore.getState().createCharacter({
         name: 'Current Character',
+        description: 'Character to be selected',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'To be selected',
+          history: 'To be selected',
           personality: 'Ready',
-          motivation: 'Playing'
+          goals: ['Playing'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
 
       useCharacterStore.getState().setCurrentCharacter(characterId);
@@ -187,15 +279,30 @@ describe('useCharacterStore', () => {
     beforeEach(() => {
       characterId = useCharacterStore.getState().createCharacter({
         name: 'Attribute Test Character',
+        description: 'Character for testing attributes',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'For testing attributes',
+          history: 'For testing attributes',
           personality: 'Test',
-          motivation: 'Testing'
+          goals: ['Testing'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
     });
 
@@ -262,15 +369,30 @@ describe('useCharacterStore', () => {
     beforeEach(() => {
       characterId = useCharacterStore.getState().createCharacter({
         name: 'Skill Test Character',
+        description: 'Character for testing skills',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'For testing skills',
+          history: 'For testing skills',
           personality: 'Test',
-          motivation: 'Testing'
+          goals: ['Testing'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
     });
 
@@ -341,15 +463,30 @@ describe('useCharacterStore', () => {
       // Add some data
       useCharacterStore.getState().createCharacter({
         name: 'Test Character',
+        description: 'Character for reset test',
         worldId: 'world-1',
+        level: 1,
         attributes: [],
         skills: [],
         background: {
-          description: 'Test',
+          history: 'Test',
           personality: 'Test',
-          motivation: 'Test'
+          goals: ['Test'],
+          fears: [],
+          relationships: []
         },
-        isPlayer: true
+        isPlayer: true,
+        status: {
+          health: 100,
+          maxHealth: 100,
+          conditions: []
+        },
+        inventory: {
+          characterId: '',
+          items: [],
+          capacity: 20,
+          categories: []
+        }
       });
       useCharacterStore.getState().setError('Some error');
       useCharacterStore.getState().setLoading(true);

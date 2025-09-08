@@ -79,7 +79,7 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
       ) : (
         <div className="space-y-6">
           {skills.map((skill, index) => (
-            <div key={skill.id} className="p-3 border border-gray-200 rounded">
+            <div key={skill.id || skill.name || index} className="p-3 border border-gray-200 rounded">
               <div className="flex justify-between mb-2">
                 <h3 className="font-medium">{skill.name}</h3>
                 <Button
@@ -158,8 +158,8 @@ const WorldSkillsForm: React.FC<WorldSkillsFormProps> = ({
                       <p className="text-gray-500 text-sm">No attributes available</p>
                     ) : (
                       <div className="space-y-2">
-                        {attributes.map(attr => (
-                          <div key={attr.id} className="flex items-center space-x-2">
+                        {attributes.map((attr, aIndex) => (
+                          <div key={attr.id || attr.name || aIndex} className="flex items-center space-x-2">
                             <Checkbox
                               id={`skill-${index}-attr-${attr.id}`}
                               checked={skill.attributeIds?.includes(attr.id) || false}
