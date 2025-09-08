@@ -630,7 +630,7 @@ export async function seedBaseData(page: Page): Promise<void> {
     localStorage.setItem('narraitor-journal-store', JSON.stringify({ state: { entries: {}, sessionEntries: {} }, version: 1 }));
     
     // Mark as seeded for debugging
-    (window as any).__TEST_SEEDED__ = 'base';
+    (window as any).__TEST_SEEDED__ = true;
     
     console.log('✅ Base data seeded for empty state');
   });
@@ -848,7 +848,7 @@ export async function seedTestData(page: Page): Promise<void> {
     
     // Also set current world context for proper navigation/breadcrumbs
     testWindow.__TEST_CURRENT_WORLD_ID__ = SAMPLE_WORLDS[0]?.id || null;
-    testWindow.__TEST_SEEDED__ = 'full';
+    testWindow.__TEST_SEEDED__ = true;
     
     // Add additional session/narrative data for active session testing
     const sessionWindow = window as typeof window & {

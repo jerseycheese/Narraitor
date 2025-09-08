@@ -145,15 +145,10 @@ export default function CharactersPage() {
   // Use worldId from URL if provided, otherwise use the current world
   const worldIdFromUrl = searchParams.get('worldId');
   
-  // In test mode, use test data; otherwise use normal store data
-  let effectiveWorldId: string | null;
-  let currentWorld: World | null;
-  let worldCharacters: Character[];
-  
   // Use normal store data
-  effectiveWorldId = worldIdFromUrl || currentWorldId;
-  currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-  worldCharacters = (Object.values(characters) as Character[]).filter(
+  const effectiveWorldId = worldIdFromUrl || currentWorldId;
+  const currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+  const worldCharacters = (Object.values(characters) as Character[]).filter(
     (char) => char.worldId === effectiveWorldId
   );
 

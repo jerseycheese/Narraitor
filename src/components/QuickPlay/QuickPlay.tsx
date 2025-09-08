@@ -3,9 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
-import { useCharacterStore, Character } from '@/state/characterStore';
-import { World } from '@/types/world.types';
-import { GameSessionState } from '@/types/game.types';
+import { useCharacterStore } from '@/state/characterStore';
 import { useSessionStore } from '@/state/sessionStore';
 import { formatRelativeTime } from '@/lib/utils';
 import { CharacterPortrait } from '@/components/CharacterPortrait';

@@ -3,11 +3,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GameSessionState } from '@/types/game.types';
-import { World } from '@/types/world.types';
 import { useSessionStore } from '@/state/sessionStore';
 import { useWorldStore } from '@/state/worldStore';
 import { useNarrativeStore } from '@/state/narrativeStore';
-import { Character, useCharacterStore } from '@/state/characterStore';
+import { useCharacterStore } from '@/state/characterStore';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { useGameSessionState } from './hooks/useGameSessionState';
 import GameSessionLoading from './GameSessionLoading';

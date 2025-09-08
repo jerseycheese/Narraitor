@@ -7,7 +7,6 @@ import { PageLayout } from '@/components/shared/PageLayout';
 import { Hero } from '@/components/shared/Hero';
 import { useWorldStore } from '@/state/worldStore';
 import { getGenreLabel } from '@/lib/constants/genres';
-import { World } from '@/types/world.types';
 
 /**
  * Play page component that initializes a game session with a worldId
