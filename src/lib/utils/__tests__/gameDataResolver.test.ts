@@ -48,7 +48,10 @@ describe('gameDataResolver', () => {
         description: 'Ability to frighten or coerce others',
         category: 'Social',
         baseValue: 0,
-        maxValue: 10
+        minValue: 0,
+        maxValue: 10,
+        worldId: 'test-world',
+        difficulty: 'medium'
       });
     });
 
@@ -61,7 +64,10 @@ describe('gameDataResolver', () => {
         description: 'Ability to move unseen and unheard',
         category: 'Physical',
         baseValue: 0,
-        maxValue: 10
+        minValue: 0,
+        maxValue: 10,
+        worldId: 'test-world',
+        difficulty: 'medium'
       });
     });
 
@@ -74,7 +80,10 @@ describe('gameDataResolver', () => {
         description: 'Ability to cast spells and use magical items',
         category: 'Mental',
         baseValue: 0,
-        maxValue: 10
+        minValue: 0,
+        maxValue: 10,
+        worldId: 'test-world',
+        difficulty: 'hard'
       });
     });
 

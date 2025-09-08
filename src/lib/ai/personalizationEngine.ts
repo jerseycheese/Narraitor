@@ -684,17 +684,16 @@ export class PersonalizationEngine {
       switch (type) {
         case 'heroic':
         case 'compassionate':
+        case 'helpful':
           if (affectedNPCs.length > 0) {
             instructions.push(`HEROIC CONSEQUENCES: Your heroic and compassionate actions have built a positive reputation. The following NPCs remember you helped them: ${affectedNPCs.join(', ')}. They should react with trust, gratitude, and willingness to help. Word of your protective nature spreads among those you've aided. NPCs seek your protection and trust your judgment. References: ${referencedChoices}.`);
           }
           break;
         case 'merciful':
+        case 'diplomatic':
           if (affectedNPCs.length > 0) {
             instructions.push(`MERCIFUL CONSEQUENCES: Your merciful decisions have established moral authority through showing restraint when others expected justice. The following NPCs were affected by your mercy: ${affectedNPCs.join(', ')}. Even those you spared may respect your sense of justice. Your reputation for mercy and balanced judgment precedes you. References: ${referencedChoices}.`);
           }
-          break;
-        case 'diplomatic':
-          instructions.push(`DIPLOMATIC CONSEQUENCES: Your diplomatic approach has created peaceful alternatives and strong relationships. NPCs involved: ${affectedNPCs.join(', ')}. They offer negotiation before conflict and seek peaceful solutions when dealing with you. References: ${referencedChoices}.`);
           break;
         case 'cunning':
         case 'strategic':
@@ -705,6 +704,16 @@ export class PersonalizationEngine {
           instructions.push(`${type.toUpperCase()} CONSEQUENCES: Your ${type} choices have shaped how NPCs perceive and interact with you. NPCs who witnessed these actions: ${affectedNPCs.join(', ')}. They react based on these established patterns of behavior. References: ${referencedChoices}.`);
       }
     });
+
+    // Add compound consequences for multiple decision types
+    if (decisionTypes.length > 1) {
+      const hasHeroic = decisionTypes.some(type => ['heroic', 'compassionate', 'helpful'].includes(type));
+      const hasMerciful = decisionTypes.some(type => ['merciful', 'diplomatic'].includes(type));
+      
+      if (hasHeroic && hasMerciful) {
+        instructions.push(`COMPOUND CONSEQUENCES: Your heroic and merciful nature has created a unique reputation. You demonstrate both the strength to protect others and the wisdom to show restraint. NPCs see you as someone with the power to protect combined with the judgment to show mercy. This balance of strength, wisdom, and restraint makes you a respected leader and trusted ally.`);
+      }
+    }
 
     return instructions.length > 0 ? instructions.join('\n\n') : '';
   }

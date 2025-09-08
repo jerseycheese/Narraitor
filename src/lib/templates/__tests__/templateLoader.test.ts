@@ -2,6 +2,9 @@ import { applyWorldTemplate } from '../templateLoader';
 import { templates } from '../worldTemplates';
 import { useWorldStore } from '../../../state/worldStore';
 
+// Get the mocked functions
+const mockSetState = useWorldStore.setState as jest.MockedFunction<typeof useWorldStore.setState>;
+
 // Mock the generateUniqueId function
 jest.mock('../../utils/generateId', () => ({
   generateUniqueId: jest.fn().mockImplementation((prefix) => {
@@ -12,14 +15,10 @@ jest.mock('../../utils/generateId', () => ({
   }),
 }));
 
-// Mock the useWorldStore
-const mockSetState = jest.fn();
-const mockGetState = jest.fn(() => ({ worlds: {} }));
-
 jest.mock('../../../state/worldStore', () => ({
   useWorldStore: {
-    setState: mockSetState,
-    getState: mockGetState
+    setState: jest.fn(),
+    getState: jest.fn(() => ({ worlds: {} }))
   }
 }));
 
