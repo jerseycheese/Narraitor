@@ -51,18 +51,17 @@ test.describe('Game Session Visual Tests', () => {
     // Give page time to load and use seeded data
     await page.waitForTimeout(3000);
     
-    // Check if there's already an active session or if we need to start one
+    // Check if there's already an active session - if so, DON'T click anything
     const hasActiveSession = await page.locator('[data-testid="game-session-active"]').count() > 0;
     console.log('🎮 Has active session:', hasActiveSession);
     
+    // With properly seeded data, we should already have an active session
+    // DO NOT click Start Session as this triggers new AI generation and overwrites seeded content
     if (!hasActiveSession) {
-      // If no active session, check for start button and click it
-      const startButton = page.locator('button:has-text("Start Session")');
-      if (await startButton.count() > 0) {
-        console.log('🎯 Clicking Start Session button');
-        await startButton.click();
-        await page.waitForTimeout(2000);
-      }
+      console.log('❌ Expected active session from seeded data but none found');
+      // This suggests the seeding didn't work properly
+    } else {
+      console.log('✅ Using existing seeded session - not triggering new generation');
     }
     
     // Final wait for content to stabilize

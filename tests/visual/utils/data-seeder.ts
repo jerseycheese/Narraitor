@@ -904,6 +904,52 @@ export async function seedTestData(page: Page): Promise<void> {
 export async function mockApiEndpoints(page: Page): Promise<void> {
   console.log('Setting up API endpoint mocks...');
   
+  // Mock narrative generation endpoints - CRITICAL to prevent AI from overriding seeded content
+  await page.route('**/api/narrative/generate', async (route) => {
+    console.log('🚫 Intercepted narrative generation API call - using seeded data instead');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      json: {
+        segment: {
+          id: 'segment-cyberpunk-1',
+          content: 'Rain pelts the neon-soaked streets of Neo-Tokyo as you crouch behind a hover-car, fingers dancing across your portable deck. The Arasaka building looms ahead, its security algorithms pulsing like a digital heartbeat.',
+          type: 'scene',
+          characterIds: ['char-cyberpunk-hacker'],
+          metadata: {
+            mood: 'tense',
+            location: 'Neo-Tokyo streets',
+            timeOfDay: 'night'
+          }
+        }
+      }
+    });
+  });
+
+  await page.route('**/api/narrative/choices', async (route) => {
+    console.log('🚫 Intercepted narrative choices API call - using seeded choices');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      json: {
+        choices: [
+          {
+            id: 'option-elevator',
+            text: 'Take the maintenance elevator - quieter but slower',
+            alignment: 'neutral',
+            hint: 'Lower risk of detection but takes more time'
+          },
+          {
+            id: 'option-stairs', 
+            text: 'Use the emergency stairs - faster but riskier',
+            alignment: 'chaotic',
+            hint: 'Quick route but higher chance of encountering security'
+          }
+        ]
+      }
+    });
+  });
+
   // Mock world generation endpoint
   await page.route('**/api/generate-world', async (route) => {
     console.log('Intercepted generate-world API call');
