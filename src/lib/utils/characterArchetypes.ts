@@ -852,6 +852,17 @@ function resetRandomFunction() {
   globalRandom = Math.random;
 }
 
+// Deterministic seed derived from world identity
+function hashString(input: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    // FNV-1a like mixing
+    h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+  }
+  return (h >>> 0);
+}
+
 export async function generateCharacterArchetypes(
   world: World, 
   existingNames: string[] = []
@@ -876,14 +887,10 @@ export async function generateCharacterArchetypes(
   const templates = getArchetypeTemplatesForGenre(world.genre);
   const archetypes: CharacterArchetype[] = [];
   
-  // Use seeded random for consistent results in test environments
-  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & { __TEST_SEEDED__?: boolean };
-  const isTestEnv = typeof window !== 'undefined' && !!testWindow.__TEST_SEEDED__;
-  
-  if (isTestEnv) {
-    setRandomFunction(createSeededRandom(42));
-  }
-  
+  // Seed random deterministically based on world identity so quickstart UI is stable
+  const seed = hashString(`${world.id}|${world.name}|${world.genre}`);
+  setRandomFunction(createSeededRandom(seed));
+
   for (const template of templates) {
     try {
       const name = generateCharacterName(template, [...existingNames, ...archetypes.map(a => a.name)]);
@@ -914,10 +921,8 @@ export async function generateCharacterArchetypes(
     }
   }
   
-  // Reset random function after generation
-  if (isTestEnv) {
-    resetRandomFunction();
-  }
+  // Reset random function if it was overridden elsewhere
+  resetRandomFunction();
   
   return archetypes;
 }
@@ -985,13 +990,6 @@ function generatePhysicalDescription(template: ArchetypeTemplate, genre: GenreVa
  * Generate a random archetype from the available options
  */
 export async function generateRandomArchetype(world: World, existingNames: string[] = []): Promise<CharacterArchetype> {
-  // Use seeded random for consistent results in test environments
-  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & { __TEST_SEEDED__?: boolean };
-  const isTestEnv = typeof window !== 'undefined' && !!testWindow.__TEST_SEEDED__;
-  
-  if (isTestEnv) {
-    setRandomFunction(createSeededRandom(84)); // Different seed than main generation
-  }
   
   const archetypes = await generateCharacterArchetypes(world, existingNames);
   const randomIndex = Math.floor(globalRandom() * archetypes.length);
@@ -1021,10 +1019,8 @@ export async function generateRandomArchetype(world: World, existingNames: strin
     )
   }));
   
-  // Reset random function after generation
-  if (isTestEnv) {
-    resetRandomFunction();
-  }
+  // Reset random function if it was overridden elsewhere
+  resetRandomFunction();
   
   return selectedArchetype;
 }

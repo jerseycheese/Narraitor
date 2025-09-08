@@ -94,7 +94,7 @@ async function globalSetup(config: FullConfig) {
           error: null,
           loading: false
         },
-        version: 1
+        version: 2
       };
       
       const narrativeStoreData = {
@@ -136,6 +136,7 @@ async function globalSetup(config: FullConfig) {
       localStorage.setItem('narraitor-character-store', JSON.stringify(characterStoreData));
       localStorage.setItem('narraitor-session-store', JSON.stringify(sessionStoreData));
       localStorage.setItem('narraitor-narrative-store', JSON.stringify(narrativeStoreData));
+      localStorage.setItem('narraitor-journal-store', JSON.stringify({ state: { entries: {}, sessionEntries: {} }, version: 1 }));
       
       // Store test data globally for later access
       const testWindow = window as typeof window & {

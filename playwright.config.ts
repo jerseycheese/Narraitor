@@ -23,8 +23,6 @@ export default defineConfig({
       threshold: 0.2,
       // Animation handling - disable all animations for consistent screenshots
       animations: 'disabled',
-      // Optimize screenshot mode for faster execution
-      mode: 'mask-diff',
     },
   },
   

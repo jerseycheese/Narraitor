@@ -121,15 +121,7 @@ export default function CharactersPage() {
   const { worlds, currentWorldId } = useWorldStore();
   const [mounted, setMounted] = useState(false);
   
-  // Check for test data to support visual regression tests (guarded for SSR)
-  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & {
-    __TEST_WORLDS__?: Record<string, unknown>;
-    __TEST_CHARACTERS__?: Record<string, unknown>;
-  };
-  
-  const testWorlds = testWindow.__TEST_WORLDS__;
-  const testCharacters = testWindow.__TEST_CHARACTERS__;
-  const isTestMode = testWorlds && testCharacters;
+  // No test globals – use persisted store state only
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatingStatus, setGeneratingStatus] = useState<string>('');
   const [generateError, setGenerateError] = useState<string | null>(null);
@@ -158,26 +150,12 @@ export default function CharactersPage() {
   let currentWorld: World | null;
   let worldCharacters: Character[];
   
-  if (isTestMode) {
-    // Use test data but respect URL-selected world when provided
-    console.log('🧪 Using test data for CharactersPage');
-    const testWorldsRecord = testWorlds as Record<string, World>;
-    const allTestWorlds = Object.values(testWorldsRecord);
-    // Prefer explicit worldId from URL, fallback to the first test world
-    effectiveWorldId = (worldIdFromUrl && testWorldsRecord[worldIdFromUrl] ? worldIdFromUrl : allTestWorlds[0]?.id) || null;
-    currentWorld = effectiveWorldId ? testWorldsRecord[effectiveWorldId] : null;
-    // Filter characters to the effective world to avoid cross-world bleed
-    worldCharacters = (Object.values(testCharacters) as Character[]).filter(
-      (char) => char.worldId === effectiveWorldId
-    );
-  } else {
-    // Use normal store data
-    effectiveWorldId = worldIdFromUrl || currentWorldId;
-    currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
-    worldCharacters = (Object.values(characters) as Character[]).filter(
-      (char) => char.worldId === effectiveWorldId
-    );
-  }
+  // Use normal store data
+  effectiveWorldId = worldIdFromUrl || currentWorldId;
+  currentWorld = effectiveWorldId ? worlds[effectiveWorldId] : null;
+  worldCharacters = (Object.values(characters) as Character[]).filter(
+    (char) => char.worldId === effectiveWorldId
+  );
 
   // Mark mounted after first client render to make header SSR-safe
   useEffect(() => {

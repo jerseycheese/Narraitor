@@ -27,17 +27,6 @@ const WorldListScreen: React.FC<WorldListScreenProps> = ({ _router, _storeAction
 
   useEffect(() => {
     try {
-      // Check for test data first (for visual regression tests)
-      const testWorlds = (window as typeof window & { __TEST_WORLDS__?: Record<string, unknown> }).__TEST_WORLDS__;
-      if (testWorlds && typeof testWorlds === 'object') {
-        console.log('🧪 Using test data for WorldListScreen');
-        setWorlds(Object.values(testWorlds) as World[]);
-        setCurrentWorldId(Object.keys(testWorlds)[0] || null);
-        setLoading(false);
-        setError(null);
-        return;
-      }
-
       const state = useWorldStore.getState();
       setWorlds(Object.values(state.worlds || {}));
       setCurrentWorldId(state.currentWorldId);

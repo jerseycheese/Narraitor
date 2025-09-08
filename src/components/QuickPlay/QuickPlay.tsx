@@ -19,39 +19,17 @@ import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
 export function QuickPlay() {
   const router = useRouter();
   
-  // Check for test data to support visual regression tests
-  const testWindow = (typeof window !== 'undefined' ? window : ({} as Window)) as typeof window & {
-    __TEST_WORLDS__?: Record<string, World>;
-    __TEST_CHARACTERS__?: Record<string, Character>;
-    __TEST_SESSIONS__?: Record<string, GameSessionState>;
-  };
-  
-  const testWorlds = testWindow.__TEST_WORLDS__;
-  const testCharacters = testWindow.__TEST_CHARACTERS__;
-  const testSessions = testWindow.__TEST_SESSIONS__;
-  const isTestMode = testWorlds && testCharacters && testSessions;
-  
-  // Use test data or normal store data
+  // Use persisted store data
   const { worlds } = useWorldStore();
   const { characters } = useCharacterStore();
   const savedSessions = useSessionStore(state => state.savedSessions);
   const resumeSavedSession = useSessionStore(state => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const onboardingCompleted = useSessionStore(state => state.onboardingCompleted);
-  
-  // In test mode, use test data
-  const actualWorlds = isTestMode ? testWorlds : worlds;
-  const actualCharacters = isTestMode ? testCharacters : characters;
-  const actualSavedSessions = isTestMode ? {
-    'session-cyberpunk-ghost': {
-      id: 'session-cyberpunk-ghost',
-      worldId: 'world-cyberpunk-2077',
-      characterId: 'char-cyberpunk-hacker',
-      lastPlayed: '2024-01-01T02:00:00.000Z',
-      narrativeCount: 3
-    }
-  } : savedSessions;
-  const actualOnboardingCompleted = isTestMode ? true : onboardingCompleted;
+  const actualWorlds = worlds;
+  const actualCharacters = characters;
+  const actualSavedSessions = savedSessions;
+  const actualOnboardingCompleted = onboardingCompleted;
   
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -115,13 +93,10 @@ export function QuickPlay() {
     }
   };
 
-  // Show guided experience for first-time users
-  // In test mode, use test conditions; otherwise use store methods
-  const showOnboarding = isTestMode 
-    ? (Object.keys(actualSavedSessions).length === 0 && !actualOnboardingCompleted)
-    : (shouldShowOnboarding 
-        ? shouldShowOnboarding() 
-        : (Object.keys(actualSavedSessions).length === 0 && !actualOnboardingCompleted));
+  // Show guided experience for first-time users using store methods
+  const showOnboarding = shouldShowOnboarding
+    ? shouldShowOnboarding()
+    : (Object.keys(actualSavedSessions).length === 0 && !actualOnboardingCompleted);
     
   if (showOnboarding) {
     return <GuidedFirstTimeExperience />;

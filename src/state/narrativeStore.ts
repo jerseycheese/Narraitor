@@ -66,65 +66,19 @@ interface NarrativeStore {
   markSessionEnded: (sessionId: EntityID) => void;
 }
 
-// Initial state with test mode detection
-const getInitialState = () => {
-  // Check for test data (only in browser environment)
-  if (typeof window === 'undefined') {
-    return {
-      segments: {},
-      decisions: {},
-      sessionSegments: {},
-      sessionDecisions: {},
-      endedSessions: {},
-      currentEnding: null,
-      isGeneratingEnding: false,
-      endingError: null,
-      error: null,
-      loading: false,
-    };
-  }
-  
-  const testWindow = window as typeof window & {
-    __TEST_SEGMENTS__?: Record<string, NarrativeSegment>;
-    __TEST_DECISIONS__?: Record<string, Decision>;
-    __TEST_SESSION_SEGMENTS__?: Record<string, string[]>;
-    __TEST_SESSION_DECISIONS__?: Record<string, string[]>;
-  };
-  
-  const testSegments = testWindow.__TEST_SEGMENTS__;
-  const testDecisions = testWindow.__TEST_DECISIONS__;
-  const testSessionSegments = testWindow.__TEST_SESSION_SEGMENTS__;
-  const testSessionDecisions = testWindow.__TEST_SESSION_DECISIONS__;
-  
-  if (testSegments && testDecisions && testSessionSegments && testSessionDecisions) {
-    return {
-      segments: testSegments,
-      sessionSegments: testSessionSegments,
-      decisions: testDecisions,
-      sessionDecisions: testSessionDecisions,
-      endedSessions: {},
-      currentEnding: null,
-      isGeneratingEnding: false,
-      endingError: null,
-      error: null,
-      loading: false,
-    };
-  }
-  
-  // Regular initial state
-  return {
-    segments: {},
-    sessionSegments: {},
-    decisions: {},
-    sessionDecisions: {},
-    endedSessions: {},
-    currentEnding: null,
-    isGeneratingEnding: false,
-    endingError: null,
-    error: null,
-    loading: false,
-  };
-};
+// Initial state
+const getInitialState = () => ({
+  segments: {},
+  sessionSegments: {},
+  decisions: {},
+  sessionDecisions: {},
+  endedSessions: {},
+  currentEnding: null,
+  isGeneratingEnding: false,
+  endingError: null,
+  error: null,
+  loading: false,
+});
 
 const initialState = getInitialState();
 

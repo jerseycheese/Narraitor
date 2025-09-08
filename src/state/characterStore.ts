@@ -111,30 +111,13 @@ export interface CharacterStore {
   setLoading: (loading: boolean) => void;
 }
 
-// Initial state with test mode detection
-const getInitialState = () => {
-  // Check for test data (used in visual regression tests)
-  if (typeof window !== 'undefined') {
-    const testCharacters = (window as typeof window & { __TEST_CHARACTERS__?: Record<string, Character> }).__TEST_CHARACTERS__;
-    
-    if (testCharacters && Object.keys(testCharacters).length > 0) {
-      console.log('🧪 CharacterStore using test data');
-      return {
-        characters: testCharacters,
-        currentCharacterId: Object.keys(testCharacters)[0] || null,
-        error: null,
-        loading: false,
-      };
-    }
-  }
-
-  return {
+// Initial state
+const getInitialState = () => ({
     characters: {},
     currentCharacterId: null,
     error: null,
     loading: false,
-  };
-};
+});
 
 const initialState = getInitialState();
 

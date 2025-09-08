@@ -49,39 +49,13 @@ export interface WorldStore {
   setLoading: (loading: boolean) => void;
 }
 
-// Function to get initial state, checking for test data
-const getInitialState = () => {
-  // Check for test data (only in browser environment)
-  if (typeof window === 'undefined') {
-    return {
-      worlds: {},
-      currentWorldId: null,
-      error: null,
-      loading: false,
-    };
-  }
-  
-  const testWorlds = (window as typeof window & { __TEST_WORLDS__?: Record<string, World> }).__TEST_WORLDS__;
-  const testCurrentWorldId = (window as typeof window & { __TEST_CURRENT_WORLD_ID__?: string }).__TEST_CURRENT_WORLD_ID__;
-  
-  if (testWorlds && Object.keys(testWorlds).length > 0) {
-    console.log('🧪 WorldStore using test data');
-    return {
-      worlds: testWorlds,
-      currentWorldId: testCurrentWorldId || Object.keys(testWorlds)[0] || null,
-      error: null,
-      loading: false,
-    };
-  }
-  
-  // Default state
-  return {
-    worlds: {},
-    currentWorldId: null,
-    error: null,
-    loading: false,
-  };
-};
+// Function to get initial state
+const getInitialState = () => ({
+  worlds: {},
+  currentWorldId: null,
+  error: null,
+  loading: false,
+});
 
 // World Store implementation with persistence
 export const useWorldStore = create<WorldStore>()(

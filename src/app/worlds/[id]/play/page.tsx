@@ -19,17 +19,8 @@ export default function PlayPage() {
   const [isClient, setIsClient] = useState(false);
   
   // Check for test data to support visual regression tests (guarded for SSR)
-  const testWorlds: Record<string, World> | undefined =
-    typeof window !== 'undefined'
-      ? (window as typeof window & { __TEST_WORLDS__?: Record<string, World> }).__TEST_WORLDS__
-      : undefined;
-  const isTestMode = !!testWorlds;
-  
-  // Always call hooks - handle test mode logic after
-  const storeWorld = useWorldStore((state) => state.worlds[worldId]);
-  
-  // Use test data or normal store data
-  const world = isTestMode ? testWorlds[worldId] : storeWorld;
+  // Always call hooks and use persisted store data
+  const world = useWorldStore((state) => state.worlds[worldId]);
   
   // Check if this should be a fresh session (from "Start New Session" button)
   const disableAutoResume = searchParams?.get('fresh') === 'true';

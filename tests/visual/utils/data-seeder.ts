@@ -541,6 +541,31 @@ export async function seedBaseData(page: Page): Promise<void> {
     // Clear any existing data to ensure true empty state
     localStorage.clear();
     
+    // Also clear/initialize IndexedDB state to ensure app reads empty stores
+    const seedZustandIndexedDB = async (key: string, value: Record<string, unknown>) => {
+      return new Promise((resolve) => {
+        const request = indexedDB.open('narraitor-state', 1);
+
+        request.onupgradeneeded = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          if (!db.objectStoreNames.contains('narraitor-store')) {
+            db.createObjectStore('narraitor-store');
+          }
+        };
+
+        request.onsuccess = (event) => {
+          const db = (event.target as IDBOpenDBRequest).result;
+          const tx = db.transaction(['narraitor-store'], 'readwrite');
+          const store = tx.objectStore('narraitor-store');
+          const put = store.put({ id: key, value }, key);
+          put.onsuccess = () => resolve('✅');
+          put.onerror = () => resolve('❌');
+        };
+
+        request.onerror = () => resolve('❌');
+      });
+    };
+    
     // Set minimal required configuration
     const emptyWorldStoreData = {
       state: {
@@ -571,7 +596,7 @@ export async function seedBaseData(page: Page): Promise<void> {
         error: null,
         loading: false
       },
-      version: 1
+      version: 2
     };
     
     const emptyNarrativeStoreData = {
@@ -590,11 +615,19 @@ export async function seedBaseData(page: Page): Promise<void> {
       version: 1
     };
     
-    // Seed localStorage with empty stores
+    // Seed both IndexedDB (primary) and localStorage (fallback) with empty stores
+    await seedZustandIndexedDB('narraitor-world-store', emptyWorldStoreData);
+    await seedZustandIndexedDB('narraitor-character-store', emptyCharacterStoreData);
+    await seedZustandIndexedDB('narraitor-session-store', emptySessionStoreData);
+    await seedZustandIndexedDB('narraitor-narrative-store', emptyNarrativeStoreData);
+    // Optional: seed journal store empty to avoid fallback logs
+    await seedZustandIndexedDB('narraitor-journal-store', { state: { entries: {}, sessionEntries: {} }, version: 1 });
+
     localStorage.setItem('narraitor-world-store', JSON.stringify(emptyWorldStoreData));
     localStorage.setItem('narraitor-character-store', JSON.stringify(emptyCharacterStoreData));
     localStorage.setItem('narraitor-session-store', JSON.stringify(emptySessionStoreData));
     localStorage.setItem('narraitor-narrative-store', JSON.stringify(emptyNarrativeStoreData));
+    localStorage.setItem('narraitor-journal-store', JSON.stringify({ state: { entries: {}, sessionEntries: {} }, version: 1 }));
     
     // Mark as seeded for debugging
     (window as any).__TEST_SEEDED__ = 'base';
@@ -663,27 +696,29 @@ export async function seedTestData(page: Page): Promise<void> {
     }
     
     // Approach 2: IndexedDB seeding (primary approach for stores)
-    const seedIndexedDB = async (dbName: string, storeData: Record<string, unknown>) => {
+    // Seed the exact location and format used by the app's persist adapter
+    const seedZustandIndexedDB = async (key: string, value: Record<string, unknown>) => {
       return new Promise((resolve) => {
-        const request = indexedDB.open(dbName, 1);
-        
+        const request = indexedDB.open('narraitor-state', 1);
+
         request.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-          if (!db.objectStoreNames.contains('state')) {
-            db.createObjectStore('state');
+          if (!db.objectStoreNames.contains('narraitor-store')) {
+            db.createObjectStore('narraitor-store');
           }
         };
-        
+
         request.onsuccess = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-          const transaction = db.transaction(['state'], 'readwrite');
-          const store = transaction.objectStore('state');
-          const putRequest = store.put(storeData, 'state');
-          
-          putRequest.onsuccess = () => resolve('✅');
-          putRequest.onerror = () => resolve('❌');
+          const tx = db.transaction(['narraitor-store'], 'readwrite');
+          const store = tx.objectStore('narraitor-store');
+
+          // Persist format used by our adapter: { id, value } saved under key
+          const put = store.put({ id: key, value }, key);
+          put.onsuccess = () => resolve('✅');
+          put.onerror = () => resolve('❌');
         };
-        
+
         request.onerror = () => resolve('❌');
       });
     };
@@ -733,7 +768,7 @@ export async function seedTestData(page: Page): Promise<void> {
           error: null,
           loading: false
         },
-        version: 1
+        version: 2
       };
       
       const narrativeStoreData = {
@@ -770,22 +805,25 @@ export async function seedTestData(page: Page): Promise<void> {
         version: 1
       };
       
-      // Seed IndexedDB stores (primary approach)
-      const worldResult = await seedIndexedDB('narraitor-world-store', worldStoreData);
-      const characterResult = await seedIndexedDB('narraitor-character-store', characterStoreData);
-      const sessionResult = await seedIndexedDB('narraitor-session-store', sessionStoreData);
-      const narrativeResult = await seedIndexedDB('narraitor-narrative-store', narrativeStoreData);
+      // Seed IndexedDB stores (primary approach) in the exact DB/store the app uses
+      const worldResult = await seedZustandIndexedDB('narraitor-world-store', worldStoreData);
+      const characterResult = await seedZustandIndexedDB('narraitor-character-store', characterStoreData);
+      const sessionResult = await seedZustandIndexedDB('narraitor-session-store', sessionStoreData);
+      const narrativeResult = await seedZustandIndexedDB('narraitor-narrative-store', narrativeStoreData);
+      const journalResult = await seedZustandIndexedDB('narraitor-journal-store', { state: { entries: {}, sessionEntries: {} }, version: 1 });
       
       seedApproaches.push(`${worldResult} IndexedDB world store seeding`);
       seedApproaches.push(`${characterResult} IndexedDB character store seeding`);
       seedApproaches.push(`${sessionResult} IndexedDB session store seeding`);
       seedApproaches.push(`${narrativeResult} IndexedDB narrative store seeding`);
+      seedApproaches.push(`${journalResult} IndexedDB journal store seeding`);
       
       // Also seed localStorage as fallback
       localStorage.setItem('narraitor-world-store', JSON.stringify(worldStoreData));
       localStorage.setItem('narraitor-character-store', JSON.stringify(characterStoreData));
       localStorage.setItem('narraitor-session-store', JSON.stringify(sessionStoreData));
       localStorage.setItem('narraitor-narrative-store', JSON.stringify(narrativeStoreData));
+      localStorage.setItem('narraitor-journal-store', JSON.stringify({ state: { entries: {}, sessionEntries: {} }, version: 1 }));
       seedApproaches.push('✅ localStorage fallback seeding');
     } catch (e) {
       seedApproaches.push('❌ Storage seeding: ' + (e as Error).message);
