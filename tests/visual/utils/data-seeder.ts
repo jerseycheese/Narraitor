@@ -748,6 +748,11 @@ export async function seedTestData(page: Page): Promise<void> {
         state: {
           sessions: sessionsRecord,
           currentSessionId: SAMPLE_GAME_SESSIONS[0]?.id || null,
+          // Active session state (required for GameSession to render ActiveGameSession)
+          id: SAMPLE_GAME_SESSIONS[0]?.id || null,
+          status: 'active' as const,
+          worldId: 'world-cyberpunk-2077',
+          characterId: 'char-cyberpunk-hacker',
           savedSessions: {
             'session-cyberpunk-ghost': {
               id: 'session-cyberpunk-ghost',
