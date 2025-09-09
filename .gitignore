@@ -114,3 +114,6 @@ AGENTS.md
 
 # Worktrees
 narraitor-worktrees/
+
+# Serena (local tooling)
+.serena/
