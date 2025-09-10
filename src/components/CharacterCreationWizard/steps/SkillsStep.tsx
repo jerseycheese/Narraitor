@@ -90,7 +90,7 @@ export const SkillsStep: React.FC<SkillsStepProps> = ({
               </div>
               <ToggleButton
                 isActive={skill.isSelected}
-                activeLabel="Selected ✓"
+                activeLabel="Selected"
                 inactiveLabel="Not Selected"
                 onClick={() => handleSkillToggle(skill.skillId)}
                 testId={`skill-toggle-${skill.skillId || skill.name || index}`}

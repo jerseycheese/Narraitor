@@ -92,11 +92,11 @@ export const ErrorSection = () => {
   // Get severity badge color
   const getSeverityColor = (severity: ErrorSeverity) => {
     switch (severity) {
-      case ErrorSeverity.CRITICAL: return 'bg-red-500';
-      case ErrorSeverity.HIGH: return 'bg-red-500';
-      case ErrorSeverity.MEDIUM: return 'bg-amber-50000';
-      case ErrorSeverity.LOW: return 'bg-blue-500';
-      default: return 'bg-gray-500';
+      case ErrorSeverity.CRITICAL: return 'bg-red-700';
+      case ErrorSeverity.HIGH: return 'bg-red-700';
+      case ErrorSeverity.MEDIUM: return 'bg-amber-700';
+      case ErrorSeverity.LOW: return 'bg-blue-700';
+      default: return 'bg-gray-700';
     }
   };
 
@@ -108,9 +108,9 @@ export const ErrorSection = () => {
   return (
     <div className="space-y-4">
       {/* Error Statistics */}
-      <div className="bg-gray-700 p-3 rounded border border-gray-700">
+      <div className="bg-gray-100 p-3 rounded border border-gray-300">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-200">Runtime Errors</h4>
+          <h4 className="text-sm font-semibold text-gray-900">Runtime Errors</h4>
           {statistics && statistics.total > 0 && (
             <Button
               onClick={handleClearAll}
@@ -124,7 +124,7 @@ export const ErrorSection = () => {
         </div>
         
         {statistics && (
-          <div className="text-xs text-gray-300 space-y-1">
+          <div className="text-xs text-gray-700 space-y-1">
             <div className="flex gap-4">
               <span>Total: {statistics.total}</span>
               <span>Recent: {statistics.recentCount}</span>
@@ -147,16 +147,16 @@ export const ErrorSection = () => {
         <div className="space-y-3">
           {/* Severity Filter */}
           <div>
-            <h5 className="text-xs font-medium text-gray-300 mb-2">Severity</h5>
+            <h5 className="text-xs font-medium text-gray-900 mb-2">Severity</h5>
             <div className="flex flex-wrap gap-2">
               {Object.values(ErrorSeverity).map(severity => (
                 <label key={severity} className="flex items-center gap-1 text-xs">
                   <Checkbox
                     checked={(filter.severity || []).includes(severity)}
                     onChange={(e) => handleSeverityFilter(severity, e.target.checked)}
-                    aria-label={severity.charAt(0).toUpperCase() + severity.slice(1)}
+                    aria-label={`Filter by ${severity.charAt(0).toUpperCase() + severity.slice(1)} severity errors`}
                   />
-                  <span className="text-gray-300 capitalize">{severity}</span>
+                  <span className="text-gray-900 capitalize">{severity}</span>
                 </label>
               ))}
             </div>
@@ -164,16 +164,16 @@ export const ErrorSection = () => {
 
           {/* Category Filter */}
           <div>
-            <h5 className="text-xs font-medium text-gray-300 mb-2">Category</h5>
+            <h5 className="text-xs font-medium text-gray-900 mb-2">Category</h5>
             <div className="flex flex-wrap gap-2">
               {Object.values(ErrorCategory).map(category => (
                 <label key={category} className="flex items-center gap-1 text-xs">
                   <Checkbox
                     checked={(filter.category || []).includes(category)}
                     onChange={(e) => handleCategoryFilter(category, e.target.checked)}
-                    aria-label={category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')}
+                    aria-label={`Filter by ${category.charAt(0).toUpperCase() + category.slice(1).replace('_', ' ')} category errors`}
                   />
-                  <span className="text-gray-300 capitalize">{category.replace('_', ' ')}</span>
+                  <span className="text-gray-900 capitalize">{category.replace('_', ' ')}</span>
                 </label>
               ))}
             </div>
@@ -185,9 +185,9 @@ export const ErrorSection = () => {
               <Checkbox
                 checked={filter.dismissed || false}
                 onChange={(e) => handleShowDismissed(e.target.checked)}
-                aria-label="Show dismissed errors"
+                aria-label="Show dismissed errors in addition to active errors"
               />
-              <span className="text-gray-300">Show dismissed errors</span>
+              <span className="text-gray-900">Show dismissed errors</span>
             </label>
           </div>
 

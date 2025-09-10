@@ -137,7 +137,7 @@ export const Grid: Story = {
     children: <div>Default content</div>,
   },
   render: () => (
-    <div className="grid grid-cols-3 gap-4 p-4" style={{ width: '800px' }}>
+    <div className="grid grid-cols-3 gap-4 p-4 w-[800px]">
       <ActiveStateCard isActive={true} activeText="Active Item">
         <div className="p-4">
           <h4 className="font-semibold">Card 1</h4>

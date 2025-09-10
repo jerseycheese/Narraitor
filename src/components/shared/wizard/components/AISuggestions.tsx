@@ -150,11 +150,15 @@ export const AISuggestions: React.FC<AISuggestionsProps> = ({
 
       {/* Toggle all indicator */}
       {onToggleAll && someAccepted && (
-        <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-blue-500 transition-all"
-            style={{ width: `${(acceptedCount / suggestions.length) * 100}%` }}
-          />
+        <div className="w-full">
+          <div className="grid grid-cols-20 gap-0.5 h-1">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className={`${i < Math.round((acceptedCount / suggestions.length) * 20) ? 'bg-blue-500' : 'bg-gray-200'} rounded-full`}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

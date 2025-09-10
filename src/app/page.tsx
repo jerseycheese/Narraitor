@@ -15,7 +15,7 @@ export default function HomePage() {
   const hasExistingData = Object.keys(worlds).length > 0 || Object.keys(characters).length > 0;
   
   return (
-    <main className="min-h-screen py-6 sm:py-12">
+    <main className="py-6 sm:py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-12">

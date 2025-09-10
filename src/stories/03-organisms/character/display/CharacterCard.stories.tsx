@@ -277,7 +277,7 @@ export const Grid: Story = {
     onDelete: () => console.log('Delete clicked'),
   },
   render: () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4" style={{ width: '1200px' }}>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 w-[1200px]">
       <CharacterCard
         character={{
           ...mockCharacter,

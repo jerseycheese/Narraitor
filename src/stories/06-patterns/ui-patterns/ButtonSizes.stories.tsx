@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
+import { Eye, Pencil } from 'lucide-react';
 import { CardActionGroup } from '@/components/shared/cards/CardActionGroup';
 
 const meta: Meta<typeof ActionButtonGroup> = {
@@ -32,12 +33,7 @@ export const ButtonSizeComparison: Story = {
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'sm',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )
+                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
               }]}
             />
             <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;sm&quot;</code>
@@ -50,12 +46,7 @@ export const ButtonSizeComparison: Story = {
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'default',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )
+                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
               }]}
             />
             <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;default&quot;</code>
@@ -68,12 +59,7 @@ export const ButtonSizeComparison: Story = {
                 onClick: () => {},
                 variant: 'secondary',
                 size: 'lg',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )
+                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
               }]}
             />
             <code className="text-xs bg-gray-100 px-2 py-1 rounded">size=&quot;lg&quot;</code>
@@ -95,23 +81,14 @@ export const ButtonSizeComparison: Story = {
                 text: 'View',
                 onClick: () => {},
                 variant: 'secondary',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 616 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )
+                icon: (<Eye className="w-4 h-4" aria-hidden="true" />)
               },
               {
                 key: 'edit',
                 text: 'Edit',
                 onClick: () => {},
                 variant: 'secondary',
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                )
+                icon: (<Pencil className="w-4 h-4" aria-hidden="true" />)
               },
               {
                 key: 'delete',

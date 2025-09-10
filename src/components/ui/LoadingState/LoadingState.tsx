@@ -136,11 +136,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
                 key={i}
                 className={cn(
                   'rounded-full bg-current animate-pulse',
-                  sizeClasses[size].dots
+                  sizeClasses[size].dots,
+                  `[animation-delay:${i * 150}ms]`
                 )}
-                style={{
-                  animationDelay: `${i * 150}ms`,
-                }}
               />
             ))}
             <span className="sr-only">Loading...</span>

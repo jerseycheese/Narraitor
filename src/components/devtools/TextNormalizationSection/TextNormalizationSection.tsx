@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   normalizeTextWithDetails, 
   analyzeText, 
@@ -116,19 +119,21 @@ export function TextNormalizationSection({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Text Normalization</h3>
-        <div className="flex gap-2 text-sm">
-          <button
+        <div className="flex gap-2">
+          <Button
             onClick={handleExport}
-            className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700"
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
             Export
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleCopyNormalized}
-            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-700"
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white"
           >
             Copy Result
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -137,13 +142,15 @@ export function TextNormalizationSection({
         <h4 className="font-medium mb-2">Load Sample Data:</h4>
         <div className="flex gap-2 flex-wrap">
           {['whitespace', 'quotes', 'lineEndings', 'specialChars', 'complex'].map(sample => (
-            <button
+            <Button
               key={sample}
               onClick={() => handleLoadSample(sample)}
-              className="px-3 py-1 bg-gray-700 text-white text-sm rounded hover:bg-gray-700"
+              size="sm"
+              variant="outline"
+              className=""
             >
               {sample}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -153,15 +160,13 @@ export function TextNormalizationSection({
         <h4 className="font-medium mb-3">Normalization Options:</h4>
         <div className="grid grid-cols-2 gap-3">
           {Object.entries(options).map(([key, value]) => (
-            <label key={key} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={value}
-                onChange={() => handleOptionChange(key as keyof TextNormalizationOptions)}
-                className="rounded"
-              />
-              <span className="text-sm">{formatOptionLabel(key)}</span>
-            </label>
+            <Checkbox
+              key={key}
+              checked={value}
+              onChange={() => handleOptionChange(key as keyof TextNormalizationOptions)}
+              label={formatOptionLabel(key)}
+              className="text-sm"
+            />
           ))}
         </div>
       </div>
@@ -169,11 +174,11 @@ export function TextNormalizationSection({
       {/* Input Text */}
       <div>
         <label htmlFor="input-text" className="block text-sm font-medium mb-2">Input Text:</label>
-        <textarea
+        <Textarea
           id="input-text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="w-full h-32 p-3 border rounded font-mono text-sm"
+          className="h-32 font-mono text-sm"
           placeholder="Enter text to normalize..."
         />
         <div className="text-xs text-gray-500 mt-1">
@@ -184,11 +189,11 @@ export function TextNormalizationSection({
       {/* Normalized Output */}
       <div>
         <label htmlFor="normalized-text" className="block text-sm font-medium mb-2">Normalized Text:</label>
-        <textarea
+        <Textarea
           id="normalized-text"
           value={normalizationResult.normalized}
           readOnly
-          className="w-full h-32 p-3 border rounded font-mono text-sm bg-gray-100"
+          className="h-32 font-mono text-sm bg-gray-100"
           placeholder="Normalized text will appear here..."
         />
         <div className="text-xs text-gray-500 mt-1">
@@ -216,25 +221,29 @@ export function TextNormalizationSection({
         <>
           {/* Analysis Toggle */}
           <div className="flex gap-4">
-            <button
+            <Button
               onClick={() => setShowAnalysis(!showAnalysis)}
-              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
+              size="sm"
+              variant="outline"
+              className=""
             >
               {showAnalysis ? 'Hide' : 'Show'} Text Analysis
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setShowStats(!showStats)}
-              className="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700"
+              size="sm"
+              variant="outline"
+              className=""
             >
               {showStats ? 'Hide' : 'Show'} Whitespace Stats
-            </button>
+            </Button>
           </div>
 
           {/* Text Analysis */}
           {showAnalysis && (
-            <div className="bg-amber-200 p-4 rounded">
-              <h4 className="font-medium mb-3">Text Analysis:</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="bg-amber-50 p-4 rounded border border-amber-200">
+              <h4 className="font-medium mb-3 text-amber-900">Text Analysis:</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-900">
                 <div>
                   <strong>Structure:</strong>
                   <ul className="ml-4">
@@ -258,9 +267,9 @@ export function TextNormalizationSection({
 
           {/* Whitespace Stats */}
           {showStats && (
-            <div className="bg-green-50 p-4 rounded">
-              <h4 className="font-medium mb-3">Whitespace Statistics:</h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="bg-green-50 p-4 rounded border border-green-200">
+              <h4 className="font-medium mb-3 text-green-900">Whitespace Statistics:</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-900">
                 <div>
                   <strong>Leading/Trailing:</strong>
                   <ul className="ml-4">

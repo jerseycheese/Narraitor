@@ -2,9 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLoreStore } from '@/state/loreStore';
+import { useWorldStore } from '@/state/worldStore';
 import { generateConsistencyInstructions } from '@/lib/ai/consistencyInstructions';
 import { buildLoreContext } from '@/lib/lore/loreContext';
 import { JsonViewer } from '@/components/devtools/JsonViewer';
+import { Select } from '@/components/ui/select';
 import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 
 /**
@@ -47,6 +49,7 @@ import { DevToolsSection } from '@/components/devtools/shared/DevToolsSection';
 export const ConsistencyValidationSection = () => {
   const [selectedWorldId, setSelectedWorldId] = useState<string>('');
   const { facts, getFacts } = useLoreStore();
+  const { worlds } = useWorldStore();
 
   // Get available world IDs from lore facts
   const availableWorldIds = useMemo(() => {
@@ -95,28 +98,28 @@ export const ConsistencyValidationSection = () => {
     <div className="flex flex-col space-y-3">
       {/* World Selection */}
       <DevToolsSection>
-        <label className="block text-xs text-gray-100 mb-1">
+        <label className="block text-xs text-gray-900 mb-1">
           Select World for Consistency Analysis:
         </label>
-        <select
-          value={selectedWorldId}
+        <Select 
+          value={selectedWorldId} 
           onChange={(e) => setSelectedWorldId(e.target.value)}
-          className="w-full bg-gray-900 text-gray-100 border border-gray-500 rounded px-2 py-1 text-xs"
+          className="text-xs"
         >
           <option value="">-- Select a World --</option>
           {availableWorldIds.map(worldId => (
             <option key={worldId} value={worldId}>
-              {worldId}
+              {worlds[worldId]?.name || worldId}
             </option>
           ))}
-        </select>
+        </Select>
       </DevToolsSection>
 
       {selectedWorldId && (
         <>
           {/* Lore Statistics */}
           <DevToolsSection title="Lore Statistics">
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-100">
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-900">
               <div>Total Facts: {loreStats.totalFacts}</div>
               <div>High Importance: {loreStats.highImportance}</div>
               <div>Characters: {loreStats.characters}</div>
@@ -128,7 +131,7 @@ export const ConsistencyValidationSection = () => {
 
           {/* Generated Consistency Instructions */}
           <DevToolsSection title="Generated Consistency Instructions">
-            <div className="bg-gray-900 p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-gray-100">
+            <div className="bg-white p-2 rounded text-xs font-mono whitespace-pre-wrap max-h-40 overflow-y-auto text-gray-900 border border-gray-300">
               {consistencyInstructions || 'No instructions generated'}
             </div>
           </DevToolsSection>
@@ -138,7 +141,7 @@ export const ConsistencyValidationSection = () => {
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={loreContext} 
-                className="bg-gray-900"
+                className="bg-white"
               />
             </div>
           </DevToolsSection>
@@ -148,7 +151,7 @@ export const ConsistencyValidationSection = () => {
             <div className="max-h-48 overflow-y-auto">
               <JsonViewer 
                 data={worldLoreFacts} 
-                className="bg-gray-900"
+                className="bg-white"
               />
             </div>
           </DevToolsSection>
@@ -158,9 +161,9 @@ export const ConsistencyValidationSection = () => {
             <div className="space-y-2 text-xs">
               {loreContext.characters.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-50">Characters:</div>
+                  <div className="font-medium text-gray-900">Characters:</div>
                   {loreContext.characters.map((char, idx) => (
-                    <div key={idx} className="ml-2 text-gray-100">
+                    <div key={idx} className="ml-2 text-gray-700">
                       {char.name} - {char.importance} importance - Traits: {char.traits.join(', ')}
                     </div>
                   ))}
@@ -169,9 +172,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.locations.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-50">Locations:</div>
+                  <div className="font-medium text-gray-900">Locations:</div>
                   {loreContext.locations.map((loc, idx) => (
-                    <div key={idx} className="ml-2 text-gray-100">
+                    <div key={idx} className="ml-2 text-gray-700">
                       {loc.name} ({loc.type}) - {loc.importance} importance
                     </div>
                   ))}
@@ -180,9 +183,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.worldRules.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-50">World Rules:</div>
+                  <div className="font-medium text-gray-900">World Rules:</div>
                   {loreContext.worldRules.map((rule, idx) => (
-                    <div key={idx} className="ml-2 text-gray-100">
+                    <div key={idx} className="ml-2 text-gray-700">
                       {rule.rule} - {rule.importance} importance
                     </div>
                   ))}
@@ -191,9 +194,9 @@ export const ConsistencyValidationSection = () => {
               
               {loreContext.historicalEvents.length > 0 && (
                 <div>
-                  <div className="font-medium text-gray-50">Historical Events:</div>
+                  <div className="font-medium text-gray-900">Historical Events:</div>
                   {loreContext.historicalEvents.map((event, idx) => (
-                    <div key={idx} className="ml-2 text-gray-100">
+                    <div key={idx} className="ml-2 text-gray-700">
                       {event.event} - {event.importance} importance
                     </div>
                   ))}
@@ -205,7 +208,7 @@ export const ConsistencyValidationSection = () => {
       )}
 
       {!selectedWorldId && availableWorldIds.length === 0 && (
-        <div className="text-xs text-gray-200">
+        <div className="text-xs text-gray-700">
           No lore facts found. Create some lore in a game session to test consistency validation.
         </div>
       )}

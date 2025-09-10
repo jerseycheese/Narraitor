@@ -111,7 +111,7 @@ export default function DevToolsTestPage() {
   };
   
   return (
-    <div className="min-h-screen p-6" style={{ paddingBottom: '60vh' }}> {/* Extra padding at bottom to ensure visibility */}
+    <div className="min-h-screen p-6 pb-[60vh]"> {/* Extra padding at bottom to ensure visibility */}
         <h2 className="text-2xl font-bold mb-6">DevTools Test Harness</h2>
         
         <div className="mb-6 p-4 border rounded bg-gray-100">

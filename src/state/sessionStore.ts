@@ -533,6 +533,49 @@ export const useSessionStore = create<SessionStore>()(
     return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;
   },
   
+  // Fix existing session narrative counts by recalculating from narrative store
+  fixExistingSessionNarrativeCounts: async () => {
+    try {
+      const { useNarrativeStore } = await import('./narrativeStore');
+      const narrativeStore = useNarrativeStore.getState();
+      const state = get();
+      
+      console.log('[SessionStore] Fixing narrative counts...');
+      console.log('[SessionStore] Saved sessions:', Object.keys(state.savedSessions));
+      console.log('[SessionStore] Narrative segments by session:', narrativeStore.sessionSegments);
+      
+      // Update each saved session's narrative count
+      const updatedSessions = { ...state.savedSessions };
+      let hasUpdates = false;
+      
+      for (const sessionId of Object.keys(updatedSessions)) {
+        const sessionSegments = narrativeStore.sessionSegments[sessionId] || [];
+        const actualCount = sessionSegments.length;
+        const currentCount = updatedSessions[sessionId].narrativeCount;
+        
+        console.log(`[SessionStore] Session ${sessionId}: current count=${currentCount}, actual count=${actualCount}`);
+        
+        if (currentCount !== actualCount) {
+          updatedSessions[sessionId] = {
+            ...updatedSessions[sessionId],
+            narrativeCount: actualCount
+          };
+          hasUpdates = true;
+          logger.debug('Fixed narrative count for session:', sessionId, actualCount);
+        }
+      }
+      
+      if (hasUpdates) {
+        set({ savedSessions: updatedSessions });
+        logger.debug('Updated narrative counts for existing sessions');
+      } else {
+        console.log('[SessionStore] No updates needed');
+      }
+    } catch (error) {
+      logger.error('Failed to fix existing session narrative counts:', error);
+    }
+  },
+
   shouldShowOnboarding: () => {
     const state = get();
     return Object.keys(state.savedSessions).length === 0 && !state.onboardingCompleted;

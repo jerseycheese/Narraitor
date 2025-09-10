@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore } from '@/state/characterStore';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { ActionButtonGroup } from '@/components/shared/ActionButtonGroup';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import { cleanupSessionData } from '@/lib/utils/sessionCleanup';
+import '@/utils/debugHelpers';
 
 export function QuickPlay() {
   const router = useRouter();
@@ -24,10 +25,16 @@ export function QuickPlay() {
   const resumeSavedSession = useSessionStore(state => state.resumeSavedSession);
   const shouldShowOnboarding = useSessionStore(state => state.shouldShowOnboarding);
   const onboardingCompleted = useSessionStore(state => state.onboardingCompleted);
+  const fixExistingSessionNarrativeCounts = useSessionStore(state => state.fixExistingSessionNarrativeCounts);
   const actualWorlds = worlds;
   const actualCharacters = characters;
   const actualSavedSessions = savedSessions;
   const actualOnboardingCompleted = onboardingCompleted;
+  
+  // Fix existing session narrative counts on component mount
+  useEffect(() => {
+    fixExistingSessionNarrativeCounts();
+  }, [fixExistingSessionNarrativeCounts]);
   
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

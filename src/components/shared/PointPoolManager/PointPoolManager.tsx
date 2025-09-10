@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { CheckCircle } from 'lucide-react';
 import RangeSlider from '@/components/ui/RangeSlider';
 import { wizardStyles } from '@/components/shared/wizard';
 
@@ -87,9 +88,7 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
           <div className="min-h-[28px] flex items-center">
             {remaining === 0 && (
               <span className="flex items-center gap-2 text-green-700 text-sm font-medium">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
+                <CheckCircle className="w-5 h-5" aria-hidden="true" />
                 All points allocated!
               </span>
             )}
@@ -141,9 +140,8 @@ export const PointPoolManager: React.FC<PointPoolManagerProps> = ({
               {/* Visual indicator when at max due to points */}
               {allocation.value === calculateMaxValue(allocation) && calculateMaxValue(allocation) < allocation.maxValue && (
                 <div className="flex items-center gap-2 text-xs text-amber-500 mt-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
+                  {/* Using a simple dot indicator via CSS */}
+                  <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden="true" />
                   <span>No points left. Reduce others to increase.</span>
                 </div>
               )}

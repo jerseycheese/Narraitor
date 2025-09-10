@@ -113,9 +113,9 @@ export const LoreManagementSection: React.FC = () => {
 
   const categoryColors: Record<LoreCategory, string> = {
     characters: 'text-blue-700',
-    locations: 'text-green-500',
+    locations: 'text-green-700',
     events: 'text-blue-700',
-    rules: 'text-amber-500'
+    rules: 'text-amber-700'
   };
 
   return (

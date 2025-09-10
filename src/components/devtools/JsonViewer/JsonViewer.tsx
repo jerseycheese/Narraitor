@@ -58,7 +58,7 @@ export const JsonViewer = ({ data, className = '' }: JsonViewerProps) => {
   return (
     <pre
       data-testid="json-viewer"
-      className={`text-xs font-mono p-2 rounded overflow-auto max-h-60 bg-gray-900 border border-gray-700 text-gray-100 ${className}`}
+      className={`text-xs font-mono p-3 rounded overflow-auto max-h-60 bg-gray-50 border border-gray-300 text-gray-900 ${className}`}
     >
       {!isMounted ? (
         // Simple content for server-side rendering
@@ -89,15 +89,15 @@ function syntaxHighlight(json: string): string {
     return sanitized.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null|undefined|\[Circular Reference\])\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, 
       (match) => {
-        let cls = 'color: #3b82f6;'; // number - blue-500
+        let cls = 'color: #1d4ed8;'; // number - blue-700
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
-            cls = 'color: #ffffff; font-weight: bold;'; // key - white
+            cls = 'color: #374151; font-weight: 600;'; // key - gray-700, semibold
           } else {
-            cls = 'color: #22c55e;'; // string - green-500
+            cls = 'color: #059669;'; // string - emerald-600
           }
         } else if (/true|false/.test(match)) {
-          cls = 'color: #f59e0b;'; // boolean - amber-500
+          cls = 'color: #d97706;'; // boolean - amber-600
         } else if (/null|undefined|\[Circular Reference\]|\[Function[^\]]*\]/.test(match)) {
           cls = 'color: #6b7280;'; // null, undefined, circular ref, functions - gray-500
         }

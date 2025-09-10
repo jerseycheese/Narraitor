@@ -41,7 +41,7 @@ It provides developers with fine-grained control over AI response behavior for c
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
         <div className="bg-gray-900 p-4 text-gray-200">
-          <div style={{ maxWidth: '700px' }}>
+          <div className="max-w-[700px]">
             <Story />
           </div>
         </div>
@@ -243,7 +243,7 @@ export const CompactLayout: Story = {
     (Story) => (
       <DevToolsProvider initialIsOpen={true}>
         <div className="bg-gray-900 p-2 text-gray-200">
-          <div style={{ maxWidth: '400px' }}>
+          <div className="max-w-[400px]">
             <Story />
           </div>
         </div>

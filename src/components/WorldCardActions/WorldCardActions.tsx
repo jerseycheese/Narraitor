@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Plus, Play, CheckCircle } from 'lucide-react';
 
 interface WorldCardActionsProps {
   worldId?: string;
@@ -40,9 +41,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
               className="flex-1 bg-green-500 hover:bg-green-700 text-white font-medium"
               data-testid="world-card-actions-create-character-button"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
+              <Plus className="w-4 h-4" aria-hidden="true" />
               Create Character
             </Button>
             <Button 
@@ -51,10 +50,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
               className="flex-1 bg-blue-700 hover:bg-blue-900 text-white font-medium"
               data-testid="world-card-actions-play-button"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <Play className="w-4 h-4" aria-hidden="true" />
               Play
             </Button>
           </>
@@ -65,9 +61,7 @@ const WorldCardActions: React.FC<WorldCardActionsProps> = ({
             className="w-full bg-green-500 hover:bg-green-700 text-white font-medium"
             data-testid="world-card-actions-make-active-button"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CheckCircle className="w-4 h-4" aria-hidden="true" />
             Make Active World
           </Button>
         )}

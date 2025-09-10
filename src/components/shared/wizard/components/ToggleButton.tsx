@@ -12,7 +12,7 @@ export interface ToggleButtonProps {
 
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
   isActive,
-  activeLabel = 'Selected ✓',
+  activeLabel = 'Selected',
   inactiveLabel = 'Excluded',
   onClick,
   testId,

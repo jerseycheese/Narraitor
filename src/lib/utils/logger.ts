@@ -14,11 +14,13 @@ interface LogColors {
   [key: string]: string;
 }
 
+import { primitiveColors } from '@/lib/design-tokens';
+
 const LOG_COLORS: LogColors = {
-  [LogLevel.DEBUG]: 'color: #6b7280; font-weight: normal;', // gray-500
-  [LogLevel.INFO]: 'color: #3b82f6; font-weight: normal;',   // blue-500  
-  [LogLevel.WARN]: 'color: #f59e0b; font-weight: bold;',     // amber-500
-  [LogLevel.ERROR]: 'color: #ef4444; font-weight: bold;'     // red-500
+  [LogLevel.DEBUG]: `color: ${primitiveColors.gray[500]}; font-weight: normal;`,
+  [LogLevel.INFO]: `color: ${primitiveColors.blue[500]}; font-weight: normal;`,
+  [LogLevel.WARN]: `color: ${primitiveColors.amber[500]}; font-weight: bold;`,
+  [LogLevel.ERROR]: `color: ${primitiveColors.red[500]}; font-weight: bold;`
 };
 
 export class Logger {

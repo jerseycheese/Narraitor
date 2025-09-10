@@ -33,7 +33,7 @@ export default function ShadcnTestPage() {
               <Button size="sm">Small</Button>
               <Button size="default">Default</Button>
               <Button size="lg">Large</Button>
-              <Button size="icon"><Settings className="w-4 h-4" /></Button>
+              <Button size="icon"><Settings className="w-4 h-4" aria-hidden="true" /></Button>
             </div>
           </div>
 
@@ -43,11 +43,11 @@ export default function ShadcnTestPage() {
               <Button>Normal</Button>
               <Button disabled>Disabled</Button>
               <Button variant="outline">
-                <BarChart className="w-4 h-4 mr-2" />
+                <BarChart className="w-4 h-4 mr-2" aria-hidden="true" />
                 With Icon
               </Button>
               <Button variant="destructive">
-                <Trash className="w-4 h-4 mr-2" />
+                <Trash className="w-4 h-4 mr-2" aria-hidden="true" />
                 Delete
               </Button>
             </div>
@@ -59,7 +59,7 @@ export default function ShadcnTestPage() {
         <h2 className="text-2xl font-semibold">Input Component Showcase</h2>
         <div className="bg-blue-50 p-4 rounded-lg mb-4">
           <p className="text-sm text-blue-900 font-medium mb-2">
-            <Clipboard className="w-4 h-4 inline mr-1" />Tab Navigation Test Instructions:
+            <Clipboard className="w-4 h-4 inline mr-1" aria-hidden="true" />Tab Navigation Test Instructions:
           </p>
           <ul className="text-sm text-blue-700 space-y-1">
             <li>• Press Tab key to navigate forward between inputs</li>

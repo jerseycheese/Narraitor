@@ -38,11 +38,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <main 
                   id="main-content" 
                   tabIndex={-1} 
-                  className="min-h-screen pb-12 md:pb-14"
+                  className="min-h-[calc(100vh-4rem-3rem)]"
                 >
                   {children}
                 </main>
-                {/* DevTools at the very bottom of the page in normal flow */}
+                {/* DevTools in normal flow to avoid interfering with screenshots */}
                 <ClientOnlyDevTools />
                 {/* Toast container - renders all active toasts */}
                 <Toaster />

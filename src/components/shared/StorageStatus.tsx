@@ -203,8 +203,8 @@ export function StorageStatus({ variant = 'floating', className = '' }: StorageS
 
         {storageState.status === StorageStatusEnum.RECOVERING && (
           <div className="mt-3">
-            <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar">
-              <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+            <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={60}>
+              <div className="bg-blue-500 h-2 rounded-full animate-pulse w-3/5"></div>
             </div>
           </div>
         )}

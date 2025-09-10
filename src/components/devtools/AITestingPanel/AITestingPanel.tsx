@@ -5,6 +5,8 @@ import type { AITestConfig, AIResponse } from '@/types';
 // Using a mock implementation for testing purposes
 import { createTestContext } from '@/lib/ai/contextOverride';
 import { requestLogger } from '@/lib/ai/requestLogger';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface AITestingPanelProps {
   className?: string;
@@ -192,93 +194,90 @@ export function AITestingPanel({ className = '' }: AITestingPanelProps) {
 
   return (
     <div className={`flex flex-col space-y-3 ${className}`}>
-      <h3 className="devtools-panel text-sm font-medium !my-0 !mb-3">AI Testing Panel</h3>
+      <h3 className="text-sm font-medium text-gray-900 mb-3">AI Testing Panel</h3>
       
       {/* World Override Section */}
-      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-white">World Override</h4>
+      <div className="bg-gray-100 p-3 rounded border border-gray-300">
+        <h4 className="text-xs font-medium mb-2 text-gray-900">World Override</h4>
         <div className="space-y-1">
           <div>
-            <label htmlFor="world-name" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">World Name:</label>
-            <input
+            <label htmlFor="world-name" className="block text-xs text-gray-700 mb-0.5">World Name:</label>
+            <Input
               id="world-name"
               type="text"
               value={testConfig.worldOverride?.name || ''}
               onChange={handleWorldNameChange}
               placeholder="Enter world name"
-              className="devtools-panel w-full bg-gray-700 text-white border-gray-500 placeholder-gray-400"
+              className=""
             />
           </div>
           <div>
-            <label htmlFor="world-genre" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">World Genre:</label>
-            <input
+            <label htmlFor="world-genre" className="block text-xs text-gray-700 mb-0.5">World Genre:</label>
+            <Input
               id="world-genre"
               type="text"
               value={testConfig.worldOverride?.genre || ''}
               onChange={handleWorldGenreChange}
               placeholder="Enter world genre"
-              className="devtools-panel w-full bg-gray-700 text-white border-gray-500 placeholder-gray-400"
+              className=""
             />
           </div>
         </div>
       </div>
 
       {/* Character Override Section */}
-      <div className="devtools-panel bg-gray-700 p-2 rounded border border-gray-700">
-        <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-white">Character Override</h4>
+      <div className="bg-gray-100 p-3 rounded border border-gray-300">
+        <h4 className="text-xs font-medium mb-2 text-gray-900">Character Override</h4>
         <div>
-          <label htmlFor="character-name" className="devtools-panel block !text-xs text-white !my-0 mb-0.5">Character Name:</label>
-          <input
+          <label htmlFor="character-name" className="block text-xs text-gray-700 mb-0.5">Character Name:</label>
+          <Input
             id="character-name"
             type="text"
             value={testConfig.characterOverride?.name || ''}
             onChange={handleCharacterNameChange}
             placeholder="Enter character name"
-            className="devtools-panel w-full bg-gray-700 text-gray-200 border-gray-500 placeholder-gray-500"
+            className=""
           />
         </div>
       </div>
 
       {/* Generate Button */}
       <div className="mt-3">
-        <button
+        <Button
           onClick={handleGenerateNarrative}
           disabled={isGenerating}
-          className={`devtools-panel w-full transition-colors ${
-            isGenerating 
-              ? '!bg-gray-100 cursor-not-allowed' 
-              : '!bg-blue-500 hover:!bg-blue-500 cursor-pointer'
-          }`}
+          className="w-full"
+          variant="default"
         >
           {isGenerating ? 'Generating...' : 'Generate Narrative'}
-        </button>
+        </Button>
       </div>
 
       {/* Results Section */}
       {isGenerating && (
-        <div className="bg-amber-700 bg-opacity-30 p-2 rounded border border-amber-50000">
-          <p className="devtools-panel !text-xs text-amber-200 !my-0">Generating narrative...</p>
+        <div className="bg-amber-50 p-2 rounded border border-amber-200">
+          <p className="text-xs text-amber-900">Generating narrative...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-900 bg-opacity-30 p-2 rounded border border-red-500">
-          <p className="devtools-panel !text-xs text-red-200 !my-0">Error: {error}</p>
+        <div className="bg-red-50 p-2 rounded border border-red-200">
+          <p className="text-xs text-red-900">Error: {error}</p>
         </div>
       )}
 
       {result && (
-        <div className="bg-green-900 bg-opacity-30 p-2 rounded border border-green-500">
-          <h4 className="devtools-panel !text-xs !font-medium !my-0 !mb-2 text-green-200">Generated Results</h4>
+        <div className="bg-green-50 p-2 rounded border border-green-200">
+          <h4 className="text-xs font-medium mb-2 text-green-900">Generated Results</h4>
           <div className="mb-2">
-            <p className="devtools-panel !text-xs text-green-100 !my-0">{result.text}</p>
+            <p className="text-xs text-green-900">{result.text}</p>
           </div>
           {result.choices && result.choices.length > 0 && (
             <div>
-              <h5 className="devtools-panel !text-xs !font-medium !my-0 !mb-1 text-green-200">Choices:</h5>
-              <ul className="text-xs text-green-100 my-0 p-0 list-none space-y-1">
+              <h5 className="text-xs font-medium mb-1 text-green-900">Choices:</h5>
+              <ul className="text-xs text-green-900 list-none space-y-1">
                 {result.choices.map((choice, index) => (
-                  <li key={index} className="pl-2 border-l-2 border-green-500 text-xs">• {choice}</li>
+                  <li key={index} className="pl-2 border-l-2 border-green-500 text-xs text-green-900">• {choice}</li>
                 ))}
               </ul>
             </div>

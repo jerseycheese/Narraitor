@@ -16,7 +16,8 @@ import {
   truncate,
   formatAIResponse 
 } from '@/lib/utils';
-import { formatSessionDuration, getSystemEventIcon } from '@/lib/utils/sessionUtils';
+import { formatSessionDuration } from '@/lib/utils/sessionUtils';
+import { Play, Square, Settings, X } from 'lucide-react';
 
 /**
  * Sanitizes HTML content to only allow safe formatting tags from formatAIResponse
@@ -59,8 +60,12 @@ const EntryDetail: React.FC<{ entry: JournalEntry }> = ({ entry }) => {
           isSystemEvent ? 'text-gray-700' : 'text-amber-900'
         }`}>
           {isSystemEvent && (
-            <span className="mr-2" role="img" aria-label="System event">
-              {getSystemEventIcon(entry.type)}
+            <span className="mr-2 inline-flex items-center" aria-label="System event">
+              {entry.type === 'session_start' && <Play className="w-4 h-4" aria-hidden="true" />}
+              {entry.type === 'session_end' && <Square className="w-4 h-4" aria-hidden="true" />}
+              {entry.type !== 'session_start' && entry.type !== 'session_end' && (
+                <Settings className="w-4 h-4" aria-hidden="true" />
+              )}
             </span>
           )}
           {entry.title || titleCase(entry.type.replace('_', ' '))}
@@ -200,7 +205,7 @@ export const JournalModal: React.FC<JournalModalProps> = ({
             aria-label="Close journal"
             className="text-amber-700 hover:text-amber-900 hover:bg-amber-200"
           >
-            ✕
+            <X className="w-4 h-4" aria-hidden="true" />
           </Button>
         </div>
 
@@ -268,8 +273,12 @@ export const JournalModal: React.FC<JournalModalProps> = ({
                             isSystemEvent ? 'text-gray-700' : 'text-amber-900'
                           }`}>
                             {isSystemEvent && (
-                              <span className="mr-1.5 text-xs" role="img" aria-label="System event">
-                                {getSystemEventIcon(entry.type)}
+                              <span className="mr-1.5 text-xs inline-flex items-center" aria-label="System event">
+                                {entry.type === 'session_start' && <Play className="w-3 h-3" aria-hidden="true" />}
+                                {entry.type === 'session_end' && <Square className="w-3 h-3" aria-hidden="true" />}
+                                {entry.type !== 'session_start' && entry.type !== 'session_end' && (
+                                  <Settings className="w-3 h-3" aria-hidden="true" />
+                                )}
                               </span>
                             )}
                             {entry.title || titleCase(entry.type.replace('_', ' '))}

@@ -30,7 +30,7 @@ It allows developers to quickly test different scenarios without creating full w
   decorators: [
     (Story) => (
       <div className="bg-gray-900 p-4 text-gray-200">
-        <div style={{ maxWidth: '600px' }}>
+        <div className="max-w-[600px]">
           <Story />
         </div>
       </div>
@@ -93,7 +93,7 @@ export const Compact: Story = {
   decorators: [
     (Story) => (
       <div className="bg-gray-900 p-2 text-gray-200">
-        <div style={{ maxWidth: '400px' }}>
+        <div className="max-w-[400px]">
           <Story />
         </div>
       </div>
