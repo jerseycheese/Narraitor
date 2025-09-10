@@ -16,7 +16,7 @@ const meta: Meta<typeof PageLayout> = {
         **Features:**
         - Consistent header with title, description, and actions
         - Responsive design with proper spacing
-        - Configurable container width
+        - Fixed 7xl container width to match navigation
         - Semantic HTML structure
         - Built-in action button area
         `,
@@ -31,11 +31,6 @@ const meta: Meta<typeof PageLayout> = {
     description: {
       control: 'text',
       description: 'Optional description text below the title'
-    },
-    maxWidth: {
-      control: 'select',
-      options: ['sm', 'md', 'lg', 'xl', '2xl', '4xl', '6xl', '7xl'],
-      description: 'Maximum width of the page content'
     },
     actions: {
       control: false,
@@ -214,28 +209,15 @@ export const CharactersPageExample: Story = {
   }
 };
 
-export const DifferentWidths: Story = {
-  render: () => (
-    <div className="space-y-8">
-      <PageLayout
-        title="Small Width (sm)"
-        maxWidth="sm"
-        description="This layout uses max-width: sm"
-      >
-        <div className="bg-white rounded-lg shadow p-6">
-          <p>Content with small max width</p>
-        </div>
-      </PageLayout>
-      
-      <PageLayout
-        title="Large Width (6xl)"
-        maxWidth="6xl"
-        description="This layout uses max-width: 6xl"
-      >
-        <div className="bg-white rounded-lg shadow p-6">
-          <p>Content with large max width</p>
-        </div>
-      </PageLayout>
-    </div>
-  )
+export const ConsistentWidth: Story = {
+  args: {
+    title: 'Consistent Width Layout',
+    description: 'All pages now use the same max-width (7xl) to match navigation',
+    children: (
+      <div className="bg-white rounded-lg shadow p-6">
+        <p>Content with consistent 7xl max width that matches the navigation bar.</p>
+        <p className="mt-2 text-gray-600">This ensures all page content aligns perfectly with the navigation structure.</p>
+      </div>
+    )
+  }
 };

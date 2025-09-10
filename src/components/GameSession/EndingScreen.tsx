@@ -254,7 +254,6 @@ export function EndingScreen() {
       <PageLayout
         title="The End"
         description={`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-        maxWidth="4xl"
         className={`ending-screen ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)}`}
       >
         <div className="space-y-6">

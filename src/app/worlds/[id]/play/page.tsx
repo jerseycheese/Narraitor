@@ -32,7 +32,7 @@ export default function PlayPage() {
   // For server rendering, show a simple placeholder
   if (!isClient) {
     return (
-      <PageLayout title="Game Session" maxWidth="7xl">
+      <PageLayout title="Game Session">
         <div className="p-4 text-center">
           <p>Creating your game...</p>
         </div>
@@ -49,7 +49,7 @@ export default function PlayPage() {
   const pageTitle = world ? `Playing in ${world.name}` : 'Game Session';
 
   return (
-    <PageLayout maxWidth="7xl" className="pb-0">
+    <PageLayout className="pb-0">
       {/* Ultra-thin world hero - always show with image or themed background */}
       {world && (
         <div className="mb-6">
