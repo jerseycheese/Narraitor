@@ -32,103 +32,149 @@ fi
 
 echo "📥 Downloading artifacts from run $RUN_ID..."
 
+# Always download into an isolated directory to avoid collisions with repo files (e.g., data/)
+ARTIFACTS_DIR=".ci-artifacts-$RUN_ID"
+rm -rf "$ARTIFACTS_DIR"
+mkdir -p "$ARTIFACTS_DIR"
+
 # Clean up any existing artifacts to avoid conflicts
 if [ -d "playwright-html-report" ]; then
     echo "🧹 Cleaning up existing HTML report..."
     rm -rf playwright-html-report
 fi
 
+# Keep the repo's own data/ directory; only clean report-specific dirs
+if [ -d "playwright-report" ]; then
+    echo "🧹 Cleaning up existing playwright-report directory..."
+    rm -rf playwright-report
+fi
+
 if [ -d "playwright-test-results" ]; then
-    echo "🧹 Cleaning up existing test results..."
+    echo "🧹 Cleaning up existing test results cache..."
     rm -rf playwright-test-results
 fi
 
-# Clean up any existing test result folders
+# Clean up any previously flattened test result folders (from prior downloads)
 if ls *-chromium* 1> /dev/null 2>&1; then
-    echo "🧹 Cleaning up existing test result folders..."
+    echo "🧹 Cleaning up stray test result folders at repo root..."
     rm -rf *-chromium*
 fi
 
-if [ -d "data" ]; then
-    echo "🧹 Cleaning up existing data directory..."
-    rm -rf data
-fi
-
-if [ -d "trace" ]; then
-    echo "🧹 Cleaning up existing trace directory..."
-    rm -rf trace
-fi
-
+# Avoid deleting repo's app-level data/; the report will come with its own under playwright-report/
 if [ -f "index.html" ]; then
-    echo "🧹 Cleaning up existing index.html..."
+    echo "🧹 Cleaning up stray index.html from prior report..."
     rm -f index.html
 fi
 
 # Download the artifacts
 echo "📦 Downloading test results..."
-gh run download $RUN_ID --name e2e-test-failures
+gh run download $RUN_ID --name e2e-test-failures --dir "$ARTIFACTS_DIR"
 
 echo "📦 Downloading HTML report..."
-gh run download $RUN_ID --name playwright-html-report
+gh run download $RUN_ID --name playwright-html-report --dir "$ARTIFACTS_DIR"
 
 # Note: e2e-test-failures contains all the test results, images and diffs
 # playwright-html-report contains the interactive HTML report
 
 # Check what was downloaded and organize it
 # The artifacts are downloaded as individual folders in the current directory
-TEST_FOLDERS=$(ls -d *-chromium* 2>/dev/null | wc -l | xargs)
-if [ "$TEST_FOLDERS" -gt 0 ]; then
-    # Create organized directory structure
-    mkdir -p playwright-test-results
-    mv *-chromium* playwright-test-results/ 2>/dev/null || true
-    
-    echo "✅ Downloaded test results successfully!"
-    echo "🖼️  Test Results: playwright-test-results/ (contains actual, expected, diff images and videos)"
-    echo ""
-    echo "📁 Test result folders:"
-    ls -1 playwright-test-results/ | head -10
-    if [ $(ls -1 playwright-test-results/ | wc -l) -gt 10 ]; then
-        echo "... and $(( $(ls -1 playwright-test-results/ | wc -l) - 10 )) more"
-    fi
-    
-    echo ""
-    echo "💡 To view individual test failures:"
-    echo "   • Open any folder in playwright-test-results/"
-    echo "   • View *-diff.png to see visual differences"
-    echo "   • Compare *-actual.png vs *-expected.png"
-    echo "   • Watch video.webm to see test execution"
-    echo ""
-    echo "🎯 Files downloaded:"
-    echo "   📁 Test Results: $(pwd)/playwright-test-results/"
-    if [ -d "playwright-test-results" ]; then
-        echo "   🖼️  Visual Diffs: $(pwd)/playwright-test-results/"
-    fi
-else
-    echo "❌ Failed to download test results. Check if artifacts are available."
-fi
 
-# Organize HTML report if it was downloaded
-if [ -f "index.html" ]; then
+# Prefer the canonical Playwright report directory if it exists
+if [ -d "$ARTIFACTS_DIR/playwright-report" ]; then
+    echo "📊 Found playwright-report/ artifact. Organizing..."
+    mv "$ARTIFACTS_DIR/playwright-report" playwright-html-report
+else
+    echo "ℹ️ No playwright-report/ directory found; using fallback organization."
     mkdir -p playwright-html-report
-    # Move HTML report files to organized directory
-    mv index.html playwright-html-report/ 2>/dev/null || true
-    # Move any other report assets (CSS, JS files that might be downloaded)
-    for file in *.js *.css *.png *.svg; do
-        if [ -f "$file" ] && [ "$file" != "next.config.js" ] && [ "$file" != "postcss.config.js" ]; then
+    # If a top-level data/ or trace/ came with the report, move them under the report directory
+    if [ -d "$ARTIFACTS_DIR/data" ]; then
+        echo "📁 Moving downloaded report data/ into playwright-html-report/"
+        mv "$ARTIFACTS_DIR/data" playwright-html-report/data
+    fi
+    if [ -d "$ARTIFACTS_DIR/trace" ]; then
+        echo "📁 Moving downloaded trace/ into playwright-html-report/"
+        mv "$ARTIFACTS_DIR/trace" playwright-html-report/trace
+    fi
+    # Move index.html and any bundled assets into the report directory
+    if [ -f "$ARTIFACTS_DIR/index.html" ]; then
+        mv "$ARTIFACTS_DIR/index.html" playwright-html-report/
+    fi
+    for file in "$ARTIFACTS_DIR"/*.js "$ARTIFACTS_DIR"/*.css "$ARTIFACTS_DIR"/*.png "$ARTIFACTS_DIR"/*.svg; do
+        if [ -f "$file" ]; then
             mv "$file" playwright-html-report/ 2>/dev/null || true
         fi
     done
-    
-    echo "📊 HTML Report: $(pwd)/playwright-html-report/"
-    echo ""
-    echo "🌐 To view the interactive HTML report:"
-    echo "   # Option 1: Direct file opening"
-    echo "   open playwright-html-report/index.html"
-    echo "   "
-    echo "   # Option 2: Simple HTTP server (if direct opening has CORS issues)"
-    echo "   cd playwright-html-report && python3 -m http.server 8080"
-    echo "   # Then open http://localhost:8080"
-    echo "   "
-    echo "   # Option 3: Playwright command (may have blank tab issues)"
-    echo "   npx playwright show-report playwright-html-report"
+fi
+
+# Now place test results where the HTML expects them: under playwright-html-report/test-results
+TEST_ROOT="playwright-html-report/test-results"
+mkdir -p "$TEST_ROOT"
+
+# Case A: Artifact provided a test-results/ directory
+if [ -d "$ARTIFACTS_DIR/test-results" ]; then
+    echo "📁 Copying test-results/ into report directory..."
+    # Copy to preserve original in case user wants it at repo root
+    cp -R "$ARTIFACTS_DIR/test-results"/* "$TEST_ROOT/" 2>/dev/null || true
+fi
+
+# Case B: Artifact flattened result folders (e.g., *-chromium) at repo root
+FLAT_COUNT=$(ls -d "$ARTIFACTS_DIR"/*-chromium* 2>/dev/null | wc -l | xargs)
+if [ "$FLAT_COUNT" -gt 0 ]; then
+    echo "📁 Moving flattened *-chromium* folders into report's test-results/"
+    mv "$ARTIFACTS_DIR"/*-chromium* "$TEST_ROOT/" 2>/dev/null || true
+fi
+
+if [ "$(ls -A $TEST_ROOT 2>/dev/null | wc -l | xargs)" = "0" ]; then
+    echo "⚠️  No test result folders detected under $TEST_ROOT. The HTML may show missing images."
+else
+    echo "✅ Test results ready at $TEST_ROOT"
+fi
+
+# Final pointers
+if [ -d "playwright-html-report" ]; then
+    echo "📊 HTML Report prepared at: $(pwd)/playwright-html-report/"
+
+    # Automatically serve the report locally (Option 1) and open browser
+    SERVE_DIR="playwright-html-report"
+    # Pick an available port (prefer 8080)
+    CANDIDATE_PORTS="8080 8081 8082 8090 8091"
+    PORT_CHOSEN=""
+    for p in $CANDIDATE_PORTS; do
+        if command -v lsof >/dev/null 2>&1; then
+            lsof -i :"$p" >/dev/null 2>&1 || { PORT_CHOSEN="$p"; break; }
+        else
+            # If lsof is unavailable, try first candidate
+            PORT_CHOSEN="$p"; break
+        fi
+    done
+    PORT_CHOSEN=${PORT_CHOSEN:-8080}
+
+    echo "🚀 Starting local server for report on http://localhost:$PORT_CHOSEN ..."
+    ( 
+      cd "$SERVE_DIR" || exit 0
+      if command -v python3 >/dev/null 2>&1; then
+        nohup python3 -m http.server "$PORT_CHOSEN" > .playwright-report-server.log 2>&1 & echo $! > .playwright-report-server.pid
+      elif command -v python >/dev/null 2>&1; then
+        nohup python -m SimpleHTTPServer "$PORT_CHOSEN" > .playwright-report-server.log 2>&1 & echo $! > .playwright-report-server.pid
+      elif command -v ruby >/dev/null 2>&1; then
+        nohup ruby -run -e httpd . -p "$PORT_CHOSEN" > .playwright-report-server.log 2>&1 & echo $! > .playwright-report-server.pid
+      else
+        echo "⚠️ No python3/python/ruby found to serve the report. Open index.html directly: $(pwd)/index.html"
+        exit 0
+      fi
+    )
+    SERVER_PID="$(cat "$SERVE_DIR/.playwright-report-server.pid" 2>/dev/null || echo "")"
+    if [ -n "$SERVER_PID" ]; then
+      echo "✅ Report server running (PID $SERVER_PID): http://localhost:$PORT_CHOSEN"
+      # Best-effort open in default browser
+      if command -v open >/dev/null 2>&1; then
+        open "http://localhost:$PORT_CHOSEN" >/dev/null 2>&1 || true
+      elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "http://localhost:$PORT_CHOSEN" >/dev/null 2>&1 || true
+      fi
+      echo "ℹ️  To stop the server: kill $SERVER_PID  # from repo root, or rm $SERVE_DIR/.playwright-report-server.pid"
+      echo "📝 Logs: $SERVE_DIR/.playwright-report-server.log"
+    else
+      echo "⚠️ Failed to start report server. You can still open the report file: $SERVE_DIR/index.html"
+    fi
 fi
