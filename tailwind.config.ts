@@ -20,9 +20,7 @@ const config: Config = {
       
       // Semantic aliases for better DX
       neutral: primitiveColors.gray,
-      success: primitiveColors.green,
       danger: primitiveColors.red,
-      warning: primitiveColors.amber,
       
       // shadcn/ui semantic tokens (extend with our colors)
       border: 'hsl(var(--border))',

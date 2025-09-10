@@ -61,10 +61,12 @@ export const createTestNarrativeSegment = (sessionId: string, content: string = 
   const segmentId = narrativeStore.addSegment(sessionId, {
     type: 'scene',
     content,
+    timestamp: new Date(),
+    updatedAt: new Date().toISOString(),
     metadata: {
       characterIds: [],
       location: 'Test Location',
-      timestamp: new Date().toISOString()
+      tags: []
     }
   });
   
