@@ -59,7 +59,7 @@ export const createTestNarrativeSegment = (sessionId: string, content: string = 
   console.log(`[DebugHelper] Creating test segment for session: ${sessionId}`);
   
   const segmentId = narrativeStore.addSegment(sessionId, {
-    type: 'narrative',
+    type: 'scene',
     content,
     metadata: {
       characterIds: [],
