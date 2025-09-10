@@ -99,3 +99,10 @@ jobs:
           name: e2e-test-failures
           path: test-results/
           retention-days: 7
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          retention-days: 7

@@ -34,7 +34,7 @@ echo "📥 Downloading artifacts from run $RUN_ID..."
 
 # Clean up any existing artifacts to avoid conflicts
 if [ -d "playwright-html-report" ]; then
-    echo "🧹 Cleaning up existing report files..."
+    echo "🧹 Cleaning up existing HTML report..."
     rm -rf playwright-html-report
 fi
 
@@ -68,7 +68,11 @@ fi
 echo "📦 Downloading test results..."
 gh run download $RUN_ID --name e2e-test-failures
 
+echo "📦 Downloading HTML report..."
+gh run download $RUN_ID --name playwright-html-report
+
 # Note: e2e-test-failures contains all the test results, images and diffs
+# playwright-html-report contains the interactive HTML report
 
 # Check what was downloaded and organize it
 # The artifacts are downloaded as individual folders in the current directory
@@ -99,6 +103,13 @@ if [ "$TEST_FOLDERS" -gt 0 ]; then
     if [ -d "playwright-test-results" ]; then
         echo "   🖼️  Visual Diffs: $(pwd)/playwright-test-results/"
     fi
+    if [ -d "playwright-html-report" ]; then
+        echo "   📊 HTML Report: $(pwd)/playwright-html-report/"
+        echo ""
+        echo "🌐 To view the interactive HTML report:"
+        echo "   npx playwright show-report playwright-html-report"
+        echo "   # Opens at http://localhost:9323"
+    fi
 else
-    echo "❌ Failed to download HTML report. Check if artifacts are available."
+    echo "❌ Failed to download test results. Check if artifacts are available."
 fi
