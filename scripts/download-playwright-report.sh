@@ -103,13 +103,32 @@ if [ "$TEST_FOLDERS" -gt 0 ]; then
     if [ -d "playwright-test-results" ]; then
         echo "   🖼️  Visual Diffs: $(pwd)/playwright-test-results/"
     fi
-    if [ -d "playwright-html-report" ]; then
-        echo "   📊 HTML Report: $(pwd)/playwright-html-report/"
-        echo ""
-        echo "🌐 To view the interactive HTML report:"
-        echo "   npx playwright show-report playwright-html-report"
-        echo "   # Opens at http://localhost:9323"
-    fi
 else
     echo "❌ Failed to download test results. Check if artifacts are available."
+fi
+
+# Organize HTML report if it was downloaded
+if [ -f "index.html" ]; then
+    mkdir -p playwright-html-report
+    # Move HTML report files to organized directory
+    mv index.html playwright-html-report/ 2>/dev/null || true
+    # Move any other report assets (CSS, JS files that might be downloaded)
+    for file in *.js *.css *.png *.svg; do
+        if [ -f "$file" ] && [ "$file" != "next.config.js" ] && [ "$file" != "postcss.config.js" ]; then
+            mv "$file" playwright-html-report/ 2>/dev/null || true
+        fi
+    done
+    
+    echo "📊 HTML Report: $(pwd)/playwright-html-report/"
+    echo ""
+    echo "🌐 To view the interactive HTML report:"
+    echo "   # Option 1: Direct file opening"
+    echo "   open playwright-html-report/index.html"
+    echo "   "
+    echo "   # Option 2: Simple HTTP server (if direct opening has CORS issues)"
+    echo "   cd playwright-html-report && python3 -m http.server 8080"
+    echo "   # Then open http://localhost:8080"
+    echo "   "
+    echo "   # Option 3: Playwright command (may have blank tab issues)"
+    echo "   npx playwright show-report playwright-html-report"
 fi

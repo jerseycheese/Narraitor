@@ -104,5 +104,7 @@ jobs:
         if: failure()
         with:
           name: playwright-html-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            !playwright-report/**/*.zip
           retention-days: 7
