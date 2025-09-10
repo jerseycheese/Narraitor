@@ -73,7 +73,7 @@ export default function CreateWorldPage() {
 
   
   return (
-    <main className="min-h-screen">
+    <main>
       <h1 className="sr-only">Create New World</h1>
       <WorldCreationWizard 
         onComplete={handleComplete}

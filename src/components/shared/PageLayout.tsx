@@ -73,7 +73,7 @@ export function PageLayout({
 
   // Merge custom className with default page styling
   // Note: The main background color is set in globals.css via `main:not(.ending-screen)`
-  const mainClasses = `min-h-screen ${className}`;
+  const mainClasses = className;
 
   return (
     <main className={mainClasses}>

@@ -12,7 +12,7 @@ export default function HomePage() {
         {/* Visually hidden H1 for accessibility */}
         <h1 className="sr-only">Narraitor - AI-Powered Interactive Storytelling Game</h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center min-h-[80vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
           {/* Left Column - Content (2/3 width) */}
           <div className="order-2 lg:order-1 lg:col-span-2">
             <SSRClientOnly>
