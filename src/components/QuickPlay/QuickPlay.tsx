@@ -33,8 +33,9 @@ export function QuickPlay() {
   
   // Fix existing session narrative counts on component mount
   useEffect(() => {
-    // Temporarily disabled to avoid test failures - this debug function can be called manually if needed
-    // fixExistingSessionNarrativeCounts();
+    if (fixExistingSessionNarrativeCounts) {
+      fixExistingSessionNarrativeCounts();
+    }
   }, [fixExistingSessionNarrativeCounts]);
   
   // State for delete confirmation dialog
