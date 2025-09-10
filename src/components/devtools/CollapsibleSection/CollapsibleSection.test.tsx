@@ -22,7 +22,7 @@ describe('CollapsibleSection', () => {
     );
     
     expect(screen.getByText('Content')).toBeVisible();
-    expect(screen.getByRole('button', { expanded: true })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'true');
   });
   
   it('hides content when toggle is clicked', () => {
@@ -34,14 +34,14 @@ describe('CollapsibleSection', () => {
     
     // Initially content should be visible and button expanded
     expect(screen.getByText('Content')).toBeInTheDocument();
-    expect(screen.getByRole('button', { expanded: true })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'true');
     
     // Click the toggle button
-    const toggleButton = screen.getByRole('button', { expanded: true });
+    const toggleButton = screen.getByTestId('collapsible-section-toggle');
     fireEvent.click(toggleButton);
     
     // Button should now show collapsed state
-    expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
     // Button text should change from − to +
     expect(screen.getByText('+')).toBeInTheDocument();
     expect(screen.queryByText('−')).not.toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('CollapsibleSection', () => {
     );
     
     // Should start with collapsed state
-    expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getByText('+')).toBeInTheDocument();
   });
   
@@ -67,7 +67,7 @@ describe('CollapsibleSection', () => {
     );
     
     // Should start with collapsed state
-    expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getByText('+')).toBeInTheDocument();
   });
   
@@ -79,15 +79,15 @@ describe('CollapsibleSection', () => {
     );
     
     // Initially collapsed
-    expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toBeInTheDocument();
     expect(screen.getByText('+')).toBeInTheDocument();
     
     // Click to expand
-    const toggleButton = screen.getByRole('button', { expanded: false });
+    const toggleButton = screen.getByTestId('collapsible-section-toggle');
     fireEvent.click(toggleButton);
     
     // Now should be expanded
-    expect(screen.getByRole('button', { expanded: true })).toBeInTheDocument();
+    expect(screen.getByTestId('collapsible-section-toggle')).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('−')).toBeInTheDocument();
     expect(screen.queryByText('+')).not.toBeInTheDocument();
   });
