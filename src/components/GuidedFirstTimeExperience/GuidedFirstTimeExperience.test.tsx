@@ -71,8 +71,8 @@ describe('GuidedFirstTimeExperience', () => {
     it('displays the guided experience interface', () => {
       render(<GuidedFirstTimeExperience />);
       
-      // Should show some indication of guided experience
-      expect(screen.getByText(/welcome/i) || screen.getByText(/get started/i) || screen.getByText(/guided/i)).toBeInTheDocument();
+      // Should show the main call to action
+      expect(screen.getByText(/create a world and start a story/i)).toBeInTheDocument();
     });
 
     it('progresses through the experience steps', async () => {
