@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { useAIMonitoringStore } from '@/stores/aiMonitoringStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { DevToolsSection } from '../shared/DevToolsSection';
 import type { AIMonitoringEntry } from '@/types/aiMonitoring';
 
@@ -37,21 +39,21 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
   };
 
   return (
-    <div className="border border-gray-700 rounded p-3 mb-2 bg-gray-700/30">
+    <div className="border border-gray-300 rounded p-3 mb-2 bg-gray-50">
       {/* Entry Header */}
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`font-mono text-xs px-2 py-1 rounded ${getStatusColor(entry.status)} bg-gray-900`}>
+            <span className={`font-mono text-xs px-2 py-1 rounded ${getStatusColor(entry.status)} bg-white border border-gray-300`}>
               {entry.status.toUpperCase()}
             </span>
-            <span className="text-xs text-gray-300">{formatTimestamp(entry.timestamp)}</span>
+            <span className="text-xs text-gray-700">{formatTimestamp(entry.timestamp)}</span>
             <span className="text-xs text-gray-500">
               {formatDuration(entry.performance.duration)}
             </span>
           </div>
-          <div className="text-sm text-gray-200">
-            <span className="font-mono text-xs bg-gray-900 px-2 py-1 rounded mr-2">
+          <div className="text-sm text-gray-900">
+            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded mr-2 text-gray-900">
               {entry.method}
             </span>
             {entry.endpoint}
@@ -65,7 +67,7 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           onClick={() => setIsExpanded(!isExpanded)}
           variant="ghost"
           size="sm"
-          className="text-xs text-gray-500 hover:text-gray-200"
+          className="text-xs text-gray-500 hover:text-gray-900"
         >
           {isExpanded ? 'Hide' : 'Show'}
         </Button>
@@ -73,21 +75,21 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
 
       {/* Expanded Details */}
       {isExpanded && (
-        <div className="border-t border-gray-700 pt-3 space-y-3">
+        <div className="border-t border-gray-200 pt-3 space-y-3">
           {/* Request Details */}
           <div>
-            <h4 className="text-xs font-semibold text-gray-300 mb-2">Request</h4>
-            <div className="bg-gray-900 p-2 rounded text-xs">
+            <h4 className="text-xs font-semibold text-gray-900 mb-2">Request</h4>
+            <div className="bg-gray-100 p-2 rounded text-xs border border-gray-300">
               <div className="mb-2">
                 <span className="text-gray-500">Prompt:</span>
-                <div className="text-gray-200 mt-1 whitespace-pre-wrap font-mono">
+                <div className="text-gray-900 mt-1 whitespace-pre-wrap font-mono">
                   {entry.request.prompt}
                 </div>
               </div>
               {entry.request.config && (
                 <div>
                   <span className="text-gray-500">Config:</span>
-                  <pre className="text-gray-200 mt-1 text-xs">
+                  <pre className="text-gray-900 mt-1 text-xs">
                     {JSON.stringify(entry.request.config, null, 2)}
                   </pre>
                 </div>
@@ -98,11 +100,11 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           {/* Response Details */}
           {entry.response && (
             <div>
-              <h4 className="text-xs font-semibold text-gray-300 mb-2">Response</h4>
-              <div className="bg-gray-900 p-2 rounded text-xs">
+              <h4 className="text-xs font-semibold text-gray-900 mb-2">Response</h4>
+              <div className="bg-gray-100 p-2 rounded text-xs border border-gray-300">
                 <div className="mb-2">
                   <span className="text-gray-500">Content:</span>
-                  <div className="text-gray-200 mt-1 whitespace-pre-wrap font-mono">
+                  <div className="text-gray-900 mt-1 whitespace-pre-wrap font-mono">
                     {entry.response.content}
                   </div>
                 </div>
@@ -120,14 +122,14 @@ const AIMonitoringEntryDisplay = ({ entry }: { entry: AIMonitoringEntry }) => {
           {/* Error Details */}
           {entry.error && (
             <div>
-              <h4 className="text-xs font-semibold text-red-500 mb-2">Error</h4>
-              <div className="bg-gray-900 p-2 rounded text-xs">
-                <div className="text-red-500 mb-1">{entry.error.message}</div>
-                <div className="text-gray-500 mb-2">
+              <h4 className="text-xs font-semibold text-red-700 mb-2">Error</h4>
+              <div className="bg-red-50 p-2 rounded text-xs border border-red-200">
+                <div className="text-red-700 mb-1">{entry.error.message}</div>
+                <div className="text-red-600 mb-2">
                   Type: {entry.error.type} | Retryable: {entry.error.retryable ? 'Yes' : 'No'}
                 </div>
                 {entry.error.details && (
-                  <pre className="text-gray-300 text-xs whitespace-pre-wrap">
+                  <pre className="text-red-900 text-xs whitespace-pre-wrap">
                     {entry.error.details}
                   </pre>
                 )}
@@ -179,15 +181,12 @@ export const AIMonitoringSection = () => {
       {/* Header Controls */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <label className="flex items-center text-sm text-gray-300">
-            <input
-              type="checkbox"
-              checked={isEnabled}
-              onChange={(e) => setEnabled(e.target.checked)}
-              className="mr-2"
-            />
-            Enable Monitoring
-          </label>
+          <Checkbox
+            checked={isEnabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+            label="Enable Monitoring"
+            className="text-sm text-gray-700"
+          />
           
           <div className="text-xs text-gray-500">
             {stats.total} total | {stats.completed} completed | {stats.errors} errors
@@ -232,28 +231,25 @@ export const AIMonitoringSection = () => {
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">Status</label>
-          <select
+          <Select
             value={filters.status || ''}
             onChange={(e) => setFilters({ status: (e.target.value as AIMonitoringEntry['status']) || undefined })}
-            className="w-full h-8 px-2 text-xs bg-gray-900 border border-gray-700 rounded"
+            className="h-8 text-xs"
           >
             <option value="">All Status</option>
             <option value="completed">Completed</option>
             <option value="error">Errors</option>
             <option value="pending">Pending</option>
-          </select>
+          </Select>
         </div>
         <div>
           <label className="block text-xs text-gray-500 mb-1">Errors Only</label>
-          <label className="flex items-center h-8">
-            <input
-              type="checkbox"
-              checked={filters.errorsOnly || false}
-              onChange={(e) => setFilters({ errorsOnly: e.target.checked || undefined })}
-              className="mr-2"
-            />
-            <span className="text-xs text-gray-300">Show only errors</span>
-          </label>
+          <Checkbox
+            checked={filters.errorsOnly || false}
+            onChange={(e) => setFilters({ errorsOnly: e.target.checked || undefined })}
+            label="Show only errors"
+            className="text-xs text-gray-700 h-8"
+          />
         </div>
       </div>
 

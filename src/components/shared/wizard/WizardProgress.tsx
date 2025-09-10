@@ -19,51 +19,34 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({
 }) => {
   return (
     <div className={`relative mb-8 ${className}`}>
-      {/* Background connector line */}
-      <div 
-        className="absolute top-5 h-1 bg-gray-200" 
-        style={{ 
-          left: `${50 / steps.length}%`,
-          right: `${50 / steps.length}%`
-        }} 
-      />
-      
-      {/* Steps container */}
-      <div className="relative flex justify-between items-start">
+      {/* Steps and connectors */}
+      <div className="relative flex items-center">
         {steps.map((step, index) => (
-          <div 
-            key={step.id} 
-            className="flex flex-col items-center flex-1"
-            style={{ maxWidth: `${100 / steps.length}%` }}
-          >
-            {/* Active connector overlay */}
-            {index > 0 && index <= currentStep && (
+          <React.Fragment key={step.id}>
+            {/* Step circle */}
+            <div className="flex flex-col items-center flex-1">
               <div
-                className="absolute top-5 h-1 bg-blue-500"
-                style={{
-                  left: `${(100 / steps.length) * (index - 1) + (50 / steps.length)}%`,
-                  width: `${100 / steps.length}%`,
-                }}
-              />
-            )}
-            
-            <div
-              className={cn(
-                wizardStyles.progress.circle,
-                "relative z-10",
-                index === currentStep
-                  ? wizardStyles.progress.circleActive
-                  : index < currentStep
-                  ? wizardStyles.progress.circleCompleted
-                  : wizardStyles.progress.circleInactive
-              )}
-            >
-              {index + 1}
+                className={cn(
+                  wizardStyles.progress.circle,
+                  index === currentStep
+                    ? wizardStyles.progress.circleActive
+                    : index < currentStep
+                    ? wizardStyles.progress.circleCompleted
+                    : wizardStyles.progress.circleInactive
+                )}
+              >
+                {index + 1}
+              </div>
+              {/* Label */}
+              <span className={cn(wizardStyles.progress.label, 'text-center mt-2 px-1')}>{step.label}</span>
             </div>
-            <span className={cn(wizardStyles.progress.label, "text-center mt-2 px-1")}>
-              {step.label}
-            </span>
-          </div>
+            {/* Connector (no connector after last circle) */}
+            {index < steps.length - 1 && (
+              <div className="flex-1 h-1 mx-4 -mt-6">
+                <div className={`h-full ${index < currentStep ? 'bg-blue-500' : 'bg-gray-200'}`} />
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </div>
     </div>

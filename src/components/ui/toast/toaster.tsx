@@ -249,8 +249,7 @@ export function Toaster({ position = 'bottom-right', maxToasts = 5 }: ToasterPro
 
   return createPortal(
     <div
-      className={`fixed z-50 flex flex-col gap-2 ${positionClasses[position]} pointer-events-none`}
-      style={{ maxWidth: 'calc(100vw - 2rem)' }}
+      className={`fixed z-50 flex flex-col gap-2 ${positionClasses[position]} pointer-events-none max-w-[calc(100vw-2rem)]`}
     >
       {visibleToasts.map((toast) => (
         <div key={toast.id} className="pointer-events-auto">

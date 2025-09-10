@@ -65,15 +65,17 @@ export const DevToolsSection: React.FC<DevToolsSectionProps> = ({
 }) => {
   return (
     <div className={cn(
-      'bg-gray-700 p-2 rounded border border-gray-700',
+      'bg-white p-3 rounded border border-gray-300 shadow-sm',
       className
     )}>
       {title && (
-        <h4 className="text-xs font-medium mb-2 text-gray-50">
+        <h4 className="text-sm font-semibold mb-2 text-gray-900 border-b border-gray-300 pb-1">
           {title}
         </h4>
       )}
-      {children}
+      <div className="text-gray-700">
+        {children}
+      </div>
     </div>
   );
 };

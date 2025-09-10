@@ -276,7 +276,7 @@ export default function AttributeReviewStep({
                   variant={suggestion.accepted ? "default" : "outline"}
                   size="sm"
                 >
-                  {suggestion.accepted ? 'Selected ✓' : 'Excluded'}
+                  {suggestion.accepted ? 'Selected' : 'Excluded'}
                 </Button>
               </div>
             </div>
@@ -446,11 +446,12 @@ export default function AttributeReviewStep({
             }
           </div>
         </div>
-        <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
-          <div 
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
-            style={{ width: `${(acceptedCount / 6) * 100}%` }}
-          ></div>
+        <div className="mt-2 w-full">
+          <div className="grid grid-cols-6 gap-0.5 h-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className={`${i < acceptedCount ? 'bg-blue-500' : 'bg-blue-200'} rounded-full`} />
+            ))}
+          </div>
         </div>
       </div>
       </WizardFormSection>

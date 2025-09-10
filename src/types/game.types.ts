@@ -89,6 +89,7 @@ export interface SessionStore {
   resumeSavedSession: (sessionId: string) => boolean;
   deleteSavedSession: (sessionId: string) => void;
   updateSavedSessionNarrativeCount: (sessionId: string, narrativeCount: number) => void;
+  fixExistingSessionNarrativeCounts: () => Promise<void>;
   
   // Template history actions
   addTemplateToHistory: (entry: TemplateHistoryEntry) => void;

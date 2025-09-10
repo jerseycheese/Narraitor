@@ -82,7 +82,7 @@ describe('AIMockingSection - User Behavior Tests', () => {
       expect(screen.getByText('Enable Mock')).toBeInTheDocument();
       
       // Should show green indicator for live mode
-      const indicator = document.querySelector('.bg-green-500');
+      const indicator = document.querySelector('.bg-green-700');
       expect(indicator).toBeInTheDocument();
     });
   });

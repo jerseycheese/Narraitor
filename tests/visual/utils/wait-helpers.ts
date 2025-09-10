@@ -66,15 +66,7 @@ export async function hideDynamicContent(page: Page): Promise<void> {
       .random-tip,
       [data-testid="current-time"],
       [data-testid="last-updated"],
-      .dynamic-content,
-      /* Hide DevTools panel during visual regression tests */
-      [data-testid="devtools-panel-container"],
-      [data-testid="devtools-panel-header"],
-      [data-testid="devtools-panel"],
-      .devtools-panel,
-      .narraitor-devtools,
-      [class*="devtools"],
-      [id*="devtools"] {
+      .dynamic-content {
         display: none !important;
         visibility: hidden !important;
       }
@@ -87,18 +79,6 @@ export async function hideDynamicContent(page: Page): Promise<void> {
         transition-delay: 0s !important;
       }
     `
-  });
-  
-  // Hide DevTools panel elements using JavaScript
-  await page.evaluate(() => {
-    const devToolsElements = document.querySelectorAll(
-      '[data-testid*="devtools"], .devtools-panel, .narraitor-devtools, [class*="devtools"], [id*="devtools"]'
-    );
-    devToolsElements.forEach(el => {
-      const element = el as HTMLElement;
-      element.style.display = 'none';
-      element.style.visibility = 'hidden';
-    });
   });
 }
 

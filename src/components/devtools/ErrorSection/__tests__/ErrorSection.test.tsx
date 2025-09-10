@@ -167,12 +167,12 @@ describe('ErrorSection', () => {
 
     render(<ErrorSection />);
 
-    // Open severity filter
-    const severityButton = screen.getByText('Severity');
-    await user.click(severityButton);
+    // First expand the Filters section
+    const filtersToggle = screen.getByTestId('collapsible-section-toggle');
+    await user.click(filtersToggle);
 
     // Select only HIGH severity
-    const highCheckbox = screen.getByLabelText('High');
+    const highCheckbox = screen.getByLabelText('Filter by High severity errors');
     await user.click(highCheckbox);
 
     // Apply filter
@@ -197,12 +197,12 @@ describe('ErrorSection', () => {
 
     render(<ErrorSection />);
 
-    // Open category filter
-    const categoryButton = screen.getByText('Category');
-    await user.click(categoryButton);
+    // First expand the Filters section
+    const filtersToggle = screen.getByTestId('collapsible-section-toggle');
+    await user.click(filtersToggle);
 
     // Select only REACT category
-    const reactCheckbox = screen.getByLabelText('React');
+    const reactCheckbox = screen.getByLabelText('Filter by React category errors');
     await user.click(reactCheckbox);
 
     // Apply filter

@@ -414,6 +414,78 @@ We use a **Darwin-only visual testing strategy**, meaning all baseline screensho
 - Production issues emerge from platform differences  
 - CI/CD pipeline needs more reliability across environments
 
+## Accessibility Visual Testing
+
+Visual regression tests also serve as accessibility validation by capturing how assistive technology users experience your interface. Here's how to structure tests that verify both visual appearance and accessibility compliance.
+
+### Testing Focus States and Interactive Elements
+
+```typescript
+test('collapsible section accessibility states', async ({ page }) => {
+  await page.goto('/devtools');
+  await waitForAppReady(page);
+  
+  // Test default collapsed state
+  const section = page.locator('[data-testid="performance-warnings-section"]');
+  await expect(section).toHaveScreenshot('warnings-collapsed.png');
+  
+  // Test focus state for keyboard navigation
+  await section.locator('button').focus();
+  await expect(section).toHaveScreenshot('warnings-focused.png');
+  
+  // Test expanded state
+  await section.locator('button').click();
+  await expect(section).toHaveScreenshot('warnings-expanded.png');
+});
+```
+
+### Warning and Alert Visual States
+
+Verify that warning components maintain proper contrast and visual accessibility:
+
+```typescript
+test('warning alerts accessibility appearance', async ({ page }) => {
+  await page.goto('/devtools');
+  await waitForAppReady(page);
+  
+  // Focus on warning content area
+  const warningsContainer = page.locator('[role="alert"]');
+  
+  // Test warning appearance with proper semantic styling
+  await expect(warningsContainer).toHaveScreenshot('warning-alerts.png', {
+    threshold: 0.2, // Low tolerance - accessibility styling should be stable
+    maxDiffPixels: 500
+  });
+});
+```
+
+### Testing High Contrast and Focus Indicators
+
+```typescript
+test('high contrast focus indicators', async ({ page }) => {
+  // Enable high contrast simulation if available
+  await page.emulateMedia({ forcedColors: 'active' });
+  
+  await page.goto('/components');
+  await waitForAppReady(page);
+  
+  // Test focus indicators are visible in high contrast
+  await page.locator('button').first().focus();
+  await expect(page.locator('button').first()).toHaveScreenshot('button-focus-high-contrast.png');
+});
+```
+
+### Accessibility Testing Strategy
+
+**What to capture visually**:
+- Focus states for all interactive elements
+- High contrast mode appearance
+- Warning/alert styling with proper semantic colors
+- Keyboard navigation visual feedback
+- Screen reader content structure (via DOM snapshots)
+
+**Testing with design tokens**: Since accessibility improvements often involve design token changes, use strict thresholds for these tests to catch unintended accessibility regressions.
+
 ## Best Practices
 
 ### Test Organization

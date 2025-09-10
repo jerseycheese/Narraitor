@@ -240,27 +240,15 @@ export const NarrativeHistory: React.FC<NarrativeHistoryProps> = ({
   
   return (
     <div
-      className={`narrative-history-container ${className}`}
+      className={`narrative-history-container outline-none ${className}`}
       onKeyDown={handleKeyDown}
-      tabIndex={0} // Make focusable for keyboard navigation
-      style={{ outline: 'none' }} // Remove focus outline for better UX
+      tabIndex={0}
     >
       <ScrollArea 
         ref={scrollAreaRef}
-        className={`${heightClass} bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner`}
-        style={{
-          // Enable smooth momentum scrolling on touch devices
-          WebkitOverflowScrolling: 'touch'
-        }}
+        className={`${heightClass} bg-gray-100 dark:bg-gray-900 rounded-lg shadow-inner mobile-scroll`}
       >
-        <div 
-          className="space-y-4 px-4 py-4" 
-          style={{ 
-            scrollSnapType: 'y mandatory',
-            // Ensure scroll snap works properly
-            scrollBehavior: 'smooth'
-          }}
-        >
+        <div className="space-y-4 px-4 py-4">
           {renderContent()}
         </div>
       </ScrollArea>

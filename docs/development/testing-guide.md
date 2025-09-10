@@ -41,6 +41,33 @@ Visual testing catches issues that other test types miss - layout breaks, stylin
 - **Purely functional components** with no visual output
 - **Frequently changing content** (use mocked stable data)
 
+### Accessibility Testing Integration
+
+Visual tests also verify accessibility implementation by capturing focus states, contrast ratios, and semantic structure. This is particularly important when implementing design system changes that affect accessibility compliance.
+
+**Accessibility test scenarios:**
+- **Focus states** for keyboard navigation
+- **High contrast mode** appearance
+- **Warning/alert styling** with proper semantic colors
+- **Interactive element states** (expanded/collapsed, hover, active)
+
+**Example accessibility visual test:**
+```typescript
+test('accessible warning component', async ({ page }) => {
+  await page.goto('/devtools');
+  
+  // Test warning with proper semantic styling
+  const warning = page.locator('[role="alert"]');
+  await expect(warning).toHaveScreenshot('semantic-warning.png', {
+    threshold: 0.2 // Strict threshold - accessibility styling should be stable
+  });
+  
+  // Test keyboard focus state
+  await page.locator('button').first().focus();
+  await expect(page.locator('button').first()).toHaveScreenshot('focused-button.png');
+});
+```
+
 ### Visual Testing in the Testing Strategy
 
 Visual tests complement other test types by focusing on the user experience:

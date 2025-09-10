@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { AlertTriangle, Check } from 'lucide-react';
 import { PromptContextManager } from '../promptContextManager';
 import { WorldContext, CharacterContext } from '../types';
 import { formatPercentage } from '@/lib/utils';
@@ -99,8 +100,9 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
               <span className="font-medium">Final tokens:</span>
               <span className="ml-1">{finalTokenCount} / {tokenLimit}</span>
               {showWarning && finalTokenCount > tokenLimit && (
-                <span className="text-red-500 ml-2 font-bold">
-                  ⚠️ Limit exceeded
+                <span className="text-red-500 ml-2 font-bold inline-flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                  Limit exceeded
                 </span>
               )}
             </div>
@@ -118,25 +120,32 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
               </span>
             </div>
             
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full ${
-                  retentionStatus === 'high' 
-                    ? 'bg-blue-700' 
-                    : retentionStatus === 'medium' 
-                      ? 'bg-blue-300' 
-                      : 'bg-gray-500'
-                }`}
-                style={{ 
-                  width: `${Math.min(contextRetentionPercentage, 100)}%`
-                }}
-              ></div>
+            <div className="w-full">
+              <div className="grid grid-cols-20 gap-0.5 h-2">
+                {Array.from({ length: 20 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`${
+                      i < Math.round((Math.min(contextRetentionPercentage, 100) / 100) * 20)
+                        ? retentionStatus === 'high'
+                          ? 'bg-blue-700'
+                          : retentionStatus === 'medium'
+                            ? 'bg-blue-300'
+                            : 'bg-gray-500'
+                        : 'bg-gray-200'
+                    } rounded-full`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
           
           {truncationOccurred && showWarning && (
             <div className="text-sm bg-amber-200 border border-amber-200 p-2 rounded text-amber-700">
-              <span className="font-bold">⚠️ Truncation applied:</span> Some content was removed to fit within the token limit.
+              <span className="font-bold inline-flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" aria-hidden="true" />
+                Truncation applied:
+              </span> Some content was removed to fit within the token limit.
               {contextRetentionPercentage < 50 && (
                 <span className="block mt-1">Significant content loss detected. Consider increasing token limit or reducing input content.</span>
               )}
@@ -160,11 +169,27 @@ export const ContextPreview: React.FC<ContextPreviewProps> = ({
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>
                 <p className="font-medium">Content Types:</p>
-                <ul className="list-none pl-0">
-                  {world && <li>✓ World</li>}
-                  {character && <li>✓ Character</li>}
-                  {recentEvents && recentEvents.length > 0 && <li>✓ Events ({recentEvents.length})</li>}
-                  {currentSituation && <li>✓ Current Situation</li>}
+                <ul className="list-none pl-0 space-y-1">
+                  {world && (
+                    <li className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3" aria-hidden="true" /> World
+                    </li>
+                  )}
+                  {character && (
+                    <li className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3" aria-hidden="true" /> Character
+                    </li>
+                  )}
+                  {recentEvents && recentEvents.length > 0 && (
+                    <li className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3" aria-hidden="true" /> Events ({recentEvents.length})
+                    </li>
+                  )}
+                  {currentSituation && (
+                    <li className="inline-flex items-center gap-1">
+                      <Check className="w-3 h-3" aria-hidden="true" /> Current Situation
+                    </li>
+                  )}
                 </ul>
               </div>
               <div>

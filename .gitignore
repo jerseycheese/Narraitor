@@ -106,8 +106,8 @@ docs/voice-writing-profile.md
 # MCP local config (do not commit)
 .mcp.json
 
-# Agent guidelines (local developer docs)
-AGENTS.md
+# Agent guidelines
+AGENTS.local.md
 
 # Personal paths (security)
 **/Users/*/

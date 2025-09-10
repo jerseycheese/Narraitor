@@ -43,7 +43,7 @@ export const AchievementFromEnding: Story = {
     description: 'You overcame the trials in the Mystic Forest and helped restore balance to the realm.',
     achievement: 'Forest Guardian',
     type: 'milestone',
-    icon: <Trophy className="w-8 h-8" />,
+    icon: <Trophy className="w-8 h-8" aria-hidden="true" />,
     buttonText: 'Continue',
   },
 };
@@ -55,7 +55,7 @@ export const SimpleAchievement: Story = {
     description: 'You made a difficult choice that showed true courage in the face of adversity.',
     achievement: 'Brave Heart',
     type: 'milestone',
-    icon: <Trophy className="w-8 h-8" />,
+    icon: <Trophy className="w-8 h-8" aria-hidden="true" />,
     buttonText: 'Continue',
   },
 };
@@ -67,7 +67,7 @@ export const LongDescriptionAchievement: Story = {
     description: 'Through wisdom and patience, you managed to unite the warring factions and bring peace to the troubled lands. Your diplomatic skills proved invaluable in resolving the ancient conflict.',
     achievement: 'Peacemaker',
     type: 'milestone',
-    icon: <Trophy className="w-8 h-8" />,
+    icon: <Trophy className="w-8 h-8" aria-hidden="true" />,
     buttonText: 'Continue',
   },
 };
@@ -88,7 +88,7 @@ export const WithJSXDescription: Story = {
     ),
     achievement: 'Natural Leader',
     type: 'milestone',
-    icon: <Trophy className="w-8 h-8" />,
+    icon: <Trophy className="w-8 h-8" aria-hidden="true" />,
     buttonText: 'Continue',
   },
 };

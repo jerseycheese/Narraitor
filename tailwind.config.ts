@@ -20,9 +20,7 @@ const config: Config = {
       
       // Semantic aliases for better DX
       neutral: primitiveColors.gray,
-      success: primitiveColors.green,
       danger: primitiveColors.red,
-      warning: primitiveColors.amber,
       
       // shadcn/ui semantic tokens (extend with our colors)
       border: 'hsl(var(--border))',
@@ -57,6 +55,19 @@ const config: Config = {
       card: {
         DEFAULT: 'hsl(var(--card))',
         foreground: 'hsl(var(--card-foreground))',
+      },
+      // Extended semantic tokens for buttons
+      info: {
+        DEFAULT: 'hsl(var(--info))',
+        foreground: 'hsl(var(--info-foreground))',
+      },
+      success: {
+        DEFAULT: 'hsl(var(--success))',
+        foreground: 'hsl(var(--success-foreground))',
+      },
+      warning: {
+        DEFAULT: 'hsl(var(--warning))',
+        foreground: 'hsl(var(--warning-foreground))',
       },
     },
     extend: {

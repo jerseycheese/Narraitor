@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils/classNames';
 
 export interface ModalProps {
@@ -111,9 +112,7 @@ export const Modal: React.FC<ModalProps> = ({
               className="text-gray-500 hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-1"
               aria-label="Close modal"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-6 h-6" aria-hidden="true" />
             </button>
           )}
         </div>

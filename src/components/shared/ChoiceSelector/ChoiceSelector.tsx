@@ -96,9 +96,9 @@ interface ChoiceSelectorProps {
 const getAlignmentIcon = (alignment?: ChoiceAlignment): React.ReactNode => {
   switch (alignment) {
     case 'lawful':
-      return <Scale className="w-4 h-4" />; // Scales of justice for lawful
+      return <Scale className="w-4 h-4" aria-hidden="true" />; // Scales of justice for lawful
     case 'chaotic':
-      return <Flame className="w-4 h-4" />; // Fire for chaotic/unpredictable
+      return <Flame className="w-4 h-4" aria-hidden="true" />; // Fire for chaotic/unpredictable
     case 'neutral':
     default:
       return null; // No icon for neutral
@@ -375,7 +375,7 @@ const ChoiceSelector: React.FC<ChoiceSelectorProps> = ({
             role="radio"
           >
             <div className="flex items-start gap-2">
-              {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" />}
+              {option.isSelected && <ChevronRight className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />}
               {!option.isSelected && getAlignmentIcon(option.alignment) && (
                 <span className="flex-shrink-0 mt-0.5">{getAlignmentIcon(option.alignment)}</span>
               )}

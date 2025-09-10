@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { X } from 'lucide-react'
 import { cn } from "@/lib/utils/classNames"
 
 /**
@@ -134,20 +135,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
             className="ml-4 inline-flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/10 transition-colors"
             aria-label="Dismiss notification"
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

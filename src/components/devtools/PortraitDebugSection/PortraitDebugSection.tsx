@@ -10,6 +10,8 @@ import { useWorldStore } from '@/state/worldStore';
 import { PromptBreakdown } from './PromptBreakdown';
 import { Character } from '@/types/character.types';
 import { World } from '@/types/world.types';
+import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 
 interface PortraitDebugSectionProps {
@@ -194,14 +196,14 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
       <div className="space-y-4">
         {/* Character Selector */}
         {charactersArray.length > 0 && (
-          <div className="bg-gray-700 p-3 rounded border border-gray-700">
-            <label className="block text-sm font-medium mb-2 text-gray-200">
+          <div className="bg-gray-100 p-3 rounded border border-gray-300">
+            <label className="block text-sm font-medium mb-2 text-gray-900">
               Select Character:
             </label>
-            <select
-              value={selectedCharacterId}
+            <Select 
+              value={selectedCharacterId} 
               onChange={(e) => setSelectedCharacterId(e.target.value)}
-              className="w-full px-3 py-1 bg-gray-900 text-gray-200 border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm"
             >
               <option value="">-- Select a character --</option>
               {charactersArray.map((char) => (
@@ -209,15 +211,15 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
                   {char.name} (Level {'level' in char ? (char as {level?: number}).level || 1 : 1})
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         )}
 
         {/* Character Info Summary */}
         {effectiveCharacterData && (
-          <div className="bg-gray-700 p-3 rounded border border-gray-700">
-            <h4 className="font-medium mb-2 text-gray-200">Character Summary</h4>
-            <div className="text-sm space-y-1 text-gray-300">
+          <div className="bg-gray-100 p-3 rounded border border-gray-300">
+            <h4 className="font-medium mb-2 text-gray-900">Character Summary</h4>
+            <div className="text-sm space-y-1 text-gray-700">
               <div><strong>Name:</strong> {effectiveCharacterData.name || 'Not set'}</div>
               <div><strong>World Genre:</strong> {effectiveWorldConfig?.genre || 'Not set'}</div>
               <div><strong>Attributes:</strong> {effectiveCharacterData.attributes?.length || 0}</div>
@@ -234,42 +236,50 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         {/* Prompt Generation */}
         <div className="space-y-2">
           <div className="flex gap-2 flex-wrap">
-            <button
+            <Button
               onClick={generatePromptPreview}
-              className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-500"
+              className="!bg-blue-700 hover:!bg-blue-900 !text-white"
+              size="sm"
+              variant="default"
               disabled={!effectiveCharacterData}
             >
               Generate Prompt Preview
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={testPromptGeneration}
-              className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-500"
+              className="!bg-green-700 hover:!bg-green-900 !text-white"
+              size="sm"
+              variant="default"
               disabled={!effectiveCharacterData || isGenerating}
             >
               {isGenerating ? 'Generating...' : 'Test Full Generation'}
-            </button>
+            </Button>
             {generatedPrompt && (
               <>
-                <button
+                <Button
                   onClick={copyPromptToClipboard}
-                  className="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-700"
+                  className="!bg-gray-700 hover:!bg-gray-900 !text-white"
+                  size="sm"
+                  variant="default"
                 >
                   Copy Prompt
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setShowBreakdown(!showBreakdown)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-700"
+                  className="!bg-blue-700 hover:!bg-blue-900 !text-white"
+                  size="sm"
+                  variant="default"
                 >
                   {showBreakdown ? 'Hide' : 'Show'} Breakdown
-                </button>
+                </Button>
               </>
             )}
           </div>
 
           {generatedPrompt && (
-            <div className="bg-gray-700 p-3 rounded border border-gray-700">
-              <h4 className="font-medium mb-2 text-gray-200">Generated Prompt:</h4>
-              <pre className="text-sm whitespace-pre-wrap break-words bg-gray-900 p-2 rounded border border-gray-700 text-gray-300">
+            <div className="bg-gray-100 p-3 rounded border border-gray-300">
+              <h4 className="font-medium mb-2 text-gray-900">Generated Prompt:</h4>
+              <pre className="text-sm whitespace-pre-wrap break-words bg-white p-2 rounded border border-gray-300 text-gray-900">
                 {generatedPrompt}
               </pre>
             </div>
@@ -287,8 +297,8 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
 
         {/* Last Generated Image */}
         {lastGeneratedImage && (
-          <div className="bg-gray-700 p-3 rounded border border-gray-700">
-            <h4 className="font-medium mb-2 text-gray-200">Last Generated Image:</h4>
+          <div className="bg-gray-100 p-3 rounded border border-gray-300">
+            <h4 className="font-medium mb-2 text-gray-900">Last Generated Image:</h4>
             <div className="relative w-32 h-32">
               <Image
                 src={lastGeneratedImage}
@@ -302,9 +312,9 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         )}
 
         {/* Prompt Building Tips */}
-        <div className="bg-blue-900 bg-opacity-30 p-3 rounded text-sm border border-blue-700">
-          <h4 className="font-medium mb-2 text-blue-300">💡 Prompt Building Tips:</h4>
-          <ul className="list-disc list-inside space-y-1 text-gray-300">
+        <div className="bg-blue-50 p-3 rounded text-sm border border-blue-200">
+          <h4 className="font-medium mb-2 text-blue-900">Prompt Building Tips:</h4>
+          <ul className="list-disc list-inside space-y-1 text-gray-700">
             <li>Character name is included automatically</li>
             <li>Personality traits influence appearance description</li>
             <li>Skills determine character class (warrior, mage, etc.)</li>
@@ -314,12 +324,12 @@ export function PortraitDebugSection({ characterData, worldConfig }: PortraitDeb
         </div>
 
         {/* API Debug Info */}
-        <div className="bg-amber-700 bg-opacity-30 p-3 rounded text-sm border border-amber-700">
-          <h4 className="font-medium mb-2 text-amber-300">🔧 API Debug Info:</h4>
-          <div className="space-y-1 text-gray-300">
+        <div className="bg-amber-50 p-3 rounded text-sm border border-amber-200">
+          <h4 className="font-medium mb-2 text-amber-900">API Debug Info:</h4>
+          <div className="space-y-1 text-gray-900">
             <div><strong>Endpoint:</strong> /api/generate-portrait</div>
             <div><strong>Model:</strong> gemini-2.0-flash-preview-image-generation</div>
-            <div><strong>Security:</strong> ✅ Server-side API key (secure)</div>
+            <div><strong>Security:</strong> Server-side API key (secure)</div>
           </div>
         </div>
       </div>

@@ -98,10 +98,10 @@
     
     /* Contextual colors for storytelling features */
     --ending-triumphant: 32 95% 44%; /* amber-500 */
-    --ending-bittersweet: 258 89% 66%; /* custom violet-500 */
+    --ending-bittersweet: 221.2 83.2% 44.3%; /* blue-700 */
     --ending-mysterious: 219 14% 32%; /* gray-700 */
     --ending-tragic: 0 84% 44%; /* red-500 */
-    --ending-hopeful: 34 84% 44%; /* green-500 */
+    --ending-hopeful: 142.1 70.6% 45.3%; /* green-500 */
     
     /* Lore category colors */
     --lore-characters-bg: 214 92% 91%; /* blue-100 */
@@ -112,9 +112,9 @@
     --lore-locations-border: 34 84% 44%; /* green-500 */
     --lore-locations-text: 154 86% 27%; /* green-700 */
     
-    --lore-events-bg: 270 100% 98%; /* custom purple-50 */
-    --lore-events-border: 267 87% 89%; /* custom purple-200 */
-    --lore-events-text: 272 81% 36%; /* custom purple-800 */
+    --lore-events-bg: 214 92% 91%; /* blue-100 */
+    --lore-events-border: 213 84% 73%; /* blue-300 */
+    --lore-events-text: 224 76% 25%; /* blue-700 */
     
     --lore-rules-bg: 43 76% 83%; /* amber-200 */
     --lore-rules-border: 32 95% 44%; /* amber-500 */
@@ -166,10 +166,10 @@
     
     /* Contextual colors remain the same in dark mode for consistency */
     --ending-triumphant: 32.1 94.6% 43.7%; /* amber-500 */
-    --ending-bittersweet: 258.3 89.5% 66.3%; /* violet-500 */
+    --ending-bittersweet: 221.2 83.2% 44.3%; /* blue-700 */
     --ending-mysterious: 219.2 13.9% 32.2%; /* gray-700 */
     --ending-tragic: 0 84.2% 30.2%; /* red-800 */
-    --ending-hopeful: 160.1 84.1% 39.4%; /* emerald-500 */
+    --ending-hopeful: 142.1 70.6% 45.3%; /* green-500 */
     
     /* Lore category colors (adjusted for dark mode) */
     --lore-characters-bg: 213.1 100% 6.1%; /* blue-950 */
@@ -180,9 +180,9 @@
     --lore-locations-border: 142.1 64.2% 24.1%; /* green-800 */
     --lore-locations-text: 142.1 76.2% 61.6%; /* green-400 */
     
-    --lore-events-bg: 271.5 81% 5.9%; /* purple-950 */
-    --lore-events-border: 271.5 81% 25.9%; /* purple-800 */
-    --lore-events-text: 270.7 91% 65.1%; /* purple-400 */
+    --lore-events-bg: 213.1 100% 6.1%; /* blue-950 */
+    --lore-events-border: 213.1 93.7% 26.1%; /* blue-800 */
+    --lore-events-text: 213.1 93.9% 67.8%; /* blue-400 */
     
     --lore-rules-bg: 25.5 95% 7.1%; /* amber-950 */
     --lore-rules-border: 32.1 94.6% 23.7%; /* amber-800 */

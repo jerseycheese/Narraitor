@@ -36,12 +36,23 @@ export class ChoiceGenerator {
     
     try {
       const { worldId, narrativeContext, characterIds, maxOptions = 4, minOptions = 3, useAlignedChoices = false } = params;
+      
+      console.log('🔄 Generating choices - Step 1: Getting world', { worldId });
       const world = this.getWorld(worldId);
+      
+      console.log('🔄 Generating choices - Step 2: Getting template', { useAlignedChoices });
       const template = this.getTemplate(useAlignedChoices ? 'alignedPlayerChoice' : 'playerChoice');
       
+      console.log('🔄 Generating choices - Step 3: Building context');
       const context = this.buildContext(world, narrativeContext, characterIds);
+      
+      console.log('🔄 Generating choices - Step 4: Generating base prompt');
       const basePrompt = template(context);
+      
+      console.log('🔄 Generating choices - Step 5: Enhancing with lore');
       const loreEnhancedPrompt = this.enhancePromptWithLore(basePrompt, worldId);
+      
+      console.log('🔄 Generating choices - Step 6: Enhancing with tone settings');
       const prompt = this.enhancePromptWithToneSettings(loreEnhancedPrompt, world);
 
 
@@ -75,12 +86,17 @@ export class ChoiceGenerator {
       
       return decision;
     } catch (error) {
-      console.error('❌ CHOICE GENERATOR ERROR:', {
+      const errorDetails = {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         worldId: params.worldId,
-        hasNarrativeContext: !!params.narrativeContext
-      });
+        hasNarrativeContext: !!params.narrativeContext,
+        characterIds: params.characterIds,
+        maxOptions: params.maxOptions,
+        minOptions: params.minOptions
+      };
+      console.error('❌ CHOICE GENERATOR ERROR:', errorDetails);
+      console.error('Full error object:', error);
       
       // Add an alert to make the error visible to the user for debugging
       if (typeof window !== 'undefined') {

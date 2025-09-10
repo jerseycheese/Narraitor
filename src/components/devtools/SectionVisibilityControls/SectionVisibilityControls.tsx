@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDevTools } from '../DevToolsContext';
 import { DevToolsSection } from '@/lib/devtools/sectionVisibilityStorage';
 import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 
 /**
  * Section information for display
@@ -139,7 +140,11 @@ export const SectionVisibilityControls = () => {
                   <span className={`w-4 h-4 border border-gray-500 rounded flex items-center justify-center ${
                     isVisible ? 'bg-gray-100' : 'bg-transparent'
                   }`}>
-                    {isVisible && <span className="text-black">✓</span>}
+                    {isVisible && (
+                      <span className="text-black" aria-hidden="true">
+                        <Check className="w-3 h-3" aria-hidden="true" />
+                      </span>
+                    )}
                   </span>
                   <span>{displayName}</span>
                 </Button>

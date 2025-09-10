@@ -15,7 +15,7 @@ const meta: Meta<typeof ImageGenerationStep> = {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: '800px', padding: '20px' }}>
+      <div className="w-[800px] p-5">
         <Story />
       </div>
     ),

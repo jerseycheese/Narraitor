@@ -213,19 +213,28 @@ export const useNarrativeStore = create<NarrativeStore>((set, get) => ({
       };
     });
 
+    // Update the saved session's narrative count
+    import('../state/sessionStore').then(({ useSessionStore }) => {
+      const sessionStore = useSessionStore.getState();
+      const sessionSegments = get().sessionSegments[sessionId] || [];
+      sessionStore.updateSavedSessionNarrativeCount(sessionId, sessionSegments.length);
+    }).catch((error) => {
+      logger.error('[NarrativeStore]', 'Failed to update session narrative count:', error);
+    });
+
     // Process the segment for goal extraction asynchronously
     // Import goalStore dynamically to avoid circular dependencies
-    import('../state/goalStore').then(({ useGoalStore }) => {
-      const goalStore = useGoalStore.getState();
-      goalStore.processSegmentForGoals(segmentId, segmentData.metadata?.characterIds?.[0])
-        .then((result) => {
-          logger.debug('[NarrativeStore]', 'Goal processing result:', result);
-        })
-        .catch((error) => {
-          logger.error('[NarrativeStore]', 'Goal processing failed:', error);
-        });
-    }).catch((error) => {
-      logger.error('[NarrativeStore]', 'Failed to import goalStore:', error);
+    Promise.resolve().then(async () => {
+      try {
+        const goalStoreModule = await import('./goalStore');
+        const goalStore = goalStoreModule.useGoalStore.getState();
+        const result = await goalStore.processSegmentForGoals(segmentId, segmentData.metadata?.characterIds?.[0]);
+        logger.debug('[NarrativeStore]', 'Goal processing result:', result);
+      } catch (error) {
+        // Silently fail goal processing if goalStore is not available
+        // This is not critical for narrative functionality
+        logger.debug('[NarrativeStore]', 'Goal processing skipped:', error instanceof Error ? error.message : 'Unknown error');
+      }
     });
 
     return segmentId;

@@ -6,6 +6,7 @@ import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { X, Globe, User, Settings, Check, Play, Plus } from 'lucide-react';
 
 interface MobileNavigationMenuProps {
   isOpen: boolean;
@@ -119,9 +120,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
           className="min-h-11 min-w-11 text-white hover:bg-gray-700"
           aria-label="Close menu"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" aria-hidden="true" />
         </Button>
       </div>
 
@@ -136,9 +135,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           }`}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+          <Globe className="w-6 h-6" aria-hidden="true" />
           Worlds
         </Button>
 
@@ -153,9 +150,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           } ${!hasWorlds ? 'hidden' : ''}`}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+          <User className="w-6 h-6" aria-hidden="true" />
           Characters
         </Button>
 
@@ -168,10 +163,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
               : 'text-link-nav-dark hover:bg-gray-900'
           }`}
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <Settings className="w-6 h-6" aria-hidden="true" />
           Settings
         </Button>
 
@@ -203,9 +195,7 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
                       <div className="text-sm opacity-75">{world.genre} • {worldCharacters} characters</div>
                     </div>
                     {world.id === currentWorldId && (
-                      <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
+                      <Check className="w-5 h-5 text-white" aria-hidden="true" />
                     )}
                   </Button>
                 );
@@ -220,31 +210,24 @@ export const MobileNavigationMenu = React.memo(function MobileNavigationMenu({ i
             <Button
               onClick={() => handleNavigation(`/worlds/${currentWorld.id}/play`)}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-700 text-white text-lg font-medium"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+           >
+              <Play className="w-6 h-6" aria-hidden="true" />
               Play {currentWorld.name}
             </Button>
           ) : Object.keys(worlds).length === 0 ? (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+           >
+              <Plus className="w-6 h-6" aria-hidden="true" />
               Create Your First World
             </Button>
           ) : (
             <Button
               onClick={() => handleNavigation('/worlds/create')}
               className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 hover:bg-blue-700 text-white text-lg font-medium"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+           >
+              <Plus className="w-6 h-6" aria-hidden="true" />
               Create New World
             </Button>
           )}

@@ -4,7 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Star } from 'lucide-react';
+import { Star, Globe, Plus, Play, Image as ImageIcon, ImageOff } from 'lucide-react';
 import { useNarrativeStore } from '@/state/narrativeStore';
 import { useCharacterStore } from '@/state/characterStore';
 import { useWorldStore } from '@/state/worldStore';
@@ -201,11 +201,7 @@ export function EndingScreen() {
       onClick: () => router.push('/worlds'),
       variant: 'primary',
       flex: true,
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: (<Globe className="w-4 h-4" aria-hidden="true" />)
     },
     {
       key: 'new-character', 
@@ -213,11 +209,7 @@ export function EndingScreen() {
       onClick: () => router.push(`/characters/create?worldId=${currentEnding.worldId}`),
       variant: 'primary',
       flex: true,
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )
+      icon: (<Plus className="w-4 h-4" aria-hidden="true" />)
     },
     {
       key: 'new-story',
@@ -243,12 +235,7 @@ export function EndingScreen() {
       },
       variant: 'success',
       flex: true,
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      )
+      icon: (<Play className="w-4 h-4" aria-hidden="true" />)
     }
   ];
 
@@ -267,7 +254,6 @@ export function EndingScreen() {
       <PageLayout
         title="The End"
         description={`${character?.name || 'Unknown Hero'} • ${world?.name || 'Unknown Realm'}${currentEnding.playTime ? ` • Play Time: ${formatPlayTime(currentEnding.playTime)}` : ''}`}
-        maxWidth="4xl"
         className={`ending-screen ending-${currentEnding.tone} ${getHeaderTextColor(currentEnding.tone)}`}
       >
         <div className="space-y-6">
@@ -293,9 +279,7 @@ export function EndingScreen() {
             ) : imageError ? (
               <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
-                  </svg>
+                  <ImageOff className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                   <p className="text-sm">Unable to generate ending image</p>
                   <Button 
                     onClick={generateEndingImage}
@@ -310,9 +294,7 @@ export function EndingScreen() {
             ) : (
               <div className="w-full h-48 md:h-64 lg:h-80 bg-gray-100 flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
-                  </svg>
+                  <ImageIcon className="w-12 h-12 mx-auto mb-2" aria-hidden="true" />
                   <p className="text-sm">Ending image</p>
                 </div>
               </div>
@@ -351,7 +333,7 @@ export function EndingScreen() {
                           key={index}
                           className="flex items-start justify-start space-x-2 text-gray-900 p-2"
                         >
-                          <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                          <Star className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
                           <div className="min-w-0 flex-1 break-words">
                             <span className="font-bold break-words">{title}</span>
                             {description && <span className="break-words">: {description}</span>}

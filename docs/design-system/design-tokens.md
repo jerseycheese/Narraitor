@@ -90,14 +90,33 @@ export const contextualColors = {
 
 ### In Tailwind Classes
 
-The most common way you'll use tokens is through Tailwind classes. The system is configured so that `bg-blue-500` automatically maps to our design token values.
+The most common way you'll use tokens is through semantic Tailwind classes. Use design token classes instead of primitive colors:
 
 ```tsx
+// ✅ Good - Uses semantic design tokens
 const Button = ({ variant = 'primary' }) => {
+  return (
+    <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90">
+      Click me
+    </button>
+  )
+}
+
+// ❌ Avoid - Uses primitive colors directly  
+const BadButton = () => {
   return (
     <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-900">
       Click me
     </button>
+  )
+}
+
+// ✅ Good - Uses semantic warning tokens
+const WarningAlert = () => {
+  return (
+    <div className="bg-warning-background border border-warning-border text-warning-foreground p-3 rounded-md">
+      Warning message
+    </div>
   )
 }
 ```
@@ -208,8 +227,44 @@ All color combinations in the token system meet WCAG accessibility standards:
 - Normal text: 4.5:1 contrast ratio minimum
 - Large text: 3:1 contrast ratio minimum  
 - Interactive elements maintain proper contrast in all states
+- Warning/alert colors provide sufficient contrast for accessibility compliance
 
 The gray scale particularly ensures readable text across all backgrounds, while the color families provide sufficient contrast for their intended uses.
+
+### Accessibility Implementation Requirements
+
+When using design tokens for UI components, follow these accessibility patterns:
+
+```tsx
+// ✅ Proper alert implementation with accessibility
+const AccessibleWarning = () => {
+  return (
+    <div 
+      className="bg-warning-background border border-warning-border text-warning-foreground p-3 rounded-md"
+      role="alert"
+      aria-live="polite"
+    >
+      <div className="font-medium">Warning Title</div>
+      <div className="text-sm mt-1">Warning description</div>
+    </div>
+  )
+}
+
+// ✅ Proper interactive element with ARIA
+const AccessibleButton = ({ isExpanded, onToggle, children }) => {
+  return (
+    <button
+      className="bg-primary text-primary-foreground px-3 py-1 rounded-md hover:bg-primary/90 focus:ring-2 focus:ring-ring"
+      aria-expanded={isExpanded}
+      onClick={onToggle}
+    >
+      {children}
+    </button>
+  )
+}
+```
+
+Always pair design tokens with proper semantic markup and ARIA attributes for full accessibility compliance.
 
 ## Dark Mode Ready
 

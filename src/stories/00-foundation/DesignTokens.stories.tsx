@@ -15,10 +15,11 @@ type Story = StoryObj<typeof meta>
 // Color Swatch Component
 const ColorSwatch = ({ color, name, description }: { color: string; name: string; description?: string }) => (
   <div className="flex items-center gap-3 p-3 border rounded-lg">
-    <div 
-      className="w-12 h-12 rounded border shadow-sm flex-shrink-0"
-      style={{ backgroundColor: color }}
-    />
+    <div className="w-12 h-12 rounded border shadow-sm flex-shrink-0 overflow-hidden">
+      <svg width="100%" height="100%" viewBox="0 0 48 48" role="img" aria-label={`${name} swatch`}>
+        <rect x="0" y="0" width="48" height="48" fill={color} />
+      </svg>
+    </div>
     <div className="flex-1 min-w-0">
       <div className="font-medium text-sm">{name}</div>
       <div className="text-xs text-muted-foreground font-mono">{color}</div>
@@ -143,15 +144,17 @@ export const ContextualTokens: Story = {
           <h3 className="font-semibold text-lg">Lore Categories</h3>
           <div className="space-y-2">
             {Object.entries(loreCategories).map(([category, colors]) => (
-              <div key={category} className="p-3 border rounded-lg" style={{ 
-                backgroundColor: colors.background,
-                borderColor: colors.border 
-              }}>
-                <div className="font-medium text-sm" style={{ color: colors.text }}>
+              <div key={category} className="p-3 border rounded-lg">
+                <div className="font-medium text-sm">
                   {category.charAt(0).toUpperCase() + category.slice(1)}
                 </div>
-                <div className="text-xs font-mono mt-1" style={{ color: colors.text }}>
+                <div className="text-xs font-mono mt-1">
                   bg: {colors.background} | border: {colors.border}
+                </div>
+                <div className="mt-2">
+                  <svg width="100%" height="32" viewBox="0 0 200 32" role="img" aria-label={`${category} example`}>
+                    <rect x="0" y="0" width="200" height="32" fill={colors.background} stroke={colors.border} />
+                  </svg>
                 </div>
               </div>
             ))}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCircle } from 'lucide-react';
 
 export interface MakeActiveButtonProps {
   /** Called when the button is clicked */
@@ -36,16 +37,7 @@ export const MakeActiveButton: React.FC<MakeActiveButtonProps> = ({
   fullWidth = true,
   icon
 }) => {
-  const defaultIcon = (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        strokeWidth={2} 
-        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
-      />
-    </svg>
-  );
+  const defaultIcon = (<CheckCircle className="w-4 h-4" aria-hidden="true" />);
 
   const baseClasses = `px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-900 
     rounded-md transition-colors border border-green-300 hover:border-green-500 font-medium 

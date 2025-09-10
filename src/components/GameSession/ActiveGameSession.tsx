@@ -649,7 +649,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
           
           {/* Hidden controller just to generate content - always include it but hide from view */}
-          <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
+          <div aria-hidden="true" className="hidden h-0 overflow-hidden">
             <NarrativeController
               key={`generator-${controllerKey}`}
               worldId={worldId}

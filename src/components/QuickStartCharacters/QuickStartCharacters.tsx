@@ -16,7 +16,7 @@ import { LoadingSkeleton } from '@/components/ui/LoadingState/LoadingState';
 import { ErrorDisplay } from '@/components/ui/ErrorDisplay/ErrorDisplay';
 import { ActiveStateCard } from '@/components/shared/cards/ActiveStateCard';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles, Plus } from 'lucide-react';
 
 const SELECTION_DELAY_MS = 300;
 
@@ -92,7 +92,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (loading && archetypes.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
           <p className="text-lg text-gray-700 mb-1">
@@ -112,7 +112,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
         </div>
@@ -130,7 +130,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Quick Start Characters</h2>
@@ -233,7 +233,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               >
                 {selectedArchetype === archetype.id ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
                     Starting Game...
                   </>
                 ) : (
@@ -256,11 +256,9 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               variant: 'outline',
               size: 'lg',
               icon: loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
               ),
               disabled: loading
             },
@@ -270,9 +268,7 @@ export const QuickStartCharacters = React.memo(function QuickStartCharacters({
               variant: 'ghost',
               size: 'lg',
               icon: (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+                <Plus className="w-4 h-4" aria-hidden="true" />
               )
             }
           ]}

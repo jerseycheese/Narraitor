@@ -9,6 +9,7 @@ import { WorldSelectionStep } from './steps/WorldSelectionStep';
 import { CharacterSelectionStep } from './steps/CharacterSelectionStep';
 import { GameReadyStep } from './steps/GameReadyStep';
 import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 export interface GameStartWizardProps {
   initialWorldId?: string;
@@ -130,7 +131,7 @@ export function GameStartWizard({
               className="text-gray-500 hover:text-gray-700 h-8 w-8"
               aria-label="Cancel"
             >
-              ✕
+              <X className="w-4 h-4" aria-hidden="true" />
             </Button>
           )}
         </div>
@@ -139,11 +140,10 @@ export function GameStartWizard({
             Step {wizard.state.currentStep + 1} of {gameStartSteps.length}: {currentStepConfig.label}
           </span>
         </div>
-        <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-blue-500 transition-all duration-300"
-            style={{ width: `${((wizard.state.currentStep + 1) / gameStartSteps.length) * 100}%` }}
-          />
+        <div className="mt-2 grid grid-cols-3 gap-0.5 h-2">
+          {Array.from({ length: gameStartSteps.length }).map((_, i) => (
+            <div key={i} className={`${i < (wizard.state.currentStep + 1) ? 'bg-blue-500' : 'bg-gray-200'} rounded-full`} />
+          ))}
         </div>
       </div>
 

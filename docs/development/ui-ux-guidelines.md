@@ -45,10 +45,12 @@ The application includes these template themes:
 ## Component Design
 
 ### Interactive Elements
-- **Buttons**: Clear states (default, hover, active, disabled)
-- **Inputs**: Consistent styling with clear focus states
-- **Selectors**: Accessible dropdown and radio/checkbox inputs
-- **Cards**: Consistent formatting for content containers
+- **Buttons**: Clear states (default, hover, active, disabled) with proper ARIA attributes
+- **Inputs**: Consistent styling with clear focus states and proper labeling
+- **Selectors**: Accessible dropdown and radio/checkbox inputs with keyboard navigation
+- **Cards**: Consistent formatting for content containers using semantic HTML
+- **Collapsible Sections**: Proper `aria-expanded` and `aria-controls` for expandable content
+- **Alerts & Warnings**: Use `role="alert"` and `aria-live` for dynamic notifications
 
 ### Critical UI Patterns
 - **Forms**: Consistent layout with inline validation
@@ -82,10 +84,12 @@ The application includes these template themes:
 - Keyboard shortcuts for common actions
 
 ### Screen Reader Support
-- Semantic HTML structure
-- ARIA labels and roles where needed
-- Meaningful alt text for images
+- Semantic HTML structure with proper headings and landmarks
+- ARIA labels, roles, and properties for complex interactions
+- Meaningful alt text for images and icons
 - Live region announcements for dynamic content
+- Descriptive `aria-expanded`, `aria-controls`, and `aria-labelledby` attributes
+- Proper form labeling and error associations
 
 ### Visual Accessibility
 - Minimum contrast ratio of 4.5:1 for text

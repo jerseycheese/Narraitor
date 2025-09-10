@@ -38,6 +38,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import { AlertTriangle, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import { formatDateTime } from '@/lib/utils';
 
@@ -167,13 +168,7 @@ export function RecoveryNotification({
             aria-label="Close"
           >
             <span className="sr-only">Close</span>
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -181,10 +176,10 @@ export function RecoveryNotification({
           <p className="text-sm text-gray-700 mb-4">
             Found saved character creation progress from a previous session.
             {hasCurrentData && (
-              <span className="block mt-2 text-amber-500 font-medium">
-                <span aria-hidden="true">⚠️</span>
+              <span className="block mt-2 text-amber-500 font-medium inline-flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                 <span className="sr-only">Warning:</span>
-                {' '}Recovering will replace any current form data you&apos;ve entered.
+                <span>Recovering will replace any current form data you&apos;ve entered.</span>
               </span>
             )}
           </p>

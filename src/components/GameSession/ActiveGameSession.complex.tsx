@@ -17,6 +17,7 @@ import type { EndingType } from '@/types/narrative.types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { JournalModal } from './JournalModal';
 import { Button } from '@/components/ui/button';
+import { BookOpen } from 'lucide-react';
 
 interface ActiveGameSessionProps {
   worldId: string;
@@ -374,9 +375,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
               aria-label="Open journal to view your adventure entries"
               title="View your journal entries"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
               <span className="hidden sm:inline">Journal</span>
             </Button>
           </div>
@@ -396,7 +395,7 @@ const ActiveGameSession: React.FC<ActiveGameSessionProps> = ({
           {/* Note: Loading indicator is handled by NarrativeHistoryManager itself */}
           
           {/* Hidden controller just to generate content - always include it but hide from view */}
-          <div aria-hidden="true" style={{ display: 'none', height: 0, overflow: 'hidden' }}>
+          <div aria-hidden="true" className="hidden h-0 overflow-hidden">
             <NarrativeController
               key={`generator-${controllerKey}`}
               worldId={worldId}

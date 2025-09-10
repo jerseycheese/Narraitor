@@ -66,7 +66,7 @@ export default function PlayPage() {
 
   if (error) {
     return (
-      <PageLayout title="Game Session Error" maxWidth="4xl">
+      <PageLayout title="Game Session Error">
         <SectionError
           title="Failed to Start Game"
           message={error}
@@ -92,7 +92,7 @@ export default function PlayPage() {
 
   if (!currentSessionId) {
     return (
-      <PageLayout title="No Active Session" maxWidth="4xl">
+      <PageLayout title="No Active Session">
         <SectionError
           title="No Active Session"
           message="Unable to create or resume a game session."
@@ -121,7 +121,7 @@ export default function PlayPage() {
   );
 
   return (
-    <PageLayout title={pageTitle} description={pageDescription} maxWidth="7xl" className="pb-0" actions={saveAction}>
+    <PageLayout title={pageTitle} description={pageDescription} className="pb-0" actions={saveAction}>
       <GameSession worldId={currentWorldId!} />
     </PageLayout>
   );

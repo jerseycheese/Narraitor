@@ -1,4 +1,5 @@
 import React from 'react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type ErrorVariant = 'inline' | 'section' | 'page' | 'toast';
@@ -143,9 +144,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
               className="ml-4 text-gray-500 hover:text-gray-700"
               aria-label="Dismiss"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
         </div>

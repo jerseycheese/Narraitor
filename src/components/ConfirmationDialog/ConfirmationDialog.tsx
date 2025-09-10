@@ -83,13 +83,13 @@ export function ConfirmationDialog({
         aria-labelledby="confirmation-title"
         aria-describedby="confirmation-message"
       >
-        <DialogTitle
-          id="confirmation-title"
-          className={title ? "text-lg font-semibold" : "sr-only"}
-        >
-          {title || "Confirmation"}
-        </DialogTitle>
         <DialogHeader>
+          <DialogTitle
+            id="confirmation-title"
+            className={title ? "text-lg font-semibold" : "sr-only"}
+          >
+            {title || "Confirmation"}
+          </DialogTitle>
         </DialogHeader>
         
         <DialogDescription

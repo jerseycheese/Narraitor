@@ -16,6 +16,7 @@ const RecentPagesDropdown = dynamic(() => import('./RecentPagesDropdown').then(m
 import { MobileNavigationMenu } from './MobileNavigationMenu';
 import { LogoIcon, LogoText } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { X, Menu, Globe, ChevronDown, Check, Plus, Play } from 'lucide-react';
 
 /**
  * Navigation - Main application navigation component
@@ -124,13 +125,9 @@ export function Navigation() {
                   aria-expanded={isMenuOpen}
                 >
                   {isMenuOpen ? (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-6 h-6" aria-hidden="true" />
                   ) : (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
+                    <Menu className="w-6 h-6" aria-hidden="true" />
                   )}
                 </Button>
               )}
@@ -187,9 +184,7 @@ export function Navigation() {
                     variant="ghost"
                     className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-900 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md transition-colors h-auto"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Globe className="w-4 h-4" aria-hidden="true" />
                     <span className="hidden sm:inline">
                       {currentWorld ? currentWorld.name : 'Select World'}
                     </span>
@@ -198,9 +193,7 @@ export function Navigation() {
                         {worldCharacterCount}
                       </span>
                     )}
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <ChevronDown className="w-4 h-4" aria-hidden="true" />
                   </Button>
                   
                   {showWorldSwitcher && (
@@ -224,9 +217,7 @@ export function Navigation() {
                               <div className="text-sm text-gray-500">{world.genre} • {worldCharacters} characters</div>
                             </div>
                             {world.id === currentWorldId && (
-                              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
+                              <Check className="w-5 h-5 text-green-500" aria-hidden="true" />
                             )}
                           </Button>
                         );
@@ -238,9 +229,7 @@ export function Navigation() {
                           className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav"
                           onClick={() => setShowWorldSwitcher(false)}
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
+                          <Plus className="w-5 h-5" aria-hidden="true" />
                           Create a world
                         </Link>
                       </div>
@@ -262,10 +251,7 @@ export function Navigation() {
                     onClick={() => navigateWithLoading(`/worlds/${currentWorld.id}/play`, `Starting ${currentWorld.name}...`)}
                     className="hidden sm:inline-flex items-center bg-green-500 hover:bg-green-700 text-white text-sm font-medium"
                   >
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <Play className="w-4 h-4 mr-1" aria-hidden="true" />
                     Play
                   </Button>
                 ) : (!hasWorldsStore ? (

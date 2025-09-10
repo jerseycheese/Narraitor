@@ -45,16 +45,29 @@ export const CollapsibleSection = ({
   return (
     <div 
       data-testid="collapsible-section" 
-      className={`border rounded mb-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 ${className}`}
+      className={`border border-border rounded-md mb-3 bg-card shadow-sm ${className}`}
+      role="region"
+      aria-labelledby={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
       <div 
-        className="border-b p-2 flex justify-between items-center bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="border-b border-border p-3 flex justify-between items-center bg-muted cursor-pointer hover:bg-accent transition-colors"
         onClick={toggleExpanded}
         data-testid="collapsible-section-header"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleExpanded();
+          }
+        }}
+        aria-expanded={isExpanded}
+        aria-controls={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
       >
         <h3 
+          id={`section-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
           data-testid="collapsible-section-title"
-          className="font-medium text-sm text-gray-700 dark:text-gray-100 select-none"
+          className="font-semibold text-sm text-foreground select-none"
         >
           {title}
         </h3>
@@ -65,14 +78,17 @@ export const CollapsibleSection = ({
             toggleExpanded();
           }}
           aria-expanded={isExpanded}
-          className="focus-visible text-base font-bold ml-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded border border-gray-300 dark:border-gray-500 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors"
+          aria-label={isExpanded ? `Collapse ${title}` : `Expand ${title}`}
+          className="text-base font-bold ml-2 bg-primary text-primary-foreground px-3 py-1 rounded-md border border-primary hover:bg-primary/90 focus:ring-2 focus:ring-ring focus:outline-none transition-colors"
         >
           {isExpanded ? '−' : '+'}
         </button>
       </div>
       <div 
+        id={`section-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
         data-testid="collapsible-section-content"
-        className={`p-2 ${isExpanded ? 'block' : 'hidden'}`}
+        className={`p-3 text-muted-foreground ${isExpanded ? 'block' : 'hidden'}`}
+        aria-hidden={!isExpanded}
       >
         {children}
       </div>

@@ -1,6 +1,7 @@
 // src/components/CharacterCreationWizard/steps/PortraitStep.tsx
 
 import React, { useState } from 'react';
+import { CheckCircle } from 'lucide-react';
 import { CharacterPortrait } from '@/components/CharacterPortrait';
 import { CharacterPortrait as CharacterPortraitType } from '@/types/character.types';
 // Removed direct AI client imports - using API routes instead
@@ -180,7 +181,10 @@ export function PortraitStep({ data, onUpdate, worldConfig }: PortraitStepProps)
 
         {portrait.type === 'ai-generated' && portrait.url && (
           <div className="text-center space-y-2">
-            <p className="text-sm text-green-500">✓ Portrait generated successfully</p>
+            <p className="text-sm text-green-500 inline-flex items-center gap-1">
+              <CheckCircle className="w-4 h-4" aria-hidden="true" />
+              Portrait generated successfully
+            </p>
             <div className="flex gap-2 justify-center">
               <button
                 type="button"

@@ -67,9 +67,9 @@ export const CharacterList: React.FC<CharacterListProps> = ({
                       }`}
                     >
                       {character.background.isKnownFigure ? (
-                        <><Star className="w-3 h-3 inline mr-1" />Known Figure</>
+                        <><Star className="w-3 h-3 inline mr-1" aria-hidden="true" />Known Figure</>
                       ) : (
-                        <><Plus className="w-3 h-3 inline mr-1" />Original</>
+                        <><Plus className="w-3 h-3 inline mr-1" aria-hidden="true" />Original</>
                       )}
                     </span>
                   )}

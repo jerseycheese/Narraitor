@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
+import { Button } from '@/components/ui/button';
 // Using API routes for secure AI operations - combines both approaches
 import { generateTestCharacter } from '@/lib/generators/characterGenerator';
 import { generateUniqueId } from '@/lib/utils/generateId';
@@ -698,57 +699,69 @@ export const TestDataGeneratorSection: React.FC = () => {
       <h3 className="font-bold text-sm">Test Data Generators</h3>
       
       <div className="space-y-2">
-        <button
+        <Button
           onClick={handleGenerateWorld}
-          className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="info"
           title="Creates diverse AI worlds: 33% original, 33% set in existing universes, 34% based on existing universes"
         >
           Generate Diverse AI World
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={handleGenerate5Worlds}
-          className="w-full px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="info"
           title="Creates 5 diverse AI worlds with mix of original, 'set in', and 'based on' types for comprehensive testing"
         >
           Generate 5 Diverse AI Worlds
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={handleGenerateCharacter}
-          className="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="success"
           disabled={!effectiveWorldId}
           title="Creates test character data and navigates to character creation form"
         >
           Generate & Fill Character Form
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={handleGenerate5Characters}
-          className="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="success"
           disabled={!effectiveWorldId}
           title="Creates 5 AI-generated characters directly in the selected world using smart character type selection based on world relationship"
         >
           Generate 5 Smart AI Characters for World
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={handleNavigateEmpty}
-          className="w-full px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="secondary"
           disabled={!effectiveWorldId}
           title="Navigate to empty character creation form"
         >
           Go to Empty Form
-        </button>
+        </Button>
         
-        <button
+        <Button
           onClick={handleDebugStorage}
-          className="w-full px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-700 text-sm transition-colors"
+          className="w-full"
+          size="sm"
+          variant="default"
           disabled={!effectiveWorldId}
           title="Check if test data exists in sessionStorage"
         >
           Debug: Check Storage
-        </button>
+        </Button>
       </div>
       
       <p className="text-xs text-gray-500">
@@ -761,45 +774,53 @@ export const TestDataGeneratorSection: React.FC = () => {
       <div className="border-t border-red-500 pt-4">
         <h4 className="font-bold text-sm text-red-500 mb-2">Destructive Operations</h4>
         <div className="space-y-2">
-          <button
+          <Button
             onClick={handleDeleteAllCharactersInWorld}
-            className="w-full px-3 py-2 bg-amber-500 text-white rounded hover:bg-amber-700 text-sm transition-colors"
+            className="w-full"
+            size="sm"
+            variant="warning"
             disabled={!effectiveWorldId}
             title={`Deletes all characters in ${effectiveWorldId ? worlds[effectiveWorldId]?.name : 'the selected world'}`}
           >
             Delete All Characters in {effectiveWorldId ? worlds[effectiveWorldId]?.name : 'World'}
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={handleDeleteAllWorlds}
-            className="w-full px-3 py-2 bg-red-500 text-white rounded hover:bg-red-700 text-sm transition-colors"
+            className="w-full"
+            size="sm"
+            variant="destructive"
             title="Deletes all worlds and their characters"
           >
             Delete All Worlds
-          </button>
+          </Button>
           
-          <button
+          <Button
             onClick={handleNukeEverything}
-            className="w-full px-3 py-2 bg-red-700 text-white rounded hover:bg-red-900 text-sm transition-colors border-2 border-red-500"
+            className="w-full border-2 border-red-500"
+            size="sm"
+            variant="destructive"
             title="NUCLEAR OPTION: Deletes absolutely everything"
           >
             NUKE EVERYTHING
-          </button>
+          </Button>
         </div>
-        <p className="text-xs text-red-300 mt-2">
+        <p className="text-xs text-red-600 mt-2">
           WARNING: These operations are permanent and cannot be undone!
         </p>
         
-        <button
+        <Button
           onClick={handleDebugPersistence}
-          className="w-full px-3 py-2 bg-blue-700 text-white rounded hover:bg-blue-700 text-sm transition-colors mt-2"
+          className="w-full mt-2"
+          size="sm"
+          variant="default"
           title="Debug current store state and persistence"
         >
           Debug Persistence State
-        </button>
+        </Button>
       </div>
       
-      <div className="text-xs text-gray-500 bg-gray-900 p-2 rounded">
+      <div className="text-xs text-gray-700 bg-gray-100 p-2 rounded border border-gray-300">
         <strong>Troubleshooting:</strong>
         <ul className="list-disc list-inside mt-1 space-y-1">
           <li>If form isn&apos;t pre-filled, try the debug page at <code>/dev/test-character-form</code></li>

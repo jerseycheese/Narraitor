@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useNavigationStore } from '@/state/navigationStore';
 import { useNavigationLoadingContext } from '@/components/shared/NavigationLoadingProvider';
 import { Button } from '@/components/ui/button';
+import { Clock, X, List } from 'lucide-react';
 import { formatRelativeTime, capitalize } from '@/lib/utils';
 
 interface RecentPagesDropdownProps {
@@ -130,9 +131,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
         aria-label="Recent pages"
         variant="ghost"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Clock className="w-4 h-4" aria-hidden="true" />
         <span className="hidden sm:inline">Recent</span>
         <span className="text-xs bg-gray-700 px-2 py-0.5 rounded-full">
           {recentPages.length}
@@ -181,9 +180,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                   variant="ghost"
                   size="icon"
                 >
-                  <svg className="w-4 h-4 text-gray-500 hover:text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4 text-gray-500 hover:text-gray-700" aria-hidden="true" />
                 </Button>
               </div>
               
@@ -200,9 +197,7 @@ export function RecentPagesDropdown({ className = '' }: RecentPagesDropdownProps
                 className="w-full text-left px-4 py-3 hover:bg-gray-100 transition-colors flex items-center gap-2 text-link-nav text-sm"
                 onClick={() => setShowRecentPages(false)}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+                <List className="w-4 h-4" aria-hidden="true" />
                 View all recent pages
               </Link>
             </div>

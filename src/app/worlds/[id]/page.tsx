@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Play } from 'lucide-react';
 import { useWorldStore } from '@/state/worldStore';
 import { useCharacterStore, type Character } from '@/state/characterStore';
 import { WorldDetailsDisplay } from '@/components/world/WorldDetailsDisplay';
@@ -84,10 +85,7 @@ export default function WorldViewPage() {
       onClick: handlePlayInWorld,
       variant: 'success' as const,
       icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Play className="w-4 h-4" aria-hidden="true" />
       )
     }
   ];

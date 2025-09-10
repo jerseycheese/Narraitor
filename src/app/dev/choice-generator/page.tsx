@@ -185,7 +185,7 @@ export default function ChoiceGeneratorTestPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6">Choice Generator Test Harness</h2>
+      <h1 className="text-2xl font-bold mb-6">Choice Generator Test Harness</h1>
       
       <div className="mb-8 p-4 bg-gray-100 rounded">
         <h2 className="text-xl font-bold mb-2">World Settings</h2>
