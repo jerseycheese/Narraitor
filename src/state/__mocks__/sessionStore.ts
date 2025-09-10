@@ -6,6 +6,7 @@ export const useSessionStore = jest.fn((selector) => {
     shouldShowOnboarding: jest.fn().mockReturnValue(false),
     onboardingCompleted: true,
     setOnboardingCompleted: jest.fn(),
+    fixExistingSessionNarrativeCounts: jest.fn(),
   };
   
   // If selector is provided, call it with the mock state
@@ -25,6 +26,7 @@ const mockSessionStore = {
     shouldShowOnboarding: jest.fn().mockReturnValue(false),
     onboardingCompleted: true,
     setOnboardingCompleted: jest.fn(),
+    fixExistingSessionNarrativeCounts: jest.fn(),
   })),
   setState: jest.fn(),
   subscribe: jest.fn(),
