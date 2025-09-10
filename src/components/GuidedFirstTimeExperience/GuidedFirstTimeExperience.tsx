@@ -12,6 +12,7 @@ import { GENRES } from '@/lib/constants/genres';
 import { generateUniqueId } from '@/lib/utils/generateId';
 import { getResponsivePlaceholder, RESPONSIVE_PLACEHOLDERS } from '@/lib/utils/responsivePlaceholder';
 import { WorldTypeSelector, WorldTypeData, convertToGenerationParams, validateWorldTypeData } from '@/components/shared/WorldTypeSelector';
+import { Globe, Users, Play } from 'lucide-react';
 
 const GUIDED_STEPS = [
   { id: 'welcome', label: 'Welcome' },
@@ -193,12 +194,46 @@ export function GuidedFirstTimeExperience() {
         <p className="text-lg text-gray-700 mb-6">
           Create a world and start a story
         </p>
-        <div className="bg-blue-50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-blue-900">
-            Let&apos;s guide you through creating your first world in just 2 steps, then create your character.
-          </p>
-        </div>
       </div>
+      
+      {/* How it Works */}
+      <section className="max-w-2xl mx-auto space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6" role="list" aria-label="Steps to get started">
+          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+            {/* Background Icon */}
+            <Globe className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+            <div className="relative z-10">
+              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">1</div>
+              <h4 className="text-lg font-semibold mb-2">Build Your World</h4>
+              <p className="text-sm text-muted-foreground">
+                Create or generate unique worlds with custom rules and settings
+              </p>
+            </div>
+          </div>
+          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+            {/* Background Icon */}
+            <Users className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+            <div className="relative z-10">
+              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">2</div>
+              <h4 className="text-lg font-semibold mb-2">Create Characters</h4>
+              <p className="text-sm text-muted-foreground">
+                Design or generate playable characters that fit your world
+              </p>
+            </div>
+          </div>
+          <div className="bg-background rounded-lg border p-6 shadow-sm relative overflow-hidden" role="listitem">
+            {/* Background Icon */}
+            <Play className="absolute inset-0 w-4/5 h-4/5 text-primary opacity-[0.07] m-auto" aria-hidden="true" />
+            <div className="relative z-10">
+              <div className="text-3xl font-bold text-primary mb-3" aria-hidden="true">3</div>
+              <h4 className="text-lg font-semibold mb-2">Start Playing</h4>
+              <p className="text-sm text-muted-foreground">
+                Make choices and shape your story
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   ), []);
 
@@ -346,32 +381,12 @@ export function GuidedFirstTimeExperience() {
   }
 
   return (
-    <WizardContainer title={
-      <div className="text-center">
-        <div>First time?</div>
-        <div className="text-sm font-normal text-gray-700">Quick start:</div>
-      </div>
-    }>
+    <WizardContainer title="First time?">
       <div className="space-y-8">
-        <WizardProgress 
-          steps={GUIDED_STEPS} 
-          currentStep={wizard.currentStep}
-        />
-        
-        <div className="text-center text-sm text-gray-500 mb-6">
-          Step {wizard.currentStep + 1} of {GUIDED_STEPS.length}
-        </div>
         
         {renderCurrentStep()}
         
-        <div className="flex justify-between items-center pt-6">
-          <button
-            onClick={wizard.handlers.handleCancel}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
-          >
-            Skip
-          </button>
-          
+        <div className="flex justify-center items-center pt-6">
           <div className="flex gap-3">
             {!wizard.isFirstStep && (
               <button
@@ -400,6 +415,16 @@ export function GuidedFirstTimeExperience() {
               </button>
             )}
           </div>
+        </div>
+        
+        {/* Skip option */}
+        <div className="text-center">
+          <button
+            onClick={wizard.handlers.handleCancel}
+            className="text-sm text-gray-500 hover:text-gray-700 underline"
+          >
+            Skip for now
+          </button>
         </div>
         
         {wizard.currentError && (
