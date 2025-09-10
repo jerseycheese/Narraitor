@@ -8,7 +8,7 @@ export default function HomePage() {
   
   return (
     <main className="py-6 sm:py-12">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Visually hidden H1 for accessibility */}
         <h1 className="sr-only">Narraitor - AI-Powered Interactive Storytelling Game</h1>
         
