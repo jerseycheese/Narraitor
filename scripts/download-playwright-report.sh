@@ -21,11 +21,11 @@ fi
 
 echo "📋 Checking PR #$PR_NUMBER for failed Playwright tests..."
 
-# Get the failed Visual Regression Tests run ID
-RUN_ID=$(gh pr view $PR_NUMBER --json statusCheckRollup | jq -r '.statusCheckRollup[] | select(.name == "Visual Regression Tests" and .conclusion == "FAILURE") | .detailsUrl' | head -1 | sed 's|.*/runs/||' | sed 's|/job/.*||')
+# Get the failed E2E Tests (which include visual regression tests) run ID
+RUN_ID=$(gh pr view $PR_NUMBER --json statusCheckRollup | jq -r '.statusCheckRollup[] | select(.name == "E2E Tests" and .conclusion == "FAILURE") | .detailsUrl' | head -1 | sed 's|.*/runs/||' | sed 's|/job/.*||')
 
 if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
-    echo "❌ No failed Visual Regression Tests found for PR #$PR_NUMBER"
+    echo "❌ No failed E2E Tests found for PR #$PR_NUMBER"
     echo "   Either tests passed or haven't run yet."
     exit 1
 fi
@@ -41,6 +41,12 @@ fi
 if [ -d "playwright-test-results" ]; then
     echo "🧹 Cleaning up existing test results..."
     rm -rf playwright-test-results
+fi
+
+# Clean up any existing test result folders
+if ls *-chromium* 1> /dev/null 2>&1; then
+    echo "🧹 Cleaning up existing test result folders..."
+    rm -rf *-chromium*
 fi
 
 if [ -d "data" ]; then
@@ -59,47 +65,37 @@ if [ -f "index.html" ]; then
 fi
 
 # Download the artifacts
-echo "📦 Downloading HTML report..."
-gh run download $RUN_ID --name playwright-html-report
+echo "📦 Downloading test results..."
+gh run download $RUN_ID --name e2e-test-failures
 
-# Also download test results if available (contains actual vs expected images)
-echo "📦 Downloading test results (images and diffs)..."
-gh run download $RUN_ID --name playwright-test-results 2>/dev/null || echo "ℹ️  Test results artifact not available"
+# Note: e2e-test-failures contains all the test results, images and diffs
 
 # Check what was downloaded and organize it
-if [ -f "index.html" ] && [ -d "data" ]; then
+# The artifacts are downloaded as individual folders in the current directory
+TEST_FOLDERS=$(ls -d *-chromium* 2>/dev/null | wc -l | xargs)
+if [ "$TEST_FOLDERS" -gt 0 ]; then
     # Create organized directory structure
-    mkdir -p playwright-html-report
-    mv index.html data trace playwright-html-report/ 2>/dev/null || true
+    mkdir -p playwright-test-results
+    mv *-chromium* playwright-test-results/ 2>/dev/null || true
     
-    # Move test result directories if they exist
-    for dir in basic-*; do
-        if [ -d "$dir" ]; then
-            mkdir -p playwright-test-results
-            mv "$dir" playwright-test-results/ 2>/dev/null || true
-        fi
-    done
-    
-    echo "✅ Downloaded and organized artifacts successfully!"
-    echo "📊 HTML Report: playwright-html-report/"
-    if [ -d "playwright-test-results" ]; then
-        echo "🖼️  Test Images: playwright-test-results/ (actual, expected, diffs)"
-    fi
-    
-    echo "🌐 Opening HTML report..."
-    
-    # Open the report in default browser
-    if command -v open >/dev/null 2>&1; then
-        open playwright-html-report/index.html
-    elif command -v xdg-open >/dev/null 2>&1; then
-        xdg-open playwright-html-report/index.html
-    else
-        echo "📂 Manual: Open playwright-html-report/index.html in your browser"
+    echo "✅ Downloaded test results successfully!"
+    echo "🖼️  Test Results: playwright-test-results/ (contains actual, expected, diff images and videos)"
+    echo ""
+    echo "📁 Test result folders:"
+    ls -1 playwright-test-results/ | head -10
+    if [ $(ls -1 playwright-test-results/ | wc -l) -gt 10 ]; then
+        echo "... and $(( $(ls -1 playwright-test-results/ | wc -l) - 10 )) more"
     fi
     
     echo ""
+    echo "💡 To view individual test failures:"
+    echo "   • Open any folder in playwright-test-results/"
+    echo "   • View *-diff.png to see visual differences"
+    echo "   • Compare *-actual.png vs *-expected.png"
+    echo "   • Watch video.webm to see test execution"
+    echo ""
     echo "🎯 Files downloaded:"
-    echo "   📊 Interactive Report: $(pwd)/playwright-html-report/index.html"
+    echo "   📁 Test Results: $(pwd)/playwright-test-results/"
     if [ -d "playwright-test-results" ]; then
         echo "   🖼️  Visual Diffs: $(pwd)/playwright-test-results/"
     fi
